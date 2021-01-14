@@ -3,7 +3,11 @@
 
 name: Deploy
 
-on: push
+on:
+  workflow_run:
+    workflows: ["QA"]
+    types:
+      - completed
 
 jobs:
   build-and-deploy:
@@ -24,7 +28,7 @@ jobs:
           cache-name: cache-node-modules
         with:
           path: node_modules
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
@@ -35,3 +39,4 @@ jobs:
         
       - name: Build
         run: yarn build
+      
