@@ -3,16 +3,11 @@
 
 name: Deploy
 
-on:
-  workflow_run:
-    workflows: ["QA"]
-    types:
-      - completed
+on: push
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest 
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
