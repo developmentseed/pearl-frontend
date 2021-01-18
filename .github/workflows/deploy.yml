@@ -8,6 +8,7 @@ env:
   STORAGE_ACCOUNT_NAME: lulc
   CDN_PROFILE_NAME: lulc
   CDN_ENDPOINT: https://lulcstaging.azureedge.net
+  RESOURCE_GROUP: lulcStaging
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest 
@@ -48,14 +49,14 @@ jobs:
         with:
           azcliversion: 2.0.72
           inlineScript: |
-              az storage blob upload-batch --account-name {{ env.STORAGE_ACCOUNT_NAME }} -d '$web' -s ./dist
+              az storage blob upload-batch --account-name $STORAGE_ACCOUNT_NAME -d '$web' -s ./dist
 
       - name: Purge CDN endpoint
         uses: azure/CLI@v1
         with:
           azcliversion: 2.0.72
           inlineScript: |
-            az cdn endpoint purge --content-paths  "/*" --profile-name {{ env.CDN_ENDPOINT }} --name {{ env.CDN_ENDPOINT }} --resource-group "RESOURCE_GROUP"
+            az cdn endpoint purge --content-paths  "/*" --profile-name $CDN_ENDPOINT --name $CDN_ENDPOINT --resource-group $RESOURCE_GROUP
             
       - name: Azure Logout
         run: az logout
