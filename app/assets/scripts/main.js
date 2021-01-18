@@ -16,7 +16,8 @@ function Root() {
   return (
     <ThemeProvider theme={{}}>
       <GlobalStyles />
-      <p>Staging website for Microsoft LULC.</p>
+      <h1>Microsoft LULC</h1>
+      <p>AI assisted LULC</p>
     </ThemeProvider>
   );
 }
