@@ -3,7 +3,13 @@
 
 name: Deploy
 
-on: push
+on:
+  workflow_run:
+    workflows: ["QA"]
+    types:
+      - completed
+    branches: [develop] 
+
 env:
   STORAGE_ACCOUNT_NAME: lulc
   CDN_PROFILE_NAME: lulc
