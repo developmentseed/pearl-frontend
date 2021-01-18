@@ -7,7 +7,7 @@ on: push
 env:
   STORAGE_ACCOUNT_NAME: lulc
   CDN_PROFILE_NAME: lulc
-  CDN_ENDPOINT: https://lulcstaging.azureedge.net
+  CDN_ENDPOINT: lulcstaging.azureedge.net
   RESOURCE_GROUP: lulcStaging
 jobs:
   build-and-deploy:
