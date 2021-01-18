@@ -16,7 +16,7 @@ function Root() {
   return (
     <ThemeProvider theme={{}}>
       <GlobalStyles />
-      <p>Hello from Starter</p>
+      <p>Staging website for Microsoft LULC.</p>
     </ThemeProvider>
   );
 }
