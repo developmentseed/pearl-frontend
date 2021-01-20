@@ -112,3 +112,4 @@ temp
 tmp
 .tmp
 dist
+cypress/**/*.mp4
