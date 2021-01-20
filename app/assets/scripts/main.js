@@ -1,15 +1,21 @@
+import '@babel/polyfill';
 import React, { useEffect } from 'react';
-import { ThemeProvider } from 'styled-components';
+import { DevseedUiThemeProvider } from '@devseed-ui/theme-provider';
+
 import { render } from 'react-dom';
 import GlobalStyles from './styles/global';
 import ErrorBoundary from './fatal-error-boundary';
 import { Router, Route, Switch } from 'react-router-dom';
 import history from './history';
 
+import theme from './styles/theme';
+
 import Home from './components/home';
 import Explore from './components/explore';
 import About from './components/about';
 import UhOh from './components/uhoh';
+
+import { GlobalContextProvider } from './context/global';
 
 // Root component.
 function Root() {
@@ -21,19 +27,21 @@ function Root() {
   }, []);
 
   return (
-    <Router history={history}>
-      <ThemeProvider theme={{}}>
-        <ErrorBoundary>
-          <GlobalStyles />
-          <Switch>
-            <Route exact path='/' component={Home} />
-            <Route exact path='/explore' component={Explore} />
-            <Route path='/about' component={About} />
-            <Route path='*' component={UhOh} />
-          </Switch>
-        </ErrorBoundary>
-      </ThemeProvider>
-    </Router>
+    <ErrorBoundary>
+      <Router history={history}>
+        <DevseedUiThemeProvider theme={theme.main}>
+          <GlobalContextProvider>
+            <GlobalStyles />
+            <Switch>
+              <Route exact path='/' component={Home} />
+              <Route exact path='/explore' component={Explore} />
+              <Route path='/about' component={About} />
+              <Route path='*' component={UhOh} />
+            </Switch>
+          </GlobalContextProvider>
+        </DevseedUiThemeProvider>
+      </Router>
+    </ErrorBoundary>
   );
 }
 

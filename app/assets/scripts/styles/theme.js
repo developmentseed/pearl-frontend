@@ -2,10 +2,11 @@ import { rgba } from 'polished';
 
 let color = {
   baseLight: '#FFFFFF',
-  baseDark: '#323232', // "Black"
-  primary: '#00264C', // Ocean Blue
-  secondary: '#2C3E50', // Midnight Blue
-  tertiary: '#673285', // Royal Purple
+  baseDark: '#443F3F',
+  primary: '#CF3F02',
+  secondary: '#E2C044',
+  tertiary: '#4DA167',
+  quaternary: '#3AB795',
 };
 
 color = {
@@ -14,25 +15,26 @@ color = {
   background: color.baseLight,
   surface: color.baseLight,
   link: color.primary,
-  danger: '#B3241C', // Red
-  success: '#189C54', // Dark Green
-  warning: '#F39C12', // Yellow
+  danger: color.primary,
+  warning: color.secondary,
+  success: color.tertiary,
   info: color.primary,
 };
 
 color = {
   ...color,
-  baseAlphaA: rgba(color.base, 0.04),
-  baseAlphaB: rgba(color.base, 0.08),
-  baseAlphaC: rgba(color.base, 0.16),
-  baseAlphaD: rgba(color.base, 0.32),
-  silk: `radial-gradient(farthest-side, ${color.surface}, ${rgba(
-    color.surface,
-    0.64
+  baseAlphaA: rgba(color.base, 0.02),
+  baseAlphaB: rgba(color.base, 0.04),
+  baseAlphaC: rgba(color.base, 0.08),
+  baseAlphaD: rgba(color.base, 0.16),
+  baseAlphaE: rgba(color.base, 0.32),
+  silkLight: `radial-gradient(farthest-side, ${color.baseLight}, ${rgba(
+    color.baseLight,
+    0.64,
   )})`,
-  darkSilk: `radial-gradient(farthest-side, ${color.baseDark}, ${rgba(
+  silkDark: `radial-gradient(farthest-side, ${color.baseDark}, ${rgba(
     color.baseDark,
-    0.64
+    0.64,
   )})`,
 };
 
@@ -42,25 +44,35 @@ const type = {
     size: '1rem',
     line: '1.5',
     color: color.base,
-    family: '"Source Sans Pro", sans-serif',
+    family: '"Open Sans", sans-serif',
     style: 'normal',
-    weight: 300,
+    settings: 'normal',
+    case: 'none',
     light: 300,
     regular: 400,
-    medium: 400,
+    medium: 600,
     bold: 700,
-    extrabold: 800,
+    weight: 300,
     antialiasing: true,
   },
   heading: {
-    family: '"Source Sans Pro", sans-serif',
+    family: '"Open Sans", sans-serif',
     style: 'normal',
-    weight: 700,
+    settings: 'normal',
+    case: 'none',
     light: 300,
     regular: 400,
-    medium: 400,
+    medium: 600,
     bold: 700,
-    extrabold: 800,
+    weight: 700,
+    textTransform: 'none',
+  },
+  button: {
+    family: '"Open Sans", sans-serif',
+    style: 'normal',
+    settings: 'normal',
+    case: 'none',
+    weight: 700,
   },
 };
 
@@ -76,43 +88,30 @@ const layout = {
   max: '1280px',
 };
 
+const boxShadow = {
+  inset: `inset 0px 0px 3px 0px ${color.baseAlphaA};`,
+  input: `0 -1px 1px 0 ${color.baseAlphaC}, 0 2px 6px 0 ${color.baseAlphaD};`,
+  elevationA: `0 0 4px 0 ${color.baseAlphaC}, 0 2px 2px 0 ${color.baseAlphaC};`,
+  elevationB: `0 0 4px 0 ${color.baseAlphaC}, 0 4px 4px 0 ${color.baseAlphaC};`,
+  elevationC: `0 0 4px 0 ${color.baseAlphaC}, 0 8px 12px 0 ${color.baseAlphaC};`,
+  elevationD: `0 0 4px 0 ${color.baseAlphaC}, 0 12px 24px 0 ${color.baseAlphaC};`,
+};
+
+const mediaRanges = {
+  xsmall: [null, 543],
+  small: [544, 767],
+  medium: [768, 991],
+  large: [992, 1199],
+  xlarge: [1216, null],
+};
+
 export default {
   main: {
     layout,
     color,
     type,
     shape,
-  },
-};
-
-/**
- * Media query ranges used by the media utility.
- * They're not exported with the main theme because the utility does not
- * build the media functions in runtime, needing the values beforehand.
- */
-export const mediaRanges = {
-  xsmall: [null, 543],
-  small: [544, 767],
-  medium: [768, 1023],
-  large: [1024, 1399],
-  xlarge: [1400, null],
-};
-
-export const indicatorGroupColors = {
-  economic: {
-    color: '#C0C0C0',
-    name: 'Grey',
-  },
-  'water-quality': {
-    color: '#154F8D',
-    name: 'Deep blue',
-  },
-  'air-quality': {
-    color: '#f2a73a',
-    name: 'Gold',
-  },
-  'greenhouse-gas': {
-    color: '#189C54',
-    name: 'Dark Green',
+    boxShadow,
+    mediaRanges,
   },
 };

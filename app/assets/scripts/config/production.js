@@ -4,5 +4,6 @@ module.exports = {
     environment: 'production',
     appTitle: 'MS LULC',
     appDescription: 'Microsoft Land Use/Land Classification project.',
+    restApiEndoint: 'http://localhost:2000',
   },
 };
