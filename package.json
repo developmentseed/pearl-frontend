@@ -94,11 +94,15 @@
   },
   "dependencies": {
     "gulp-replace": "^1.0.0",
+    "history": "^4.10.1",
     "lodash.defaultsdeep": "^4.6.1",
     "polished": "^4.0.3",
     "prop-types": "^15.7.2",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
+    "react-helmet": "^6.1.0",
+    "react-router": "^5.2.0",
+    "react-router-dom": "^5.2.0",
     "styled-components": "^5.2.1"
   }
 }
