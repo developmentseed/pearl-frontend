@@ -65,6 +65,22 @@ Compiles the javascript and launches the server making the site available at `ht
 The system will watch files and execute tasks whenever one of them changes.
 The site will automatically refresh since it is bundled with livereload.
 
+## Testing
+
+The app is using cypress to perform end-to-end testing. New tests should be added to `cypress/integrations/*.spec.js`. 
+
+To run tests using cypress gui:
+
+```sh
+yarn run cy:open
+```
+
+To run tests using in CLI:
+
+```sh
+yarn run cy:run
+```
+
 ## Deployment
 
 To prepare the app for deployment run:
