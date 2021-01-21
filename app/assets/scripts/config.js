@@ -22,6 +22,10 @@ import defaultsDeep from 'lodash.defaultsdeep';
 var configurations = require('./config/*.js', { mode: 'hash' });
 var config = configurations.production || {};
 
+if (process.env.NODE_ENV === 'testing') {
+  config = defaultsDeep(configurations.testing || {}, config);
+}
+
 if (process.env.NODE_ENV === 'staging') {
   config = defaultsDeep(configurations.staging, config);
 }
