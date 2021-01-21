@@ -98,9 +98,12 @@
     "watchify": "^3.11.1"
   },
   "dependencies": {
+    "@babel/polyfill": "^7.12.1",
+    "@devseed-ui/theme-provider": "^3.0.0-rc.0",
     "gulp-replace": "^1.0.0",
     "history": "^4.10.1",
     "lodash.defaultsdeep": "^4.6.1",
+    "lodash.get": "^4.4.2",
     "polished": "^4.0.3",
     "prop-types": "^15.7.2",
     "react": "^17.0.1",
