@@ -6,9 +6,6 @@ import {
   queryRestApiHealth,
 } from '../reducers/api';
 import config from '../config';
-import request from 'request-promise';
-
-const session = request.jar();
 
 const { restApiEndoint } = config;
 
@@ -33,38 +30,23 @@ export function GlobalContextProvider(props) {
   useEffect(() => {
     async function getWebsocketConnection() {
       try {
-        const res = await fetchJSON(`${restApiEndoint}/api/user`, {
+        await fetchJSON(`${restApiEndoint}/api/login`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          // credentials: 'include',
-          body: JSON.stringify(currentUser),
-        });
-        console.log(res);
-      } catch (error) {
-        console.log(error.message);
-      }
-
-      try {
-        const res = await fetchJSON(`${restApiEndoint}/api/login`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          // credentials: 'include',
+          credentials: 'include',
           body: JSON.stringify({
             username: currentUser.username,
             password: currentUser.password,
           }),
         });
-        console.log(res);
       } catch (error) {
         console.log(error.message);
       }
 
       try {
-        const res = await fetchJSON(`${restApiEndoint}/api/token`, {
+        await fetchJSON(`${restApiEndoint}/api/token`, {
           method: 'POST',
           credentials: 'include',
           headers: {
@@ -74,34 +56,9 @@ export function GlobalContextProvider(props) {
             name: 'Access Token',
           }),
         });
-        console.log(res);
       } catch (error) {
         console.log(error.message);
       }
-
-      // await request({
-      //   method: 'POST',
-      //   json: true,
-      //   url: `${restApiEndoint}/api/login`,
-      //   jar: session,
-      //   body: {
-      //     username: currentUser.username,
-      //     password: currentUser.password,
-      //   },
-      // });
-
-      // await request({
-      //   method: 'POST',
-      //   json: true,
-      //   jar: session,
-      //   url: `${restApiEndoint}/api/token`,
-      //   header: {
-
-      //   },
-      //   body: {
-      //     name: 'Access Token',
-      //   },
-      // });
     }
 
     const { isReady, hasError } = restApiHealth;
