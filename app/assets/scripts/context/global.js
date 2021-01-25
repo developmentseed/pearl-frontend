@@ -11,53 +11,111 @@ const { restApiEndoint } = config;
 
 const GlobalContext = createContext({});
 
+const currentUser = {
+  username: 'example',
+  email: 'example@example.com',
+  password: 'password123',
+};
+
+const currentModel = {
+  name: 'Example Model',
+  active: true,
+  model_type: 'keras_example',
+  model_finetunelayer: -2,
+  model_numparams: 563498,
+  model_inputshape: [100, 100, 4],
+  classes: [
+    { name: 'Water', color: '#0000FF' },
+    { name: 'Tree Canopy', color: '#008000' },
+    { name: 'Field', color: '#80FF80' },
+    { name: 'Built', color: '#806060' },
+  ],
+  meta: {},
+};
+
+/* eslint-disable no-console */
 export function GlobalContextProvider(props) {
   const [restApiHealth, dispatchRestApiStatus] = useReducer(
     createRestApiHealthReducer,
     initialApiRequestState
   );
 
-  const [currentUser] = useState({
-    username: 'example',
-    email: 'example@example.com',
-    password: 'password123',
-  });
-
   useEffect(() => {
     queryRestApiHealth()(dispatchRestApiStatus);
   }, []);
 
+  const [gpuInstance, setGpuInstance] = useState(null);
+
   useEffect(() => {
     async function getWebsocketConnection() {
+      // Create user
       try {
-        await fetchJSON(`${restApiEndoint}/api/login`, {
+        await fetchJSON(`${restApiEndoint}/api/user`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           credentials: 'include',
-          body: JSON.stringify({
-            username: currentUser.username,
-            password: currentUser.password,
-          }),
+          body: JSON.stringify(currentUser),
         });
       } catch (error) {
-        console.log(error.message);
+        // Ignore error if user already exists
+        if (error.message !== 'Cannot create duplicate user') {
+          console.log(error.message);
+        }
       }
 
+      // Sign in
+      await fetchJSON(`${restApiEndoint}/api/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          username: currentUser.username,
+          password: currentUser.password,
+        }),
+      });
+
+      // Create or get model with id=1
       try {
-        await fetchJSON(`${restApiEndoint}/api/token`, {
-          method: 'POST',
-          credentials: 'include',
+        await fetchJSON(`${restApiEndoint}/api/model/1`, {
+          method: 'GET',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            name: 'Access Token',
-          }),
+          credentials: 'include',
         });
       } catch (error) {
-        console.log(error.message);
+        if (error.statusCode === 404) {
+          await fetchJSON(`${restApiEndoint}/api/model`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify(currentModel),
+          });
+        }
+      }
+
+      // Get GPU instance
+      try {
+        const { body } = await fetchJSON(`${restApiEndoint}/api/instance`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify({
+            model_id: 1,
+          }),
+        });
+        setGpuInstance(body);
+      } catch (error) {
+        console.log('Unexpected error');
+        console.log(error);
       }
     }
 
@@ -65,7 +123,21 @@ export function GlobalContextProvider(props) {
     if (isReady() && !hasError()) {
       getWebsocketConnection();
     }
-  }, [restApiHealth, currentUser]);
+  }, [restApiHealth]);
+
+  useEffect(() => {
+    if (!gpuInstance || !gpuInstance.token) return;
+
+    const ws = new WebSocket(
+      config.websocketEndpoint + `?token=${gpuInstance.token}`
+    );
+
+    ws.addEventListener('open', () => {
+      console.log('ws opened.');
+      ws.close();
+    });
+    ws.addEventListener('close', () => console.log('ws closed.'));
+  }, [gpuInstance]);
 
   return (
     <>
