@@ -5,5 +5,6 @@ module.exports = {
     appTitle: 'MS LULC',
     appDescription: 'Microsoft Land Use/Land Classification project.',
     restApiEndoint: 'http://localhost:2000',
+    websocketEndpoint: 'ws://localhost:1999',
   },
 };

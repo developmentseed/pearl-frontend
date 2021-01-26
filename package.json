@@ -111,6 +111,7 @@
     "react-helmet": "^6.1.0",
     "react-router": "^5.2.0",
     "react-router-dom": "^5.2.0",
+    "request-promise": "^4.2.6",
     "styled-components": "^5.2.1"
   }
 }
