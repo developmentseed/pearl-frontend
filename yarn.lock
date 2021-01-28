@@ -2,6 +2,26 @@
 # yarn lockfile v1
 
 
+"@auth0/auth0-react@^1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@auth0/auth0-react/-/auth0-react-1.2.0.tgz#6d63a3aa618f610ba3a5c0f51d513907f62d1802"
+  integrity sha512-Gq6N4s3I/+B90Xz2JeUQUkulHef5m0FgfvMO2gew60tQYjkvWUtuwK9IOMs5xjp9PISQmdsMkpZoXmLESRb+9w==
+  dependencies:
+    "@auth0/auth0-spa-js" "^1.13.1"
+
+"@auth0/auth0-spa-js@^1.13.1":
+  version "1.13.6"
+  resolved "https://registry.yarnpkg.com/@auth0/auth0-spa-js/-/auth0-spa-js-1.13.6.tgz#3ad50e1a60467cd35ff3887edef67399bff98dfc"
+  integrity sha512-o+Mb0YXrasP364j+WB5hoALoL9sn8SZC0rDFLcyks6HUnQH/vzupdoWWFAIl1+EocAFB3CGMgSc425wpHNB4pw==
+  dependencies:
+    abortcontroller-polyfill "^1.5.0"
+    browser-tabs-lock "1.2.9"
+    core-js "^3.8.0"
+    es-cookie "^1.3.2"
+    fast-text-encoding "^1.0.3"
+    promise-polyfill "^8.2.0"
+    unfetch "^4.2.0"
+
 "@babel/code-frame@^7.0.0", "@babel/code-frame@^7.10.4", "@babel/code-frame@^7.12.11":
   version "7.12.11"
   resolved "https://registry.yarnpkg.com/@babel/code-frame/-/code-frame-7.12.11.tgz#f4ad435aa263db935b8f10f2c552d23fb716a63f"
@@ -917,6 +937,19 @@
     debug "^3.1.0"
     lodash.once "^4.1.1"
 
+"@devseed-ui/button@^3.0.0-rc.0":
+  version "3.0.0-rc.0"
+  resolved "https://registry.yarnpkg.com/@devseed-ui/button/-/button-3.0.0-rc.0.tgz#a9c86e322a3f213ac8a226e155eeda2200a806a8"
+  integrity sha512-sCblHDFi63e6O0qauyHJli8H2oZxl7AysTergEpb/Iiag1Fk2qJYsKBCqaG0zr0EiSHyiQYgl7BgxPY6QKAj7w==
+  dependencies:
+    "@devseed-ui/collecticons" "2.0.0-rc.0"
+    "@devseed-ui/theme-provider" "^3.0.0-rc.0"
+
+"@devseed-ui/collecticons@2.0.0-rc.0":
+  version "2.0.0-rc.0"
+  resolved "https://registry.yarnpkg.com/@devseed-ui/collecticons/-/collecticons-2.0.0-rc.0.tgz#27698f775859ca0eb77dd430a95084cf9327fa7a"
+  integrity sha512-OD5PwsR0VuzS1lSGbCB9B052Q0h8w2gNSG4C/XOOi+lChw45l8oE4rpmLmQWK90Y3IP2U+zAIwJ/y6kuy2XvbQ==
+
 "@devseed-ui/theme-provider@^3.0.0-rc.0":
   version "3.0.0-rc.0"
   resolved "https://registry.yarnpkg.com/@devseed-ui/theme-provider/-/theme-provider-3.0.0-rc.0.tgz#7e479897a217cb7ebbd05f471f8f491347d46954"
@@ -1102,6 +1135,11 @@ abbrev@1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/abbrev/-/abbrev-1.1.1.tgz#f8f2c887ad10bf67f634f005b6987fed3179aac8"
   integrity sha512-nne9/IiQ/hzIhY6pdDnbBtz7DjPTKrY00P/zvPSm5pOFkl6xuGrGnXn/VtTNNfNtAfZ9/1RtehkszU9qcTii0Q==
+
+abortcontroller-polyfill@^1.5.0:
+  version "1.7.1"
+  resolved "https://registry.yarnpkg.com/abortcontroller-polyfill/-/abortcontroller-polyfill-1.7.1.tgz#27084bac87d78a7224c8ee78135d05df430c2d2f"
+  integrity sha512-yml9NiDEH4M4p0G4AcPkg8AAa4mF3nfYF28VQxaokpO67j9H7gWgmsVWJ/f1Rn+PzsnDYvzJzWIQzCqDKRvWlA==
 
 accepts@~1.3.4:
   version "1.3.7"
@@ -1934,6 +1972,11 @@ browser-sync@^2.26.13:
     socket.io "2.1.1"
     ua-parser-js "^0.7.18"
     yargs "^15.4.1"
+
+browser-tabs-lock@1.2.9:
+  version "1.2.9"
+  resolved "https://registry.yarnpkg.com/browser-tabs-lock/-/browser-tabs-lock-1.2.9.tgz#fa9568471c49de1dbe311a6da95f86794bbe1fdf"
+  integrity sha512-cczryjv6i6kAfTWKhhNW3LWhFDwzPazEsNG9IG2n6AeYzPVb1tUCY3aqTKeFJL0rKUnfSXto7esjrqY3fz+ugA==
 
 browserify-aes@^1.0.0, browserify-aes@^1.0.4:
   version "1.2.0"
@@ -2812,6 +2855,11 @@ core-js@^2.6.5:
   resolved "https://registry.yarnpkg.com/core-js/-/core-js-2.6.12.tgz#d9333dfa7b065e347cc5682219d6f690859cc2ec"
   integrity sha512-Kb2wC0fvsWfQrgk8HU5lW6U/Lcs8+9aaYcy4ZFc6DDlo4nZ7n70dEgE5rtR0oG6ufKDUnrwfWL1mXR5ljDatrQ==
 
+core-js@^3.8.0:
+  version "3.8.3"
+  resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.8.3.tgz#c21906e1f14f3689f93abcc6e26883550dd92dd0"
+  integrity sha512-KPYXeVZYemC2TkNEkX/01I+7yd+nX3KddKwZ1Ww7SKWdI2wQprSgLmrTddT8nw92AjEklTsPBoSdQBhbI1bQ6Q==
+
 core-util-is@1.0.2, core-util-is@~1.0.0:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/core-util-is/-/core-util-is-1.0.2.tgz#b5fd54220aa2bc5ab57aab7140c940754503c1a7"
@@ -3669,6 +3717,11 @@ es-abstract@^1.18.0-next.1:
     string.prototype.trimend "^1.0.1"
     string.prototype.trimstart "^1.0.1"
 
+es-cookie@^1.3.2:
+  version "1.3.2"
+  resolved "https://registry.yarnpkg.com/es-cookie/-/es-cookie-1.3.2.tgz#80e831597f72a25721701bdcb21d990319acd831"
+  integrity sha512-UTlYYhXGLOy05P/vKVT2Ui7WtC7NiRzGtJyAKKn32g5Gvcjn7KAClLPWlipCtxIus934dFg9o9jXiBL0nP+t9Q==
+
 es-to-primitive@^1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/es-to-primitive/-/es-to-primitive-1.2.1.tgz#e55cd4c9cdc188bcefb03b366c736323fc5c898a"
@@ -4193,6 +4246,11 @@ fast-safe-stringify@^2.0.7:
   version "2.0.7"
   resolved "https://registry.yarnpkg.com/fast-safe-stringify/-/fast-safe-stringify-2.0.7.tgz#124aa885899261f68aedb42a7c080de9da608743"
   integrity sha512-Utm6CdzT+6xsDk2m8S6uL8VHxNwI6Jub+e9NYTcAms28T84pTa25GJQV9j0CY0N1rM8hK4x6grpF2BQf+2qwVA==
+
+fast-text-encoding@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/fast-text-encoding/-/fast-text-encoding-1.0.3.tgz#ec02ac8e01ab8a319af182dae2681213cfe9ce53"
+  integrity sha512-dtm4QZH9nZtcDt8qJiOH9fcQd1NAgi+K1O2DbE6GG1PPCK/BWfOH3idCTRQ4ImXRUOyopDEgDEnVEE7Y/2Wrig==
 
 fastest-levenshtein@^1.0.12:
   version "1.0.12"
@@ -7936,6 +7994,11 @@ progress@^2.0.0:
   resolved "https://registry.yarnpkg.com/progress/-/progress-2.0.3.tgz#7e8cf8d8f5b8f239c1bc68beb4eb78567d572ef8"
   integrity sha512-7PiHtLll5LdnKIMw100I+8xJXR5gW2QwWYkT6iJva0bXitZKa/XMrSbdmg3r2Xnaidz9Qumd0VPaMrZlF9V9sA==
 
+promise-polyfill@^8.2.0:
+  version "8.2.0"
+  resolved "https://registry.yarnpkg.com/promise-polyfill/-/promise-polyfill-8.2.0.tgz#367394726da7561457aba2133c9ceefbd6267da0"
+  integrity sha512-k/TC0mIcPVF6yHhUvwAp7cvL6I2fFV7TzF1DuGPI8mBh4QQazf36xCKEHKTZKRysEoTQoQdKyP25J8MPJp7j5g==
+
 prop-types@^15.6.2, prop-types@^15.7.2:
   version "15.7.2"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.7.2.tgz#52c41e75b8c87e72b9d9360e0206b99dcbffa6c5"
@@ -10147,6 +10210,11 @@ undertaker@^1.2.1:
     object.defaults "^1.0.0"
     object.reduce "^1.0.0"
     undertaker-registry "^1.0.0"
+
+unfetch@^4.2.0:
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/unfetch/-/unfetch-4.2.0.tgz#7e21b0ef7d363d8d9af0fb929a5555f6ef97a3be"
+  integrity sha512-F9p7yYCn6cIW9El1zi0HI6vqpeIvBsr3dSuRO6Xuppb1u5rXpCPmMvLSyECLhybr9isec8Ohl0hPekMVrEinDA==
 
 unicode-canonical-property-names-ecmascript@^1.0.4:
   version "1.0.4"

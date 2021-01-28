@@ -98,7 +98,9 @@
     "watchify": "^3.11.1"
   },
   "dependencies": {
+    "@auth0/auth0-react": "^1.2.0",
     "@babel/polyfill": "^7.12.1",
+    "@devseed-ui/button": "^3.0.0-rc.0",
     "@devseed-ui/theme-provider": "^3.0.0-rc.0",
     "gulp-replace": "^1.0.0",
     "history": "^4.10.1",

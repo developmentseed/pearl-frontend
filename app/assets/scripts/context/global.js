@@ -6,6 +6,7 @@ import {
   queryRestApiHealth,
 } from '../reducers/api';
 import config from '../config';
+import { useAuth0 } from '@auth0/auth0-react';
 
 const { restApiEndoint } = config;
 
@@ -35,6 +36,8 @@ const currentModel = {
 
 /* eslint-disable no-console */
 export function GlobalContextProvider(props) {
+  const { isAuthenticated, getAccessTokenSilently } = useAuth0();
+
   const [restApiHealth, dispatchRestApiStatus] = useReducer(
     createRestApiHealthReducer,
     initialApiRequestState
@@ -48,45 +51,20 @@ export function GlobalContextProvider(props) {
 
   useEffect(() => {
     async function getWebsocketConnection() {
-      // Create user
-      try {
-        await fetchJSON(`${restApiEndoint}/api/user`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          credentials: 'include',
-          body: JSON.stringify(currentUser),
-        });
-      } catch (error) {
-        // Ignore error if user already exists
-        if (error.message !== 'Cannot create duplicate user') {
-          console.log(error.message);
-        }
-      }
-
-      // Sign in
-      await fetchJSON(`${restApiEndoint}/api/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          username: currentUser.username,
-          password: currentUser.password,
-        }),
+      const token = await getAccessTokenSilently({
+        audience: 'http://localhost:2000',
       });
 
       // Create or get model with id=1
       try {
-        await fetchJSON(`${restApiEndoint}/api/model/1`, {
+        const res = await fetchJSON(`${restApiEndoint}/api/model/1`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
           },
-          credentials: 'include',
         });
+        console.log(res);
       } catch (error) {
         if (error.statusCode === 404) {
           await fetchJSON(`${restApiEndoint}/api/model`, {
@@ -106,8 +84,8 @@ export function GlobalContextProvider(props) {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
           },
-          credentials: 'include',
           body: JSON.stringify({
             model_id: 1,
           }),
@@ -120,10 +98,10 @@ export function GlobalContextProvider(props) {
     }
 
     const { isReady, hasError } = restApiHealth;
-    if (isReady() && !hasError()) {
+    if (isReady() && !hasError() && isAuthenticated) {
       getWebsocketConnection();
     }
-  }, [restApiHealth]);
+  }, [restApiHealth, isAuthenticated, getAccessTokenSilently]);
 
   useEffect(() => {
     if (!gpuInstance || !gpuInstance.token) return;
