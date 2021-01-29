@@ -8,28 +8,32 @@ import {
   antialiased,
   visuallyHidden,
   disabled,
-  visuallyDisabled
+  visuallyDisabled,
 } from '../helpers';
 import { themeVal } from '../utils/general';
 import collecticon from '../collecticons';
 
 // eslint-disable-next-line react/display-name
 const BaseButton = React.forwardRef(
-  ({
-    children,
-    element: El,
-    type,
-    // Props to remove before they get to the DOM.
-    active,
-    hideText,
-    size,
-    variation,
-    radius,
-    visuallyDisabled,
-    useIcon,
-    ...rest
-  },
-  ref) => {
+  (
+    {
+      children,
+      element: El,
+      type,
+      // Props to remove before they get to the DOM.
+      /* eslint-disable no-unused-vars */
+      active,
+      hideText,
+      size,
+      variation,
+      radius,
+      visuallyDisabled,
+      useIcon,
+      /* eslint-enable no-unused-vars */
+      ...rest
+    },
+    ref
+  ) => {
     const elType = El === 'button' ? type || 'button' : '';
     return (
       <El ref={ref} {...rest} type={elType}>
@@ -49,14 +53,14 @@ BaseButton.propTypes = {
   visuallyDisabled: T.bool,
   size: T.string,
   variation: T.string,
-  radius: T.string
+  radius: T.string,
 };
 
 BaseButton.defaultProps = {
   element: 'button',
   type: 'button',
   size: 'medium',
-  radius: 'rounded'
+  radius: 'rounded',
 };
 
 /**
@@ -116,11 +120,13 @@ const Button = styled(BaseButton)`
     outline: none; /* This causes usability problems. Needs fixing. */
   }
 
-  ${({ visuallyDisabled: vd }) => !vd && css`
-    &:hover {
-      opacity: 1;
-    }
-  `}
+  ${({ visuallyDisabled: vd }) =>
+    !vd &&
+    css`
+      &:hover {
+        opacity: 1;
+      }
+    `}
 
   ${({ active }) => (active ? '&,' : '')}
   /* stylelint-disable-line */
@@ -137,8 +143,12 @@ const Button = styled(BaseButton)`
     font-size: 1rem;
   }
 
-  &::before { margin-right: 0.375rem; }
-  &::after { margin-left: 0.375rem; }
+  &::before {
+    margin-right: 0.375rem;
+  }
+  &::after {
+    margin-left: 0.375rem;
+  }
 
   &::before,
   &::after,
@@ -148,8 +158,7 @@ const Button = styled(BaseButton)`
     line-height: inherit !important;
   }
 
-  ${props => renderIcon(props)}
-
+  ${(props) => renderIcon(props)}
 
   /* Checkbox/radio handling */
 
@@ -163,19 +172,20 @@ const Button = styled(BaseButton)`
   transition: background-color 0.24s ease 0s;
 
   /* Variations */
-  ${props => renderButtonVariation(props)}
+  ${(props) => renderButtonVariation(props)}
 
   /* Size */
-  ${props => renderButtonSize(props)}
+  ${(props) => renderButtonSize(props)}
 
   /* Radius */
-  ${props => renderButtonRadius(props)}
+  ${(props) => renderButtonRadius(props)}
 
   /* Box */
-  ${props => renderButtonBox(props)}
+  ${(props) => renderButtonBox(props)}
 
   /* Hide Text */
-  ${({ hideText }) => hideText &&
+  ${({ hideText }) =>
+    hideText &&
     css`
       padding-left: 0;
       padding-right: 0;
@@ -193,13 +203,15 @@ const Button = styled(BaseButton)`
     `}
 
   /* Disabled */
-  ${({ disabled: dis }) => dis &&
+  ${({ disabled: dis }) =>
+    dis &&
     css`
       ${disabled()}
     `}
 
   /* Visually Disabled */
-  ${({ visuallyDisabled: vd }) => vd &&
+  ${({ visuallyDisabled: vd }) =>
+    vd &&
     css`
       ${visuallyDisabled()}
     `}
@@ -211,7 +223,7 @@ Button.propTypes = {
   hideText: T.bool,
   variation: T.string,
   size: T.string,
-  radius: T.string
+  radius: T.string,
 };
 
 export default Button;
@@ -220,7 +232,7 @@ export default Button;
 //                                 HELPER FUNCTIONS
 // /////////////////////////////////////////////////////////////////////////////
 
-function renderIcon ({ useIcon }) {
+function renderIcon({ useIcon }) {
   if (!useIcon) return;
   const [icon, position] = Array.isArray(useIcon)
     ? useIcon
@@ -243,7 +255,7 @@ function renderIcon ({ useIcon }) {
  * @param {string} brightness The button brightness
  * @param {object} props The element props
  */
-function buttonVariationColors (color, style, brightness, { theme }) {
+function buttonVariationColors(color, style, brightness, { theme }) {
   let textColor = null;
   let bgColor = null;
   let bgColorHover = null;
@@ -301,7 +313,7 @@ function buttonVariationColors (color, style, brightness, { theme }) {
     bgColor,
     bgColorHover,
     bgColorActive,
-    shadowColor
+    shadowColor,
   };
 }
 
@@ -313,12 +325,13 @@ function buttonVariationColors (color, style, brightness, { theme }) {
  * @param {string} brightness The button brightness
  * @param {object} props The element props
  */
-export function buttonVariationBaseCss (color, style, brightness, { theme }) {
-  const {
-    textColor,
-    bgColor,
-    shadowColor
-  } = buttonVariationColors(color, style, brightness, { theme });
+export function buttonVariationBaseCss(color, style, brightness, { theme }) {
+  const { textColor, bgColor, shadowColor } = buttonVariationColors(
+    color,
+    style,
+    brightness,
+    { theme }
+  );
 
   return css`
     background-color: ${bgColor};
@@ -329,10 +342,10 @@ export function buttonVariationBaseCss (color, style, brightness, { theme }) {
     }
 
     ${shadowColor &&
-      css`
-        box-shadow: 0 -1px 1px 0 ${rgba(theme.color.base, 0.08)},
-          0 2px 6px 0 ${shadowColor};
-      `}
+    css`
+      box-shadow: 0 -1px 1px 0 ${rgba(theme.color.base, 0.08)},
+        0 2px 6px 0 ${shadowColor};
+    `}
   `;
 }
 
@@ -344,18 +357,20 @@ export function buttonVariationBaseCss (color, style, brightness, { theme }) {
  * @param {string} brightness The button brightness
  * @param {object} props The element props
  */
-export function buttonVariationActiveCss (color, style, brightness, { theme }) {
-  const {
-    bgColorActive,
-    shadowColor
-  } = buttonVariationColors(color, style, brightness, { theme });
+export function buttonVariationActiveCss(color, style, brightness, { theme }) {
+  const { bgColorActive, shadowColor } = buttonVariationColors(
+    color,
+    style,
+    brightness,
+    { theme }
+  );
 
   return css`
     background-color: ${bgColorActive};
     ${shadowColor &&
-      css`
-        box-shadow: inset 0 1px 2px 0 ${shadowColor};
-      `}
+    css`
+      box-shadow: inset 0 1px 2px 0 ${shadowColor};
+    `}
   `;
 }
 
@@ -367,10 +382,10 @@ export function buttonVariationActiveCss (color, style, brightness, { theme }) {
  * @param {string} brightness The button brightness
  * @param {object} props The element props
  */
-export function buttonVariationHoverCss (color, style, brightness, { theme }) {
-  const {
-    bgColorHover
-  } = buttonVariationColors(color, style, brightness, { theme });
+export function buttonVariationHoverCss(color, style, brightness, { theme }) {
+  const { bgColorHover } = buttonVariationColors(color, style, brightness, {
+    theme,
+  });
 
   return css`
     background-color: ${bgColorHover};
@@ -385,23 +400,25 @@ export function buttonVariationHoverCss (color, style, brightness, { theme }) {
  * @param {string} brightness The button brightness
  * @param {object} props The element props
  */
-export function buttonVariation (color, style, brightness, props) {
+export function buttonVariation(color, style, brightness, props) {
   return css`
     ${buttonVariationBaseCss(color, style, brightness, props)}
 
-    ${({ visuallyDisabled }) => !visuallyDisabled && css`
-      /* &.button--hover, */
-      &:hover {
-        ${buttonVariationHoverCss(color, style, brightness, props)}
-      }
+    ${({ visuallyDisabled }) =>
+      !visuallyDisabled &&
+      css`
+        /* &.button--hover, */
+        &:hover {
+          ${buttonVariationHoverCss(color, style, brightness, props)}
+        }
 
-      ${({ active }) => (active ? '&, &:hover,' : '')}
-      /* stylelint-disable-line */
+        ${({ active }) => (active ? '&, &:hover,' : '')}
+        /* stylelint-disable-line */
       &.active,
       &:active {
-        ${buttonVariationActiveCss(color, style, brightness, props)}
-      }
-    `}
+          ${buttonVariationActiveCss(color, style, brightness, props)}
+        }
+      `}
   `;
 }
 
@@ -410,7 +427,7 @@ export function buttonVariation (color, style, brightness, props) {
  *
  * @param {object} props The element props
  */
-function renderButtonVariation (props) {
+function renderButtonVariation(props) {
   const { primary, danger, success } = props.theme.color;
   const baseType = props.theme.type.base.color;
 
@@ -459,7 +476,7 @@ function renderButtonVariation (props) {
  *
  * @param {object} props The element props
  */
-function renderButtonRadius (props) {
+function renderButtonRadius(props) {
   switch (props.radius) {
     case 'ellipsoid':
       return css`
@@ -481,7 +498,7 @@ function renderButtonRadius (props) {
  *
  * @param {object} props The element props
  */
-function renderButtonBox (props) {
+function renderButtonBox(props) {
   switch (props.box) {
     case 'block':
       return css`
@@ -505,7 +522,7 @@ function renderButtonBox (props) {
  *
  * @param {object} props The element props
  */
-function renderButtonSize (props) {
+function renderButtonSize(props) {
   switch (props.size) {
     // Small (24px)
     case 'small':

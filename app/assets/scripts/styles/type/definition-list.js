@@ -5,7 +5,7 @@ import { themeVal } from '../utils/general';
 import { headingAlt } from './heading';
 
 const Dl = styled.dl`
-  font-feature-settings: "pnum" 0; /* Use proportional numbers */
+  font-feature-settings: 'pnum' 0; /* Use proportional numbers */
 
   dt {
     ${headingAlt()}

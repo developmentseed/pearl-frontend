@@ -12,7 +12,7 @@ import { css } from 'styled-components';
  */
 export const glsp = (...args) => {
   args = args.length ? args : [1];
-  const fns = args.map(m => multiply(themeVal('layout.space'), m));
+  const fns = args.map((m) => multiply(themeVal('layout.space'), m));
   // If the there's only one argument return in value format to be used by
   // other methods that need this to resolve to a number.
   if (fns.length === 1) return fns[0];

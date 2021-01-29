@@ -9,7 +9,7 @@ import {
 } from '../../styles/inpage';
 import Panel from '../common/panel';
 
-function Explore(props) {
+function Explore() {
   return (
     <>
       <Inpage isMapCentric>

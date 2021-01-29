@@ -3,7 +3,7 @@ import styled from 'styled-components';
 
 import config from '../../config';
 
-import { Link, NavLink } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import {
   themeVal,
   stylizeFunction,
@@ -16,10 +16,9 @@ import collecticon from '../../styles/collecticons';
 import { multiply } from '../../styles/utils/math';
 import media from '../../styles/utils/media-queries';
 
-
 const _rgba = stylizeFunction(rgba);
 
-const { appTitle, appShortTitle } = config;
+const { appTitle } = config;
 
 const PageHead = styled.header`
   background-color: ${themeVal('color.primary')};

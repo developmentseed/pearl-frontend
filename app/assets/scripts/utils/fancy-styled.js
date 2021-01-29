@@ -56,7 +56,7 @@ import styledComponents, { css } from 'styled-components';
  *
  * @param {mixed} element The react element.
  */
-function styled (element) {
+function styled(element) {
   // Create a function that receives a component constructor. This is needed
   // because styled-components creates components with several functions, like
   // the root, attrs() and withConfig().
@@ -69,7 +69,7 @@ function styled (element) {
       const fancyStyled = component(...templateLiteral);
       // To the styled component that was returned add a getStyles method which
       // accepts props to allow customization.
-      fancyStyled.getStyles = newProps => {
+      fancyStyled.getStyles = (newProps) => {
         // This this is supposed to be used as part of interpolation return
         // a function that accepts props
         //
@@ -83,7 +83,7 @@ function styled (element) {
         // css`
         //  ${props => Button.getStyles({ primary: true})(props)}
         // `;
-        return props => {
+        return (props) => {
           // Recursive function to render all the nested css declarations.
           // This happens when we have several uses of `css` within the style
           // definition. Absurd example:
@@ -98,23 +98,23 @@ function styled (element) {
           //     }
           //   `}
           // `;
-          const render = style => {
+          const render = (style) => {
             // If we're dealing with a style array, every entry needs to be
             // checked and maybe rendered.
             return Array.isArray(style)
-              ? style.map(styleLine => {
-                // A styled array may consist of strings, numbers and functions.
-                // Functions need to be rendered recursively because they may
-                // result in other functions.
-                return typeof styleLine === 'function'
-                  // Execute the function passing the merged props.
-                  ? render(styleLine({ ...props, ...newProps }))
-                  // No recursive render needed.
-                  : styleLine;
-              })
-              // If the current style line is not an array, there's no more
-              // rendering to do.
-              : style;
+              ? style.map((styleLine) => {
+                  // A styled array may consist of strings, numbers and functions.
+                  // Functions need to be rendered recursively because they may
+                  // result in other functions.
+                  return typeof styleLine === 'function'
+                    ? // Execute the function passing the merged props.
+                      render(styleLine({ ...props, ...newProps }))
+                    : // No recursive render needed.
+                      styleLine;
+                })
+              : // If the current style line is not an array, there's no more
+                // rendering to do.
+                style;
           };
           // Start the render process by flattening the template literal using
           // styled-components' css function.
@@ -135,14 +135,13 @@ function styled (element) {
   // However it also has some methods to modify the component that have to be
   // considered. The withConfig is mostly called by the styled-processor on
   // transpile time to add metadata.
-  theConstructor.withConfig = config =>
+  theConstructor.withConfig = (config) =>
     templateFn(component.withConfig(config));
   // Lastly the attrs method allows user to add default props to the components:
   // const Btn = styled(Button).attrs({ size: 'large' })`
   //   background: teal;
   // `
-  theConstructor.attrs = attrs =>
-    templateFn(component.attrs(attrs));
+  theConstructor.attrs = (attrs) => templateFn(component.attrs(attrs));
 
   return theConstructor;
 }
@@ -150,7 +149,7 @@ function styled (element) {
 // To ensure that the styled api stays consistent add the styled.element
 // capabilities to the function.
 // This will enable the use of styled.div, styled.a, etc...
-Object.keys(styledComponents).forEach(k => {
+Object.keys(styledComponents).forEach((k) => {
   styled[k] = styled(k);
 });
 

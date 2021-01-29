@@ -20,7 +20,7 @@ import { px, rem } from './general';
  *
  * @param {string} op Math operation to perform. Can be + - * /
  */
-const createMathOperation = op => (a, b) => (...args) => {
+const createMathOperation = (op) => (a, b) => (...args) => {
   a = typeof a === 'function' ? a(...args) : a;
   b = typeof b === 'function' ? b(...args) : b;
 
@@ -112,15 +112,11 @@ const rp2rp = (v, unit) => (...args) => {
   const srcVal = parseFloat(v);
 
   if (unit === 'px') {
-    return srcUnit === 'rem'
-      ? srcVal * parseFloat(rootV)
-      : px(srcVal);
+    return srcUnit === 'rem' ? srcVal * parseFloat(rootV) : px(srcVal);
   }
 
   if (unit === 'rem') {
-    return srcUnit === 'px'
-      ? srcVal / parseFloat(rootV)
-      : rem(srcVal);
+    return srcUnit === 'px' ? srcVal / parseFloat(rootV) : rem(srcVal);
   }
 
   // Invalid unit - return as is.

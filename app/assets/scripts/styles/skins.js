@@ -19,5 +19,6 @@ export const panelSkin = () => css`
 
 export const surfaceElevatedD = () => css`
   background-color: ${themeVal('color.surface')};
-  box-shadow: 0 0 0 1px ${themeVal('color.baseAlphaB')}, 0 0 16px 2px ${themeVal('color.baseAlphaB')};
+  box-shadow: 0 0 0 1px ${themeVal('color.baseAlphaB')},
+    0 0 16px 2px ${themeVal('color.baseAlphaB')};
 `;

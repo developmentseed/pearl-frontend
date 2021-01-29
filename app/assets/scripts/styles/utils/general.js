@@ -10,7 +10,7 @@ import get from 'lodash.get';
  *
  * @param {string} unit The unit to use
  */
-export const unitify = unit => v =>
+export const unitify = (unit) => (v) =>
   typeof v === 'function' ? (...args) => `${v(...args)}${unit}` : `${v}${unit}`;
 
 /**
@@ -47,7 +47,7 @@ export const px = unitify('px');
  *
  * @param {string} path The path to get from theme
  */
-export const themeVal = path => ({ theme }) => {
+export const themeVal = (path) => ({ theme }) => {
   const v = get(theme, path, undefined);
   if (v === undefined) {
     console.error( // eslint-disable-line
@@ -74,7 +74,9 @@ export const themeVal = path => ({ theme }) => {
  */
 export const stylizeFunction = (fn) => {
   return (...fnArgs) => (...props) => {
-    const mappedArgs = fnArgs.map(arg => typeof arg === 'function' ? arg(...props) : arg);
+    const mappedArgs = fnArgs.map((arg) =>
+      typeof arg === 'function' ? arg(...props) : arg
+    );
     return fn(...mappedArgs);
   };
 };
@@ -114,18 +116,22 @@ export const stylizeFunction = (fn) => {
  * @param {object} Comp The react component
  * @param {array} filterProps Props to filter off of the component
  */
-export function filterComponentProps (Comp, filterProps = []) {
-  const isValidProp = p => !filterProps.includes(p);
+export function filterComponentProps(Comp, filterProps = []) {
+  const isValidProp = (p) => !filterProps.includes(p);
 
   return React.forwardRef((rawProps, ref) => {
-    const props = Object.keys(rawProps).reduce((acc, p) => (
-      isValidProp(p) ? { ...acc, [p]: rawProps[p] } : acc
-    ), {});
+    const props = Object.keys(rawProps).reduce(
+      (acc, p) => (isValidProp(p) ? { ...acc, [p]: rawProps[p] } : acc),
+      {}
+    );
     return <Comp ref={ref} {...props} />;
   });
 }
 
 /* Transform string into title case */
-export function makeTitleCase (text) {
-  return text.split(' ').map(word => `${word[0].toUpperCase()}${word.slice(1)}`).join(' ');
+export function makeTitleCase(text) {
+  return text
+    .split(' ')
+    .map((word) => `${word[0].toUpperCase()}${word.slice(1)}`)
+    .join(' ');
 }

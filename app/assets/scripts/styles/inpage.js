@@ -20,8 +20,9 @@ export const Inpage = styled.article`
    * The latter is needed so that inpageBody can be displayed in full height.
    */
 
-  ${({ isMapCentric }) => isMapCentric &&
-   css`
+  ${({ isMapCentric }) =>
+    isMapCentric &&
+    css`
       grid-template-rows: 1fr;
       ${InpageHeader} {
         ${visuallyHidden()}
@@ -31,8 +32,9 @@ export const Inpage = styled.article`
 
 export const InpageHeader = styled.header`
   /* Visually hidden */
-  ${({ isHidden }) => isHidden &&
-   css`
+  ${({ isHidden }) =>
+    isHidden &&
+    css`
       ${visuallyHidden()}
     `}
 `;
@@ -41,7 +43,10 @@ export const InpageHeaderInner = styled.div`
   display: flex;
   flex-flow: row nowrap;
   align-items: flex-end;
-  padding: ${multiply(themeVal('layout.space'), 4)} ${multiply(themeVal('layout.space'), 4)} ${multiply(themeVal('layout.space'), 2)} ${multiply(themeVal('layout.space'), 4)};
+  padding: ${multiply(themeVal('layout.space'), 4)}
+    ${multiply(themeVal('layout.space'), 4)}
+    ${multiply(themeVal('layout.space'), 2)}
+    ${multiply(themeVal('layout.space'), 4)};
   margin: 0 auto;
 `;
 
@@ -90,6 +95,8 @@ export const InpageBody = styled.div`
 `;
 
 export const InpageBodyInner = styled.div`
-  padding: 0 ${multiply(themeVal('layout.space'), 4)} ${multiply(themeVal('layout.space'), 4)} ${multiply(themeVal('layout.space'), 4)};
+  padding: 0 ${multiply(themeVal('layout.space'), 4)}
+    ${multiply(themeVal('layout.space'), 4)}
+    ${multiply(themeVal('layout.space'), 4)};
   max-width: ${themeVal('layout.max')};
 `;

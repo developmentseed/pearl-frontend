@@ -9,7 +9,7 @@ const sizeMapping = {
   small: '0.875rem',
   medium: '1rem',
   large: '1.25rem',
-  xlarge: '1.5rem'
+  xlarge: '1.5rem',
 };
 
 const lineHeightMapping = {
@@ -17,7 +17,7 @@ const lineHeightMapping = {
   small: '1.25rem',
   medium: '1.5rem',
   large: '1.75rem',
-  xlarge: '2rem'
+  xlarge: '2rem',
 };
 
 const Heading = styled.h1`
@@ -33,7 +33,7 @@ const Heading = styled.h1`
 `;
 
 Heading.defaultProps = {
-  size: 'medium'
+  size: 'medium',
 };
 
 export default Heading;
@@ -42,7 +42,7 @@ export const Subheading = styled.h2`
   color: ${_rgba(themeVal('type.base.color'), 0.64)};
   font-size: 0.875rem;
   line-height: 1.25rem;
-  font-feature-settings: "pnum" 0; /* Use proportional numbers */
+  font-feature-settings: 'pnum' 0; /* Use proportional numbers */
   font-family: ${themeVal('type.base.family')};
   font-weight: ${themeVal('type.heading.regular')};
   text-transform: uppercase;
@@ -53,7 +53,7 @@ export const headingAlt = () => css`
   color: inherit;
   font-size: 0.875rem;
   line-height: 1.25rem;
-  font-feature-settings: "pnum" 0; /* Use proportional numbers */
+  font-feature-settings: 'pnum' 0; /* Use proportional numbers */
   font-family: ${themeVal('type.base.family')};
   font-weight: ${themeVal('type.heading.regular')};
   text-transform: uppercase;

@@ -36,7 +36,7 @@ import get from 'lodash.get';
  *
  */
 export default class QsState {
-  constructor (definition) {
+  constructor(definition) {
     // {
     //   field: {
     //     accessor: 'filters.field',
@@ -57,13 +57,13 @@ export default class QsState {
    * @param {bool} force If true the definition will be replaced, otherwise
    *                     merged. Default false
    */
-  setDefinition (opt, definition, force = false) {
+  setDefinition(opt, definition, force = false) {
     this.definition[opt] = force
       ? definition
       : {
-        ...this.definition[opt],
-        ...definition
-      };
+          ...this.definition[opt],
+          ...definition,
+        };
 
     return this;
   }
@@ -75,21 +75,21 @@ export default class QsState {
    *
    * @returns {object} The new state
    */
-  getState (qString) {
+  getState(qString) {
     const parsedQS = qs.parse(qString);
     const validOptions = Object.keys(this.definition);
 
     return validOptions.reduce((acc, opt) => {
       const optDef = this.definition[opt];
       // Function to convert the value from the string before using it.
-      const hydrator = optDef.hydrator || (v => v);
+      const hydrator = optDef.hydrator || ((v) => v);
       // Get the value.
       const value = hydrator(parsedQS[opt]);
 
       // Get the correct validator
-      let validator = v => !!v;
+      let validator = (v) => !!v;
       if (optDef.validator && typeof optDef.validator.indexOf === 'function') {
-        validator = v => optDef.validator.indexOf(v) !== -1;
+        validator = (v) => optDef.validator.indexOf(v) !== -1;
       } else if (typeof optDef.validator === 'function') {
         validator = optDef.validator;
       }
@@ -107,19 +107,19 @@ export default class QsState {
    *
    * @returns {string} The new search string
    */
-  getQs (state) {
+  getQs(state) {
     const validOptions = Object.keys(this.definition);
     const qsObject = validOptions.reduce((acc, opt) => {
       const optDef = this.definition[opt];
       // Function to convert the value to the string before using it.
-      const dehydrator = optDef.dehydrator || (v => v);
+      const dehydrator = optDef.dehydrator || ((v) => v);
       // Get the value.
       const value = dehydrator(get(state, optDef.accessor, optDef.default));
 
       if (value !== optDef.default) {
         return {
           ...acc,
-          [opt]: value
+          [opt]: value,
         };
       }
 
