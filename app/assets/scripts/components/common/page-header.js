@@ -54,56 +54,6 @@ const GlobalMenu = styled.ul`
   align-items: center;
   margin: 0;
   list-style: none;
-
-  > * {
-    margin: 0;
-  }
-  > *:first-child {
-    margin-right: auto;
-  }
-  > *:last-child > * {
-    text-align: center;
-  }
-
-  ${media.mediumUp`
-    /*flex-flow: column nowrap;*/
-    justify-content: center;
-  `}
-
-  ${media.mediumUp`
-    > *:first-child {
-      margin: 0;
-    }
-    > *:last-child {
-      /*margin-top: auto;*/
-    }
-  `}
-`;
-
-const HomeLink = styled.a`
-  position: relative;
-  display: block;
-  width: 4rem;
-  height: 3rem;
-  text-align: center;
-  transition: all 0.24s ease 0s;
-  font-weight: ${themeVal('type.heading.bold')};
-  font-size: 1.5rem;
-
-  &,
-  &:visited {
-    color: inherit;
-  }
-
-  &.active {
-    color: ${themeVal('color.baseLight')};
-    opacity: 1;
-    background: ${_rgba(themeVal('color.baseLight'), 0.08)};
-  }
-
-  span {
-    ${visuallyHidden()}
-  }
 `;
 
 const GlobalMenuLink = styled.a`
@@ -154,16 +104,6 @@ class PageHeader extends React.Component {
         <PageHeadInner>
           <PageNav role='navigation'>
             <GlobalMenu>
-              <li>
-                <HomeLink
-                  as={StyledLink}
-                  to='/'
-                  title='Visit the home page'
-                  data-tip={appTitle}
-                >
-                  <span>{appShortTitle}</span>
-                </HomeLink>
-              </li>
               <li>
                 <GlobalMenuLink
                   as={StyledNavLink}
