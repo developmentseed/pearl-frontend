@@ -917,6 +917,27 @@
     debug "^3.1.0"
     lodash.once "^4.1.1"
 
+"@devseed-ui/button@^2.4.5":
+  version "2.4.5"
+  resolved "https://registry.yarnpkg.com/@devseed-ui/button/-/button-2.4.5.tgz#fe291b26765ac314ddd347161a54a228b5e5ef04"
+  integrity sha512-0UyqNo2q2uR5qnhE6/CaH9KObKoXwNGV6VZsh1BvPO3aXL1YarKJ+m40y5H7dHFjaQbnMLSZ1Ecbxd3PHWytig==
+  dependencies:
+    "@devseed-ui/collecticons" "1.0.0"
+    "@devseed-ui/theme-provider" "^2.4.0"
+
+"@devseed-ui/collecticons@1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@devseed-ui/collecticons/-/collecticons-1.0.0.tgz#c185b55a973e1de4aadde6dc2d9fef4f2d3a81d0"
+  integrity sha512-27+t+hvxo7iqSk7XsdONxIN646NyuD8wZOlr1NuDp7Owxsl9MyFspRYe788QxKChEF1pnhG7GIZXJqf9NuG6jw==
+
+"@devseed-ui/theme-provider@^2.4.0":
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/@devseed-ui/theme-provider/-/theme-provider-2.4.0.tgz#69685a38fc9e2a444e414b7adbbb0e661bbc377e"
+  integrity sha512-pJpd7jwV0HEu2EDWUQFMXyCE7RR5HIR+j9jNFHMvhl/ceL5YlzIxkN/66g9uxyM4DIWs+Y9Xco3OpLMT+4fZbA==
+  dependencies:
+    lodash.get "^4.4.2"
+    polished "^3.4.2"
+
 "@devseed-ui/theme-provider@^3.0.0-rc.0":
   version "3.0.0-rc.0"
   resolved "https://registry.yarnpkg.com/@devseed-ui/theme-provider/-/theme-provider-3.0.0-rc.0.tgz#7e479897a217cb7ebbd05f471f8f491347d46954"
