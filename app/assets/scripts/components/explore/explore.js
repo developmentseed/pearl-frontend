@@ -5,7 +5,7 @@ import {
   InpageHeaderInner,
   InpageHeadline,
   InpageTitle,
-  InpageBody
+  InpageBody,
 } from '../../styles/inpage';
 import Panel from '../common/panel';
 
@@ -21,14 +21,11 @@ function Explore(props) {
           </InpageHeaderInner>
         </InpageHeader>
         <InpageBody>
-          <Panel 
+          <Panel
             collapsible
             direction='left'
             initialState={true}
-            bodyContent ={
-              <div>Primary panel</div>
-            }
-
+            bodyContent={<div>Primary panel</div>}
           />
         </InpageBody>
       </Inpage>

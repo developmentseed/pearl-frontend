@@ -1,6 +1,5 @@
 import React from 'react';
 import App from '../common/app';
-import { Link } from 'react-router-dom';
 
 import ExploreComponent from './explore';
 
