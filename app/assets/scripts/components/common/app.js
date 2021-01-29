@@ -4,6 +4,9 @@ import { withRouter } from 'react-router';
 import styled from 'styled-components';
 
 import MetaTags from './meta-tags';
+import SizeAwareElement from './size-aware-element';
+import PageHeader from './page-header';
+
 import { reveal } from '../../styles/animation';
 
 import config from '../../config';
@@ -45,10 +48,11 @@ class App extends Component {
     const title = pageTitle ? `${pageTitle} — ` : '';
 
     return (
-      <Page className='page' hideFooter={hideFooter}>
+      <SizeAwareElement element={Page} className='page' hideFooter={hideFooter}>
         <MetaTags title={`${title}${appTitle}`} description={appDescription} />
+        <PageHeader />
         <PageBody role='main'>{children}</PageBody>
-      </Page>
+      </SizeAwareElement>
     );
   }
 }
