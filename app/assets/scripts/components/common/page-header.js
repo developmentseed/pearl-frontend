@@ -95,7 +95,6 @@ const GlobalMenuLink = styled.a`
 // See documentation of filterComponentProp as to why this is
 const propsToFilter = ['variation', 'size', 'hideText', 'useIcon', 'active'];
 const StyledNavLink = filterComponentProps(NavLink, propsToFilter);
-const StyledLink = filterComponentProps(Link, propsToFilter);
 
 class PageHeader extends React.Component {
   render() {
