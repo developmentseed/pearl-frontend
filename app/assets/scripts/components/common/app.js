@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useEffect } from 'react';
 import T from 'prop-types';
 import { withRouter } from 'react-router';
 import styled from 'styled-components';
@@ -7,61 +7,37 @@ import MetaTags from './meta-tags';
 import SizeAwareElement from './size-aware-element';
 import PageHeader from './page-header';
 
-import { reveal } from '../../styles/animation';
+import { Page, PageBody } from '../../styles/page';
 
 import config from '../../config';
 
 const { appTitle, appDescription } = config;
 
-const Page = styled.div`
-  display: grid;
-  grid-template-rows: minmax(2rem, min-content) 1fr ${({ hideFooter }) =>
-      hideFooter ? 0 : 'auto'};
-  min-height: 100vh;
-`;
 
-const PageBody = styled.main`
-  padding: 0;
-  margin: 0;
-
-  /* Animation */
-  animation: ${reveal} 0.48s ease 0s 1;
-`;
-
-class App extends Component {
-  componentDidMount() {
-    window.scrollTo(0, 0);
-  }
+//class App extends Component {
+function App(props) {
+  const { location, pageTitle, children, hideFooter } = props;
+  const title = pageTitle ? `${pageTitle} — ` : '';
 
   // Handle cases where the page is updated without changing
-  componentDidUpdate(prevProps) {
-    if (
-      this.props.location &&
-      this.props.location.pathname !== prevProps.location.pathname
-    ) {
+  useEffect(() => {
       window.scrollTo(0, 0);
-    }
-  }
+  }, [location]);
 
-  render() {
-    const { pageTitle, children, hideFooter } = this.props;
-    const title = pageTitle ? `${pageTitle} — ` : '';
-
-    return (
-      <SizeAwareElement element={Page} className='page' hideFooter={hideFooter}>
-        <MetaTags title={`${title}${appTitle}`} description={appDescription} />
-        <PageHeader />
-        <PageBody role='main'>{children}</PageBody>
-      </SizeAwareElement>
-    );
-  }
+  return (
+    <SizeAwareElement element={Page} className='page' hideFooter={hideFooter}>
+      <MetaTags title={`${title}${appTitle}`} description={appDescription} />
+      {children}
+    </SizeAwareElement>
+  );
 }
 
 App.propTypes = {
-  pageTitle: T.string,
   children: T.node,
   location: T.object,
+  header: T.node,
   hideFooter: T.bool,
+  pageTitle: T.string
 };
 
 export default withRouter(App);

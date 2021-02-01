@@ -1,16 +1,27 @@
 import React from 'react';
 import App from '../common/app';
-
 import ExploreComponent from './explore';
+import PageHeader from '../common/page-header';
+import { PageBody } from '../../styles/page';
+import Button from '../../styles/button/button';
 
-class Explore extends React.Component {
-  render() {
-    return (
-      <App pageTitle='Explore'>
+function Explore(props) {
+  return (
+    <App pageTitle='Explore'>
+      <PageHeader>
+        <Button
+          variation='base-raised-light'
+          useIcon='house'
+          title='Set this option'
+        >
+          <span>A button</span>
+        </Button>
+      </PageHeader>
+      <PageBody role='main'>
         <ExploreComponent />
-      </App>
-    );
-  }
+      </PageBody>
+    </App>
+  );
 }
 
 export default Explore;

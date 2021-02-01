@@ -21,7 +21,7 @@ const _rgba = stylizeFunction(rgba);
 const { appTitle } = config;
 
 const PageHead = styled.header`
-  background-color: ${themeVal('color.primary')};
+  background-color: ${themeVal('color.baseAlphaE')};
   color: ${themeVal('color.baseLight')};
   position: sticky;
   z-index: 20;
@@ -38,9 +38,9 @@ const PageHeadInner = styled.div`
 `;
 
 const PageNav = styled.nav`
-  display: flex;
-  flex-flow: row nowrap;
-  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  width: 100%;
   ${media.mediumUp`
   `}
 `;
@@ -53,6 +53,30 @@ const GlobalMenu = styled.ul`
   align-items: center;
   margin: 0;
   list-style: none;
+`;
+
+const PrimarySection = styled.div`
+  grid-column: 1 / 10;
+
+  display: grid;
+  align-items: center;
+  justify-content: space-between;
+
+  * {
+    grid-row: 1;
+    width: min-content;
+  }
+
+`;
+const SecondarySection = styled.ul`
+  border-left: 0.5px solid ${themeVal('color.base')};
+  grid-column: 10 / -1;
+`;
+
+const PageSpecificControls = styled.div`
+  display: grid;
+  grid-gap: 1rem;
+  padding: 0rem 1rem;
 `;
 
 const GlobalMenuLink = styled.a`
@@ -95,12 +119,12 @@ const GlobalMenuLink = styled.a`
 const propsToFilter = ['variation', 'size', 'hideText', 'useIcon', 'active'];
 const StyledNavLink = filterComponentProps(NavLink, propsToFilter);
 
-class PageHeader extends React.Component {
-  render() {
-    return (
-      <PageHead role='banner'>
-        <PageHeadInner>
-          <PageNav role='navigation'>
+function PageHeader(props) {
+  return (
+    <PageHead role='banner'>
+      <PageHeadInner>
+        <PageNav role='navigation'>
+          <PrimarySection>
             <GlobalMenu>
               <li>
                 <GlobalMenuLink
@@ -114,36 +138,19 @@ class PageHeader extends React.Component {
                   <span>{appTitle}</span>
                 </GlobalMenuLink>
               </li>
-              <li>
-                <GlobalMenuLink
-                  as={StyledNavLink}
-                  exact
-                  to='/explore'
-                  useIcon='compass'
-                  data-tip='Explore'
-                  title='View Explore page'
-                >
-                  <span>Explore</span>
-                </GlobalMenuLink>
-              </li>
-              <li>
-                <GlobalMenuLink
-                  as={StyledNavLink}
-                  exact
-                  to='/about'
-                  useIcon='circle-information'
-                  data-tip='About'
-                  title='View About page'
-                >
-                  <span>About</span>
-                </GlobalMenuLink>
-              </li>
             </GlobalMenu>
-          </PageNav>
-        </PageHeadInner>
-      </PageHead>
-    );
-  }
+            {props.children && (
+              <PageSpecificControls>
+                {props.children}
+              </PageSpecificControls>
+            )}
+          </PrimarySection>
+          <SecondarySection>
+          </SecondarySection>
+        </PageNav>
+      </PageHeadInner>
+    </PageHead>
+  );
 }
 
 PageHeader.propTypes = {};

@@ -15,8 +15,7 @@ const ExploreBody = styled(InpageBody)`
   grid-template-columns: min-content 1fr min-content;
 `;
 
-const ExploreCarto = styled.section`
-`
+const ExploreCarto = styled.section``;
 
 function Explore() {
   return (
@@ -43,7 +42,6 @@ function Explore() {
             initialState={true}
             bodyContent={<div>Secondar panel</div>}
           />
-          
         </ExploreBody>
       </Inpage>
     </>
