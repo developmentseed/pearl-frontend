@@ -69,7 +69,7 @@ jobs:
       - name: Test End-to-end
         uses: cypress-io/github-action@v2
         with:
-          start: yarn serve
+          start: yarn serve:testing
           wait-on: 'http://localhost:9000'
 
   build:
