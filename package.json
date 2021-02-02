@@ -100,7 +100,8 @@
   "dependencies": {
     "@babel/polyfill": "^7.12.1",
     "@devseed-ui/button": "3.0.0-rc.0",
-    "@devseed-ui/dropdown": "^1.0.0",
+    "@devseed-ui/collecticons": "2.0.0-rc.0",
+    "@devseed-ui/dropdown": "2.0.0-rc.0",
     "@devseed-ui/theme-provider": "^3.0.0-rc.0",
     "element-resize-event": "^3.0.3",
     "gulp-replace": "^1.0.0",

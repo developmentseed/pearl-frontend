@@ -16,7 +16,7 @@ import About from './components/about';
 import UhOh from './components/uhoh';
 
 import { GlobalContextProvider } from './context/global';
-
+import { CollecticonsGlobalStyle } from '@devseed-ui/collecticons';
 // Root component.
 function Root() {
   useEffect(() => {
@@ -30,6 +30,7 @@ function Root() {
     <ErrorBoundary>
       <Router history={history}>
         <DevseedUiThemeProvider theme={theme.main}>
+          <CollecticonsGlobalStyle />
           <GlobalContextProvider>
             <GlobalStyles />
             <Switch>

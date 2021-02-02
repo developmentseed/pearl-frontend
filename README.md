@@ -55,6 +55,9 @@ module.exports = {
 };
 ```
 
+#### Dependencies
+This project uses components from the DevSeed UI Library. Library collecticons are included and can be used in both library and local components. The gulp file still runs a task to compile compile local icons. To add a custom icon, add to `icons/collecticons` and import `collecticon` from `./app/scripts/styles/collecticons/index.js`.
+
 #### Starting the app
 
 ```sh

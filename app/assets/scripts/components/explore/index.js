@@ -3,7 +3,8 @@ import App from '../common/app';
 import ExploreComponent from './explore';
 import PageHeader from '../common/page-header';
 import { PageBody } from '../../styles/page';
-import Button from '../../styles/button/button';
+//import Button from '../../styles/button/button';
+import { Button } from '@devseed-ui/button';
 
 function Explore() {
   return (
