@@ -19,7 +19,7 @@ import {
 } from '../../styles/utils/general';
 import { rgba } from 'polished';
 import { visuallyHidden } from '../../styles/helpers';
-import collecticon from '@devseed-ui/collecticons';
+import collecticon from '../../styles/collecticons';
 
 import { multiply } from '../../styles/utils/math';
 import media from '../../styles/utils/media-queries';
