@@ -46,7 +46,9 @@ const PageHeadInner = styled.div`
 
 const PageNav = styled.nav`
   display: grid;
-  grid-template-columns: repeat(12, 1fr);
+  grid-template-columns: 3fr 1fr;
+  padding: 0 1rem;
+  grid-gap: 1rem;
   width: 100%;
   ${media.mediumUp`
   `}
@@ -60,11 +62,11 @@ const GlobalMenu = styled.ul`
   align-items: center;
   margin: 0;
   list-style: none;
+  border: 1px solid ${themeVal('color.base')};
+  border-radius: 2rem;
 `;
 
 const PrimarySection = styled.div`
-  grid-column: 1 / 10;
-
   display: grid;
   align-items: center;
   justify-content: space-between;
@@ -77,10 +79,12 @@ const PrimarySection = styled.div`
 
 const SecondarySection = styled.div`
   border-left: 0.5px solid ${themeVal('color.base')};
-  grid-column: 10 / -1;
+  padding-left: 1rem;
   display: grid;
   align-items: center;
   justify-content: space-between;
+  grid-template-columns: min-content min-content min-content;
+  grid-gap: 1rem;
 
   .user-options-trigger::before {
     ${collecticon('house')}
@@ -91,15 +95,14 @@ const SecondarySection = styled.div`
 const PageSpecificControls = styled.div`
   display: grid;
   grid-gap: 1rem;
-  padding: 0rem 1rem;
 `;
 
 const GlobalMenuLink = styled.a`
   position: relative;
   display: block;
-  width: ${multiply(themeVal('layout.space'), 3)};
-  height: ${multiply(themeVal('layout.space'), 3)};
-  line-height: ${multiply(themeVal('layout.space'), 3)};
+  width: ${multiply(themeVal('layout.space'), 2)};
+  height: ${multiply(themeVal('layout.space'), 2)};
+  line-height: ${multiply(themeVal('layout.space'), 2)};
   text-align: center;
   border-radius: ${themeVal('shape.rounded')};
   transition: all 0.24s ease 0s;
@@ -166,6 +169,16 @@ function PageHeader(props) {
             )}
           </PrimarySection>
           <SecondarySection>
+            <Button
+              variation='base-raised-semidark'
+              useIcon='circle-question'
+              title='App help'
+              size='small'
+              hideText
+            >
+              <span>Info</span>
+            </Button>
+
             <Dropdown
               alignment='center'
               direction='down'
@@ -175,6 +188,36 @@ function PageHeader(props) {
                   useIcon={['chevron-down--small', 'after']}
                   title='Open dropdown'
                   className='user-options-trigger'
+                  size='small'
+                  {...props}
+                >
+                  Checkpoints
+                </DropdownTrigger>
+              )}
+            >
+              <React.Fragment>
+                <DropTitle>Drop Title</DropTitle>
+                <DropMenu>
+                  <li>
+                    <DropMenuItem>Menu item 1</DropMenuItem>
+                    <DropMenuItem>Menu item 2</DropMenuItem>
+                  </li>
+                </DropMenu>
+                <DropInset>
+                  <p>Inset Text</p>
+                </DropInset>
+              </React.Fragment>
+            </Dropdown>
+            <Dropdown
+              alignment='center'
+              direction='down'
+              triggerElement={(props) => (
+                <DropdownTrigger
+                  variation='base-raised-light'
+                  useIcon={['chevron-down--small', 'after']}
+                  title='Open dropdown'
+                  className='user-options-trigger'
+                  size='small'
                   {...props}
                 >
                   Account

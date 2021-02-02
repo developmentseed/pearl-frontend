@@ -99,7 +99,7 @@
   },
   "dependencies": {
     "@babel/polyfill": "^7.12.1",
-    "@devseed-ui/button": "^2.4.5",
+    "@devseed-ui/button": "3.0.0-rc.0",
     "@devseed-ui/dropdown": "^1.0.0",
     "@devseed-ui/theme-provider": "^3.0.0-rc.0",
     "element-resize-event": "^3.0.3",

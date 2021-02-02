@@ -917,7 +917,7 @@
     debug "^3.1.0"
     lodash.once "^4.1.1"
 
-"@devseed-ui/button@2.4.5", "@devseed-ui/button@^2.4.5":
+"@devseed-ui/button@2.4.5":
   version "2.4.5"
   resolved "https://registry.yarnpkg.com/@devseed-ui/button/-/button-2.4.5.tgz#fe291b26765ac314ddd347161a54a228b5e5ef04"
   integrity sha512-0UyqNo2q2uR5qnhE6/CaH9KObKoXwNGV6VZsh1BvPO3aXL1YarKJ+m40y5H7dHFjaQbnMLSZ1Ecbxd3PHWytig==
@@ -925,10 +925,23 @@
     "@devseed-ui/collecticons" "1.0.0"
     "@devseed-ui/theme-provider" "^2.4.0"
 
+"@devseed-ui/button@3.0.0-rc.0":
+  version "3.0.0-rc.0"
+  resolved "https://registry.yarnpkg.com/@devseed-ui/button/-/button-3.0.0-rc.0.tgz#a9c86e322a3f213ac8a226e155eeda2200a806a8"
+  integrity sha512-sCblHDFi63e6O0qauyHJli8H2oZxl7AysTergEpb/Iiag1Fk2qJYsKBCqaG0zr0EiSHyiQYgl7BgxPY6QKAj7w==
+  dependencies:
+    "@devseed-ui/collecticons" "2.0.0-rc.0"
+    "@devseed-ui/theme-provider" "^3.0.0-rc.0"
+
 "@devseed-ui/collecticons@1.0.0":
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@devseed-ui/collecticons/-/collecticons-1.0.0.tgz#c185b55a973e1de4aadde6dc2d9fef4f2d3a81d0"
   integrity sha512-27+t+hvxo7iqSk7XsdONxIN646NyuD8wZOlr1NuDp7Owxsl9MyFspRYe788QxKChEF1pnhG7GIZXJqf9NuG6jw==
+
+"@devseed-ui/collecticons@2.0.0-rc.0":
+  version "2.0.0-rc.0"
+  resolved "https://registry.yarnpkg.com/@devseed-ui/collecticons/-/collecticons-2.0.0-rc.0.tgz#27698f775859ca0eb77dd430a95084cf9327fa7a"
+  integrity sha512-OD5PwsR0VuzS1lSGbCB9B052Q0h8w2gNSG4C/XOOi+lChw45l8oE4rpmLmQWK90Y3IP2U+zAIwJ/y6kuy2XvbQ==
 
 "@devseed-ui/dropdown@^1.0.0":
   version "1.0.0"

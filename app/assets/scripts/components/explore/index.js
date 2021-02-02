@@ -11,18 +11,22 @@ function Explore() {
       <PageHeader>
         <Button
           variation='base-raised-semidark'
-          useIcon='house'
+          useIcon='square'
           title='Set this option'
+          size='small'
+
         >
-          <span>A button</span>
+          <span>Save Checkpoint</span>
         </Button>
 
         <Button
           variation='base-raised-semidark'
-          useIcon='house'
+          useIcon='download-2'
           title='Set this option'
+          size='small'
+          
         >
-          <span>A button</span>
+          <span>Download</span>
         </Button>
       </PageHeader>
       <PageBody role='main'>
