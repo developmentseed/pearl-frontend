@@ -833,7 +833,7 @@
     "@babel/plugin-transform-react-jsx-development" "^7.12.7"
     "@babel/plugin-transform-react-pure-annotations" "^7.12.1"
 
-"@babel/runtime@^7.1.2", "@babel/runtime@^7.12.1", "@babel/runtime@^7.12.5", "@babel/runtime@^7.8.4", "@babel/runtime@^7.9.2":
+"@babel/runtime@^7.1.2", "@babel/runtime@^7.12.1", "@babel/runtime@^7.12.5", "@babel/runtime@^7.5.5", "@babel/runtime@^7.8.4", "@babel/runtime@^7.8.7", "@babel/runtime@^7.9.2":
   version "7.12.5"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.12.5.tgz#410e7e487441e1b360c29be715d870d9b985882e"
   integrity sha512-plcc+hbExy3McchJCEQG3knOsuh3HH+Prx1P6cLIkET/0dLuQDEnrT+s27Axgc9bqfsmNUNHfscgMUdBpC9xfg==
@@ -917,7 +917,7 @@
     debug "^3.1.0"
     lodash.once "^4.1.1"
 
-"@devseed-ui/button@^2.4.5":
+"@devseed-ui/button@2.4.5", "@devseed-ui/button@^2.4.5":
   version "2.4.5"
   resolved "https://registry.yarnpkg.com/@devseed-ui/button/-/button-2.4.5.tgz#fe291b26765ac314ddd347161a54a228b5e5ef04"
   integrity sha512-0UyqNo2q2uR5qnhE6/CaH9KObKoXwNGV6VZsh1BvPO3aXL1YarKJ+m40y5H7dHFjaQbnMLSZ1Ecbxd3PHWytig==
@@ -929,6 +929,18 @@
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@devseed-ui/collecticons/-/collecticons-1.0.0.tgz#c185b55a973e1de4aadde6dc2d9fef4f2d3a81d0"
   integrity sha512-27+t+hvxo7iqSk7XsdONxIN646NyuD8wZOlr1NuDp7Owxsl9MyFspRYe788QxKChEF1pnhG7GIZXJqf9NuG6jw==
+
+"@devseed-ui/dropdown@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@devseed-ui/dropdown/-/dropdown-1.0.0.tgz#96453d2283a7343df1ac6f4a7507cfb9054ab252"
+  integrity sha512-EILaXYCuT20LCOpnGpSL8I4sGaTuUAx0SpSTjkRdoUT8J/73I5R+PhOdK5iwGi2b7wNP9Ex8l0CTn0Yax7UM2Q==
+  dependencies:
+    "@devseed-ui/button" "2.4.5"
+    "@devseed-ui/collecticons" "1.0.0"
+    "@devseed-ui/theme-provider" "^2.4.0"
+    "@devseed-ui/typography" "0.1.0"
+    react-tether "^2.0.7"
+    react-transition-group "^4.3.0"
 
 "@devseed-ui/theme-provider@^2.4.0":
   version "2.4.0"
@@ -945,6 +957,13 @@
   dependencies:
     lodash.get "^4.4.2"
     polished "^3.4.2"
+
+"@devseed-ui/typography@0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@devseed-ui/typography/-/typography-0.1.0.tgz#c2ce0651eb600595974976fb05ec279d3d62fa14"
+  integrity sha512-QydqGNN7dHGfURjroH3bSFiUCost2Cs8NGGgFWOSMDnvK7+T+Yzq7n3bdL05OS3z0WrCDlMQR0G+cS1XWl16dA==
+  dependencies:
+    "@devseed-ui/theme-provider" "^2.4.0"
 
 "@emotion/is-prop-valid@^0.8.8":
   version "0.8.8"
@@ -2997,6 +3016,11 @@ csso@^4.0.0, csso@^4.0.2:
   dependencies:
     css-tree "^1.1.2"
 
+csstype@^3.0.2:
+  version "3.0.6"
+  resolved "https://registry.yarnpkg.com/csstype/-/csstype-3.0.6.tgz#865d0b5833d7d8d40f4e5b8a6d76aea3de4725ef"
+  integrity sha512-+ZAmfyWMT7TiIlzdqJgjMb7S4f1beorDbWbsocyK4RaiqA5RTX3K14bnBWmmA9QEM0gRdsjyyrEmcyga8Zsxmw==
+
 cubic2quad@^1.0.0:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/cubic2quad/-/cubic2quad-1.1.1.tgz#69b19c61a3f5b41ecf2f1d5fae8fb03415aa8b15"
@@ -3354,6 +3378,14 @@ doctrine@^3.0.0:
   integrity sha512-yS+Q5i3hBf7GBkd4KG8a7eBNNWNGLTaEwwYWUijIYM7zrlYDM0BFXHjjPWlWZ1Rg7UaddZeIDmi9jF3HmqiQ2w==
   dependencies:
     esutils "^2.0.2"
+
+dom-helpers@^5.0.1:
+  version "5.2.0"
+  resolved "https://registry.yarnpkg.com/dom-helpers/-/dom-helpers-5.2.0.tgz#57fd054c5f8f34c52a3eeffdb7e7e93cd357d95b"
+  integrity sha512-Ru5o9+V8CpunKnz5LGgWXkmrH/20cGKwcHwS4m73zIvs54CN9epEmT/HLqFJW3kXpakAFkEdzgy1hzlJe3E4OQ==
+  dependencies:
+    "@babel/runtime" "^7.8.7"
+    csstype "^3.0.2"
 
 dom-serializer@0:
   version "0.2.2"
@@ -8175,6 +8207,24 @@ react-side-effect@^2.1.0:
   resolved "https://registry.yarnpkg.com/react-side-effect/-/react-side-effect-2.1.1.tgz#66c5701c3e7560ab4822a4ee2742dee215d72eb3"
   integrity sha512-2FoTQzRNTncBVtnzxFOk2mCpcfxQpenBMbk5kSVBg5UcPqV9fRbgY2zhb7GTWWOlpFmAxhClBDlIq8Rsubz1yQ==
 
+react-tether@^2.0.7:
+  version "2.0.7"
+  resolved "https://registry.yarnpkg.com/react-tether/-/react-tether-2.0.7.tgz#81b15e84d9588b0f9e4c40a92596cce46d98e104"
+  integrity sha512-OZAMoT0y1//SN357HiJKic+Ax/kMe3CwdaDT+05P/DHMR9adTYH2RTMDZMjw/OGMmLlBFg6UrDFXiulVKKIBRw==
+  dependencies:
+    prop-types "^15.6.2"
+    tether "^1.4.5"
+
+react-transition-group@^4.3.0:
+  version "4.4.1"
+  resolved "https://registry.yarnpkg.com/react-transition-group/-/react-transition-group-4.4.1.tgz#63868f9325a38ea5ee9535d828327f85773345c9"
+  integrity sha512-Djqr7OQ2aPUiYurhPalTrVy9ddmFCCzwhqQmtN+J3+3DzLO209Fdr70QrN8Z3DsglWql6iY1lDWAfpFiBtuKGw==
+  dependencies:
+    "@babel/runtime" "^7.5.5"
+    dom-helpers "^5.0.1"
+    loose-envify "^1.4.0"
+    prop-types "^15.6.2"
+
 react@^17.0.1:
   version "17.0.1"
   resolved "https://registry.yarnpkg.com/react/-/react-17.0.1.tgz#6e0600416bd57574e3f86d92edba3d9008726127"
@@ -9811,6 +9861,11 @@ terser@>=4:
     commander "^2.20.0"
     source-map "~0.7.2"
     source-map-support "~0.5.19"
+
+tether@^1.4.5:
+  version "1.4.7"
+  resolved "https://registry.yarnpkg.com/tether/-/tether-1.4.7.tgz#d56a818590d8fe72e387f77a67f93ab96d8e1fb2"
+  integrity sha512-Z0J1aExjoFU8pybVkQAo/vD2wfSO63r+XOPfWQMC5qtf1bI7IWqNk4MiyBcgvvnY8kqnY06dVdvwTK2S3PU/Fw==
 
 text-table@^0.2.0:
   version "0.2.0"

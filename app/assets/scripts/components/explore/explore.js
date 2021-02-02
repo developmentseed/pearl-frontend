@@ -40,7 +40,7 @@ function Explore() {
             collapsible
             direction='right'
             initialState={true}
-            bodyContent={<div>Secondar panel</div>}
+            bodyContent={<div>Secondary panel</div>}
           />
         </ExploreBody>
       </Inpage>

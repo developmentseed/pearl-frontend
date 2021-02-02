@@ -5,12 +5,20 @@ import PageHeader from '../common/page-header';
 import { PageBody } from '../../styles/page';
 import Button from '../../styles/button/button';
 
-function Explore(props) {
+function Explore() {
   return (
     <App pageTitle='Explore'>
       <PageHeader>
         <Button
-          variation='base-raised-light'
+          variation='base-raised-semidark'
+          useIcon='house'
+          title='Set this option'
+        >
+          <span>A button</span>
+        </Button>
+
+        <Button
+          variation='base-raised-semidark'
           useIcon='house'
           title='Set this option'
         >

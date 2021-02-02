@@ -4,12 +4,19 @@ import styled from 'styled-components';
 import config from '../../config';
 
 import { NavLink } from 'react-router-dom';
+import Button from '../../styles/button/button';
+
+import Dropdown, {
+  DropTitle,
+  DropMenu,
+  DropMenuItem,
+  DropInset,
+} from '@devseed-ui/dropdown';
 import {
   themeVal,
   stylizeFunction,
   filterComponentProps,
 } from '../../styles/utils/general';
-
 import { rgba } from 'polished';
 import { visuallyHidden } from '../../styles/helpers';
 import collecticon from '../../styles/collecticons';
@@ -21,7 +28,7 @@ const _rgba = stylizeFunction(rgba);
 const { appTitle } = config;
 
 const PageHead = styled.header`
-  background-color: ${themeVal('color.baseAlphaE')};
+  background-color: ${themeVal('color.baseAlphaA')};
   color: ${themeVal('color.baseLight')};
   position: sticky;
   z-index: 20;
@@ -66,11 +73,19 @@ const PrimarySection = styled.div`
     grid-row: 1;
     width: min-content;
   }
-
 `;
-const SecondarySection = styled.ul`
+
+const SecondarySection = styled.div`
   border-left: 0.5px solid ${themeVal('color.base')};
   grid-column: 10 / -1;
+  display: grid;
+  align-items: center;
+  justify-content: space-between;
+
+  .user-options-trigger::before {
+    ${collecticon('house')}
+    font-size: ${multiply(themeVal('type.base.size'), 1.125)};
+  }
 `;
 
 const PageSpecificControls = styled.div`
@@ -88,6 +103,7 @@ const GlobalMenuLink = styled.a`
   text-align: center;
   border-radius: ${themeVal('shape.rounded')};
   transition: all 0.24s ease 0s;
+  color: ${themeVal('color.base')};
 
   &::before {
     ${({ useIcon }) => collecticon(useIcon)}
@@ -96,7 +112,7 @@ const GlobalMenuLink = styled.a`
 
   &,
   &:visited {
-    color: inherit;
+    color: ${themeVal('color.base')};
   }
 
   &:hover {
@@ -105,13 +121,19 @@ const GlobalMenuLink = styled.a`
   }
 
   &.active {
-    color: ${themeVal('color.baseLight')};
+    color: ${themeVal('color.base')};
     opacity: 1;
     background: ${_rgba(themeVal('color.baseLight'), 0.16)};
   }
 
   span {
     ${visuallyHidden()}
+  }
+`;
+const DropdownTrigger = styled(Button)`
+  &::before {
+    ${collecticon('user')}
+    font-size: ${multiply(themeVal('type.base.size'), 1.125)};
   }
 `;
 
@@ -140,12 +162,38 @@ function PageHeader(props) {
               </li>
             </GlobalMenu>
             {props.children && (
-              <PageSpecificControls>
-                {props.children}
-              </PageSpecificControls>
+              <PageSpecificControls>{props.children}</PageSpecificControls>
             )}
           </PrimarySection>
           <SecondarySection>
+            <Dropdown
+              alignment='center'
+              direction='down'
+              triggerElement={(props) => (
+                <DropdownTrigger
+                  variation='base-raised-light'
+                  useIcon={['chevron-down--small', 'after']}
+                  title='Open dropdown'
+                  className='user-options-trigger'
+                  {...props}
+                >
+                  Account
+                </DropdownTrigger>
+              )}
+            >
+              <React.Fragment>
+                <DropTitle>Drop Title</DropTitle>
+                <DropMenu>
+                  <li>
+                    <DropMenuItem>Menu item 1</DropMenuItem>
+                    <DropMenuItem>Menu item 2</DropMenuItem>
+                  </li>
+                </DropMenu>
+                <DropInset>
+                  <p>Inset Text</p>
+                </DropInset>
+              </React.Fragment>
+            </Dropdown>
           </SecondarySection>
         </PageNav>
       </PageHeadInner>
