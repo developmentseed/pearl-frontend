@@ -14,7 +14,6 @@ function Explore() {
           useIcon='square'
           title='Set this option'
           size='small'
-
         >
           <span>Save Checkpoint</span>
         </Button>
@@ -24,7 +23,6 @@ function Explore() {
           useIcon='download-2'
           title='Set this option'
           size='small'
-          
         >
           <span>Download</span>
         </Button>
