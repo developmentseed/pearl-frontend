@@ -6,7 +6,7 @@ export const Page = styled.div`
   grid-template-rows: minmax(2rem, min-content) 1fr ${({ hideFooter }) =>
       hideFooter ? 0 : 'auto'};
   min-height: 100vh;
-`
+`;
 
 export const PageBody = styled.main`
   padding: 0;
@@ -15,4 +15,3 @@ export const PageBody = styled.main`
   /* Animation */
   animation: ${reveal} 0.48s ease 0s 1;
 `;
-

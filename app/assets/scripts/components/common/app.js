@@ -1,18 +1,15 @@
 import React, { useEffect } from 'react';
 import T from 'prop-types';
 import { withRouter } from 'react-router';
-import styled from 'styled-components';
 
 import MetaTags from './meta-tags';
 import SizeAwareElement from './size-aware-element';
-import PageHeader from './page-header';
 
-import { Page, PageBody } from '../../styles/page';
+import { Page } from '../../styles/page';
 
 import config from '../../config';
 
 const { appTitle, appDescription } = config;
-
 
 //class App extends Component {
 function App(props) {
@@ -21,7 +18,7 @@ function App(props) {
 
   // Handle cases where the page is updated without changing
   useEffect(() => {
-      window.scrollTo(0, 0);
+    window.scrollTo(0, 0);
   }, [location]);
 
   return (
@@ -35,9 +32,8 @@ function App(props) {
 App.propTypes = {
   children: T.node,
   location: T.object,
-  header: T.node,
   hideFooter: T.bool,
-  pageTitle: T.string
+  pageTitle: T.string,
 };
 
 export default withRouter(App);

@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-
+import T from 'prop-types';
 import config from '../../config';
 
 import { NavLink } from 'react-router-dom';
@@ -201,6 +201,8 @@ function PageHeader(props) {
   );
 }
 
-PageHeader.propTypes = {};
+PageHeader.propTypes = {
+  children: T.node,
+};
 
 export default PageHeader;
