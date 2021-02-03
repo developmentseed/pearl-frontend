@@ -11,7 +11,6 @@ import config from '../../config';
 
 const { appTitle, appDescription } = config;
 
-//class App extends Component {
 function App(props) {
   const { location, pageTitle, children, hideFooter } = props;
   const title = pageTitle ? `${pageTitle} — ` : '';
