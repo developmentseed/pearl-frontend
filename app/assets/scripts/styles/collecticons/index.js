@@ -2,11 +2,12 @@ import { css } from 'styled-components';
 
 const catalog = require('./catalog.json');
 
-const fontEncode = 'data:application/font-woff2;charset=utf-8;base64,';
 export const collecticonsFont = () => css`
   @font-face {
     font-family: '${catalog.name}';
-    src: url(${fontEncode}${catalog.fonts.woff2}) format('woff2');
+    src: url(data:application/font-woff2;charset=utf-8;base64,${catalog.fonts
+        .woff2})
+      format('woff2');
     font-weight: normal;
     font-style: normal;
   }

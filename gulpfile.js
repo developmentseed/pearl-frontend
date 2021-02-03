@@ -201,7 +201,7 @@ function vendorScripts() {
 function collecticons() {
   return collecticonsCompile({
     dirPath: 'app/assets/icons/collecticons/',
-    fontName: 'Collecticons',
+    fontName: 'Collecticons-local',
     authorName: 'Development Seed',
     authorUrl: 'https://developmentseed.org/',
     catalogDest: 'app/assets/scripts/styles/collecticons/',

@@ -5,7 +5,7 @@ describe('The About Page', () => {
   });
 
   it('successfully loads', () => {
-    cy.get('main');
-    cy.get('h1');
+    cy.get('body');
+    cy.get('header');
   });
 });
