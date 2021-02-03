@@ -9,6 +9,7 @@ import {
   InpageBody,
 } from '../../styles/inpage';
 import Panel from '../common/panel';
+import MapComponent from '../common/map/map';
 
 const ExploreBody = styled(InpageBody)`
   display: grid;
@@ -35,7 +36,9 @@ function Explore() {
             initialState={true}
             bodyContent={<div>Primary panel</div>}
           />
-          <ExploreCarto />
+          <ExploreCarto >
+            <MapComponent />
+          </ExploreCarto>
           <Panel
             collapsible
             direction='right'
