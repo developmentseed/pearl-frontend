@@ -19,8 +19,10 @@ function MapComponent(props) {
   const { children, center, zoom } = props;
   const [map, setMap] = useState();
   useEffect(() => {
-    let m = leaflet.map('map', { zoomControl: false });
-    m.on('load', () => {
+    let m = leaflet
+      .map('map', { zoomControl: false })
+      .setView(center || [0, 0], zoom || 5);
+    m.whenReady(() => {
       setMap(m);
       leaflet
         .tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -34,15 +36,12 @@ function MapComponent(props) {
         window.map = m;
       }
     });
-    return () => {
-      map.remove();
-    };
     /* eslint-disable-next-line react-hooks/exhaustive-deps */
   }, []);
 
   useEffect(() => {
-    if (map) {
-      map.setView(center || [0, 0], zoom || 5);
+    if (map && center && zoom) {
+      map.setView(center, zoom);
     }
   }, [map, center, zoom]);
 
