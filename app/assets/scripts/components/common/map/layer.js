@@ -23,9 +23,6 @@ function Layer(props) {
       l.addTo(map);
       setLayer(layer);
     }
-    return () => {
-      map.removeLayer(layer);
-    };
   }, [map, source]);
 
   useEffect(() => {
