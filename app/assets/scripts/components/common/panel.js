@@ -191,7 +191,11 @@ class Panel extends React.Component {
       ) : null;
 
     return (
-      <PanelSelf revealed={revealed} className={className}>
+      <PanelSelf
+        revealed={revealed}
+        className={className}
+        data-cy={this.props['data-cy']}
+      >
         {header}
         <PanelBody revealed={revealed}>{bodyContent}</PanelBody>
 
@@ -233,6 +237,7 @@ Panel.propTypes = {
   headerContent: T.node,
   renderHeader: T.func,
   bodyContent: T.node,
+  'data-cy': T.string,
 };
 
 Panel.defaultProps = {
