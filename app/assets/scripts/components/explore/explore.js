@@ -10,6 +10,7 @@ import {
 } from '../../styles/inpage';
 import Panel from '../common/panel';
 import MapComponent from '../common/map/map';
+import Layer from '../common/map/layer';
 
 const ExploreBody = styled(InpageBody)`
   display: grid;
@@ -35,15 +36,36 @@ function Explore() {
             direction='left'
             initialState={true}
             bodyContent={<div>Primary panel</div>}
+            data-cy='primary-panel'
           />
-          <ExploreCarto >
-            <MapComponent />
+          <ExploreCarto>
+            <MapComponent>
+              <Layer
+                name='base-map'
+                type='tileLayer'
+                source='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png?'
+                options={{
+                  attribution:
+                    '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                }}
+              />
+
+              <Layer
+                type='polyline'
+                source={[
+                  [45.51, -122.68],
+                  [37.77, -122.43],
+                  [34.04, -118.2],
+                ]}
+              />
+            </MapComponent>
           </ExploreCarto>
           <Panel
             collapsible
             direction='right'
             initialState={true}
             bodyContent={<div>Secondary panel</div>}
+            data-cy='secondary-panel'
           />
         </ExploreBody>
       </Inpage>

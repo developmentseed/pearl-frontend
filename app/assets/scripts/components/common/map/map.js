@@ -22,15 +22,9 @@ function MapComponent(props) {
     let m = leaflet
       .map('map', { zoomControl: false })
       .setView(center || [0, 0], zoom || 5);
+
     m.whenReady(() => {
       setMap(m);
-      leaflet
-        .tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution:
-            '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-        })
-        .addTo(m);
-
       if (process.env.NODE_ENV === 'development') {
         // makes map accessible in console for debugging
         window.map = m;
