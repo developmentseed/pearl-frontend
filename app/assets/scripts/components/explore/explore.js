@@ -9,6 +9,7 @@ import {
   InpageBody,
 } from '../../styles/inpage';
 import Panel from '../common/panel';
+import PrimePanel from './prime-panel';
 import MapComponent from '../common/map/map';
 import Layer from '../common/map/layer';
 
@@ -31,13 +32,7 @@ function Explore() {
           </InpageHeaderInner>
         </InpageHeader>
         <ExploreBody>
-          <Panel
-            collapsible
-            direction='left'
-            initialState={true}
-            bodyContent={<div>Primary panel</div>}
-            data-cy='primary-panel'
-          />
+          <PrimePanel />
           <ExploreCarto>
             <MapComponent>
               <Layer
