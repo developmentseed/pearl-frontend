@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import leaflet from 'leaflet';
 import T from 'prop-types';
 
@@ -11,31 +11,30 @@ import T from 'prop-types';
 
 function Layer(props) {
   const { type, source, map, options } = props;
-  const [layer, setLayer] = useState(null);
-  useEffect(() => {
-    if (map) {
-      if (layer) {
-        // Source change, remove layer
-        map.removeLayer(layer);
-      }
 
-      let l = leaflet[type](source, options || {});
-      l.addTo(map);
-      setLayer(layer);
-    }
-  }, [map, source]);
+  const layer = useRef();
 
   useEffect(() => {
-    if (map && layer) {
-      layer.setStyle(options);
+    if (layer.current) {
+      map.removeLayer(layer.current);
     }
-  }, [map, layer, options]);
+    let l = leaflet[type](source, options || {});
+    l.addTo(map);
+    layer.current = l;
+  }, [source]);
+
+  useEffect(() => {
+    const { current } = layer;
+    if (current) {
+      current.setStyle && current.setStyle(options);
+    }
+  }, [options]);
   return null;
 }
 
 Layer.propTypes = {
   type: T.string,
-  source: T.oneOfType([T.string, T.object]),
+  source: T.oneOfType([T.string, T.object, T.array]),
   map: T.object,
   options: T.object,
 };
