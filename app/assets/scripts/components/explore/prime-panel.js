@@ -35,7 +35,6 @@ export const HeadOptionHeadline = styled.div`
 export const EditButton = styled(Button).attrs({
   variation: 'base-plain',
   size: 'small',
-  useIcon: 'pencil',
   hideText: true,
 })`
   opacity: 50%;
@@ -44,6 +43,7 @@ export const EditButton = styled(Button).attrs({
 
 function PrimePanel() {
   const [selectedModel, setSelectedModel] = useState(null);
+  const [selectedArea, setSelectedArea] = useState(null);
 
   return (
     <Panel
@@ -54,6 +54,34 @@ function PrimePanel() {
         <PanelBlock>
           <PanelBlockHeader>
             <HeadOptionHeadline>
+              <Subheading>Area: </Subheading>
+              <Subheading variation='primary'>
+                <SubheadingStrong>
+                  {selectedArea || 'Not selected'}
+                </SubheadingStrong>
+              </Subheading>
+              <EditButton
+                onClick={function () {
+                  setSelectedArea('1000 km2');
+                }}
+                title='Edit Model'
+                useIcon='area'
+              >
+                Clear and Edit Area
+              </EditButton>
+              <EditButton
+                onClick={function () {
+                  setSelectedArea(null);
+                }}
+                title='Edit Model'
+                useIcon='trash-bin'
+              >
+                Edit Area Selection
+              </EditButton>
+            </HeadOptionHeadline>
+          </PanelBlockHeader>
+          <PanelBlockHeader>
+            <HeadOptionHeadline>
               <Subheading>Model: </Subheading>
               <Subheading variation='primary'>
                 <SubheadingStrong>
@@ -61,6 +89,7 @@ function PrimePanel() {
                 </SubheadingStrong>
               </Subheading>
               <EditButton
+                useIcon='swap-horizontal'
                 onClick={function () {
                   setSelectedModel('CB Starter 123');
                 }}
