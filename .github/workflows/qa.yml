@@ -1,13 +1,17 @@
 name: QA
 
 on:
-  push:
   pull_request:
-    types: [opened]
+    types:
+        - opened
+        - synchronize
+        - reopened
+        - ready_for_review
 
 jobs:
   lint:
     runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
 
     steps:
       - name: Checkout
