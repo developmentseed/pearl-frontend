@@ -21,25 +21,33 @@ const ScrollShadow = styled.div`
   pointer-events: none;
   z-index: 1000;
 
-  ${({ position }) => position === 'top'
-    ? css`
-      top: 0;
-    `
-    : css`
-      bottom: 0;
-      transform: scaleY(-1);
-    `
-  }
+  ${({ position }) =>
+    position === 'top'
+      ? css`
+          top: 0;
+        `
+      : css`
+          bottom: 0;
+          transform: scaleY(-1);
+        `}
 
   ${({ variation }) => {
     switch (variation) {
       case 'light':
         return css`
-          background: linear-gradient(to bottom, ${_rgba('#FFF', 1)} 0%, ${_rgba('#FFF', 0)} 100%);
+          background: linear-gradient(
+            to bottom,
+            ${_rgba('#FFF', 1)} 0%,
+            ${_rgba('#FFF', 0)} 100%
+          );
         `;
       case 'dark':
         return css`
-          background: linear-gradient(to bottom, ${_rgba(themeVal('color.primary'), 1)} 0%, ${_rgba(themeVal('color.primary'), 0)} 100%);
+          background: linear-gradient(
+            to bottom,
+            ${_rgba(themeVal('color.primary'), 1)} 0%,
+            ${_rgba(themeVal('color.primary'), 0)} 100%
+          );
         `;
     }
   }}
@@ -62,25 +70,23 @@ const ScrollShadow = styled.div`
  *   Setting it to 'none' removes the shadow.
  */
 class ShadowScrollbar extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props);
 
     this.state = {
       shadowTopOpacity: 1,
-      shadowBottomOpacity: 1
+      shadowBottomOpacity: 1,
     };
 
     this.handleUpdate = this.handleUpdate.bind(this);
   }
 
-  handleUpdate (values) {
+  handleUpdate(values) {
     // If there are no shadows there's no point in doing calculations.
-    const {
-      topShadowVariation,
-      bottomShadowVariation
-    } = this.props;
+    const { topShadowVariation, bottomShadowVariation } = this.props;
 
-    if (topShadowVariation === 'none' && bottomShadowVariation === 'none') return;
+    if (topShadowVariation === 'none' && bottomShadowVariation === 'none')
+      return;
 
     const { scrollTop, scrollHeight, clientHeight } = values;
     const shadowTopOpacity = (1 / 20) * Math.min(scrollTop, 20);
@@ -89,11 +95,11 @@ class ShadowScrollbar extends React.Component {
       (1 / 20) * (bottomScrollTop - Math.max(scrollTop, bottomScrollTop - 20));
     this.setState({
       shadowTopOpacity,
-      shadowBottomOpacity
+      shadowBottomOpacity,
     });
   }
 
-  render () {
+  render() {
     const {
       className,
       topShadowVariation,
@@ -103,10 +109,7 @@ class ShadowScrollbar extends React.Component {
       ...rest
     } = this.props;
 
-    const {
-      shadowTopOpacity,
-      shadowBottomOpacity
-    } = this.state;
+    const { shadowTopOpacity, shadowBottomOpacity } = this.state;
 
     // Ensure that it takes up the correct size.
     const scrollbarStyle = { width: '100%', height: '100%' };
@@ -146,13 +149,13 @@ ShadowScrollbar.propTypes = {
   topShadowVariation: T.string,
   bottomShadowVariation: T.string,
   scrollbarsProps: T.object,
-  children: T.node
+  children: T.node,
 };
 
 ShadowScrollbar.defaultProps = {
   topShadowVariation: 'light',
   bottomShadowVariation: 'light',
-  scrollbarsProps: {}
+  scrollbarsProps: {},
 };
 
 export default ShadowScrollbar;
