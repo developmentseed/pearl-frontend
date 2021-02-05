@@ -47,6 +47,7 @@ function PrimePanel() {
 
   return (
     <Panel
+      data-cy='primary-panel'
       collapsible
       direction='left'
       initialState={true}
