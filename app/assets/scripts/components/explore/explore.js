@@ -1,4 +1,4 @@
-import React, { useState }  from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import {
   Inpage,
@@ -20,11 +20,6 @@ const ExploreBody = styled(InpageBody)`
 const ExploreCarto = styled.section``;
 
 function Explore() {
-  const [s,setS] = useState([
-  [45.51, -122.68],
-  [37.77, -122.43],
-  [34.04, -118.2],
-]);
   return (
     <>
       <Inpage isMapCentric>
@@ -44,7 +39,6 @@ function Explore() {
             data-cy='primary-panel'
           />
           <ExploreCarto>
-            <button onClick={() => setS([[45,-123],[46,-124]])}>but</button>
             <MapComponent>
               <Layer
                 name='base-map'
@@ -58,7 +52,11 @@ function Explore() {
 
               <Layer
                 type='polyline'
-                source={s}
+                source={[
+                  [45.51, -122.68],
+                  [37.77, -122.43],
+                  [34.04, -118.2],
+                ]}
               />
             </MapComponent>
           </ExploreCarto>
