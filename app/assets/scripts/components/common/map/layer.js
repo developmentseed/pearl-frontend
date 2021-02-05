@@ -34,7 +34,7 @@ function Layer(props) {
 
 Layer.propTypes = {
   type: T.string,
-  source: T.oneOfType([T.string, T.object, T.arra]),
+  source: T.oneOfType([T.string, T.object, T.array]),
   map: T.object,
   options: T.object,
 };
