@@ -46,7 +46,6 @@ function SelectModal(props) {
 
   return (
     <Modal
-      data-cy={id}
       id={id}
       className='select'
       size='xlarge'
@@ -70,6 +69,7 @@ function SelectModal(props) {
 }
 
 SelectModal.propTypes = {
+  id: T.string,
   revealed: T.bool,
   onOverlayClick: T.func,
   data: T.array,
