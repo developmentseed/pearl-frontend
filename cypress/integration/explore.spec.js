@@ -17,4 +17,12 @@ describe('The Explore Page', () => {
   it('Renders a map', () => {
     cy.get('[data-cy=leaflet-map]').should('exist');
   });
+
+  it('Display select model modal on click', () => {
+    cy.get('[data-cy=show-select-model-button]').click();
+
+    // Ideally we should use data-cy prop, but the Model doesn't support it.
+    // Ticketed here: https://github.com/developmentseed/ui-library-seed/issues/175
+    cy.get('[id=select-model-modal]').should('exist');
+  });
 });
