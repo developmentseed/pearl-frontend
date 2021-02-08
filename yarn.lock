@@ -942,6 +942,22 @@
     react-tether "^2.0.7"
     react-transition-group "^4.3.0"
 
+"@devseed-ui/modal@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@devseed-ui/modal/-/modal-2.0.0.tgz#29aa73038985edf7153fe68781da16e12f175bfe"
+  integrity sha512-/MzdXPeTsz6UcMKpAPGIXzzolGjXy7eJ1hWHCN1O5NDrg2Jg9ldAegTJ0g6IGdn4eoa8QlursJYkVRxeAe7Ucg==
+  dependencies:
+    "@devseed-ui/theme-provider" "^2.4.0"
+    react-transition-group "^4.3.0"
+
+"@devseed-ui/theme-provider@^2.4.0":
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/@devseed-ui/theme-provider/-/theme-provider-2.4.0.tgz#69685a38fc9e2a444e414b7adbbb0e661bbc377e"
+  integrity sha512-pJpd7jwV0HEu2EDWUQFMXyCE7RR5HIR+j9jNFHMvhl/ceL5YlzIxkN/66g9uxyM4DIWs+Y9Xco3OpLMT+4fZbA==
+  dependencies:
+    lodash.get "^4.4.2"
+    polished "^3.4.2"
+
 "@devseed-ui/theme-provider@^3.0.0-rc.0":
   version "3.0.0-rc.0"
   resolved "https://registry.yarnpkg.com/@devseed-ui/theme-provider/-/theme-provider-3.0.0-rc.0.tgz#7e479897a217cb7ebbd05f471f8f491347d46954"
