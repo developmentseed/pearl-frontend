@@ -116,6 +116,7 @@
     "react-custom-scrollbars": "^4.2.1",
     "react-dom": "^17.0.1",
     "react-helmet": "^6.1.0",
+    "react-leaflet": "^3.1.0",
     "react-router": "^5.2.0",
     "react-router-dom": "^5.2.0",
     "request-promise": "^4.2.6",
