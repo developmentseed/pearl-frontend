@@ -12,6 +12,7 @@ import Panel from '../common/panel';
 import PrimePanel from './prime-panel';
 import MapComponent from '../common/map/map';
 import Layer from '../common/map/layer';
+import GeoCoder from '../common/map/geocoder.js';
 
 const ExploreBody = styled(InpageBody)`
   display: grid;
@@ -35,6 +36,7 @@ function Explore() {
           <PrimePanel />
           <ExploreCarto>
             <MapComponent>
+              <GeoCoder />
               <Layer
                 name='base-map'
                 type='tileLayer'

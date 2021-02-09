@@ -7,6 +7,15 @@ import T from 'prop-types';
 const MapContainer = styled.div`
   height: 100%;
   z-index: 1;
+
+  .leaflet-top.leaflet-left {
+    /* Shift control container vertically */
+    top: 7.5vh;
+    .leaflet-geosearch-button.active form {
+      /* CSS quirk to make input box the right height */
+      line-height: 2.5;
+    }
+  }
 `;
 
 /* Componentized Leaflet Map container
@@ -20,7 +29,7 @@ function MapComponent(props) {
   const [map, setMap] = useState();
   useEffect(() => {
     let m = leaflet
-      .map('map', { zoomControl: false })
+      .map('map', { zoomControl: true })
       .setView(center || [0, 0], zoom || 5);
 
     m.whenReady(() => {

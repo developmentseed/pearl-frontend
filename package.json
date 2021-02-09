@@ -108,6 +108,7 @@
     "gulp-replace": "^1.0.0",
     "history": "^4.10.1",
     "leaflet": "^1.7.1",
+    "leaflet-geosearch": "^3.2.1",
     "lodash.defaultsdeep": "^4.6.1",
     "lodash.get": "^4.4.2",
     "polished": "^4.0.3",
