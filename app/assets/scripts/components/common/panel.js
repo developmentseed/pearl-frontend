@@ -24,7 +24,6 @@ export const PanelSelf = styled.section`
   z-index: 10;
   transition: all 0.16s ease 0s;
 
-
   ${({ revealed, fitContent }) =>
     revealed &&
     css`
@@ -173,7 +172,7 @@ class Panel extends React.Component {
       className,
       overrideControl,
       additionalControls,
-      fitContent
+      fitContent,
     } = this.props;
     const revealed = overrideControl
       ? this.props.revealed
@@ -243,6 +242,7 @@ Panel.propTypes = {
   headerContent: T.node,
   renderHeader: T.func,
   bodyContent: T.node,
+  fitContent: T.bool,
   'data-cy': T.string,
 };
 

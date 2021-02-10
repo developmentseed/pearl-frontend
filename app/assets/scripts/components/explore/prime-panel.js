@@ -1,29 +1,35 @@
 import React, { useState } from 'react';
-import Panel from '../common/panel';
 import styled from 'styled-components';
-import { themeVal, glsp } from '@devseed-ui/theme-provider';
-
+import { themeVal } from '@devseed-ui/theme-provider';
 import { Button } from '@devseed-ui/button';
-import { PanelBlock, PanelBlockHeader } from '../common/panel-block';
-import { Subheading } from '../../styles/type/heading';
+import T from 'prop-types';
+import Panel from '../common/panel';
+import {
+  PanelBlock,
+  PanelBlockHeader,
+  PanelBlockBody,
+} from '../common/panel-block';
+import { Subheading as BaseSubheading } from '../../styles/type/heading';
 import SelectModal from './select-modal';
 import { Card } from './card-list';
+import { PlaceholderMessage } from '../../styles/placeholder.js';
 
 import { availableModels } from './sample-data';
 
 const SubheadingStrong = styled.strong`
   color: ${themeVal('color.base')};
+  font-size: 0.875rem;
+`;
+
+const Subheading = styled(BaseSubheading)`
+  font-size: 0.75rem;
 `;
 
 export const HeadOption = styled.div`
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   box-shadow: 0px 1px 0px 0px ${themeVal('color.baseAlphaC')};
-  padding-bottom: ${glsp(0.5)};
-
-  & ~ & {
-    padding-top: ${glsp(0.5)};
-  }
+  padding: 1rem 0;
 `;
 
 export const HeadOptionHeadline = styled.div`
@@ -41,9 +47,22 @@ export const EditButton = styled(Button).attrs({
 
 const StyledPanelBlock = styled(PanelBlock)`
   width: 20rem;
+  display: flex;
+  justify-content: space-between;
+  > * {
+    padding: 1rem;
+  }
 `;
 
-function PrimePanel() {
+const PanelControls = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 1rem;
+`;
+
+function PrimePanel(props) {
+  const { inferenceResults } = props;
+
   const [selectedModel, setSelectedModel] = useState(null);
   const [showSelectModelModal, setShowSelectModelModal] = useState(false);
   const [selectedArea, setSelectedArea] = useState(null);
@@ -126,11 +145,59 @@ function PrimePanel() {
                     setShowSelectModelModal(true);
                   }}
                   title='Edit Model'
+                  style={{
+                    gridColumn: '5',
+                    justifySelf: 'end',
+                  }}
                 >
                   Edit Model Selection
                 </EditButton>
               </HeadOption>
             </PanelBlockHeader>
+            <PanelBlockBody>
+              {inferenceResults ? (
+                <div>Inference</div>
+              ) : (
+                <PlaceholderMessage>
+                  Click &quot;Run Inference&quot; to generate the class LULC map
+                  for your AOI
+                </PlaceholderMessage>
+              )}
+            </PanelBlockBody>
+
+            <PanelControls>
+              <Button
+                variation='base-raised-light'
+                size='medium'
+                useIcon='tick--small'
+                style={{
+                  gridColumn: '1 / 2',
+                }}
+              >
+                Reset
+              </Button>
+              <Button
+                variation='base-raised-light'
+                size='medium'
+                useIcon='tick--small'
+                style={{
+                  gridColumn: '2 / -1',
+                }}
+              >
+                Undo
+              </Button>
+
+              <Button
+                variation='base-raised-dark'
+                size='medium'
+                useIcon='tick--small'
+                style={{
+                  gridColumn: '1 / -1',
+                }}
+              >
+                Run inference
+              </Button>
+            </PanelControls>
           </StyledPanelBlock>
         }
       />
@@ -160,4 +227,7 @@ function PrimePanel() {
   );
 }
 
+PrimePanel.propTypes = {
+  inferenceResults: T.array,
+};
 export default PrimePanel;
