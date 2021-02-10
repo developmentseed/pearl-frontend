@@ -16,24 +16,18 @@ const SubheadingStrong = styled.strong`
 `;
 
 export const HeadOption = styled.div`
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  box-shadow: 0px 1px 0px 0px ${themeVal('color.baseAlphaC')};
+  padding-bottom: ${glsp(0.5)};
+
   & ~ & {
     padding-top: ${glsp(0.5)};
-  }
-  &:last-of-type {
-    box-shadow: 0px 1px 0px 0px ${themeVal('color.baseAlphaB')};
-    padding-bottom: ${glsp(0.5)};
   }
 `;
 
 export const HeadOptionHeadline = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-
-  & > :first-child {
-    min-width: 5rem;
-  }
+  grid-column: 1 / -1;
 `;
 
 export const EditButton = styled(Button).attrs({
@@ -42,7 +36,11 @@ export const EditButton = styled(Button).attrs({
   hideText: true,
 })`
   opacity: 50%;
-  margin-left: auto;
+  width: min-content;
+`;
+
+const StyledPanelBlock = styled(PanelBlock)`
+  width: 20rem;
 `;
 
 function PrimePanel() {
@@ -57,22 +55,36 @@ function PrimePanel() {
         collapsible
         direction='left'
         initialState={true}
+        fitContent
         bodyContent={
-          <PanelBlock>
+          <StyledPanelBlock>
             <PanelBlockHeader>
-              <HeadOptionHeadline>
-                <Subheading>Area: </Subheading>
-                <Subheading variation='primary'>
+              <HeadOption>
+                <HeadOptionHeadline>
+                  <Subheading>Selected Area </Subheading>
+                </HeadOptionHeadline>
+
+                <Subheading
+                  variation='primary'
+                  style={{
+                    gridColumn: '1 / 4',
+                  }}
+                >
                   <SubheadingStrong>
                     {selectedArea || 'Not selected'}
                   </SubheadingStrong>
                 </Subheading>
+
                 <EditButton
                   onClick={function () {
                     setSelectedArea('1000 km2');
                   }}
                   title='Edit Model'
                   useIcon='area'
+                  style={{
+                    gridColumn: '4',
+                    justifySelf: 'end',
+                  }}
                 >
                   Clear and Edit Area
                 </EditButton>
@@ -82,19 +94,31 @@ function PrimePanel() {
                   }}
                   title='Edit Model'
                   useIcon='trash-bin'
+                  style={{
+                    gridColumn: '5',
+                    justifySelf: 'end',
+                  }}
                 >
                   Edit Area Selection
                 </EditButton>
-              </HeadOptionHeadline>
-            </PanelBlockHeader>
-            <PanelBlockHeader>
-              <HeadOptionHeadline>
-                <Subheading>Model: </Subheading>
-                <Subheading variation='primary'>
+              </HeadOption>
+
+              <HeadOption>
+                <HeadOptionHeadline>
+                  <Subheading>Selected Model</Subheading>
+                </HeadOptionHeadline>
+
+                <Subheading
+                  variation='primary'
+                  style={{
+                    gridColumn: '1 / 4',
+                  }}
+                >
                   <SubheadingStrong>
                     {selectedModel || 'Select Model'}
                   </SubheadingStrong>
                 </Subheading>
+
                 <EditButton
                   data-cy='show-select-model-button'
                   useIcon='swap-horizontal'
@@ -105,9 +129,9 @@ function PrimePanel() {
                 >
                   Edit Model Selection
                 </EditButton>
-              </HeadOptionHeadline>
+              </HeadOption>
             </PanelBlockHeader>
-          </PanelBlock>
+          </StyledPanelBlock>
         }
       />
       <SelectModal
