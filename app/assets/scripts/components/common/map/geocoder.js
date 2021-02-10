@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import * as GeoSearch from 'leaflet-geosearch';
-import config from '../config';
+import config from '../../../config';
 
 const { bingApiKey } = config;
 
