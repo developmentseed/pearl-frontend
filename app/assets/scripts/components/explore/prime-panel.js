@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import Panel from '../common/panel';
 import styled from 'styled-components';
 import { themeVal, glsp } from '@devseed-ui/theme-provider';
@@ -8,8 +8,9 @@ import { PanelBlock, PanelBlockHeader } from '../common/panel-block';
 import { Subheading } from '../../styles/type/heading';
 import SelectModal from './select-modal';
 import { Card } from './card-list';
-
 import { availableModels } from './sample-data';
+import ExploreContext from './context';
+import { viewModes } from './constants';
 
 const SubheadingStrong = styled.strong`
   color: ${themeVal('color.base')};
@@ -46,6 +47,7 @@ export const EditButton = styled(Button).attrs({
 `;
 
 function PrimePanel() {
+  const { setViewMode } = useContext(ExploreContext);
   const [selectedModel, setSelectedModel] = useState(null);
   const [showSelectModelModal, setShowSelectModelModal] = useState(false);
   const [selectedArea, setSelectedArea] = useState(null);
@@ -69,7 +71,7 @@ function PrimePanel() {
                 </Subheading>
                 <EditButton
                   onClick={function () {
-                    setSelectedArea('1000 km2');
+                    setViewMode(viewModes.CREATE_AOI_MODE);
                   }}
                   title='Edit Model'
                   useIcon='area'
