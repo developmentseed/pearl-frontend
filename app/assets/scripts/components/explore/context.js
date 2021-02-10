@@ -6,12 +6,15 @@ const ExploreContext = createContext({});
 
 export function ExploreProvider(props) {
   const [viewMode, setViewMode] = useState(viewModes.BROWSE_MODE);
+  const [aoi, setAoi] = useState(null);
 
   return (
     <ExploreContext.Provider
       value={{
         viewMode,
         setViewMode,
+        aoi,
+        setAoi,
       }}
     >
       {props.children}

@@ -47,10 +47,9 @@ export const EditButton = styled(Button).attrs({
 `;
 
 function PrimePanel() {
-  const { setViewMode } = useContext(ExploreContext);
+  const { setViewMode, aoi, setAoi } = useContext(ExploreContext);
   const [selectedModel, setSelectedModel] = useState(null);
   const [showSelectModelModal, setShowSelectModelModal] = useState(false);
-  const [selectedArea, setSelectedArea] = useState(null);
 
   return (
     <>
@@ -66,7 +65,7 @@ function PrimePanel() {
                 <Subheading>Area: </Subheading>
                 <Subheading variation='primary'>
                   <SubheadingStrong>
-                    {selectedArea || 'Not selected'}
+                    {aoi && aoi.area > 0 ? `${aoi.area} km2` : 'Not selected'}
                   </SubheadingStrong>
                 </Subheading>
                 <EditButton
@@ -80,7 +79,7 @@ function PrimePanel() {
                 </EditButton>
                 <EditButton
                   onClick={function () {
-                    setSelectedArea(null);
+                    setAoi(null);
                   }}
                   title='Edit Model'
                   useIcon='trash-bin'

@@ -1,10 +1,15 @@
 import React, { useState, useMemo, useContext, useEffect } from 'react';
 import styled from 'styled-components';
+import { lineString as tLineString, convertArea } from '@turf/helpers';
+import tArea from '@turf/area';
+import tBbox from '@turf/bbox';
+import tBboxPolygon from '@turf/bbox-polygon';
 import SizeAwareElement from '../../common/size-aware-element';
 import { MapContainer, TileLayer, FeatureGroup } from 'react-leaflet';
 import EditControl from './edit-control';
 import ExploreContext from '../context';
 import { viewModes } from '../constants';
+import { round } from '../../../utils/format';
 
 const center = [38.942, -95.449];
 const zoom = 4;
@@ -21,7 +26,7 @@ const Container = styled.div`
 
 function Map() {
   const [map, setMap] = useState(null);
-  const { viewMode } = useContext(ExploreContext);
+  const { viewMode, setViewMode, setAoi } = useContext(ExploreContext);
   const [drawRef, setDrawRef] = useState(null);
 
   /**
@@ -49,9 +54,27 @@ function Map() {
         />
         <FeatureGroup>
           <EditControl
-            onMounted={(ref) => {
-              // Get ref from Leaflet.draw to control its state.
-              setDrawRef(ref);
+            onMounted={setDrawRef}
+            onCreated={(e) => {
+              // Disable draw mode
+              setViewMode(viewModes.BROWSE_MODE);
+
+              // Get drawn vector as LineString GeoJSON
+              const vertices = e.layer._latlngs[0].map(({ lat, lng }) => {
+                return [lng, lat];
+              });
+              const lineString = tLineString(vertices);
+
+              // Calculate BBox and area in square kilometers
+              const bbox = tBbox(lineString);
+              const poly = tBboxPolygon(bbox);
+              const area = convertArea(tArea(poly), 'meters', 'kilometers');
+
+              // Add AOI to context
+              setAoi({
+                area: round(area, 0),
+                bbox,
+              });
             }}
             draw={{
               polyline: false,
