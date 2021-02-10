@@ -27,13 +27,23 @@ const Subheading = styled(BaseSubheading)`
 
 export const HeadOption = styled.div`
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   box-shadow: 0px 1px 0px 0px ${themeVal('color.baseAlphaC')};
   padding: 1rem 0;
+  gap: 0.5rem;
 `;
 
 export const HeadOptionHeadline = styled.div`
   grid-column: 1 / -1;
+`;
+
+export const HeadOptionToolbar = styled.div`
+  display: grid;
+  justify-self: end;
+  grid-template-columns: repeat(auto-fill, minmax(1rem, 1fr));
+  gap: 1rem;
+  grid-auto-flow: column;
+  justify-items: center;
 `;
 
 export const EditButton = styled(Button).attrs({
@@ -46,11 +56,11 @@ export const EditButton = styled(Button).attrs({
 `;
 
 const StyledPanelBlock = styled(PanelBlock)`
-  width: 20rem;
+  width: 24rem;
   display: flex;
   justify-content: space-between;
   > * {
-    padding: 1rem;
+    padding: 1.5rem 2rem;
   }
 `;
 
@@ -83,43 +93,31 @@ function PrimePanel(props) {
                   <Subheading>Selected Area </Subheading>
                 </HeadOptionHeadline>
 
-                <Subheading
-                  variation='primary'
-                  style={{
-                    gridColumn: '1 / 4',
-                  }}
-                >
+                <Subheading variation='primary'>
                   <SubheadingStrong>
                     {selectedArea || 'Not selected'}
                   </SubheadingStrong>
                 </Subheading>
-
-                <EditButton
-                  onClick={function () {
-                    setSelectedArea('1000 km2');
-                  }}
-                  title='Edit Model'
-                  useIcon='area'
-                  style={{
-                    gridColumn: '4',
-                    justifySelf: 'end',
-                  }}
-                >
-                  Clear and Edit Area
-                </EditButton>
-                <EditButton
-                  onClick={function () {
-                    setSelectedArea(null);
-                  }}
-                  title='Edit Model'
-                  useIcon='trash-bin'
-                  style={{
-                    gridColumn: '5',
-                    justifySelf: 'end',
-                  }}
-                >
-                  Edit Area Selection
-                </EditButton>
+                <HeadOptionToolbar>
+                  <EditButton
+                    onClick={function () {
+                      setSelectedArea('1000 km2');
+                    }}
+                    title='Edit Model'
+                    useIcon='area'
+                  >
+                    Clear and Edit Area
+                  </EditButton>
+                  <EditButton
+                    onClick={function () {
+                      setSelectedArea(null);
+                    }}
+                    title='Edit Model'
+                    useIcon='pencil'
+                  >
+                    Edit Area Selection
+                  </EditButton>
+                </HeadOptionToolbar>
               </HeadOption>
 
               <HeadOption>
@@ -127,31 +125,23 @@ function PrimePanel(props) {
                   <Subheading>Selected Model</Subheading>
                 </HeadOptionHeadline>
 
-                <Subheading
-                  variation='primary'
-                  style={{
-                    gridColumn: '1 / 4',
-                  }}
-                >
+                <Subheading variation='primary'>
                   <SubheadingStrong>
                     {selectedModel || 'Select Model'}
                   </SubheadingStrong>
                 </Subheading>
-
-                <EditButton
-                  data-cy='show-select-model-button'
-                  useIcon='swap-horizontal'
-                  onClick={function () {
-                    setShowSelectModelModal(true);
-                  }}
-                  title='Edit Model'
-                  style={{
-                    gridColumn: '5',
-                    justifySelf: 'end',
-                  }}
-                >
-                  Edit Model Selection
-                </EditButton>
+                <HeadOptionToolbar>
+                  <EditButton
+                    data-cy='show-select-model-button'
+                    useIcon='swap-horizontal'
+                    onClick={function () {
+                      setShowSelectModelModal(true);
+                    }}
+                    title='Edit Model'
+                  >
+                    Edit Model Selection
+                  </EditButton>
+                </HeadOptionToolbar>
               </HeadOption>
             </PanelBlockHeader>
             <PanelBlockBody>
