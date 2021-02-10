@@ -23,6 +23,13 @@ import collecticon from '@devseed-ui/collecticons';
 import { multiply } from '../../styles/utils/math';
 import media from '../../styles/utils/media-queries';
 
+import {
+  DropdownHeader,
+  DropdownBody,
+  DropdownItem,
+  DropdownFooter,
+} from '../../styles/dropdown';
+
 const _rgba = stylizeFunction(rgba);
 
 const { appTitle } = config;
@@ -136,7 +143,7 @@ const GlobalMenuLink = styled.a`
 const DropdownTrigger = styled(Button)`
   &::before {
     ${collecticon('user')}
-    font-size: ${multiply(themeVal('type.base.size'), 1.125)};
+    font-size: ${multiply(themeVal('type.base.size'), 0.85)};
   }
 `;
 
@@ -184,7 +191,7 @@ function PageHeader(props) {
               direction='down'
               triggerElement={(props) => (
                 <DropdownTrigger
-                  variation='base-raised-light'
+                  variation='base-raised-semidark'
                   useIcon={['chevron-down--small', 'after']}
                   title='Open dropdown'
                   className='user-options-trigger'
@@ -213,7 +220,7 @@ function PageHeader(props) {
               direction='down'
               triggerElement={(props) => (
                 <DropdownTrigger
-                  variation='base-raised-light'
+                  variation='base-raised-semidark'
                   useIcon={['chevron-down--small', 'after']}
                   title='Open dropdown'
                   className='user-options-trigger'
@@ -224,18 +231,15 @@ function PageHeader(props) {
                 </DropdownTrigger>
               )}
             >
-              <React.Fragment>
-                <DropTitle>Drop Title</DropTitle>
-                <DropMenu>
+              <>
+                <DropdownHeader>Header</DropdownHeader>
+                <DropdownBody>
                   <li>
-                    <DropMenuItem>Menu item 1</DropMenuItem>
-                    <DropMenuItem>Menu item 2</DropMenuItem>
+                    <DropdownItem>Test</DropdownItem>
                   </li>
-                </DropMenu>
-                <DropInset>
-                  <p>Inset Text</p>
-                </DropInset>
-              </React.Fragment>
+                </DropdownBody>
+                <DropdownFooter>Footer</DropdownFooter>
+              </>
             </Dropdown>
           </SecondarySection>
         </PageNav>
