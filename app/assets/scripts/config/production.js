@@ -6,5 +6,7 @@ module.exports = {
     appDescription: 'Microsoft Land Use/Land Classification project.',
     restApiEndoint: 'http://localhost:2000',
     websocketEndpoint: 'ws://localhost:1999',
+    bingApiKey:
+      'ArLmu8JG2PHK_-_zo7yS1WbvDz7PgsoVEgcqFTg8uaH-lsXLcjADCAtnyQB054uq',
   },
 };
