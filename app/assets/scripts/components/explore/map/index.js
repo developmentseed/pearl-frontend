@@ -7,8 +7,7 @@ import tBboxPolygon from '@turf/bbox-polygon';
 import SizeAwareElement from '../../common/size-aware-element';
 import { MapContainer, TileLayer, FeatureGroup } from 'react-leaflet';
 import EditControl from './edit-control';
-import ExploreContext from '../context';
-import { viewModes } from '../constants';
+import { ExploreContext, viewModes } from '../../../context/explore';
 import { round } from '../../../utils/format';
 
 const center = [38.942, -95.449];
@@ -26,7 +25,9 @@ const Container = styled.div`
 
 function Map() {
   const [map, setMap] = useState(null);
-  const { viewMode, setViewMode, setAoi } = useContext(ExploreContext);
+  const { previousViewMode, viewMode, setViewMode, setAoi } = useContext(
+    ExploreContext
+  );
   const [drawRef, setDrawRef] = useState(null);
 
   /**
@@ -37,8 +38,13 @@ function Map() {
 
     if (viewMode === viewModes.CREATE_AOI_MODE) {
       drawRef._toolbars.draw._modes.rectangle.handler.enable();
+    } else if (viewMode === viewModes.EDIT_AOI_MODE) {
+      drawRef._toolbars.edit._modes.edit.handler.enable();
+    } else if (previousViewMode === viewModes.EDIT_AOI_MODE) {
+      drawRef._toolbars.edit._modes.edit.handler.save();
+      drawRef._toolbars.edit._modes.edit.handler.disable();
     }
-  }, [viewMode, drawRef]);
+  }, [drawRef, previousViewMode, viewMode]);
 
   const displayMap = useMemo(
     () => (
@@ -76,6 +82,26 @@ function Map() {
                 bbox,
               });
             }}
+            onEdited={(e) => {
+              const layerId = Object.keys(e.layers._layers)[0];
+              const layer = e.layers._layers[layerId];
+              // Get drawn vector as LineString GeoJSON
+              const vertices = layer._latlngs[0].map(({ lat, lng }) => {
+                return [lng, lat];
+              });
+              const lineString = tLineString(vertices);
+
+              // Calculate BBox and area in square kilometers
+              const bbox = tBbox(lineString);
+              const poly = tBboxPolygon(bbox);
+              const area = convertArea(tArea(poly), 'meters', 'kilometers');
+
+              // Add AOI to context
+              setAoi({
+                area: round(area, 0),
+                bbox,
+              });
+            }}
             draw={{
               polyline: false,
               polygon: false,
@@ -85,7 +111,7 @@ function Map() {
               marker: false,
             }}
             edit={{
-              edit: false,
+              edit: true,
               remove: false,
             }}
           />

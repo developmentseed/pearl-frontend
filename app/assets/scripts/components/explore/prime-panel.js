@@ -9,8 +9,7 @@ import { Subheading } from '../../styles/type/heading';
 import SelectModal from './select-modal';
 import { Card } from './card-list';
 import { availableModels } from './sample-data';
-import ExploreContext from './context';
-import { viewModes } from './constants';
+import { ExploreContext, viewModes } from '../../context/explore';
 
 const SubheadingStrong = styled.strong`
   color: ${themeVal('color.base')};
@@ -47,7 +46,7 @@ export const EditButton = styled(Button).attrs({
 `;
 
 function PrimePanel() {
-  const { setViewMode, aoi, setAoi } = useContext(ExploreContext);
+  const { viewMode, setViewMode, aoi } = useContext(ExploreContext);
   const [selectedModel, setSelectedModel] = useState(null);
   const [showSelectModelModal, setShowSelectModelModal] = useState(false);
 
@@ -70,21 +69,28 @@ function PrimePanel() {
                 </Subheading>
                 <EditButton
                   onClick={function () {
-                    setViewMode(viewModes.CREATE_AOI_MODE);
+                    if (!aoi) {
+                      setViewMode(viewModes.CREATE_AOI_MODE);
+                    } else {
+                      if (viewMode === viewModes.BROWSE_MODE) {
+                        setViewMode(viewModes.EDIT_AOI_MODE);
+                      } else {
+                        setViewMode(viewModes.BROWSE_MODE);
+                      }
+                    }
                   }}
-                  title='Edit Model'
-                  useIcon='area'
+                  title={
+                    aoi ? 'Select Area of Interest' : 'Edit Area of Interest'
+                  }
+                  useIcon={
+                    viewMode === viewModes.EDIT_AOI_MODE
+                      ? 'tick'
+                      : aoi
+                      ? 'pencil'
+                      : 'plus'
+                  }
                 >
-                  Clear and Edit Area
-                </EditButton>
-                <EditButton
-                  onClick={function () {
-                    setAoi(null);
-                  }}
-                  title='Edit Model'
-                  useIcon='trash-bin'
-                >
-                  Edit Area Selection
+                  Select AOI
                 </EditButton>
               </HeadOptionHeadline>
             </PanelBlockHeader>

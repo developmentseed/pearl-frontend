@@ -4,7 +4,7 @@ import ExploreComponent from './explore';
 import PageHeader from '../common/page-header';
 import { PageBody } from '../../styles/page';
 import { Button } from '@devseed-ui/button';
-import { ExploreProvider } from './context';
+import { ExploreProvider } from '../../context/explore';
 
 function Explore() {
   return (
