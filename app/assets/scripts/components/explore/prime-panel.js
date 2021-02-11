@@ -1,39 +1,49 @@
 import React, { useState } from 'react';
-import Panel from '../common/panel';
 import styled from 'styled-components';
-import { themeVal, glsp } from '@devseed-ui/theme-provider';
-
+import { themeVal } from '@devseed-ui/theme-provider';
 import { Button } from '@devseed-ui/button';
-import { PanelBlock, PanelBlockHeader } from '../common/panel-block';
-import { Subheading } from '../../styles/type/heading';
+import T from 'prop-types';
+import Panel from '../common/panel';
+import {
+  PanelBlock,
+  PanelBlockHeader,
+  PanelBlockBody,
+} from '../common/panel-block';
+import { Subheading as BaseSubheading } from '../../styles/type/heading';
 import SelectModal from './select-modal';
 import { Card } from './card-list';
+import { PlaceholderMessage } from '../../styles/placeholder.js';
 
 import { availableModels } from './sample-data';
 
 const SubheadingStrong = styled.strong`
   color: ${themeVal('color.base')};
+  font-size: 0.875rem;
+`;
+
+const Subheading = styled(BaseSubheading)`
+  font-size: 0.75rem;
 `;
 
 export const HeadOption = styled.div`
-  & ~ & {
-    padding-top: ${glsp(0.5)};
-  }
-  &:last-of-type {
-    box-shadow: 0px 1px 0px 0px ${themeVal('color.baseAlphaB')};
-    padding-bottom: ${glsp(0.5)};
-  }
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  box-shadow: 0px 1px 0px 0px ${themeVal('color.baseAlphaC')};
+  padding: 1rem 0;
+  gap: 0.5rem;
 `;
 
 export const HeadOptionHeadline = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
+  grid-column: 1 / -1;
+`;
 
-  & > :first-child {
-    min-width: 5rem;
-  }
+export const HeadOptionToolbar = styled.div`
+  display: grid;
+  justify-self: end;
+  grid-template-columns: repeat(auto-fill, minmax(1rem, 1fr));
+  gap: 1rem;
+  grid-auto-flow: column;
+  justify-items: center;
 `;
 
 export const EditButton = styled(Button).attrs({
@@ -42,10 +52,27 @@ export const EditButton = styled(Button).attrs({
   hideText: true,
 })`
   opacity: 50%;
-  margin-left: auto;
+  width: min-content;
 `;
 
-function PrimePanel() {
+const StyledPanelBlock = styled(PanelBlock)`
+  width: 24rem;
+  display: flex;
+  justify-content: space-between;
+  > * {
+    padding: 1.5rem 2rem;
+  }
+`;
+
+const PanelControls = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 1rem;
+`;
+
+function PrimePanel(props) {
+  const { inferenceResults } = props;
+
   const [selectedModel, setSelectedModel] = useState(null);
   const [showSelectModelModal, setShowSelectModelModal] = useState(false);
   const [selectedArea, setSelectedArea] = useState(null);
@@ -57,57 +84,111 @@ function PrimePanel() {
         collapsible
         direction='left'
         initialState={true}
+        fitContent
         bodyContent={
-          <PanelBlock>
+          <StyledPanelBlock>
             <PanelBlockHeader>
-              <HeadOptionHeadline>
-                <Subheading>Area: </Subheading>
+              <HeadOption>
+                <HeadOptionHeadline>
+                  <Subheading>Selected Area </Subheading>
+                </HeadOptionHeadline>
+
                 <Subheading variation='primary'>
                   <SubheadingStrong>
                     {selectedArea || 'Not selected'}
                   </SubheadingStrong>
                 </Subheading>
-                <EditButton
-                  onClick={function () {
-                    setSelectedArea('1000 km2');
-                  }}
-                  title='Edit Model'
-                  useIcon='area'
-                >
-                  Clear and Edit Area
-                </EditButton>
-                <EditButton
-                  onClick={function () {
-                    setSelectedArea(null);
-                  }}
-                  title='Edit Model'
-                  useIcon='trash-bin'
-                >
-                  Edit Area Selection
-                </EditButton>
-              </HeadOptionHeadline>
-            </PanelBlockHeader>
-            <PanelBlockHeader>
-              <HeadOptionHeadline>
-                <Subheading>Model: </Subheading>
+                <HeadOptionToolbar>
+                  <EditButton
+                    onClick={function () {
+                      setSelectedArea('1000 km2');
+                    }}
+                    title='Edit Model'
+                    useIcon='area'
+                  >
+                    Clear and Edit Area
+                  </EditButton>
+                  <EditButton
+                    onClick={function () {
+                      setSelectedArea(null);
+                    }}
+                    title='Edit Model'
+                    useIcon='pencil'
+                  >
+                    Edit Area Selection
+                  </EditButton>
+                </HeadOptionToolbar>
+              </HeadOption>
+
+              <HeadOption>
+                <HeadOptionHeadline>
+                  <Subheading>Selected Model</Subheading>
+                </HeadOptionHeadline>
+
                 <Subheading variation='primary'>
                   <SubheadingStrong>
                     {selectedModel || 'Select Model'}
                   </SubheadingStrong>
                 </Subheading>
-                <EditButton
-                  data-cy='show-select-model-button'
-                  useIcon='swap-horizontal'
-                  onClick={function () {
-                    setShowSelectModelModal(true);
-                  }}
-                  title='Edit Model'
-                >
-                  Edit Model Selection
-                </EditButton>
-              </HeadOptionHeadline>
+                <HeadOptionToolbar>
+                  <EditButton
+                    data-cy='show-select-model-button'
+                    useIcon='swap-horizontal'
+                    onClick={function () {
+                      setShowSelectModelModal(true);
+                    }}
+                    title='Edit Model'
+                  >
+                    Edit Model Selection
+                  </EditButton>
+                </HeadOptionToolbar>
+              </HeadOption>
             </PanelBlockHeader>
-          </PanelBlock>
+            <PanelBlockBody>
+              {inferenceResults ? (
+                <div>Inference</div>
+              ) : (
+                <PlaceholderMessage>
+                  Click &quot;Run Inference&quot; to generate the class LULC map
+                  for your AOI
+                </PlaceholderMessage>
+              )}
+            </PanelBlockBody>
+
+            <PanelControls>
+              <Button
+                variation='base-raised-light'
+                size='medium'
+                useIcon='tick--small'
+                style={{
+                  gridColumn: '1 / 2',
+                }}
+              >
+                Reset
+              </Button>
+              <Button
+                variation='base-raised-light'
+                size='medium'
+                useIcon='tick--small'
+                style={{
+                  gridColumn: '2 / -1',
+                }}
+              >
+                Undo
+              </Button>
+
+              <Button
+                variation='base-raised-dark'
+                size='medium'
+                useIcon='tick--small'
+                style={{
+                  gridColumn: '1 / -1',
+                }}
+              >
+                Run inference
+              </Button>
+            </PanelControls>
+          </StyledPanelBlock>
         }
       />
       <SelectModal
@@ -136,4 +217,7 @@ function PrimePanel() {
   );
 }
 
+PrimePanel.propTypes = {
+  inferenceResults: T.array,
+};
 export default PrimePanel;
