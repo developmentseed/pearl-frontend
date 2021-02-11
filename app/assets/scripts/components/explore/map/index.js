@@ -105,7 +105,19 @@ function Map() {
             draw={{
               polyline: false,
               polygon: false,
-              rectangle: true,
+              rectangle: {
+                shapeOptions: {
+                  stroke: true,
+                  color: '#3388ff',
+                  weight: 4,
+                  opacity: 0.5,
+                  fill: false,
+                  fillColor: null, //same as color by default
+                  fillOpacity: 0.2,
+                  showArea: false,
+                  clickable: false,
+                },
+              },
               circle: false,
               circlemarker: false,
               marker: false,
