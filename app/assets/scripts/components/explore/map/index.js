@@ -84,6 +84,10 @@ function Map() {
             }}
             onEdited={(e) => {
               const layerId = Object.keys(e.layers._layers)[0];
+
+              // Bypass if no layer was touched
+              if (typeof layerId === 'undefined') return;
+
               const layer = e.layers._layers[layerId];
               // Get drawn vector as LineString GeoJSON
               const vertices = layer._latlngs[0].map(({ lat, lng }) => {
