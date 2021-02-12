@@ -8,7 +8,8 @@ function GeoCoder({ map }) {
   useEffect(() => {
     const search = new GeoSearch.GeoSearchControl({
       showMarker: false,
-
+      autoClose: true,
+      resetButton: null,
       provider: new GeoSearch.BingProvider({
         params: {
           key: bingApiKey,
