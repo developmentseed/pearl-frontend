@@ -10,8 +10,7 @@ import {
 } from '../../styles/inpage';
 import Panel from '../common/panel';
 import PrimePanel from './prime-panel';
-import MapComponent from '../common/map/map';
-import Layer from '../common/map/layer';
+import Map from './map';
 
 const ExploreBody = styled(InpageBody)`
   display: grid;
@@ -34,26 +33,7 @@ function Explore() {
         <ExploreBody>
           <PrimePanel />
           <ExploreCarto>
-            <MapComponent>
-              <Layer
-                name='base-map'
-                type='tileLayer'
-                source='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png?'
-                options={{
-                  attribution:
-                    '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-                }}
-              />
-
-              <Layer
-                type='polyline'
-                source={[
-                  [45.51, -122.68],
-                  [37.77, -122.43],
-                  [34.04, -118.2],
-                ]}
-              />
-            </MapComponent>
+            <Map />
           </ExploreCarto>
           <Panel
             collapsible
