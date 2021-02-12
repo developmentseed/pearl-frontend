@@ -23,6 +23,29 @@ const Container = styled.div`
   }
 `;
 
+/**
+ * Helper function to extract an AOI from a layer created/edited with Leaflet.draw
+ *
+ * @param {Object} layer A layer object from Leaflet.draw
+ */
+function getAoiFromLayer(layer) {
+  // Get drawn vector as LineString GeoJSON
+  const vertices = layer._latlngs[0].map(({ lat, lng }) => {
+    return [lng, lat];
+  });
+  const lineString = tLineString(vertices);
+
+  // Calculate BBox and area in square kilometers
+  const bbox = tBbox(lineString);
+  const poly = tBboxPolygon(bbox);
+  const area = convertArea(tArea(poly), 'meters', 'kilometers');
+
+  return {
+    area: round(area, 0),
+    bbox,
+  };
+}
+
 function Map() {
   const [map, setMap] = useState(null);
   const { previousViewMode, viewMode, setViewMode, setAoi } = useContext(
@@ -65,22 +88,8 @@ function Map() {
               // Disable draw mode
               setViewMode(viewModes.BROWSE_MODE);
 
-              // Get drawn vector as LineString GeoJSON
-              const vertices = e.layer._latlngs[0].map(({ lat, lng }) => {
-                return [lng, lat];
-              });
-              const lineString = tLineString(vertices);
-
-              // Calculate BBox and area in square kilometers
-              const bbox = tBbox(lineString);
-              const poly = tBboxPolygon(bbox);
-              const area = convertArea(tArea(poly), 'meters', 'kilometers');
-
               // Add AOI to context
-              setAoi({
-                area: round(area, 0),
-                bbox,
-              });
+              setAoi(getAoiFromLayer(e.layer));
             }}
             onEdited={(e) => {
               const layerId = Object.keys(e.layers._layers)[0];
@@ -88,23 +97,11 @@ function Map() {
               // Bypass if no layer was touched
               if (typeof layerId === 'undefined') return;
 
+              // Get first layer edited
               const layer = e.layers._layers[layerId];
-              // Get drawn vector as LineString GeoJSON
-              const vertices = layer._latlngs[0].map(({ lat, lng }) => {
-                return [lng, lat];
-              });
-              const lineString = tLineString(vertices);
-
-              // Calculate BBox and area in square kilometers
-              const bbox = tBbox(lineString);
-              const poly = tBboxPolygon(bbox);
-              const area = convertArea(tArea(poly), 'meters', 'kilometers');
 
               // Add AOI to context
-              setAoi({
-                area: round(area, 0),
-                bbox,
-              });
+              setAoi(getAoiFromLayer(layer));
             }}
             draw={{
               polyline: false,
