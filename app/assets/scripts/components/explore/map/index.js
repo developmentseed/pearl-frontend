@@ -95,7 +95,7 @@ function Map() {
         zoom={zoom}
         style={{ height: '100%' }}
         whenCreated={(m) => {
-          setMap(m)
+          setMap(m);
 
           if (process.env.NODE_ENV !== 'production') {
             // makes map accessible in console for debugging
