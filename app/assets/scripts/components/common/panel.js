@@ -4,6 +4,8 @@ import styled, { css } from 'styled-components';
 import Button from '../../styles/button/button';
 
 import { themeVal, stylizeFunction } from '../../styles/utils/general';
+import { multiply } from '../../styles/utils/math';
+
 import { tint } from 'polished';
 import { headingAlt } from '../../styles/type/heading';
 import { panelSkin } from '../../styles/skins';
@@ -103,7 +105,7 @@ const PanelOffsetActions = styled.div`
 
 const PanelControls = styled.div`
   display: grid;
-  grid-gap: 0.5rem;
+  grid-gap: ${multiply(themeVal('layout.space'), 0.5)};
 
   position: absolute;
   top: ${glsp(0.5)};

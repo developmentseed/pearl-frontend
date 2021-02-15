@@ -9,6 +9,9 @@ import { MapContainer, TileLayer, FeatureGroup } from 'react-leaflet';
 import EditControl from './edit-control';
 import { ExploreContext, viewModes } from '../../../context/explore';
 import { round } from '../../../utils/format';
+import GeoCoder from '../../common/map/geocoder';
+import { themeVal } from '../../../styles/utils/general';
+import { multiply } from '../../../styles/utils/math';
 
 const center = [38.942, -95.449];
 const zoom = 4;
@@ -20,6 +23,22 @@ const Container = styled.div`
   .leaflet-draw-toolbar,
   .leaflet-draw-actions {
     visibility: hidden;
+  }
+
+  .leaflet-top.leaflet-left {
+    /* Shift control container vertically */
+    top: 7.5vh;
+    .leaflet-geosearch-button.active form {
+      /* CSS quirk to make input box the right height */
+      line-height: 2.5;
+    }
+    .leaflet-control {
+      margin-left: ${multiply(themeVal('layout.space'), 0.5)};
+    }
+
+    .leaflet-control.leaflet-draw {
+      box-shadow: none;
+    }
   }
 `;
 
@@ -75,13 +94,21 @@ function Map() {
         center={center}
         zoom={zoom}
         style={{ height: '100%' }}
-        whenCreated={setMap}
+        whenCreated={(m) => {
+          setMap(m);
+
+          if (process.env.NODE_ENV !== 'production') {
+            // makes map accessible in console for debugging
+            window.map = m;
+          }
+        }}
       >
         <TileLayer
           attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
           url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
         />
         <FeatureGroup>
+          <GeoCoder />
           <EditControl
             onMounted={setDrawRef}
             onCreated={(e) => {
