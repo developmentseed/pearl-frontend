@@ -1,10 +1,13 @@
 import { useEffect } from 'react';
 import * as GeoSearch from 'leaflet-geosearch';
 import config from '../../../config';
+import { useMap } from 'react-leaflet';
 
 const { bingApiKey } = config;
 
-function GeoCoder({ map }) {
+function GeoCoder() {
+  const map = useMap();
+
   useEffect(() => {
     const search = new GeoSearch.GeoSearchControl({
       showMarker: false,
@@ -17,7 +20,7 @@ function GeoCoder({ map }) {
       }),
     });
     map.addControl(search);
-  }, []);
+  }, [map]);
   return null;
 }
 

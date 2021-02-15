@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
+import Panel from '../common/panel';
 import styled from 'styled-components';
 import { themeVal } from '@devseed-ui/theme-provider';
 import { Button } from '@devseed-ui/button';
 import T from 'prop-types';
-import Panel from '../common/panel';
 import {
   PanelBlock,
   PanelBlockHeader,
@@ -15,6 +15,7 @@ import { Card } from './card-list';
 import { PlaceholderMessage } from '../../styles/placeholder.js';
 
 import { availableModels } from './sample-data';
+import { ExploreContext, viewModes } from '../../context/explore';
 
 const SubheadingStrong = styled.strong`
   color: ${themeVal('color.base')};
@@ -72,10 +73,10 @@ const PanelControls = styled.div`
 
 function PrimePanel(props) {
   const { inferenceResults } = props;
+  const { viewMode, setViewMode, aoi } = useContext(ExploreContext);
 
   const [selectedModel, setSelectedModel] = useState(null);
   const [showSelectModelModal, setShowSelectModelModal] = useState(false);
-  const [selectedArea, setSelectedArea] = useState(null);
 
   return (
     <>
@@ -95,27 +96,34 @@ function PrimePanel(props) {
 
                 <Subheading variation='primary'>
                   <SubheadingStrong>
-                    {selectedArea || 'Not selected'}
+                    {aoi && aoi.area > 0 ? `${aoi.area} km2` : 'Not selected'}
                   </SubheadingStrong>
                 </Subheading>
                 <HeadOptionToolbar>
                   <EditButton
                     onClick={function () {
-                      setSelectedArea('1000 km2');
+                      if (!aoi) {
+                        setViewMode(viewModes.CREATE_AOI_MODE);
+                      } else {
+                        if (viewMode === viewModes.BROWSE_MODE) {
+                          setViewMode(viewModes.EDIT_AOI_MODE);
+                        } else {
+                          setViewMode(viewModes.BROWSE_MODE);
+                        }
+                      }
                     }}
-                    title='Edit Model'
-                    useIcon='area'
+                    title={
+                      aoi ? 'Select Area of Interest' : 'Edit Area of Interest'
+                    }
+                    useIcon={
+                      viewMode === viewModes.EDIT_AOI_MODE
+                        ? 'tick'
+                        : aoi
+                        ? 'pencil'
+                        : 'plus'
+                    }
                   >
-                    Clear and Edit Area
-                  </EditButton>
-                  <EditButton
-                    onClick={function () {
-                      setSelectedArea(null);
-                    }}
-                    title='Edit Model'
-                    useIcon='pencil'
-                  >
-                    Edit Area Selection
+                    Select AOI
                   </EditButton>
                 </HeadOptionToolbar>
               </HeadOption>
