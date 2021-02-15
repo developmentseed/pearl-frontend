@@ -102,6 +102,7 @@
     "@devseed-ui/button": "3.0.0-rc.0",
     "@devseed-ui/collecticons": "2.0.0-rc.0",
     "@devseed-ui/dropdown": "2.0.0-rc.0",
+    "@devseed-ui/global-loading": "^1.0.0-rc.0",
     "@devseed-ui/modal": "^2.0.0",
     "@devseed-ui/theme-provider": "^3.0.0-rc.0",
     "@react-leaflet/core": "^1.0.2",
@@ -127,6 +128,7 @@
     "react-leaflet-draw": "^0.19.0",
     "react-router": "^5.2.0",
     "react-router-dom": "^5.2.0",
+    "react-toastify": "^7.0.3",
     "request-promise": "^4.2.6",
     "styled-components": "^5.2.1"
   }

@@ -917,6 +917,13 @@
     debug "^3.1.0"
     lodash.once "^4.1.1"
 
+"@devseed-ui/base@2.2.0", "@devseed-ui/base@^2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@devseed-ui/base/-/base-2.2.0.tgz#191e9a5cb6f068716a5b00ee175514e2ebd15e78"
+  integrity sha512-n/PluIDo8oyAfP5Tyl/R14vE9a3AAR+v1f8Oo+sdIIST3zkqORuq0/8qO+Y9UAxXOT0yzJgZb3RG5XrM+gNJ/A==
+  dependencies:
+    lodash.get "^4.4.2"
+
 "@devseed-ui/button@3.0.0-rc.0":
   version "3.0.0-rc.0"
   resolved "https://registry.yarnpkg.com/@devseed-ui/button/-/button-3.0.0-rc.0.tgz#a9c86e322a3f213ac8a226e155eeda2200a806a8"
@@ -924,6 +931,26 @@
   dependencies:
     "@devseed-ui/collecticons" "2.0.0-rc.0"
     "@devseed-ui/theme-provider" "^3.0.0-rc.0"
+
+"@devseed-ui/button@^2.4.2":
+  version "2.4.5"
+  resolved "https://registry.yarnpkg.com/@devseed-ui/button/-/button-2.4.5.tgz#fe291b26765ac314ddd347161a54a228b5e5ef04"
+  integrity sha512-0UyqNo2q2uR5qnhE6/CaH9KObKoXwNGV6VZsh1BvPO3aXL1YarKJ+m40y5H7dHFjaQbnMLSZ1Ecbxd3PHWytig==
+  dependencies:
+    "@devseed-ui/collecticons" "1.0.0"
+    "@devseed-ui/theme-provider" "^2.4.0"
+
+"@devseed-ui/collecticons@0.12.0":
+  version "0.12.0"
+  resolved "https://registry.yarnpkg.com/@devseed-ui/collecticons/-/collecticons-0.12.0.tgz#c7b70fc6cf0fd48b318645cfb9a89a167eb7610b"
+  integrity sha512-/hZ59PIPpMnc19B+Qltxh/fSPkj3DjrSffOtWdaZlAK9tX1l37r/ZvwJlom+EUJrwJjTDTXgXFrOFKzWJF1j2w==
+  dependencies:
+    collecticons-lib "^2.1.0"
+
+"@devseed-ui/collecticons@1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@devseed-ui/collecticons/-/collecticons-1.0.0.tgz#c185b55a973e1de4aadde6dc2d9fef4f2d3a81d0"
+  integrity sha512-27+t+hvxo7iqSk7XsdONxIN646NyuD8wZOlr1NuDp7Owxsl9MyFspRYe788QxKChEF1pnhG7GIZXJqf9NuG6jw==
 
 "@devseed-ui/collecticons@2.0.0-rc.0":
   version "2.0.0-rc.0"
@@ -941,6 +968,26 @@
     "@devseed-ui/typography" "1.0.0-rc.0"
     react-tether "^2.0.7"
     react-transition-group "^4.3.0"
+
+"@devseed-ui/global-loading@^1.0.0-rc.0":
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/@devseed-ui/global-loading/-/global-loading-1.2.2.tgz#6ec1051f6186bb336537bc43a9747ed812b05b55"
+  integrity sha512-BmrKR3s6/S80zJXvVFi35wuawfb36WYzQwxO1gJsxURjl6afY37sObi11ui6ydEcNwED7COdu6mQyAiOCiytEw==
+  dependencies:
+    "@devseed-ui/base" "^2.2.0"
+    "@devseed-ui/button" "^2.4.2"
+    "@devseed-ui/collecticons" "0.12.0"
+    "@devseed-ui/helpers" "^2.3.0"
+    react-dom "^16.13.0"
+    react-transition-group "^4.3.0"
+
+"@devseed-ui/helpers@^2.3.0":
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/@devseed-ui/helpers/-/helpers-2.3.0.tgz#f8e622a4184c6663b8c30adcdebb443500afbf65"
+  integrity sha512-e0HjzsBQlU3ZPC8ARIGPp4SayOzYXajpdixxkqXvkdQxuFxB2l3fMGQh1AjP18MmJNxCx6lwXi4CnZ/A3+xWYQ==
+  dependencies:
+    "@devseed-ui/base" "2.2.0"
+    "@devseed-ui/theme" "2.3.0"
 
 "@devseed-ui/modal@^2.0.0":
   version "2.0.0"
@@ -964,6 +1011,13 @@
   integrity sha512-yYjS5b3Y/sZ5fw9F/AOJIrMcfTxHu0c88ryQ467pIU9ObJUPC3R9avGfzOWz0ayGkpkUo6hL+fBDWDOLd36RmQ==
   dependencies:
     lodash.get "^4.4.2"
+    polished "^3.4.2"
+
+"@devseed-ui/theme@2.3.0":
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/@devseed-ui/theme/-/theme-2.3.0.tgz#98b9aa3c40ff28315ba713c5dd5d6fa045a1db43"
+  integrity sha512-59/CzyAhx/iSfUBpYsADE+/Ld1FvPB6Xr5+WTwpJI67tWnLihiND+hcOX1LjQahgNePNYDzDPuntC7IQjudweQ==
+  dependencies:
     polished "^3.4.2"
 
 "@devseed-ui/typography@1.0.0-rc.0":
@@ -2645,6 +2699,11 @@ cloneable-readable@^1.0.0:
     process-nextick-args "^2.0.0"
     readable-stream "^2.3.5"
 
+clsx@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/clsx/-/clsx-1.1.1.tgz#98b3134f9abbdf23b2663491ace13c5c03a73188"
+  integrity sha512-6/bPho624p3S2pMyvP5kKBPXnI3ufHLObBFCfgx+LkeR5lg2XYy2hqZqUf45ypD8COn2bhgGJSUE+l5dhNBieA==
+
 coa@^2.0.2:
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/coa/-/coa-2.0.2.tgz#43f6c21151b4ef2bf57187db0d73de229e3e7ec3"
@@ -2658,6 +2717,11 @@ code-point-at@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/code-point-at/-/code-point-at-1.1.0.tgz#0d070b4d043a5bea33a2f1a40e2edb3d9a4ccf77"
   integrity sha1-DQcLTQQ6W+ozovGkDi7bPZpMz3c=
+
+collecticons-lib@^2.1.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/collecticons-lib/-/collecticons-lib-2.2.0.tgz#030ccbd5548f9524322f07c2db2fffc546f8abff"
+  integrity sha512-CZMlA74WOxOF0aqaZa3XLhV+mrY0mueNHf4FgBxGikRT/tp3/iEwISx+B709uZ51g27HHJDNvk/cfO5V1aa7kA==
 
 collecticons-processor@^4.1.0:
   version "4.1.0"
@@ -8247,6 +8311,16 @@ react-custom-scrollbars@^4.2.1:
     prop-types "^15.5.10"
     raf "^3.1.0"
 
+react-dom@^16.13.0:
+  version "16.14.0"
+  resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-16.14.0.tgz#7ad838ec29a777fb3c75c3a190f661cf92ab8b89"
+  integrity sha512-1gCeQXDLoIqMgqD3IO2Ah9bnf0w9kzhwN5q4FGnHZ67hBm9yePzB5JJAIQCc8x3pFnNlwFq4RidZggNAAkzWWw==
+  dependencies:
+    loose-envify "^1.1.0"
+    object-assign "^4.1.1"
+    prop-types "^15.6.2"
+    scheduler "^0.19.1"
+
 react-dom@^17.0.1:
   version "17.0.1"
   resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-17.0.1.tgz#1de2560474ec9f0e334285662ede52dbc5426fc6"
@@ -8331,6 +8405,13 @@ react-tether@^2.0.7:
   dependencies:
     prop-types "^15.6.2"
     tether "^1.4.5"
+
+react-toastify@^7.0.3:
+  version "7.0.3"
+  resolved "https://registry.yarnpkg.com/react-toastify/-/react-toastify-7.0.3.tgz#93804c777ecf918872ba3b5be9c654db14547f85"
+  integrity sha512-cxZ5rfurC8LzcZQMTYc8RHIkQTs+BFur18Pzk6Loz6uS8OXUWm6nXVlH/wqglz4Z7UAE8xxcF5mRjfE13487uQ==
+  dependencies:
+    clsx "^1.1.1"
 
 react-transition-group@^4.3.0:
   version "4.4.1"
@@ -8881,6 +8962,14 @@ sax@^1.2.4, sax@~1.2.4:
   version "1.2.4"
   resolved "https://registry.yarnpkg.com/sax/-/sax-1.2.4.tgz#2816234e2378bddc4e5354fab5caa895df7100d9"
   integrity sha512-NqVDv9TpANUjFm0N8uM5GxL36UgKi9/atZw+x7YFnQ8ckwFGKrl4xX4yWtrey3UJm5nP1kUbnYgLopqWNSRhWw==
+
+scheduler@^0.19.1:
+  version "0.19.1"
+  resolved "https://registry.yarnpkg.com/scheduler/-/scheduler-0.19.1.tgz#4f3e2ed2c1a7d65681f4c854fa8c5a1ccb40f196"
+  integrity sha512-n/zwRWRYSUj0/3g/otKDRPMh6qv2SYMWNq85IEa8iZyAv8od9zDYpGSnpBEjNgcMNq6Scbu5KfIPxNF72R/2EA==
+  dependencies:
+    loose-envify "^1.1.0"
+    object-assign "^4.1.1"
 
 scheduler@^0.20.1:
   version "0.20.1"
