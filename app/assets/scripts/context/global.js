@@ -36,7 +36,7 @@ const currentModel = {
 
 /* eslint-disable no-console */
 export function GlobalContextProvider(props) {
-  const { isAuthenticated, getAccessTokenSilently } = useAuth0();
+  const { isAuthenticated, getAccessTokenWithPopup } = useAuth0();
 
   const [restApiHealth, dispatchRestApiStatus] = useReducer(
     createRestApiHealthReducer,
@@ -51,7 +51,7 @@ export function GlobalContextProvider(props) {
 
   useEffect(() => {
     async function getWebsocketConnection() {
-      const token = await getAccessTokenSilently({
+      const token = await getAccessTokenWithPopup({
         audience: 'http://localhost:2000',
       });
 
