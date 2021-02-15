@@ -4,10 +4,10 @@ import usePrevious from '../utils/use-previous';
 import { initialApiRequestState } from '../reducers/reduxeed';
 import { createApiMetaReducer, queryApiMeta } from '../reducers/api';
 import {
-  showGlobalLoading,
   showGlobalLoadingMessage,
   hideGlobalLoading,
 } from '@devseed-ui/global-loading';
+import toasts from '../components/common/toasts';
 import { useHistory } from 'react-router-dom';
 
 /**
@@ -49,6 +49,7 @@ export function ExploreProvider(props) {
 
     hideGlobalLoading();
     if (apiMeta.hasError()) {
+      toasts.error('API is unavailable, please try again later.');
       history.push('/');
     }
   }, [apiMeta]); // eslint-disable-line react-hooks/exhaustive-deps

@@ -18,6 +18,7 @@ import UhOh from './components/uhoh';
 import { GlobalContextProvider } from './context/global';
 import { CollecticonsGlobalStyle } from '@devseed-ui/collecticons';
 import { GlobalLoading } from '@devseed-ui/global-loading';
+import { ToastContainerCustom } from './components/common/toasts';
 
 // Root component.
 function Root() {
@@ -33,7 +34,6 @@ function Root() {
       <Router history={history}>
         <DevseedUiThemeProvider theme={theme.main}>
           <CollecticonsGlobalStyle />
-          <GlobalLoading />
           <GlobalContextProvider>
             <GlobalStyles />
             <Switch>
@@ -43,6 +43,8 @@ function Root() {
               <Route path='*' component={UhOh} />
             </Switch>
           </GlobalContextProvider>
+          <GlobalLoading />
+          <ToastContainerCustom />
         </DevseedUiThemeProvider>
       </Router>
     </ErrorBoundary>
