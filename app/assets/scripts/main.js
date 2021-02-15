@@ -15,7 +15,6 @@ import Explore from './components/explore';
 import About from './components/about';
 import UhOh from './components/uhoh';
 
-import { GlobalContextProvider } from './context/global';
 import { CollecticonsGlobalStyle } from '@devseed-ui/collecticons';
 import { GlobalLoading } from '@devseed-ui/global-loading';
 import { ToastContainerCustom } from './components/common/toasts';
@@ -34,15 +33,13 @@ function Root() {
       <Router history={history}>
         <DevseedUiThemeProvider theme={theme.main}>
           <CollecticonsGlobalStyle />
-          <GlobalContextProvider>
-            <GlobalStyles />
-            <Switch>
-              <Route exact path='/' component={Home} />
-              <Route exact path='/explore' component={Explore} />
-              <Route path='/about' component={About} />
-              <Route path='*' component={UhOh} />
-            </Switch>
-          </GlobalContextProvider>
+          <GlobalStyles />
+          <Switch>
+            <Route exact path='/' component={Home} />
+            <Route exact path='/explore' component={Explore} />
+            <Route path='/about' component={About} />
+            <Route path='*' component={UhOh} />
+          </Switch>
           <GlobalLoading />
           <ToastContainerCustom />
         </DevseedUiThemeProvider>
