@@ -5,7 +5,7 @@ import {
   makeAbortableAPIReducer,
   wrapLogReducer,
 } from './reduxeed';
-const { restApiEndoint } = config;
+const { restApiEndpoint } = config;
 
 /**
  * REST API HEALTH
@@ -14,7 +14,7 @@ const restApiHealthActions = makeAbortableActions('REST_API_HEALTH');
 
 export function queryRestApiHealth() {
   return makeFetchThunk({
-    url: `${restApiEndoint}/health`,
+    url: `${restApiEndpoint}/health`,
     requestFn: restApiHealthActions.request,
     receiveFn: restApiHealthActions.receive,
   });

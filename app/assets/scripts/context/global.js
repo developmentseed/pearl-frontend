@@ -7,7 +7,7 @@ import {
 } from '../reducers/api';
 import config from '../config';
 
-const { restApiEndoint } = config;
+const { restApiEndpoint } = config;
 
 const GlobalContext = createContext({});
 
@@ -50,7 +50,7 @@ export function GlobalContextProvider(props) {
     async function getWebsocketConnection() {
       // Create user
       try {
-        await fetchJSON(`${restApiEndoint}/api/user`, {
+        await fetchJSON(`${restApiEndpoint}/api/user`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -66,7 +66,7 @@ export function GlobalContextProvider(props) {
       }
 
       // Sign in
-      await fetchJSON(`${restApiEndoint}/api/login`, {
+      await fetchJSON(`${restApiEndpoint}/api/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -80,7 +80,7 @@ export function GlobalContextProvider(props) {
 
       // Create or get model with id=1
       try {
-        await fetchJSON(`${restApiEndoint}/api/model/1`, {
+        await fetchJSON(`${restApiEndpoint}/api/model/1`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -89,7 +89,7 @@ export function GlobalContextProvider(props) {
         });
       } catch (error) {
         if (error.statusCode === 404) {
-          await fetchJSON(`${restApiEndoint}/api/model`, {
+          await fetchJSON(`${restApiEndpoint}/api/model`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -102,7 +102,7 @@ export function GlobalContextProvider(props) {
 
       // Get GPU instance
       try {
-        const { body } = await fetchJSON(`${restApiEndoint}/api/instance`, {
+        const { body } = await fetchJSON(`${restApiEndpoint}/api/instance`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
