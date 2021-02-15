@@ -117,7 +117,6 @@ export default () => css`
     }
   }
 
-
   @keyframes Toastify__trackProgress {
     0% {
       transform: scaleX(1);
