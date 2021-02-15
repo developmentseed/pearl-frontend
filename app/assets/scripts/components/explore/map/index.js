@@ -94,7 +94,14 @@ function Map() {
         center={center}
         zoom={zoom}
         style={{ height: '100%' }}
-        whenCreated={setMap}
+        whenCreated={(m) => {
+          setMap(m)
+
+          if (process.env.NODE_ENV !== 'production') {
+            // makes map accessible in console for debugging
+            window.map = m;
+          }
+        }}
       >
         <TileLayer
           attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
