@@ -104,6 +104,7 @@
     "@devseed-ui/dropdown": "2.0.0-rc.0",
     "@devseed-ui/modal": "^2.0.0",
     "@devseed-ui/theme-provider": "^3.0.0-rc.0",
+    "@devseed-ui/global-loading": "^1.0.0-rc.0",
     "@react-leaflet/core": "^1.0.2",
     "@turf/area": "^6.3.0",
     "@turf/bbox": "^6.3.0",

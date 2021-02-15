@@ -17,6 +17,8 @@ import UhOh from './components/uhoh';
 
 import { GlobalContextProvider } from './context/global';
 import { CollecticonsGlobalStyle } from '@devseed-ui/collecticons';
+import { GlobalLoading } from '@devseed-ui/global-loading';
+
 // Root component.
 function Root() {
   useEffect(() => {
@@ -31,6 +33,7 @@ function Root() {
       <Router history={history}>
         <DevseedUiThemeProvider theme={theme.main}>
           <CollecticonsGlobalStyle />
+          <GlobalLoading />
           <GlobalContextProvider>
             <GlobalStyles />
             <Switch>

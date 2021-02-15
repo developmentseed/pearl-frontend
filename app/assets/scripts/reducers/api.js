@@ -2,7 +2,7 @@ import config from '../config';
 import {
   makeAbortableActions,
   makeFetchThunk,
-  makeAbortableAPIReducer,
+  makeAPIReducer,
   wrapLogReducer,
 } from './reduxeed';
 const { restApiEndpoint } = config;
@@ -21,5 +21,20 @@ export function queryRestApiHealth() {
 }
 
 export const createRestApiHealthReducer = wrapLogReducer(
-  makeAbortableAPIReducer('REST_API_HEALTH')
+  makeAPIReducer('REST_API_HEALTH')
 );
+
+/**
+ * API Metadata
+ */
+const apiMetaActions = makeAbortableActions('API_META');
+
+export function queryApiMeta() {
+  return makeFetchThunk({
+    url: `${restApiEndpoint}/api`,
+    requestFn: apiMetaActions.request,
+    receiveFn: apiMetaActions.receive,
+  });
+}
+
+export const createApiMetaReducer = wrapLogReducer(makeAPIReducer('API_META'));
