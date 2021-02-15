@@ -23,6 +23,7 @@ jobs:
           node-version: 14
 
       - name: Cache node modules
+        id: cache-node-modules
         uses: actions/cache@v2
         env:
           cache-name: cache-node-modules
@@ -35,6 +36,7 @@ jobs:
             ${{ runner.os }}-
 
       - name: Install
+        if: steps.cache-node-modules.outputs.cache-hit != 'true'
         run: yarn install
 
       - name: Lint
@@ -54,6 +56,7 @@ jobs:
           node-version: 14
 
       - name: Cache node modules
+        id: cache-node-modules
         uses: actions/cache@v2
         env:
           cache-name: cache-node-modules
@@ -68,6 +71,7 @@ jobs:
             ${{ runner.os }}-
 
       - name: Install
+        if: steps.cache-node-modules.outputs.cache-hit != 'true'
         run: yarn install
 
       - name: Test End-to-end
@@ -90,6 +94,7 @@ jobs:
           node-version: 14
 
       - name: Cache node modules
+        id: cache-node-modules
         uses: actions/cache@v2
         env:
           cache-name: cache-node-modules
@@ -102,6 +107,7 @@ jobs:
             ${{ runner.os }}-
 
       - name: Install
+        if: steps.cache-node-modules.outputs.cache-hit != 'true'
         run: yarn install
 
       - name: Build
