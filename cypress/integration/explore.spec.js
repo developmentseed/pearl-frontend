@@ -19,7 +19,7 @@ describe('The Explore Page', () => {
   });
 
   it('Display select model modal on click', () => {
-    cy.get('[data-cy=show-select-model-button]').click();
+    cy.get('[data-cy=show-select-model-button]').click({ force: true });
 
     // Ideally we should use data-cy prop, but the Model doesn't support it.
     // Ticketed here: https://github.com/developmentseed/ui-library-seed/issues/175
