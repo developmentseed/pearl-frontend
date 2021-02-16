@@ -6,12 +6,7 @@ import config from '../../config';
 import { NavLink } from 'react-router-dom';
 import Button from '../../styles/button/button';
 
-import Dropdown, {
-  DropTitle,
-  DropMenu,
-  DropMenuItem,
-  DropInset,
-} from '@devseed-ui/dropdown';
+import Dropdown from '@devseed-ui/dropdown';
 import {
   themeVal,
   stylizeFunction,
@@ -201,19 +196,25 @@ function PageHeader(props) {
                   Checkpoints
                 </DropdownTrigger>
               )}
+              className='global__dropdown'
             >
-              <React.Fragment>
-                <DropTitle>Drop Title</DropTitle>
-                <DropMenu>
+              <>
+                <DropdownHeader>
+                  <p>Hello</p>
+                  <h1>Sylvan Couvert</h1>
+                </DropdownHeader>
+                <DropdownBody>
                   <li>
-                    <DropMenuItem>Menu item 1</DropMenuItem>
-                    <DropMenuItem>Menu item 2</DropMenuItem>
+                    <DropdownItem useIcon='picture'>My Projects</DropdownItem>
                   </li>
-                </DropMenu>
-                <DropInset>
-                  <p>Inset Text</p>
-                </DropInset>
-              </React.Fragment>
+                  <li>
+                    <DropdownItem useIcon='picture'>My Projects</DropdownItem>
+                  </li>
+                </DropdownBody>
+                <DropdownFooter>
+                  <DropdownItem useIcon='logout'>Sign Out</DropdownItem>
+                </DropdownFooter>
+              </>
             </Dropdown>
             <Dropdown
               alignment='center'
@@ -230,15 +231,24 @@ function PageHeader(props) {
                   Account
                 </DropdownTrigger>
               )}
+              className='global__dropdown'
             >
               <>
-                <DropdownHeader>Header</DropdownHeader>
+                <DropdownHeader>
+                  <p>Hello</p>
+                  <h1>Sylvan Couvert</h1>
+                </DropdownHeader>
                 <DropdownBody>
                   <li>
-                    <DropdownItem>Test</DropdownItem>
+                    <DropdownItem useIcon='picture'>My Projects</DropdownItem>
+                  </li>
+                  <li>
+                    <DropdownItem useIcon='picture'>My Projects</DropdownItem>
                   </li>
                 </DropdownBody>
-                <DropdownFooter>Footer</DropdownFooter>
+                <DropdownFooter>
+                  <DropdownItem useIcon='logout'>Sign Out</DropdownItem>
+                </DropdownFooter>
               </>
             </Dropdown>
           </SecondarySection>
