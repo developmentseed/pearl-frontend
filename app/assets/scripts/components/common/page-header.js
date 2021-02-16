@@ -6,7 +6,7 @@ import config from '../../config';
 import { NavLink } from 'react-router-dom';
 import Button from '../../styles/button/button';
 
-import Dropdown from '@devseed-ui/dropdown';
+import BaseDropdown from '@devseed-ui/dropdown';
 import {
   themeVal,
   stylizeFunction,
@@ -28,6 +28,9 @@ import {
 const _rgba = stylizeFunction(rgba);
 
 const { appTitle } = config;
+const Dropdown = styled(BaseDropdown)`
+  padding: 0;
+`;
 
 const PageHead = styled.header`
   background-color: ${themeVal('color.baseAlphaA')};
