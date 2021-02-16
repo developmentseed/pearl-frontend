@@ -6,6 +6,5 @@ describe('The Home Page', () => {
 
   it('successfully loads', () => {
     cy.get('body');
-    cy.get('header');
   });
 });

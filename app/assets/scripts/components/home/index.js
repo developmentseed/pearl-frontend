@@ -20,7 +20,7 @@ function renderRestApiHealth(restApiHealth) {
 }
 
 function Home() {
-  const { restApiHealth } = useContext(GlobalContext);
+  const { restApiHealth, apiToken } = useContext(GlobalContext);
   const { user, isAuthenticated, loginWithRedirect, logout } = useAuth0();
   const logoutWithRedirect = () =>
     logout({
@@ -29,45 +29,57 @@ function Home() {
 
   return (
     <App pageTitle='Home'>
-      <h1>Home</h1>
-      <h2>Available Pages</h2>
-      <ul>
-        <li>
-          <Link to='/explore'>Explore</Link>
-        </li>
-        <li>
-          <Link to='/about'>About</Link>
-        </li>
-      </ul>
-      <h2>Status</h2>
-      <p>API: {renderRestApiHealth(restApiHealth)}</p>
-      {!isAuthenticated && (
-        <>
-          <Button
-            variation='base-raised-light'
-            size='medium'
-            className='button-class'
-            title='sample button'
-            onClick={() => loginWithRedirect()}
-          >
-            Log in
-          </Button>
-        </>
-      )}
-      {isAuthenticated && (
-        <>
-          <p>{JSON.stringify(user)}</p>
-          <Button
-            variation='base-raised-light'
-            size='medium'
-            className='button-class'
-            title='sample button'
-            onClick={() => logoutWithRedirect()}
-          >
-            Log out
-          </Button>
-        </>
-      )}
+      <section>
+        <h1>Home</h1>
+        <h2>Available Pages</h2>
+        <ul>
+          <li>
+            <Link to='/explore'>Explore</Link>
+          </li>
+          <li>
+            <Link to='/about'>About</Link>
+          </li>
+        </ul>
+        <h2>Status</h2>
+        <p>API: {renderRestApiHealth(restApiHealth)}</p>
+        {!isAuthenticated && (
+          <>
+            <Button
+              variation='base-raised-light'
+              size='medium'
+              className='button-class'
+              title='sample button'
+              onClick={() => loginWithRedirect()}
+            >
+              Log in
+            </Button>
+          </>
+        )}
+        {isAuthenticated && (
+          <>
+            <h2>Logged user</h2>
+            <ul>
+              {Object.keys(user).map((key) => (
+                <li key={key}>
+                  {key}: {user[key]}
+                </li>
+              ))}
+            </ul>
+
+            <h2>API Token</h2>
+            <p>{apiToken || 'Loading...'}</p>
+            <Button
+              variation='base-raised-light'
+              size='medium'
+              className='button-class'
+              title='sample button'
+              onClick={() => logoutWithRedirect()}
+            >
+              Log out
+            </Button>
+          </>
+        )}
+      </section>
     </App>
   );
 }
