@@ -14,6 +14,11 @@ jobs:
     if: github.event.pull_request.draft == false
 
     steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.8.0
+        with:
+          access_token: ${{ github.token }}
+
       - name: Checkout
         uses: actions/checkout@v2
 
@@ -23,6 +28,7 @@ jobs:
           node-version: 14
 
       - name: Cache node modules
+        id: cache-node-modules
         uses: actions/cache@v2
         env:
           cache-name: cache-node-modules
@@ -35,6 +41,7 @@ jobs:
             ${{ runner.os }}-
 
       - name: Install
+        if: steps.cache-node-modules.outputs.cache-hit != 'true'
         run: yarn install
 
       - name: Lint
@@ -45,6 +52,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.8.0
+        with:
+          access_token: ${{ github.token }}
+
       - name: Checkout
         uses: actions/checkout@v2
 
@@ -54,6 +66,7 @@ jobs:
           node-version: 14
 
       - name: Cache node modules
+        id: cache-node-modules
         uses: actions/cache@v2
         env:
           cache-name: cache-node-modules
@@ -68,6 +81,7 @@ jobs:
             ${{ runner.os }}-
 
       - name: Install
+        if: steps.cache-node-modules.outputs.cache-hit != 'true'
         run: yarn install
 
       - name: Test End-to-end
@@ -90,6 +104,7 @@ jobs:
           node-version: 14
 
       - name: Cache node modules
+        id: cache-node-modules
         uses: actions/cache@v2
         env:
           cache-name: cache-node-modules
@@ -102,6 +117,7 @@ jobs:
             ${{ runner.os }}-
 
       - name: Install
+        if: steps.cache-node-modules.outputs.cache-hit != 'true'
         run: yarn install
 
       - name: Build

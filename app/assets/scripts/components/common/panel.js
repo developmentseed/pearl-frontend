@@ -4,6 +4,8 @@ import styled, { css } from 'styled-components';
 import Button from '../../styles/button/button';
 
 import { themeVal, stylizeFunction } from '../../styles/utils/general';
+import { multiply } from '../../styles/utils/math';
+
 import { tint } from 'polished';
 import { headingAlt } from '../../styles/type/heading';
 import { panelSkin } from '../../styles/skins';
@@ -17,12 +19,14 @@ export const PanelSelf = styled.section`
   display: flex;
   flex-flow: column nowrap;
   max-width: 0;
-  width: 100vw;
+
+  /*width: 100vw;*/
+
   height: 100%;
   z-index: 10;
   transition: all 0.16s ease 0s;
 
-  ${({ revealed }) =>
+  ${({ revealed, fitContent }) =>
     revealed &&
     css`
       ${panelSkin()}
@@ -30,7 +34,8 @@ export const PanelSelf = styled.section`
       z-index: 15;
 
       ${media.largeUp`
-      width: 16rem;
+      width: ${fitContent ? 'fit-content' : '16rem'};
+
     `}
     `}
 `;
@@ -100,7 +105,7 @@ const PanelOffsetActions = styled.div`
 
 const PanelControls = styled.div`
   display: grid;
-  grid-gap: 0.5rem;
+  grid-gap: ${multiply(themeVal('layout.space'), 0.5)};
 
   position: absolute;
   top: ${glsp(0.5)};
@@ -169,6 +174,7 @@ class Panel extends React.Component {
       className,
       overrideControl,
       additionalControls,
+      fitContent,
     } = this.props;
     const revealed = overrideControl
       ? this.props.revealed
@@ -195,6 +201,7 @@ class Panel extends React.Component {
         revealed={revealed}
         className={className}
         data-cy={this.props['data-cy']}
+        fitContent={fitContent}
       >
         {header}
         <PanelBody revealed={revealed}>{bodyContent}</PanelBody>
@@ -237,6 +244,7 @@ Panel.propTypes = {
   headerContent: T.node,
   renderHeader: T.func,
   bodyContent: T.node,
+  fitContent: T.bool,
   'data-cy': T.string,
 };
 
