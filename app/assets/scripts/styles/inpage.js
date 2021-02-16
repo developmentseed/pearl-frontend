@@ -4,7 +4,7 @@ import { rgba } from 'polished';
 import { visuallyHidden, truncated } from './helpers';
 import { themeVal, stylizeFunction } from './utils/general';
 import { multiply } from './utils/math';
-import { headingAlt } from './type/heading';
+import { headingAlt } from '@devseed-ui/typography';
 
 const _rgba = stylizeFunction(rgba);
 

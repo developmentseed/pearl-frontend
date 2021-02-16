@@ -3,7 +3,7 @@ import { tint } from 'polished';
 
 import { themeVal, stylizeFunction } from '../../styles/utils/general';
 import { glsp } from '../../styles/utils/theme-values';
-import Heading from '../../styles/type/heading';
+import { Heading } from '@devseed-ui/typography';
 import ShadowScrollbar from '../common/shadow-scrollbar';
 
 const _tint = stylizeFunction(tint);
