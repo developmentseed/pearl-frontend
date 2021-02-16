@@ -1,5 +1,5 @@
 import { css } from 'styled-components';
-import { themeVal } from './utils/general';
+import { themeVal } from '@devseed-ui/theme-provider';
 
 export const stackSkin = () => css`
   background-color: ${themeVal('color.surface')};

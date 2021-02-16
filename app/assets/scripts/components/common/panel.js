@@ -3,14 +3,16 @@ import T from 'prop-types';
 import styled, { css } from 'styled-components';
 import { Button } from '@devseed-ui/button';
 
-import { themeVal, stylizeFunction } from '../../styles/utils/general';
-import { multiply } from '../../styles/utils/math';
-
 import { tint } from 'polished';
 import { headingAlt } from '@devseed-ui/typography';
 import { panelSkin } from '../../styles/skins';
-import { glsp } from '../../styles/utils/theme-values';
-import media from '../../styles/utils/media-queries';
+import {
+  themeVal,
+  stylizeFunction,
+  multiply,
+  glsp,
+  media,
+} from '@devseed-ui/theme-provider';
 
 const _tint = stylizeFunction(tint);
 

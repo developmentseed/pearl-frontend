@@ -14,16 +14,15 @@ import Dropdown, {
 } from '@devseed-ui/dropdown';
 import {
   themeVal,
-  stylizeFunction,
-  filterComponentProps,
-} from '../../styles/utils/general';
-import { rgba } from 'polished';
-import { visuallyHidden } from '../../styles/helpers';
-import collecticon from '@devseed-ui/collecticons';
-import { multiply } from '../../styles/utils/math';
-import media from '../../styles/utils/media-queries';
+  rgba,
+  visuallyHidden,
+  multiply,
+  media,
+} from '@devseed-ui/theme-provider';
 
-const _rgba = stylizeFunction(rgba);
+import { filterComponentProps } from '../../styles/utils/general';
+
+import collecticon from '@devseed-ui/collecticons';
 
 const { appTitle } = config;
 
@@ -120,13 +119,13 @@ const GlobalMenuLink = styled.a`
 
   &:hover {
     opacity: 1;
-    background: ${_rgba(themeVal('color.baseLight'), 0.08)};
+    background: ${rgba(themeVal('color.baseLight'), 0.08)};
   }
 
   &.active {
     color: ${themeVal('color.base')};
     opacity: 1;
-    background: ${_rgba(themeVal('color.baseLight'), 0.16)};
+    background: ${rgba(themeVal('color.baseLight'), 0.16)};
   }
 
   span {
