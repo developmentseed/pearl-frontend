@@ -21,6 +21,7 @@ export const DropdownHeader = styled.header`
 export const DropdownBody = styled.ul`
   display: grid;
   grid-gap: ${multiply(themeVal('layout.space'), 0.5)};
+  padding: ${multiply(themeVal('layout.space'), 0.5)} 0;
 `;
 export const DropdownItem = styled.a`
   display: grid;
@@ -41,4 +42,5 @@ export const DropdownItem = styled.a`
 `;
 export const DropdownFooter = styled.footer`
   border-top: 1px solid ${themeVal('color.baseAlphaD')};
+  padding: ${multiply(themeVal('layout.space'), 0.5)} 0;
 `;

@@ -246,11 +246,16 @@ function PageHeader(props) {
                     <DropdownItem useIcon='folder'>My Projects</DropdownItem>
                   </li>
                   <li>
-                    <DropdownItem useIcon='map'>My Maps</DropdownItem>
+                    <DropdownItem useIcon='map'>My Saved Maps</DropdownItem>
                   </li>
                   <li>
                     <DropdownItem useIcon='git-fork'>
                       My Checkpoints
+                    </DropdownItem>
+                  </li>
+                  <li>
+                    <DropdownItem useIcon='house' to='/'>
+                      Visit Homepage
                     </DropdownItem>
                   </li>
                 </DropdownBody>
