@@ -8,7 +8,7 @@ import {
 import config from '../config';
 import { useAuth0 } from '@auth0/auth0-react';
 
-const { restApiEndoint } = config;
+const { restApiEndpoint } = config;
 
 const GlobalContext = createContext({});
 
@@ -47,27 +47,25 @@ export function GlobalContextProvider(props) {
     queryRestApiHealth()(dispatchRestApiStatus);
   }, []);
 
-  const [gpuInstance, setGpuInstance] = useState(null);
-
   useEffect(() => {
-    async function getWebsocketConnection() {
+    async function getModel() {
       const token = await getAccessTokenWithPopup({
         audience: 'http://localhost:2000',
       });
 
       // Create or get model with id=1
       try {
-        const res = await fetchJSON(`${restApiEndoint}/api/model/1`, {
+        const res = await fetchJSON(`${restApiEndpoint}/api/model/1`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
           },
         });
-        console.log(res);
+        console.log(res)
       } catch (error) {
         if (error.statusCode === 404) {
-          await fetchJSON(`${restApiEndoint}/api/model`, {
+          await fetchJSON(`${restApiEndpoint}/api/model`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -78,45 +76,13 @@ export function GlobalContextProvider(props) {
           });
         }
       }
-
-      // Get GPU instance
-      try {
-        const { body } = await fetchJSON(`${restApiEndoint}/api/instance`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            model_id: 1,
-          }),
-        });
-        setGpuInstance(body);
-      } catch (error) {
-        console.log('Unexpected error');
-        console.log(error);
-      }
     }
 
     const { isReady, hasError } = restApiHealth;
     if (isReady() && !hasError() && isAuthenticated) {
-      getWebsocketConnection();
+      getModel();
     }
-  }, [restApiHealth, isAuthenticated, getAccessTokenSilently]);
-
-  useEffect(() => {
-    if (!gpuInstance || !gpuInstance.token) return;
-
-    const ws = new WebSocket(
-      config.websocketEndpoint + `?token=${gpuInstance.token}`
-    );
-
-    ws.addEventListener('open', () => {
-      console.log('ws opened.');
-      ws.close();
-    });
-    ws.addEventListener('close', () => console.log('ws closed.'));
-  }, [gpuInstance]);
+  }, [restApiHealth, isAuthenticated]);
 
   return (
     <>

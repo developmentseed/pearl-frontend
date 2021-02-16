@@ -18,6 +18,9 @@ import About from './components/about';
 import UhOh from './components/uhoh';
 
 import { GlobalContextProvider } from './context/global';
+import { CollecticonsGlobalStyle } from '@devseed-ui/collecticons';
+import { GlobalLoading } from '@devseed-ui/global-loading';
+import { ToastContainerCustom } from './components/common/toasts';
 
 const onRedirectCallback = (appState) => {
   history.push(
@@ -45,6 +48,7 @@ function Root() {
         <Router history={history}>
           <DevseedUiThemeProvider theme={theme.main}>
             <GlobalContextProvider>
+              <CollecticonsGlobalStyle />
               <GlobalStyles />
               <Switch>
                 <Route exact path='/' component={Home} />
@@ -52,6 +56,8 @@ function Root() {
                 <Route path='/about' component={About} />
                 <Route path='*' component={UhOh} />
               </Switch>
+              <GlobalLoading />
+              <ToastContainerCustom />
             </GlobalContextProvider>
           </DevseedUiThemeProvider>
         </Router>
