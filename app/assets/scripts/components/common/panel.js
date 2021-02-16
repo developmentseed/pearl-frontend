@@ -7,7 +7,6 @@ import { themeVal, stylizeFunction } from '../../styles/utils/general';
 import { multiply } from '../../styles/utils/math';
 
 import { tint } from 'polished';
-//import { headingAlt } from '../../styles/type/heading';
 import { headingAlt } from '@devseed-ui/typography';
 import { panelSkin } from '../../styles/skins';
 import { glsp } from '../../styles/utils/theme-values';
