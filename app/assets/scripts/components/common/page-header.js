@@ -51,7 +51,7 @@ const PageHeadInner = styled.div`
 
 const PageNav = styled.nav`
   display: grid;
-  grid-template-columns: 3fr 1fr;
+  grid-template-columns: 6fr 1fr;
   padding: 0 1rem;
   grid-gap: 1rem;
   width: 100%;
@@ -88,7 +88,7 @@ const SecondarySection = styled.div`
   display: grid;
   align-items: center;
   justify-content: space-between;
-  grid-template-columns: min-content min-content min-content;
+  grid-template-columns: min-content min-content;
   grid-gap: 1rem;
 
   .user-options-trigger::before {
@@ -184,41 +184,6 @@ function PageHeader(props) {
               <span>Info</span>
             </Button>
 
-            <Dropdown
-              alignment='center'
-              direction='down'
-              triggerElement={(props) => (
-                <DropdownTrigger
-                  variation='base-raised-semidark'
-                  useIcon={['chevron-down--small', 'after']}
-                  title='Open dropdown'
-                  className='user-options-trigger'
-                  size='small'
-                  {...props}
-                >
-                  Checkpoints
-                </DropdownTrigger>
-              )}
-              className='global__dropdown'
-            >
-              <>
-                <DropdownHeader>
-                  <p>Hello</p>
-                  <h1>Sylvan Couvert</h1>
-                </DropdownHeader>
-                <DropdownBody>
-                  <li>
-                    <DropdownItem useIcon='picture'>My Projects</DropdownItem>
-                  </li>
-                  <li>
-                    <DropdownItem useIcon='picture'>My Projects</DropdownItem>
-                  </li>
-                </DropdownBody>
-                <DropdownFooter>
-                  <DropdownItem useIcon='logout'>Sign Out</DropdownItem>
-                </DropdownFooter>
-              </>
-            </Dropdown>
             <Dropdown
               alignment='center'
               direction='down'
