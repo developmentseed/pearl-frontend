@@ -243,10 +243,15 @@ function PageHeader(props) {
                 </DropdownHeader>
                 <DropdownBody>
                   <li>
-                    <DropdownItem useIcon='picture'>My Projects</DropdownItem>
+                    <DropdownItem useIcon='folder'>My Projects</DropdownItem>
                   </li>
                   <li>
-                    <DropdownItem useIcon='picture'>My Projects</DropdownItem>
+                    <DropdownItem useIcon='map'>My Maps</DropdownItem>
+                  </li>
+                  <li>
+                    <DropdownItem useIcon='git-fork'>
+                      My Checkpoints
+                    </DropdownItem>
                   </li>
                 </DropdownBody>
                 <DropdownFooter>
