@@ -6,12 +6,7 @@ import config from '../../config';
 import { NavLink } from 'react-router-dom';
 import { Button } from '@devseed-ui/button';
 
-import Dropdown, {
-  DropTitle,
-  DropMenu,
-  DropMenuItem,
-  DropInset,
-} from '@devseed-ui/dropdown';
+import BaseDropdown from '@devseed-ui/dropdown';
 import {
   themeVal,
   rgba,
@@ -23,8 +18,17 @@ import {
 import { filterComponentProps } from '../../styles/utils/general';
 
 import collecticon from '@devseed-ui/collecticons';
+import {
+  DropdownHeader,
+  DropdownBody,
+  DropdownItem,
+  DropdownFooter,
+} from '../../styles/dropdown';
 
 const { appTitle } = config;
+const Dropdown = styled(BaseDropdown)`
+  padding: 0;
+`;
 
 const PageHead = styled.header`
   background-color: ${themeVal('color.baseAlphaA')};
@@ -45,7 +49,7 @@ const PageHeadInner = styled.div`
 
 const PageNav = styled.nav`
   display: grid;
-  grid-template-columns: 3fr 1fr;
+  grid-template-columns: 6fr 1fr;
   padding: 0 1rem;
   grid-gap: 1rem;
   width: 100%;
@@ -82,7 +86,7 @@ const SecondarySection = styled.div`
   display: grid;
   align-items: center;
   justify-content: space-between;
-  grid-template-columns: min-content min-content min-content;
+  grid-template-columns: min-content min-content;
   grid-gap: 1rem;
 
   .user-options-trigger::before {
@@ -135,7 +139,7 @@ const GlobalMenuLink = styled.a`
 const DropdownTrigger = styled(Button)`
   &::before {
     ${collecticon('user')}
-    font-size: ${multiply(themeVal('type.base.size'), 1.125)};
+    font-size: ${multiply(themeVal('type.base.size'), 0.85)};
   }
 `;
 
@@ -183,36 +187,7 @@ function PageHeader(props) {
               direction='down'
               triggerElement={(props) => (
                 <DropdownTrigger
-                  variation='base-raised-light'
-                  useIcon={['chevron-down--small', 'after']}
-                  title='Open dropdown'
-                  className='user-options-trigger'
-                  size='small'
-                  {...props}
-                >
-                  Checkpoints
-                </DropdownTrigger>
-              )}
-            >
-              <React.Fragment>
-                <DropTitle>Drop Title</DropTitle>
-                <DropMenu>
-                  <li>
-                    <DropMenuItem>Menu item 1</DropMenuItem>
-                    <DropMenuItem>Menu item 2</DropMenuItem>
-                  </li>
-                </DropMenu>
-                <DropInset>
-                  <p>Inset Text</p>
-                </DropInset>
-              </React.Fragment>
-            </Dropdown>
-            <Dropdown
-              alignment='center'
-              direction='down'
-              triggerElement={(props) => (
-                <DropdownTrigger
-                  variation='base-raised-light'
+                  variation='base-raised-semidark'
                   useIcon={['chevron-down--small', 'after']}
                   title='Open dropdown'
                   className='user-options-trigger'
@@ -222,19 +197,35 @@ function PageHeader(props) {
                   Account
                 </DropdownTrigger>
               )}
+              className='global__dropdown'
             >
-              <React.Fragment>
-                <DropTitle>Drop Title</DropTitle>
-                <DropMenu>
+              <>
+                <DropdownHeader>
+                  <p>Hello</p>
+                  <h1>Sylvan Couvert</h1>
+                </DropdownHeader>
+                <DropdownBody>
                   <li>
-                    <DropMenuItem>Menu item 1</DropMenuItem>
-                    <DropMenuItem>Menu item 2</DropMenuItem>
+                    <DropdownItem useIcon='folder'>My Projects</DropdownItem>
                   </li>
-                </DropMenu>
-                <DropInset>
-                  <p>Inset Text</p>
-                </DropInset>
-              </React.Fragment>
+                  <li>
+                    <DropdownItem useIcon='map'>My Saved Maps</DropdownItem>
+                  </li>
+                  <li>
+                    <DropdownItem useIcon='git-fork'>
+                      My Checkpoints
+                    </DropdownItem>
+                  </li>
+                  <li>
+                    <DropdownItem useIcon='house' to='/'>
+                      Visit Homepage
+                    </DropdownItem>
+                  </li>
+                </DropdownBody>
+                <DropdownFooter>
+                  <DropdownItem useIcon='logout'>Sign Out</DropdownItem>
+                </DropdownFooter>
+              </>
             </Dropdown>
           </SecondarySection>
         </PageNav>
