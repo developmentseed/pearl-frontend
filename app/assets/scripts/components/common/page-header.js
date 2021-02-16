@@ -4,7 +4,7 @@ import T from 'prop-types';
 import config from '../../config';
 
 import { NavLink } from 'react-router-dom';
-import Button from '../../styles/button/button';
+import { Button } from '@devseed-ui/button';
 
 import Dropdown, {
   DropTitle,
