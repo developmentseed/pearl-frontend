@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import T from 'prop-types';
 import config from '../../config';
@@ -21,7 +21,6 @@ import {
   DropdownFooter,
 } from '../../styles/dropdown';
 import { StyledLink, StyledNavLink } from '../../styles/link';
-import GlobalContext from '../../context/global';
 
 const { appTitle } = config;
 const Dropdown = styled(BaseDropdown)`
