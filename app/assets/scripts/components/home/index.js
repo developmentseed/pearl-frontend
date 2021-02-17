@@ -17,12 +17,7 @@ function renderRestApiHealth(restApiHealth) {
 }
 
 function Home() {
-  const { restApiHealth, apiToken } = useContext(GlobalContext);
-  const { user, isAuthenticated, loginWithRedirect, logout } = useAuth0();
-  const logoutWithRedirect = () =>
-    logout({
-      returnTo: window.location.origin,
-    });
+  const { restApiHealth } = useContext(GlobalContext);
 
   return (
     <App pageTitle='Home'>
@@ -31,42 +26,6 @@ function Home() {
         <h1>Home page</h1>
         <h2>Status</h2>
         <p>API: {renderRestApiHealth(restApiHealth)}</p>
-        {!isAuthenticated && (
-          <>
-            <Button
-              variation='base-raised-light'
-              size='medium'
-              className='button-class'
-              title='sample button'
-              onClick={() => loginWithRedirect()}
-            >
-              Log in
-            </Button>
-          </>
-        )}
-        {isAuthenticated && (
-          <>
-            <h2>Logged user</h2>
-            <ul>
-              {Object.keys(user).map((key) => (
-                <li key={key}>
-                  {key}: {user[key]}
-                </li>
-              ))}
-            </ul>
-            <h2>API Token</h2>
-            <p>{apiToken || 'Loading...'}</p>
-            <Button
-              variation='base-raised-light'
-              size='medium'
-              className='button-class'
-              title='sample button'
-              onClick={() => logoutWithRedirect()}
-            >
-              Log out
-            </Button>
-          </>
-        )}
       </PageBody>
     </App>
   );

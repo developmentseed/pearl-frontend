@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import styled from 'styled-components';
 import T from 'prop-types';
 import config from '../../config';
+import { useAuth0 } from '@auth0/auth0-react';
 
 import { Button } from '@devseed-ui/button';
 import BaseDropdown from '@devseed-ui/dropdown';
@@ -20,6 +21,7 @@ import {
   DropdownFooter,
 } from '../../styles/dropdown';
 import { StyledLink, StyledNavLink } from '../../styles/link';
+import GlobalContext from '../../context/global';
 
 const { appTitle } = config;
 const Dropdown = styled(BaseDropdown)`
@@ -140,6 +142,12 @@ const DropdownTrigger = styled(Button)`
 `;
 
 function PageHeader(props) {
+  const { isAuthenticated, loginWithRedirect, logout } = useAuth0();
+  const logoutWithRedirect = () =>
+    logout({
+      returnTo: window.location.origin,
+    });
+
   return (
     <PageHead role='banner'>
       <PageHeadInner>
@@ -187,51 +195,68 @@ function PageHeader(props) {
             )}
           </PrimarySection>
           <SecondarySection>
-            <Dropdown
-              alignment='center'
-              direction='down'
-              triggerElement={(props) => (
-                <DropdownTrigger
-                  variation='base-raised-semidark'
-                  useIcon={['chevron-down--small', 'after']}
-                  title='Open dropdown'
-                  className='user-options-trigger'
-                  size='small'
-                  {...props}
-                >
-                  Account
-                </DropdownTrigger>
-              )}
-              className='global__dropdown'
-            >
-              <>
-                <DropdownHeader>
-                  <p>Hello</p>
-                  <h1>Sylvan Couvert</h1>
-                </DropdownHeader>
-                <DropdownBody>
-                  <li>
-                    <DropdownItem useIcon='folder'>My Projects</DropdownItem>
-                  </li>
-                  <li>
-                    <DropdownItem useIcon='map'>My Saved Maps</DropdownItem>
-                  </li>
-                  <li>
-                    <DropdownItem useIcon='git-fork'>
-                      My Checkpoints
+            {!isAuthenticated ? (
+              <Button
+                variation='base-raised-light'
+                size='medium'
+                className='button-class'
+                title='sample button'
+                onClick={() => loginWithRedirect()}
+              >
+                Log in
+              </Button>
+            ) : (
+              <Dropdown
+                alignment='center'
+                direction='down'
+                triggerElement={(props) => (
+                  <DropdownTrigger
+                    variation='base-raised-semidark'
+                    useIcon={['chevron-down--small', 'after']}
+                    title='Open dropdown'
+                    className='user-options-trigger'
+                    size='small'
+                    {...props}
+                  >
+                    Account
+                  </DropdownTrigger>
+                )}
+                className='global__dropdown'
+              >
+                <>
+                  <DropdownHeader>
+                    <p>Hello</p>
+                    <h1>Sylvan Couvert</h1>
+                  </DropdownHeader>
+                  <DropdownBody>
+                    <li>
+                      <DropdownItem useIcon='folder'>My Projects</DropdownItem>
+                    </li>
+                    <li>
+                      <DropdownItem useIcon='map'>My Saved Maps</DropdownItem>
+                    </li>
+                    <li>
+                      <DropdownItem useIcon='git-fork'>
+                        My Checkpoints
+                      </DropdownItem>
+                    </li>
+                    <li>
+                      <DropdownItem useIcon='house' to='/'>
+                        Visit Homepage
+                      </DropdownItem>
+                    </li>
+                  </DropdownBody>
+                  <DropdownFooter>
+                    <DropdownItem
+                      useIcon='logout'
+                      onClick={() => logoutWithRedirect()}
+                    >
+                      Sign Out
                     </DropdownItem>
-                  </li>
-                  <li>
-                    <DropdownItem useIcon='house' to='/'>
-                      Visit Homepage
-                    </DropdownItem>
-                  </li>
-                </DropdownBody>
-                <DropdownFooter>
-                  <DropdownItem useIcon='logout'>Sign Out</DropdownItem>
-                </DropdownFooter>
-              </>
-            </Dropdown>
+                  </DropdownFooter>
+                </>
+              </Dropdown>
+            )}
           </SecondarySection>
         </PageNav>
       </PageHeadInner>
