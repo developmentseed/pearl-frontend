@@ -934,13 +934,13 @@
   dependencies:
     lodash.get "^4.4.2"
 
-"@devseed-ui/button@3.0.0-rc.0":
-  version "3.0.0-rc.0"
-  resolved "https://registry.yarnpkg.com/@devseed-ui/button/-/button-3.0.0-rc.0.tgz#a9c86e322a3f213ac8a226e155eeda2200a806a8"
-  integrity sha512-sCblHDFi63e6O0qauyHJli8H2oZxl7AysTergEpb/Iiag1Fk2qJYsKBCqaG0zr0EiSHyiQYgl7BgxPY6QKAj7w==
+"@devseed-ui/button@3.0.0", "@devseed-ui/button@^3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@devseed-ui/button/-/button-3.0.0.tgz#98c4d744a86eb7393e099a7e50993daa9a8614e7"
+  integrity sha512-vVSIe/sIcUBPvN02b4Me9LhJCDJI1DPK+YN0aNj5zOF5mBoT30rQU63FrphPSMsJdAa1L3LO1/OXey5vVLq8+g==
   dependencies:
-    "@devseed-ui/collecticons" "2.0.0-rc.0"
-    "@devseed-ui/theme-provider" "^3.0.0-rc.0"
+    "@devseed-ui/collecticons" "2.0.0"
+    "@devseed-ui/theme-provider" "^3.0.0"
 
 "@devseed-ui/button@^2.4.2":
   version "2.4.5"
@@ -962,24 +962,24 @@
   resolved "https://registry.yarnpkg.com/@devseed-ui/collecticons/-/collecticons-1.0.0.tgz#c185b55a973e1de4aadde6dc2d9fef4f2d3a81d0"
   integrity sha512-27+t+hvxo7iqSk7XsdONxIN646NyuD8wZOlr1NuDp7Owxsl9MyFspRYe788QxKChEF1pnhG7GIZXJqf9NuG6jw==
 
-"@devseed-ui/collecticons@2.0.0-rc.0":
-  version "2.0.0-rc.0"
-  resolved "https://registry.yarnpkg.com/@devseed-ui/collecticons/-/collecticons-2.0.0-rc.0.tgz#27698f775859ca0eb77dd430a95084cf9327fa7a"
-  integrity sha512-OD5PwsR0VuzS1lSGbCB9B052Q0h8w2gNSG4C/XOOi+lChw45l8oE4rpmLmQWK90Y3IP2U+zAIwJ/y6kuy2XvbQ==
+"@devseed-ui/collecticons@2.0.0", "@devseed-ui/collecticons@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@devseed-ui/collecticons/-/collecticons-2.0.0.tgz#206ea7c6770a4a8bf903e361f95d0acd3c05a02a"
+  integrity sha512-irjrk8tBR4dXglFXGaFUgkSxsvkn1M6i29/DSPevcFEGxRPa1oTxQs/yC5hxyDGykGnK93oMO88efwFqDAMj3w==
 
-"@devseed-ui/dropdown@2.0.0-rc.0":
-  version "2.0.0-rc.0"
-  resolved "https://registry.yarnpkg.com/@devseed-ui/dropdown/-/dropdown-2.0.0-rc.0.tgz#66c435358a5a72f2a4bc1b09c71c1da93e3420dd"
-  integrity sha512-xtE5FzI4dIZttPrlb+hskMDjUWKRcnt2x7Bxk/R0N0Phq70pB3aaC3fTPd/n2RjRaB0pL30+0E95TJR72x+wMA==
+"@devseed-ui/dropdown@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@devseed-ui/dropdown/-/dropdown-2.0.0.tgz#84aeceb7178860260e81e3f9028a10292c2dba5c"
+  integrity sha512-lqA66eBFjAQwsi21T2vfGgz1xPrUmrJ5dsEQ9MI8GbyBXhtmxavoIxbUzyYs6eA5e9zWixwLfLcrWRpX5deFUw==
   dependencies:
-    "@devseed-ui/button" "3.0.0-rc.0"
-    "@devseed-ui/collecticons" "2.0.0-rc.0"
-    "@devseed-ui/theme-provider" "^3.0.0-rc.0"
-    "@devseed-ui/typography" "1.0.0-rc.0"
+    "@devseed-ui/button" "3.0.0"
+    "@devseed-ui/collecticons" "2.0.0"
+    "@devseed-ui/theme-provider" "^3.0.0"
+    "@devseed-ui/typography" "1.0.0"
     react-tether "^2.0.7"
     react-transition-group "^4.3.0"
 
-"@devseed-ui/global-loading@^1.0.0-rc.0":
+"@devseed-ui/global-loading@^1.0.0":
   version "1.2.2"
   resolved "https://registry.yarnpkg.com/@devseed-ui/global-loading/-/global-loading-1.2.2.tgz#6ec1051f6186bb336537bc43a9747ed812b05b55"
   integrity sha512-BmrKR3s6/S80zJXvVFi35wuawfb36WYzQwxO1gJsxURjl6afY37sObi11ui6ydEcNwED7COdu6mQyAiOCiytEw==
@@ -1015,10 +1015,10 @@
     lodash.get "^4.4.2"
     polished "^3.4.2"
 
-"@devseed-ui/theme-provider@^3.0.0-rc.0":
-  version "3.0.0-rc.0"
-  resolved "https://registry.yarnpkg.com/@devseed-ui/theme-provider/-/theme-provider-3.0.0-rc.0.tgz#7e479897a217cb7ebbd05f471f8f491347d46954"
-  integrity sha512-yYjS5b3Y/sZ5fw9F/AOJIrMcfTxHu0c88ryQ467pIU9ObJUPC3R9avGfzOWz0ayGkpkUo6hL+fBDWDOLd36RmQ==
+"@devseed-ui/theme-provider@^3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@devseed-ui/theme-provider/-/theme-provider-3.0.0.tgz#13b22818f5ab3dc11d99b82d21e11afbde3ff487"
+  integrity sha512-/l5hVfWSGJe91m0NjO0tUNgoqCsCpr32VwCPhugc37qgvi/1tF54vwSl2hEz4CA4VPpbtCpxKrmb8234vhd7lw==
   dependencies:
     lodash.get "^4.4.2"
     polished "^3.4.2"
@@ -1030,12 +1030,12 @@
   dependencies:
     polished "^3.4.2"
 
-"@devseed-ui/typography@1.0.0-rc.0", "@devseed-ui/typography@^1.0.0-rc.0":
-  version "1.0.0-rc.0"
-  resolved "https://registry.yarnpkg.com/@devseed-ui/typography/-/typography-1.0.0-rc.0.tgz#5c8757e130126d2babde747a7f1caf6410e196b4"
-  integrity sha512-toRlVB/0CflUJf2NSgSqEnBCCffzVjTZiely/6+s3f/hl7BbomC3cB3wrR2gJjUe2VJegbF82D0LpX2aJUpPoQ==
+"@devseed-ui/typography@1.0.0", "@devseed-ui/typography@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@devseed-ui/typography/-/typography-1.0.0.tgz#50b659bf787d123fa362833b8c74293810130771"
+  integrity sha512-GNulPCp32+M/wi+QouhIsrzlYdB0mooTU+SbUk/6xRomzmVaHYPx/3Y8FA8bw1r6KoFW9jON9Nx+3g5L1f+/Ww==
   dependencies:
-    "@devseed-ui/theme-provider" "^3.0.0-rc.0"
+    "@devseed-ui/theme-provider" "^3.0.0"
 
 "@emotion/is-prop-valid@^0.8.8":
   version "0.8.8"
