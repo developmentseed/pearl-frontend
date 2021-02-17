@@ -2,12 +2,8 @@ import React from 'react';
 import { PropTypes as T } from 'prop-types';
 import styled, { css } from 'styled-components';
 import { Scrollbars } from 'react-custom-scrollbars';
-import { rgba } from 'polished';
 
-import { themeVal, stylizeFunction } from '../../styles/utils/general';
-import { glsp } from '../../styles/utils/theme-values';
-
-const _rgba = stylizeFunction(rgba);
+import { themeVal, glsp, rgba } from '@devseed-ui/theme-provider';
 
 const ScrollWrapper = styled.div`
   position: relative;
@@ -37,16 +33,16 @@ const ScrollShadow = styled.div`
         return css`
           background: linear-gradient(
             to bottom,
-            ${_rgba('#FFF', 1)} 0%,
-            ${_rgba('#FFF', 0)} 100%
+            ${rgba('#FFF', 1)} 0%,
+            ${rgba('#FFF', 0)} 100%
           );
         `;
       case 'dark':
         return css`
           background: linear-gradient(
             to bottom,
-            ${_rgba(themeVal('color.primary'), 1)} 0%,
-            ${_rgba(themeVal('color.primary'), 0)} 100%
+            ${rgba(themeVal('color.primary'), 1)} 0%,
+            ${rgba(themeVal('color.primary'), 0)} 100%
           );
         `;
     }

@@ -4,8 +4,7 @@ import ShadowScrollbar from '../common/shadow-scrollbar';
 import { PanelBlockBody } from '../common/panel-block';
 import T from 'prop-types';
 
-import { truncated } from '../../styles/helpers/index';
-import { themeVal } from '@devseed-ui/theme-provider';
+import { truncated, themeVal } from '@devseed-ui/theme-provider';
 
 export const CardWrapper = styled.article`
   height: ${({ size }) => (size === 'large' ? '5rem' : '3.5rem')};

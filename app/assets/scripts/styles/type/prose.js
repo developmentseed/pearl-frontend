@@ -1,8 +1,5 @@
 import styled, { css } from 'styled-components';
-
-import { themeVal } from '../utils/general';
-import { multiply } from '../utils/math';
-import { glsp } from '../utils/theme-values';
+import { themeVal, multiply, glsp } from '@devseed-ui/theme-provider';
 
 // Extract fn to avoid complaints by the linter.
 const numColumnsFn = ({ numColumns }) =>

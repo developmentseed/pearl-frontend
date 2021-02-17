@@ -4,28 +4,26 @@ import T from 'prop-types';
 import config from '../../config';
 
 import { NavLink } from 'react-router-dom';
-import Button from '../../styles/button/button';
+import { Button } from '@devseed-ui/button';
 
 import BaseDropdown from '@devseed-ui/dropdown';
 import {
   themeVal,
-  stylizeFunction,
-  filterComponentProps,
-} from '../../styles/utils/general';
-import { rgba } from 'polished';
-import { visuallyHidden } from '../../styles/helpers';
-import collecticon from '@devseed-ui/collecticons';
-import { multiply } from '../../styles/utils/math';
-import media from '../../styles/utils/media-queries';
+  rgba,
+  visuallyHidden,
+  multiply,
+  media,
+} from '@devseed-ui/theme-provider';
 
+import { filterComponentProps } from '../../styles/utils/general';
+
+import collecticon from '@devseed-ui/collecticons';
 import {
   DropdownHeader,
   DropdownBody,
   DropdownItem,
   DropdownFooter,
 } from '../../styles/dropdown';
-
-const _rgba = stylizeFunction(rgba);
 
 const { appTitle } = config;
 const Dropdown = styled(BaseDropdown)`
@@ -125,13 +123,13 @@ const GlobalMenuLink = styled.a`
 
   &:hover {
     opacity: 1;
-    background: ${_rgba(themeVal('color.baseLight'), 0.08)};
+    background: ${rgba(themeVal('color.baseLight'), 0.08)};
   }
 
   &.active {
     color: ${themeVal('color.base')};
     opacity: 1;
-    background: ${_rgba(themeVal('color.baseLight'), 0.16)};
+    background: ${rgba(themeVal('color.baseLight'), 0.16)};
   }
 
   span {

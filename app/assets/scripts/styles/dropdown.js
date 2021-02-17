@@ -1,6 +1,5 @@
 import styled from 'styled-components';
-import { themeVal } from './utils/general';
-import { multiply } from './utils/math';
+import { themeVal, multiply } from '@devseed-ui/theme-provider';
 import collecticon from '@devseed-ui/collecticons';
 
 export const DropdownHeader = styled.header`
