@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import T from 'prop-types';
 import config from '../../config';
 import { useAuth0 } from '@auth0/auth0-react';
+import { NavLink, Link } from 'react-router-dom';
 
 import { Button } from '@devseed-ui/button';
 import BaseDropdown from '@devseed-ui/dropdown';
@@ -20,7 +21,7 @@ import {
   DropdownItem,
   DropdownFooter,
 } from '../../styles/dropdown';
-import { StyledLink, StyledNavLink } from '../../styles/link';
+import { filterComponentProps } from '../../styles/utils/general';
 
 const { appTitle } = config;
 const Dropdown = styled(BaseDropdown)`
@@ -140,6 +141,18 @@ const DropdownTrigger = styled(Button)`
   }
 `;
 
+// Please refer to filterComponentProps to understand why this is needed
+const propsToFilter = [
+  'variation',
+  'size',
+  'hideText',
+  'useIcon',
+  'active',
+  'visuallyDisabled',
+];
+const StyledNavLink = filterComponentProps(NavLink, propsToFilter);
+const StyledLink = filterComponentProps(Link, propsToFilter);
+
 function PageHeader(props) {
   const { isAuthenticated, loginWithRedirect, logout } = useAuth0();
   const logoutWithRedirect = () =>
@@ -171,24 +184,24 @@ function PageHeader(props) {
               // Default controls when no children is passed
               <>
                 <Button
-                  as={StyledNavLink}
+                  forwardedAs={StyledNavLink}
                   to='/about'
                   variation='base-raised-semidark'
                   useIcon='circle-information'
                   title='Visit About page'
                   size='small'
                 >
-                  <span>About</span>
+                  About
                 </Button>
                 <Button
-                  as={StyledNavLink}
+                  forwardedAs={StyledNavLink}
                   to='/explore'
                   variation='base-raised-semidark'
                   useIcon='globe'
                   title='Launch application'
                   size='small'
                 >
-                  <span>Launch Application</span>
+                  Launch Application
                 </Button>
               </>
             )}
