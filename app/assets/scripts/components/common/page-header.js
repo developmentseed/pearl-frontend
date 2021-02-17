@@ -187,15 +187,6 @@ function PageHeader(props) {
             )}
           </PrimarySection>
           <SecondarySection>
-            <Button
-              variation='base-raised-semidark'
-              useIcon='circle-question'
-              title='App help'
-              size='small'
-            >
-              <span>Help</span>
-            </Button>
-
             <Dropdown
               alignment='center'
               direction='down'
