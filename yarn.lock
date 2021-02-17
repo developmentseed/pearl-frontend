@@ -1030,7 +1030,7 @@
   dependencies:
     polished "^3.4.2"
 
-"@devseed-ui/typography@1.0.0-rc.0":
+"@devseed-ui/typography@1.0.0-rc.0", "@devseed-ui/typography@^1.0.0-rc.0":
   version "1.0.0-rc.0"
   resolved "https://registry.yarnpkg.com/@devseed-ui/typography/-/typography-1.0.0-rc.0.tgz#5c8757e130126d2babde747a7f1caf6410e196b4"
   integrity sha512-toRlVB/0CflUJf2NSgSqEnBCCffzVjTZiely/6+s3f/hl7BbomC3cB3wrR2gJjUe2VJegbF82D0LpX2aJUpPoQ==

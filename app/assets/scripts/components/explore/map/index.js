@@ -10,8 +10,7 @@ import EditControl from './edit-control';
 import { ExploreContext, viewModes } from '../../../context/explore';
 import { round } from '../../../utils/format';
 import GeoCoder from '../../common/map/geocoder';
-import { themeVal } from '../../../styles/utils/general';
-import { multiply } from '../../../styles/utils/math';
+import { themeVal, multiply } from '@devseed-ui/theme-provider';
 
 const center = [38.942, -95.449];
 const zoom = 4;

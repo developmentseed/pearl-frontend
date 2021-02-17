@@ -1,6 +1,5 @@
 import { css } from 'styled-components';
-import { themeVal } from '../utils/general';
-import { divide } from '../utils/math';
+import { themeVal, divide } from '@devseed-ui/theme-provider';
 
 export default () => css`
   /* Overrides for react-toastify styles. */

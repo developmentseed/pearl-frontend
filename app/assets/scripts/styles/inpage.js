@@ -1,12 +1,13 @@
 import styled, { css } from 'styled-components';
-import { rgba } from 'polished';
 
-import { visuallyHidden, truncated } from './helpers';
-import { themeVal, stylizeFunction } from './utils/general';
-import { multiply } from './utils/math';
-import { headingAlt } from './type/heading';
-
-const _rgba = stylizeFunction(rgba);
+import {
+  visuallyHidden,
+  truncated,
+  themeVal,
+  multiply,
+  rgba,
+} from '@devseed-ui/theme-provider';
+import { headingAlt } from '@devseed-ui/typography';
 
 export const Inpage = styled.article`
   display: grid;
@@ -87,7 +88,7 @@ export const InpageTagline = styled.p`
   order: -1;
   font-size: 0.875rem;
   line-height: 1rem;
-  color: ${_rgba('#FFFFFF', 0.64)};
+  color: ${rgba('#FFFFFF', 0.64)};
 `;
 
 export const InpageBody = styled.div`
