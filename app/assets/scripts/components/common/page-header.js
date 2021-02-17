@@ -3,20 +3,16 @@ import styled from 'styled-components';
 import T from 'prop-types';
 import config from '../../config';
 
-import { NavLink } from 'react-router-dom';
 import Button from '../../styles/button/button';
 
 import BaseDropdown from '@devseed-ui/dropdown';
-import {
-  themeVal,
-  stylizeFunction,
-  filterComponentProps,
-} from '../../styles/utils/general';
+import { themeVal, stylizeFunction } from '../../styles/utils/general';
 import { rgba } from 'polished';
 import { visuallyHidden } from '../../styles/helpers';
 import collecticon from '@devseed-ui/collecticons';
 import { multiply } from '../../styles/utils/math';
 import media from '../../styles/utils/media-queries';
+import StyledNavLink from '../../styles/nav-link';
 
 import {
   DropdownHeader,
@@ -144,11 +140,6 @@ const DropdownTrigger = styled(Button)`
     font-size: ${multiply(themeVal('type.base.size'), 0.85)};
   }
 `;
-
-// See documentation of filterComponentProp as to why this is
-const propsToFilter = ['variation', 'size', 'hideText', 'useIcon', 'active'];
-const StyledNavLink = filterComponentProps(NavLink, propsToFilter);
-
 function PageHeader(props) {
   return (
     <PageHead role='banner'>
@@ -179,9 +170,8 @@ function PageHeader(props) {
               useIcon='circle-question'
               title='App help'
               size='small'
-              hideText
             >
-              <span>Info</span>
+              <span>Help</span>
             </Button>
 
             <Dropdown

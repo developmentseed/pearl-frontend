@@ -1,11 +1,11 @@
 import React, { useContext } from 'react';
 import App from '../common/app';
-import { Link } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
 
 import { Button } from '@devseed-ui/button';
 import PageHeader from '../common/page-header';
 import { PageBody } from '../../styles/page';
+import StyledNavLink from '../../styles/nav-link';
 
 import GlobalContext from '../../context/global';
 
@@ -26,19 +26,31 @@ function Home() {
 
   return (
     <App pageTitle='Home'>
-      <PageHeader />
+      <PageHeader>
+        <Button
+          as={StyledNavLink}
+          to='/about'
+          variation='base-raised-semidark'
+          useIcon='circle-information'
+          title='Visit About page'
+          size='small'
+        >
+          <span>About</span>
+        </Button>
+        <Button
+          as={StyledNavLink}
+          to='/explore'
+          variation='base-raised-semidark'
+          useIcon='globe'
+          title='Launch application'
+          size='small'
+        >
+          <span>Launch Application</span>
+        </Button>
+      </PageHeader>
 
       <PageBody role='main'>
-        <h1>Home</h1>
-        <h2>Available Pages</h2>
-        <ul>
-          <li>
-            <Link to='/explore'>Explore</Link>
-          </li>
-          <li>
-            <Link to='/about'>About</Link>
-          </li>
-        </ul>
+        <h1>Home page</h1>
         <h2>Status</h2>
         <p>API: {renderRestApiHealth(restApiHealth)}</p>
         {!isAuthenticated && (
