@@ -19,7 +19,7 @@ import {
   DropdownItem,
   DropdownFooter,
 } from '../../styles/dropdown';
-import { StyledNavLink } from '../../styles/nav-link';
+import { StyledLink } from '../../styles/link';
 
 const { appTitle } = config;
 const Dropdown = styled(BaseDropdown)`
@@ -147,8 +147,7 @@ function PageHeader(props) {
             <GlobalMenu>
               <li>
                 <GlobalMenuLink
-                  as={StyledNavLink}
-                  exact
+                  as={StyledLink}
                   to='/'
                   useIcon='house'
                   title='Visit the home page'

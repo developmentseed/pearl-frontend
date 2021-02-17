@@ -5,7 +5,7 @@ import { useAuth0 } from '@auth0/auth0-react';
 import { Button } from '@devseed-ui/button';
 import PageHeader from '../common/page-header';
 import { PageBody } from '../../styles/page';
-import StyledNavLink from '../../styles/nav-link';
+import { StyledNavLink } from '../../styles/link';
 
 import GlobalContext from '../../context/global';
 
