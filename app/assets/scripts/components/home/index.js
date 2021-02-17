@@ -1,21 +1,18 @@
 import React, { useContext } from 'react';
-
 import App from '../common/app';
 import { Link } from 'react-router-dom';
-
-import GlobalContext from '../../context/global';
-
 import { useAuth0 } from '@auth0/auth0-react';
 
 import { Button } from '@devseed-ui/button';
+import PageHeader from '../common/page-header';
+import { PageBody } from '../../styles/page';
+
+import GlobalContext from '../../context/global';
 
 function renderRestApiHealth(restApiHealth) {
   const { isReady, hasError, getData } = restApiHealth;
-
   if (!isReady()) return 'Fetching...';
-
   if (hasError()) return 'Unavailable.';
-
   return getData().message || 'Ok';
 }
 
@@ -29,7 +26,9 @@ function Home() {
 
   return (
     <App pageTitle='Home'>
-      <section>
+      <PageHeader />
+
+      <PageBody role='main'>
         <h1>Home</h1>
         <h2>Available Pages</h2>
         <ul>
@@ -65,7 +64,6 @@ function Home() {
                 </li>
               ))}
             </ul>
-
             <h2>API Token</h2>
             <p>{apiToken || 'Loading...'}</p>
             <Button
@@ -79,7 +77,7 @@ function Home() {
             </Button>
           </>
         )}
-      </section>
+      </PageBody>
     </App>
   );
 }
