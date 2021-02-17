@@ -26,29 +26,7 @@ function Home() {
 
   return (
     <App pageTitle='Home'>
-      <PageHeader>
-        <Button
-          as={StyledNavLink}
-          to='/about'
-          variation='base-raised-semidark'
-          useIcon='circle-information'
-          title='Visit About page'
-          size='small'
-        >
-          <span>About</span>
-        </Button>
-        <Button
-          as={StyledNavLink}
-          to='/explore'
-          variation='base-raised-semidark'
-          useIcon='globe'
-          title='Launch application'
-          size='small'
-        >
-          <span>Launch Application</span>
-        </Button>
-      </PageHeader>
-
+      <PageHeader />
       <PageBody role='main'>
         <h1>Home page</h1>
         <h2>Status</h2>

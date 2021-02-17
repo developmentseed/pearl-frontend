@@ -19,7 +19,7 @@ import {
   DropdownItem,
   DropdownFooter,
 } from '../../styles/dropdown';
-import { StyledLink } from '../../styles/link';
+import { StyledLink, StyledNavLink } from '../../styles/link';
 
 const { appTitle } = config;
 const Dropdown = styled(BaseDropdown)`
@@ -138,6 +138,7 @@ const DropdownTrigger = styled(Button)`
     font-size: ${multiply(themeVal('type.base.size'), 0.85)};
   }
 `;
+
 function PageHeader(props) {
   return (
     <PageHead role='banner'>
@@ -157,8 +158,32 @@ function PageHeader(props) {
                 </GlobalMenuLink>
               </li>
             </GlobalMenu>
-            {props.children && (
+            {props.children ? (
               <PageSpecificControls>{props.children}</PageSpecificControls>
+            ) : (
+              // Default controls when no children is passed
+              <>
+                <Button
+                  as={StyledNavLink}
+                  to='/about'
+                  variation='base-raised-semidark'
+                  useIcon='circle-information'
+                  title='Visit About page'
+                  size='small'
+                >
+                  <span>About</span>
+                </Button>
+                <Button
+                  as={StyledNavLink}
+                  to='/explore'
+                  variation='base-raised-semidark'
+                  useIcon='globe'
+                  title='Launch application'
+                  size='small'
+                >
+                  <span>Launch Application</span>
+                </Button>
+              </>
             )}
           </PrimarySection>
           <SecondarySection>
