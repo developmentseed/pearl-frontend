@@ -213,7 +213,7 @@ function PageHeader(props) {
                 size='medium'
                 className='button-class'
                 title='sample button'
-                onClick={() => loginWithRedirect()}
+                onClick={() => loginWithRedirect({ prompt: 'consent' })}
               >
                 Log in
               </Button>
