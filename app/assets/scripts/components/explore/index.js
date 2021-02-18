@@ -28,6 +28,14 @@ function Explore() {
           >
             <span>Download</span>
           </Button>
+          <Button
+            variation='base-raised-semidark'
+            useIcon='circle-question'
+            title='App help'
+            size='small'
+          >
+            <span>Help</span>
+          </Button>
         </PageHeader>
         <PageBody role='main'>
           <ExploreComponent />
