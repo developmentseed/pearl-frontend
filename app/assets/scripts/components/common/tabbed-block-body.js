@@ -1,15 +1,10 @@
 import React, { useState, Children } from 'react';
 import T from 'prop-types';
 import styled, { css } from 'styled-components';
-import { PanelBlockScroll, PanelBlockHeader } from './panel-block';
 import { Button } from '@devseed-ui/button';
-import { Subheading } from '../../styles/type/heading';
-import {
-  listReset,
-  truncated,
-  themeVal,
-  glsp,
-} from '@devseed-ui/theme-provider';
+import { listReset, themeVal, glsp } from '@devseed-ui/theme-provider';
+
+import { PanelBlockScroll, PanelBlockHeader } from './panel-block';
 
 const Tab = styled(Button)`
   display: inline-flex;

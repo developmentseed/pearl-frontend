@@ -1,9 +1,9 @@
 import React, { useState, useContext } from 'react';
-import Panel from '../common/panel';
 import styled from 'styled-components';
 import { themeVal } from '@devseed-ui/theme-provider';
 import { Button } from '@devseed-ui/button';
-import T from 'prop-types';
+
+import Panel from '../common/panel';
 import {
   PanelBlock,
   PanelBlockHeader as BasePanelBlockHeader,
@@ -14,8 +14,6 @@ import { Subheading as BaseSubheading } from '../../styles/type/heading';
 import SelectModal from './select-modal';
 import { Card } from './card-list';
 import { PlaceholderMessage } from '../../styles/placeholder.js';
-
-import { availableModels } from './sample-data';
 import { ExploreContext, viewModes } from '../../context/explore';
 import TabbedBlock from '../common/tabbed-block-body';
 
@@ -25,6 +23,8 @@ import {
   HeadOptionToolbar,
 } from '../../styles/panel';
 import { EditButton } from '../../styles/button';
+
+import { availableModels } from './sample-data';
 
 const PlaceholderPanelSection = styled.div`
   padding: 1rem;
@@ -41,10 +41,6 @@ const Subheading = styled(BaseSubheading)`
 
 const StyledPanelBlock = styled(PanelBlock)`
   width: 24rem;
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-template-rows: min-content 1fr min-content;
-  grid-gap: 1rem;
 `;
 
 const PanelBlockHeader = styled(BasePanelBlockHeader)`
@@ -217,7 +213,5 @@ function PrimePanel() {
     </>
   );
 }
-
-PrimePanel.propTypes = {};
 
 export default PrimePanel;
