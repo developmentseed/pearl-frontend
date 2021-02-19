@@ -1,0 +1,125 @@
+import React, { useState, Children } from 'react';
+import T from 'prop-types';
+import styled, { css } from 'styled-components';
+import { PanelBlockScroll, PanelBlockHeader } from './panel-block';
+import { Button } from '@devseed-ui/button';
+import { Subheading } from '../../styles/type/heading';
+import {
+  listReset,
+  truncated,
+  themeVal,
+  glsp,
+} from '@devseed-ui/theme-provider';
+
+const Tab = styled(Button)`
+  display: inline-flex;
+  user-select: none;
+  position: relative;
+  transition: color 0.16s ease-in-out 0s;
+  padding: ${glsp(0.25)} 0;
+  color: ${themeVal('color.base')};
+  font-weight: ${themeVal('type.heading.weight')};
+  &,
+  &:visited {
+    background-color: transparent;
+    color: ${themeVal('color.base')};
+  }
+
+  &:hover {
+    opacity: 1;
+    color: ${themeVal('color.primary')};
+    background-color: transparent;
+  }
+
+  &::after {
+    position: absolute;
+    margin: 0;
+    bottom: 0;
+    left: 50%;
+    content: '';
+    width: 0;
+    height: 2px;
+    background: ${themeVal('color.primary')};
+    transform: translate(-50%, 0);
+
+    /* Animation */
+    transition: width 0.24s ease-in-out 0s;
+  }
+
+  ${({ active }) =>
+    active &&
+    css`
+      /* stylelint-disable-next-line */
+      &,
+      &:visited {
+        color: ${themeVal('color.primary')};
+      }
+      /* stylelint-disable-next-line no-duplicate-selectors */
+      &::after {
+        width: 105%;
+      }
+    `}
+`;
+
+const TabbedBlockHeader = styled(PanelBlockHeader)`
+  /*padding: 0 1.5rem;*/
+  ul {
+    ${listReset}
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+  }
+`;
+
+function TabbedBlock(props) {
+  const { children } = props;
+  const [activeTab, setActiveTab] = useState(0);
+
+  return (
+    <>
+      <TabbedBlockHeader as='nav' role='navigation'>
+        <ul>
+          {Children.map(children, (child, ind) => {
+            const { name, icon } = child.props;
+            return (
+              <li key={name}>
+                <Tab
+                  as='a'
+                  id={`${name}-tab`}
+                  active={ind === activeTab}
+                  useIcon={icon}
+                  title='Show menu'
+                  size='small'
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setActiveTab(ind);
+                  }}
+                >
+                  {name}
+                </Tab>
+              </li>
+            );
+          })}
+        </ul>
+      </TabbedBlockHeader>
+      <PanelBlockScroll>
+        {Children.map(children, (child, i) => {
+          const active = i === activeTab;
+          return (
+            <>
+              {React.cloneElement(child, {
+                active: active,
+                style: active ? {} : { display: 'none' },
+              })}
+            </>
+          );
+        })}
+      </PanelBlockScroll>
+    </>
+  );
+}
+
+TabbedBlock.propTypes = {
+  children: T.node.isRequired,
+};
+export default TabbedBlock;
