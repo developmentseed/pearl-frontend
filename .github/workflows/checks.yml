@@ -1,12 +1,10 @@
-name: QA
+name: Checks
 
 on:
-  pull_request:
-    types:
-        - opened
-        - synchronize
-        - reopened
-        - ready_for_review
+  push:
+    branches-ignore:
+      - 'main'
+      - 'develop'
 
 jobs:
   lint:
