@@ -1,14 +1,9 @@
-# This workflow will build and deploy the site
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
-
-name: Deploy
+name: Deploy to staging
 
 on:
-  workflow_run:
-    workflows: ["QA"]
-    types:
-      - completed
-    branches: [develop] 
+  push:
+    branches:
+    - 'develop'
 
 env:
   STORAGE_ACCOUNT_NAME: lulc
