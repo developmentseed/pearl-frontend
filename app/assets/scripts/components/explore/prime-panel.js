@@ -1,21 +1,34 @@
 import React, { useState, useContext } from 'react';
-import Panel from '../common/panel';
 import styled from 'styled-components';
 import { themeVal } from '@devseed-ui/theme-provider';
 import { Button } from '@devseed-ui/button';
-import T from 'prop-types';
+
+import Panel from '../common/panel';
 import {
   PanelBlock,
-  PanelBlockHeader,
+  PanelBlockHeader as BasePanelBlockHeader,
   PanelBlockBody,
+  PanelBlockFooter,
 } from '../common/panel-block';
 import { Subheading as BaseSubheading } from '../../styles/type/heading';
 import SelectModal from './select-modal';
 import { Card } from './card-list';
 import { PlaceholderMessage } from '../../styles/placeholder.js';
+import { ExploreContext, viewModes } from '../../context/explore';
+import TabbedBlock from '../common/tabbed-block-body';
+
+import {
+  HeadOption,
+  HeadOptionHeadline,
+  HeadOptionToolbar,
+} from '../../styles/panel';
+import { EditButton } from '../../styles/button';
 
 import { availableModels } from './sample-data';
-import { ExploreContext, viewModes } from '../../context/explore';
+
+const PlaceholderPanelSection = styled.div`
+  padding: 1rem;
+`;
 
 const SubheadingStrong = styled.strong`
   color: ${themeVal('color.base')};
@@ -26,53 +39,22 @@ const Subheading = styled(BaseSubheading)`
   font-size: 0.75rem;
 `;
 
-export const HeadOption = styled.div`
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  box-shadow: 0px 1px 0px 0px ${themeVal('color.baseAlphaC')};
-  padding: 1rem 0;
-  gap: 0.5rem;
-`;
-
-export const HeadOptionHeadline = styled.div`
-  grid-column: 1 / -1;
-`;
-
-export const HeadOptionToolbar = styled.div`
-  display: grid;
-  justify-self: end;
-  grid-template-columns: repeat(auto-fill, minmax(1rem, 1fr));
-  gap: 1rem;
-  grid-auto-flow: column;
-  justify-items: center;
-`;
-
-export const EditButton = styled(Button).attrs({
-  variation: 'base-plain',
-  size: 'small',
-  hideText: true,
-})`
-  opacity: 50%;
-  width: min-content;
-`;
-
 const StyledPanelBlock = styled(PanelBlock)`
   width: 24rem;
-  display: flex;
-  justify-content: space-between;
-  > * {
-    padding: 1.5rem 2rem;
-  }
 `;
 
-const PanelControls = styled.div`
+const PanelBlockHeader = styled(BasePanelBlockHeader)`
+  display: grid;
+  grid-gap: 1rem;
+`;
+
+const PanelControls = styled(PanelBlockFooter)`
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-gap: 1rem;
 `;
 
-function PrimePanel(props) {
-  const { inferenceResults } = props;
+function PrimePanel() {
   const { viewMode, setViewMode, aoi } = useContext(ExploreContext);
 
   const [selectedModel, setSelectedModel] = useState(null);
@@ -153,14 +135,21 @@ function PrimePanel(props) {
               </HeadOption>
             </PanelBlockHeader>
             <PanelBlockBody>
-              {inferenceResults ? (
-                <div>Inference</div>
-              ) : (
-                <PlaceholderMessage>
-                  Click &quot;Run Inference&quot; to generate the class LULC map
-                  for your AOI
-                </PlaceholderMessage>
-              )}
+              <TabbedBlock>
+                <PlaceholderPanelSection name='Retrain Model'>
+                  <PlaceholderMessage>
+                    Click &quot;Run Inference&quot; to generate the class LULC
+                    map for your AOI
+                  </PlaceholderMessage>
+                </PlaceholderPanelSection>
+
+                <PlaceholderPanelSection name='Refine Results'>
+                  <PlaceholderMessage>Refine results</PlaceholderMessage>
+                </PlaceholderPanelSection>
+                <PlaceholderPanelSection name='Layers'>
+                  <PlaceholderMessage>Refine results</PlaceholderMessage>
+                </PlaceholderPanelSection>
+              </TabbedBlock>
             </PanelBlockBody>
 
             <PanelControls>
@@ -225,7 +214,4 @@ function PrimePanel(props) {
   );
 }
 
-PrimePanel.propTypes = {
-  inferenceResults: T.array,
-};
 export default PrimePanel;

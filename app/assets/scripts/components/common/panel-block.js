@@ -8,19 +8,23 @@ import ShadowScrollbar from '../common/shadow-scrollbar';
 const _tint = stylizeFunction(tint);
 
 export const PanelBlock = styled.section`
-  display: flex;
-  flex-flow: column nowrap;
+  /* Grid style assumes header, body, footer layout */
   flex: 1;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: min-content 1fr min-content;
+  grid-gap: 1rem;
+
   position: relative;
   z-index: 10;
   box-shadow: 0 -1px 0 0 ${themeVal('color.baseAlphaB')};
+  padding: ${glsp()} ${glsp(1.5)};
 `;
 
 export const PanelBlockHeader = styled.header`
   background: ${_tint(0.02, themeVal('color.surface'))};
   position: relative;
   z-index: 10;
-  padding: ${glsp()} ${glsp(1.5)};
 `;
 
 export const PanelBlockFooter = styled.footer`
@@ -28,7 +32,6 @@ export const PanelBlockFooter = styled.footer`
   background: ${_tint(0.02, themeVal('color.surface'))};
   position: relative;
   z-index: 10;
-  padding: ${glsp()} ${glsp(1.5)};
 `;
 
 export const PanelBlockTitle = styled(Heading).attrs({ size: 'medium' })`
