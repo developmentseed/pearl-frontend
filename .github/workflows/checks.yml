@@ -1,10 +1,12 @@
 name: Checks
 
 on:
-  push:
-    branches-ignore:
-      - 'main'
-      - 'develop'
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
 
 jobs:
   lint:
