@@ -11,9 +11,13 @@ import { ExploreContext, viewModes } from '../../../context/explore';
 import { round } from '../../../utils/format';
 import GeoCoder from '../../common/map/geocoder';
 import { themeVal, multiply } from '@devseed-ui/theme-provider';
+import FreeDraw, { ALL } from 'leaflet-freedraw';
 
 const center = [38.942, -95.449];
 const zoom = 4;
+const freeDraw = new FreeDraw({
+  mode: ALL,
+});
 
 const Container = styled.div`
   height: 100%;
@@ -95,6 +99,8 @@ function Map() {
         style={{ height: '100%' }}
         whenCreated={(m) => {
           setMap(m);
+
+          m.addLayer(freeDraw);
 
           if (process.env.NODE_ENV !== 'production') {
             // makes map accessible in console for debugging
