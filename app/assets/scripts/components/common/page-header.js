@@ -6,7 +6,6 @@ import { useAuth0 } from '@auth0/auth0-react';
 import { NavLink, Link } from 'react-router-dom';
 
 import { Button } from '@devseed-ui/button';
-import BaseDropdown from '@devseed-ui/dropdown';
 import {
   themeVal,
   rgba,
@@ -16,17 +15,16 @@ import {
 } from '@devseed-ui/theme-provider';
 import collecticon from '@devseed-ui/collecticons';
 import {
+  Dropdown,
   DropdownHeader,
   DropdownBody,
   DropdownItem,
   DropdownFooter,
+  DropdownTrigger,
 } from '../../styles/dropdown';
 import { filterComponentProps } from '../../styles/utils/general';
 
 const { appTitle } = config;
-const Dropdown = styled(BaseDropdown)`
-  padding: 0;
-`;
 
 const PageHead = styled.header`
   background-color: ${themeVal('color.baseAlphaA')};
@@ -134,12 +132,6 @@ const GlobalMenuLink = styled.a`
     ${visuallyHidden()}
   }
 `;
-const DropdownTrigger = styled(Button)`
-  &::before {
-    ${collecticon('user')}
-    font-size: ${multiply(themeVal('type.base.size'), 0.85)};
-  }
-`;
 
 // Please refer to filterComponentProps to understand why this is needed
 const propsToFilter = [
@@ -225,6 +217,7 @@ function PageHeader(props) {
                   <DropdownTrigger
                     variation='base-raised-semidark'
                     useIcon={['chevron-down--small', 'after']}
+                    usePreIcon='user'
                     title='Open dropdown'
                     className='user-options-trigger'
                     size='small'

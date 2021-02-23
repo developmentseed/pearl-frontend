@@ -5,12 +5,17 @@ import PageHeader from '../common/page-header';
 import { PageBody } from '../../styles/page';
 import { Button } from '@devseed-ui/button';
 import { ExploreProvider } from '../../context/explore';
+import SessionOutputControl from './session-output-control';
 
 function Explore() {
   return (
     <App pageTitle='Explore'>
       <ExploreProvider>
         <PageHeader>
+          <SessionOutputControl
+          />
+
+    {/*
           <Button
             variation='base-raised-semidark'
             useIcon='square'
@@ -35,7 +40,7 @@ function Explore() {
             size='small'
           >
             <span>Help</span>
-          </Button>
+          </Button>*/}
         </PageHeader>
         <PageBody role='main'>
           <ExploreComponent />

@@ -1,6 +1,8 @@
 import styled from 'styled-components';
 import { themeVal, multiply } from '@devseed-ui/theme-provider';
 import collecticon from '@devseed-ui/collecticons';
+import BaseDropdown from '@devseed-ui/dropdown';
+import { Button } from '@devseed-ui/button';
 
 export const DropdownHeader = styled.header`
   background: ${themeVal('color.baseAlphaB')};
@@ -42,4 +44,14 @@ export const DropdownItem = styled.a`
 export const DropdownFooter = styled.footer`
   border-top: 1px solid ${themeVal('color.baseAlphaD')};
   padding: ${multiply(themeVal('layout.space'), 0.5)} 0;
+`;
+
+export const Dropdown = styled(BaseDropdown)`
+  padding: 0;
+`;
+export const DropdownTrigger = styled(Button)`
+  &::before {
+    ${({ usePreIcon }) => usePreIcon && collecticon(usePreIcon)}
+    font-size: ${multiply(themeVal('type.base.size'), 0.85)};
+  }
 `;
