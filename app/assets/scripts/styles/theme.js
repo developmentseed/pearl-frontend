@@ -3,7 +3,8 @@ import { rgba } from 'polished';
 let color = {
   baseLight: '#F7F7F7',
   baseDark: '#121826',
-  primary: '#09CEAD',
+  primary: '#07A68C',
+  primaryDark: '#09CEAD',
   secondary: '#F7C948',
   tertiary: '#42A6D1',
   quaternary: '#EE4E44',
