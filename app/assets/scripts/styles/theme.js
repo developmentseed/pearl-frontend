@@ -44,7 +44,7 @@ const type = {
     size: '1rem',
     line: '1.5',
     color: color.base,
-    family: '"Open Sans", sans-serif',
+    family: '"Titillium Web", sans-serif',
     style: 'normal',
     settings: 'normal',
     case: 'none',
@@ -56,7 +56,7 @@ const type = {
     antialiasing: true,
   },
   heading: {
-    family: '"Open Sans", sans-serif',
+    family: '"Titillium Web", sans-serif',
     style: 'normal',
     settings: 'normal',
     case: 'none',
