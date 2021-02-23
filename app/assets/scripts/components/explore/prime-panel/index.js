@@ -3,28 +3,29 @@ import styled from 'styled-components';
 import { themeVal } from '@devseed-ui/theme-provider';
 import { Button } from '@devseed-ui/button';
 
-import Panel from '../common/panel';
+import Panel from '../../common/panel';
 import {
   PanelBlock,
   PanelBlockHeader as BasePanelBlockHeader,
   PanelBlockBody,
   PanelBlockFooter,
-} from '../common/panel-block';
-import { Subheading as BaseSubheading } from '../../styles/type/heading';
-import SelectModal from './select-modal';
-import { Card } from './card-list';
-import { PlaceholderMessage } from '../../styles/placeholder.js';
-import { ExploreContext, viewModes } from '../../context/explore';
-import TabbedBlock from '../common/tabbed-block-body';
+} from '../../common/panel-block';
+import { Subheading as BaseSubheading } from '../../../styles/type/heading';
+import SelectModal from '../select-modal';
+import { Card } from '../card-list';
+import { PlaceholderMessage } from '../../../styles/placeholder.js';
+import { ExploreContext, viewModes } from '../../../context/explore';
+import TabbedBlock from '../../common/tabbed-block-body';
+import RetrainModel from './retrain-model';
 
 import {
   HeadOption,
   HeadOptionHeadline,
   HeadOptionToolbar,
-} from '../../styles/panel';
-import { EditButton } from '../../styles/button';
+} from '../../../styles/panel';
+import { EditButton } from '../../../styles/button';
 
-import { availableModels } from './sample-data';
+import { availableModels } from '../sample-data';
 
 const PlaceholderPanelSection = styled.div`
   padding: 1rem;
@@ -59,6 +60,7 @@ function PrimePanel() {
 
   const [selectedModel, setSelectedModel] = useState(null);
   const [showSelectModelModal, setShowSelectModelModal] = useState(false);
+  const [inference, setInference] = useState(false);
 
   return (
     <>
@@ -137,10 +139,14 @@ function PrimePanel() {
             <PanelBlockBody>
               <TabbedBlock>
                 <PlaceholderPanelSection name='Retrain Model'>
-                  <PlaceholderMessage>
-                    Click &quot;Run Inference&quot; to generate the class LULC
-                    map for your AOI
-                  </PlaceholderMessage>
+                  {!inference ? (
+                    <PlaceholderMessage>
+                      Click &quot;Run Inference&quot; to generate the class LULC
+                      map for your AOI
+                    </PlaceholderMessage>
+                  ) : (
+                    <RetrainModel />
+                  )}
                 </PlaceholderPanelSection>
 
                 <PlaceholderPanelSection name='Refine Results'>
@@ -181,6 +187,7 @@ function PrimePanel() {
                 style={{
                   gridColumn: '1 / -1',
                 }}
+                onClick={() => setInference(true)}
               >
                 Run inference
               </Button>
