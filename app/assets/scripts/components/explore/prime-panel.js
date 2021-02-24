@@ -10,7 +10,7 @@ import {
   PanelBlockBody,
   PanelBlockFooter,
 } from '../common/panel-block';
-import { Subheading as BaseSubheading } from '../../styles/type/heading';
+import { Subheading } from '../../styles/type/heading';
 import SelectModal from './select-modal';
 import { Card } from './card-list';
 import { PlaceholderMessage } from '../../styles/placeholder.js';
@@ -30,13 +30,10 @@ const PlaceholderPanelSection = styled.div`
   padding: 1rem;
 `;
 
-const SubheadingStrong = styled.strong`
+const SubheadingStrong = styled.h3`
   color: ${themeVal('color.base')};
-  font-size: 0.875rem;
-`;
-
-const Subheading = styled(BaseSubheading)`
-  font-size: 0.75rem;
+  font-size: 1.125rem;
+  line-height: 1.5rem;
 `;
 
 const StyledPanelBlock = styled(PanelBlock)`
@@ -75,12 +72,9 @@ function PrimePanel() {
                 <HeadOptionHeadline>
                   <Subheading>Selected Area </Subheading>
                 </HeadOptionHeadline>
-
-                <Subheading variation='primary'>
-                  <SubheadingStrong>
-                    {aoi && aoi.area > 0 ? `${aoi.area} km2` : 'Not selected'}
-                  </SubheadingStrong>
-                </Subheading>
+                <SubheadingStrong>
+                  {aoi && aoi.area > 0 ? `${aoi.area} km2` : 'Not selected'}
+                </SubheadingStrong>
                 <HeadOptionToolbar>
                   <EditButton
                     onClick={function () {
@@ -114,12 +108,9 @@ function PrimePanel() {
                 <HeadOptionHeadline>
                   <Subheading>Selected Model</Subheading>
                 </HeadOptionHeadline>
-
-                <Subheading variation='primary'>
-                  <SubheadingStrong>
-                    {selectedModel || 'Select Model'}
-                  </SubheadingStrong>
-                </Subheading>
+                <SubheadingStrong>
+                  {selectedModel || 'Select Model'}
+                </SubheadingStrong>
                 <HeadOptionToolbar>
                   <EditButton
                     data-cy='show-select-model-button'
@@ -154,7 +145,7 @@ function PrimePanel() {
 
             <PanelControls>
               <Button
-                variation='base-raised-light'
+                variation='primary-raised-light'
                 size='medium'
                 useIcon='tick--small'
                 style={{
@@ -164,7 +155,7 @@ function PrimePanel() {
                 Reset
               </Button>
               <Button
-                variation='base-raised-light'
+                variation='primary-raised-light'
                 size='medium'
                 useIcon='tick--small'
                 style={{
@@ -175,7 +166,7 @@ function PrimePanel() {
               </Button>
 
               <Button
-                variation='base-raised-dark'
+                variation='primary-raised-dark'
                 size='medium'
                 useIcon='tick--small'
                 style={{
