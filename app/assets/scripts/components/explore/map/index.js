@@ -10,15 +10,14 @@ import { ExploreContext, viewModes } from '../../../context/explore';
 import { round } from '../../../utils/format';
 import GeoCoder from '../../common/map/geocoder';
 import { themeVal, multiply } from '@devseed-ui/theme-provider';
-// import FreeDraw, { ALL } from 'leaflet-freedraw';
+import FreeDraw, { ALL } from 'leaflet-freedraw';
 import L from 'leaflet';
 
-const { CREATE_AOI_MODE, EDIT_AOI_MODE, BROWSE_MODE } = viewModes;
 const center = [38.942, -95.449];
 const zoom = 4;
-// const freeDraw = new FreeDraw({
-//   mode: ALL,
-// });
+const freeDraw = new FreeDraw({
+  mode: ALL,
+});
 
 const Container = styled.div`
   height: 100%;
@@ -119,16 +118,30 @@ function enterEditAoiMode(map, aoi, setAoi) {
 
 function Map() {
   const [map, setMap] = useState(null);
-  const { viewMode, setViewMode, aoi, setAoi } = useContext(ExploreContext);
+  const { viewMode, previousViewMode, setViewMode, aoi, setAoi } = useContext(
+    ExploreContext
+  );
 
   useEffect(() => {
-    if (viewMode === CREATE_AOI_MODE) {
-      enterCreateAoiMode(map, (aoi) => {
-        setAoi(aoi);
-        setViewMode(BROWSE_MODE);
-      });
-    } else if (viewMode === EDIT_AOI_MODE) {
-      enterEditAoiMode(map, aoi, setAoi);
+    if (previousViewMode === viewModes.EDIT_CLASS_MODE) {
+      map.removeLayer(freeDraw);
+    }
+
+    switch (viewMode) {
+      case viewModes.CREATE_AOI_MODE:
+        enterCreateAoiMode(map, (aoi) => {
+          setAoi(aoi);
+          setViewMode(viewModes.BROWSE_MODE);
+        });
+        break;
+      case viewModes.EDIT_AOI_MODE:
+        enterEditAoiMode(map, aoi, setAoi);
+        break;
+      case viewModes.EDIT_CLASS_MODE:
+        map.addLayer(freeDraw);
+        break;
+      default:
+        break;
     }
   }, [viewMode]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -140,8 +153,6 @@ function Map() {
         style={{ height: '100%' }}
         whenCreated={(m) => {
           setMap(m);
-
-          // m.addLayer(freeDraw);
 
           if (process.env.NODE_ENV !== 'production') {
             // makes map accessible in console for debugging

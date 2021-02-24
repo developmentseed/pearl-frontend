@@ -13,13 +13,11 @@ import { useHistory } from 'react-router-dom';
 /**
  * Explore View Modes
  */
-const BROWSE_MODE = 'BROWSE_MODE';
-const CREATE_AOI_MODE = 'CREATE_AOI_MODE';
-const EDIT_AOI_MODE = 'EDIT_AOI_MODE';
 export const viewModes = {
-  BROWSE_MODE,
-  CREATE_AOI_MODE,
-  EDIT_AOI_MODE,
+  BROWSE_MODE: 'BROWSE_MODE',
+  CREATE_AOI_MODE: 'CREATE_AOI_MODE',
+  EDIT_AOI_MODE: 'EDIT_AOI_MODE',
+  EDIT_CLASS_MODE: 'EDIT_CLASS_MODE',
 };
 
 /**
