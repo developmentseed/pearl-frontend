@@ -12,29 +12,26 @@ function Explore() {
       <ExploreProvider>
         <PageHeader>
           <Button
-            variation='base-raised-semidark'
-            useIcon='square'
-            title='Set this option'
-            size='small'
+            variation='base-plain'
+            useIcon='circle-question'
+            title='App help'
           >
-            <span>Save Checkpoint</span>
+            <span>Help</span>
           </Button>
 
           <Button
-            variation='base-raised-semidark'
+            variation='primary-raised-light'
             useIcon='download-2'
             title='Set this option'
-            size='small'
           >
-            <span>Download</span>
+            <span>Export</span>
           </Button>
           <Button
-            variation='base-raised-semidark'
-            useIcon='circle-question'
-            title='App help'
-            size='small'
+            variation='primary-raised-dark'
+            useIcon='square'
+            title='Set this option'
           >
-            <span>Help</span>
+            <span>Save Project</span>
           </Button>
         </PageHeader>
         <PageBody role='main'>
