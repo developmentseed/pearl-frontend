@@ -1,19 +1,19 @@
 import React, { useState, useMemo, useContext, useEffect } from 'react';
 import styled from 'styled-components';
-// import { lineString as tLineString, convertArea } from '@turf/helpers';
-// import tArea from '@turf/area';
-// import tBbox from '@turf/bbox';
-// import tBboxPolygon from '@turf/bbox-polygon';
+import { lineString as tLineString, convertArea } from '@turf/helpers';
+import tArea from '@turf/area';
+import tBbox from '@turf/bbox';
+import tBboxPolygon from '@turf/bbox-polygon';
 import SizeAwareElement from '../../common/size-aware-element';
 import { MapContainer, TileLayer, FeatureGroup } from 'react-leaflet';
 import { ExploreContext, viewModes } from '../../../context/explore';
-// import { round } from '../../../utils/format';
+import { round } from '../../../utils/format';
 import GeoCoder from '../../common/map/geocoder';
 import { themeVal, multiply } from '@devseed-ui/theme-provider';
 // import FreeDraw, { ALL } from 'leaflet-freedraw';
 import L from 'leaflet';
 
-const { CREATE_AOI_MODE } = viewModes;
+const { CREATE_AOI_MODE, EDIT_AOI_MODE, BROWSE_MODE } = viewModes;
 const center = [38.942, -95.449];
 const zoom = 4;
 // const freeDraw = new FreeDraw({
@@ -53,10 +53,10 @@ function getEventLatLng(event) {
   return [lat, lng];
 }
 
-function enterCreateAoiMode(map) {
+function enterCreateAoiMode(map, onCreateEnd) {
   let start;
   let end;
-  let rectangle;
+  let aoiRef;
 
   function onMouseDown(event) {
     map.dragging.disable();
@@ -67,11 +67,10 @@ function enterCreateAoiMode(map) {
     function onMouseMove(event) {
       end = getEventLatLng(event);
 
-      if (!rectangle) {
-        rectangle = L.rectangle([start, end]);
-        rectangle.addTo(map);
+      if (!aoiRef) {
+        aoiRef = L.rectangle([start, end]).addTo(map);
       } else {
-        rectangle.setBounds([start, end]);
+        aoiRef.setBounds([start, end]);
       }
     }
 
@@ -80,6 +79,19 @@ function enterCreateAoiMode(map) {
       map.dragging.enable();
       map.off('mousemove', onMouseMove);
       map.off('mouseup', onMouseUp);
+
+      // Calculate BBox and area in square kilometers
+      const lineString = tLineString([start, end]);
+      const bbox = tBbox(lineString);
+      const poly = tBboxPolygon(bbox);
+      const area = convertArea(tArea(poly), 'meters', 'kilometers');
+
+      // Return AOI on end
+      onCreateEnd({
+        area: round(area, 0),
+        bbox,
+        ref: aoiRef,
+      });
     }
 
     // Add draw events after mouse down
@@ -91,13 +103,32 @@ function enterCreateAoiMode(map) {
   map.on('mousedown', onMouseDown);
 }
 
+function enterEditAoiMode(map, aoi, setAoi) {
+  const aoiRef = aoi.ref;
+
+  const [minX, minY, maxX, maxY] = aoi.bbox;
+
+  const seResizeMarker = L.marker([minX, minY]).addTo(map);
+  const neResizeMarker = L.marker([minX, maxY]).addTo(map);
+  const swResizeMarker = L.marker([maxX, minY]).addTo(map);
+  const nwResizeMarker = L.marker([maxX, maxY]).addTo(map);
+  const moveMarker = L.marker([(maxX + minX) / 2, (maxY + minY) / 2]).addTo(
+    map
+  );
+}
+
 function Map() {
   const [map, setMap] = useState(null);
-  const { viewMode } = useContext(ExploreContext);
+  const { viewMode, setViewMode, aoi, setAoi } = useContext(ExploreContext);
 
   useEffect(() => {
     if (viewMode === CREATE_AOI_MODE) {
-      enterCreateAoiMode(map);
+      enterCreateAoiMode(map, (aoi) => {
+        setAoi(aoi);
+        setViewMode(BROWSE_MODE);
+      });
+    } else if (viewMode === EDIT_AOI_MODE) {
+      enterEditAoiMode(map, aoi, setAoi);
     }
   }, [viewMode]); // eslint-disable-line react-hooks/exhaustive-deps
 
