@@ -45,7 +45,7 @@ const PageHeadInner = styled.div`
 
 const PageNav = styled.nav`
   display: grid;
-  grid-template-columns: 6fr 1fr;
+  grid-template-columns: 6fr min-content;
   padding: 0 1rem;
   grid-gap: 1rem;
   width: 100%;
@@ -69,6 +69,7 @@ const PrimarySection = styled.div`
   display: grid;
   align-items: center;
   justify-content: space-between;
+  grid-template-columns: 1fr min-content;
 
   * {
     grid-row: 1;
@@ -83,7 +84,6 @@ const SecondarySection = styled.div`
   align-items: center;
   justify-content: space-between;
   grid-template-columns: min-content min-content;
-  grid-gap: 1rem;
 
   .user-options-trigger::before {
     ${collecticon('house')}
