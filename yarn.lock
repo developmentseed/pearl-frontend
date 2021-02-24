@@ -6444,11 +6444,6 @@ lead@^1.0.0:
   dependencies:
     flush-write-stream "^1.0.2"
 
-leaflet-draw@^1.0.4:
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/leaflet-draw/-/leaflet-draw-1.0.4.tgz#45be92f378ed253e7202fdeda1fcc71885198d46"
-  integrity sha512-rsQ6saQO5ST5Aj6XRFylr5zvarWgzWnrg46zQ1MEOEIHsppdC/8hnN8qMoFvACsPvTioAuysya/TVtog15tyAQ==
-
 leaflet-freedraw@^2.13.3:
   version "2.13.3"
   resolved "https://registry.yarnpkg.com/leaflet-freedraw/-/leaflet-freedraw-2.13.3.tgz#df5cd0e0d130d338cc9cecdce3011078639c3bcc"

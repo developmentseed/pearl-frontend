@@ -1,23 +1,24 @@
 import React, { useState, useMemo, useContext, useEffect } from 'react';
 import styled from 'styled-components';
-import { lineString as tLineString, convertArea } from '@turf/helpers';
-import tArea from '@turf/area';
-import tBbox from '@turf/bbox';
-import tBboxPolygon from '@turf/bbox-polygon';
+// import { lineString as tLineString, convertArea } from '@turf/helpers';
+// import tArea from '@turf/area';
+// import tBbox from '@turf/bbox';
+// import tBboxPolygon from '@turf/bbox-polygon';
 import SizeAwareElement from '../../common/size-aware-element';
 import { MapContainer, TileLayer, FeatureGroup } from 'react-leaflet';
-import EditControl from './edit-control';
 import { ExploreContext, viewModes } from '../../../context/explore';
-import { round } from '../../../utils/format';
+// import { round } from '../../../utils/format';
 import GeoCoder from '../../common/map/geocoder';
 import { themeVal, multiply } from '@devseed-ui/theme-provider';
-import FreeDraw, { ALL } from 'leaflet-freedraw';
+// import FreeDraw, { ALL } from 'leaflet-freedraw';
+import L from 'leaflet';
 
+const { CREATE_AOI_MODE } = viewModes;
 const center = [38.942, -95.449];
 const zoom = 4;
-const freeDraw = new FreeDraw({
-  mode: ALL,
-});
+// const freeDraw = new FreeDraw({
+//   mode: ALL,
+// });
 
 const Container = styled.div`
   height: 100%;
@@ -45,51 +46,60 @@ const Container = styled.div`
   }
 `;
 
-/**
- * Helper function to extract an AOI from a layer created/edited with Leaflet.draw
- *
- * @param {Object} layer A layer object from Leaflet.draw
- */
-function getAoiFromLayer(layer) {
-  // Get drawn vector as LineString GeoJSON
-  const vertices = layer._latlngs[0].map(({ lat, lng }) => {
-    return [lng, lat];
-  });
-  const lineString = tLineString(vertices);
+function getEventLatLng(event) {
+  const {
+    latlng: { lng, lat },
+  } = event;
+  return [lat, lng];
+}
 
-  // Calculate BBox and area in square kilometers
-  const bbox = tBbox(lineString);
-  const poly = tBboxPolygon(bbox);
-  const area = convertArea(tArea(poly), 'meters', 'kilometers');
+function enterCreateAoiMode(map) {
+  let start;
+  let end;
+  let rectangle;
 
-  return {
-    area: round(area, 0),
-    bbox,
-  };
+  function onMouseDown(event) {
+    map.dragging.disable();
+    map.off('mousedown', onMouseDown);
+    start = getEventLatLng(event);
+
+    // Update rectangle on mouse move
+    function onMouseMove(event) {
+      end = getEventLatLng(event);
+
+      if (!rectangle) {
+        rectangle = L.rectangle([start, end]);
+        rectangle.addTo(map);
+      } else {
+        rectangle.setBounds([start, end]);
+      }
+    }
+
+    // Listen to draw end
+    function onMouseUp() {
+      map.dragging.enable();
+      map.off('mousemove', onMouseMove);
+      map.off('mouseup', onMouseUp);
+    }
+
+    // Add draw events after mouse down
+    map.on('mousemove', onMouseMove);
+    map.on('mouseup', onMouseUp);
+  }
+
+  // Listen to draw start
+  map.on('mousedown', onMouseDown);
 }
 
 function Map() {
   const [map, setMap] = useState(null);
-  const { previousViewMode, viewMode, setViewMode, setAoi } = useContext(
-    ExploreContext
-  );
-  const [drawRef, setDrawRef] = useState(null);
+  const { viewMode } = useContext(ExploreContext);
 
-  /**
-   * Handle changes in view mode
-   */
   useEffect(() => {
-    if (!drawRef) return;
-
-    if (viewMode === viewModes.CREATE_AOI_MODE) {
-      drawRef._toolbars.draw._modes.rectangle.handler.enable();
-    } else if (viewMode === viewModes.EDIT_AOI_MODE) {
-      drawRef._toolbars.edit._modes.edit.handler.enable();
-    } else if (previousViewMode === viewModes.EDIT_AOI_MODE) {
-      drawRef._toolbars.edit._modes.edit.handler.save();
-      drawRef._toolbars.edit._modes.edit.handler.disable();
+    if (viewMode === CREATE_AOI_MODE) {
+      enterCreateAoiMode(map);
     }
-  }, [drawRef, previousViewMode, viewMode]);
+  }, [viewMode]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const displayMap = useMemo(
     () => (
@@ -100,7 +110,7 @@ function Map() {
         whenCreated={(m) => {
           setMap(m);
 
-          m.addLayer(freeDraw);
+          // m.addLayer(freeDraw);
 
           if (process.env.NODE_ENV !== 'production') {
             // makes map accessible in console for debugging
@@ -114,56 +124,10 @@ function Map() {
         />
         <FeatureGroup>
           <GeoCoder />
-          <EditControl
-            onMounted={setDrawRef}
-            onCreated={(e) => {
-              // Disable draw mode
-              setViewMode(viewModes.BROWSE_MODE);
-
-              // Add AOI to context
-              setAoi(getAoiFromLayer(e.layer));
-            }}
-            onEdited={(e) => {
-              const layerId = Object.keys(e.layers._layers)[0];
-
-              // Bypass if no layer was touched
-              if (typeof layerId === 'undefined') return;
-
-              // Get first layer edited
-              const layer = e.layers._layers[layerId];
-
-              // Add AOI to context
-              setAoi(getAoiFromLayer(layer));
-            }}
-            draw={{
-              polyline: false,
-              polygon: false,
-              rectangle: {
-                shapeOptions: {
-                  stroke: true,
-                  color: '#3388ff',
-                  weight: 4,
-                  opacity: 0.5,
-                  fill: false,
-                  fillColor: null, //same as color by default
-                  fillOpacity: 0.2,
-                  showArea: false,
-                  clickable: false,
-                },
-              },
-              circle: false,
-              circlemarker: false,
-              marker: false,
-            }}
-            edit={{
-              edit: true,
-              remove: false,
-            }}
-          />
         </FeatureGroup>
       </MapContainer>
     ),
-    [] // eslint-disable-line react-hooks/exhaustive-deps
+    [viewMode] // eslint-disable-line react-hooks/exhaustive-deps
   );
 
   return (
