@@ -220,7 +220,7 @@ function PageHeader(props) {
                     usePreIcon='user'
                     title='Open dropdown'
                     className='user-options-trigger'
-                    size='small'
+                    size='medium'
                     {...props}
                   >
                     Account

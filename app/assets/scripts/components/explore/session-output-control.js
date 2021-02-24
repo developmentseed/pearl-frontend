@@ -1,14 +1,8 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useAuth0 } from '@auth0/auth0-react';
-import {
-  Dropdown,
-  DropdownHeader,
-  DropdownBody,
-  DropdownItem,
-  DropdownFooter,
-  DropdownTrigger,
-} from '../../styles/dropdown';
+import T from 'prop-types';
+import { Dropdown, DropdownTrigger } from '../../styles/dropdown';
 import { Button } from '@devseed-ui/button';
 import { glsp } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
@@ -49,8 +43,7 @@ function SessionOutputControl(props) {
 
   return (
     <Wrapper>
-      <Button variation='base-plain' disabled size='small'
-      >
+      <Button variation='base-plain' disabled size='small'>
         Session Status: {status || 'None Provided'}
       </Button>
 
@@ -59,10 +52,9 @@ function SessionOutputControl(props) {
         direction='down'
         triggerElement={(props) => (
           <DropdownTrigger
-            variation='base-raised-semidark'
-            usePreIcon='circle-tick'
+            variation='base-raised-dark'
+            useIcon={['circle-tick', 'before']}
             title='Open dropdown'
-            useIcon={['chevron-down--small', 'after']}
             className='user-options-trigger'
             size='small'
             {...props}
@@ -117,8 +109,25 @@ function SessionOutputControl(props) {
           </Form>
         </DropWrapper>
       </Dropdown>
+      <DropdownTrigger
+        variation='base-raised-semidark'
+        useIcon={['download', 'before']}
+        title='Open dropdown'
+        className='user-options-trigger'
+        size='medium'
+        {...props}
+        disabled={!isAuthenticated}
+      >
+        Export
+      </DropdownTrigger>
     </Wrapper>
   );
 }
+
+SessionOutputControl.propTypes = {
+  status: T.string,
+  projectName: T.string,
+  setProjectName: T.func,
+};
 
 export default SessionOutputControl;
