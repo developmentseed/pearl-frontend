@@ -104,16 +104,157 @@ function enterCreateAoiMode(map, onCreateEnd) {
 
 function enterEditAoiMode(map, aoi, setAoi) {
   const aoiRef = aoi.ref;
+  let _resizeMarkers;
+  let _oppositeCorner;
+  let _moveMarker;
 
-  const [minX, minY, maxX, maxY] = aoi.bbox;
+  function _createMoveMarker() {
+    var bounds = aoiRef.getBounds(),
+      center = bounds.getCenter();
 
-  const seResizeMarker = L.marker([minX, minY]).addTo(map);
-  const neResizeMarker = L.marker([minX, maxY]).addTo(map);
-  const swResizeMarker = L.marker([maxX, minY]).addTo(map);
-  const nwResizeMarker = L.marker([maxX, maxY]).addTo(map);
-  const moveMarker = L.marker([(maxX + minX) / 2, (maxY + minY) / 2]).addTo(
-    map
-  );
+    _moveMarker = _createMarker(center);
+  }
+
+  function _createMarker(latlng) {
+    var marker = new L.Marker(latlng, {
+      draggable: true,
+    });
+
+    _bindMarker(marker);
+
+    map.addLayer(marker);
+
+    return marker;
+  }
+
+  function _bindMarker(marker) {
+    marker
+      .on('dragstart', _onMarkerDragStart)
+      .on('drag', _onMarkerDrag)
+      .on('dragend', _onMarkerDragEnd);
+  }
+
+  function _unbindMarker(marker) {
+    marker
+      .off('dragstart', _onMarkerDragStart)
+      .off('drag', _onMarkerDrag)
+      .off('dragend', _onMarkerDragEnd);
+  }
+
+  function _onMarkerDragStart(e) {
+    // L.Edit.SimpleShape.prototype._onMarkerDragStart.call(this, e);
+
+    // Save a reference to the opposite point
+    var corners = _getCorners(),
+      marker = e.target,
+      currentCornerIndex = marker._cornerIndex;
+
+    _oppositeCorner = corners[(currentCornerIndex + 2) % 4];
+
+    _toggleCornerMarkers(0, currentCornerIndex);
+  }
+
+  function _onMarkerDragEnd(e) {
+    var marker = e.target,
+      bounds,
+      center;
+
+    // Reset move marker position to the center
+    if (marker === this._moveMarker) {
+      bounds = this._shape.getBounds();
+      center = bounds.getCenter();
+
+      marker.setLatLng(center);
+    }
+
+    _toggleCornerMarkers(1);
+
+    _repositionCornerMarkers();
+
+    marker.setOpacity(1);
+  }
+
+  function _onMarkerDrag(e) {
+    var marker = e.target,
+      latlng = marker.getLatLng();
+
+    if (marker === _moveMarker) {
+      _move(latlng);
+    } else {
+      _resize(latlng);
+    }
+
+    aoiRef.redraw();
+  }
+
+  function _resize(latlng) {
+    var bounds;
+
+    // Update the shape based on the current position of this corner and the opposite point
+    aoiRef.setBounds(L.latLngBounds(latlng, _oppositeCorner));
+
+    // Reposition the move marker
+    bounds = aoiRef.getBounds();
+    _moveMarker.setLatLng(bounds.getCenter());
+  }
+
+  function _move(newCenter) {
+    var latlngs = aoiRef._defaultShape
+        ? aoiRef._defaultShape()
+        : aoiRef.getLatLngs(),
+      bounds = aoiRef.getBounds(),
+      center = bounds.getCenter(),
+      offset,
+      newLatLngs = [];
+
+    // Offset the latlngs to the new center
+    for (var i = 0, l = latlngs.length; i < l; i++) {
+      offset = [latlngs[i].lat - center.lat, latlngs[i].lng - center.lng];
+      newLatLngs.push([newCenter.lat + offset[0], newCenter.lng + offset[1]]);
+    }
+
+    aoiRef.setLatLngs(newLatLngs);
+
+    _repositionCornerMarkers();
+  }
+
+  function _getCorners() {
+    const bounds = aoiRef.getBounds();
+    const nw = bounds.getNorthWest();
+    const ne = bounds.getNorthEast();
+    const se = bounds.getSouthEast();
+    const sw = bounds.getSouthWest();
+    return [nw, ne, se, sw];
+  }
+
+  function _createResizeMarkers() {
+    const corners = _getCorners();
+
+    _resizeMarkers = [];
+
+    for (var i = 0, l = corners.length; i < l; i++) {
+      _resizeMarkers.push(_createMarker(corners[i]));
+      // Monkey in the corner index as we will need to know this for dragging
+      _resizeMarkers[i]._cornerIndex = i;
+    }
+  }
+
+  function _toggleCornerMarkers(opacity) {
+    for (var i = 0, l = _resizeMarkers.length; i < l; i++) {
+      _resizeMarkers[i].setOpacity(opacity);
+    }
+  }
+
+  function _repositionCornerMarkers() {
+    var corners = _getCorners();
+
+    for (var i = 0, l = _resizeMarkers.length; i < l; i++) {
+      _resizeMarkers[i].setLatLng(corners[i]);
+    }
+  }
+
+  _createResizeMarkers();
+  _createMoveMarker();
 }
 
 function Map() {
