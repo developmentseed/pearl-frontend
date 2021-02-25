@@ -7,7 +7,6 @@ import { ExploreProvider } from '../../context/explore';
 import SessionTimeoutModal from '../common/timeout-modal';
 import SessionOutputControl from './session-output-control';
 
-
 function Explore() {
   const [projectName, setProjectName] = useState('Untitled Project');
   return (
