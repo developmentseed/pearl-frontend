@@ -5,6 +5,7 @@ import PageHeader from '../common/page-header';
 import { PageBody } from '../../styles/page';
 import { Button } from '@devseed-ui/button';
 import { ExploreProvider } from '../../context/explore';
+import SessionTimeoutModal from '../common/timeout-modal';
 
 function Explore() {
   return (
@@ -37,6 +38,7 @@ function Explore() {
         <PageBody role='main'>
           <ExploreComponent />
         </PageBody>
+        <SessionTimeoutModal revealed={false} />
       </ExploreProvider>
     </App>
   );
