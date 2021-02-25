@@ -927,6 +927,11 @@
     debug "^3.1.0"
     lodash.once "^4.1.1"
 
+"@devseed-ui/animation@^3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@devseed-ui/animation/-/animation-3.0.0.tgz#b4e846072c61dc8b4e46d0f4ca65534c64ba9446"
+  integrity sha512-ykV0jszdKJ8MFy0pVxyuE5egGKgdaum2CAmGwO3lvWrqU4DsbZmcqMwsLNz3kyHQmAd+XHJ/yyQ71gRS+9l7tA==
+
 "@devseed-ui/button@3.0.0", "@devseed-ui/button@^3.0.0":
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/@devseed-ui/button/-/button-3.0.0.tgz#98c4d744a86eb7393e099a7e50993daa9a8614e7"
@@ -951,6 +956,16 @@
     "@devseed-ui/typography" "1.0.0"
     react-tether "^2.0.7"
     react-transition-group "^4.3.0"
+
+"@devseed-ui/form@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@devseed-ui/form/-/form-1.0.1.tgz#4f5d6742342a50f95ab8d71eca2e962f7cb19727"
+  integrity sha512-k1E+yowoGMjohI9aUdWUWMjfK1rjr7QiFBcWvPUlcWTr88SH2IjTuCAGyuM758oSMOKxFLQhivRThsR2o55m9w==
+  dependencies:
+    "@devseed-ui/animation" "^3.0.0"
+    "@devseed-ui/button" "3.0.0"
+    "@devseed-ui/theme-provider" "^3.0.0"
+    "@devseed-ui/typography" "1.0.0"
 
 "@devseed-ui/global-loading@^2.0.0":
   version "2.0.0"
