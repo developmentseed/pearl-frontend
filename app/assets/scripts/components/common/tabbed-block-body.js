@@ -4,7 +4,10 @@ import styled, { css } from 'styled-components';
 import { Button } from '@devseed-ui/button';
 import { listReset, themeVal, glsp } from '@devseed-ui/theme-provider';
 
-import { PanelBlockScroll, PanelBlockHeader } from './panel-block';
+import {
+  PanelBlockScroll as ScrollableBody,
+  PanelBlockHeader,
+} from './panel-block';
 import { headingAlt } from '@devseed-ui/typography';
 
 const Tab = styled(Button)`
@@ -69,6 +72,13 @@ const TabbedBlockHeader = styled(PanelBlockHeader)`
   }
 `;
 
+const PanelBlockScroll = styled(ScrollableBody)`
+  .inactive-panel {
+    display: none;
+  }
+  padding: ${glsp(0.5)} 0;
+`;
+
 function TabbedBlock(props) {
   const { children } = props;
   const [activeTab, setActiveTab] = useState(0);
@@ -103,11 +113,13 @@ function TabbedBlock(props) {
       <PanelBlockScroll>
         {Children.map(children, (child, i) => {
           const active = i === activeTab;
+          const className = child.props.className || '';
           return (
             <>
               {React.cloneElement(child, {
                 active: active,
-                style: active ? {} : { display: 'none' },
+                //style: active ? {} : { display: 'none' },
+                className: active ? className : `${className} inactive-panel`,
               })}
             </>
           );
