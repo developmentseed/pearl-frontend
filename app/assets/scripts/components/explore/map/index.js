@@ -78,8 +78,13 @@ function Map() {
         map.aoi.control.draw.disable();
         map.aoi.control.edit.enable(aoi);
         break;
+      case viewModes.BROWSE_MODE:
+        if (map) {
+          map.aoi.control.draw.disable();
+          map.aoi.control.edit.disable();
+        }
+        break;
       case viewModes.EDIT_CLASS_MODE:
-        map.aoi.control.edit.disable(aoi);
         map.addLayer(freeDraw);
         break;
       default:

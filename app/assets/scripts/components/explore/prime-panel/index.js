@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react';
 import styled from 'styled-components';
 import { themeVal } from '@devseed-ui/theme-provider';
 import { Button } from '@devseed-ui/button';
+import T from 'prop-types';
 
 import Panel from '../../common/panel';
 import {
@@ -53,6 +54,49 @@ const PanelControls = styled(PanelBlockFooter)`
   grid-gap: 1rem;
 `;
 
+function AoiEditButtons(props) {
+  const { setViewMode, viewMode, aoi } = props;
+
+  // Display confirm/cancel buttons when AOI edition is active
+  if (
+    viewMode === viewModes.CREATE_AOI_MODE ||
+    viewMode === viewModes.EDIT_AOI_MODE
+  ) {
+    return (
+      <>
+        <EditButton
+          onClick={function () {
+            setViewMode(viewModes.BROWSE_MODE);
+          }}
+          title='Set Area of Interest'
+          useIcon='tick'
+        >
+          Select AOI
+        </EditButton>
+        <EditButton useIcon='xmark'>Select AOI</EditButton>
+      </>
+    );
+  }
+
+  return (
+    <EditButton
+      onClick={() => {
+        setViewMode(!aoi ? viewModes.CREATE_AOI_MODE : viewModes.EDIT_AOI_MODE);
+      }}
+      title='Draw Area of Interest'
+      useIcon='pencil'
+    >
+      Select AOI
+    </EditButton>
+  );
+}
+
+AoiEditButtons.propTypes = {
+  setViewMode: T.func,
+  viewMode: T.string,
+  aoi: T.object,
+};
+
 function PrimePanel() {
   const { viewMode, setViewMode, aoi, aoiArea } = useContext(ExploreContext);
 
@@ -81,31 +125,11 @@ function PrimePanel() {
                     : 'Not selected'}
                 </SubheadingStrong>
                 <HeadOptionToolbar>
-                  <EditButton
-                    onClick={function () {
-                      if (!aoi) {
-                        setViewMode(viewModes.CREATE_AOI_MODE);
-                      } else {
-                        if (viewMode === viewModes.BROWSE_MODE) {
-                          setViewMode(viewModes.EDIT_AOI_MODE);
-                        } else {
-                          setViewMode(viewModes.BROWSE_MODE);
-                        }
-                      }
-                    }}
-                    title={
-                      aoi ? 'Select Area of Interest' : 'Edit Area of Interest'
-                    }
-                    useIcon={
-                      viewMode === viewModes.EDIT_AOI_MODE
-                        ? 'tick'
-                        : aoi
-                        ? 'pencil'
-                        : 'plus'
-                    }
-                  >
-                    Select AOI
-                  </EditButton>
+                  <AoiEditButtons
+                    setViewMode={setViewMode}
+                    aoi={aoi}
+                    viewMode={viewMode}
+                  />
                 </HeadOptionToolbar>
               </HeadOption>
 
