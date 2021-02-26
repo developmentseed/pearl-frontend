@@ -61,7 +61,9 @@ function Category({ checkExpanded, setExpanded, category, layers }) {
             <Layer key={`${layer.category}-${layer.name}`}>
               <IconPlaceholder />
               <SliderWrapper>
-                <Heading as='h4' size='xsmall'>{layer.name}</Heading>
+                <Heading as='h4' size='xsmall'>
+                  {layer.name}
+                </Heading>
                 <InputRange
                   onChange={() => 1}
                   value={50}
