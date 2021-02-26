@@ -6,7 +6,6 @@ import { useAuth0 } from '@auth0/auth0-react';
 import { NavLink, Link } from 'react-router-dom';
 
 import { Button } from '@devseed-ui/button';
-import BaseDropdown from '@devseed-ui/dropdown';
 import {
   themeVal,
   rgba,
@@ -16,24 +15,23 @@ import {
 } from '@devseed-ui/theme-provider';
 import collecticon from '@devseed-ui/collecticons';
 import {
+  Dropdown,
   DropdownHeader,
   DropdownBody,
   DropdownItem,
   DropdownFooter,
+  DropdownTrigger,
 } from '../../styles/dropdown';
 import { filterComponentProps } from '../../styles/utils/general';
 
 const { appTitle } = config;
-const Dropdown = styled(BaseDropdown)`
-  padding: 0;
-`;
 
 const PageHead = styled.header`
   background-color: ${themeVal('color.baseAlphaA')};
   color: ${themeVal('color.baseLight')};
   position: sticky;
   z-index: 20;
-  padding: ${multiply(themeVal('layout.space'), 0.5)} 0;
+  padding: ${multiply(themeVal('layout.space'), 0.625)} 0;
 `;
 
 const PageHeadInner = styled.div`
@@ -47,9 +45,9 @@ const PageHeadInner = styled.div`
 
 const PageNav = styled.nav`
   display: grid;
-  grid-template-columns: 6fr 1fr;
-  padding: 0 1rem;
-  grid-gap: 1rem;
+  grid-template-columns: 1fr auto;
+  padding: 0 1.5rem;
+  grid-gap: 1.5rem;
   width: 100%;
   ${media.mediumUp`
   `}
@@ -71,7 +69,8 @@ const PrimarySection = styled.div`
   display: grid;
   align-items: center;
   justify-content: space-between;
-
+  grid-template-columns: 1fr min-content;
+  grid-gap: 1.5rem;
   * {
     grid-row: 1;
     width: min-content;
@@ -79,13 +78,12 @@ const PrimarySection = styled.div`
 `;
 
 const SecondarySection = styled.div`
-  border-left: 0.5px solid ${themeVal('color.base')};
-  padding-left: 1rem;
+  border-left: 0.5px solid ${themeVal('color.baseAlphaC')};
+  padding-left: 1.5rem;
   display: grid;
   align-items: center;
   justify-content: space-between;
   grid-template-columns: min-content min-content;
-  grid-gap: 1rem;
 
   .user-options-trigger::before {
     ${collecticon('house')}
@@ -95,7 +93,7 @@ const SecondarySection = styled.div`
 
 const PageSpecificControls = styled.div`
   display: grid;
-  grid-gap: 1rem;
+  grid-gap: 1.5rem;
 `;
 
 const GlobalMenuLink = styled.a`
@@ -132,12 +130,6 @@ const GlobalMenuLink = styled.a`
 
   span {
     ${visuallyHidden()}
-  }
-`;
-const DropdownTrigger = styled(Button)`
-  &::before {
-    ${collecticon('user')}
-    font-size: ${multiply(themeVal('type.base.size'), 0.85)};
   }
 `;
 
@@ -182,35 +174,31 @@ function PageHeader(props) {
               <PageSpecificControls>{props.children}</PageSpecificControls>
             ) : (
               // Default controls when no children is passed
-              <>
+              <PageSpecificControls>
                 <Button
                   forwardedAs={StyledNavLink}
                   to='/about'
-                  variation='base-raised-semidark'
                   useIcon='circle-information'
                   title='Visit About page'
-                  size='small'
                 >
                   About
                 </Button>
                 <Button
                   forwardedAs={StyledNavLink}
                   to='/explore'
-                  variation='base-raised-semidark'
+                  variation='primary-raised-dark'
                   useIcon='globe'
                   title='Launch application'
-                  size='small'
                 >
                   Launch Application
                 </Button>
-              </>
+              </PageSpecificControls>
             )}
           </PrimarySection>
           <SecondarySection>
             {!isAuthenticated ? (
               <Button
-                variation='base-raised-light'
-                size='medium'
+                variation='primary-raised-light'
                 className='button-class'
                 title='sample button'
                 onClick={() => loginWithRedirect({ prompt: 'consent' })}
@@ -223,11 +211,12 @@ function PageHeader(props) {
                 direction='down'
                 triggerElement={(props) => (
                   <DropdownTrigger
-                    variation='base-raised-semidark'
+                    variation='primary-raised-light'
                     useIcon={['chevron-down--small', 'after']}
+                    usePreIcon='user'
                     title='Open dropdown'
                     className='user-options-trigger'
-                    size='small'
+                    size='medium'
                     {...props}
                   >
                     Account

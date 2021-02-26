@@ -5,6 +5,7 @@ import { Button } from '@devseed-ui/button';
 import { listReset, themeVal, glsp } from '@devseed-ui/theme-provider';
 
 import { PanelBlockScroll, PanelBlockHeader } from './panel-block';
+import { headingAlt } from '@devseed-ui/typography';
 
 const Tab = styled(Button)`
   display: inline-flex;
@@ -13,7 +14,8 @@ const Tab = styled(Button)`
   transition: color 0.16s ease-in-out 0s;
   padding: ${glsp(0.25)} 0;
   color: ${themeVal('color.base')};
-  font-weight: ${themeVal('type.heading.weight')};
+  ${headingAlt()};
+  letter-spacing: 0.5px;
   &,
   &:visited {
     background-color: transparent;
@@ -48,6 +50,7 @@ const Tab = styled(Button)`
       &,
       &:visited {
         color: ${themeVal('color.primary')};
+        opacity: 1;
       }
       /* stylelint-disable-next-line no-duplicate-selectors */
       &::after {
