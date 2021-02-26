@@ -43,6 +43,9 @@ const AccordionFold = styled(BaseFold)`
       padding: ${glsp(0.5)} 0;
     }
   }
+  & ~ & {
+    margin-top: ${glsp(2)};
+  }
 `;
 
 function Category({ checkExpanded, setExpanded, category, layers }) {
@@ -58,7 +61,7 @@ function Category({ checkExpanded, setExpanded, category, layers }) {
             <Layer key={`${layer.category}-${layer.name}`}>
               <IconPlaceholder />
               <SliderWrapper>
-                <Heading size='xsmall'>{layer.name}</Heading>
+                <Heading as='h4' size='xsmall'>{layer.name}</Heading>
                 <InputRange
                   onChange={() => 1}
                   value={50}

@@ -6,7 +6,7 @@ import { themeVal, rem, disabled } from '@devseed-ui/theme-provider';
 // This file overrides to be used the default react-input-range styles.
 
 const sliderSize = 1;
-const trackHeight = 0.25;
+const trackHeight = 0.5;
 
 export default () => css`
   .input-range__slider {
