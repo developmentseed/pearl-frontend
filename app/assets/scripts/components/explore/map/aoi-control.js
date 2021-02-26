@@ -1,5 +1,16 @@
 import L from 'leaflet';
 
+const icons = {
+  moveIcon: new L.DivIcon({
+    iconSize: new L.Point(8, 8),
+    className: 'leaflet-div-icon leaflet-editing-icon leaflet-edit-move',
+  }),
+  resizeIcon: new L.DivIcon({
+    iconSize: new L.Point(8, 8),
+    className: 'leaflet-div-icon leaflet-editing-icon leaflet-edit-resize',
+  }),
+};
+
 class AoiControl {
   constructor(map) {
     this.map = map;
@@ -15,12 +26,13 @@ class AoiControl {
     var bounds = this._shape.getBounds(),
       center = bounds.getCenter();
 
-    this._moveMarker = this._createMarker(center);
+    this._moveMarker = this._createMarker(center, icons.moveIcon);
   }
 
-  _createMarker(latlng) {
+  _createMarker(latlng, icon) {
     var marker = new L.Marker(latlng, {
       draggable: true,
+      icon,
     });
 
     this._bindMarker(marker);
@@ -134,7 +146,9 @@ class AoiControl {
     this._resizeMarkers = [];
 
     for (var i = 0, l = corners.length; i < l; i++) {
-      this._resizeMarkers.push(this._createMarker(corners[i]));
+      this._resizeMarkers.push(
+        this._createMarker(corners[i], icons.resizeIcon)
+      );
       // Monkey in the corner index as we will need to know this for dragging
       this._resizeMarkers[i]._cornerIndex = i;
     }
