@@ -4,6 +4,7 @@ import ExploreComponent from './explore';
 import PageHeader from '../common/page-header';
 import { PageBody } from '../../styles/page';
 import { ExploreProvider } from '../../context/explore';
+import SessionTimeoutModal from '../common/timeout-modal';
 import SessionOutputControl from './session-output-control';
 
 function Explore() {
@@ -20,6 +21,7 @@ function Explore() {
         <PageBody role='main'>
           <ExploreComponent />
         </PageBody>
+        <SessionTimeoutModal revealed={false} />
       </ExploreProvider>
     </App>
   );
