@@ -12,9 +12,19 @@ const icons = {
 };
 
 class AoiControl {
-  constructor(map, onChange) {
+  constructor(map, onBoundsChange) {
     this._map = map;
-    this.onChange = onChange;
+    this.onBoundsChange = (leafletBounds) => {
+      const { _southWest, _northEast } = leafletBounds;
+
+      // Pass bounds as minX, minY, maxX, maxY
+      onBoundsChange([
+        _southWest.lng,
+        _southWest.lat,
+        _northEast.lng,
+        _northEast.lat,
+      ]);
+    };
   }
 
   enableEdit(aoi) {
@@ -113,6 +123,8 @@ class AoiControl {
     // Reposition the move marker
     bounds = this._shape.getBounds();
     this._moveMarker.setLatLng(bounds.getCenter());
+
+    this.onBoundsChange(bounds);
   }
 
   _move(newCenter) {
@@ -134,7 +146,7 @@ class AoiControl {
 
     this._repositionCornerMarkers();
 
-    this.onChange(bounds);
+    this.onBoundsChange(bounds);
   }
 
   _getCorners() {
