@@ -19,7 +19,6 @@ const zoom = 4;
 const freeDraw = new FreeDraw({
   mode: ALL,
 });
-const aoiControl = new AoiControl();
 
 const Container = styled.div`
   height: 100%;
@@ -46,6 +45,17 @@ const Container = styled.div`
     }
   }
 `;
+
+
+/**
+ * Get area from bbox
+ * 
+ * @param {array} bbox extent in minX, minY, maxX, maxY order
+ */
+function areaFromBounds(bbox) {
+  const poly = tBboxPolygon(bbox);
+  return convertArea(tArea(poly), 'meters', 'kilometers');
+}
 
 function getEventLatLng(event) {
   const {
@@ -106,9 +116,14 @@ function enterCreateAoiMode(map, onCreateEnd) {
 
 function Map() {
   const [map, setMap] = useState(null);
-  const { viewMode, previousViewMode, setViewMode, aoi, setAoi } = useContext(
-    ExploreContext
-  );
+  const {
+    viewMode,
+    previousViewMode,
+    setViewMode,
+    aoi,
+    setAoi,
+    setAoiArea,
+  } = useContext(ExploreContext);
 
   useEffect(() => {
     if (previousViewMode === viewModes.EDIT_CLASS_MODE) {
@@ -143,7 +158,7 @@ function Map() {
         whenCreated={(m) => {
           // Add AOI Control
           m.aoiControl = new AoiControl(m, (bounds) => {
-            console.log(bounds);
+            setAoiArea(areaFromBounds(bounds));
           });
 
           // Add map to state

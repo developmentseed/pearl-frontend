@@ -26,6 +26,7 @@ import {
 import { EditButton } from '../../../styles/button';
 
 import { availableModels } from '../sample-data';
+import { round } from '../../../utils/format';
 
 const PlaceholderPanelSection = styled.div`
   padding: 1rem;
@@ -53,7 +54,7 @@ const PanelControls = styled(PanelBlockFooter)`
 `;
 
 function PrimePanel() {
-  const { viewMode, setViewMode, aoi } = useContext(ExploreContext);
+  const { viewMode, setViewMode, aoi, aoiArea } = useContext(ExploreContext);
 
   const [selectedModel, setSelectedModel] = useState(null);
   const [showSelectModelModal, setShowSelectModelModal] = useState(false);
@@ -75,7 +76,9 @@ function PrimePanel() {
                   <Subheading>Selected Area </Subheading>
                 </HeadOptionHeadline>
                 <SubheadingStrong>
-                  {aoi && aoi.area > 0 ? `${aoi.area} km2` : 'Not selected'}
+                  {aoiArea && aoiArea > 0
+                    ? `${round(aoiArea, 0)} km2`
+                    : 'Not selected'}
                 </SubheadingStrong>
                 <HeadOptionToolbar>
                   <EditButton
