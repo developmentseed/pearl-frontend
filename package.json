@@ -100,6 +100,7 @@
   "dependencies": {
     "@auth0/auth0-react": "^1.2.0",
     "@babel/polyfill": "^7.12.1",
+    "@devseed-ui/accordion": "^3.0.0",
     "@devseed-ui/button": "^3.0.0",
     "@devseed-ui/collecticons": "^2.0.0",
     "@devseed-ui/dropdown": "^2.0.0",

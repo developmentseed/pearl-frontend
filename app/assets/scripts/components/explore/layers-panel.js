@@ -5,6 +5,7 @@ import { Button } from '@devseed-ui/button';
 import { Heading } from '@devseed-ui/typography';
 import { themeVal, glsp } from '@devseed-ui/theme-provider';
 import InputRange from 'react-input-range';
+import { Accordion, AccordionFold as BaseFold } from '@devseed-ui/accordion';
 
 const Wrapper = styled.div`
   display: grid;
@@ -35,37 +36,107 @@ const SliderWrapper = styled.div`
   }
 `;
 
+const AccordionFold = styled(BaseFold)`
+  background: unset;
+  header {
+    a {
+      padding: ${glsp(0.5)} 0;
+    }
+  }
+`;
+
+function Category({ checkExpanded, setExpanded, category, layers }) {
+  return (
+    <AccordionFold
+      id={`${category}-fold`}
+      title={category}
+      isFoldExpanded={checkExpanded()}
+      setFoldExpanded={setExpanded}
+      renderBody={() => (
+        <Wrapper>
+          {layers.map((layer) => (
+            <Layer key={`${layer.category}-${layer.name}`}>
+              <IconPlaceholder />
+              <SliderWrapper>
+                <Heading size='xsmall'>{layer.name}</Heading>
+                <InputRange
+                  onChange={() => 1}
+                  value={50}
+                  formatLabel={() => null}
+                  minValue={0}
+                  maxValue={100}
+                />
+              </SliderWrapper>
+              <Button
+                variation='base-plain'
+                size='small'
+                hideText
+                useIcon='circle-information'
+              >
+                Info
+              </Button>
+              <Button
+                variation='base-plain'
+                size='small'
+                hideText
+                useIcon='eye'
+              >
+                Info
+              </Button>
+            </Layer>
+          ))}
+        </Wrapper>
+      )}
+    />
+  );
+}
+
+Category.propTypes = {
+  checkExpanded: T.func,
+  setExpanded: T.func,
+  category: T.string,
+  layers: T.array,
+};
+
 function LayersPanel(props) {
   const { layers, className } = props;
+
+  const categorizedLayers = layers.reduce((cats, layer) => {
+    if (!cats[layer.category]) {
+      cats[layer.category] = [];
+    }
+    cats[layer.category].push(layer);
+    return cats;
+  }, {});
+
   return (
-    <Wrapper className={className}>
-      {layers.map((layer) => (
-        <Layer key={layer.name}>
-          <IconPlaceholder />
-          <SliderWrapper>
-            <Heading size='xsmall'>{layer.name}</Heading>
-            <InputRange
-              onChange={() => 1}
-              value={50}
-              formatLabel={() => null}
-              minValue={0}
-              maxValue={100}
-            />
-          </SliderWrapper>
-          <Button
-            variation='base-plain'
-            size='small'
-            hideText
-            useIcon='circle-information'
-          >
-            Info
-          </Button>
-          <Button variation='base-plain' size='small' hideText useIcon='eye'>
-            Info
-          </Button>
-        </Layer>
-      ))}
-    </Wrapper>
+    <div className={className}>
+      <Accordion
+        className={className}
+        allowMultiple
+        foldCount={Object.keys(categorizedLayers).length}
+        initialState={[
+          true,
+          ...Object.keys(categorizedLayers)
+            .slice(1)
+            .map(() => false),
+        ]}
+      >
+        {
+          ({ checkExpanded, setExpanded }) =>
+            Object.entries(categorizedLayers).map(([cat, layers], index) => (
+              <Category
+                key={cat}
+                checkExpanded={() => checkExpanded(index)}
+                setExpanded={(v) => setExpanded(index, v)}
+                category={cat}
+                layers={layers}
+              />
+            ))
+          /* eslint-disable-next-line react/jsx-curly-newline */
+        }
+      </Accordion>
+    </div>
   );
 }
 

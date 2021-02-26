@@ -927,6 +927,15 @@
     debug "^3.1.0"
     lodash.once "^4.1.1"
 
+"@devseed-ui/accordion@^3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@devseed-ui/accordion/-/accordion-3.0.0.tgz#d7ba05f6892c2f140cbafc6f1b4fd8f019bb84ff"
+  integrity sha512-8j1vLOYjUBaetgeBIsTFsph0tioOrmGHKT6YCnJWIweJq98EonjqO6kszdViBobSuozUdmzJALX0l6f3kTQIPQ==
+  dependencies:
+    "@devseed-ui/button" "3.0.0"
+    "@devseed-ui/collecticons" "2.0.0"
+    "@devseed-ui/theme-provider" "3.0.0"
+
 "@devseed-ui/animation@^3.0.0":
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/@devseed-ui/animation/-/animation-3.0.0.tgz#b4e846072c61dc8b4e46d0f4ca65534c64ba9446"
@@ -983,18 +992,18 @@
     "@devseed-ui/theme-provider" "^2.4.0"
     react-transition-group "^4.3.0"
 
-"@devseed-ui/theme-provider@^2.4.0":
-  version "2.4.0"
-  resolved "https://registry.yarnpkg.com/@devseed-ui/theme-provider/-/theme-provider-2.4.0.tgz#69685a38fc9e2a444e414b7adbbb0e661bbc377e"
-  integrity sha512-pJpd7jwV0HEu2EDWUQFMXyCE7RR5HIR+j9jNFHMvhl/ceL5YlzIxkN/66g9uxyM4DIWs+Y9Xco3OpLMT+4fZbA==
+"@devseed-ui/theme-provider@3.0.0", "@devseed-ui/theme-provider@^3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@devseed-ui/theme-provider/-/theme-provider-3.0.0.tgz#13b22818f5ab3dc11d99b82d21e11afbde3ff487"
+  integrity sha512-/l5hVfWSGJe91m0NjO0tUNgoqCsCpr32VwCPhugc37qgvi/1tF54vwSl2hEz4CA4VPpbtCpxKrmb8234vhd7lw==
   dependencies:
     lodash.get "^4.4.2"
     polished "^3.4.2"
 
-"@devseed-ui/theme-provider@^3.0.0":
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/@devseed-ui/theme-provider/-/theme-provider-3.0.0.tgz#13b22818f5ab3dc11d99b82d21e11afbde3ff487"
-  integrity sha512-/l5hVfWSGJe91m0NjO0tUNgoqCsCpr32VwCPhugc37qgvi/1tF54vwSl2hEz4CA4VPpbtCpxKrmb8234vhd7lw==
+"@devseed-ui/theme-provider@^2.4.0":
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/@devseed-ui/theme-provider/-/theme-provider-2.4.0.tgz#69685a38fc9e2a444e414b7adbbb0e661bbc377e"
+  integrity sha512-pJpd7jwV0HEu2EDWUQFMXyCE7RR5HIR+j9jNFHMvhl/ceL5YlzIxkN/66g9uxyM4DIWs+Y9Xco3OpLMT+4fZbA==
   dependencies:
     lodash.get "^4.4.2"
     polished "^3.4.2"
