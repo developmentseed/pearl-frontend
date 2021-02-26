@@ -126,6 +126,7 @@ function Map() {
         map.aoiControl.enableEdit(aoi);
         break;
       case viewModes.EDIT_CLASS_MODE:
+        map.aoiControl.exitEdit();
         map.addLayer(freeDraw);
         break;
       default:
@@ -141,7 +142,9 @@ function Map() {
         style={{ height: '100%' }}
         whenCreated={(m) => {
           // Add AOI Control
-          m.aoiControl = new AoiControl(m);
+          m.aoiControl = new AoiControl(m, (bounds) => {
+            console.log(bounds);
+          });
 
           // Add map to state
           setMap(m);

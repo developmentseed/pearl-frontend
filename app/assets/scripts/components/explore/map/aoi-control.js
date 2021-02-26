@@ -12,14 +12,18 @@ const icons = {
 };
 
 class AoiControl {
-  constructor(map) {
-    this.map = map;
+  constructor(map, onChange) {
+    this._map = map;
+    this.onChange = onChange;
   }
 
   enableEdit(aoi) {
     this._shape = aoi.ref;
-    this._createResizeMarkers();
-    this._createMoveMarker();
+    this.addHooks();
+  }
+
+  exitEdit() {
+    this.removeHooks();
   }
 
   _createMoveMarker() {
@@ -37,7 +41,7 @@ class AoiControl {
 
     this._bindMarker(marker);
 
-    this.map.addLayer(marker);
+    this._markerGroup.addLayer(marker);
 
     return marker;
   }
@@ -129,6 +133,8 @@ class AoiControl {
     this._shape.setLatLngs(newLatLngs);
 
     this._repositionCornerMarkers();
+
+    this.onChange(bounds);
   }
 
   _getCorners() {
@@ -166,6 +172,53 @@ class AoiControl {
     for (var i = 0, l = this._resizeMarkers.length; i < l; i++) {
       this._resizeMarkers[i].setLatLng(corners[i]);
     }
+  }
+
+  _initMarkers() {
+    if (!this._markerGroup) {
+      this._markerGroup = new L.LayerGroup();
+    }
+
+    // Create center marker
+    this._createMoveMarker();
+
+    // Create edge marker
+    this._createResizeMarkers();
+  }
+
+  addHooks() {
+    var shape = this._shape;
+    if (this._shape._map) {
+      this._map = this._shape._map;
+
+      if (shape._map) {
+        this._map = shape._map;
+        if (!this._markerGroup) {
+          this._initMarkers();
+        }
+        this._map.addLayer(this._markerGroup);
+      }
+    }
+  }
+
+  removeHooks() {
+    var shape = this._shape;
+
+    shape.setStyle(shape.options.original);
+
+    if (shape._map) {
+      this._unbindMarker(this._moveMarker);
+
+      for (var i = 0, l = this._resizeMarkers.length; i < l; i++) {
+        this._unbindMarker(this._resizeMarkers[i]);
+      }
+      this._resizeMarkers = null;
+
+      this._map.removeLayer(this._markerGroup);
+      delete this._markerGroup;
+    }
+
+    this._map = null;
   }
 }
 
