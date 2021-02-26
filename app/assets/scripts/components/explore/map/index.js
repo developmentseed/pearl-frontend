@@ -1,18 +1,16 @@
 import React, { useState, useMemo, useContext, useEffect } from 'react';
 import styled from 'styled-components';
-import { lineString as tLineString, convertArea } from '@turf/helpers';
+import { convertArea } from '@turf/helpers';
 import tArea from '@turf/area';
-import tBbox from '@turf/bbox';
 import tBboxPolygon from '@turf/bbox-polygon';
 import SizeAwareElement from '../../common/size-aware-element';
 import { MapContainer, TileLayer, FeatureGroup } from 'react-leaflet';
 import { ExploreContext, viewModes } from '../../../context/explore';
-import { round } from '../../../utils/format';
 import GeoCoder from '../../common/map/geocoder';
 import { themeVal, multiply } from '@devseed-ui/theme-provider';
 import FreeDraw, { ALL } from 'leaflet-freedraw';
-import L from 'leaflet';
-import AoiControl from './aoi-control';
+import AoiDrawControl from './aoi-draw-control';
+import AoiEditControl from './aoi-edit-control';
 
 const center = [38.942, -95.449];
 const zoom = 4;
@@ -46,72 +44,14 @@ const Container = styled.div`
   }
 `;
 
-
 /**
  * Get area from bbox
- * 
+ *
  * @param {array} bbox extent in minX, minY, maxX, maxY order
  */
 function areaFromBounds(bbox) {
   const poly = tBboxPolygon(bbox);
   return convertArea(tArea(poly), 'meters', 'kilometers');
-}
-
-function getEventLatLng(event) {
-  const {
-    latlng: { lng, lat },
-  } = event;
-  return [lat, lng];
-}
-
-function enterCreateAoiMode(map, onCreateEnd) {
-  let start;
-  let end;
-  let aoiRef;
-
-  function onMouseDown(event) {
-    map.dragging.disable();
-    map.off('mousedown', onMouseDown);
-    start = getEventLatLng(event);
-
-    // Update rectangle on mouse move
-    function onMouseMove(event) {
-      end = getEventLatLng(event);
-
-      if (!aoiRef) {
-        aoiRef = L.rectangle([start, end]).addTo(map);
-      } else {
-        aoiRef.setBounds([start, end]);
-      }
-    }
-
-    // Listen to draw end
-    function onMouseUp() {
-      map.dragging.enable();
-      map.off('mousemove', onMouseMove);
-      map.off('mouseup', onMouseUp);
-
-      // Calculate BBox and area in square kilometers
-      const lineString = tLineString([start, end]);
-      const bbox = tBbox(lineString);
-      const poly = tBboxPolygon(bbox);
-      const area = convertArea(tArea(poly), 'meters', 'kilometers');
-
-      // Return AOI on end
-      onCreateEnd({
-        area: round(area, 0),
-        bbox,
-        ref: aoiRef,
-      });
-    }
-
-    // Add draw events after mouse down
-    map.on('mousemove', onMouseMove);
-    map.on('mouseup', onMouseUp);
-  }
-
-  // Listen to draw start
-  map.on('mousedown', onMouseDown);
 }
 
 function Map() {
@@ -132,16 +72,14 @@ function Map() {
 
     switch (viewMode) {
       case viewModes.CREATE_AOI_MODE:
-        enterCreateAoiMode(map, (aoi) => {
-          setAoi(aoi);
-          setViewMode(viewModes.BROWSE_MODE);
-        });
+        map.aoi.control.draw.enable();
         break;
       case viewModes.EDIT_AOI_MODE:
-        map.aoiControl.enableEdit(aoi);
+        map.aoi.control.draw.disable();
+        map.aoi.control.edit.enable(aoi);
         break;
       case viewModes.EDIT_CLASS_MODE:
-        map.aoiControl.exitEdit();
+        map.aoi.control.edit.disable(aoi);
         map.addLayer(freeDraw);
         break;
       default:
@@ -156,8 +94,20 @@ function Map() {
         zoom={zoom}
         style={{ height: '100%' }}
         whenCreated={(m) => {
-          // Add AOI Control
-          m.aoiControl = new AoiControl(m, (bounds) => {
+          // Setup AOI controllers
+          m.aoi = {
+            control: {},
+          };
+          m.aoi.control.draw = new AoiDrawControl(m, {
+            onDrawChange: (bbox) => {
+              setAoiArea(areaFromBounds(bbox));
+            },
+            onDrawEnd: (shape) => {
+              setAoi(shape);
+              setViewMode(viewModes.EDIT_AOI_MODE);
+            },
+          });
+          m.aoi.control.edit = new AoiEditControl(m, (bounds) => {
             setAoiArea(areaFromBounds(bounds));
           });
 

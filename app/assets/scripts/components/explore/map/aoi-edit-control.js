@@ -11,7 +11,7 @@ const icons = {
   }),
 };
 
-class AoiControl {
+class AoiEditControl {
   constructor(map, onBoundsChange) {
     this._map = map;
     this.onBoundsChange = (leafletBounds) => {
@@ -27,12 +27,12 @@ class AoiControl {
     };
   }
 
-  enableEdit(aoi) {
-    this._shape = aoi.ref;
+  enable(shape) {
+    this._shape = shape;
     this.addHooks();
   }
 
-  exitEdit() {
+  disable() {
     this.removeHooks();
   }
 
@@ -234,4 +234,4 @@ class AoiControl {
   }
 }
 
-export default AoiControl;
+export default AoiEditControl;
