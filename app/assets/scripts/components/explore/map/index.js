@@ -66,6 +66,8 @@ function Map() {
   } = useContext(ExploreContext);
 
   useEffect(() => {
+    if (!map) return;
+
     if (previousViewMode === viewModes.EDIT_CLASS_MODE) {
       map.removeLayer(freeDraw);
     }
