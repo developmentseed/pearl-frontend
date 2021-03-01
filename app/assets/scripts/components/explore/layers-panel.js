@@ -42,11 +42,16 @@ const AccordionFold = styled(BaseFold)`
     a {
       padding: ${glsp(0.5)} 0;
       h1 {
+        text-transform: uppercase;
+        font-size: 0.875rem;
+        letter-spacing: 0.5px;
+        opacity: 0.64;
+        font-weight: ${themeVal('type.base.weight')};
       }
     }
   }
   & ~ & {
-    margin-top: ${glsp(2)};
+    margin-top: ${glsp()};
   }
 `;
 
