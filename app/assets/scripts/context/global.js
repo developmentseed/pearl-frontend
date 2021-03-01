@@ -4,17 +4,30 @@ import { initialApiRequestState } from '../reducers/reduxeed';
 import {
   createRestApiHealthReducer,
   queryRestApiHealth,
+  createQueryApiGetReducer,
+  queryApiGet,
 } from '../reducers/api';
 import config from '../config';
 import { useAuth0 } from '@auth0/auth0-react';
 
 const GlobalContext = createContext({});
 export function GlobalContextProvider(props) {
-  const { isAuthenticated, getAccessTokenSilently } = useAuth0();
+  const { isAuthenticated, getAccessTokenWithPopup } = useAuth0();
   const [apiToken, setApiToken] = useState();
 
   const [restApiHealth, dispatchRestApiStatus] = useReducer(
     createRestApiHealthReducer,
+    initialApiRequestState
+  );
+
+  /* User data Reducers */
+  const [modelsList, dispatchModelsList] = useReducer(
+    createQueryApiGetReducer('model'),
+    initialApiRequestState
+  );
+
+  const [projectsList, dispatchProjectsList] = useReducer(
+    createQueryApiGetReducer('project'),
     initialApiRequestState
   );
 
@@ -23,25 +36,20 @@ export function GlobalContextProvider(props) {
   }, []);
 
   useEffect(() => {
+    /*
+     * Request api acces token via Auth0
+     */
     async function getApiToken() {
-      const token = await getAccessTokenSilently({
+      const token = await getAccessTokenWithPopup({
         audience: config.audience,
-      });
-      try {
-        const response = await fetch(
-          'https://api.lulc-staging.ds.io/api/model',
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        const res = await response.json();
-        console.log(`GET /models successful: ${res.models.length} found`); // eslint-disable-line
-      } catch (error) {
-        console.log(error); // eslint-disable-line
+      }).catch((err) =>
+        /* eslint-disable-next-line no-console */
+        console.error(err)
+      );
+
+      if (token) {
+        setApiToken(token);
       }
-      setApiToken(token);
     }
 
     const { isReady, hasError } = restApiHealth;
@@ -50,12 +58,26 @@ export function GlobalContextProvider(props) {
     }
   }, [restApiHealth, isAuthenticated]); // eslint-disable-line
 
+  useEffect(() => {
+    /*
+     * Request user data when api token is available
+    */
+    if (!apiToken) {
+      return;
+    }
+
+    queryApiGet({ token: apiToken, endpoint: 'model' })(dispatchModelsList);
+    queryApiGet({ token: apiToken, endpoint: 'project' })(dispatchProjectsList);
+  }, [apiToken]);
+
   return (
     <>
       <GlobalContext.Provider
         value={{
           restApiHealth,
           apiToken,
+          modelsList,
+          projectsList,
         }}
       >
         {props.children}

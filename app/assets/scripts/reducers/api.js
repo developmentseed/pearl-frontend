@@ -38,3 +38,32 @@ export function queryApiMeta() {
 }
 
 export const createApiMetaReducer = wrapLogReducer(makeAPIReducer('API_META'));
+
+/*
+ * API Endpoint reducer
+ * Use to query any get endpoint
+ * if id is undefined -> List  results
+ * else -> get by id
+ */
+export function queryApiGet({ endpoint, id, token }) {
+  if (!token) {
+    throw new Error(`Token required for ${endpoint}`);
+  }
+  const queryApiGetActions = makeAbortableActions(
+    `API_GET_${endpoint.toUpperCase()}`
+  );
+  return makeFetchThunk({
+    url: `${restApiEndpoint}/api/${endpoint}${id ? `:${id}` : ''}`,
+    options: {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      method: 'GET'
+    },
+    requestFn: queryApiGetActions.request,
+    receiveFn: queryApiGetActions.receive,
+  });
+}
+
+export const createQueryApiGetReducer = (endpoint) =>
+  wrapLogReducer(makeAPIReducer(`API_GET_${endpoint.toUpperCase()}`));
