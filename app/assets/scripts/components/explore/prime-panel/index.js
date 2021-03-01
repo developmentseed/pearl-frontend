@@ -109,11 +109,16 @@ AoiEditButtons.propTypes = {
 };
 
 function PrimePanel() {
-  const { viewMode, setViewMode, aoiRef, aoiArea, apiLimits } = useContext(
+  const { viewMode, setViewMode, aoiRef, aoiArea, apiLimits,
+  } = useContext(
     ExploreContext
   );
 
-  const [selectedModel, setSelectedModel] = useState(null);
+  const {   selectedModel,
+  setSelectedModel
+  } = useContext(GlobalContext);
+
+  //const [selectedModel, setSelectedModel] = useState(null);
   const [showSelectModelModal, setShowSelectModelModal] = useState(false);
   const [inference, setInference] = useState(false);
 
@@ -157,7 +162,7 @@ function PrimePanel() {
                   <Subheading>Selected Model</Subheading>
                 </HeadOptionHeadline>
                 <SubheadingStrong>
-                  {selectedModel || 'Select Model'}
+                  {(selectedModel && selectedModel.name) || 'Select Model'}
                 </SubheadingStrong>
                 <HeadOptionToolbar>
                   <EditButton
@@ -238,7 +243,7 @@ function PrimePanel() {
         onOverlayClick={() => {
           setShowSelectModelModal(false);
         }}
-        data={models}
+        data={models || []}
         renderCard={(model) => (
           <Card
             id={`model-${model.name}-card`}
@@ -248,7 +253,7 @@ function PrimePanel() {
             borderlessMedia
             onClick={() => {
               setShowSelectModelModal(false);
-              setSelectedModel(model.name);
+              setSelectedModel(model);
             }}
           />
         )}

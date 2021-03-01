@@ -7,6 +7,8 @@ import {
   createQueryApiGetReducer,
   queryApiGet,
 } from '../reducers/api';
+import { createQueryApiPostReducer, queryApiPost } from '../reducers/api';
+
 import config from '../config';
 import { useAuth0 } from '@auth0/auth0-react';
 
@@ -28,6 +30,14 @@ export function GlobalContextProvider(props) {
 
   const [projectsList, dispatchProjectsList] = useReducer(
     createQueryApiGetReducer('project'),
+    initialApiRequestState
+  );
+
+  const [selectedModel, setSelectedModel] = useState(null);
+  const [currentProjectName, setCurrentProjectName] = useState(null);
+
+  const [currentProject, dispatchProject] = useReducer(
+    createQueryApiPostReducer('project'),
     initialApiRequestState
   );
 
@@ -70,6 +80,33 @@ export function GlobalContextProvider(props) {
     queryApiGet({ token: apiToken, endpoint: 'project' })(dispatchProjectsList);
   }, [apiToken]);
 
+  /* Post updates to the API */
+  useEffect(() => {
+    if (currentProject.isReady()) {
+      console.error(
+        'Project name update not supported by api. Change is front end only'
+      );
+      return;
+    } else if (currentProjectName && selectedModel) {
+      queryApiPost({
+        endpoint: 'project',
+        token: apiToken,
+        query: {
+          name: currentProjectName,
+          model_id: selectedModel.id,
+          mosaic: 'naip.latest',
+        },
+      })(dispatchProject);
+    } else {
+      if (!currentProjectName) {
+        console.error('Project name not set');
+      }
+      if (!selectedModel) {
+        console.error('Model not selected');
+      }
+    }
+  }, [currentProjectName, selectedModel]);
+
   return (
     <>
       <GlobalContext.Provider
@@ -78,6 +115,11 @@ export function GlobalContextProvider(props) {
           apiToken,
           modelsList,
           projectsList,
+          selectedModel,
+          setSelectedModel,
+
+          currentProjectName,
+          setCurrentProjectName,
         }}
       >
         {props.children}
