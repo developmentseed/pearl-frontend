@@ -13,13 +13,11 @@ import { useHistory } from 'react-router-dom';
 /**
  * Explore View Modes
  */
-const BROWSE_MODE = 'BROWSE_MODE';
-const CREATE_AOI_MODE = 'CREATE_AOI_MODE';
-const EDIT_AOI_MODE = 'EDIT_AOI_MODE';
 export const viewModes = {
-  BROWSE_MODE,
-  CREATE_AOI_MODE,
-  EDIT_AOI_MODE,
+  BROWSE_MODE: 'BROWSE_MODE',
+  CREATE_AOI_MODE: 'CREATE_AOI_MODE',
+  EDIT_AOI_MODE: 'EDIT_AOI_MODE',
+  EDIT_CLASS_MODE: 'EDIT_CLASS_MODE',
 };
 
 /**
@@ -28,7 +26,8 @@ export const viewModes = {
 export const ExploreContext = createContext({});
 export function ExploreProvider(props) {
   const history = useHistory();
-  const [aoi, setAoi] = useState(null);
+  const [aoiRef, setAoiRef] = useState(null);
+  const [aoiArea, setAoiArea] = useState(null);
   const [viewMode, setViewMode] = useState(viewModes.BROWSE_MODE);
   const previousViewMode = usePrevious(viewMode);
 
@@ -57,12 +56,15 @@ export function ExploreProvider(props) {
   return (
     <ExploreContext.Provider
       value={{
-        apiMeta,
+        apiLimits:
+          apiMeta.isReady() && !apiMeta.hasError() && apiMeta.getData().limits,
         previousViewMode,
         viewMode,
         setViewMode,
-        aoi,
-        setAoi,
+        aoiRef,
+        setAoiRef,
+        aoiArea,
+        setAoiArea,
       }}
     >
       {props.children}

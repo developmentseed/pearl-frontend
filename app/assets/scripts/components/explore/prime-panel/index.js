@@ -2,29 +2,32 @@ import React, { useState, useContext } from 'react';
 import styled from 'styled-components';
 import { themeVal } from '@devseed-ui/theme-provider';
 import { Button } from '@devseed-ui/button';
+import T from 'prop-types';
 
-import Panel from '../common/panel';
+import Panel from '../../common/panel';
 import {
   PanelBlock,
   PanelBlockHeader as BasePanelBlockHeader,
   PanelBlockBody,
   PanelBlockFooter,
-} from '../common/panel-block';
-import { Subheading } from '../../styles/type/heading';
-import SelectModal from './select-modal';
-import { Card } from './card-list';
-import { PlaceholderMessage } from '../../styles/placeholder.js';
-import { ExploreContext, viewModes } from '../../context/explore';
-import TabbedBlock from '../common/tabbed-block-body';
+} from '../../common/panel-block';
+import { Subheading } from '../../../styles/type/heading';
+import SelectModal from '../select-modal';
+import { Card } from '../card-list';
+import { PlaceholderMessage } from '../../../styles/placeholder.js';
+import { ExploreContext, viewModes } from '../../../context/explore';
+import TabbedBlock from '../../common/tabbed-block-body';
+import RetrainModel from './retrain-model';
 
 import {
   HeadOption,
   HeadOptionHeadline,
   HeadOptionToolbar,
-} from '../../styles/panel';
-import { EditButton } from '../../styles/button';
+} from '../../../styles/panel';
+import { EditButton } from '../../../styles/button';
 
-import { availableModels } from './sample-data';
+import { availableModels } from '../sample-data';
+import { round } from '../../../utils/format';
 
 const PlaceholderPanelSection = styled.div`
   padding: 1rem;
@@ -51,11 +54,68 @@ const PanelControls = styled(PanelBlockFooter)`
   grid-gap: 1rem;
 `;
 
+function AoiEditButtons(props) {
+  const { setViewMode, viewMode, aoiRef, aoiArea, apiLimits } = props;
+
+  // Display confirm/cancel buttons when AOI edition is active
+  if (
+    viewMode === viewModes.CREATE_AOI_MODE ||
+    viewMode === viewModes.EDIT_AOI_MODE
+  ) {
+    return (
+      <>
+        <EditButton
+          onClick={function () {
+            setViewMode(viewModes.BROWSE_MODE);
+          }}
+          title='Set Area of Interest'
+          useIcon='tick'
+          disabled={
+            !aoiArea ||
+            aoiArea === 0 ||
+            (apiLimits &&
+              apiLimits.max_inference &&
+              apiLimits.max_inference < aoiArea)
+          }
+        >
+          Select AOI
+        </EditButton>
+        <EditButton useIcon='xmark'>Select AOI</EditButton>
+      </>
+    );
+  }
+
+  return (
+    <EditButton
+      onClick={() => {
+        setViewMode(
+          !aoiRef ? viewModes.CREATE_AOI_MODE : viewModes.EDIT_AOI_MODE
+        );
+      }}
+      title='Draw Area of Interest'
+      useIcon='pencil'
+    >
+      Select AOI
+    </EditButton>
+  );
+}
+
+AoiEditButtons.propTypes = {
+  setViewMode: T.func,
+  viewMode: T.string,
+  aoiRef: T.object,
+  aoiArea: T.oneOfType([T.bool, T.number]),
+  apiLimits: T.oneOfType([T.bool, T.object]),
+};
+
 function PrimePanel() {
-  const { viewMode, setViewMode, aoi } = useContext(ExploreContext);
+  const { viewMode, setViewMode, aoiRef, aoiArea, apiLimits } = useContext(
+    ExploreContext
+  );
 
   const [selectedModel, setSelectedModel] = useState(null);
   const [showSelectModelModal, setShowSelectModelModal] = useState(false);
+  const [inference, setInference] = useState(false);
 
   return (
     <>
@@ -73,34 +133,18 @@ function PrimePanel() {
                   <Subheading>Selected Area </Subheading>
                 </HeadOptionHeadline>
                 <SubheadingStrong>
-                  {aoi && aoi.area > 0 ? `${aoi.area} km2` : 'Not selected'}
+                  {aoiArea && aoiArea > 0
+                    ? `${round(aoiArea, 0)} km2`
+                    : 'Not selected'}
                 </SubheadingStrong>
                 <HeadOptionToolbar>
-                  <EditButton
-                    onClick={function () {
-                      if (!aoi) {
-                        setViewMode(viewModes.CREATE_AOI_MODE);
-                      } else {
-                        if (viewMode === viewModes.BROWSE_MODE) {
-                          setViewMode(viewModes.EDIT_AOI_MODE);
-                        } else {
-                          setViewMode(viewModes.BROWSE_MODE);
-                        }
-                      }
-                    }}
-                    title={
-                      aoi ? 'Select Area of Interest' : 'Edit Area of Interest'
-                    }
-                    useIcon={
-                      viewMode === viewModes.EDIT_AOI_MODE
-                        ? 'tick'
-                        : aoi
-                        ? 'pencil'
-                        : 'plus'
-                    }
-                  >
-                    Select AOI
-                  </EditButton>
+                  <AoiEditButtons
+                    setViewMode={setViewMode}
+                    aoiRef={aoiRef}
+                    aoiArea={aoiArea}
+                    viewMode={viewMode}
+                    apiLimits={apiLimits}
+                  />
                 </HeadOptionToolbar>
               </HeadOption>
 
@@ -128,10 +172,14 @@ function PrimePanel() {
             <PanelBlockBody>
               <TabbedBlock>
                 <PlaceholderPanelSection name='Retrain Model'>
-                  <PlaceholderMessage>
-                    Click &quot;Run Inference&quot; to generate the class LULC
-                    map for your AOI
-                  </PlaceholderMessage>
+                  {!inference ? (
+                    <PlaceholderMessage>
+                      Click &quot;Run Inference&quot; to generate the class LULC
+                      map for your AOI
+                    </PlaceholderMessage>
+                  ) : (
+                    <RetrainModel />
+                  )}
                 </PlaceholderPanelSection>
 
                 <PlaceholderPanelSection name='Refine Results'>
@@ -172,6 +220,7 @@ function PrimePanel() {
                 style={{
                   gridColumn: '1 / -1',
                 }}
+                onClick={() => setInference(true)}
               >
                 Run inference
               </Button>

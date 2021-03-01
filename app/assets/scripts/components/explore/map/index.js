@@ -1,19 +1,23 @@
 import React, { useState, useMemo, useContext, useEffect } from 'react';
 import styled from 'styled-components';
-import { lineString as tLineString, convertArea } from '@turf/helpers';
+import toasts from '../../common/toasts';
+import { convertArea } from '@turf/helpers';
 import tArea from '@turf/area';
-import tBbox from '@turf/bbox';
 import tBboxPolygon from '@turf/bbox-polygon';
 import SizeAwareElement from '../../common/size-aware-element';
 import { MapContainer, TileLayer, FeatureGroup } from 'react-leaflet';
-import EditControl from './edit-control';
 import { ExploreContext, viewModes } from '../../../context/explore';
-import { round } from '../../../utils/format';
 import GeoCoder from '../../common/map/geocoder';
 import { themeVal, multiply } from '@devseed-ui/theme-provider';
+import FreeDraw, { ALL } from 'leaflet-freedraw';
+import AoiDrawControl from './aoi-draw-control';
+import AoiEditControl from './aoi-edit-control';
 
 const center = [38.942, -95.449];
 const zoom = 4;
+const freeDraw = new FreeDraw({
+  mode: ALL,
+});
 
 const Container = styled.div`
   height: 100%;
@@ -42,50 +46,104 @@ const Container = styled.div`
 `;
 
 /**
- * Helper function to extract an AOI from a layer created/edited with Leaflet.draw
+ * Get area from bbox
  *
- * @param {Object} layer A layer object from Leaflet.draw
+ * @param {array} bbox extent in minX, minY, maxX, maxY order
  */
-function getAoiFromLayer(layer) {
-  // Get drawn vector as LineString GeoJSON
-  const vertices = layer._latlngs[0].map(({ lat, lng }) => {
-    return [lng, lat];
-  });
-  const lineString = tLineString(vertices);
-
-  // Calculate BBox and area in square kilometers
-  const bbox = tBbox(lineString);
+function areaFromBounds(bbox) {
   const poly = tBboxPolygon(bbox);
-  const area = convertArea(tArea(poly), 'meters', 'kilometers');
-
-  return {
-    area: round(area, 0),
-    bbox,
-  };
+  return convertArea(tArea(poly), 'meters', 'kilometers');
 }
 
 function Map() {
   const [map, setMap] = useState(null);
-  const { previousViewMode, viewMode, setViewMode, setAoi } = useContext(
-    ExploreContext
-  );
-  const [drawRef, setDrawRef] = useState(null);
+  const {
+    apiLimits,
+    aoiRef,
+    previousViewMode,
+    setAoiRef,
+    setAoiArea,
+    setViewMode,
+    viewMode,
+  } = useContext(ExploreContext);
+
+  useEffect(() => {
+    if (!map) return;
+
+    if (previousViewMode === viewModes.EDIT_CLASS_MODE) {
+      map.removeLayer(freeDraw);
+    }
+
+    switch (viewMode) {
+      case viewModes.CREATE_AOI_MODE:
+        map.aoi.control.draw.enable();
+        break;
+      case viewModes.EDIT_AOI_MODE:
+        map.aoi.control.draw.disable();
+        map.aoi.control.edit.enable(aoiRef);
+        break;
+      case viewModes.BROWSE_MODE:
+        if (map) {
+          map.aoi.control.draw.disable();
+          map.aoi.control.edit.disable();
+        }
+        break;
+      case viewModes.EDIT_CLASS_MODE:
+        map.addLayer(freeDraw);
+        break;
+      default:
+        break;
+    }
+  }, [viewMode]); // eslint-disable-line react-hooks/exhaustive-deps
 
   /**
-   * Handle changes in view mode
+   * Add/update AOI controls on API metadata change.
    */
   useEffect(() => {
-    if (!drawRef) return;
+    if (!map) return;
 
-    if (viewMode === viewModes.CREATE_AOI_MODE) {
-      drawRef._toolbars.draw._modes.rectangle.handler.enable();
-    } else if (viewMode === viewModes.EDIT_AOI_MODE) {
-      drawRef._toolbars.edit._modes.edit.handler.enable();
-    } else if (previousViewMode === viewModes.EDIT_AOI_MODE) {
-      drawRef._toolbars.edit._modes.edit.handler.save();
-      drawRef._toolbars.edit._modes.edit.handler.disable();
+    // Setup AOI controllers
+    map.aoi = {
+      control: {},
+    };
+
+    // Check if API has limits and area is larger than them
+    function checkAreaSize(bbox) {
+      // Show toast on large area
+      if (
+        apiLimits &&
+        apiLimits.max_inference &&
+        apiLimits.max_inference < areaFromBounds(bbox)
+      ) {
+        toasts.error('AOI is too large.', {
+          autoClose: 3000,
+        });
+        return false;
+      } else return true;
     }
-  }, [drawRef, previousViewMode, viewMode]);
+
+    // Draw control, for creating an AOI
+    map.aoi.control.draw = new AoiDrawControl(map, {
+      onDrawChange: (bbox) => {
+        setAoiArea(areaFromBounds(bbox));
+      },
+      onDrawEnd: (bbox, shape) => {
+        checkAreaSize(bbox);
+        setAoiRef(shape);
+        setViewMode(viewModes.EDIT_AOI_MODE);
+      },
+    });
+
+    // Edit AOI control
+    map.aoi.control.edit = new AoiEditControl(map, {
+      onBoundsChange: (bbox) => {
+        setAoiArea(areaFromBounds(bbox));
+      },
+      onBoundsChangeEnd: (bbox) => {
+        checkAreaSize(bbox);
+      },
+    });
+  }, [map, apiLimits]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const displayMap = useMemo(
     () => (
@@ -94,6 +152,7 @@ function Map() {
         zoom={zoom}
         style={{ height: '100%' }}
         whenCreated={(m) => {
+          // Add map to state
           setMap(m);
 
           if (process.env.NODE_ENV !== 'production') {
@@ -108,56 +167,10 @@ function Map() {
         />
         <FeatureGroup>
           <GeoCoder />
-          <EditControl
-            onMounted={setDrawRef}
-            onCreated={(e) => {
-              // Disable draw mode
-              setViewMode(viewModes.BROWSE_MODE);
-
-              // Add AOI to context
-              setAoi(getAoiFromLayer(e.layer));
-            }}
-            onEdited={(e) => {
-              const layerId = Object.keys(e.layers._layers)[0];
-
-              // Bypass if no layer was touched
-              if (typeof layerId === 'undefined') return;
-
-              // Get first layer edited
-              const layer = e.layers._layers[layerId];
-
-              // Add AOI to context
-              setAoi(getAoiFromLayer(layer));
-            }}
-            draw={{
-              polyline: false,
-              polygon: false,
-              rectangle: {
-                shapeOptions: {
-                  stroke: true,
-                  color: '#3388ff',
-                  weight: 4,
-                  opacity: 0.5,
-                  fill: false,
-                  fillColor: null, //same as color by default
-                  fillOpacity: 0.2,
-                  showArea: false,
-                  clickable: false,
-                },
-              },
-              circle: false,
-              circlemarker: false,
-              marker: false,
-            }}
-            edit={{
-              edit: true,
-              remove: false,
-            }}
-          />
         </FeatureGroup>
       </MapContainer>
     ),
-    [] // eslint-disable-line react-hooks/exhaustive-deps
+    [viewMode, apiLimits] // eslint-disable-line react-hooks/exhaustive-deps
   );
 
   return (
