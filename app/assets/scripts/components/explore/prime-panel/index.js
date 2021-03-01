@@ -137,7 +137,7 @@ function PrimePanel() {
                     ? `${formatThousands(aoiArea)} km2`
                     : viewMode === viewModes.CREATE_AOI_MODE
                     ? 'Drag on map to select'
-                    : 'Not selected yet'}
+                    : 'None selected - Draw area on map'}
                 </SubheadingStrong>
                 <HeadOptionToolbar>
                   <AoiEditButtons
