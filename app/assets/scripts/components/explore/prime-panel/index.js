@@ -109,14 +109,11 @@ AoiEditButtons.propTypes = {
 };
 
 function PrimePanel() {
-  const { viewMode, setViewMode, aoiRef, aoiArea, apiLimits,
-  } = useContext(
+  const { viewMode, setViewMode, aoiRef, aoiArea, apiLimits } = useContext(
     ExploreContext
   );
 
-  const {   selectedModel,
-  setSelectedModel
-  } = useContext(GlobalContext);
+  const { selectedModel, setSelectedModel } = useContext(GlobalContext);
 
   //const [selectedModel, setSelectedModel] = useState(null);
   const [showSelectModelModal, setShowSelectModelModal] = useState(false);

@@ -6,12 +6,11 @@ import { PageBody } from '../../styles/page';
 import { ExploreProvider } from '../../context/explore';
 import SessionTimeoutModal from '../common/timeout-modal';
 import SessionOutputControl from './session-output-control';
-import GlobalContext  from '../../context/global';
+import GlobalContext from '../../context/global';
 
 function Explore() {
-  const [projectName, setProjectName] = useState('Untitled Project');
   const { currentProjectName, setCurrentProjectName } = useContext(
-   GlobalContext 
+    GlobalContext
   );
   return (
     <App pageTitle='Explore'>

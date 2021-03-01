@@ -82,6 +82,11 @@ export function GlobalContextProvider(props) {
 
   /* Post updates to the API */
   useEffect(() => {
+    /*
+     * When project name and model have both been set, automatically create a new project
+     */
+
+    /* eslint-disable no-console */
     if (currentProject.isReady()) {
       console.error(
         'Project name update not supported by api. Change is front end only'
@@ -105,6 +110,7 @@ export function GlobalContextProvider(props) {
         console.error('Model not selected');
       }
     }
+    /* eslint-enable no-console */
   }, [currentProjectName, selectedModel]);
 
   return (

@@ -31,7 +31,6 @@ export function ExploreProvider(props) {
   const [viewMode, setViewMode] = useState(viewModes.BROWSE_MODE);
   const previousViewMode = usePrevious(viewMode);
 
-
   const [apiMeta, dispatchApiMeta] = useReducer(
     createApiMetaReducer,
     initialApiRequestState
