@@ -16,6 +16,8 @@ import SelectModal from '../select-modal';
 import { Card } from '../card-list';
 import { PlaceholderMessage } from '../../../styles/placeholder.js';
 import { ExploreContext, viewModes } from '../../../context/explore';
+import GlobalContext from '../../../context/global';
+
 import TabbedBlock from '../../common/tabbed-block-body';
 import RetrainModel from './retrain-model';
 
@@ -26,9 +28,7 @@ import {
 } from '../../../styles/panel';
 import { EditButton } from '../../../styles/button';
 
-import { availableModels } from '../sample-data';
 import { round } from '../../../utils/format';
-
 const PlaceholderPanelSection = styled.div`
   padding: 1rem;
 `;
@@ -116,6 +116,10 @@ function PrimePanel() {
   const [selectedModel, setSelectedModel] = useState(null);
   const [showSelectModelModal, setShowSelectModelModal] = useState(false);
   const [inference, setInference] = useState(false);
+
+  const { modelsList } = useContext(GlobalContext);
+
+  const { models } = modelsList.isReady() && modelsList.getData();
 
   return (
     <>
@@ -234,7 +238,7 @@ function PrimePanel() {
         onOverlayClick={() => {
           setShowSelectModelModal(false);
         }}
-        data={availableModels}
+        data={models}
         renderCard={(model) => (
           <Card
             id={`model-${model.name}-card`}

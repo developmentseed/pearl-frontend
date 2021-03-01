@@ -61,7 +61,7 @@ export function GlobalContextProvider(props) {
   useEffect(() => {
     /*
      * Request user data when api token is available
-    */
+     */
     if (!apiToken) {
       return;
     }
