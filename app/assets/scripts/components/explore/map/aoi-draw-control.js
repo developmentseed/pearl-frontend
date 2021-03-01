@@ -45,7 +45,7 @@ class AoiDrawControl {
       this._map.dragging.enable();
       this._map.off('mousemove', onMouseMove, this);
       this._map.off('mouseup', onMouseUp, this);
-      this.onDrawEnd(this._shape);
+      this.onDrawEnd(this.getBbox(), this._shape);
     }
 
     // Add draw events after mouse down

@@ -56,7 +56,8 @@ export function ExploreProvider(props) {
   return (
     <ExploreContext.Provider
       value={{
-        apiMeta,
+        apiLimits:
+          apiMeta.isReady() && !apiMeta.hasError() && apiMeta.getData().limits,
         previousViewMode,
         viewMode,
         setViewMode,

@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useContext, useEffect } from 'react';
 import styled from 'styled-components';
+import toasts from '../../common/toasts';
 import { convertArea } from '@turf/helpers';
 import tArea from '@turf/area';
 import tBboxPolygon from '@turf/bbox-polygon';
@@ -57,12 +58,13 @@ function areaFromBounds(bbox) {
 function Map() {
   const [map, setMap] = useState(null);
   const {
-    viewMode,
-    previousViewMode,
-    setViewMode,
+    apiLimits,
     aoi,
+    previousViewMode,
     setAoi,
     setAoiArea,
+    setViewMode,
+    viewMode,
   } = useContext(ExploreContext);
 
   useEffect(() => {
@@ -94,6 +96,53 @@ function Map() {
     }
   }, [viewMode]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  /**
+   * Add/update AOI controls.
+   */
+  useEffect(() => {
+    if (!map) return;
+
+    // Setup AOI controllers
+    map.aoi = {
+      control: {},
+    };
+
+    // Check if API has limits and area is larger than them
+    function checkAreaSize(bbox) {
+      // Show toast on large area
+      if (
+        apiLimits &&
+        apiLimits.max_inference &&
+        apiLimits.max_inference < areaFromBounds(bbox)
+      ) {
+        toasts.error('AOI is too large.');
+        return false;
+      } else return true;
+    }
+
+    // Draw control, for creating an AOI
+    map.aoi.control.draw = new AoiDrawControl(map, {
+      onDrawChange: (bbox) => {
+        setAoiArea(areaFromBounds(bbox));
+      },
+      onDrawEnd: (bbox, shape) => {
+        checkAreaSize(bbox);
+        setAoi(shape);
+        setViewMode(viewModes.EDIT_AOI_MODE);
+      },
+    });
+
+    // Edit AOI control
+    map.aoi.control.edit = new AoiEditControl(map, {
+      onBoundsChange: (bbox) => {
+        setAoiArea(areaFromBounds(bbox));
+      },
+      onBoundsChangeEnd: (bbox) => {
+        checkAreaSize(bbox);
+      },
+    });
+  }, [map, apiLimits]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const displayMap = useMemo(
     () => (
       <MapContainer
@@ -101,23 +150,6 @@ function Map() {
         zoom={zoom}
         style={{ height: '100%' }}
         whenCreated={(m) => {
-          // Setup AOI controllers
-          m.aoi = {
-            control: {},
-          };
-          m.aoi.control.draw = new AoiDrawControl(m, {
-            onDrawChange: (bbox) => {
-              setAoiArea(areaFromBounds(bbox));
-            },
-            onDrawEnd: (shape) => {
-              setAoi(shape);
-              setViewMode(viewModes.EDIT_AOI_MODE);
-            },
-          });
-          m.aoi.control.edit = new AoiEditControl(m, (bounds) => {
-            setAoiArea(areaFromBounds(bounds));
-          });
-
           // Add map to state
           setMap(m);
 
@@ -136,7 +168,7 @@ function Map() {
         </FeatureGroup>
       </MapContainer>
     ),
-    [viewMode] // eslint-disable-line react-hooks/exhaustive-deps
+    [viewMode, apiLimits] // eslint-disable-line react-hooks/exhaustive-deps
   );
 
   return (

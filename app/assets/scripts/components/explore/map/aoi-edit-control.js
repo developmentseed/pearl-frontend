@@ -12,19 +12,10 @@ const icons = {
 };
 
 class AoiEditControl {
-  constructor(map, onBoundsChange) {
+  constructor(map, { onBoundsChange, onBoundsChangeEnd }) {
     this._map = map;
-    this.onBoundsChange = (leafletBounds) => {
-      const { _southWest, _northEast } = leafletBounds;
-
-      // Pass bounds as minX, minY, maxX, maxY
-      onBoundsChange([
-        _southWest.lng,
-        _southWest.lat,
-        _northEast.lng,
-        _northEast.lat,
-      ]);
-    };
+    this.onBoundsChangeEnd = () => onBoundsChangeEnd(this._getBbox());
+    this.onBoundsChange = () => onBoundsChange(this._getBbox());
   }
 
   enable(shape) {
@@ -34,6 +25,14 @@ class AoiEditControl {
 
   disable() {
     this.removeHooks();
+  }
+
+  _getBbox() {
+    const bounds = this._shape.getBounds();
+    const { _southWest, _northEast } = bounds;
+
+    // Pass bounds as minX, minY, maxX, maxY
+    return [_southWest.lng, _southWest.lat, _northEast.lng, _northEast.lat];
   }
 
   _createMoveMarker() {
@@ -99,6 +98,8 @@ class AoiEditControl {
     this._repositionCornerMarkers();
 
     marker.setOpacity(1);
+
+    this.onBoundsChangeEnd();
   }
 
   _onMarkerDrag(e) {
@@ -124,7 +125,7 @@ class AoiEditControl {
     bounds = this._shape.getBounds();
     this._moveMarker.setLatLng(bounds.getCenter());
 
-    this.onBoundsChange(bounds);
+    this.onBoundsChange();
   }
 
   _move(newCenter) {
@@ -146,7 +147,7 @@ class AoiEditControl {
 
     this._repositionCornerMarkers();
 
-    this.onBoundsChange(bounds);
+    this.onBoundsChange();
   }
 
   _getCorners() {
@@ -200,8 +201,8 @@ class AoiEditControl {
 
   addHooks() {
     var shape = this._shape;
-    if (this._shape._map) {
-      this._map = this._shape._map;
+    if (shape && shape._map) {
+      this._map = shape._map;
 
       if (shape._map) {
         this._map = shape._map;
