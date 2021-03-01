@@ -46,7 +46,6 @@ const AccordionFold = styled(BaseFold)`
         font-size: 0.875rem;
         letter-spacing: 0.5px;
         opacity: 0.64;
-        font-weight: ${themeVal('type.base.weight')};
       }
     }
   }

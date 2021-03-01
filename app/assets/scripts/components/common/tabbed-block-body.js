@@ -52,6 +52,7 @@ const Tab = styled(Button)`
       /* stylelint-disable-next-line */
       &,
       &:visited {
+        font-weight: ${themeVal('type.heading.weight')};
         color: ${themeVal('color.primary')};
         opacity: 1;
       }
