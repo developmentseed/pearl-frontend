@@ -28,7 +28,6 @@ export function ExploreProvider(props) {
   const history = useHistory();
   const [aoiRef, setAoiRef] = useState(null);
   const [aoiArea, setAoiArea] = useState(null);
-  const [aoiBbox, setAoiBbox] = useState(null);
   const [viewMode, setViewMode] = useState(viewModes.BROWSE_MODE);
   const previousViewMode = usePrevious(viewMode);
 
