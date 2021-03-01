@@ -41,6 +41,8 @@ const AccordionFold = styled(BaseFold)`
   header {
     a {
       padding: ${glsp(0.5)} 0;
+      h1 {
+      }
     }
   }
   & ~ & {
