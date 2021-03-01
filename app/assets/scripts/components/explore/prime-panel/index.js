@@ -19,6 +19,8 @@ import { ExploreContext, viewModes } from '../../../context/explore';
 import TabbedBlock from '../../common/tabbed-block-body';
 import RetrainModel from './retrain-model';
 
+import LayersPanel from '../layers-panel';
+
 import {
   HeadOption,
   HeadOptionHeadline,
@@ -26,7 +28,7 @@ import {
 } from '../../../styles/panel';
 import { EditButton } from '../../../styles/button';
 
-import { availableModels } from '../sample-data';
+import { availableModels, availableLayers } from '../sample-data';
 import { round } from '../../../utils/format';
 
 const PlaceholderPanelSection = styled.div`
@@ -185,9 +187,7 @@ function PrimePanel() {
                 <PlaceholderPanelSection name='Refine Results'>
                   <PlaceholderMessage>Refine results</PlaceholderMessage>
                 </PlaceholderPanelSection>
-                <PlaceholderPanelSection name='Layers'>
-                  <PlaceholderMessage>Refine results</PlaceholderMessage>
-                </PlaceholderPanelSection>
+                <LayersPanel name='layers' layers={availableLayers} />
               </TabbedBlock>
             </PanelBlockBody>
 
