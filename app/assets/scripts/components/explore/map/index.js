@@ -59,9 +59,9 @@ function Map() {
   const [map, setMap] = useState(null);
   const {
     apiLimits,
-    aoi,
+    aoiRef,
     previousViewMode,
-    setAoi,
+    setAoiRef,
     setAoiArea,
     setViewMode,
     viewMode,
@@ -80,7 +80,7 @@ function Map() {
         break;
       case viewModes.EDIT_AOI_MODE:
         map.aoi.control.draw.disable();
-        map.aoi.control.edit.enable(aoi);
+        map.aoi.control.edit.enable(aoiRef);
         break;
       case viewModes.BROWSE_MODE:
         if (map) {
@@ -97,7 +97,7 @@ function Map() {
   }, [viewMode]); // eslint-disable-line react-hooks/exhaustive-deps
 
   /**
-   * Add/update AOI controls.
+   * Add/update AOI controls on API metadata change.
    */
   useEffect(() => {
     if (!map) return;
@@ -129,7 +129,7 @@ function Map() {
       },
       onDrawEnd: (bbox, shape) => {
         checkAreaSize(bbox);
-        setAoi(shape);
+        setAoiRef(shape);
         setViewMode(viewModes.EDIT_AOI_MODE);
       },
     });

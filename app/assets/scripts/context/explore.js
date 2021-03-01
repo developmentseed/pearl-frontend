@@ -26,8 +26,9 @@ export const viewModes = {
 export const ExploreContext = createContext({});
 export function ExploreProvider(props) {
   const history = useHistory();
-  const [aoi, setAoi] = useState(null);
+  const [aoiRef, setAoiRef] = useState(null);
   const [aoiArea, setAoiArea] = useState(null);
+  const [aoiBbox, setAoiBbox] = useState(null);
   const [viewMode, setViewMode] = useState(viewModes.BROWSE_MODE);
   const previousViewMode = usePrevious(viewMode);
 
@@ -61,8 +62,8 @@ export function ExploreProvider(props) {
         previousViewMode,
         viewMode,
         setViewMode,
-        aoi,
-        setAoi,
+        aoiRef,
+        setAoiRef,
         aoiArea,
         setAoiArea,
       }}

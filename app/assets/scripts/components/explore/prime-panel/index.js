@@ -55,7 +55,7 @@ const PanelControls = styled(PanelBlockFooter)`
 `;
 
 function AoiEditButtons(props) {
-  const { setViewMode, viewMode, aoi } = props;
+  const { setViewMode, viewMode, aoiRef, aoiArea, apiLimits } = props;
 
   // Display confirm/cancel buttons when AOI edition is active
   if (
@@ -70,6 +70,13 @@ function AoiEditButtons(props) {
           }}
           title='Set Area of Interest'
           useIcon='tick'
+          disabled={
+            !aoiArea ||
+            aoiArea === 0 ||
+            (apiLimits &&
+              apiLimits.max_inference &&
+              apiLimits.max_inference < aoiArea)
+          }
         >
           Select AOI
         </EditButton>
@@ -81,7 +88,9 @@ function AoiEditButtons(props) {
   return (
     <EditButton
       onClick={() => {
-        setViewMode(!aoi ? viewModes.CREATE_AOI_MODE : viewModes.EDIT_AOI_MODE);
+        setViewMode(
+          !aoiRef ? viewModes.CREATE_AOI_MODE : viewModes.EDIT_AOI_MODE
+        );
       }}
       title='Draw Area of Interest'
       useIcon='pencil'
@@ -94,11 +103,15 @@ function AoiEditButtons(props) {
 AoiEditButtons.propTypes = {
   setViewMode: T.func,
   viewMode: T.string,
-  aoi: T.object,
+  aoiRef: T.object,
+  aoiArea: T.oneOfType([T.bool, T.number]),
+  apiLimits: T.oneOfType([T.bool, T.object]),
 };
 
 function PrimePanel() {
-  const { viewMode, setViewMode, aoi, aoiArea } = useContext(ExploreContext);
+  const { viewMode, setViewMode, aoiRef, aoiArea, apiLimits } = useContext(
+    ExploreContext
+  );
 
   const [selectedModel, setSelectedModel] = useState(null);
   const [showSelectModelModal, setShowSelectModelModal] = useState(false);
@@ -127,8 +140,10 @@ function PrimePanel() {
                 <HeadOptionToolbar>
                   <AoiEditButtons
                     setViewMode={setViewMode}
-                    aoi={aoi}
+                    aoiRef={aoiRef}
+                    aoiArea={aoiArea}
                     viewMode={viewMode}
+                    apiLimits={apiLimits}
                   />
                 </HeadOptionToolbar>
               </HeadOption>

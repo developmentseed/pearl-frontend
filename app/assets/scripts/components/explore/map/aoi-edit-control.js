@@ -28,10 +28,7 @@ class AoiEditControl {
   }
 
   _getBbox() {
-    const bounds = this._shape.getBounds();
-    const { _southWest, _northEast } = bounds;
-
-    // Pass bounds as minX, minY, maxX, maxY
+    const { _southWest, _northEast } = this._shape.getBounds();
     return [_southWest.lng, _southWest.lat, _northEast.lng, _northEast.lat];
   }
 
