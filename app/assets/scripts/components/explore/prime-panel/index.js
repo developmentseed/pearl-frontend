@@ -27,7 +27,7 @@ import {
 import { EditButton } from '../../../styles/button';
 
 import { availableModels } from '../sample-data';
-import { round } from '../../../utils/format';
+import { formatThousands } from '../../../utils/format';
 
 const PlaceholderPanelSection = styled.div`
   padding: 1rem;
@@ -134,8 +134,10 @@ function PrimePanel() {
                 </HeadOptionHeadline>
                 <SubheadingStrong>
                   {aoiArea && aoiArea > 0
-                    ? `${round(aoiArea, 0)} km2`
-                    : 'Not selected'}
+                    ? `${formatThousands(aoiArea)} km2`
+                    : viewMode === viewModes.CREATE_AOI_MODE
+                    ? 'Drag on map to select'
+                    : 'Not selected yet'}
                 </SubheadingStrong>
                 <HeadOptionToolbar>
                   <AoiEditButtons
