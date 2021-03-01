@@ -58,7 +58,7 @@ export function queryApiGet({ endpoint, id, token }) {
       headers: {
         Authorization: `Bearer ${token}`,
       },
-      method: 'GET'
+      method: 'GET',
     },
     requestFn: queryApiGetActions.request,
     receiveFn: queryApiGetActions.receive,
