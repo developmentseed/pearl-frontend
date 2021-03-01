@@ -39,6 +39,7 @@ const SliderWrapper = styled.div`
 const AccordionFold = styled(BaseFold)`
   background: unset;
   header {
+    padding: ${glsp()} 0;
     a {
       padding: ${glsp(0.5)} 0;
       h1 {
@@ -48,9 +49,6 @@ const AccordionFold = styled(BaseFold)`
         opacity: 0.64;
       }
     }
-  }
-  & ~ & {
-    margin-top: ${glsp()};
   }
 `;
 
