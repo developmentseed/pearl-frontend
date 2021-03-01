@@ -115,7 +115,9 @@ function Map() {
         apiLimits.max_inference &&
         apiLimits.max_inference < areaFromBounds(bbox)
       ) {
-        toasts.error('AOI is too large.');
+        toasts.error('AOI is too large.', {
+          autoClose: 3000,
+        });
         return false;
       } else return true;
     }
