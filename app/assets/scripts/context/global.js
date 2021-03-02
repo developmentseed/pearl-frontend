@@ -79,6 +79,16 @@ export function GlobalContextProvider(props) {
     queryApiGet({ token: apiToken, endpoint: 'model' })(dispatchModelsList);
     queryApiGet({ token: apiToken, endpoint: 'project' })(dispatchProjectsList);
   }, [apiToken]);
+  useEffect(() => {
+    if (currentProject.isReady()) {
+      const project = currentProject.getData();
+      queryApiGet({
+        token: apiToken,
+        endpoint: 'project',
+        subPath: `${project.id}/checkpoint`,
+      })(dispatchProjectsList);
+    }
+  }, [currentProject]);
 
   /* Post updates to the API */
   useEffect(() => {

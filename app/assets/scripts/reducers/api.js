@@ -43,17 +43,26 @@ export const createApiMetaReducer = wrapLogReducer(makeAPIReducer('API_META'));
  * API Endpoint reducer
  * Use to query any get endpoint
  * if id is undefined -> List  results
- * else -> get by id
+ * else if subpathProvided -> get by subpath (endpoint/subpath)
+ * else  if id provided-> get by id (endpoint/id)
  */
-export function queryApiGet({ endpoint, id, token }) {
+export function queryApiGet({ endpoint, id, subPath, token }) {
   if (!token) {
     throw new Error(`Token required for ${endpoint}`);
   }
   const queryApiGetActions = makeAbortableActions(
     `API_GET_${endpoint.toUpperCase()}`
   );
+  let url = `${restApiEndpoint}/api/${endpoint}`
+
+  if (subPath) {
+    url =`${url}/${subPath}`
+  } else if (id){
+    url = `${url}/${id}`
+
+  }
   return makeFetchThunk({
-    url: `${restApiEndpoint}/api/${endpoint}${id ? `:${id}` : ''}`,
+    url,
     options: {
       headers: {
         Authorization: `Bearer ${token}`,
