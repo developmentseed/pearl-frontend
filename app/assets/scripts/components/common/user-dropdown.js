@@ -17,11 +17,9 @@ import {
   FormGroupHeader,
   FormGroupBody,
   FormLabel,
-  Field,
   FormInput,
 } from '@devseed-ui/form';
 import { useAuth0 } from '@auth0/auth0-react';
-import SelectModal from './select-modal';
 
 import { Card } from '../common/card-list';
 
@@ -33,7 +31,7 @@ const Modal = styled(BaseModal)`
   }
 `;
 
-function UserDropdown(props) {
+function UserDropdown() {
   const { isAuthenticated, loginWithRedirect, logout } = useAuth0();
   const logoutWithRedirect = () =>
     logout({
@@ -112,7 +110,7 @@ function UserDropdown(props) {
       )}
       <Modal
         id='checkpoints-modal'
-        revealed={true || showCheckpoints}
+        revealed={showCheckpoints}
         size='xlarge'
         onOverlayClick={() => setShowCheckpoints(false)}
         renderHeader={() => (
@@ -141,17 +139,22 @@ function UserDropdown(props) {
             numColumns={3}
             style={{ height: '45vh' }}
             data={availableCheckpoints}
+            filterCard={(card) => {
+              return Object.values(card)
+                .map((v) => String(v).toLowerCase())
+                .join(',')
+                .includes(checkpointFilterString.toLowerCase());
+            }}
             renderCard={(ckpt) => (
               <Card
                 id={ckpt.id}
                 title={ckpt.name}
                 details={ckpt}
-                key={ckpt.key}
+                key={ckpt.id}
                 cardMedia={<img src='https://place-hold.it/120x68/#dbdbd' />}
                 expanded
               />
             )}
-            filterCard={() => true}
           />
         )}
       />

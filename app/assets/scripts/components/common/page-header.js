@@ -2,7 +2,6 @@ import React from 'react';
 import styled from 'styled-components';
 import T from 'prop-types';
 import config from '../../config';
-import { useAuth0 } from '@auth0/auth0-react';
 import { NavLink, Link } from 'react-router-dom';
 
 import { Button } from '@devseed-ui/button';
@@ -15,14 +14,6 @@ import {
 } from '@devseed-ui/theme-provider';
 import collecticon from '@devseed-ui/collecticons';
 import UserDropdown from '../common/user-dropdown';
-import {
-  Dropdown,
-  DropdownHeader,
-  DropdownBody,
-  DropdownItem,
-  DropdownFooter,
-  DropdownTrigger,
-} from '../../styles/dropdown';
 import { filterComponentProps } from '../../styles/utils/general';
 
 const { appTitle } = config;
@@ -147,7 +138,6 @@ const StyledNavLink = filterComponentProps(NavLink, propsToFilter);
 const StyledLink = filterComponentProps(Link, propsToFilter);
 
 function PageHeader(props) {
-
   return (
     <PageHead role='banner'>
       <PageHeadInner>

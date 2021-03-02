@@ -2,25 +2,25 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 import ShadowScrollbar from '../common/shadow-scrollbar';
 import { PanelBlockBody } from '../common/panel-block';
+import DetailsList from './details-list';
 import T from 'prop-types';
 
 import { truncated, themeVal } from '@devseed-ui/theme-provider';
 
 export const CardWrapper = styled.article`
   display: grid;
-  ${({expanded}) => {
+  ${({ expanded }) => {
     if (expanded) {
       return css`
         grid-template-columns: 1fr;
         grid-template-rows: 3fr 1fr 3fr;
-      `
-
-     } else {
-       return css`
+      `;
+    } else {
+      return css`
         grid-template-columns: 1fr 4fr;
         height: 3.5rem;
-       `
-     }
+      `;
+    }
   }}
   padding: 0.5rem;
   border: 1px solid ${themeVal('color.baseAlphaC')};
@@ -58,9 +58,6 @@ const CardMedia = styled.figure`
     pointer-events: none;
   }
 `;
-const CardIcon = styled.img`
-  width: 3rem;
-`;
 const CardTitle = styled.h4`
   ${truncated}
   padding: 1rem 0rem;
@@ -74,7 +71,7 @@ export const Card = ({
   borderlessMedia,
   cardMedia,
   details,
-  expanded
+  expanded,
 }) => {
   return (
     <CardWrapper id={id} size={size} onClick={onClick} expanded={expanded}>
@@ -82,9 +79,7 @@ export const Card = ({
         <CardMedia borderlessMedia={borderlessMedia}>{cardMedia}</CardMedia>
       )}
       <CardTitle>{title}</CardTitle>
-      {
-        details && <div>details </div>
-      }
+      {details && <DetailsList details={details} />}
     </CardWrapper>
   );
 };
@@ -95,6 +90,9 @@ Card.propTypes = {
   size: T.oneOf(['small', 'large']),
   onClick: T.func,
   borderlessMedia: T.bool,
+  cardMedia: T.node,
+  details: T.object,
+  expanded: T.bool,
 };
 
 const CardListContainer = styled.ol`
@@ -154,6 +152,7 @@ CardList.propTypes = {
   filterCard: T.func,
   numColumns: T.number,
   nonScrolling: T.bool,
+  style: T.object,
 };
 
 export default CardList;

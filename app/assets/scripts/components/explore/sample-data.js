@@ -47,8 +47,22 @@ export const availableLayers = [
 
 export const availableCheckpoints = [
   {
-    id: 1432,
-    name: 'Checkpoint Name',
+    id: 1,
+    name: 'Checkpoint number 1',
+    classes: ['class1'],
+    storage: true,
+    created: new Date().toISOString(),
+  },
+  {
+    id: 2,
+    name: 'Checkpoint number 2',
+    classes: ['class1'],
+    storage: true,
+    created: new Date().toISOString(),
+  },
+  {
+    id: 3,
+    name: 'Checkpoint Name 3',
     classes: ['class1'],
     storage: true,
     created: new Date().toISOString(),
