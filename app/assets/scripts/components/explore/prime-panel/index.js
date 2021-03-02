@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { themeVal } from '@devseed-ui/theme-provider';
 import { Button } from '@devseed-ui/button';
 import T from 'prop-types';
+import { useAuth0 } from '@auth0/auth0-react';
 
 import Panel from '../../common/panel';
 import {
@@ -117,13 +118,15 @@ function PrimePanel() {
     ExploreContext
   );
 
-  const { selectedModel, setSelectedModel } = useContext(GlobalContext);
+  const { isAuthenticated } = useAuth0();
+
+  const { selectedModel, setSelectedModel, modelsList } = useContext(
+    GlobalContext
+  );
 
   //const [selectedModel, setSelectedModel] = useState(null);
   const [showSelectModelModal, setShowSelectModelModal] = useState(false);
   const [inference, setInference] = useState(false);
-
-  const { modelsList } = useContext(GlobalContext);
 
   const { models } = modelsList.isReady() && modelsList.getData();
 
@@ -165,7 +168,12 @@ function PrimePanel() {
                   <Subheading>Selected Model</Subheading>
                 </HeadOptionHeadline>
                 <SubheadingStrong>
-                  {(selectedModel && selectedModel.name) || 'Select Model'}
+                  {(selectedModel && selectedModel.name) ||
+                    (isAuthenticated
+                      ? models && models.length
+                        ? 'Select Model'
+                        : 'No models available'
+                      : 'Login to select model')}
                 </SubheadingStrong>
                 <HeadOptionToolbar>
                   <EditButton
@@ -175,6 +183,7 @@ function PrimePanel() {
                       setShowSelectModelModal(true);
                     }}
                     title='Edit Model'
+                    disabled={!models?.length}
                   >
                     Edit Model Selection
                   </EditButton>
