@@ -14,6 +14,7 @@ import {
   media,
 } from '@devseed-ui/theme-provider';
 import collecticon from '@devseed-ui/collecticons';
+import UserDropdown from '../common/user-dropdown';
 import {
   Dropdown,
   DropdownHeader,
@@ -146,11 +147,6 @@ const StyledNavLink = filterComponentProps(NavLink, propsToFilter);
 const StyledLink = filterComponentProps(Link, propsToFilter);
 
 function PageHeader(props) {
-  const { isAuthenticated, loginWithRedirect, logout } = useAuth0();
-  const logoutWithRedirect = () =>
-    logout({
-      returnTo: window.location.origin,
-    });
 
   return (
     <PageHead role='banner'>
@@ -196,68 +192,7 @@ function PageHeader(props) {
             )}
           </PrimarySection>
           <SecondarySection>
-            {!isAuthenticated ? (
-              <Button
-                variation='primary-raised-light'
-                className='button-class'
-                title='sample button'
-                onClick={() => loginWithRedirect({ prompt: 'consent' })}
-              >
-                Log in
-              </Button>
-            ) : (
-              <Dropdown
-                alignment='center'
-                direction='down'
-                triggerElement={(props) => (
-                  <DropdownTrigger
-                    variation='primary-raised-light'
-                    useIcon={['chevron-down--small', 'after']}
-                    usePreIcon='user'
-                    title='Open dropdown'
-                    className='user-options-trigger'
-                    size='medium'
-                    {...props}
-                  >
-                    Account
-                  </DropdownTrigger>
-                )}
-                className='global__dropdown'
-              >
-                <>
-                  <DropdownHeader>
-                    <p>Hello</p>
-                    <h1>Sylvan Couvert</h1>
-                  </DropdownHeader>
-                  <DropdownBody>
-                    <li>
-                      <DropdownItem useIcon='folder'>My Projects</DropdownItem>
-                    </li>
-                    <li>
-                      <DropdownItem useIcon='map'>My Saved Maps</DropdownItem>
-                    </li>
-                    <li>
-                      <DropdownItem useIcon='git-fork'>
-                        My Checkpoints
-                      </DropdownItem>
-                    </li>
-                    <li>
-                      <DropdownItem useIcon='house' to='/'>
-                        Visit Homepage
-                      </DropdownItem>
-                    </li>
-                  </DropdownBody>
-                  <DropdownFooter>
-                    <DropdownItem
-                      useIcon='logout'
-                      onClick={() => logoutWithRedirect()}
-                    >
-                      Sign Out
-                    </DropdownItem>
-                  </DropdownFooter>
-                </>
-              </Dropdown>
-            )}
+            <UserDropdown />
           </SecondarySection>
         </PageNav>
       </PageHeadInner>

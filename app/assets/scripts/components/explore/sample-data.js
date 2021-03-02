@@ -44,3 +44,13 @@ export const availableLayers = [
     category: 'Base Satellite Imagery',
   },
 ];
+
+export const availableCheckpoints = [
+  {
+    id: 1432,
+    name: 'Checkpoint Name',
+    classes: ['class1'],
+    storage: true,
+    created: new Date().toISOString(),
+  },
+];

@@ -7,11 +7,22 @@ import T from 'prop-types';
 import { truncated, themeVal } from '@devseed-ui/theme-provider';
 
 export const CardWrapper = styled.article`
-  height: ${({ size }) => (size === 'large' ? '5rem' : '3.5rem')};
-  display: flex;
-  flex-direction: row;
-  justify-content: start;
-  align-items: center;
+  display: grid;
+  ${({expanded}) => {
+    if (expanded) {
+      return css`
+        grid-template-columns: 1fr;
+        grid-template-rows: 3fr 1fr 3fr;
+      `
+
+     } else {
+       return css`
+        grid-template-columns: 1fr 4fr;
+        height: 3.5rem;
+       `
+     }
+  }}
+  padding: 0.5rem;
   border: 1px solid ${themeVal('color.baseAlphaC')};
   border-radius: ${themeVal('shape.rounded')};
 
@@ -29,8 +40,6 @@ export const CardWrapper = styled.article`
 
 const CardMedia = styled.figure`
   display: flex;
-  margin: 0.5rem;
-  margin-right: 0;
   position: relative;
   &:before {
     position: absolute;
@@ -54,33 +63,35 @@ const CardIcon = styled.img`
 `;
 const CardTitle = styled.h4`
   ${truncated}
-  padding: 1rem;
+  padding: 1rem 0rem;
 `;
 
 export const Card = ({
   id,
   title,
-  iconPath,
   size,
   onClick,
   borderlessMedia,
+  cardMedia,
+  details,
+  expanded
 }) => {
   return (
-    <CardWrapper id={id} size={size} onClick={onClick}>
-      {iconPath && (
-        <CardMedia borderlessMedia={borderlessMedia}>
-          <CardIcon src={iconPath} />
-        </CardMedia>
+    <CardWrapper id={id} size={size} onClick={onClick} expanded={expanded}>
+      {cardMedia && (
+        <CardMedia borderlessMedia={borderlessMedia}>{cardMedia}</CardMedia>
       )}
       <CardTitle>{title}</CardTitle>
+      {
+        details && <div>details </div>
+      }
     </CardWrapper>
   );
 };
 
 Card.propTypes = {
-  id: T.string,
+  id: T.oneOfType([T.number, T.string]),
   title: T.string,
-  iconPath: T.string,
   size: T.oneOf(['small', 'large']),
   onClick: T.func,
   borderlessMedia: T.bool,
@@ -118,9 +129,10 @@ function CardList({
   filterCard = () => true,
   numColumns,
   nonScrolling,
+  style,
 }) {
   return (
-    <CardListWrapper nonScrolling={nonScrolling}>
+    <CardListWrapper style={style} nonScrolling={nonScrolling}>
       {nonScrolling ? (
         <CardListContainer numColumns={numColumns} className='list-container'>
           {data.filter(filterCard).map(renderCard)}
