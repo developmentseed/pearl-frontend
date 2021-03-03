@@ -131,6 +131,13 @@ function Map() {
         checkAreaSize(bbox);
         setAoiRef(shape);
         setViewMode(viewModes.EDIT_AOI_MODE);
+
+        const [minX, minY, maxX, maxY] = bbox;
+
+        map.fitBounds([
+          [minY, minX],
+          [maxY, maxX],
+        ]);
       },
     });
 
