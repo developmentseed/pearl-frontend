@@ -86,6 +86,12 @@ function Map() {
         if (map) {
           map.aoi.control.draw.disable();
           map.aoi.control.edit.disable();
+          if (
+            previousViewMode === viewModes.CREATE_AOI_MODE ||
+            previousViewMode === viewModes.EDIT_AOI_MODE
+          ) {
+            map.fitBounds(aoiRef.getBounds());
+          }
         }
         break;
       case viewModes.EDIT_CLASS_MODE:
@@ -131,13 +137,6 @@ function Map() {
         checkAreaSize(bbox);
         setAoiRef(shape);
         setViewMode(viewModes.EDIT_AOI_MODE);
-
-        const [minX, minY, maxX, maxY] = bbox;
-
-        map.fitBounds([
-          [minY, minX],
-          [maxY, maxX],
-        ]);
       },
     });
 
