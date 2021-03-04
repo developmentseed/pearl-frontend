@@ -47,7 +47,7 @@ export function GlobalContextProvider(props) {
 
   useEffect(() => {
     /*
-     * Request api acces token via Auth0
+     * Request api access token via Auth0
      */
     async function getApiToken() {
       const token = await getAccessTokenWithPopup({
@@ -111,7 +111,7 @@ export function GlobalContextProvider(props) {
       }
     }
     /* eslint-enable no-console */
-  }, [currentProjectName, selectedModel]);
+  }, [currentProjectName, selectedModel]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <>
