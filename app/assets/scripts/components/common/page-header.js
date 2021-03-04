@@ -249,15 +249,6 @@ function PageHeader(props) {
                       </DropdownItem>
                     </li>
                     <li>
-                      <DropdownItem
-                        as={StyledLink}
-                        to='/profile/checkpoints'
-                        useIcon='git-fork'
-                      >
-                        My Checkpoints
-                      </DropdownItem>
-                    </li>
-                    <li>
                       <DropdownItem as={StyledLink} to='/' useIcon='house'>
                         Visit Homepage
                       </DropdownItem>

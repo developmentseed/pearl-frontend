@@ -22,7 +22,6 @@ import { CollecticonsGlobalStyle } from '@devseed-ui/collecticons';
 import GlobalLoadingProvider from '@devseed-ui/global-loading';
 import { ToastContainerCustom } from './components/common/toasts';
 import Projects from './components/profile/projects';
-import Checkpoints from './components/profile/checkpoints';
 import Maps from './components/profile/maps';
 
 const onRedirectCallback = (appState) => {
@@ -61,11 +60,6 @@ function Root() {
               <Switch>
                 <Route exact path='/' component={Home} />
                 <Route exact path='/explore' component={Explore} />
-                <ProtectedRoute
-                  exact
-                  path='/profile/checkpoints'
-                  component={Checkpoints}
-                />
                 <ProtectedRoute exact path='/profile/maps' component={Maps} />
                 <ProtectedRoute
                   exact
