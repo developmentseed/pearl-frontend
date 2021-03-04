@@ -12,6 +12,7 @@ import { themeVal, multiply } from '@devseed-ui/theme-provider';
 import FreeDraw, { ALL } from 'leaflet-freedraw';
 import AoiDrawControl from './aoi-draw-control';
 import AoiEditControl from './aoi-edit-control';
+import config from '../../../config';
 
 const center = [38.942, -95.449];
 const zoom = 4;
@@ -164,6 +165,13 @@ function Map() {
         <TileLayer
           attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
           url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+          maxZoom={11}
+        />
+        <TileLayer
+          attribution='&copy; NAIP'
+          url={config.NaipTileUrl}
+          minZoom={12}
+          maxZoom={18}
         />
         <FeatureGroup>
           <GeoCoder />
