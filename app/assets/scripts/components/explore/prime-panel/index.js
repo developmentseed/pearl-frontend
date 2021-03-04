@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import styled from 'styled-components';
 import { themeVal } from '@devseed-ui/theme-provider';
 import { Button } from '@devseed-ui/button';
@@ -30,6 +30,7 @@ import {
   HeadOptionToolbar,
 } from '../../../styles/panel';
 import { EditButton } from '../../../styles/button';
+import InfoButton from '../../common/info-button';
 
 import { availableLayers } from '../sample-data';
 import { formatThousands } from '../../../utils/format';
@@ -124,10 +125,66 @@ function PrimePanel() {
     GlobalContext
   );
 
-  //const [selectedModel, setSelectedModel] = useState(null);
   const [showSelectModelModal, setShowSelectModelModal] = useState(false);
   const [inference, setInference] = useState(false);
 
+  const [applyText, setApplyText] = useState();
+  const [applyState, setApplyState] = useState();
+  const [applyTooltip, setApplyTooltip] = useState();
+
+  useEffect(() => {
+    if (!aoiArea || !selectedModel) {
+      /* pre-AOI selected */
+      setApplyState(false);
+      setApplyTooltip('Select AOI to run model');
+    } else if (!inference) {
+      /* AOI selected, inference not yet applied */
+      setApplyState(true);
+      setApplyTooltip(null);
+    } /*else if (checkpoint) {
+      //assume inference = false when checkpoint is !undefined
+      setApplyState(true);
+      setApplyTooltip(null);
+       setApplyText('Retrain Checkpoint')
+    }*/
+
+    /* No Retraining samples selected, AOI changed */
+    // Retraining samples not implemented yet
+
+    setApplyText('Run Model');
+  }, [aoiArea /* retraining samples, checkoint */, selectedModel]);
+
+  useEffect(() => {
+    if (inference) {
+      /* No Retraining samples selected, AOI unchanged*/
+      setApplyState(false);
+      setApplyText('Retrain Model');
+      setApplyTooltip('Select retraining samples to retrain model');
+    }
+  }, [inference /* retraining samples */]);
+
+  /*
+  useEffect(() => {
+    // Retraining Samples selected
+    if (retraining samples) {
+      setApplyState(true)
+      setApplyText('Retrain Model')
+      setApplyTooltip('Retrain model with your selected samples')
+
+    }
+  }, [retraining samples ])
+  */
+
+  /* Check point based settings
+  useEffect(() => {
+    if (checkpoint) {
+      //Post-retraining (Checkpoint), AOI unchanged
+      setApplyState(false)
+      setApplyText('Retrain Checkpoint')
+      setApplyTooltip('Select retraining samples to retrain checkpoint')
+    }
+  }, [checkpoint])
+  */
   const { models } = modelsList.isReady() && modelsList.getData();
 
   return (
@@ -232,17 +289,24 @@ function PrimePanel() {
                 Undo
               </Button>
 
-              <Button
+              <InfoButton
                 variation='primary-raised-dark'
                 size='medium'
                 useIcon='tick--small'
                 style={{
                   gridColumn: '1 / -1',
                 }}
-                onClick={() => setInference(true)}
+                onClick={() => {
+                  if (!applyState) {
+                    return;
+                  }
+                  setInference(true);
+                }}
+                visuallyDisabled={!applyState}
+                info={applyTooltip}
               >
-                Run inference
-              </Button>
+                {applyText}
+              </InfoButton>
             </PanelControls>
           </StyledPanelBlock>
         }
