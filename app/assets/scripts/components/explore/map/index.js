@@ -163,6 +163,11 @@ function Map() {
         }}
       >
         <TileLayer
+          attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+          url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+          maxZoom={11}
+        />
+        <TileLayer
           attribution='&copy; NAIP'
           url={config.NaipTileUrl}
           minZoom={12}
