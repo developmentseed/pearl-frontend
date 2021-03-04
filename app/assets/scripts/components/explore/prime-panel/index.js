@@ -133,7 +133,7 @@ function PrimePanel() {
   const [applyTooltip, setApplyTooltip] = useState();
 
   useEffect(() => {
-    if (!aoiArea) {
+    if (!aoiArea || !selectedModel) {
       /* pre-AOI selected */
       setApplyState(false);
       setApplyTooltip('Select AOI to run model');
@@ -152,7 +152,7 @@ function PrimePanel() {
     // Retraining samples not implemented yet
 
     setApplyText('Run Model');
-  }, [aoiArea /* retraining samples, checkoint */]);
+  }, [aoiArea /* retraining samples, checkoint */, selectedModel]);
 
   useEffect(() => {
     if (inference) {
