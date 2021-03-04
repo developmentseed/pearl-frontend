@@ -90,7 +90,7 @@ function Map() {
             previousViewMode === viewModes.CREATE_AOI_MODE ||
             previousViewMode === viewModes.EDIT_AOI_MODE
           ) {
-            map.fitBounds(aoiRef.getBounds());
+            map.fitBounds(aoiRef.getBounds(), { padding: [25, 25] });
           }
         }
         break;
