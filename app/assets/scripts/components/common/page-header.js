@@ -146,7 +146,7 @@ const StyledNavLink = filterComponentProps(NavLink, propsToFilter);
 const StyledLink = filterComponentProps(Link, propsToFilter);
 
 function PageHeader(props) {
-  const { isAuthenticated, loginWithRedirect, logout } = useAuth0();
+  const { isAuthenticated, loginWithRedirect, logout, user } = useAuth0();
   const logoutWithRedirect = () =>
     logout({
       returnTo: window.location.origin,
@@ -227,22 +227,29 @@ function PageHeader(props) {
                 <>
                   <DropdownHeader>
                     <p>Hello</p>
-                    <h1>Sylvan Couvert</h1>
+                    <h1>{user.name}</h1>
                   </DropdownHeader>
                   <DropdownBody>
                     <li>
-                      <DropdownItem useIcon='folder'>My Projects</DropdownItem>
-                    </li>
-                    <li>
-                      <DropdownItem useIcon='map'>My Saved Maps</DropdownItem>
-                    </li>
-                    <li>
-                      <DropdownItem useIcon='git-fork'>
-                        My Checkpoints
+                      <DropdownItem
+                        as={StyledLink}
+                        to='/profile/projects'
+                        useIcon='folder'
+                      >
+                        My Projects
                       </DropdownItem>
                     </li>
                     <li>
-                      <DropdownItem useIcon='house' to='/'>
+                      <DropdownItem
+                        as={StyledLink}
+                        to='/profile/maps'
+                        useIcon='map'
+                      >
+                        My Saved Maps
+                      </DropdownItem>
+                    </li>
+                    <li>
+                      <DropdownItem as={StyledLink} to='/' useIcon='house'>
                         Visit Homepage
                       </DropdownItem>
                     </li>

@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { themeVal } from '@devseed-ui/theme-provider';
 import { Button } from '@devseed-ui/button';
 import T from 'prop-types';
+import { useAuth0 } from '@auth0/auth0-react';
 
 import Panel from '../../common/panel';
 import {
@@ -16,6 +17,8 @@ import SelectModal from '../select-modal';
 import { Card } from '../card-list';
 import { PlaceholderMessage } from '../../../styles/placeholder.js';
 import { ExploreContext, viewModes } from '../../../context/explore';
+import GlobalContext from '../../../context/global';
+
 import TabbedBlock from '../../common/tabbed-block-body';
 import RetrainModel from './retrain-model';
 
@@ -29,7 +32,7 @@ import {
 import { EditButton } from '../../../styles/button';
 import InfoButton from '../../common/info-button';
 
-import { availableModels, availableLayers } from '../sample-data';
+import { availableLayers } from '../sample-data';
 import { formatThousands } from '../../../utils/format';
 
 const PlaceholderPanelSection = styled.div`
@@ -116,7 +119,12 @@ function PrimePanel() {
     ExploreContext
   );
 
-  const [selectedModel, setSelectedModel] = useState(null);
+  const { isAuthenticated } = useAuth0();
+
+  const { selectedModel, setSelectedModel, modelsList } = useContext(
+    GlobalContext
+  );
+
   const [showSelectModelModal, setShowSelectModelModal] = useState(false);
   const [inference, setInference] = useState(false);
 
@@ -165,19 +173,19 @@ function PrimePanel() {
 
     }
   }, [retraining samples ])
-   */
+  */
 
-  /*
-     Check point based settings
-    useEffect(() => {
-     if (checkpoint) {
+  /* Check point based settings
+  useEffect(() => {
+    if (checkpoint) {
       //Post-retraining (Checkpoint), AOI unchanged
-       setApplyState(false)
-       setApplyText('Retrain Checkpoint')
-       setApplyTooltip('Select retraining samples to retrain checkpoint')
-     }
-     }, [checkpoint])
-     * */
+      setApplyState(false)
+      setApplyText('Retrain Checkpoint')
+      setApplyTooltip('Select retraining samples to retrain checkpoint')
+    }
+  }, [checkpoint])
+  */
+  const { models } = modelsList.isReady() && modelsList.getData();
 
   return (
     <>
@@ -217,7 +225,12 @@ function PrimePanel() {
                   <Subheading>Selected Model</Subheading>
                 </HeadOptionHeadline>
                 <SubheadingStrong>
-                  {selectedModel || 'Select Model'}
+                  {(selectedModel && selectedModel.name) ||
+                    (isAuthenticated
+                      ? models && models.length
+                        ? 'Select Model'
+                        : 'No models available'
+                      : 'Login to select model')}
                 </SubheadingStrong>
                 <HeadOptionToolbar>
                   <EditButton
@@ -227,6 +240,7 @@ function PrimePanel() {
                       setShowSelectModelModal(true);
                     }}
                     title='Edit Model'
+                    disabled={!models?.length}
                   >
                     Edit Model Selection
                   </EditButton>
@@ -303,7 +317,7 @@ function PrimePanel() {
         onOverlayClick={() => {
           setShowSelectModelModal(false);
         }}
-        data={availableModels}
+        data={models || []}
         renderCard={(model) => (
           <Card
             id={`model-${model.name}-card`}
@@ -313,7 +327,7 @@ function PrimePanel() {
             borderlessMedia
             onClick={() => {
               setShowSelectModelModal(false);
-              setSelectedModel(model.name);
+              setSelectedModel(model);
             }}
           />
         )}
