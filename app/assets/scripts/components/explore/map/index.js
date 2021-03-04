@@ -128,7 +128,7 @@ function Map() {
     map.aoi.control.edit = new AoiEditControl(map, {
       onBoundsChange: (bbox) => {
         setAoiArea(areaFromBounds(bbox));
-      }
+      },
     });
   }, [map, apiLimits]); // eslint-disable-line react-hooks/exhaustive-deps
 

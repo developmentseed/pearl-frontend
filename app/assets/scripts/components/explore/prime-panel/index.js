@@ -124,7 +124,7 @@ function AoiEditButtons(props) {
                   </Button>
                 )}
                 <Button onClick={() => setActiveModal(false)}>
-                  Modify Area
+                  Keep editing
                 </Button>
               </>
             )}
