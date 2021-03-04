@@ -46,7 +46,6 @@ export function GlobalContextProvider(props) {
     initialApiRequestState
   );
 
-
   useEffect(() => {
     queryRestApiHealth()(dispatchRestApiStatus);
   }, []);
@@ -96,7 +95,7 @@ export function GlobalContextProvider(props) {
         subPath: `${project.id}/checkpoint`,
       })(dispatchProjectCheckpoints);
     }
-  }, [currentProject]);
+  }, [apiToken, currentProject]);
 
   /* Post updates to the API */
   useEffect(() => {
@@ -139,6 +138,8 @@ export function GlobalContextProvider(props) {
           apiToken,
           modelsList,
           projectsList,
+          projectCheckpoints,
+
           selectedModel,
           setSelectedModel,
 

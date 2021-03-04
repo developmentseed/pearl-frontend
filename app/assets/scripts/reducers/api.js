@@ -46,7 +46,7 @@ export const createApiMetaReducer = wrapLogReducer(makeAPIReducer('API_META'));
  * else if subpathProvided -> get by subpath (endpoint/subpath)
  * else  if id provided-> get by id (endpoint/id)
  */
-export function queryApiGet({ endpoint, id, subPath, token, name}) {
+export function queryApiGet({ endpoint, id, subPath, token, name }) {
   if (!token) {
     throw new Error(`Token required for ${endpoint}`);
   }
