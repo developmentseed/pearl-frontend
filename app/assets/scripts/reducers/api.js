@@ -46,20 +46,19 @@ export const createApiMetaReducer = wrapLogReducer(makeAPIReducer('API_META'));
  * else if subpathProvided -> get by subpath (endpoint/subpath)
  * else  if id provided-> get by id (endpoint/id)
  */
-export function queryApiGet({ endpoint, id, subPath, token }) {
+export function queryApiGet({ endpoint, id, subPath, token, name}) {
   if (!token) {
     throw new Error(`Token required for ${endpoint}`);
   }
   const queryApiGetActions = makeAbortableActions(
-    `API_GET_${endpoint.toUpperCase()}`
+    `API_GET_${(name || endpoint).toUpperCase()}`
   );
-  let url = `${restApiEndpoint}/api/${endpoint}`
+  let url = `${restApiEndpoint}/api/${endpoint}`;
 
   if (subPath) {
-    url =`${url}/${subPath}`
-  } else if (id){
-    url = `${url}/${id}`
-
+    url = `${url}/${subPath}`;
+  } else if (id) {
+    url = `${url}/${id}`;
   }
   return makeFetchThunk({
     url,
@@ -83,12 +82,12 @@ export const createQueryApiGetReducer = (endpoint) =>
  * if id is undefined -> List  results
  * else -> get by id
  */
-export function queryApiPost({ endpoint, query, token }) {
+export function queryApiPost({ endpoint, query, token, name }) {
   if (!token) {
     throw new Error(`Token required for ${endpoint}`);
   }
   const queryApiPostActions = makeAbortableActions(
-    `API_POST_${endpoint.toUpperCase()}`
+    `API_POST_${(name || endpoint).toUpperCase()}`
   );
   return makeFetchThunk({
     url: `${restApiEndpoint}/api/${endpoint}`,
