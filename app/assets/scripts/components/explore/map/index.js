@@ -87,6 +87,12 @@ function Map() {
         if (map) {
           map.aoi.control.draw.disable();
           map.aoi.control.edit.disable();
+          if (
+            previousViewMode === viewModes.CREATE_AOI_MODE ||
+            previousViewMode === viewModes.EDIT_AOI_MODE
+          ) {
+            map.fitBounds(aoiRef.getBounds(), { padding: [25, 25] });
+          }
         }
         break;
       case viewModes.EDIT_CLASS_MODE:
