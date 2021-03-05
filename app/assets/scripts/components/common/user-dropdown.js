@@ -3,7 +3,7 @@ import { Button } from '@devseed-ui/button';
 import CardList from './card-list';
 import { Modal as BaseModal } from '@devseed-ui/modal';
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import {
   Dropdown,
   DropdownHeader,
@@ -62,6 +62,7 @@ const propsToFilter = [
 const StyledLink = filterComponentProps(Link, propsToFilter);
 
 function UserDropdown() {
+  const location = useLocation();
   const { isAuthenticated, loginWithRedirect, logout } = useAuth0();
   const logoutWithRedirect = () =>
     logout({
@@ -121,14 +122,18 @@ function UserDropdown() {
                   My Saved Maps
                 </DropdownItem>
               </li>
-              <li>
-                <DropdownItem
-                  useIcon='git-fork'
-                  onClick={() => setShowCheckpoints(true)}
-                >
-                  My Checkpoints
-                </DropdownItem>
-              </li>
+              {location &&
+                location.pathname &&
+                location.pathname.startsWith('/explore') && (
+                  <li>
+                    <DropdownItem
+                      useIcon='git-fork'
+                      onClick={() => setShowCheckpoints(true)}
+                    >
+                      My Checkpoints
+                    </DropdownItem>
+                  </li>
+                )}
               <li>
                 <DropdownItem as={StyledLink} to='/' useIcon='house'>
                   Visit Homepage
