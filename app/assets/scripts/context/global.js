@@ -14,8 +14,12 @@ import { useAuth0 } from '@auth0/auth0-react';
 
 const GlobalContext = createContext({});
 export function GlobalContextProvider(props) {
-  const { isAuthenticated, getAccessTokenWithPopup } = useAuth0();
-  const [apiToken, setApiToken] = useLocalStorage();
+  const {
+    isAuthenticated,
+    getAccessTokenWithPopup,
+    isLoading: auth0IsLoading,
+  } = useAuth0();
+  const [apiToken, setApiToken, removeApiToken] = useLocalStorage();
 
   const [restApiHealth, dispatchRestApiStatus] = useReducer(
     createRestApiHealthReducer,
@@ -63,10 +67,16 @@ export function GlobalContextProvider(props) {
     }
 
     const { isReady, hasError } = restApiHealth;
-    if (isReady() && !hasError() && isAuthenticated && !apiToken) {
-      getApiToken();
+    if (isReady() && !hasError() && !auth0IsLoading) {
+      if (isAuthenticated && !apiToken) {
+        // Get API token if user has signed in
+        getApiToken();
+      } else if (!isAuthenticated && apiToken) {
+        // Clear it on sign off
+        removeApiToken();
+      }
     }
-  }, [restApiHealth, isAuthenticated]); // eslint-disable-line
+  }, [restApiHealth, isAuthenticated, auth0IsLoading]); // eslint-disable-line
 
   useEffect(() => {
     /*
