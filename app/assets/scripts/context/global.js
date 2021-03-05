@@ -8,14 +8,14 @@ import {
   queryApiGet,
 } from '../reducers/api';
 import { createQueryApiPostReducer, queryApiPost } from '../reducers/api';
-
+import useLocalStorage from '@rooks/use-localstorage';
 import config from '../config';
 import { useAuth0 } from '@auth0/auth0-react';
 
 const GlobalContext = createContext({});
 export function GlobalContextProvider(props) {
   const { isAuthenticated, getAccessTokenWithPopup } = useAuth0();
-  const [apiToken, setApiToken] = useState();
+  const [apiToken, setApiToken] = useLocalStorage();
 
   const [restApiHealth, dispatchRestApiStatus] = useReducer(
     createRestApiHealthReducer,
@@ -63,7 +63,7 @@ export function GlobalContextProvider(props) {
     }
 
     const { isReady, hasError } = restApiHealth;
-    if (isReady() && !hasError() && isAuthenticated) {
+    if (isReady() && !hasError() && isAuthenticated && !apiToken) {
       getApiToken();
     }
   }, [restApiHealth, isAuthenticated]); // eslint-disable-line
