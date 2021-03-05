@@ -1,6 +1,5 @@
 import React, { useState, useMemo, useContext, useEffect } from 'react';
 import styled from 'styled-components';
-import toasts from '../../common/toasts';
 import { convertArea } from '@turf/helpers';
 import tArea from '@turf/area';
 import tBboxPolygon from '@turf/bbox-polygon';
@@ -87,6 +86,12 @@ function Map() {
         if (map) {
           map.aoi.control.draw.disable();
           map.aoi.control.edit.disable();
+          if (
+            previousViewMode === viewModes.CREATE_AOI_MODE ||
+            previousViewMode === viewModes.EDIT_AOI_MODE
+          ) {
+            map.fitBounds(aoiRef.getBounds(), { padding: [25, 25] });
+          }
         }
         break;
       case viewModes.EDIT_CLASS_MODE:
@@ -108,28 +113,12 @@ function Map() {
       control: {},
     };
 
-    // Check if API has limits and area is larger than them
-    function checkAreaSize(bbox) {
-      // Show toast on large area
-      if (
-        apiLimits &&
-        apiLimits.max_inference &&
-        apiLimits.max_inference < areaFromBounds(bbox)
-      ) {
-        toasts.error('AOI is too large.', {
-          autoClose: 3000,
-        });
-        return false;
-      } else return true;
-    }
-
     // Draw control, for creating an AOI
     map.aoi.control.draw = new AoiDrawControl(map, {
       onDrawChange: (bbox) => {
         setAoiArea(areaFromBounds(bbox));
       },
       onDrawEnd: (bbox, shape) => {
-        checkAreaSize(bbox);
         setAoiRef(shape);
         setViewMode(viewModes.EDIT_AOI_MODE);
       },
@@ -139,9 +128,6 @@ function Map() {
     map.aoi.control.edit = new AoiEditControl(map, {
       onBoundsChange: (bbox) => {
         setAoiArea(areaFromBounds(bbox));
-      },
-      onBoundsChangeEnd: (bbox) => {
-        checkAreaSize(bbox);
       },
     });
   }, [map, apiLimits]); // eslint-disable-line react-hooks/exhaustive-deps
