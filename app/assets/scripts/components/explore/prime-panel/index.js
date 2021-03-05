@@ -41,7 +41,7 @@ import { availableLayers } from '../sample-data';
 import { formatThousands } from '../../../utils/format';
 
 const PlaceholderPanelSection = styled.div`
-  padding: 1rem;
+  padding: ${glsp()};
 `;
 
 const SubheadingStrong = styled.h3`
@@ -51,18 +51,18 @@ const SubheadingStrong = styled.h3`
 `;
 
 const StyledPanelBlock = styled(PanelBlock)`
-  width: 24rem;
+  width: ${glsp(24)};
 `;
 
 const PanelBlockHeader = styled(BasePanelBlockHeader)`
   display: grid;
-  grid-gap: 1rem;
+  grid-gap: ${glsp()};
 `;
 
 const PanelControls = styled(PanelBlockFooter)`
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-gap: 1rem;
+  grid-gap: ${glsp()};
 `;
 
 const ModalFooter = styled(BaseModalFooter)`
