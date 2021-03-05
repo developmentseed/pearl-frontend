@@ -41,10 +41,19 @@ export const createApiMetaReducer = wrapLogReducer(makeAPIReducer('API_META'));
 
 /*
  * API Endpoint reducer
- * Use to query any get endpoint
- * if id is undefined -> List  results
- * else if subpathProvided -> get by subpath (endpoint/subpath)
- * else  if id provided-> get by id (endpoint/id)
+ * Use to query any get endpoint.
+ * Endpoints follow one of the following formats
+ * /endpoint - generally used for listing
+ * /endpoint/{id} - generally used to GET a resource
+ * /endpoint/{id}/subPath - used to get and list
+ *
+ * @param endpoint - required string
+ * @param id - optional string, can be added if relevant to the request
+ * @param subPath - optional string, can be added if relevant to the request
+ * @param token - required access token
+ * @param name - will override endpoint as the name of the reducer. Useful
+ *                when using subPath. i.e. /project/{id}/checkpoint should be
+ *                called CHECKPOINT not PROJECT
  */
 export function queryApiGet({ endpoint, id, subPath, token, name }) {
   if (!token) {
@@ -78,9 +87,13 @@ export const createQueryApiGetReducer = (endpoint) =>
 
 /*
  * API Endpoint reducer
- * Use to query any get endpoint
- * if id is undefined -> List  results
- * else -> get by id
+ * Use to query any post endpoint.
+ *
+ * @param endpoint - required string
+ * @param token - required access token
+ * @param name - optional override to use as name of reducer. Otherwise
+ *                {endpoint} will be used as the name
+ * @param query - JSON object payload
  */
 export function queryApiPost({ endpoint, query, token, name }) {
   if (!token) {
