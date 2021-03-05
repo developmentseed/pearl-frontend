@@ -13,6 +13,7 @@ import {
   DropdownTrigger,
 } from '../../styles/dropdown';
 import { Heading } from '@devseed-ui/typography';
+import { glsp } from '@devseed-ui/theme-provider';
 import {
   FormGroup,
   FormGroupHeader,
@@ -32,7 +33,23 @@ const Modal = styled(BaseModal)`
     padding: 1rem;
   }
 `;
-//
+
+const Headline = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding-bottom: ${glsp(1)};
+
+  h1 {
+    margin: 0;
+  }
+
+  ${Button} {
+    height: min-content;
+    align-self: center;
+  }
+`;
+
 // Please refer to filterComponentProps to understand why this is needed
 const propsToFilter = [
   'variation',
@@ -136,7 +153,19 @@ function UserDropdown() {
         onOverlayClick={() => setShowCheckpoints(false)}
         renderHeader={() => (
           <>
-            <Heading>Saved Checkpoints</Heading>
+            <Headline>
+              {' '}
+              <Heading>Saved Checkpoints</Heading>
+              <Button
+                hideText
+                variation='base-plain'
+                size='small'
+                useIcon='xmark'
+                onClick={() => setShowCheckpoints(false)}
+              >
+                Close modal
+              </Button>
+            </Headline>
             <FormGroup>
               <FormGroupHeader>
                 <FormLabel htmlFor='checkpoint-filter'>
@@ -169,7 +198,9 @@ function UserDropdown() {
                 title={ckpt.name}
                 details={ckpt}
                 key={ckpt.id}
-                cardMedia={<img src='https://place-hold.it/120x68/#dbdbd' />}
+                cardMedia={
+                  <img width='100%' src='https://place-hold.it/120x68/#dbdbd' />
+                }
                 expanded
               />
             )}
