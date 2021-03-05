@@ -13,13 +13,13 @@ import {
   PanelBlockFooter,
 } from '../../common/panel-block';
 import { Subheading } from '../../../styles/type/heading';
-import SelectModal from '../select-modal';
+import SelectModal from '../../common/select-modal';
+import { Card } from '../../common/card-list';
 import {
   Modal,
   ModalHeadline,
   ModalFooter as BaseModalFooter,
 } from '@devseed-ui/modal';
-import { Card } from '../card-list';
 import { PlaceholderMessage } from '../../../styles/placeholder.js';
 import { ExploreContext, viewModes } from '../../../context/explore';
 import GlobalContext from '../../../context/global';
