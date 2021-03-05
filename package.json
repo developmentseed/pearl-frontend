@@ -106,7 +106,7 @@
     "@devseed-ui/dropdown": "^2.0.0",
     "@devseed-ui/form": "^1.0.1",
     "@devseed-ui/global-loading": "^2.0.0",
-    "@devseed-ui/modal": "^2.0.0",
+    "@devseed-ui/modal": "^3.0.0",
     "@devseed-ui/theme-provider": "^3.0.0",
     "@devseed-ui/typography": "^1.0.0",
     "@react-leaflet/core": "^1.0.2",

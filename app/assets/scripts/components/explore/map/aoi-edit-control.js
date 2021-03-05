@@ -14,8 +14,10 @@ const icons = {
 class AoiEditControl {
   constructor(map, { onBoundsChange, onBoundsChangeEnd }) {
     this._map = map;
-    this.onBoundsChangeEnd = () => onBoundsChangeEnd(this._getBbox());
-    this.onBoundsChange = () => onBoundsChange(this._getBbox());
+    this.onBoundsChangeEnd = () =>
+      onBoundsChangeEnd && onBoundsChangeEnd(this._getBbox());
+    this.onBoundsChange = () =>
+      onBoundsChange && onBoundsChange(this._getBbox());
   }
 
   enable(shape) {

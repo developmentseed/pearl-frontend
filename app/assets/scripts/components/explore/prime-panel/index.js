@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
 import styled from 'styled-components';
-import { themeVal } from '@devseed-ui/theme-provider';
+import { themeVal, glsp } from '@devseed-ui/theme-provider';
 import { Button } from '@devseed-ui/button';
 import T from 'prop-types';
 import { useAuth0 } from '@auth0/auth0-react';
@@ -14,6 +14,11 @@ import {
 } from '../../common/panel-block';
 import { Subheading } from '../../../styles/type/heading';
 import SelectModal from '../select-modal';
+import {
+  Modal,
+  ModalHeadline,
+  ModalFooter as BaseModalFooter,
+} from '@devseed-ui/modal';
 import { Card } from '../card-list';
 import { PlaceholderMessage } from '../../../styles/placeholder.js';
 import { ExploreContext, viewModes } from '../../../context/explore';
@@ -36,7 +41,7 @@ import { availableLayers } from '../sample-data';
 import { formatThousands } from '../../../utils/format';
 
 const PlaceholderPanelSection = styled.div`
-  padding: 1rem;
+  padding: ${glsp()};
 `;
 
 const SubheadingStrong = styled.h3`
@@ -46,22 +51,34 @@ const SubheadingStrong = styled.h3`
 `;
 
 const StyledPanelBlock = styled(PanelBlock)`
-  width: 24rem;
+  width: ${glsp(24)};
 `;
 
 const PanelBlockHeader = styled(BasePanelBlockHeader)`
   display: grid;
-  grid-gap: 1rem;
+  grid-gap: ${glsp()};
 `;
 
 const PanelControls = styled(PanelBlockFooter)`
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-gap: 1rem;
+  grid-gap: ${glsp()};
+`;
+
+const ModalFooter = styled(BaseModalFooter)`
+  padding: ${glsp(2)} 0 0 0;
+  > button,
+  ${Button} {
+    flex: 1;
+    margin: 0;
+    border-radius: 0;
+  }
 `;
 
 function AoiEditButtons(props) {
   const { setViewMode, viewMode, aoiRef, aoiArea, apiLimits } = props;
+
+  const [activeModal, setActiveModal] = useState(false);
 
   // Display confirm/cancel buttons when AOI edition is active
   if (
@@ -72,21 +89,69 @@ function AoiEditButtons(props) {
       <>
         <EditButton
           onClick={function () {
-            setViewMode(viewModes.BROWSE_MODE);
+            if (!apiLimits || apiLimits.live_inference > aoiArea) {
+              setViewMode(viewModes.BROWSE_MODE);
+            } else if (apiLimits.max_inference > aoiArea) {
+              setActiveModal('no-live-inference');
+            } else {
+              setActiveModal('area-too-large');
+            }
           }}
           title='Set Area of Interest'
           useIcon='tick'
-          disabled={
-            !aoiArea ||
-            aoiArea === 0 ||
-            (apiLimits &&
-              apiLimits.max_inference &&
-              apiLimits.max_inference < aoiArea)
-          }
         >
           Select AOI
         </EditButton>
         <EditButton useIcon='xmark'>Select AOI</EditButton>
+        {activeModal && (
+          <Modal
+            id='confirm-area-size'
+            revealed={true}
+            size='small'
+            closeButton={false}
+            renderHeadline={() => (
+              <ModalHeadline>
+                <h1>Save Area</h1>
+              </ModalHeadline>
+            )}
+            content={
+              activeModal === 'no-live-inference' ? (
+                <div>
+                  Live inference is not available for areas larger than{' '}
+                  {formatThousands(apiLimits.live_inference)} km2.
+                </div>
+              ) : (
+                <div>
+                  Area size is limited to{' '}
+                  {formatThousands(apiLimits.max_inference)} km2.
+                </div>
+              )
+            }
+            renderFooter={() => (
+              <ModalFooter>
+                {activeModal && activeModal !== 'area-too-large' && (
+                  <Button
+                    size='xlarge'
+                    variation='base-plain'
+                    onClick={() => {
+                      setActiveModal(false);
+                      setViewMode(viewModes.BROWSE_MODE);
+                    }}
+                  >
+                    Proceed anyway
+                  </Button>
+                )}
+                <Button
+                  size='xlarge'
+                  variation='primary-plain'
+                  onClick={() => setActiveModal(false)}
+                >
+                  Keep editing
+                </Button>
+              </ModalFooter>
+            )}
+          />
+        )}
       </>
     );
   }
