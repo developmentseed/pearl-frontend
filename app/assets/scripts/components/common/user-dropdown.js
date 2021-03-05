@@ -3,6 +3,7 @@ import { Button } from '@devseed-ui/button';
 import CardList from './card-list';
 import { Modal as BaseModal } from '@devseed-ui/modal';
 import styled from 'styled-components';
+import { Link } from 'react-router-dom';
 import {
   Dropdown,
   DropdownHeader,
@@ -24,12 +25,24 @@ import { useAuth0 } from '@auth0/auth0-react';
 import { Card } from '../common/card-list';
 
 import { availableCheckpoints } from '../explore/sample-data';
+import { filterComponentProps } from '../../styles/utils/general';
 
 const Modal = styled(BaseModal)`
   .modal__contents {
     padding: 1rem;
   }
 `;
+//
+// Please refer to filterComponentProps to understand why this is needed
+const propsToFilter = [
+  'variation',
+  'size',
+  'hideText',
+  'useIcon',
+  'active',
+  'visuallyDisabled',
+];
+const StyledLink = filterComponentProps(Link, propsToFilter);
 
 function UserDropdown() {
   const { isAuthenticated, loginWithRedirect, logout } = useAuth0();
@@ -78,10 +91,18 @@ function UserDropdown() {
             </DropdownHeader>
             <DropdownBody>
               <li>
-                <DropdownItem useIcon='folder'>My Projects</DropdownItem>
+                <DropdownItem
+                  as={StyledLink}
+                  to='/profile/projects'
+                  useIcon='folder'
+                >
+                  My Projects
+                </DropdownItem>
               </li>
               <li>
-                <DropdownItem useIcon='map'>My Saved Maps</DropdownItem>
+                <DropdownItem as={StyledLink} to='/profile/maps' useIcon='map'>
+                  My Saved Maps
+                </DropdownItem>
               </li>
               <li>
                 <DropdownItem
@@ -92,7 +113,7 @@ function UserDropdown() {
                 </DropdownItem>
               </li>
               <li>
-                <DropdownItem useIcon='house' to='/'>
+                <DropdownItem as={StyledLink} to='/' useIcon='house'>
                   Visit Homepage
                 </DropdownItem>
               </li>
