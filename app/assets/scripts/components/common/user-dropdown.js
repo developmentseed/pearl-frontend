@@ -161,10 +161,7 @@ function UserDropdown() {
             style={{ height: '45vh' }}
             data={availableCheckpoints}
             filterCard={(card) => {
-              return Object.values(card)
-                .map((v) => String(v).toLowerCase())
-                .join(',')
-                .includes(checkpointFilterString.toLowerCase());
+              return card.name.includes(checkpointFilterString.toLowerCase());
             }}
             renderCard={(ckpt) => (
               <Card
