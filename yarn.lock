@@ -984,26 +984,18 @@
     "@devseed-ui/collecticons" "2.0.0"
     "@devseed-ui/theme-provider" "^3.0.0"
 
-"@devseed-ui/modal@^2.0.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@devseed-ui/modal/-/modal-2.0.0.tgz#29aa73038985edf7153fe68781da16e12f175bfe"
-  integrity sha512-/MzdXPeTsz6UcMKpAPGIXzzolGjXy7eJ1hWHCN1O5NDrg2Jg9ldAegTJ0g6IGdn4eoa8QlursJYkVRxeAe7Ucg==
+"@devseed-ui/modal@^3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@devseed-ui/modal/-/modal-3.0.0.tgz#3033dd9b6cba901d9babf106f047db0cad2f6b1b"
+  integrity sha512-SXfofVotfzGO4Qr+7l5S2940F7yKP10MrhpeYWmix30EJAe3j0v5qzVw1ep5AGsfS12ZLCRRLtG1i1S7wTdINQ==
   dependencies:
-    "@devseed-ui/theme-provider" "^2.4.0"
+    "@devseed-ui/theme-provider" "^3.0.0"
     react-transition-group "^4.3.0"
 
 "@devseed-ui/theme-provider@3.0.0", "@devseed-ui/theme-provider@^3.0.0":
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/@devseed-ui/theme-provider/-/theme-provider-3.0.0.tgz#13b22818f5ab3dc11d99b82d21e11afbde3ff487"
   integrity sha512-/l5hVfWSGJe91m0NjO0tUNgoqCsCpr32VwCPhugc37qgvi/1tF54vwSl2hEz4CA4VPpbtCpxKrmb8234vhd7lw==
-  dependencies:
-    lodash.get "^4.4.2"
-    polished "^3.4.2"
-
-"@devseed-ui/theme-provider@^2.4.0":
-  version "2.4.0"
-  resolved "https://registry.yarnpkg.com/@devseed-ui/theme-provider/-/theme-provider-2.4.0.tgz#69685a38fc9e2a444e414b7adbbb0e661bbc377e"
-  integrity sha512-pJpd7jwV0HEu2EDWUQFMXyCE7RR5HIR+j9jNFHMvhl/ceL5YlzIxkN/66g9uxyM4DIWs+Y9Xco3OpLMT+4fZbA==
   dependencies:
     lodash.get "^4.4.2"
     polished "^3.4.2"
