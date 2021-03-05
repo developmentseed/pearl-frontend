@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
 import styled from 'styled-components';
-import { themeVal } from '@devseed-ui/theme-provider';
+import { themeVal, glsp } from '@devseed-ui/theme-provider';
 import { Button } from '@devseed-ui/button';
 import T from 'prop-types';
 import { useAuth0 } from '@auth0/auth0-react';
@@ -14,7 +14,11 @@ import {
 } from '../../common/panel-block';
 import { Subheading } from '../../../styles/type/heading';
 import SelectModal from '../select-modal';
-import { Modal, ModalHeadline } from '@devseed-ui/modal';
+import {
+  Modal,
+  ModalHeadline,
+  ModalFooter as BaseModalFooter,
+} from '@devseed-ui/modal';
 import { Card } from '../card-list';
 import { PlaceholderMessage } from '../../../styles/placeholder.js';
 import { ExploreContext, viewModes } from '../../../context/explore';
@@ -61,6 +65,16 @@ const PanelControls = styled(PanelBlockFooter)`
   grid-gap: 1rem;
 `;
 
+const ModalFooter = styled(BaseModalFooter)`
+  padding: ${glsp(2)} 0 0 0;
+  > button,
+  ${Button} {
+    flex: 1;
+    margin: 0;
+    border-radius: 0;
+  }
+`;
+
 function AoiEditButtons(props) {
   const { setViewMode, viewMode, aoiRef, aoiArea, apiLimits } = props;
 
@@ -93,6 +107,7 @@ function AoiEditButtons(props) {
           <Modal
             id='confirm-area-size'
             revealed={true}
+            size='small'
             renderHeadline={() => (
               <ModalHeadline>
                 <h1>Save Area</h1>
@@ -112,9 +127,11 @@ function AoiEditButtons(props) {
               )
             }
             renderFooter={() => (
-              <>
+              <ModalFooter>
                 {activeModal && activeModal !== 'area-too-large' && (
                   <Button
+                    size='xlarge'
+                    variation='base-plain'
                     onClick={() => {
                       setActiveModal(false);
                       setViewMode(viewModes.BROWSE_MODE);
@@ -123,10 +140,14 @@ function AoiEditButtons(props) {
                     Proceed anyway
                   </Button>
                 )}
-                <Button onClick={() => setActiveModal(false)}>
+                <Button
+                  size='xlarge'
+                  variation='primary-plain'
+                  onClick={() => setActiveModal(false)}
+                >
                   Keep editing
                 </Button>
-              </>
+              </ModalFooter>
             )}
           />
         )}
