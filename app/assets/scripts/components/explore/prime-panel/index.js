@@ -108,6 +108,7 @@ function AoiEditButtons(props) {
             id='confirm-area-size'
             revealed={true}
             size='small'
+            closeButton={false}
             renderHeadline={() => (
               <ModalHeadline>
                 <h1>Save Area</h1>
