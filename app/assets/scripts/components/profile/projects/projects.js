@@ -40,8 +40,28 @@ function Projects(props) {
       <Inpage>
         <InpageHeader>
           <InpageHeaderInner>
-            <InpageHeadline>
+            <InpageHeadline
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr auto',
+                gridTemplateRows: '1fr',
+                width: '100%',
+                justifyContent: 'space-between'
+              }}
+            >
               <InpageTitle>Projects</InpageTitle>
+              <Button
+                forwardedAs={StyledNavLink}
+                to='/explore'
+                variation='base-raised-semidark'
+                useIcon={['plus', 'after']}
+                title='Launch application'
+                style={{
+                  alignSelf: 'center'
+                }}
+              >
+                New Project
+              </Button>
             </InpageHeadline>
           </InpageHeaderInner>
         </InpageHeader>
@@ -49,7 +69,7 @@ function Projects(props) {
           <NavPane>
             <NavList>
               <li>
-                <StyledNavLink to='/profile/projects' dclassName='active'>
+                <StyledNavLink to='/profile/projects' className='active'>
                   {' '}
                   Projects
                 </StyledNavLink>
@@ -71,9 +91,9 @@ function Projects(props) {
                   key={proj.id}
                   details={{
                     edited: proj.created,
-                    model: proj.model,
-                    checkpoint: proj.checkpoint,
-                    aoi: proj.aoi,
+                    model: proj.model || 'No model set',
+                    checkpoint: proj.checkpoint || 'No checkpoint set',
+                    aoi: proj.aoi || 'No AOI set',
                     results: (
                       <CardResults>
                         <Button

@@ -6,6 +6,7 @@ import { toTitleCase } from '../../utils/format';
 const List = styled.ol`
   li {
     display: grid;
+    grid-gap: 0.5rem;
     grid-template-columns: 1fr 2fr;
     h1 {
       margin: 0;
