@@ -12,6 +12,7 @@ import {
   InpageBody,
 } from '../../../styles/inpage';
 import { glsp } from '@devseed-ui/theme-provider';
+import { Heading } from '@devseed-ui/typography';
 import { StyledNavLink } from '../../../styles/links';
 
 const ProjectsBody = styled(InpageBody)`
@@ -80,7 +81,7 @@ function Projects(props) {
             </NavList>
           </NavPane>
 
-          {projects && (
+          {projects ? (
             <CardList
               numColumns={1}
               data={projects}
@@ -124,7 +125,7 @@ function Projects(props) {
                 />
               )}
             />
-          )}
+          ) : <Heading>No projects available </Heading>}
         </ProjectsBody>
       </Inpage>
     </>
