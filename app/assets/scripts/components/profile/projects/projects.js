@@ -46,7 +46,7 @@ function Projects(props) {
                 gridTemplateColumns: '1fr auto',
                 gridTemplateRows: '1fr',
                 width: '100%',
-                justifyContent: 'space-between'
+                justifyContent: 'space-between',
               }}
             >
               <InpageTitle>Projects</InpageTitle>
@@ -57,7 +57,7 @@ function Projects(props) {
                 useIcon={['plus', 'after']}
                 title='Launch application'
                 style={{
-                  alignSelf: 'center'
+                  alignSelf: 'center',
                 }}
               >
                 New Project
