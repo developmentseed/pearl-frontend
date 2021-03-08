@@ -5,38 +5,7 @@ import { PanelBlockBody } from '../common/panel-block';
 import DetailsList from './details-list';
 import T from 'prop-types';
 
-import { truncated, themeVal } from '@devseed-ui/theme-provider';
-
-export const CardWrapper = styled.article`
-  display: grid;
-  ${({ expanded }) => {
-    if (expanded) {
-      return css`
-        grid-template-columns: 1fr;
-        grid-template-rows: 3fr 1fr 3fr;
-      `;
-    } else {
-      return css`
-        grid-template-columns: 1fr 4fr;
-        height: 3.5rem;
-      `;
-    }
-  }}
-  padding: 0.5rem;
-  border: 1px solid ${themeVal('color.baseAlphaC')};
-  border-radius: ${themeVal('shape.rounded')};
-
-  box-shadow: 0 0 16px 2px ${themeVal('color.baseAlphaA')},
-    0 8px 24px -16px ${themeVal('color.baseAlphaB')};
-
-  cursor: pointer;
-  transition: all 0.16s ease 0s;
-  &:hover {
-    box-shadow: 0 0 16px 4px ${themeVal('color.baseAlphaA')},
-      0 8px 24px -8px ${themeVal('color.baseAlphaB')};
-    transform: translate(0, -0.125rem);
-  }
-`;
+import { truncated, themeVal, glsp } from '@devseed-ui/theme-provider';
 
 const CardMedia = styled.figure`
   display: flex;
@@ -61,6 +30,63 @@ const CardMedia = styled.figure`
 const CardTitle = styled.h4`
   ${truncated}
   padding: 1rem 0rem;
+`;
+export const CardWrapper = styled.article`
+  display: grid;
+  grid-gap: ${glsp(1)};
+  ${({ expanded }) => {
+    if (expanded) {
+      return css`
+        grid-template-columns: 1fr;
+        grid-template-rows: 3fr 1fr 3fr;
+      `;
+    } else {
+      return css`
+        grid-template-columns: 1fr 4fr;
+        grid-template-rows: auto 4fr;
+
+        ${CardMedia} {
+          grid-row: 1 / -1;
+        }
+        ${CardTitle} {
+          grid-row: 1;
+        }
+        ol {
+          grid-row: 2;
+        }
+      `;
+    }
+  }}
+
+  ${({ size }) => {
+    if (size == 'large') {
+      return css`
+        height: 12rem;
+      `;
+    } else if (size == 'small') {
+      return css`
+        height: 3.5rem;
+      `;
+    }
+  }}
+
+
+
+
+  padding: 0.5rem;
+  border: 1px solid ${themeVal('color.baseAlphaC')};
+  border-radius: ${themeVal('shape.rounded')};
+
+  box-shadow: 0 0 16px 2px ${themeVal('color.baseAlphaA')},
+    0 8px 24px -16px ${themeVal('color.baseAlphaB')};
+
+  cursor: pointer;
+  transition: all 0.16s ease 0s;
+  &:hover {
+    box-shadow: 0 0 16px 4px ${themeVal('color.baseAlphaA')},
+      0 8px 24px -8px ${themeVal('color.baseAlphaB')};
+    transform: translate(0, -0.125rem);
+  }
 `;
 
 export const Card = ({
@@ -105,7 +131,6 @@ const CardListContainer = styled.ol`
     }
   }};
   gap: 2rem;
-  padding: 1rem 1rem 1rem 0;
 `;
 const CardListScroll = styled(ShadowScrollbar)`
   flex: 1;
@@ -148,7 +173,7 @@ function CardList({
 
 CardList.propTypes = {
   data: T.array,
-  renderCard: T.func,
+  renderCard: T.func.isRequired,
   filterCard: T.func,
   numColumns: T.number,
   nonScrolling: T.bool,
