@@ -81,51 +81,54 @@ function Projects(props) {
             </NavList>
           </NavPane>
 
-          {projects ? (
-            <CardList
-              numColumns={1}
-              data={projects}
-              renderCard={(proj) => (
-                <Card
-                  id={proj.id}
-                  title={proj.name}
-                  key={proj.id}
-                  details={{
-                    edited: proj.created,
-                    model: proj.model || 'No model set',
-                    checkpoint: proj.checkpoint || 'No checkpoint set',
-                    aoi: proj.aoi || 'No AOI set',
-                    results: (
-                      <CardResults>
-                        <Button
-                          variation='base-raised-semidark'
-                          useIcon={['clipboard', 'after']}
-                          size='small'
-                        >
-                          Saved url
-                        </Button>
-                        <Button
-                          variation='base-raised-semidark'
-                          useIcon={['download', 'after']}
-                          size='small'
-                        >
-                          Download
-                        </Button>
-                      </CardResults>
-                    ),
-                  }}
-                  cardMedia={
-                    <img
-                      width='100%'
-                      src='https://place-hold.it/120x68/#dbdbd'
-                    />
-                  }
-                  size='large'
-                  // onClick = set current project
-                />
-              )}
-            />
-          ) : <Heading>No projects available </Heading>}
+          {projects &&
+            (projects.length ? (
+              <CardList
+                numColumns={1}
+                data={projects}
+                renderCard={(proj) => (
+                  <Card
+                    id={proj.id}
+                    title={proj.name}
+                    key={proj.id}
+                    details={{
+                      edited: proj.created,
+                      model: proj.model || 'No model set',
+                      checkpoint: proj.checkpoint || 'No checkpoint set',
+                      aoi: proj.aoi || 'No AOI set',
+                      results: (
+                        <CardResults>
+                          <Button
+                            variation='base-raised-semidark'
+                            useIcon={['clipboard', 'after']}
+                            size='small'
+                          >
+                            Saved url
+                          </Button>
+                          <Button
+                            variation='base-raised-semidark'
+                            useIcon={['download', 'after']}
+                            size='small'
+                          >
+                            Download
+                          </Button>
+                        </CardResults>
+                      ),
+                    }}
+                    cardMedia={
+                      <img
+                        width='100%'
+                        src='https://place-hold.it/120x68/#dbdbd'
+                      />
+                    }
+                    size='large'
+                    // onClick = set current project
+                  />
+                )}
+              />
+            ) : (
+              <Heading>No projects available </Heading>
+            ))}
         </ProjectsBody>
       </Inpage>
     </>
