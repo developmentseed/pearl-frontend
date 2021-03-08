@@ -186,7 +186,7 @@ function PrimePanel() {
 
   const { isAuthenticated } = useAuth0();
 
-  const { selectedModel, setSelectedModel, modelsList } = useContext(
+  const { selectedModel, setSelectedModel, modelsList, mosaicList } = useContext(
     GlobalContext
   );
 
