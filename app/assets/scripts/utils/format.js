@@ -107,3 +107,13 @@ export function formatThousands(num, options) {
     ? `${int}.${dec} ${largeNumUnit}`
     : `${int} ${largeNumUnit}`;
 }
+/**
+ * Returns a title-cased version string passed
+ *
+ * @param {String} str String to make title-cased.
+ */
+export function toTitleCase(str) {
+  return str.replace(/\w\S*/g, function (txt) {
+    return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+  });
+}

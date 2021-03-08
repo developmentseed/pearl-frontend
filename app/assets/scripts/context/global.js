@@ -45,6 +45,11 @@ export function GlobalContextProvider(props) {
     initialApiRequestState
   );
 
+  const [projectCheckpoints, dispatchProjectCheckpoints] = useReducer(
+    createQueryApiGetReducer('checkpoints'),
+    initialApiRequestState
+  );
+
   useEffect(() => {
     queryRestApiHealth()(dispatchRestApiStatus);
   }, []);
@@ -90,6 +95,18 @@ export function GlobalContextProvider(props) {
     queryApiGet({ token: apiToken, endpoint: 'project' })(dispatchProjectsList);
   }, [apiToken]);
 
+  useEffect(() => {
+    if (currentProject.isReady()) {
+      const project = currentProject.getData();
+      queryApiGet({
+        token: apiToken,
+        endpoint: 'project',
+        name: 'checkpoints',
+        subPath: `${project.id}/checkpoint`,
+      })(dispatchProjectCheckpoints);
+    }
+  }, [apiToken, currentProject]);
+
   /* Post updates to the API */
   useEffect(() => {
     /*
@@ -131,6 +148,8 @@ export function GlobalContextProvider(props) {
           apiToken,
           modelsList,
           projectsList,
+          projectCheckpoints,
+
           selectedModel,
           setSelectedModel,
 

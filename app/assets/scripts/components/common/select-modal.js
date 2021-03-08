@@ -41,6 +41,7 @@ function SelectModal(props) {
     renderHeader,
     renderCard,
     filterCard,
+    size,
     nonScrolling,
   } = props;
 
@@ -48,7 +49,7 @@ function SelectModal(props) {
     <Modal
       id={id}
       className='select'
-      size='xlarge'
+      size={size || 'xlarge'}
       revealed={revealed}
       onOverlayClick={onOverlayClick}
       closeButton={false}
@@ -77,5 +78,6 @@ SelectModal.propTypes = {
   renderCard: T.func,
   filterCard: T.func,
   nonScrolling: T.bool,
+  size: T.string,
 };
 export default SelectModal;

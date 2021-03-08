@@ -41,19 +41,36 @@ export const createApiMetaReducer = wrapLogReducer(makeAPIReducer('API_META'));
 
 /*
  * API Endpoint reducer
- * Use to query any get endpoint
- * if id is undefined -> List  results
- * else -> get by id
+ * Use to query any get endpoint.
+ * Endpoints follow one of the following formats
+ * /endpoint - generally used for listing
+ * /endpoint/{id} - generally used to GET a resource
+ * /endpoint/{id}/subPath - used to get and list
+ *
+ * @param endpoint - required string
+ * @param id - optional string, can be added if relevant to the request
+ * @param subPath - optional string, can be added if relevant to the request
+ * @param token - required access token
+ * @param name - will override endpoint as the name of the reducer. Useful
+ *                when using subPath. i.e. /project/{id}/checkpoint should be
+ *                called CHECKPOINT not PROJECT
  */
-export function queryApiGet({ endpoint, id, token }) {
+export function queryApiGet({ endpoint, id, subPath, token, name }) {
   if (!token) {
     throw new Error(`Token required for ${endpoint}`);
   }
   const queryApiGetActions = makeAbortableActions(
-    `API_GET_${endpoint.toUpperCase()}`
+    `API_GET_${(name || endpoint).toUpperCase()}`
   );
+  let url = `${restApiEndpoint}/api/${endpoint}`;
+
+  if (subPath) {
+    url = `${url}/${subPath}`;
+  } else if (id) {
+    url = `${url}/${id}`;
+  }
   return makeFetchThunk({
-    url: `${restApiEndpoint}/api/${endpoint}${id ? `:${id}` : ''}`,
+    url,
     options: {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -70,16 +87,20 @@ export const createQueryApiGetReducer = (endpoint) =>
 
 /*
  * API Endpoint reducer
- * Use to query any get endpoint
- * if id is undefined -> List  results
- * else -> get by id
+ * Use to query any post endpoint.
+ *
+ * @param endpoint - required string
+ * @param token - required access token
+ * @param name - optional override to use as name of reducer. Otherwise
+ *                {endpoint} will be used as the name
+ * @param query - JSON object payload
  */
-export function queryApiPost({ endpoint, query, token }) {
+export function queryApiPost({ endpoint, query, token, name }) {
   if (!token) {
     throw new Error(`Token required for ${endpoint}`);
   }
   const queryApiPostActions = makeAbortableActions(
-    `API_POST_${endpoint.toUpperCase()}`
+    `API_POST_${(name || endpoint).toUpperCase()}`
   );
   return makeFetchThunk({
     url: `${restApiEndpoint}/api/${endpoint}`,

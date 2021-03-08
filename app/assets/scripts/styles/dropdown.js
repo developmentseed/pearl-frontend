@@ -31,7 +31,7 @@ export const DropdownItem = styled.a`
   padding: ${multiply(themeVal('layout.space'), 0.25)}
     ${themeVal('layout.space')};
   grid-gap: ${themeVal('layout.space')};
-  color: ${themeVal('color.base')};
+  color: ${themeVal('color.primary')};
 
   ::before {
     ${({ useIcon }) => useIcon && collecticon(useIcon)}
