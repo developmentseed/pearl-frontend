@@ -16,7 +16,7 @@ import { Form, FormInput } from '@devseed-ui/form';
 import { glsp } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
 import { StyledNavLink } from '../../../styles/links';
-
+import toasts from '../../common/toasts';
 const ProjectsBody = styled(InpageBodyInner)`
   display: grid;
   grid-template-columns: 1fr 4fr;
@@ -41,6 +41,11 @@ const FormInputGroup = styled.div`
   > :last-child:not(:first-child) {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
+  }
+
+  .form__control::selection {
+    background-color: unset;
+    color: unset;
   }
 `;
 
@@ -121,7 +126,7 @@ function Projects(props) {
                             <Form>
                               <FormInputGroup>
                                 <FormInput
-                                  id='site-url'
+                                  id={`${proj.id}-site_url`}
                                   name='site-url'
                                   className='form__control'
                                   type='text'
@@ -134,6 +139,16 @@ function Projects(props) {
                                   useIcon='clipboard'
                                   size='small'
                                   hideText
+                                  onClick={() => {
+                                    document
+                                      .getElementById(`${proj.id}-site_url`)
+                                      .select();
+                                    document.execCommand('copy');
+                                    window.getSelection().removeAllRanges();
+                                    toasts.success('File path copied!', {
+                                      autoClose: 3000,
+                                    });
+                                  }}
                                 >
                                   <span>Copy to clipboard</span>
                                 </Button>
@@ -149,12 +164,6 @@ function Projects(props) {
                           </CardResults>
                         ),
                       }}
-                      // cardMedia={
-                      //   <img
-                      //     width='100%'
-                      //     src='https://place-hold.it/120x68/#dbdbd'
-                      //   />
-                      // }
                       size='large'
                       // onClick = set current project
                     />
