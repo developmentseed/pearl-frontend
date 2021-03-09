@@ -115,6 +115,7 @@
     "@turf/bbox": "^6.3.0",
     "@turf/bbox-polygon": "^6.3.0",
     "@turf/helpers": "^6.3.0",
+    "date-fns": "^2.19.0",
     "element-resize-event": "^3.0.3",
     "gulp-replace": "^1.0.0",
     "history": "^4.10.1",

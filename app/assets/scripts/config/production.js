@@ -15,7 +15,7 @@ module.exports = {
       'https://tiles.lulc-staging.ds.io/mosaic/naip.latest/tiles/{z}/{x}/{y}@1x?bidx=1%2C2%2C3',
     instances: {
       checkInterval: 5000, // 5 s
-      timeout: 5 * 60 * 1000, // 5 min
+      createTimeout: 10 * 60 * 1000, // 10 min
     }
   },
 };

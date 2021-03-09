@@ -1,5 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
 import styled from 'styled-components';
+import { differenceInMilliseconds } from 'date-fns';
 import { themeVal, glsp } from '@devseed-ui/theme-provider';
 import { Button } from '@devseed-ui/button';
 import T from 'prop-types';
@@ -289,10 +290,10 @@ function PrimePanel() {
 
       let instance = currentInstance;
       if (!instance) {
-        showGlobalLoadingMessage('Starting instance...');
+        showGlobalLoadingMessage('Requesting instance to run inference...');
         try {
           instance = await apiClient.createInstance(project.id);
-          console.log(instance);
+          const createdAt = new Date(instance.created);
 
           const intervalId = setInterval(
             getInstanceStatus,
@@ -307,6 +308,16 @@ function PrimePanel() {
               hideGlobalLoading();
             }
 
+            const elapsedTime = differenceInMilliseconds(
+              Date.now(),
+              createdAt,
+            );
+
+            if (elapsedTime > instancesConfig.createTimeout) {
+              toasts.error('Error while creating an instance, please try again later.');
+              stop()
+            }
+
             try {
               status = await apiClient.getInstance(project.id, instance.id);
               console.log(status);
@@ -315,24 +326,19 @@ function PrimePanel() {
               }
             } catch (error) {
               stop();
-              toast.error('An error occured when creating an instance.');
+              toasts.error('Error while creating an instance, please try again later.');
             }
           }
 
           setCurrentInstance(instance);
         } catch (error) {
-          console.log(error)
           hideGlobalLoading();
-          toasts.error('Error while starting an instance, please try again later.');
+          toasts.error(
+            'Error while creating an instance, please try again later.'
+          );
         }
       }
     }
-
-    // show global loading
-    // create project if doesn't exist
-    // init instance if doesn't exist
-    // connect to instance
-    // populate map
   }
 
   return (
