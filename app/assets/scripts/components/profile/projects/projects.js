@@ -20,6 +20,7 @@ const ProjectsBody = styled(InpageBodyInner)`
   display: grid;
   grid-template-columns: 1fr 4fr;
   padding: 0 ${glsp(4)};
+  min-height: 100%;
 `;
 const CardResults = styled.div`
   display: grid;
@@ -55,7 +56,8 @@ function Projects(props) {
               <Button
                 forwardedAs={StyledNavLink}
                 to='/explore'
-                variation='base-raised-semidark'
+                variation='primary-raised-light'
+                size='large'
                 useIcon={['plus', 'after']}
                 title='Launch application'
                 style={{
@@ -108,7 +110,7 @@ function Projects(props) {
                               Saved url
                             </Button>
                             <Button
-                              variation='base-raised-semidark'
+                              variation='primary-plain'
                               useIcon={['download', 'after']}
                               size='small'
                             >
@@ -117,12 +119,12 @@ function Projects(props) {
                           </CardResults>
                         ),
                       }}
-                      cardMedia={
-                        <img
-                          width='100%'
-                          src='https://place-hold.it/120x68/#dbdbd'
-                        />
-                      }
+                      // cardMedia={
+                      //   <img
+                      //     width='100%'
+                      //     src='https://place-hold.it/120x68/#dbdbd'
+                      //   />
+                      // }
                       size='large'
                       // onClick = set current project
                     />

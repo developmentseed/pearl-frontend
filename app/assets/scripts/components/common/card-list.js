@@ -29,25 +29,28 @@ const CardMedia = styled.figure`
 `;
 const CardTitle = styled.h4`
   ${truncated}
-  padding: 1rem 0rem;
 `;
 export const CardWrapper = styled.article`
   display: grid;
   grid-gap: ${glsp(1)};
-  ${({ expanded }) => {
+  ${({ expanded, cardMedia }) => {
     if (expanded) {
       return css`
         grid-template-columns: 1fr;
         grid-template-rows: 3fr 1fr 3fr;
       `;
-    } else {
+    } else if (cardMedia) {
       return css`
         grid-template-columns: 1fr 4fr;
         grid-template-rows: auto 4fr;
-
         ${CardMedia} {
           grid-row: 1 / -1;
         }
+      `;
+    } else {
+      return css`
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
         ${CardTitle} {
           grid-row: 1;
         }
@@ -61,7 +64,7 @@ export const CardWrapper = styled.article`
   ${({ size }) => {
     if (size == 'large') {
       return css`
-        height: 12rem;
+        min-height: 12rem;
       `;
     } else if (size == 'small') {
       return css`
@@ -73,7 +76,7 @@ export const CardWrapper = styled.article`
 
 
 
-  padding: 0.5rem;
+  padding: 1rem;
   border: 1px solid ${themeVal('color.baseAlphaC')};
   border-radius: ${themeVal('shape.rounded')};
 
@@ -100,7 +103,13 @@ export const Card = ({
   expanded,
 }) => {
   return (
-    <CardWrapper id={id} size={size} onClick={onClick} expanded={expanded}>
+    <CardWrapper
+      id={id}
+      size={size}
+      onClick={onClick}
+      expanded={expanded}
+      cardMedia={cardMedia}
+    >
       {cardMedia && (
         <CardMedia borderlessMedia={borderlessMedia}>{cardMedia}</CardMedia>
       )}
