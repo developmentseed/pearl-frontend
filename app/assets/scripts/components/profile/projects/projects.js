@@ -140,14 +140,20 @@ function Projects(props) {
                                   size='small'
                                   hideText
                                   onClick={() => {
-                                    document
-                                      .getElementById(`${proj.id}-site_url`)
-                                      .select();
-                                    document.execCommand('copy');
-                                    window.getSelection().removeAllRanges();
-                                    toasts.success('File path copied!', {
-                                      autoClose: 3000,
-                                    });
+                                    try {
+                                      document
+                                        .getElementById(`${proj.id}-site_url`)
+                                        .select();
+                                      document.execCommand('copy');
+                                      window.getSelection().removeAllRanges();
+                                      toasts.success('File path copied!', {
+                                        autoClose: 3000,
+                                      });
+                                    } catch (err) {
+                                      toasts.error('Copy to clipboard failed', {
+                                        autoClose: 3000,
+                                      });
+                                    }
                                   }}
                                 >
                                   <span>Copy to clipboard</span>
