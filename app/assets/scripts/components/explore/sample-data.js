@@ -10,8 +10,7 @@ export const availableModels = [
   },
 ];
 
-export const availableLayers = [
-];
+export const availableLayers = [];
 
 export const availableCheckpoints = [
   {

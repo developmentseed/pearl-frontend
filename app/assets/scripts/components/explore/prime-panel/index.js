@@ -194,7 +194,7 @@ function PrimePanel() {
     mosaicList,
   } = useContext(GlobalContext);
 
-  const { map, layerIds } = useContext(MapContext);
+  const { map, mapLayers } = useContext(MapContext);
 
   const [showSelectModelModal, setShowSelectModelModal] = useState(false);
   const [inference, setInference] = useState(false);
@@ -341,7 +341,15 @@ function PrimePanel() {
                     mosaicList.isReady() ? mosaicList.getData().mosaics : []
                   }
                   onSliderChange={(name, value) => {
-                    map._layers[layerIds[name]].setOpacity(value);
+                    mapLayers[name].setOpacity(value);
+                    //map._layers[layerIds[name]].setOpacity(value);
+                  }}
+                  onVisibilityToggle={(name, value) => {
+                    if (value) {
+                      map.addLayer(mapLayers[name]);
+                    } else {
+                      map.removeLayer(mapLayers[name]);
+                    }
                   }}
                 />
               </TabbedBlock>

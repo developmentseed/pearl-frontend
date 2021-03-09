@@ -59,7 +59,7 @@ function areaFromBounds(bbox) {
 }
 
 function Map() {
-  const { map, setMap, layerIds, setLayerIds } = useContext(MapContext);
+  const { map, setMap, mapLayers, setMapLayers } = useContext(MapContext);
   const {
     apiLimits,
     aoiRef,
@@ -171,9 +171,9 @@ function Map() {
               maxZoom={18}
               eventHandlers={{
                 add: (v) => {
-                  setLayerIds({
-                    ...layerIds,
-                    [layer]: v.target._leaflet_id,
+                  setMapLayers({
+                    ...mapLayers,
+                    [layer]: v.target,
                   });
                 },
               }}

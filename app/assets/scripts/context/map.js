@@ -4,15 +4,15 @@ import T from 'prop-types';
 export const MapContext = createContext({});
 export function MapProvider(props) {
   const [map, setMap] = useState();
-  const [layerIds, setLayerIds] = useState({});
+  const [mapLayers, setMapLayers] = useState({});
   return (
     <MapContext.Provider
       value={{
         map,
         setMap,
 
-        layerIds,
-        setLayerIds,
+        mapLayers,
+        setMapLayers,
       }}
     >
       {props.children}

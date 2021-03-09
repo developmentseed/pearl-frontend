@@ -52,8 +52,9 @@ const AccordionFold = styled(BaseFold)`
   }
 `;
 
-function Layer({ layer, onSliderChange }) {
+function Layer({ layer, onSliderChange, onVisibilityToggle }) {
   const [value, setValue] = useState(1);
+  const [visible, setVisible] = useState(true);
   return (
     <LayerWrapper>
       <IconPlaceholder />
@@ -81,7 +82,16 @@ function Layer({ layer, onSliderChange }) {
       >
         Info
       </Button>
-      <Button variation='base-plain' size='small' hideText useIcon='eye'>
+      <Button
+        variation='base-plain'
+        size='small'
+        hideText
+        useIcon={visible ? 'eye' : 'eye-disabled'}
+        onClick={() => {
+          setVisible(!visible);
+          onVisibilityToggle(layer.name, !visible);
+        }}
+      >
         Info
       </Button>
     </LayerWrapper>
@@ -91,6 +101,7 @@ function Layer({ layer, onSliderChange }) {
 Layer.propTypes = {
   layer: T.object,
   onSliderChange: T.func,
+  onVisibilityToggle: T.func,
 };
 
 function Category({
@@ -99,6 +110,7 @@ function Category({
   category,
   layers,
   onSliderChange,
+  onVisibilityToggle,
 }) {
   return (
     <AccordionFold
@@ -113,6 +125,7 @@ function Category({
               key={`${category}-${layer.name}`}
               layer={layer}
               onSliderChange={onSliderChange}
+              onVisibilityToggle={onVisibilityToggle}
             />
           ))}
         </Wrapper>
@@ -127,10 +140,17 @@ Category.propTypes = {
   category: T.string,
   layers: T.array,
   onSliderChange: T.func,
+  onVisibilityToggle: T.func,
 };
 
 function LayersPanel(props) {
-  const { layers, baseLayerNames, className, onSliderChange } = props;
+  const {
+    layers,
+    baseLayerNames,
+    className,
+    onSliderChange,
+    onVisibilityToggle,
+  } = props;
 
   const categorizedLayers = layers.reduce((cats, layer) => {
     if (!cats[layer.category]) {
@@ -168,6 +188,7 @@ function LayersPanel(props) {
                   category={cat}
                   layers={layers}
                   onSliderChange={onSliderChange}
+                  onVisibilityToggle={onVisibilityToggle}
                 />
               ))}
               <Category
@@ -180,6 +201,7 @@ function LayersPanel(props) {
                 category='Base Satellite Imagery'
                 layers={baseLayers}
                 onSliderChange={onSliderChange}
+                onVisibilityToggle={onVisibilityToggle}
               />
             </>
           )
@@ -195,6 +217,7 @@ LayersPanel.propTypes = {
   className: T.string,
   baseLayerNames: T.array,
   onSliderChange: T.func,
+  onVisibilityToggle: T.func,
 };
 
 export default LayersPanel;
