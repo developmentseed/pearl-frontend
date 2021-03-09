@@ -29,6 +29,13 @@ const CardMedia = styled.figure`
 `;
 const CardTitle = styled.h4`
   ${truncated}
+  &:hover {
+    ${({ onClick }) =>
+      onClick &&
+      css`
+        color: ${themeVal('color.primary')};
+      `}
+  }
 `;
 export const CardWrapper = styled.article`
   display: grid;
@@ -73,9 +80,6 @@ export const CardWrapper = styled.article`
     }
   }}
 
-
-
-
   padding: 1rem;
   border: 1px solid ${themeVal('color.baseAlphaC')};
   border-radius: ${themeVal('shape.rounded')};
@@ -113,7 +117,7 @@ export const Card = ({
       {cardMedia && (
         <CardMedia borderlessMedia={borderlessMedia}>{cardMedia}</CardMedia>
       )}
-      <CardTitle>{title}</CardTitle>
+      <CardTitle onClick={onClick}>{title}</CardTitle>
       {details && <DetailsList details={details} />}
     </CardWrapper>
   );
