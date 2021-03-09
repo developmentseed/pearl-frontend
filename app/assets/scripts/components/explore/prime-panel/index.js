@@ -4,7 +4,7 @@ import { themeVal, glsp } from '@devseed-ui/theme-provider';
 import { Button } from '@devseed-ui/button';
 import T from 'prop-types';
 import { useAuth0 } from '@auth0/auth0-react';
-
+import config from '../../../config';
 import Panel from '../../common/panel';
 import {
   PanelBlock,
@@ -44,6 +44,8 @@ import InfoButton from '../../common/info-button';
 
 import { availableLayers } from '../sample-data';
 import { formatThousands } from '../../../utils/format';
+
+const { instances: instancesConfig } = config;
 
 const PlaceholderPanelSection = styled.div`
   padding: ${glsp()};
@@ -292,28 +294,36 @@ function PrimePanel() {
           instance = await apiClient.createInstance(project.id);
           console.log(instance);
 
+          const intervalId = setInterval(
+            getInstanceStatus,
+            instancesConfig.checkInterval
+          );
+
           async function getInstanceStatus() {
             let status;
+
+            function stop() {
+              clearInterval(intervalId);
+              hideGlobalLoading();
+            }
+
             try {
               status = await apiClient.getInstance(project.id, instance.id);
               console.log(status);
               if (status.active) {
-                clearInterval(getInstanceStatus);
-                hideGlobalLoading();
+                stop();
               }
             } catch (error) {
-              console.log(error);
-              clearInterval(getInstanceStatus);
-              hideGlobalLoading();
+              stop();
+              toast.error('An error occured when creating an instance.');
             }
           }
 
-          setInterval(getInstanceStatus, 1000);
-
           setCurrentInstance(instance);
         } catch (error) {
+          console.log(error)
           hideGlobalLoading();
-          toasts.error('Could not start instance, please try again later.');
+          toasts.error('Error while starting an instance, please try again later.');
         }
       }
     }
