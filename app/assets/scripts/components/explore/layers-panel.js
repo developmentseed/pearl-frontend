@@ -172,10 +172,10 @@ function LayersPanel(props) {
               ))}
               <Category
                 checkExpanded={() => {
-                  checkExpanded(Object.keys(categorizedLayers).length);
+                  return checkExpanded(Object.keys(categorizedLayers).length);
                 }}
                 setExpanded={(v) => {
-                  setExpanded(Object.keys(categorizedLayers).length, v);
+                  return setExpanded(Object.keys(categorizedLayers).length, v);
                 }}
                 category='Base Satellite Imagery'
                 layers={baseLayers}

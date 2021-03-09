@@ -11,18 +11,6 @@ export const availableModels = [
 ];
 
 export const availableLayers = [
-  {
-    name: 'Layer 1',
-    category: 'LULC Layers',
-  },
-  {
-    name: 'Layer 2',
-    category: 'LULC Layers',
-  },
-  {
-    name: 'Layer 3',
-    category: 'LULC Layers',
-  },
 ];
 
 export const availableCheckpoints = [
