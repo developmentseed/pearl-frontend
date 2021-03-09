@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useContext, useEffect } from 'react';
+import React, { useMemo, useContext, useEffect } from 'react';
 import styled from 'styled-components';
 import { convertArea } from '@turf/helpers';
 import tArea from '@turf/area';
