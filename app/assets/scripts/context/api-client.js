@@ -72,7 +72,7 @@ class ApiClient {
   }
 
   getInstance(projectId, instanceId) {
-    return this.post(`project/${projectId}/instance/${instanceId}`);
+    return this.get(`project/${projectId}/instance/${instanceId}`);
   }
 }
 
