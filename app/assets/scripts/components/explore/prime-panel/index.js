@@ -20,6 +20,11 @@ import {
   ModalHeadline,
   ModalFooter as BaseModalFooter,
 } from '@devseed-ui/modal';
+import toasts from '../../common/toasts';
+import {
+  showGlobalLoadingMessage,
+  hideGlobalLoading,
+} from '@devseed-ui/global-loading';
 import { PlaceholderMessage } from '../../../styles/placeholder.js';
 import { ExploreContext, viewModes } from '../../../context/explore';
 import GlobalContext from '../../../context/global';
@@ -186,7 +191,7 @@ function PrimePanel() {
 
   const { isAuthenticated } = useAuth0();
 
-  const { selectedModel, setSelectedModel, modelsList } = useContext(
+  const { apiClient, selectedModel, setSelectedModel, modelsList } = useContext(
     GlobalContext
   );
 
@@ -196,6 +201,10 @@ function PrimePanel() {
   const [applyText, setApplyText] = useState();
   const [applyState, setApplyState] = useState();
   const [applyTooltip, setApplyTooltip] = useState();
+
+  const [currentProject, setCurrentProject] = useState(null);
+  const [currentInstance, setCurrentInstance] = useState(null);
+  const [currentInstanceStatus, setCurrentInstanceStatus] = useState(null);
 
   useEffect(() => {
     if (!aoiArea || !selectedModel) {
@@ -251,6 +260,70 @@ function PrimePanel() {
   }, [checkpoint])
   */
   const { models } = modelsList.isReady() && modelsList.getData();
+
+  async function handleInferenceRun() {
+    // if (!applyState) {
+    //   return;
+    // }
+    // setInference(true);
+
+    if (apiClient) {
+      showGlobalLoadingMessage('Creating project...');
+
+      let project = currentProject;
+      try {
+        if (!project) {
+          project = await apiClient.createProject({
+            model_id: 1,
+            mosaic: 'naip.latest',
+            name: 'Untitled',
+          });
+          setCurrentProject(project);
+        }
+      } catch (error) {
+        hideGlobalLoading();
+        toasts.error('Could not create a project, please try again later.');
+      }
+
+      let instance = currentInstance;
+      if (!instance) {
+        showGlobalLoadingMessage('Starting instance...');
+        try {
+          instance = await apiClient.createInstance(project.id);
+          console.log(instance);
+
+          async function getInstanceStatus() {
+            let status;
+            try {
+              status = await apiClient.getInstance(project.id, instance.id);
+              console.log(status);
+              if (status.active) {
+                clearInterval(getInstanceStatus);
+                hideGlobalLoading();
+              }
+            } catch (error) {
+              console.log(error);
+              clearInterval(getInstanceStatus);
+              hideGlobalLoading();
+            }
+          }
+
+          setInterval(getInstanceStatus, 1000);
+
+          setCurrentInstance(instance);
+        } catch (error) {
+          hideGlobalLoading();
+          toasts.error('Could not start instance, please try again later.');
+        }
+      }
+    }
+
+    // show global loading
+    // create project if doesn't exist
+    // init instance if doesn't exist
+    // connect to instance
+    // populate map
+  }
 
   return (
     <>
@@ -361,13 +434,8 @@ function PrimePanel() {
                 style={{
                   gridColumn: '1 / -1',
                 }}
-                onClick={() => {
-                  if (!applyState) {
-                    return;
-                  }
-                  setInference(true);
-                }}
-                visuallyDisabled={!applyState}
+                onClick={handleInferenceRun}
+                // visuallyDisabled={!applyState}
                 info={applyTooltip}
               >
                 {applyText}
