@@ -22,6 +22,7 @@ import {
 } from '@devseed-ui/modal';
 import { PlaceholderMessage } from '../../../styles/placeholder.js';
 import { ExploreContext, viewModes } from '../../../context/explore';
+import { MapContext } from '../../../context/map';
 import GlobalContext from '../../../context/global';
 
 import TabbedBlock from '../../common/tabbed-block-body';
@@ -190,6 +191,9 @@ function PrimePanel() {
     GlobalContext
   );
 
+  const { map, layerIds } = useContext(MapContext);
+  
+
   const [showSelectModelModal, setShowSelectModelModal] = useState(false);
   const [inference, setInference] = useState(false);
 
@@ -251,6 +255,7 @@ function PrimePanel() {
   }, [checkpoint])
   */
   const { models } = modelsList.isReady() && modelsList.getData();
+
 
   return (
     <>
@@ -328,7 +333,16 @@ function PrimePanel() {
                 <PlaceholderPanelSection name='Refine Results'>
                   <PlaceholderMessage>Refine results</PlaceholderMessage>
                 </PlaceholderPanelSection>
-                <LayersPanel name='layers' layers={availableLayers} />
+                <LayersPanel 
+                  name='layers' 
+                  layers={availableLayers}
+                  baseLayerNames={mosaicList.isReady() ? mosaicList.getData().mosaics : []}
+                  onSliderChange={(name, value) => {
+                    console.log(name)
+                    console.log(layerIds)
+                    map._layers[layerIds[name]].setOpacity(value)
+                  }}
+                />
               </TabbedBlock>
             </PanelBlockBody>
 

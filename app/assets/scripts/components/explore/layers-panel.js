@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import T from 'prop-types';
 import styled from 'styled-components';
 import { Button } from '@devseed-ui/button';
@@ -11,7 +11,7 @@ const Wrapper = styled.div`
   display: grid;
   grid-gap: 1rem;
 `;
-const Layer = styled.div`
+const LayerWrapper = styled.div`
   display: grid;
   grid-template-columns: 2fr 4fr 1fr 1fr;
   ${Button} {
@@ -52,7 +52,43 @@ const AccordionFold = styled(BaseFold)`
   }
 `;
 
-function Category({ checkExpanded, setExpanded, category, layers }) {
+function Layer({ layer, onSliderChange }) {
+  const [value, setValue] = useState(1);
+  return (
+    <LayerWrapper>
+      <IconPlaceholder />
+      <SliderWrapper>
+        <Heading as='h4' size='xsmall'>
+          {layer.name}
+        </Heading>
+        <InputRange
+          onChange={(v) => {
+            setValue(v);
+            onSliderChange(layer.name, v)
+          }}
+          value={value}
+          formatLabel={() => null}
+          minValue={0}
+          maxValue={1}
+          step={0.1}
+        />
+      </SliderWrapper>
+      <Button
+        variation='base-plain'
+        size='small'
+        hideText
+        useIcon='circle-information'
+      >
+        Info
+      </Button>
+      <Button variation='base-plain' size='small' hideText useIcon='eye'>
+        Info
+      </Button>
+    </LayerWrapper>
+  );
+}
+
+function Category({ checkExpanded, setExpanded, category, layers, onSliderChange }) {
   return (
     <AccordionFold
       id={`${category}-fold`}
@@ -62,37 +98,9 @@ function Category({ checkExpanded, setExpanded, category, layers }) {
       renderBody={() => (
         <Wrapper>
           {layers.map((layer) => (
-            <Layer key={`${layer.category}-${layer.name}`}>
-              <IconPlaceholder />
-              <SliderWrapper>
-                <Heading as='h4' size='xsmall'>
-                  {layer.name}
-                </Heading>
-                <InputRange
-                  onChange={() => 1}
-                  value={50}
-                  formatLabel={() => null}
-                  minValue={0}
-                  maxValue={100}
-                />
-              </SliderWrapper>
-              <Button
-                variation='base-plain'
-                size='small'
-                hideText
-                useIcon='circle-information'
-              >
-                Info
-              </Button>
-              <Button
-                variation='base-plain'
-                size='small'
-                hideText
-                useIcon='eye'
-              >
-                Info
-              </Button>
-            </Layer>
+            <Layer key={`${category}-${layer.name}`} layer={layer}
+              onSliderChange={onSliderChange}
+            />
           ))}
         </Wrapper>
       )}
@@ -108,7 +116,7 @@ Category.propTypes = {
 };
 
 function LayersPanel(props) {
-  const { layers, className } = props;
+  const { layers, baseLayerNames, className, onSliderChange } = props;
 
   const categorizedLayers = layers.reduce((cats, layer) => {
     if (!cats[layer.category]) {
@@ -117,6 +125,10 @@ function LayersPanel(props) {
     cats[layer.category].push(layer);
     return cats;
   }, {});
+
+  const baseLayers = baseLayerNames.map((n) => ({
+    name: n,
+  }));
 
   return (
     <div className={className}>
@@ -132,16 +144,30 @@ function LayersPanel(props) {
         ]}
       >
         {
-          ({ checkExpanded, setExpanded }) =>
-            Object.entries(categorizedLayers).map(([cat, layers], index) => (
+          ({ checkExpanded, setExpanded }) => (
+            <>
+              {Object.entries(categorizedLayers).map(([cat, layers], index) => (
+                <Category
+                  key={cat}
+                  checkExpanded={() => checkExpanded(index)}
+                  setExpanded={(v) => setExpanded(index, v)}
+                  category={cat}
+                  layers={layers}
+                  onSliderChange={onSliderChange}
+                />
+              ))}
               <Category
-                key={cat}
-                checkExpanded={() => checkExpanded(index)}
-                setExpanded={(v) => setExpanded(index, v)}
-                category={cat}
-                layers={layers}
+                checkExpanded={() =>
+                  checkExpanded(Object.keys(categorizedLayers).length)}
+                setExpanded={(v) =>
+                  setExpanded(Object.keys(categorizedLayers).length, v)}
+                category='Base Satellite Imagery'
+                layers={baseLayers}
+                  onSliderChange={onSliderChange}
+
               />
-            ))
+            </>
+          )
           /* eslint-disable-next-line react/jsx-curly-newline */
         }
       </Accordion>

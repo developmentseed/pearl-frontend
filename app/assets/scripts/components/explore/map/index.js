@@ -5,7 +5,10 @@ import tArea from '@turf/area';
 import tBboxPolygon from '@turf/bbox-polygon';
 import SizeAwareElement from '../../common/size-aware-element';
 import { MapContainer, TileLayer, FeatureGroup } from 'react-leaflet';
+import GlobalContext from '../../../context/global';
 import { ExploreContext, viewModes } from '../../../context/explore';
+import { MapContext } from '../../../context/map';
+
 import GeoCoder from '../../common/map/geocoder';
 import { themeVal, multiply } from '@devseed-ui/theme-provider';
 import FreeDraw, { ALL } from 'leaflet-freedraw';
@@ -56,7 +59,7 @@ function areaFromBounds(bbox) {
 }
 
 function Map() {
-  const [map, setMap] = useState(null);
+  const { map, setMap, layerIds, setLayerIds } = useContext(MapContext);
   const {
     apiLimits,
     aoiRef,
@@ -66,6 +69,10 @@ function Map() {
     setViewMode,
     viewMode,
   } = useContext(ExploreContext);
+
+  const { mosaicList } = useContext(GlobalContext);
+
+  const { mosaics } = mosaicList.isReady() ? mosaicList.getData() : {};
 
   useEffect(() => {
     if (!map) return;
@@ -153,18 +160,31 @@ function Map() {
           url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
           maxZoom={11}
         />
-        <TileLayer
-          attribution='&copy; NAIP'
-          url={config.NaipTileUrl}
-          minZoom={12}
-          maxZoom={18}
-        />
+
+        {mosaics &&
+          mosaics.map((layer) => (
+            <TileLayer
+              key={layer}
+              attribution='&copy; NAIP'
+              url={config.tileUrlTemplate.replace('{LAYER_NAME}', layer)}
+              minZoom={12}
+              maxZoom={18}
+              eventHandlers={{
+                add: (v) => {
+                  setLayerIds({
+                    ...layerIds,
+                    [layer]: v.target._leaflet_id,
+                  });
+                },
+              }}
+            />
+          ))}
         <FeatureGroup>
           <GeoCoder />
         </FeatureGroup>
       </MapContainer>
     ),
-    [viewMode, apiLimits] // eslint-disable-line react-hooks/exhaustive-deps
+    [viewMode, apiLimits, mosaics] // eslint-disable-line react-hooks/exhaustive-deps
   );
 
   return (
