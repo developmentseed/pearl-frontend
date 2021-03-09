@@ -12,6 +12,7 @@ import {
   InpageBody,
   InpageBodyInner,
 } from '../../../styles/inpage';
+import { Form, FormInput } from '@devseed-ui/form';
 import { glsp } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
 import { StyledNavLink } from '../../../styles/links';
@@ -24,8 +25,23 @@ const ProjectsBody = styled(InpageBodyInner)`
 `;
 const CardResults = styled.div`
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 2fr 1fr;
   grid-gap: 1rem;
+`;
+
+const FormInputGroup = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 2.125rem;
+
+  > :first-child:not(:last-child) {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  > :last-child:not(:first-child) {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
 `;
 
 const NavPane = styled.div`
@@ -102,13 +118,27 @@ function Projects(props) {
                         aoi: proj.aoi || 'No AOI set',
                         results: (
                           <CardResults>
-                            <Button
-                              variation='base-raised-semidark'
-                              useIcon={['clipboard', 'after']}
-                              size='small'
-                            >
-                              Saved url
-                            </Button>
+                            <Form>
+                              <FormInputGroup>
+                                <FormInput
+                                  id='site-url'
+                                  name='site-url'
+                                  className='form__control'
+                                  type='text'
+                                  readOnly
+                                  // value={val}
+                                  value='url://map.link.here'
+                                />
+                                <Button
+                                  variation='base-raised-semidark'
+                                  useIcon='clipboard'
+                                  size='small'
+                                  hideText
+                                >
+                                  <span>Copy to clipboard</span>
+                                </Button>
+                              </FormInputGroup>
+                            </Form>
                             <Button
                               variation='primary-plain'
                               useIcon={['download', 'after']}
