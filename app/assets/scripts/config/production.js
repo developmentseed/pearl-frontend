@@ -5,17 +5,13 @@ module.exports = {
     appTitle: 'MS LULC',
     appDescription: 'Microsoft Land Use/Land Classification project.',
     restApiEndpoint: 'https://api.lulc-staging.ds.io',
-    websocketEndpoint: 'ws://localhost:1999',
+    websocketEndpoint: 'wss://socket.lulc-staging.ds.io',
     auth0Domain: 'dev-y5qeoqlh.us.auth0.com',
     clientId: 'cnTAr7SyMGYu4qDLaw5rEGy4G0sn4Htn',
     audience: 'https://api.lulc-staging.ds.io',
     bingApiKey:
       'ArLmu8JG2PHK_-_zo7yS1WbvDz7PgsoVEgcqFTg8uaH-lsXLcjADCAtnyQB054uq',
     NaipTileUrl:
-      'https://tiles.lulc-staging.ds.io/mosaic/naip.latest/tiles/{z}/{x}/{y}@1x?bidx=1%2C2%2C3',
-    instances: {
-      checkInterval: 5000, // 5 s
-      createTimeout: 10 * 60 * 1000, // 10 min
-    }
+      'https://tiles.lulc-staging.ds.io/mosaic/naip.latest/tiles/{z}/{x}/{y}@1x?bidx=1%2C2%2C3'
   },
 };

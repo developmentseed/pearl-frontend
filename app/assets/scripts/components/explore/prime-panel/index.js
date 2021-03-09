@@ -1,6 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
 import styled from 'styled-components';
-import { differenceInMilliseconds } from 'date-fns';
 import { themeVal, glsp } from '@devseed-ui/theme-provider';
 import { Button } from '@devseed-ui/button';
 import T from 'prop-types';
@@ -45,8 +44,8 @@ import InfoButton from '../../common/info-button';
 
 import { availableLayers } from '../sample-data';
 import { formatThousands } from '../../../utils/format';
-
-const { instances: instancesConfig } = config;
+import useLocalstorage from '@rooks/use-localstorage';
+import WebsocketClient from '../../../context/websocket-client';
 
 const PlaceholderPanelSection = styled.div`
   padding: ${glsp()};
@@ -205,9 +204,10 @@ function PrimePanel() {
   const [applyState, setApplyState] = useState();
   const [applyTooltip, setApplyTooltip] = useState();
 
-  const [currentProject, setCurrentProject] = useState(null);
-  const [currentInstance, setCurrentInstance] = useState(null);
+  const [currentProject, setCurrentProject] = useLocalstorage(null);
+  const [currentInstance, setCurrentInstance] = useLocalstorage(null);
   const [currentInstanceStatus, setCurrentInstanceStatus] = useState(null);
+  const [wsClient, setWsClient] = useState(null);
 
   useEffect(() => {
     if (!aoiArea || !selectedModel) {
@@ -293,43 +293,6 @@ function PrimePanel() {
         showGlobalLoadingMessage('Requesting instance to run inference...');
         try {
           instance = await apiClient.createInstance(project.id);
-          const createdAt = new Date(instance.created);
-
-          const intervalId = setInterval(
-            getInstanceStatus,
-            instancesConfig.checkInterval
-          );
-
-          async function getInstanceStatus() {
-            let status;
-
-            function stop() {
-              clearInterval(intervalId);
-              hideGlobalLoading();
-            }
-
-            const elapsedTime = differenceInMilliseconds(
-              Date.now(),
-              createdAt,
-            );
-
-            if (elapsedTime > instancesConfig.createTimeout) {
-              toasts.error('Error while creating an instance, please try again later.');
-              stop()
-            }
-
-            try {
-              status = await apiClient.getInstance(project.id, instance.id);
-              console.log(status);
-              if (status.active) {
-                stop();
-              }
-            } catch (error) {
-              stop();
-              toasts.error('Error while creating an instance, please try again later.');
-            }
-          }
-
           setCurrentInstance(instance);
         } catch (error) {
           hideGlobalLoading();
@@ -340,6 +303,20 @@ function PrimePanel() {
       }
     }
   }
+
+  useEffect(() => {
+    if (currentInstance) {
+      const wsClient = new WebsocketClient(currentInstance.token);
+      wsClient.setupListeners();
+      setWsClient(wsClient);
+    }
+
+    return () => {
+      if (wsClient) {
+        wsClient.close();
+      }
+    };
+  }, [currentInstance]);
 
   return (
     <>
