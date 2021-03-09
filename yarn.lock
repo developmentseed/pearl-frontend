@@ -1090,6 +1090,11 @@
   resolved "https://registry.yarnpkg.com/@react-leaflet/core/-/core-1.0.2.tgz#39c6a73f61c666d5dcf673741cea2672fa4bbae1"
   integrity sha512-QbleYZTMcgujAEyWGki8Lx6cXQqWkNtQlqf5c7NImlIp8bKW66bFpez/6EVatW7+p9WKBOEOVci/9W7WW70EZg==
 
+"@rooks/use-localstorage@^4.9.2":
+  version "4.9.2"
+  resolved "https://registry.yarnpkg.com/@rooks/use-localstorage/-/use-localstorage-4.9.2.tgz#a409e7b6f00bbbfc1609e5549891b6fbc23091c8"
+  integrity sha512-NiFDL3ADQQDeebgtt0y4G+hFBd/7C3ahDERhbUPpAcGR98298TcHpxcaqEoyaztAZXtih7gsKEYAq26mJ9xxGA==
+
 "@samverschueren/stream-to-observable@^0.3.0":
   version "0.3.1"
   resolved "https://registry.yarnpkg.com/@samverschueren/stream-to-observable/-/stream-to-observable-0.3.1.tgz#a21117b19ee9be70c379ec1877537ef2e1c63301"
