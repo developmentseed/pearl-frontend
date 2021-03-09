@@ -187,12 +187,14 @@ function PrimePanel() {
 
   const { isAuthenticated } = useAuth0();
 
-  const { selectedModel, setSelectedModel, modelsList, mosaicList } = useContext(
-    GlobalContext
-  );
+  const {
+    selectedModel,
+    setSelectedModel,
+    modelsList,
+    mosaicList,
+  } = useContext(GlobalContext);
 
   const { map, layerIds } = useContext(MapContext);
-  
 
   const [showSelectModelModal, setShowSelectModelModal] = useState(false);
   const [inference, setInference] = useState(false);
@@ -255,7 +257,6 @@ function PrimePanel() {
   }, [checkpoint])
   */
   const { models } = modelsList.isReady() && modelsList.getData();
-
 
   return (
     <>
@@ -333,14 +334,14 @@ function PrimePanel() {
                 <PlaceholderPanelSection name='Refine Results'>
                   <PlaceholderMessage>Refine results</PlaceholderMessage>
                 </PlaceholderPanelSection>
-                <LayersPanel 
-                  name='layers' 
+                <LayersPanel
+                  name='layers'
                   layers={availableLayers}
-                  baseLayerNames={mosaicList.isReady() ? mosaicList.getData().mosaics : []}
+                  baseLayerNames={
+                    mosaicList.isReady() ? mosaicList.getData().mosaics : []
+                  }
                   onSliderChange={(name, value) => {
-                    console.log(name)
-                    console.log(layerIds)
-                    map._layers[layerIds[name]].setOpacity(value)
+                    map._layers[layerIds[name]].setOpacity(value);
                   }}
                 />
               </TabbedBlock>

@@ -11,10 +11,15 @@ export function MapProvider(props) {
         map,
         setMap,
 
-        layerIds, setLayerIds
+        layerIds,
+        setLayerIds,
       }}
     >
       {props.children}
     </MapContext.Provider>
   );
 }
+
+MapProvider.propTypes = {
+  children: T.node,
+};

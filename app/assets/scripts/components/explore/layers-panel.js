@@ -64,7 +64,7 @@ function Layer({ layer, onSliderChange }) {
         <InputRange
           onChange={(v) => {
             setValue(v);
-            onSliderChange(layer.name, v)
+            onSliderChange(layer.name, v);
           }}
           value={value}
           formatLabel={() => null}
@@ -88,7 +88,18 @@ function Layer({ layer, onSliderChange }) {
   );
 }
 
-function Category({ checkExpanded, setExpanded, category, layers, onSliderChange }) {
+Layer.propTypes = {
+  layer: T.object,
+  onSliderChange: T.func,
+};
+
+function Category({
+  checkExpanded,
+  setExpanded,
+  category,
+  layers,
+  onSliderChange,
+}) {
   return (
     <AccordionFold
       id={`${category}-fold`}
@@ -98,7 +109,9 @@ function Category({ checkExpanded, setExpanded, category, layers, onSliderChange
       renderBody={() => (
         <Wrapper>
           {layers.map((layer) => (
-            <Layer key={`${category}-${layer.name}`} layer={layer}
+            <Layer
+              key={`${category}-${layer.name}`}
+              layer={layer}
               onSliderChange={onSliderChange}
             />
           ))}
@@ -113,6 +126,7 @@ Category.propTypes = {
   setExpanded: T.func,
   category: T.string,
   layers: T.array,
+  onSliderChange: T.func,
 };
 
 function LayersPanel(props) {
@@ -157,14 +171,15 @@ function LayersPanel(props) {
                 />
               ))}
               <Category
-                checkExpanded={() =>
-                  checkExpanded(Object.keys(categorizedLayers).length)}
-                setExpanded={(v) =>
-                  setExpanded(Object.keys(categorizedLayers).length, v)}
+                checkExpanded={() => {
+                  checkExpanded(Object.keys(categorizedLayers).length);
+                }}
+                setExpanded={(v) => {
+                  setExpanded(Object.keys(categorizedLayers).length, v);
+                }}
                 category='Base Satellite Imagery'
                 layers={baseLayers}
-                  onSliderChange={onSliderChange}
-
+                onSliderChange={onSliderChange}
               />
             </>
           )
@@ -178,6 +193,8 @@ function LayersPanel(props) {
 LayersPanel.propTypes = {
   layers: T.array,
   className: T.string,
+  baseLayerNames: T.array,
+  onSliderChange: T.func,
 };
 
 export default LayersPanel;
