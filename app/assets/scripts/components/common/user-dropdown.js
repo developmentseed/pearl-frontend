@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from '@devseed-ui/button';
-import CardList from './card-list';
+import CardList, { Card } from './card-list';
 import { Modal as BaseModal } from '@devseed-ui/modal';
 import styled from 'styled-components';
 import { Link, useLocation } from 'react-router-dom';
@@ -22,8 +22,6 @@ import {
   FormInput,
 } from '@devseed-ui/form';
 import { useAuth0 } from '@auth0/auth0-react';
-
-import { Card } from '../common/card-list';
 
 import { availableCheckpoints } from '../explore/sample-data';
 import { filterComponentProps } from '../../styles/utils/general';
