@@ -2,7 +2,6 @@ import React from 'react';
 import styled from 'styled-components';
 import T from 'prop-types';
 import config from '../../config';
-import { NavLink, Link } from 'react-router-dom';
 
 import { Button } from '@devseed-ui/button';
 import {
@@ -14,7 +13,7 @@ import {
 } from '@devseed-ui/theme-provider';
 import collecticon from '@devseed-ui/collecticons';
 import UserDropdown from '../common/user-dropdown';
-import { filterComponentProps } from '../../styles/utils/general';
+import { StyledNavLink, StyledLink } from '../../styles/links';
 
 const { appTitle } = config;
 
@@ -124,18 +123,6 @@ const GlobalMenuLink = styled.a`
     ${visuallyHidden()}
   }
 `;
-
-// Please refer to filterComponentProps to understand why this is needed
-const propsToFilter = [
-  'variation',
-  'size',
-  'hideText',
-  'useIcon',
-  'active',
-  'visuallyDisabled',
-];
-const StyledNavLink = filterComponentProps(NavLink, propsToFilter);
-const StyledLink = filterComponentProps(Link, propsToFilter);
 
 function PageHeader(props) {
   return (

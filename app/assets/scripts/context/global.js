@@ -158,6 +158,9 @@ export function GlobalContextProvider(props) {
 
           mosaicList,
 
+          dispatchProject,
+          currentProject,
+
           selectedModel,
           setSelectedModel,
 

@@ -40,10 +40,25 @@ class AoiDrawControl {
       this.onDrawChange(this.getBbox());
     }
 
-    // Listen to draw end
+    // Listen to mouseUp: if the user has drawn a bbox, call drawEnd,
+    // else if it's just a click, reset user state to before mouseDown.
     function onMouseUp() {
-      this._map.dragging.enable();
+      // Turn off the mousemove handler in all cases
+      // on the mouseUp action
       this._map.off('mousemove', onMouseMove, this);
+
+      // We need to enable dragging to get the
+      // cursor to remain consistent
+      this._map.dragging.enable();
+
+      // User has done a mouseUp action without actually drawing a bbox,
+      // In this case, we re-enable the mouseDown event to let the user
+      // draw again, keeping the user in AOI-drawing mode
+      if (!this._shape) {
+        this._map.on('mousedown', this._onMouseDown, this);
+        return;
+      }
+
       this._map.off('mouseup', onMouseUp, this);
       this.onDrawEnd(this.getBbox(), this._shape);
     }
