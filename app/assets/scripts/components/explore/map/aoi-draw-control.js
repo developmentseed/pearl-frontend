@@ -40,7 +40,8 @@ class AoiDrawControl {
       this.onDrawChange(this.getBbox());
     }
 
-    // Listen to draw end
+    // Listen to mouseUp: if the user has drawn a bbox, call drawEnd,
+    // else if it's just a click, reset user state to before mouseDown.
     function onMouseUp() {
       // Turn off the mousemove handler in all cases
       // on the mouseUp action
