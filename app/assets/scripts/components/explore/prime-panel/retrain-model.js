@@ -3,40 +3,54 @@ import { Button } from '@devseed-ui/button';
 import styled, { css } from 'styled-components';
 import { glsp, themeVal } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
+import collecticon from '@devseed-ui/collecticons';
 
 const ClassList = styled.div`
   display: grid;
-  grid-gap: ${glsp(1)};
+  grid-gap: ${glsp(0.5)};
 `;
 
 const Class = styled.div`
   display: grid;
-  grid-template-columns: min-content auto;
+  grid-template-columns: min-content auto min-content;
   grid-gap: ${glsp(1)};
-  padding: ${glsp(0.5)};
+  padding: ${glsp(0.5)} 0;
   ${Heading} {
     margin: 0;
     align-self: center;
   }
-  :hover {
-    cursor: pointer;
-    background-color: ${themeVal('color.baseAlphaC')};
-  }
-  ${({ selected }) =>
-    selected &&
+
+  ${({ muted }) =>
+    muted &&
     css`
-      background-color: ${themeVal('color.baseAlphaC')};
+      color: ${themeVal('color.baseAlphaE')};
+      border-color: ${themeVal('color.baseAlphaE')};
     `};
 `;
 const Thumbnail = styled.div`
-  width: 3rem;
-  height: 3rem;
+  width: ${glsp(2)};
+  height: ${glsp(2)};
   background: ${({ color }) => color};
+  display: grid;
+  justify-content: center;
+  align-content: center;
+  ${({ outline }) =>
+    outline &&
+    css`
+      border: 1px solid;
+    `};
+  ${({ useIcon }) =>
+    useIcon &&
+    css`
+      ::before {
+        ${({ useIcon }) => useIcon && collecticon(useIcon)}
+      }
+    `};
 `;
 
 const Wrapper = styled.div`
   display: grid;
-  grid-gap: ${glsp(1)};
+  grid-gap: ${glsp(0.5)};
 `;
 
 function RetrainModel(props) {
@@ -44,6 +58,7 @@ function RetrainModel(props) {
   const [selectedClass, setSelectedClass] = useState({});
   return (
     <Wrapper>
+      <Heading useAlt>Classes</Heading>
       <ClassList>
         {classList.map((c) => (
           <Class
@@ -55,9 +70,18 @@ function RetrainModel(props) {
           >
             <Thumbnail color={c.color} />
             <Heading size='xsmall'>{c.name}</Heading>
+
+            <Button useIcon='cog' hideText variation='base-plain'>
+              Options
+            </Button>
           </Class>
         ))}
       </ClassList>
+
+      <Class className='add__class' muted>
+        <Thumbnail useIcon='plus' outline />
+        <Heading size='xsmall'>Add Class</Heading>
+      </Class>
     </Wrapper>
   );
 }

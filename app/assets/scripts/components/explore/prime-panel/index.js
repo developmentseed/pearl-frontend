@@ -191,7 +191,7 @@ function PrimePanel() {
   );
 
   const [showSelectModelModal, setShowSelectModelModal] = useState(false);
-  const [inference, setInference] = useState(false);
+  const [inference, setInference] = useState(true);
 
   const [applyText, setApplyText] = useState();
   const [applyState, setApplyState] = useState();
