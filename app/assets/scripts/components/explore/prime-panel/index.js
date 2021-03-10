@@ -302,6 +302,7 @@ function PrimePanel() {
                   <EditButton
                     data-cy='show-select-model-button'
                     useIcon='swap-horizontal'
+                    id='select-model-trigger'
                     onClick={function () {
                       setShowSelectModelModal(true);
                     }}
