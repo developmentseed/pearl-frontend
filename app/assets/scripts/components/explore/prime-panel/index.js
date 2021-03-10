@@ -3,8 +3,8 @@ import styled from 'styled-components';
 import { themeVal, glsp } from '@devseed-ui/theme-provider';
 import { Button } from '@devseed-ui/button';
 import T from 'prop-types';
+import L from 'leaflet';
 import { useAuth0 } from '@auth0/auth0-react';
-import config from '../../../config';
 import Panel from '../../common/panel';
 import {
   PanelBlock,
@@ -187,15 +187,26 @@ AoiEditButtons.propTypes = {
 };
 
 function PrimePanel() {
-  const { viewMode, setViewMode, aoiRef, aoiArea, apiLimits } = useContext(
-    ExploreContext
-  );
+  const {
+    map,
+    viewMode,
+    setViewMode,
+    aoiRef,
+    aoiArea,
+    apiLimits,
+    setPrediction,
+    currentInstance,
+    setCurrentInstance
+  } = useContext(ExploreContext);
 
   const { isAuthenticated } = useAuth0();
 
-  const { restApiClient, selectedModel, setSelectedModel, modelsList } = useContext(
-    GlobalContext
-  );
+  const {
+    restApiClient,
+    selectedModel,
+    setSelectedModel,
+    modelsList,
+  } = useContext(GlobalContext);
 
   const [showSelectModelModal, setShowSelectModelModal] = useState(false);
   const [inference, setInference] = useState(false);
@@ -204,8 +215,12 @@ function PrimePanel() {
   const [applyState, setApplyState] = useState();
   const [applyTooltip, setApplyTooltip] = useState();
 
-  const [currentProject, setCurrentProject] = useLocalstorage(null);
-  const [currentInstance, setCurrentInstance] = useLocalstorage(null);
+  const [
+    currentProject,
+    setCurrentProject,
+    removeCurrentProject,
+  ] = useLocalstorage(null);
+
   const [currentInstanceStatus, setCurrentInstanceStatus] = useState(null);
   const [wsClient, setWsClient] = useState(null);
 
@@ -218,18 +233,10 @@ function PrimePanel() {
       /* AOI selected, inference not yet applied */
       setApplyState(true);
       setApplyTooltip(null);
-    } /*else if (checkpoint) {
-      //assume inference = false when checkpoint is !undefined
-      setApplyState(true);
-      setApplyTooltip(null);
-       setApplyText('Retrain Checkpoint')
-    }*/
-
-    /* No Retraining samples selected, AOI changed */
-    // Retraining samples not implemented yet
+    }
 
     setApplyText('Run Model');
-  }, [aoiArea /* retraining samples, checkoint */, selectedModel]);
+  }, [aoiArea, selectedModel]);
 
   useEffect(() => {
     if (inference) {
@@ -240,29 +247,11 @@ function PrimePanel() {
     }
   }, [inference /* retraining samples */]);
 
-  /*
-  useEffect(() => {
-    // Retraining Samples selected
-    if (retraining samples) {
-      setApplyState(true)
-      setApplyText('Retrain Model')
-      setApplyTooltip('Retrain model with your selected samples')
-
-    }
-  }, [retraining samples ])
-  */
-
-  /* Check point based settings
-  useEffect(() => {
-    if (checkpoint) {
-      //Post-retraining (Checkpoint), AOI unchanged
-      setApplyState(false)
-      setApplyText('Retrain Checkpoint')
-      setApplyTooltip('Select retraining samples to retrain checkpoint')
-    }
-  }, [checkpoint])
-  */
   const { models } = modelsList.isReady() && modelsList.getData();
+
+  function requestPrediction() {
+
+  }
 
   async function handleInferenceRun() {
     // if (!applyState) {
@@ -271,52 +260,156 @@ function PrimePanel() {
     // setInference(true);
 
     if (restApiClient) {
-      showGlobalLoadingMessage('Creating project...');
-
       let project = currentProject;
-      try {
-        if (!project) {
+      if (!project) {
+        try {
+          showGlobalLoadingMessage('Creating project...');
           project = await restApiClient.createProject({
             model_id: 1,
             mosaic: 'naip.latest',
             name: 'Untitled',
           });
           setCurrentProject(project);
+        } catch (error) {
+          toasts.error('Could not create a project, please try again later.');
+        } finally {
+          hideGlobalLoading();
         }
-      } catch (error) {
-        hideGlobalLoading();
-        toasts.error('Could not create a project, please try again later.');
       }
 
       let instance = currentInstance;
       if (!instance) {
-        showGlobalLoadingMessage('Requesting instance to run inference...');
         try {
+          showGlobalLoadingMessage('Requesting instance to run inference...');
           instance = await restApiClient.createInstance(project.id);
           setCurrentInstance(instance);
         } catch (error) {
-          hideGlobalLoading();
           toasts.error(
             'Error while creating an instance, please try again later.'
           );
+        } finally {
+          hideGlobalLoading();
         }
       }
     }
+
+    // if (aoiRef && wsClient) {
+    //   console.log('will request prediction');
+
+    //   const {
+    //     _southWest: { lng: minX, lat: minY },
+    //     _northEast: { lng: maxX, lat: maxY },
+    //   } = aoiRef.getBounds();
+    //   const aoiPolygon = {
+    //     type: 'Polygon',
+    //     coordinates: [
+    //       [
+    //         [minX, minY],
+    //         [maxX, minY],
+    //         [maxX, maxY],
+    //         [minX, maxY],
+    //         [minX, minY],
+    //       ],
+    //     ],
+    //   };
+
+    //   wsClient.send(
+    //     JSON.stringify({
+    //       action: 'model#prediction',
+    //       data: {
+    //         name: 'Seneca Rocks, WV',
+    //         polygon: aoiPolygon,
+    //       },
+    //     })
+    //   );
+    // }
   }
 
-  useEffect(() => {
-    if (currentInstance) {
-      const wsClient = new WebsocketClient(currentInstance.token);
-      wsClient.setupListeners();
-      setWsClient(wsClient);
-    }
+  // useEffect(() => {
+  //   // removeCurrentInstance();
+  //   // removeCurrentProject();
 
-    return () => {
-      if (wsClient) {
-        wsClient.close();
-      }
-    };
-  }, [currentInstance]);
+  //   if (currentInstance) {
+  //     console.log(currentInstance);
+  //     showGlobalLoadingMessage('Connecting to instance...');
+  //     const wsClient = new WebsocketClient(currentInstance.token);
+  //     wsClient.addEventListener('open', (event) => {
+  //       console.log(event)
+  //       hideGlobalLoading();
+  //       setWsClient(wsClient);
+  //       toasts.info('Connected to instance.');
+  //     });
+
+  //     wsClient.addEventListener('message', function (event) {
+  //       console.log(event);
+  //       if (event.data) {
+  //         const eventData = JSON.parse(event.data);
+  //         if (eventData.message === 'model#prediction') {
+  //           const { data } = eventData;
+  //           const [minX, minY, maxX, maxY] = data.bounds;
+  //           console.log(data.image);
+  //           console.log(`data:image/png;base64,${data.image}`);
+
+  //           setPrediction({
+  //             // image: data.image,
+  //             // image: 'http://www.lib.utexas.edu/maps/historical/newark_nj_1922.jpg',
+  //             image: `data:image/png;base64,${data.image}`,
+  //             bounds: [
+  //               [minY, minX],
+  //               [maxY, maxX],
+  //             ],
+  //           });
+  //           // L.ImageOverlay(data.image, [
+  //           //   [minY, minX],
+  //           //   [maxY, maxX],
+  //           // ]).addTo(map);
+  //         }
+  //       }
+  //       // console.log(event)
+
+  //       // console.log('Message from server ', data);
+  //     });
+  //   }
+
+  //   return () => {
+  //     // if (wsClient) {
+  //     //   wsClient.close();
+  //     // }
+  //   };
+  // }, []);
+
+  // useEffect(() => {
+  //   if (!aoiRef || !wsClient) return;
+
+  //   console.log('will request prediction');
+
+  //   const {
+  //     _southWest: { lng: minX, lat: minY },
+  //     _northEast: { lng: maxX, lat: maxY },
+  //   } = aoiRef.getBounds();
+  //   const aoiPolygon = {
+  //     type: 'Polygon',
+  //     coordinates: [
+  //       [
+  //         [minX, minY],
+  //         [maxX, minY],
+  //         [maxX, maxY],
+  //         [minX, maxY],
+  //         [minX, minY],
+  //       ],
+  //     ],
+  //   };
+
+  //   wsClient.send(
+  //     JSON.stringify({
+  //       action: 'model#prediction',
+  //       data: {
+  //         name: 'Seneca Rocks, WV',
+  //         polygon: aoiPolygon,
+  //       },
+  //     })
+  //   );
+  // }, [aoiRef]);
 
   return (
     <>

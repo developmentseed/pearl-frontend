@@ -4,7 +4,7 @@ import { convertArea } from '@turf/helpers';
 import tArea from '@turf/area';
 import tBboxPolygon from '@turf/bbox-polygon';
 import SizeAwareElement from '../../common/size-aware-element';
-import { MapContainer, TileLayer, FeatureGroup } from 'react-leaflet';
+import { MapContainer, TileLayer, FeatureGroup, ImageOverlay } from 'react-leaflet';
 import { ExploreContext, viewModes } from '../../../context/explore';
 import GeoCoder from '../../common/map/geocoder';
 import { themeVal, multiply } from '@devseed-ui/theme-provider';
@@ -13,8 +13,8 @@ import AoiDrawControl from './aoi-draw-control';
 import AoiEditControl from './aoi-edit-control';
 import config from '../../../config';
 
-const center = [38.942, -95.449];
-const zoom = 4;
+const center = [38.83428180092151, -79.37724530696869];
+const zoom = 15;
 const freeDraw = new FreeDraw({
   mode: ALL,
 });
@@ -56,8 +56,10 @@ function areaFromBounds(bbox) {
 }
 
 function Map() {
-  const [map, setMap] = useState(null);
+  // const [] = useState(null);
   const {
+    map,
+    setMap,
     apiLimits,
     aoiRef,
     previousViewMode,
@@ -65,6 +67,7 @@ function Map() {
     setAoiArea,
     setViewMode,
     viewMode,
+    prediction
   } = useContext(ExploreContext);
 
   useEffect(() => {
@@ -148,11 +151,18 @@ function Map() {
           }
         }}
       >
-        <TileLayer
+        {prediction && (
+          <ImageOverlay
+            key={`prediction`}
+            url={prediction.image}
+            bounds={prediction.bounds}
+          ></ImageOverlay>
+        )}
+        {/* <TileLayer
           attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
           url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
           maxZoom={11}
-        />
+        /> */}
         <TileLayer
           attribution='&copy; NAIP'
           url={config.NaipTileUrl}
