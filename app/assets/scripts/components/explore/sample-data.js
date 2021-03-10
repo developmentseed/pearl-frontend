@@ -72,16 +72,14 @@ export const availableCheckpoints = [
 export const availableClasses = [
   {
     name: 'Water',
-    color: '#ff0000'
+    color: '#ff0000',
   },
   {
     name: 'Land',
-    color: '#00ff00'
+    color: '#00ff00',
   },
   {
     name: 'Building',
-    color: '#0000ff'
+    color: '#0000ff',
   },
-
 ];
-

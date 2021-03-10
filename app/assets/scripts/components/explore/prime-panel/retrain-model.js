@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import T from 'prop-types';
 import { Button } from '@devseed-ui/button';
 import styled, { css } from 'styled-components';
 import { glsp, themeVal } from '@devseed-ui/theme-provider';
@@ -86,5 +87,7 @@ function RetrainModel(props) {
   );
 }
 
-RetrainModel.propTypes = {};
+RetrainModel.propTypes = {
+  classList: T.array,
+};
 export default RetrainModel;
