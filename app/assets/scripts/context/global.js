@@ -157,6 +157,9 @@ export function GlobalContextProvider(props) {
           projectsList,
           projectCheckpoints,
 
+          dispatchProject,
+          currentProject,
+
           selectedModel,
           setSelectedModel,
 

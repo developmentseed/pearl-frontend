@@ -1,11 +1,18 @@
 import React from 'react';
 import styled from 'styled-components';
 import T from 'prop-types';
+import { Heading } from '@devseed-ui/typography';
 import { toTitleCase } from '../../utils/format';
 const List = styled.ol`
+  display: grid;
+  grid-gap: 0.25rem;
   li {
     display: grid;
-    grid-template-columns: 1fr 2fr;
+    grid-gap: 0.5rem;
+    grid-template-columns: 1fr 4fr;
+    h1 {
+      margin: 0;
+    }
   }
 `;
 
@@ -15,8 +22,10 @@ function DetailsList(props) {
     <List>
       {Object.entries(details).map(([key, value]) => (
         <li key={key}>
-          <strong>{toTitleCase(key)}</strong>
-          <p>{value}</p>
+          <>
+            <Heading useAlt>{toTitleCase(key)}</Heading>
+            {React.isValidElement(value) ? value : <p>{value}</p>}
+          </>
         </li>
       ))}
     </List>

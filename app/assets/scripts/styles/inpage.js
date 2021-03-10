@@ -48,6 +48,7 @@ export const InpageHeaderInner = styled.div`
     ${multiply(themeVal('layout.space'), 4)}
     ${multiply(themeVal('layout.space'), 2)}
     ${multiply(themeVal('layout.space'), 4)};
+  max-width: ${themeVal('layout.max')};
   margin: 0 auto;
 `;
 
@@ -100,4 +101,5 @@ export const InpageBodyInner = styled.div`
     ${multiply(themeVal('layout.space'), 4)}
     ${multiply(themeVal('layout.space'), 4)};
   max-width: ${themeVal('layout.max')};
+  margin: 0 auto;
 `;
