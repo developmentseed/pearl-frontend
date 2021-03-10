@@ -68,3 +68,20 @@ export const availableCheckpoints = [
     created: new Date().toISOString(),
   },
 ];
+
+export const availableClasses = [
+  {
+    name: 'Water',
+    color: '#ff0000'
+  },
+  {
+    name: 'Land',
+    color: '#00ff00'
+  },
+  {
+    name: 'Building',
+    color: '#0000ff'
+  },
+
+];
+
