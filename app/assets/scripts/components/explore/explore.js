@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import styled from 'styled-components';
 import {
   Inpage,
@@ -12,14 +12,17 @@ import Panel from '../common/panel';
 import PrimePanel from './prime-panel';
 import Map from './map';
 
+import Tour from '../common/tour';
+import { ExploreContext } from '../../context/explore';
+
 const ExploreBody = styled(InpageBody)`
   display: grid;
   grid-template-columns: min-content 1fr min-content;
 `;
 
 const ExploreCarto = styled.section``;
-
 function Explore() {
+  const { tourStep, setTourStep } = useContext(ExploreContext);
   return (
     <>
       <Inpage isMapCentric>
@@ -43,6 +46,7 @@ function Explore() {
             data-cy='secondary-panel'
           />
         </ExploreBody>
+        <Tour tourStep={tourStep} setTourStep={setTourStep} />
       </Inpage>
     </>
   );

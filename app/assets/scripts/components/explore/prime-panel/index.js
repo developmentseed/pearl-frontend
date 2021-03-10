@@ -164,6 +164,7 @@ function AoiEditButtons(props) {
         );
       }}
       title='Draw Area of Interest'
+      id='edit-aoi-trigger'
       useIcon='pencil'
     >
       Select AOI

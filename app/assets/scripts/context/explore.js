@@ -26,6 +26,8 @@ export const viewModes = {
 export const ExploreContext = createContext({});
 export function ExploreProvider(props) {
   const history = useHistory();
+  const [tourStep, setTourStep] = useState(0);
+
   const [aoiRef, setAoiRef] = useState(null);
   const [aoiArea, setAoiArea] = useState(null);
   const [viewMode, setViewMode] = useState(viewModes.BROWSE_MODE);
@@ -40,6 +42,11 @@ export function ExploreProvider(props) {
   useEffect(() => {
     showGlobalLoadingMessage('Checking API status...');
     queryApiMeta()(dispatchApiMeta);
+
+    const visited = localStorage.getItem('site-tour');
+    if (visited !== null) {
+      setTourStep(Number(visited));
+    }
   }, []);
 
   // If API is unreachable, redirect to home
@@ -53,6 +60,10 @@ export function ExploreProvider(props) {
     }
   }, [apiMeta]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  useEffect(() => {
+    localStorage.setItem('site-tour', tourStep);
+  }, [tourStep]);
+
   return (
     <ExploreContext.Provider
       value={{
@@ -65,6 +76,9 @@ export function ExploreProvider(props) {
         setAoiRef,
         aoiArea,
         setAoiArea,
+
+        tourStep,
+        setTourStep,
       }}
     >
       {props.children}
