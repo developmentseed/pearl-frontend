@@ -55,10 +55,10 @@ const Wrapper = styled.div`
 `;
 
 function RetrainModel(props) {
-  const { classList } = props;
+  const { classList, className } = props;
   const [selectedClass, setSelectedClass] = useState({});
   return (
-    <Wrapper>
+    <Wrapper className={className}>
       <Heading useAlt>Classes</Heading>
       <ClassList>
         {classList.map((c) => (
@@ -89,5 +89,6 @@ function RetrainModel(props) {
 
 RetrainModel.propTypes = {
   classList: T.array,
+  className: T.string,
 };
 export default RetrainModel;
