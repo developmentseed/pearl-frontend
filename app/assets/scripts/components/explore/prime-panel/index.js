@@ -196,7 +196,8 @@ function PrimePanel() {
     apiLimits,
     setPrediction,
     currentInstance,
-    setCurrentInstance
+    setCurrentInstance,
+    requestPrediction,
   } = useContext(ExploreContext);
 
   const { isAuthenticated } = useAuth0();
@@ -215,14 +216,7 @@ function PrimePanel() {
   const [applyState, setApplyState] = useState();
   const [applyTooltip, setApplyTooltip] = useState();
 
-  const [
-    currentProject,
-    setCurrentProject,
-    removeCurrentProject,
-  ] = useLocalstorage(null);
-
-  const [currentInstanceStatus, setCurrentInstanceStatus] = useState(null);
-  const [wsClient, setWsClient] = useState(null);
+  const [currentProject, setCurrentProject] = useLocalstorage(null);
 
   useEffect(() => {
     if (!aoiArea || !selectedModel) {
@@ -249,16 +243,7 @@ function PrimePanel() {
 
   const { models } = modelsList.isReady() && modelsList.getData();
 
-  function requestPrediction() {
-
-  }
-
   async function handleInferenceRun() {
-    // if (!applyState) {
-    //   return;
-    // }
-    // setInference(true);
-
     if (restApiClient) {
       let project = currentProject;
       if (!project) {
@@ -293,123 +278,8 @@ function PrimePanel() {
       }
     }
 
-    // if (aoiRef && wsClient) {
-    //   console.log('will request prediction');
-
-    //   const {
-    //     _southWest: { lng: minX, lat: minY },
-    //     _northEast: { lng: maxX, lat: maxY },
-    //   } = aoiRef.getBounds();
-    //   const aoiPolygon = {
-    //     type: 'Polygon',
-    //     coordinates: [
-    //       [
-    //         [minX, minY],
-    //         [maxX, minY],
-    //         [maxX, maxY],
-    //         [minX, maxY],
-    //         [minX, minY],
-    //       ],
-    //     ],
-    //   };
-
-    //   wsClient.send(
-    //     JSON.stringify({
-    //       action: 'model#prediction',
-    //       data: {
-    //         name: 'Seneca Rocks, WV',
-    //         polygon: aoiPolygon,
-    //       },
-    //     })
-    //   );
-    // }
+    requestPrediction();
   }
-
-  // useEffect(() => {
-  //   // removeCurrentInstance();
-  //   // removeCurrentProject();
-
-  //   if (currentInstance) {
-  //     console.log(currentInstance);
-  //     showGlobalLoadingMessage('Connecting to instance...');
-  //     const wsClient = new WebsocketClient(currentInstance.token);
-  //     wsClient.addEventListener('open', (event) => {
-  //       console.log(event)
-  //       hideGlobalLoading();
-  //       setWsClient(wsClient);
-  //       toasts.info('Connected to instance.');
-  //     });
-
-  //     wsClient.addEventListener('message', function (event) {
-  //       console.log(event);
-  //       if (event.data) {
-  //         const eventData = JSON.parse(event.data);
-  //         if (eventData.message === 'model#prediction') {
-  //           const { data } = eventData;
-  //           const [minX, minY, maxX, maxY] = data.bounds;
-  //           console.log(data.image);
-  //           console.log(`data:image/png;base64,${data.image}`);
-
-  //           setPrediction({
-  //             // image: data.image,
-  //             // image: 'http://www.lib.utexas.edu/maps/historical/newark_nj_1922.jpg',
-  //             image: `data:image/png;base64,${data.image}`,
-  //             bounds: [
-  //               [minY, minX],
-  //               [maxY, maxX],
-  //             ],
-  //           });
-  //           // L.ImageOverlay(data.image, [
-  //           //   [minY, minX],
-  //           //   [maxY, maxX],
-  //           // ]).addTo(map);
-  //         }
-  //       }
-  //       // console.log(event)
-
-  //       // console.log('Message from server ', data);
-  //     });
-  //   }
-
-  //   return () => {
-  //     // if (wsClient) {
-  //     //   wsClient.close();
-  //     // }
-  //   };
-  // }, []);
-
-  // useEffect(() => {
-  //   if (!aoiRef || !wsClient) return;
-
-  //   console.log('will request prediction');
-
-  //   const {
-  //     _southWest: { lng: minX, lat: minY },
-  //     _northEast: { lng: maxX, lat: maxY },
-  //   } = aoiRef.getBounds();
-  //   const aoiPolygon = {
-  //     type: 'Polygon',
-  //     coordinates: [
-  //       [
-  //         [minX, minY],
-  //         [maxX, minY],
-  //         [maxX, maxY],
-  //         [minX, maxY],
-  //         [minX, minY],
-  //       ],
-  //     ],
-  //   };
-
-  //   wsClient.send(
-  //     JSON.stringify({
-  //       action: 'model#prediction',
-  //       data: {
-  //         name: 'Seneca Rocks, WV',
-  //         polygon: aoiPolygon,
-  //       },
-  //     })
-  //   );
-  // }, [aoiRef]);
 
   return (
     <>

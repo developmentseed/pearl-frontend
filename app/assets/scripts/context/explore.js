@@ -66,32 +66,45 @@ export function ExploreProvider(props) {
       if (websocketClient) {
         websocketClient.close();
       }
-
       initWebsocket();
     }
   }, [currentInstance]);
 
-  useEffect(() => {
-    if (currentInstance) {
-      initWebsocket();
-    }
-  }, []);
-
   function initWebsocket() {
-    console.log('initWebsocket')
+    console.log('initWebsocket');
+    console.log(currentInstance);
     // Create new websocket
     const newWebsocketClient = new WebsocketClient(currentInstance.token);
     newWebsocketClient.addEventListener('open', (event) => {
-      console.log(event.data);
+      console.log('open');
+      console.log(event);
     });
     newWebsocketClient.addEventListener('message', (event) => {
       console.log('message');
-      console.log(event.data);
+      console.log(event);
+
+      if (!event.data) return;
+
+      const eventData = JSON.parse(event.data);
+      if (eventData.message === 'model#prediction') {
+        const [minX, minY, maxX, maxY] = eventData.data.bounds;
+
+        setPrediction({
+          image: `data:image/png;base64,${eventData.data.image}`,
+          bounds: [
+            [minY, minX],
+            [maxY, maxX],
+          ],
+        });
+      }
     });
     setWebsocketClient(newWebsocketClient);
   }
 
   function requestPrediction() {
+    console.log('requestPrediction');
+    if (!aoiRef || !websocketClient) return;
+
     // Get AOI bounds polygon
     const {
       _southWest: { lng: minX, lat: minY },
