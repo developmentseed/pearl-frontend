@@ -42,12 +42,11 @@ class AoiDrawControl {
 
     // Listen to draw end
     function onMouseUp() {
-      
       // Turn off the mousemove handler in all cases
       // on the mouseUp action
       this._map.off('mousemove', onMouseMove, this);
 
-      // We need to enable dragging to get the 
+      // We need to enable dragging to get the
       // cursor to remain consistent
       this._map.dragging.enable();
 
