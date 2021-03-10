@@ -193,7 +193,7 @@ function PrimePanel() {
 
   const { isAuthenticated } = useAuth0();
 
-  const { apiClient, selectedModel, setSelectedModel, modelsList } = useContext(
+  const { restApiClient, selectedModel, setSelectedModel, modelsList } = useContext(
     GlobalContext
   );
 
@@ -270,13 +270,13 @@ function PrimePanel() {
     // }
     // setInference(true);
 
-    if (apiClient) {
+    if (restApiClient) {
       showGlobalLoadingMessage('Creating project...');
 
       let project = currentProject;
       try {
         if (!project) {
-          project = await apiClient.createProject({
+          project = await restApiClient.createProject({
             model_id: 1,
             mosaic: 'naip.latest',
             name: 'Untitled',
@@ -292,7 +292,7 @@ function PrimePanel() {
       if (!instance) {
         showGlobalLoadingMessage('Requesting instance to run inference...');
         try {
-          instance = await apiClient.createInstance(project.id);
+          instance = await restApiClient.createInstance(project.id);
           setCurrentInstance(instance);
         } catch (error) {
           hideGlobalLoading();

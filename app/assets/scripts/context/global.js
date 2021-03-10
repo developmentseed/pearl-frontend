@@ -11,7 +11,7 @@ import { createQueryApiPostReducer, queryApiPost } from '../reducers/api';
 import useLocalStorage from '@rooks/use-localstorage';
 import config from '../config';
 import { useAuth0 } from '@auth0/auth0-react';
-import ApiClient from './api-client';
+import RestApiClient from './rest-api-client';
 
 const GlobalContext = createContext({});
 export function GlobalContextProvider(props) {
@@ -21,7 +21,7 @@ export function GlobalContextProvider(props) {
     isLoading: auth0IsLoading,
   } = useAuth0();
   const [apiToken, setApiToken, removeApiToken] = useLocalStorage();
-  const [apiClient, setApiClient] = useState();
+  const [restApiClient, setRestApiClient] = useState();
 
   const [restApiHealth, dispatchRestApiStatus] = useReducer(
     createRestApiHealthReducer,
@@ -94,8 +94,8 @@ export function GlobalContextProvider(props) {
     }
 
     // Create API Client
-    const apiClient = new ApiClient({ apiToken });
-    setApiClient(apiClient);
+    const restApiClient = new RestApiClient({ apiToken });
+    setRestApiClient(restApiClient);
 
     queryApiGet({ token: apiToken, endpoint: 'model' })(dispatchModelsList);
     queryApiGet({ token: apiToken, endpoint: 'project' })(dispatchProjectsList);
@@ -152,7 +152,7 @@ export function GlobalContextProvider(props) {
         value={{
           restApiHealth,
           apiToken,
-          apiClient,
+          restApiClient,
           modelsList,
           projectsList,
           projectCheckpoints,
