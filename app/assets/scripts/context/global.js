@@ -14,6 +14,8 @@ import { useAuth0 } from '@auth0/auth0-react';
 
 const GlobalContext = createContext({});
 export function GlobalContextProvider(props) {
+  const [tourStep, setTourStep] = useState(0);
+
   const {
     isAuthenticated,
     getAccessTokenWithPopup,
@@ -52,7 +54,15 @@ export function GlobalContextProvider(props) {
 
   useEffect(() => {
     queryRestApiHealth()(dispatchRestApiStatus);
+    const visited = localStorage.getItem('site-tour');
+    if (visited !== null) {
+      setTourStep(Number(visited));
+    }
   }, []);
+
+  useEffect(() => {
+    localStorage.setItem('site-tour', tourStep);
+  }, [tourStep]);
 
   useEffect(() => {
     /*
@@ -158,6 +168,9 @@ export function GlobalContextProvider(props) {
 
           currentProjectName,
           setCurrentProjectName,
+
+          tourStep,
+          setTourStep,
         }}
       >
         {props.children}

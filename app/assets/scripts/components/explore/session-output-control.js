@@ -29,7 +29,7 @@ const Form = styled(BaseForm)`
 function SessionOutputControl(props) {
   const { isAuthenticated } = useAuth0();
 
-  const { status, projectName, setProjectName } = props;
+  const { status, projectName, setProjectName, openHelp } = props;
   const [localProjectName, setLocalProjectName] = useState(projectName);
 
   const handleSubmit = (evt) => {
@@ -120,6 +120,15 @@ function SessionOutputControl(props) {
       >
         Export
       </DropdownTrigger>
+
+      <Button
+        variation='base-plain'
+        size='small'
+        useIcon='circle-question'
+        onClick={openHelp}
+      >
+        Help
+      </Button>
     </Wrapper>
   );
 }
@@ -128,6 +137,7 @@ SessionOutputControl.propTypes = {
   status: T.string,
   projectName: T.string,
   setProjectName: T.func,
+  openHelp: T.func,
 };
 
 export default SessionOutputControl;

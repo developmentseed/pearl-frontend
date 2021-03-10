@@ -13,7 +13,7 @@ import PrimePanel from './prime-panel';
 import Map from './map';
 
 import Tour from '../common/tour';
-import { ExploreContext } from '../../context/explore';
+import GlobalContext from '../../context/global';
 
 const ExploreBody = styled(InpageBody)`
   display: grid;
@@ -22,7 +22,7 @@ const ExploreBody = styled(InpageBody)`
 
 const ExploreCarto = styled.section``;
 function Explore() {
-  const { tourStep, setTourStep } = useContext(ExploreContext);
+  const { tourStep, setTourStep } = useContext(GlobalContext);
   return (
     <>
       <Inpage isMapCentric>

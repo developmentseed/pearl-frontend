@@ -9,7 +9,7 @@ import SessionOutputControl from './session-output-control';
 import GlobalContext from '../../context/global';
 
 function Explore() {
-  const { currentProjectName, setCurrentProjectName } = useContext(
+  const { currentProjectName, setCurrentProjectName, setTourStep } = useContext(
     GlobalContext
   );
   return (
@@ -19,6 +19,7 @@ function Explore() {
           <SessionOutputControl
             projectName={currentProjectName || 'Untitled Project'}
             setProjectName={setCurrentProjectName}
+            openHelp={() => setTourStep(0)}
           />
         </PageHeader>
         <PageBody role='main'>
