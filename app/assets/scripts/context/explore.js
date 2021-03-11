@@ -75,10 +75,6 @@ export function ExploreProvider(props) {
     console.log(currentInstance);
     // Create new websocket
     const newWebsocketClient = new WebsocketClient(currentInstance.token);
-    newWebsocketClient.addEventListener('open', (event) => {
-      console.log('open');
-      console.log(event);
-    });
     newWebsocketClient.addEventListener('message', (event) => {
       console.log('message');
       console.log(event);
@@ -88,7 +84,14 @@ export function ExploreProvider(props) {
       const eventData = JSON.parse(event.data);
       if (eventData.message === 'model#prediction') {
         const [minX, minY, maxX, maxY] = eventData.data.bounds;
-
+        const predictionObj = {
+          image: `data:image/png;base64,${eventData.data.image}`,
+          bounds: [
+            [minY, minX],
+            [maxY, maxX],
+          ],
+        };
+        console.log(predictionObj);
         setPrediction({
           image: `data:image/png;base64,${eventData.data.image}`,
           bounds: [
@@ -123,16 +126,17 @@ export function ExploreProvider(props) {
       ],
     };
 
+    const message = {
+      action: 'model#prediction',
+      data: {
+        polygon: aoiPolygon,
+      },
+    };
+
+    console.log(message);
+
     // Send request prediction message
-    websocketClient.send(
-      JSON.stringify({
-        action: 'model#prediction',
-        data: {
-          name: 'Seneca Rocks, WV',
-          polygon: aoiPolygon,
-        },
-      })
-    );
+    websocketClient.send(JSON.stringify(message));
   }
 
   return (

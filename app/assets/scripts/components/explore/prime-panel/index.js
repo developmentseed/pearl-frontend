@@ -246,6 +246,10 @@ function PrimePanel() {
   async function handleInferenceRun() {
     if (restApiClient) {
       let project = currentProject;
+      let instance = currentInstance;
+      // let project;
+      // let instance;
+
       if (!project) {
         try {
           showGlobalLoadingMessage('Creating project...');
@@ -262,8 +266,7 @@ function PrimePanel() {
         }
       }
 
-      let instance = currentInstance;
-      if (!instance) {
+      if (!instance && project) {
         try {
           showGlobalLoadingMessage('Requesting instance to run inference...');
           instance = await restApiClient.createInstance(project.id);
@@ -276,9 +279,12 @@ function PrimePanel() {
           hideGlobalLoading();
         }
       }
+
+      if (instance) {
+        requestPrediction();
+      }
     }
 
-    requestPrediction();
   }
 
   return (
