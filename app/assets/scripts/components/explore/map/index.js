@@ -59,16 +59,19 @@ function areaFromBounds(bbox) {
 }
 
 function Map() {
-  const { map, setMap, mapLayers, setMapLayers } = useContext(MapContext);
   const {
-    apiLimits,
+    map,
+    setMap,
+    mapLayers,
+    setMapLayers,
     aoiRef,
     previousViewMode,
     setAoiRef,
     setAoiArea,
     setViewMode,
     viewMode,
-  } = useContext(ExploreContext);
+  } = useContext(MapContext);
+  const { apiLimits } = useContext(ExploreContext);
 
   const { mosaicList } = useContext(GlobalContext);
 

@@ -1,6 +1,5 @@
-import React, { createContext, useState, useEffect, useReducer } from 'react';
+import React, { createContext, useEffect, useReducer } from 'react';
 import T from 'prop-types';
-import usePrevious from '../utils/use-previous';
 import { initialApiRequestState } from '../reducers/reduxeed';
 import { createApiMetaReducer, queryApiMeta } from '../reducers/api';
 import {
@@ -10,15 +9,6 @@ import {
 import toasts from '../components/common/toasts';
 import { useHistory } from 'react-router-dom';
 
-/**
- * Explore View Modes
- */
-export const viewModes = {
-  BROWSE_MODE: 'BROWSE_MODE',
-  CREATE_AOI_MODE: 'CREATE_AOI_MODE',
-  EDIT_AOI_MODE: 'EDIT_AOI_MODE',
-  EDIT_CLASS_MODE: 'EDIT_CLASS_MODE',
-};
 
 /**
  * Context & Provider
@@ -28,13 +18,6 @@ export function ExploreProvider(props) {
   const history = useHistory();
   
   // AOI Leaflet layer ref
-  const [aoiRef, setAoiRef] = useState(null);
-
-  //Current AOI square area
-  const [aoiArea, setAoiArea] = useState(null);
-
-  const [viewMode, setViewMode] = useState(viewModes.BROWSE_MODE);
-  const previousViewMode = usePrevious(viewMode);
 
   const [apiMeta, dispatchApiMeta] = useReducer(
     createApiMetaReducer,
@@ -63,13 +46,6 @@ export function ExploreProvider(props) {
       value={{
         apiLimits:
           apiMeta.isReady() && !apiMeta.hasError() && apiMeta.getData().limits,
-        previousViewMode,
-        viewMode,
-        setViewMode,
-        aoiRef,
-        setAoiRef,
-        aoiArea,
-        setAoiArea,
       }}
     >
       {props.children}

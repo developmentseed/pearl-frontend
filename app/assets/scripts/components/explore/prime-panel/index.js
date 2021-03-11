@@ -217,18 +217,10 @@ AoiEditButtons.propTypes = {
   aoiArea: T.oneOfType([T.bool, T.number]),
   apiLimits: T.oneOfType([T.bool, T.object]),
   map: T.object,
-
 };
 
 function PrimePanel() {
-  const {
-    viewMode,
-    setViewMode,
-    aoiRef,
-    setAoiRef,
-    aoiArea,
-    apiLimits,
-  } = useContext(ExploreContext);
+  const { apiLimits } = useContext(ExploreContext);
 
   const { isAuthenticated } = useAuth0();
 
@@ -239,7 +231,17 @@ function PrimePanel() {
     mosaicList,
   } = useContext(GlobalContext);
 
-  const { map, mapLayers, aoiBounds, setAoiBounds } = useContext(MapContext);
+  const {
+    map,
+    mapLayers,
+    aoiBounds,
+    setAoiBounds,
+    viewMode,
+    setViewMode,
+    aoiRef,
+    setAoiRef,
+    aoiArea,
+  } = useContext(MapContext);
 
   const [showSelectModelModal, setShowSelectModelModal] = useState(false);
   const [inference, setInference] = useState(false);
