@@ -8,7 +8,7 @@ import React, {
 import T from 'prop-types';
 import usePrevious from '../utils/use-previous';
 import { initialApiRequestState } from '../reducers/reduxeed';
-import { createApiMetaReducer, queryApiMeta } from '../reducers/api';
+import { createApiMetaReducer } from '../reducers/api';
 import {
   showGlobalLoadingMessage,
   hideGlobalLoading,
@@ -16,7 +16,6 @@ import {
 import toasts from '../components/common/toasts';
 import { useHistory, useParams } from 'react-router-dom';
 import WebsocketClient from './websocket-client';
-import useLocalstorage from '@rooks/use-localstorage';
 import GlobalContext from './global';
 
 /**
@@ -46,7 +45,17 @@ export function ExploreProvider(props) {
   const [selectedModel, setSelectedModel] = useState(null);
 
   const previousViewMode = usePrevious(viewMode);
-  const [predictions, setPredictions] = useState([]);
+  const [predictions, dispatchtPredictions] = useReducer((state, action) => {
+    switch (action.type) {
+      case 'add':
+        // Add prediction to list. Id serve as key for react components
+        return state.concat({ id: state.length + 1, ...action.data });
+      case 'clear':
+        return [];
+      default:
+        throw new Error('Unexpected error.');
+    }
+  }, []);
   const [currentInstance, setCurrentInstance] = useState(null);
   const [websocketClient, setWebsocketClient] = useState(null);
 
@@ -99,14 +108,9 @@ export function ExploreProvider(props) {
   }, [currentInstance]);
 
   function initWebsocket() {
-    console.log('initWebsocket');
-    console.log(currentInstance);
     // Create new websocket
     const newWebsocketClient = new WebsocketClient(currentInstance.token);
     newWebsocketClient.addEventListener('message', (event) => {
-      console.log('message');
-      console.log(event);
-
       if (!event.data) return;
       const eventData = JSON.parse(event.data);
 
@@ -138,7 +142,6 @@ export function ExploreProvider(props) {
           },
         };
 
-        console.log(message);
         newWebsocketClient.send(JSON.stringify(message));
 
         // On prediction received, update the map
@@ -152,7 +155,7 @@ export function ExploreProvider(props) {
           ],
         };
 
-        setPredictions(predictions.concat(prediction));
+        dispatchtPredictions({ type: 'add', data: prediction });
       }
     });
     setWebsocketClient(newWebsocketClient);
@@ -164,7 +167,6 @@ export function ExploreProvider(props) {
         map,
         setMap,
         predictions,
-        setPredictions,
         apiLimits:
           apiMeta.isReady() && !apiMeta.hasError() && apiMeta.getData().limits,
         previousViewMode,

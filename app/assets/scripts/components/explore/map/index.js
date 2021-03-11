@@ -157,9 +157,9 @@ function Map() {
         }}
       >
         {predictions &&
-          predictions.map((p, i) => (
+          predictions.map((p) => (
             <ImageOverlay
-              key={`prediction-${i}`}
+              key={p.id}
               url={p.image}
               bounds={p.bounds}
             />
