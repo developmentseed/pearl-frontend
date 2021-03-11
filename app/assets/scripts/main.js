@@ -59,7 +59,7 @@ function Root() {
               <GlobalStyles />
               <Switch>
                 <Route exact path='/' component={Home} />
-                <Route exact path='/explore' component={Explore} />
+                <Route path='/project/:id' component={Explore} />
                 <ProtectedRoute exact path='/profile/maps' component={Maps} />
                 <ProtectedRoute
                   exact

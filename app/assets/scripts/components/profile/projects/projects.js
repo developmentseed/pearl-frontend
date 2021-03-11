@@ -76,11 +76,11 @@ function Projects(props) {
               <InpageTitle>Projects</InpageTitle>
               <Button
                 forwardedAs={StyledNavLink}
-                to='/explore'
+                to='/project/new'
                 variation='primary-raised-light'
                 size='large'
                 useIcon={['plus', 'after']}
-                title='Launch application'
+                title='Start a new project'
                 style={{
                   alignSelf: 'center',
                 }}
