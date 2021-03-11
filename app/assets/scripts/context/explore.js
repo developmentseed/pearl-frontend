@@ -47,7 +47,7 @@ export function ExploreProvider(props) {
 
   const previousViewMode = usePrevious(viewMode);
   const [prediction, setPrediction] = useState();
-  const [currentInstance, setCurrentInstance] = useLocalstorage(null);
+  const [currentInstance, setCurrentInstance] = useState(null);
   const [websocketClient, setWebsocketClient] = useState(null);
 
   const [apiMeta, dispatchApiMeta] = useReducer(
@@ -108,9 +108,40 @@ export function ExploreProvider(props) {
       console.log(event);
 
       if (!event.data) return;
-
       const eventData = JSON.parse(event.data);
-      if (eventData.message === 'model#prediction') {
+
+      // On connected, request a prediction
+      if (eventData.message === 'info#connected') {
+        // Get AOI bounds polygon
+        const {
+          _southWest: { lng: minX, lat: minY },
+          _northEast: { lng: maxX, lat: maxY },
+        } = aoiRef.getBounds();
+        const aoiPolygon = {
+          type: 'Polygon',
+          coordinates: [
+            [
+              [minX, minY],
+              [maxX, minY],
+              [maxX, maxY],
+              [minX, maxY],
+              [minX, minY],
+            ],
+          ],
+        };
+
+        const message = {
+          action: 'model#prediction',
+          data: {
+            polygon: aoiPolygon,
+          },
+        };
+
+        console.log(message);
+        newWebsocketClient.send(JSON.stringify(message));
+
+        // On prediction received, update the map
+      } else if (eventData.message === 'model#prediction') {
         const [minX, minY, maxX, maxY] = eventData.data.bounds;
         const predictionObj = {
           image: `data:image/png;base64,${eventData.data.image}`,
@@ -132,41 +163,6 @@ export function ExploreProvider(props) {
     setWebsocketClient(newWebsocketClient);
   }
 
-  function requestPrediction() {
-    console.log('requestPrediction');
-    if (!aoiRef || !websocketClient) return;
-
-    // Get AOI bounds polygon
-    const {
-      _southWest: { lng: minX, lat: minY },
-      _northEast: { lng: maxX, lat: maxY },
-    } = aoiRef.getBounds();
-    const aoiPolygon = {
-      type: 'Polygon',
-      coordinates: [
-        [
-          [minX, minY],
-          [maxX, minY],
-          [maxX, maxY],
-          [minX, maxY],
-          [minX, minY],
-        ],
-      ],
-    };
-
-    const message = {
-      action: 'model#prediction',
-      data: {
-        polygon: aoiPolygon,
-      },
-    };
-
-    console.log(message);
-
-    // Send request prediction message
-    websocketClient.send(JSON.stringify(message));
-  }
-
   return (
     <ExploreContext.Provider
       value={{
@@ -185,7 +181,6 @@ export function ExploreProvider(props) {
         setAoiArea,
         currentInstance,
         setCurrentInstance,
-        requestPrediction,
         currentProject,
         setCurrentProject,
         selectedModel,

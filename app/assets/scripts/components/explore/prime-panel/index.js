@@ -202,7 +202,6 @@ function PrimePanel() {
     apiLimits,
     currentInstance,
     setCurrentInstance,
-    requestPrediction,
   } = useContext(ExploreContext);
 
   const { isAuthenticated } = useAuth0();
@@ -234,7 +233,7 @@ function PrimePanel() {
         try {
           showGlobalLoadingMessage('Creating project...');
           project = await restApiClient.createProject({
-            model_id: 1,
+            model_id: selectedModel.id,
             mosaic: 'naip.latest',
             name: 'Untitled',
           });
@@ -259,10 +258,6 @@ function PrimePanel() {
         } finally {
           hideGlobalLoading();
         }
-      }
-
-      if (instance) {
-        requestPrediction();
       }
     }
   }
