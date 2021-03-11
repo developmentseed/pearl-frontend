@@ -22,6 +22,7 @@ import {
 } from '@devseed-ui/modal';
 import { PlaceholderMessage } from '../../../styles/placeholder.js';
 import { ExploreContext, viewModes } from '../../../context/explore';
+import { MapContext } from '../../../context/map';
 import GlobalContext from '../../../context/global';
 
 import TabbedBlock from '../../common/tabbed-block-body';
@@ -192,9 +193,14 @@ function PrimePanel() {
 
   const { isAuthenticated } = useAuth0();
 
-  const { selectedModel, setSelectedModel, modelsList } = useContext(
-    GlobalContext
-  );
+  const {
+    selectedModel,
+    setSelectedModel,
+    modelsList,
+    mosaicList,
+  } = useContext(GlobalContext);
+
+  const { map, mapLayers } = useContext(MapContext);
 
   const [showSelectModelModal, setShowSelectModelModal] = useState(false);
   const [inference, setInference] = useState(false);
@@ -334,7 +340,23 @@ function PrimePanel() {
                 <PlaceholderPanelSection name='Refine Results'>
                   <PlaceholderMessage>Refine results</PlaceholderMessage>
                 </PlaceholderPanelSection>
-                <LayersPanel name='layers' layers={availableLayers} />
+                <LayersPanel
+                  name='layers'
+                  layers={availableLayers}
+                  baseLayerNames={
+                    mosaicList.isReady() ? mosaicList.getData().mosaics : []
+                  }
+                  onSliderChange={(name, value) => {
+                    mapLayers[name].setOpacity(value);
+                  }}
+                  onVisibilityToggle={(name, value) => {
+                    if (value) {
+                      map.addLayer(mapLayers[name]);
+                    } else {
+                      map.removeLayer(mapLayers[name]);
+                    }
+                  }}
+                />
               </TabbedBlock>
             </PanelBlockBody>
 

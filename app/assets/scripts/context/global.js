@@ -37,6 +37,11 @@ export function GlobalContextProvider(props) {
     initialApiRequestState
   );
 
+  const [mosaicList, dispatchMosaicList] = useReducer(
+    createQueryApiGetReducer('mosaic'),
+    initialApiRequestState
+  );
+
   const [selectedModel, setSelectedModel] = useState(null);
   const [currentProjectName, setCurrentProjectName] = useState(null);
 
@@ -93,6 +98,7 @@ export function GlobalContextProvider(props) {
 
     queryApiGet({ token: apiToken, endpoint: 'model' })(dispatchModelsList);
     queryApiGet({ token: apiToken, endpoint: 'project' })(dispatchProjectsList);
+    queryApiGet({ token: apiToken, endpoint: 'mosaic' })(dispatchMosaicList);
   }, [apiToken]);
 
   useEffect(() => {
@@ -149,6 +155,8 @@ export function GlobalContextProvider(props) {
           modelsList,
           projectsList,
           projectCheckpoints,
+
+          mosaicList,
 
           dispatchProject,
           currentProject,
