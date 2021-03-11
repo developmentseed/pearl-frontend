@@ -46,7 +46,7 @@ export function ExploreProvider(props) {
   const [selectedModel, setSelectedModel] = useState(null);
 
   const previousViewMode = usePrevious(viewMode);
-  const [prediction, setPrediction] = useState();
+  const [predictions, setPredictions] = useState([]);
   const [currentInstance, setCurrentInstance] = useState(null);
   const [websocketClient, setWebsocketClient] = useState(null);
 
@@ -133,6 +133,7 @@ export function ExploreProvider(props) {
         const message = {
           action: 'model#prediction',
           data: {
+            name: 'A name',
             polygon: aoiPolygon,
           },
         };
@@ -143,21 +144,15 @@ export function ExploreProvider(props) {
         // On prediction received, update the map
       } else if (eventData.message === 'model#prediction') {
         const [minX, minY, maxX, maxY] = eventData.data.bounds;
-        const predictionObj = {
+        const prediction = {
           image: `data:image/png;base64,${eventData.data.image}`,
           bounds: [
             [minY, minX],
             [maxY, maxX],
           ],
         };
-        console.log(predictionObj);
-        setPrediction({
-          image: `data:image/png;base64,${eventData.data.image}`,
-          bounds: [
-            [minY, minX],
-            [maxY, maxX],
-          ],
-        });
+
+        setPredictions(predictions.concat(prediction));
       }
     });
     setWebsocketClient(newWebsocketClient);
@@ -168,8 +163,8 @@ export function ExploreProvider(props) {
       value={{
         map,
         setMap,
-        prediction,
-        setPrediction,
+        predictions,
+        setPredictions,
         apiLimits:
           apiMeta.isReady() && !apiMeta.hasError() && apiMeta.getData().limits,
         previousViewMode,

@@ -4,7 +4,12 @@ import { convertArea } from '@turf/helpers';
 import tArea from '@turf/area';
 import tBboxPolygon from '@turf/bbox-polygon';
 import SizeAwareElement from '../../common/size-aware-element';
-import { MapContainer, TileLayer, FeatureGroup, ImageOverlay } from 'react-leaflet';
+import {
+  MapContainer,
+  TileLayer,
+  FeatureGroup,
+  ImageOverlay,
+} from 'react-leaflet';
 import { ExploreContext, viewModes } from '../../../context/explore';
 import GeoCoder from '../../common/map/geocoder';
 import { themeVal, multiply } from '@devseed-ui/theme-provider';
@@ -67,7 +72,7 @@ function Map() {
     setAoiArea,
     setViewMode,
     viewMode,
-    prediction
+    predictions,
   } = useContext(ExploreContext);
 
   useEffect(() => {
@@ -151,30 +156,32 @@ function Map() {
           }
         }}
       >
-        {prediction && (
-          <ImageOverlay
-            key={`prediction`}
-            url={prediction.image}
-            bounds={prediction.bounds}
-          ></ImageOverlay>
-        )}
-        {/* <TileLayer
-          attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-          url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-          maxZoom={11}
-        /> */}
+        {predictions &&
+          predictions.map((p, i) => (
+            <ImageOverlay
+              key={`prediction-${i}`}
+              url={p.image}
+              bounds={p.bounds}
+            />
+          ))}
+
         <TileLayer
           attribution='&copy; NAIP'
           url={config.NaipTileUrl}
           minZoom={12}
           maxZoom={18}
         />
+        <TileLayer
+          attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+          url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+          maxZoom={11}
+        />
         <FeatureGroup>
           <GeoCoder />
         </FeatureGroup>
       </MapContainer>
     ),
-    [viewMode, apiLimits] // eslint-disable-line react-hooks/exhaustive-deps
+    [viewMode, apiLimits, predictions] // eslint-disable-line react-hooks/exhaustive-deps
   );
 
   return (
