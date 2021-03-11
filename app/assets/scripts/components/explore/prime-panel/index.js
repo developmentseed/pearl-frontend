@@ -342,7 +342,6 @@ function PrimePanel() {
                   }
                   onSliderChange={(name, value) => {
                     mapLayers[name].setOpacity(value);
-                    //map._layers[layerIds[name]].setOpacity(value);
                   }}
                   onVisibilityToggle={(name, value) => {
                     if (value) {
