@@ -37,6 +37,10 @@ class RestApiClient {
     return this.fetch('POST', path, data);
   }
 
+  getProject(id) {
+    return this.get(`project/${id}`);
+  }
+
   createProject(data) {
     return this.post('project', data);
   }

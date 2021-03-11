@@ -1,4 +1,10 @@
-import React, { createContext, useState, useEffect, useReducer } from 'react';
+import React, {
+  createContext,
+  useState,
+  useEffect,
+  useReducer,
+  useContext,
+} from 'react';
 import T from 'prop-types';
 import usePrevious from '../utils/use-previous';
 import { initialApiRequestState } from '../reducers/reduxeed';
@@ -8,9 +14,10 @@ import {
   hideGlobalLoading,
 } from '@devseed-ui/global-loading';
 import toasts from '../components/common/toasts';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import WebsocketClient from './websocket-client';
 import useLocalstorage from '@rooks/use-localstorage';
+import GlobalContext from './global';
 
 /**
  * Explore View Modes
@@ -28,6 +35,10 @@ export const viewModes = {
 export const ExploreContext = createContext({});
 export function ExploreProvider(props) {
   const history = useHistory();
+  let { projectId } = useParams();
+  const { restApiClient } = useContext(GlobalContext);
+
+  const [currentProject, setCurrentProject] = useState(null);
   const [map, setMap] = useState(null);
   const [aoiRef, setAoiRef] = useState(null);
   const [aoiArea, setAoiArea] = useState(null);
@@ -42,11 +53,26 @@ export function ExploreProvider(props) {
     initialApiRequestState
   );
 
-  // On mount, fetch API metadata
+  // Load project meta on load and api client ready
   useEffect(() => {
-    showGlobalLoadingMessage('Checking API status...');
-    queryApiMeta()(dispatchApiMeta);
-  }, []);
+    async function loadProject() {
+      if (projectId !== 'new') {
+        showGlobalLoadingMessage('Loading project...');
+        try {
+          // Get project metadata
+          const project = await restApiClient.getProject(projectId);
+          setCurrentProject(project);
+        } catch (error) {
+          toasts.error('Error loading project, please try again later.');
+        } finally {
+          hideGlobalLoading();
+        }
+      }
+    }
+    if (restApiClient) {
+      loadProject();
+    }
+  }, [restApiClient]);
 
   // If API is unreachable, redirect to home
   useEffect(() => {
@@ -158,6 +184,8 @@ export function ExploreProvider(props) {
         currentInstance,
         setCurrentInstance,
         requestPrediction,
+        currentProject,
+        setCurrentProject,
       }}
     >
       {props.children}

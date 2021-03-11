@@ -46,6 +46,7 @@ import { availableLayers } from '../sample-data';
 import { formatThousands } from '../../../utils/format';
 import useLocalstorage from '@rooks/use-localstorage';
 import WebsocketClient from '../../../context/websocket-client';
+import { useHistory } from 'react-router';
 
 const PlaceholderPanelSection = styled.div`
   padding: ${glsp()};
@@ -187,10 +188,13 @@ AoiEditButtons.propTypes = {
 };
 
 function PrimePanel() {
+  const history = useHistory();
   const {
     map,
     viewMode,
     setViewMode,
+    currentProject,
+    setCurrentProject,
     aoiRef,
     aoiArea,
     apiLimits,
@@ -215,8 +219,6 @@ function PrimePanel() {
   const [applyText, setApplyText] = useState();
   const [applyState, setApplyState] = useState();
   const [applyTooltip, setApplyTooltip] = useState();
-
-  const [currentProject, setCurrentProject] = useLocalstorage(null);
 
   useEffect(() => {
     if (!aoiArea || !selectedModel) {
@@ -247,8 +249,6 @@ function PrimePanel() {
     if (restApiClient) {
       let project = currentProject;
       let instance = currentInstance;
-      // let project;
-      // let instance;
 
       if (!project) {
         try {
@@ -259,8 +259,9 @@ function PrimePanel() {
             name: 'Untitled',
           });
           setCurrentProject(project);
+          history.push(`/project/${project.id}`);
         } catch (error) {
-          toasts.error('Could not create a project, please try again later.');
+          toasts.error('Could not create project, please try again later.');
         } finally {
           hideGlobalLoading();
         }
@@ -284,7 +285,6 @@ function PrimePanel() {
         requestPrediction();
       }
     }
-
   }
 
   return (
