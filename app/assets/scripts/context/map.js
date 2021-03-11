@@ -29,12 +29,11 @@ export function MapProvider(props) {
   const [viewMode, setViewMode] = useState(viewModes.BROWSE_MODE);
   const previousViewMode = usePrevious(viewMode);
 
-
   useEffect(() => {
     if (!aoiRef) {
-      setAoiArea(null)
+      setAoiArea(null);
     }
-  }, [aoiRef])
+  }, [aoiRef]);
 
   return (
     <MapContext.Provider

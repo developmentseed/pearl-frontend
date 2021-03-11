@@ -6,8 +6,8 @@ import tBboxPolygon from '@turf/bbox-polygon';
 import SizeAwareElement from '../../common/size-aware-element';
 import { MapContainer, TileLayer, FeatureGroup } from 'react-leaflet';
 import GlobalContext from '../../../context/global';
-import { ExploreContext, viewModes } from '../../../context/explore';
-import { MapContext } from '../../../context/map';
+import { ExploreContext } from '../../../context/explore';
+import { MapContext, viewModes } from '../../../context/map';
 
 import GeoCoder from '../../common/map/geocoder';
 import { themeVal, multiply } from '@devseed-ui/theme-provider';

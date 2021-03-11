@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
 import { Button } from '@devseed-ui/button';
-import { ExploreContext, viewModes } from '../../../context/explore';
+import { ExploreContext } from '../../../context/explore';
+import { viewModes } from '../../../context/map';
 
 function RetrainModel() {
   const { setViewMode } = useContext(ExploreContext);

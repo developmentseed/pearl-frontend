@@ -21,8 +21,8 @@ import {
   ModalFooter as BaseModalFooter,
 } from '@devseed-ui/modal';
 import { PlaceholderMessage } from '../../../styles/placeholder.js';
-import { ExploreContext, viewModes } from '../../../context/explore';
-import { MapContext } from '../../../context/map';
+import { ExploreContext } from '../../../context/explore';
+import { MapContext, viewModes  } from '../../../context/map';
 import GlobalContext from '../../../context/global';
 
 import TabbedBlock from '../../common/tabbed-block-body';

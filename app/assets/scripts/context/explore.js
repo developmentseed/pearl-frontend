@@ -9,14 +9,13 @@ import {
 import toasts from '../components/common/toasts';
 import { useHistory } from 'react-router-dom';
 
-
 /**
  * Context & Provider
  */
 export const ExploreContext = createContext({});
 export function ExploreProvider(props) {
   const history = useHistory();
-  
+
   // AOI Leaflet layer ref
 
   const [apiMeta, dispatchApiMeta] = useReducer(

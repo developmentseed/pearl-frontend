@@ -9,8 +9,8 @@ class AoiDrawControl {
 
   clear() {
     if (this._shape) {
-      this._map.removeLayer(this._shape)
-      this._shape = null
+      this._map.removeLayer(this._shape);
+      this._shape = null;
     }
   }
   getEventLatLng(event) {
