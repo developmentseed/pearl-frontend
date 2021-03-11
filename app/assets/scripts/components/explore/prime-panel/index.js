@@ -102,7 +102,13 @@ function AoiEditButtons(props) {
         >
           Select AOI
         </EditButton>
-        <EditButton useIcon='xmark'>Select AOI</EditButton>
+        <EditButton 
+          onClick={
+            () => {
+              setViewMode(viewModes.BROWSE_MODE)
+            }
+          }
+        useIcon='xmark'>Select AOI</EditButton>
         {activeModal && (
           <Modal
             id='confirm-area-size'

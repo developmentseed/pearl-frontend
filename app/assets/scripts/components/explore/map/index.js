@@ -84,13 +84,17 @@ function Map() {
         break;
       case viewModes.BROWSE_MODE:
         if (map) {
-          map.aoi.control.draw.disable();
-          map.aoi.control.edit.disable();
-          if (
-            previousViewMode === viewModes.CREATE_AOI_MODE ||
-            previousViewMode === viewModes.EDIT_AOI_MODE
-          ) {
-            map.fitBounds(aoiRef.getBounds(), { padding: [25, 25] });
+          if (aoiRef) {
+            // Only disable if something has been drawn
+            map.aoi.control.draw.disable();
+            map.aoi.control.edit.disable();
+            if (
+              previousViewMode === viewModes.CREATE_AOI_MODE ||
+              previousViewMode === viewModes.EDIT_AOI_MODE
+            ) {
+              // On confirm, zoom to bounds
+              map.fitBounds(aoiRef.getBounds(), { padding: [25, 25] });
+            }
           }
         }
         break;
@@ -100,7 +104,7 @@ function Map() {
       default:
         break;
     }
-  }, [viewMode]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [viewMode, aoiRef]); // eslint-disable-line react-hooks/exhaustive-deps
 
   /**
    * Add/update AOI controls on API metadata change.
