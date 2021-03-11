@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import T from 'prop-types';
 import styled from 'styled-components';
 import { Button } from '@devseed-ui/button';
@@ -11,7 +11,7 @@ const Wrapper = styled.div`
   display: grid;
   grid-gap: 1rem;
 `;
-const Layer = styled.div`
+const LayerWrapper = styled.div`
   display: grid;
   grid-template-columns: 2fr 4fr 1fr 1fr;
   ${Button} {
@@ -52,7 +52,66 @@ const AccordionFold = styled(BaseFold)`
   }
 `;
 
-function Category({ checkExpanded, setExpanded, category, layers }) {
+function Layer({ layer, onSliderChange, onVisibilityToggle }) {
+  const [value, setValue] = useState(1);
+  const [visible, setVisible] = useState(true);
+  return (
+    <LayerWrapper>
+      <IconPlaceholder />
+      <SliderWrapper>
+        <Heading as='h4' size='xsmall'>
+          {layer.name}
+        </Heading>
+        <InputRange
+          onChange={(v) => {
+            setValue(v);
+            onSliderChange(layer.name, v);
+          }}
+          value={value}
+          formatLabel={() => null}
+          minValue={0}
+          maxValue={1}
+          step={0.1}
+        />
+      </SliderWrapper>
+      <Button
+        variation='base-plain'
+        size='small'
+        hideText
+        useIcon='circle-information'
+      >
+        Info
+      </Button>
+      <Button
+        variation='base-plain'
+        size='small'
+        hideText
+        useIcon={visible ? 'eye' : 'eye-disabled'}
+        onClick={() => {
+          setVisible(!visible);
+          onVisibilityToggle(layer.name, !visible);
+        }}
+      >
+        Info
+      </Button>
+    </LayerWrapper>
+  );
+}
+
+Layer.propTypes = {
+  layer: T.object,
+  onSliderChange: T.func,
+  onVisibilityToggle: T.func,
+};
+
+function Category({
+  checkExpanded,
+  setExpanded,
+  category,
+  layers,
+  onSliderChange,
+  onVisibilityToggle,
+}) {
   return (
     <AccordionFold
       id={`${category}-fold`}
@@ -62,37 +121,12 @@ function Category({ checkExpanded, setExpanded, category, layers }) {
       renderBody={() => (
         <Wrapper>
           {layers.map((layer) => (
-            <Layer key={`${layer.category}-${layer.name}`}>
-              <IconPlaceholder />
-              <SliderWrapper>
-                <Heading as='h4' size='xsmall'>
-                  {layer.name}
-                </Heading>
-                <InputRange
-                  onChange={() => 1}
-                  value={50}
-                  formatLabel={() => null}
-                  minValue={0}
-                  maxValue={100}
-                />
-              </SliderWrapper>
-              <Button
-                variation='base-plain'
-                size='small'
-                hideText
-                useIcon='circle-information'
-              >
-                Info
-              </Button>
-              <Button
-                variation='base-plain'
-                size='small'
-                hideText
-                useIcon='eye'
-              >
-                Info
-              </Button>
-            </Layer>
+            <Layer
+              key={`${category}-${layer.name}`}
+              layer={layer}
+              onSliderChange={onSliderChange}
+              onVisibilityToggle={onVisibilityToggle}
+            />
           ))}
         </Wrapper>
       )}
@@ -105,10 +139,18 @@ Category.propTypes = {
   setExpanded: T.func,
   category: T.string,
   layers: T.array,
+  onSliderChange: T.func,
+  onVisibilityToggle: T.func,
 };
 
 function LayersPanel(props) {
-  const { layers, className } = props;
+  const {
+    layers,
+    baseLayerNames,
+    className,
+    onSliderChange,
+    onVisibilityToggle,
+  } = props;
 
   const categorizedLayers = layers.reduce((cats, layer) => {
     if (!cats[layer.category]) {
@@ -117,6 +159,10 @@ function LayersPanel(props) {
     cats[layer.category].push(layer);
     return cats;
   }, {});
+
+  const baseLayers = baseLayerNames.map((n) => ({
+    name: n,
+  }));
 
   return (
     <div className={className}>
@@ -132,16 +178,33 @@ function LayersPanel(props) {
         ]}
       >
         {
-          ({ checkExpanded, setExpanded }) =>
-            Object.entries(categorizedLayers).map(([cat, layers], index) => (
+          ({ checkExpanded, setExpanded }) => (
+            <>
+              {Object.entries(categorizedLayers).map(([cat, layers], index) => (
+                <Category
+                  key={cat}
+                  checkExpanded={() => checkExpanded(index)}
+                  setExpanded={(v) => setExpanded(index, v)}
+                  category={cat}
+                  layers={layers}
+                  onSliderChange={onSliderChange}
+                  onVisibilityToggle={onVisibilityToggle}
+                />
+              ))}
               <Category
-                key={cat}
-                checkExpanded={() => checkExpanded(index)}
-                setExpanded={(v) => setExpanded(index, v)}
-                category={cat}
-                layers={layers}
+                checkExpanded={() => {
+                  return checkExpanded(Object.keys(categorizedLayers).length);
+                }}
+                setExpanded={(v) => {
+                  return setExpanded(Object.keys(categorizedLayers).length, v);
+                }}
+                category='Base Satellite Imagery'
+                layers={baseLayers}
+                onSliderChange={onSliderChange}
+                onVisibilityToggle={onVisibilityToggle}
               />
-            ))
+            </>
+          )
           /* eslint-disable-next-line react/jsx-curly-newline */
         }
       </Accordion>
@@ -152,6 +215,9 @@ function LayersPanel(props) {
 LayersPanel.propTypes = {
   layers: T.array,
   className: T.string,
+  baseLayerNames: T.array,
+  onSliderChange: T.func,
+  onVisibilityToggle: T.func,
 };
 
 export default LayersPanel;

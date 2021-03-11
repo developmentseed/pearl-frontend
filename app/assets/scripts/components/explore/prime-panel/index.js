@@ -22,6 +22,7 @@ import {
 } from '@devseed-ui/modal';
 import { PlaceholderMessage } from '../../../styles/placeholder.js';
 import { ExploreContext, viewModes } from '../../../context/explore';
+import { MapContext } from '../../../context/map';
 import GlobalContext from '../../../context/global';
 
 import TabbedBlock from '../../common/tabbed-block-body';
@@ -37,7 +38,7 @@ import {
 import { EditButton } from '../../../styles/button';
 import InfoButton from '../../common/info-button';
 
-import { availableLayers } from '../sample-data';
+import { availableLayers, availableClasses } from '../sample-data';
 import { formatThousands } from '../../../utils/format';
 
 const PlaceholderPanelSection = styled.div`
@@ -187,12 +188,17 @@ function PrimePanel() {
 
   const { isAuthenticated } = useAuth0();
 
-  const { selectedModel, setSelectedModel, modelsList } = useContext(
-    GlobalContext
-  );
+  const {
+    selectedModel,
+    setSelectedModel,
+    modelsList,
+    mosaicList,
+  } = useContext(GlobalContext);
+
+  const { map, mapLayers } = useContext(MapContext);
 
   const [showSelectModelModal, setShowSelectModelModal] = useState(false);
-  const [inference, setInference] = useState(false);
+  const [inference, setInference] = useState(true);
 
   const [applyText, setApplyText] = useState();
   const [applyState, setApplyState] = useState();
@@ -316,21 +322,40 @@ function PrimePanel() {
             </PanelBlockHeader>
             <PanelBlockBody>
               <TabbedBlock>
-                <PlaceholderPanelSection name='Retrain Model'>
-                  {!inference ? (
+                {!inference ? (
+                  <PlaceholderPanelSection name='Retrain Model'>
                     <PlaceholderMessage>
                       Click &quot;Run Inference&quot; to generate the class LULC
                       map for your AOI
                     </PlaceholderMessage>
-                  ) : (
-                    <RetrainModel />
-                  )}
-                </PlaceholderPanelSection>
+                  </PlaceholderPanelSection>
+                ) : (
+                  <RetrainModel
+                    name='retrain model'
+                    classList={availableClasses}
+                  />
+                )}
 
                 <PlaceholderPanelSection name='Refine Results'>
                   <PlaceholderMessage>Refine results</PlaceholderMessage>
                 </PlaceholderPanelSection>
-                <LayersPanel name='layers' layers={availableLayers} />
+                <LayersPanel
+                  name='layers'
+                  layers={availableLayers}
+                  baseLayerNames={
+                    mosaicList.isReady() ? mosaicList.getData().mosaics : []
+                  }
+                  onSliderChange={(name, value) => {
+                    mapLayers[name].setOpacity(value);
+                  }}
+                  onVisibilityToggle={(name, value) => {
+                    if (value) {
+                      map.addLayer(mapLayers[name]);
+                    } else {
+                      map.removeLayer(mapLayers[name]);
+                    }
+                  }}
+                />
               </TabbedBlock>
             </PanelBlockBody>
 
