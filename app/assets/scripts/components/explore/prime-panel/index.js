@@ -190,15 +190,16 @@ AoiEditButtons.propTypes = {
 function PrimePanel() {
   const history = useHistory();
   const {
-    map,
     viewMode,
     setViewMode,
     currentProject,
     setCurrentProject,
+    selectedModel,
+    setSelectedModel,
+    inference,
     aoiRef,
     aoiArea,
     apiLimits,
-    setPrediction,
     currentInstance,
     setCurrentInstance,
     requestPrediction,
@@ -206,44 +207,23 @@ function PrimePanel() {
 
   const { isAuthenticated } = useAuth0();
 
-  const {
-    restApiClient,
-    selectedModel,
-    setSelectedModel,
-    modelsList,
-  } = useContext(GlobalContext);
+  const { restApiClient, modelsList } = useContext(GlobalContext);
 
   const [showSelectModelModal, setShowSelectModelModal] = useState(false);
-  const [inference, setInference] = useState(false);
-
-  const [applyText, setApplyText] = useState();
-  const [applyState, setApplyState] = useState();
-  const [applyTooltip, setApplyTooltip] = useState();
-
-  useEffect(() => {
-    if (!aoiArea || !selectedModel) {
-      /* pre-AOI selected */
-      setApplyState(false);
-      setApplyTooltip('Select AOI to run model');
-    } else if (!inference) {
-      /* AOI selected, inference not yet applied */
-      setApplyState(true);
-      setApplyTooltip(null);
-    }
-
-    setApplyText('Run Model');
-  }, [aoiArea, selectedModel]);
-
-  useEffect(() => {
-    if (inference) {
-      /* No Retraining samples selected, AOI unchanged*/
-      setApplyState(false);
-      setApplyText('Retrain Model');
-      setApplyTooltip('Select retraining samples to retrain model');
-    }
-  }, [inference /* retraining samples */]);
 
   const { models } = modelsList.isReady() && modelsList.getData();
+
+  // Enable/disable "Run Inference" button
+  const allowInferenceRun =
+    viewMode === viewModes.BROWSE_MODE &&
+    aoiRef &&
+    aoiArea > 0 &&
+    selectedModel;
+
+  // "Run Inference" button
+  const applyTooltip = currentProject
+    ? 'Run inference for this model'
+    : 'Create project and run model';
 
   async function handleInferenceRun() {
     if (restApiClient) {
@@ -397,10 +377,10 @@ function PrimePanel() {
                   gridColumn: '1 / -1',
                 }}
                 onClick={handleInferenceRun}
-                // visuallyDisabled={!applyState}
+                visuallyDisabled={!allowInferenceRun}
                 info={applyTooltip}
               >
-                {applyText}
+                Run Model
               </InfoButton>
             </PanelControls>
           </StyledPanelBlock>

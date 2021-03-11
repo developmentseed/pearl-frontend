@@ -39,7 +39,6 @@ export function GlobalContextProvider(props) {
     initialApiRequestState
   );
 
-  const [selectedModel, setSelectedModel] = useState(null);
   const [currentProjectName, setCurrentProjectName] = useState(null);
 
   const [currentProject, dispatchProject] = useReducer(
@@ -113,39 +112,6 @@ export function GlobalContextProvider(props) {
     }
   }, [apiToken, currentProject]);
 
-  /* Post updates to the API */
-  useEffect(() => {
-    /*
-     * When project name and model have both been set, automatically create a new project
-     */
-
-    /* eslint-disable no-console */
-    if (currentProject.isReady()) {
-      console.error(
-        'Project name update not supported by api. Change is front end only'
-      );
-      return;
-    } else if (currentProjectName && selectedModel) {
-      queryApiPost({
-        endpoint: 'project',
-        token: apiToken,
-        query: {
-          name: currentProjectName,
-          model_id: selectedModel.id,
-          mosaic: 'naip.latest',
-        },
-      })(dispatchProject);
-    } else {
-      if (!currentProjectName) {
-        console.error('Project name not set');
-      }
-      if (!selectedModel) {
-        console.error('Model not selected');
-      }
-    }
-    /* eslint-enable no-console */
-  }, [currentProjectName, selectedModel]); // eslint-disable-line react-hooks/exhaustive-deps
-
   return (
     <>
       <GlobalContext.Provider
@@ -159,9 +125,6 @@ export function GlobalContextProvider(props) {
 
           dispatchProject,
           currentProject,
-
-          selectedModel,
-          setSelectedModel,
 
           currentProjectName,
           setCurrentProjectName,

@@ -43,6 +43,8 @@ export function ExploreProvider(props) {
   const [aoiRef, setAoiRef] = useState(null);
   const [aoiArea, setAoiArea] = useState(null);
   const [viewMode, setViewMode] = useState(viewModes.BROWSE_MODE);
+  const [selectedModel, setSelectedModel] = useState(null);
+
   const previousViewMode = usePrevious(viewMode);
   const [prediction, setPrediction] = useState();
   const [currentInstance, setCurrentInstance] = useLocalstorage(null);
@@ -186,6 +188,8 @@ export function ExploreProvider(props) {
         requestPrediction,
         currentProject,
         setCurrentProject,
+        selectedModel,
+        setSelectedModel,
       }}
     >
       {props.children}
