@@ -1,4 +1,4 @@
-import React, { createContext, useState } from 'react';
+import React, { createContext, useState, useEffect } from 'react';
 import T from 'prop-types';
 import usePrevious from '../utils/use-previous';
 
@@ -28,6 +28,13 @@ export function MapProvider(props) {
 
   const [viewMode, setViewMode] = useState(viewModes.BROWSE_MODE);
   const previousViewMode = usePrevious(viewMode);
+
+
+  useEffect(() => {
+    if (!aoiRef) {
+      setAoiArea(null)
+    }
+  }, [aoiRef])
 
   return (
     <MapContext.Provider
