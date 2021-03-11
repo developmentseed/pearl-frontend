@@ -26,8 +26,13 @@ export const viewModes = {
 export const ExploreContext = createContext({});
 export function ExploreProvider(props) {
   const history = useHistory();
+  
+  // AOI Leaflet layer ref
   const [aoiRef, setAoiRef] = useState(null);
+
+  //Current AOI square area
   const [aoiArea, setAoiArea] = useState(null);
+
   const [viewMode, setViewMode] = useState(viewModes.BROWSE_MODE);
   const previousViewMode = usePrevious(viewMode);
 

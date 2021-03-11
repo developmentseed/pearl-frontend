@@ -77,7 +77,16 @@ const ModalFooter = styled(BaseModalFooter)`
 `;
 
 function AoiEditButtons(props) {
-  const { setViewMode, viewMode, aoiRef, aoiArea, apiLimits } = props;
+  const {
+    setViewMode,
+    viewMode,
+    aoiRef,
+    aoiArea,
+    aoiBounds,
+    setAoiBounds,
+    apiLimits,
+  } = props;
+  console.log(aoiBounds)
 
   const [activeModal, setActiveModal] = useState(false);
 
@@ -92,6 +101,8 @@ function AoiEditButtons(props) {
           onClick={function () {
             if (!apiLimits || apiLimits.live_inference > aoiArea) {
               setViewMode(viewModes.BROWSE_MODE);
+              setAoiBounds(aoiRef.getBounds());
+              console.log(aoiRef.getBounds())
             } else if (apiLimits.max_inference > aoiArea) {
               setActiveModal('no-live-inference');
             } else {
@@ -103,13 +114,19 @@ function AoiEditButtons(props) {
         >
           Select AOI
         </EditButton>
-        <EditButton 
-          onClick={
-            () => {
-              setViewMode(viewModes.BROWSE_MODE)
+        <EditButton
+          onClick={() => {
+            setViewMode(viewModes.BROWSE_MODE);
+            if (aoiBounds) {
+              console.log(aoiBounds)
+              // 
+              aoiRef.setBounds(aoiBounds)
             }
-          }
-        useIcon='xmark'>Select AOI</EditButton>
+          }}
+          useIcon='xmark'
+        >
+          Select AOI
+        </EditButton>
         {activeModal && (
           <Modal
             id='confirm-area-size'
@@ -200,7 +217,7 @@ function PrimePanel() {
     mosaicList,
   } = useContext(GlobalContext);
 
-  const { map, mapLayers } = useContext(MapContext);
+  const { map, mapLayers, aoiBounds, setAoiBounds } = useContext(MapContext);
 
   const [showSelectModelModal, setShowSelectModelModal] = useState(false);
   const [inference, setInference] = useState(false);
@@ -291,6 +308,8 @@ function PrimePanel() {
                     setViewMode={setViewMode}
                     aoiRef={aoiRef}
                     aoiArea={aoiArea}
+                    setAoiBounds={setAoiBounds}
+                    aoiBounds={aoiBounds}
                     viewMode={viewMode}
                     apiLimits={apiLimits}
                   />
