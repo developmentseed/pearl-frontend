@@ -41,7 +41,6 @@ export function ExploreProvider(props) {
   const { restApiClient } = useContext(GlobalContext);
 
   const [currentProject, setCurrentProject] = useState(null);
-  const [map, setMap] = useState(null);
   const [aoiRef, setAoiRef] = useState(null);
   const [aoiArea, setAoiArea] = useState(null);
   const [viewMode, setViewMode] = useState(viewModes.BROWSE_MODE);
@@ -177,8 +176,6 @@ export function ExploreProvider(props) {
   return (
     <ExploreContext.Provider
       value={{
-        map,
-        setMap,
         predictions,
         apiLimits:
           apiMeta.isReady() && !apiMeta.hasError() && apiMeta.getData().limits,
