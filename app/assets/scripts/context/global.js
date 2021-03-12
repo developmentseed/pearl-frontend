@@ -7,7 +7,7 @@ import {
   createQueryApiGetReducer,
   queryApiGet,
 } from '../reducers/api';
-import { createQueryApiPostReducer, queryApiPost } from '../reducers/api';
+import { createQueryApiPostReducer } from '../reducers/api';
 import useLocalStorage from '@rooks/use-localstorage';
 import config from '../config';
 import { useAuth0 } from '@auth0/auth0-react';

@@ -194,7 +194,7 @@ function PrimePanel() {
 
   const { isAuthenticated } = useAuth0();
 
-  const { restApiClient, modelsList } = useContext(GlobalContext);
+  const { modelsList } = useContext(GlobalContext);
 
   const [showSelectModelModal, setShowSelectModelModal] = useState(false);
 

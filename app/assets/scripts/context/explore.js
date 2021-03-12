@@ -8,7 +8,7 @@ import React, {
 import T from 'prop-types';
 import usePrevious from '../utils/use-previous';
 import { initialApiRequestState } from '../reducers/reduxeed';
-import { createApiMetaReducer } from '../reducers/api';
+import { createApiMetaReducer, queryApiMeta } from '../reducers/api';
 import {
   showGlobalLoadingMessage,
   hideGlobalLoading,
@@ -20,7 +20,6 @@ import GlobalContext from './global';
 import predictionsReducer, {
   initialPredictionsState,
 } from '../reducers/predictions';
-import logger from '../utils/logger';
 
 /**
  * Explore View Modes
@@ -62,6 +61,8 @@ export function ExploreProvider(props) {
   );
 
   useEffect(() => {
+    showGlobalLoadingMessage('Checking API status...');
+    queryApiMeta()(dispatchApiMeta);
     return () => {
       // Terminate instance on page unmount
       if (websocketClient) {
