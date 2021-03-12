@@ -63,13 +63,16 @@ export function ExploreProvider(props) {
   useEffect(() => {
     showGlobalLoadingMessage('Checking API status...');
     queryApiMeta()(dispatchApiMeta);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
     return () => {
       // Terminate instance on page unmount
       if (websocketClient) {
         websocketClient.terminateInstance();
       }
     };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [websocketClient]);
 
   // Load project meta on load and api client ready
   useEffect(() => {
