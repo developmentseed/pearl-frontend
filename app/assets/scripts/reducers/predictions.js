@@ -10,6 +10,7 @@ export const actions = {
   START_PREDICTION: 'START_PREDICTION',
   RECEIVE_PREDICTION: 'RECEIVE_PREDICTION',
   COMPLETE_PREDICTION: 'COMPLETE_PREDICTION',
+  FAILED_PREDICTION: 'FAILED_PREDICTION'
 };
 
 export default function (state, action) {
@@ -51,6 +52,13 @@ export default function (state, action) {
         receivedAt: Date.now(),
         fetching: false,
         fetched: true,
+      };
+    case actions.FAILED_PREDICTION:
+      return {
+        ...state,
+        fetching: false,
+        fetched: false,
+        error: true,
       };
     default:
       throw new Error('Unexpected error.');

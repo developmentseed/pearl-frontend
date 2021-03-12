@@ -119,6 +119,9 @@ export function ExploreProvider(props) {
       }
     } else {
       hideGlobalLoading();
+      if (predictions.error) {
+        toasts.error('An inference error occurred, please try again later.');
+      }
     }
   }, [predictions]);
 

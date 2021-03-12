@@ -40,6 +40,11 @@ class WebsocketClient extends WebSocket {
             type: actions.COMPLETE_PREDICTION,
           });
           break;
+        case 'error':
+          dispatchPredictions({
+            type: actions.FAILED_PREDICTION,
+          });
+          break;
         default:
           logger('Unknown websocket message:');
           logger(event);
