@@ -200,7 +200,6 @@ function PrimePanel() {
     aoiRef,
     aoiArea,
     apiLimits,
-    currentInstance,
     setCurrentInstance,
   } = useContext(ExploreContext);
 
@@ -227,7 +226,7 @@ function PrimePanel() {
   async function handleInferenceRun() {
     if (restApiClient) {
       let project = currentProject;
-      let instance = currentInstance;
+      let instance;
 
       if (!project) {
         try {
@@ -240,23 +239,21 @@ function PrimePanel() {
           setCurrentProject(project);
           history.push(`/project/${project.id}`);
         } catch (error) {
-          toasts.error('Could not create project, please try again later.');
-        } finally {
           hideGlobalLoading();
+          toasts.error('Could not create project, please try again later.');
         }
       }
 
-      if (!instance && project) {
+      if (project) {
         try {
-          showGlobalLoadingMessage('Requesting instance to run inference...');
+          showGlobalLoadingMessage('Requesting instance for inference run...');
           instance = await restApiClient.createInstance(project.id);
           setCurrentInstance(instance);
         } catch (error) {
+          hideGlobalLoading();
           toasts.error(
             'Error while creating an instance, please try again later.'
           );
-        } finally {
-          hideGlobalLoading();
         }
       }
     }

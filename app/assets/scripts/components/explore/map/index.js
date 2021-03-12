@@ -157,12 +157,9 @@ function Map() {
         }}
       >
         {predictions &&
-          predictions.map((p) => (
-            <ImageOverlay
-              key={p.id}
-              url={p.image}
-              bounds={p.bounds}
-            />
+          !predictions.error &&
+          predictions.data.map((p) => (
+            <ImageOverlay key={p.key} url={p.image} bounds={p.bounds} />
           ))}
 
         <TileLayer

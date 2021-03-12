@@ -17,6 +17,10 @@ import toasts from '../components/common/toasts';
 import { useHistory, useParams } from 'react-router-dom';
 import WebsocketClient from './websocket-client';
 import GlobalContext from './global';
+import predictionsReducer, {
+  initialPredictionsState,
+} from '../reducers/predictions';
+import logger from '../utils/logger';
 
 /**
  * Explore View Modes
@@ -45,17 +49,10 @@ export function ExploreProvider(props) {
   const [selectedModel, setSelectedModel] = useState(null);
 
   const previousViewMode = usePrevious(viewMode);
-  const [predictions, dispatchtPredictions] = useReducer((state, action) => {
-    switch (action.type) {
-      case 'add':
-        // Add prediction to list. Id serve as key for react components
-        return state.concat({ id: state.length + 1, ...action.data });
-      case 'clear':
-        return [];
-      default:
-        throw new Error('Unexpected error.');
-    }
-  }, []);
+  const [predictions, dispatchPredictions] = useReducer(
+    predictionsReducer,
+    initialPredictionsState
+  );
   const [currentInstance, setCurrentInstance] = useState(null);
   const [websocketClient, setWebsocketClient] = useState(null);
 
@@ -103,63 +100,59 @@ export function ExploreProvider(props) {
       if (websocketClient) {
         websocketClient.close();
       }
-      initWebsocket();
+
+      // Create websocket
+      const newWebsocketClient = new WebsocketClient({
+        token: currentInstance.token,
+        dispatchPredictions,
+        onConnected: () => {
+          logger('onConnected');
+          // Get AOI bounds polygon
+          const {
+            _southWest: { lng: minX, lat: minY },
+            _northEast: { lng: maxX, lat: maxY },
+          } = aoiRef.getBounds();
+          const aoiPolygon = {
+            type: 'Polygon',
+            coordinates: [
+              [
+                [minX, minY],
+                [maxX, minY],
+                [maxX, maxY],
+                [minX, maxY],
+                [minX, minY],
+              ],
+            ],
+          };
+
+          // Start prediction on connected
+          newWebsocketClient.requestPrediction('A name', aoiPolygon);
+        },
+      });
+
+      setWebsocketClient(newWebsocketClient);
     }
   }, [currentInstance]);
 
-  function initWebsocket() {
-    // Create new websocket
-    const newWebsocketClient = new WebsocketClient(currentInstance.token);
-    newWebsocketClient.addEventListener('message', (event) => {
-      if (!event.data) return;
-      const eventData = JSON.parse(event.data);
+  useEffect(() => {
+    if (!predictions) return;
 
-      // On connected, request a prediction
-      if (eventData.message === 'info#connected') {
-        // Get AOI bounds polygon
-        const {
-          _southWest: { lng: minX, lat: minY },
-          _northEast: { lng: maxX, lat: maxY },
-        } = aoiRef.getBounds();
-        const aoiPolygon = {
-          type: 'Polygon',
-          coordinates: [
-            [
-              [minX, minY],
-              [maxX, minY],
-              [maxX, maxY],
-              [minX, maxY],
-              [minX, minY],
-            ],
-          ],
-        };
-
-        const message = {
-          action: 'model#prediction',
-          data: {
-            name: 'A name',
-            polygon: aoiPolygon,
-          },
-        };
-
-        newWebsocketClient.send(JSON.stringify(message));
-
-        // On prediction received, update the map
-      } else if (eventData.message === 'model#prediction') {
-        const [minX, minY, maxX, maxY] = eventData.data.bounds;
-        const prediction = {
-          image: `data:image/png;base64,${eventData.data.image}`,
-          bounds: [
-            [minY, minX],
-            [maxY, maxX],
-          ],
-        };
-
-        dispatchtPredictions({ type: 'add', data: prediction });
+    if (predictions.fetching) {
+      const { processed, total } = predictions;
+      if (!total) {
+        showGlobalLoadingMessage(`Waiting for predictions...`);
+      } else {
+        showGlobalLoadingMessage(
+          `Receiving images: ${processed} of ${total}...`
+        );
       }
-    });
-    setWebsocketClient(newWebsocketClient);
-  }
+    } else {
+      hideGlobalLoading();
+      if (websocketClient) {
+        websocketClient.terminateInstance();
+      }
+    }
+  }, [predictions]);
 
   return (
     <ExploreContext.Provider
