@@ -12,7 +12,8 @@ function CenterMap({ aoiRef }) {
       button.setAttribute('role', 'button');
       button.setAttribute('href', '#');
       button.setAttribute('title', 'Center Map');
-      button.onclick = () => map.fitBounds(aoiRef.getBounds());
+      button.onclick = () =>
+        map.fitBounds(aoiRef.getBounds(), { padding: [25, 25] });
 
       return container;
     },
