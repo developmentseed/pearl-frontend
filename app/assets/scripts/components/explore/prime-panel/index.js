@@ -1,9 +1,8 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext } from 'react';
 import styled from 'styled-components';
 import { themeVal, glsp } from '@devseed-ui/theme-provider';
 import { Button } from '@devseed-ui/button';
 import T from 'prop-types';
-import L from 'leaflet';
 import { useAuth0 } from '@auth0/auth0-react';
 import Panel from '../../common/panel';
 import {
@@ -20,11 +19,6 @@ import {
   ModalHeadline,
   ModalFooter as BaseModalFooter,
 } from '@devseed-ui/modal';
-import toasts from '../../common/toasts';
-import {
-  showGlobalLoadingMessage,
-  hideGlobalLoading,
-} from '@devseed-ui/global-loading';
 import { PlaceholderMessage } from '../../../styles/placeholder.js';
 import { ExploreContext, viewModes } from '../../../context/explore';
 import GlobalContext from '../../../context/global';
@@ -44,9 +38,6 @@ import InfoButton from '../../common/info-button';
 
 import { availableLayers } from '../sample-data';
 import { formatThousands } from '../../../utils/format';
-import useLocalstorage from '@rooks/use-localstorage';
-import WebsocketClient from '../../../context/websocket-client';
-import { useHistory } from 'react-router';
 
 const PlaceholderPanelSection = styled.div`
   padding: ${glsp()};
@@ -188,19 +179,17 @@ AoiEditButtons.propTypes = {
 };
 
 function PrimePanel() {
-  const history = useHistory();
   const {
     viewMode,
     setViewMode,
     currentProject,
-    setCurrentProject,
     selectedModel,
     setSelectedModel,
     inference,
     aoiRef,
     aoiArea,
     apiLimits,
-    setCurrentInstance,
+    runInference,
   } = useContext(ExploreContext);
 
   const { isAuthenticated } = useAuth0();
@@ -222,42 +211,6 @@ function PrimePanel() {
   const applyTooltip = currentProject
     ? 'Run inference for this model'
     : 'Create project and run model';
-
-  async function handleInferenceRun() {
-    if (restApiClient) {
-      let project = currentProject;
-      let instance;
-
-      if (!project) {
-        try {
-          showGlobalLoadingMessage('Creating project...');
-          project = await restApiClient.createProject({
-            model_id: selectedModel.id,
-            mosaic: 'naip.latest',
-            name: 'Untitled',
-          });
-          setCurrentProject(project);
-          history.push(`/project/${project.id}`);
-        } catch (error) {
-          hideGlobalLoading();
-          toasts.error('Could not create project, please try again later.');
-        }
-      }
-
-      if (project) {
-        try {
-          showGlobalLoadingMessage('Requesting instance for inference run...');
-          instance = await restApiClient.createInstance(project.id);
-          setCurrentInstance(instance);
-        } catch (error) {
-          hideGlobalLoading();
-          toasts.error(
-            'Error while creating an instance, please try again later.'
-          );
-        }
-      }
-    }
-  }
 
   return (
     <>
@@ -368,7 +321,7 @@ function PrimePanel() {
                 style={{
                   gridColumn: '1 / -1',
                 }}
-                onClick={handleInferenceRun}
+                onClick={runInference}
                 visuallyDisabled={!allowInferenceRun}
                 info={applyTooltip}
               >

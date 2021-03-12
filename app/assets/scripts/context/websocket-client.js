@@ -53,7 +53,26 @@ class WebsocketClient extends WebSocket {
    * @param {String} name
    * @param {Object} polygon
    */
-  requestPrediction(name, polygon) {
+  requestPrediction(name, aoiRef) {
+    // Get bbox polygon from AOI
+    const {
+      _southWest: { lng: minX, lat: minY },
+      _northEast: { lng: maxX, lat: maxY },
+    } = aoiRef.getBounds();
+    const polygon = {
+      type: 'Polygon',
+      coordinates: [
+        [
+          [minX, minY],
+          [maxX, minY],
+          [maxX, maxY],
+          [minX, maxY],
+          [minX, minY],
+        ],
+      ],
+    };
+
+    // Compose message
     const message = {
       action: 'model#prediction',
       data: {
@@ -61,7 +80,11 @@ class WebsocketClient extends WebSocket {
         polygon,
       },
     };
+
+    // Send
     this.send(JSON.stringify(message));
+
+    // Update state
     this.dispatchPredictions({ type: actions.START_PREDICTION });
   }
 

@@ -61,6 +61,15 @@ export function ExploreProvider(props) {
     initialApiRequestState
   );
 
+  useEffect(() => {
+    return () => {
+      // Terminate instance on page unmount
+      if (websocketClient) {
+        websocketClient.terminateInstance();
+      }
+    };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Load project meta on load and api client ready
   useEffect(() => {
     async function loadProject() {
@@ -80,7 +89,7 @@ export function ExploreProvider(props) {
     if (restApiClient) {
       loadProject();
     }
-  }, [restApiClient]);
+  }, [restApiClient]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // If API is unreachable, redirect to home
   useEffect(() => {
@@ -92,47 +101,6 @@ export function ExploreProvider(props) {
       history.push('/');
     }
   }, [apiMeta]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Handle instance changes
-  useEffect(() => {
-    if (currentInstance) {
-      // Kill existing websocket if instance has changed
-      if (websocketClient) {
-        websocketClient.close();
-      }
-
-      // Create websocket
-      const newWebsocketClient = new WebsocketClient({
-        token: currentInstance.token,
-        dispatchPredictions,
-        onConnected: () => {
-          logger('onConnected');
-          // Get AOI bounds polygon
-          const {
-            _southWest: { lng: minX, lat: minY },
-            _northEast: { lng: maxX, lat: maxY },
-          } = aoiRef.getBounds();
-          const aoiPolygon = {
-            type: 'Polygon',
-            coordinates: [
-              [
-                [minX, minY],
-                [maxX, minY],
-                [maxX, maxY],
-                [minX, maxY],
-                [minX, minY],
-              ],
-            ],
-          };
-
-          // Start prediction on connected
-          newWebsocketClient.requestPrediction('A name', aoiPolygon);
-        },
-      });
-
-      setWebsocketClient(newWebsocketClient);
-    }
-  }, [currentInstance]);
 
   useEffect(() => {
     if (!predictions) return;
@@ -148,11 +116,59 @@ export function ExploreProvider(props) {
       }
     } else {
       hideGlobalLoading();
-      if (websocketClient) {
-        websocketClient.terminateInstance();
-      }
     }
   }, [predictions]);
+
+  async function runInference() {
+    if (restApiClient) {
+      let project = currentProject;
+      let instance;
+
+      if (!project) {
+        try {
+          showGlobalLoadingMessage('Creating project...');
+          project = await restApiClient.createProject({
+            model_id: selectedModel.id,
+            mosaic: 'naip.latest',
+            name: 'Untitled',
+          });
+          setCurrentProject(project);
+          history.push(`/project/${project.id}`);
+        } catch (error) {
+          hideGlobalLoading();
+          toasts.error('Could not create project, please try again later.');
+        }
+      }
+
+      // Request a new instance if none is available.
+      if (!websocketClient) {
+        try {
+          // Create instance
+          showGlobalLoadingMessage('Requesting instance...');
+          instance = await restApiClient.createInstance(project.id);
+
+          // Setup websocket
+          showGlobalLoadingMessage('Connecting to instance...');
+          const newWebsocketClient = new WebsocketClient({
+            token: instance.token,
+            dispatchPredictions,
+            onConnected: () =>
+              newWebsocketClient.requestPrediction('A name', aoiRef),
+          });
+
+          setWebsocketClient(newWebsocketClient);
+        } catch (error) {
+          hideGlobalLoading();
+          toasts.error(
+            'Error while creating an instance, please try again later.'
+          );
+        }
+      } else {
+        // Send message with existing websocket
+        websocketClient.requestPrediction('A name', aoiRef);
+      }
+    }
+  }
 
   return (
     <ExploreContext.Provider
@@ -175,6 +191,7 @@ export function ExploreProvider(props) {
         setCurrentProject,
         selectedModel,
         setSelectedModel,
+        runInference,
       }}
     >
       {props.children}
