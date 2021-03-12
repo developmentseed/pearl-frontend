@@ -6,7 +6,6 @@ import React, {
   useContext,
 } from 'react';
 import T from 'prop-types';
-import usePrevious from '../utils/use-previous';
 import { initialApiRequestState } from '../reducers/reduxeed';
 import { createApiMetaReducer, queryApiMeta } from '../reducers/api';
 import {
@@ -20,6 +19,7 @@ import GlobalContext from './global';
 import predictionsReducer, {
   initialPredictionsState,
 } from '../reducers/predictions';
+import usePrevious from '../utils/use-previous';
 
 /**
  * Explore View Modes
@@ -175,6 +175,12 @@ export function ExploreProvider(props) {
       }
     }
   }
+
+  useEffect(() => {
+    if (!aoiRef) {
+      setAoiArea(null);
+    }
+  }, [aoiRef]);
 
   return (
     <ExploreContext.Provider

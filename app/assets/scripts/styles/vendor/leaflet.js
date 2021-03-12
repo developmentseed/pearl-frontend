@@ -28,6 +28,10 @@ export default () => css`
 
   }
 
+  .leaflet-control.leaflet-bar a.centerMap::after {
+    ${collecticon('crosshair-2')};
+  }
+
   .leaflet-top.leaflet-left {
     .leaflet-control {
       box-shadow: 0 -1px 1px 0 rgba(68,63,63,0.08), 0 2px 6px 0 rgba(68,63,63,0.16);

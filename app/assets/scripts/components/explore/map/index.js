@@ -15,6 +15,8 @@ import { ExploreContext, viewModes } from '../../../context/explore';
 import { MapContext } from '../../../context/map';
 
 import GeoCoder from '../../common/map/geocoder';
+import CenterMap from '../../common/map/center-map';
+
 import { themeVal, multiply } from '@devseed-ui/theme-provider';
 import FreeDraw, { ALL } from 'leaflet-freedraw';
 import AoiDrawControl from './aoi-draw-control';
@@ -64,9 +66,7 @@ function areaFromBounds(bbox) {
 }
 
 function Map() {
-  const { map, setMap, mapLayers, setMapLayers } = useContext(MapContext);
   const {
-    apiLimits,
     aoiRef,
     previousViewMode,
     setAoiRef,
@@ -74,7 +74,10 @@ function Map() {
     setViewMode,
     viewMode,
     predictions,
+    apiLimits,
   } = useContext(ExploreContext);
+
+  const { map, setMap, mapLayers, setMapLayers } = useContext(MapContext);
 
   const { mosaicList } = useContext(GlobalContext);
 
@@ -97,13 +100,17 @@ function Map() {
         break;
       case viewModes.BROWSE_MODE:
         if (map) {
-          map.aoi.control.draw.disable();
-          map.aoi.control.edit.disable();
-          if (
-            previousViewMode === viewModes.CREATE_AOI_MODE ||
-            previousViewMode === viewModes.EDIT_AOI_MODE
-          ) {
-            map.fitBounds(aoiRef.getBounds(), { padding: [25, 25] });
+          if (aoiRef) {
+            // Only disable if something has been drawn
+            map.aoi.control.draw.disable();
+            map.aoi.control.edit.disable();
+            if (
+              previousViewMode === viewModes.CREATE_AOI_MODE ||
+              previousViewMode === viewModes.EDIT_AOI_MODE
+            ) {
+              // On confirm, zoom to bounds
+              map.fitBounds(aoiRef.getBounds(), { padding: [25, 25] });
+            }
           }
         }
         break;
@@ -113,7 +120,7 @@ function Map() {
       default:
         break;
     }
-  }, [viewMode]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [viewMode, aoiRef]); // eslint-disable-line react-hooks/exhaustive-deps
 
   /**
    * Add/update AOI controls on API metadata change.
@@ -193,6 +200,7 @@ function Map() {
           ))}
         <FeatureGroup>
           <GeoCoder />
+          {aoiRef && <CenterMap aoiRef={aoiRef} />}
         </FeatureGroup>
       </MapContainer>
     ),

@@ -76,7 +76,17 @@ const ModalFooter = styled(BaseModalFooter)`
 `;
 
 function AoiEditButtons(props) {
-  const { setViewMode, viewMode, aoiRef, aoiArea, apiLimits } = props;
+  const {
+    setViewMode,
+    viewMode,
+    aoiRef,
+    aoiArea,
+    aoiBounds,
+    setAoiBounds,
+    apiLimits,
+    map,
+    setAoiRef,
+  } = props;
 
   const [activeModal, setActiveModal] = useState(false);
 
@@ -91,6 +101,7 @@ function AoiEditButtons(props) {
           onClick={function () {
             if (!apiLimits || apiLimits.live_inference > aoiArea) {
               setViewMode(viewModes.BROWSE_MODE);
+              setAoiBounds(aoiRef.getBounds());
             } else if (apiLimits.max_inference > aoiArea) {
               setActiveModal('no-live-inference');
             } else {
@@ -102,7 +113,30 @@ function AoiEditButtons(props) {
         >
           Select AOI
         </EditButton>
-        <EditButton useIcon='xmark'>Select AOI</EditButton>
+        <EditButton
+          onClick={() => {
+            setViewMode(viewModes.BROWSE_MODE);
+            if (aoiBounds) {
+              // editing is canceled
+              aoiRef.setBounds(aoiBounds);
+            } else {
+              // Drawing canceled
+              map.aoi.control.draw.disable();
+
+              //Edit mode is enabled as soon as draw is done
+              map.aoi.control.edit.disable();
+
+              //Layer must be removed from the map
+              map.aoi.control.draw.clear();
+
+              // Layer ref set to null, will be recreated when draw is attempted again
+              setAoiRef(null);
+            }
+          }}
+          useIcon='xmark'
+        >
+          Select AOI
+        </EditButton>
         {activeModal && (
           <Modal
             id='confirm-area-size'
@@ -136,6 +170,7 @@ function AoiEditButtons(props) {
                     onClick={() => {
                       setActiveModal(false);
                       setViewMode(viewModes.BROWSE_MODE);
+                      setAoiBounds(aoiRef.getBounds());
                     }}
                   >
                     Proceed anyway
@@ -175,11 +210,17 @@ AoiEditButtons.propTypes = {
   setViewMode: T.func,
   viewMode: T.string,
   aoiRef: T.object,
+  setAoiRef: T.func,
+  aoiBounds: T.object,
+  setAoiBounds: T.func,
   aoiArea: T.oneOfType([T.bool, T.number]),
   apiLimits: T.oneOfType([T.bool, T.object]),
+  map: T.object,
 };
 
 function PrimePanel() {
+  const { isAuthenticated } = useAuth0();
+
   const {
     viewMode,
     setViewMode,
@@ -188,16 +229,15 @@ function PrimePanel() {
     setSelectedModel,
     inference,
     aoiRef,
+    setAoiRef,
     aoiArea,
     apiLimits,
     runInference,
   } = useContext(ExploreContext);
 
-  const { isAuthenticated } = useAuth0();
-
   const { modelsList, mosaicList } = useContext(GlobalContext);
 
-  const { map, mapLayers } = useContext(MapContext);
+  const { map, mapLayers, aoiBounds, setAoiBounds } = useContext(MapContext);
 
   const [showSelectModelModal, setShowSelectModelModal] = useState(false);
 
@@ -241,7 +281,11 @@ function PrimePanel() {
                   <AoiEditButtons
                     setViewMode={setViewMode}
                     aoiRef={aoiRef}
+                    setAoiRef={setAoiRef}
+                    map={map}
                     aoiArea={aoiArea}
+                    setAoiBounds={setAoiBounds}
+                    aoiBounds={aoiBounds}
                     viewMode={viewMode}
                     apiLimits={apiLimits}
                   />
