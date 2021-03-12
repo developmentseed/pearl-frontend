@@ -6,8 +6,8 @@ import tBboxPolygon from '@turf/bbox-polygon';
 import SizeAwareElement from '../../common/size-aware-element';
 import { MapContainer, TileLayer, FeatureGroup } from 'react-leaflet';
 import GlobalContext from '../../../context/global';
-import { ExploreContext, viewModes } from '../../../context/explore';
-import { MapContext } from '../../../context/map';
+import { ExploreContext } from '../../../context/explore';
+import { MapContext, viewModes } from '../../../context/map';
 
 import GeoCoder from '../../common/map/geocoder';
 import { themeVal, multiply } from '@devseed-ui/theme-provider';
@@ -59,16 +59,19 @@ function areaFromBounds(bbox) {
 }
 
 function Map() {
-  const { map, setMap, mapLayers, setMapLayers } = useContext(MapContext);
   const {
-    apiLimits,
+    map,
+    setMap,
+    mapLayers,
+    setMapLayers,
     aoiRef,
     previousViewMode,
     setAoiRef,
     setAoiArea,
     setViewMode,
     viewMode,
-  } = useContext(ExploreContext);
+  } = useContext(MapContext);
+  const { apiLimits } = useContext(ExploreContext);
 
   const { mosaicList } = useContext(GlobalContext);
 
@@ -91,13 +94,17 @@ function Map() {
         break;
       case viewModes.BROWSE_MODE:
         if (map) {
-          map.aoi.control.draw.disable();
-          map.aoi.control.edit.disable();
-          if (
-            previousViewMode === viewModes.CREATE_AOI_MODE ||
-            previousViewMode === viewModes.EDIT_AOI_MODE
-          ) {
-            map.fitBounds(aoiRef.getBounds(), { padding: [25, 25] });
+          if (aoiRef) {
+            // Only disable if something has been drawn
+            map.aoi.control.draw.disable();
+            map.aoi.control.edit.disable();
+            if (
+              previousViewMode === viewModes.CREATE_AOI_MODE ||
+              previousViewMode === viewModes.EDIT_AOI_MODE
+            ) {
+              // On confirm, zoom to bounds
+              map.fitBounds(aoiRef.getBounds(), { padding: [25, 25] });
+            }
           }
         }
         break;
@@ -107,7 +114,7 @@ function Map() {
       default:
         break;
     }
-  }, [viewMode]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [viewMode, aoiRef]); // eslint-disable-line react-hooks/exhaustive-deps
 
   /**
    * Add/update AOI controls on API metadata change.
