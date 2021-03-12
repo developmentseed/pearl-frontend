@@ -4,7 +4,7 @@ import { useAuth0 } from '@auth0/auth0-react';
 import T from 'prop-types';
 import { Dropdown, DropdownTrigger } from '../../styles/dropdown';
 import { Button } from '@devseed-ui/button';
-import { glsp } from '@devseed-ui/theme-provider';
+import { themeVal, glsp } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
 import { Form as BaseForm, FormInput } from '@devseed-ui/form';
 import Prose from '../../styles/type/prose';
@@ -34,6 +34,13 @@ const Form = styled(BaseForm)`
   }
 `;
 
+const StatusHeading = styled(Heading)`
+  margin-right: auto;
+  span {
+    color: ${themeVal('color.base')};
+  }
+`;
+
 function SessionOutputControl(props) {
   const { isAuthenticated } = useAuth0();
 
@@ -51,10 +58,6 @@ function SessionOutputControl(props) {
 
   return (
     <Wrapper>
-      <Button variation='base-plain' disabled size='small'>
-        Session Status: {status || 'None Provided'}
-      </Button>
-
       <Dropdown
         alignment='center'
         direction='down'
@@ -117,6 +120,20 @@ function SessionOutputControl(props) {
           </Form>
         </DropWrapper>
       </Dropdown>
+      <StatusHeading
+        variation={status === 'OK' ? 'primary' : 'danger'}
+        size='xxsmall'
+      >
+        <span>Session Status:</span> {status || 'None Provided'}
+      </StatusHeading>
+      <Button
+        variation='base-plain'
+        size='small'
+        useIcon='circle-question'
+        onClick={openHelp}
+      >
+        Help
+      </Button>
       <DropdownTrigger
         variation='base-raised-semidark'
         useIcon={['download', 'before']}
@@ -128,15 +145,6 @@ function SessionOutputControl(props) {
       >
         Export
       </DropdownTrigger>
-
-      <Button
-        variation='base-plain'
-        size='small'
-        useIcon='circle-question'
-        onClick={openHelp}
-      >
-        Help
-      </Button>
     </Wrapper>
   );
 }

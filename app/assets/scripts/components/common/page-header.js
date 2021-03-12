@@ -64,7 +64,6 @@ const PrimarySection = styled.div`
   grid-gap: 1.5rem;
   * {
     grid-row: 1;
-    width: min-content;
   }
 `;
 
