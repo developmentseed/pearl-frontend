@@ -12,6 +12,6 @@ module.exports = {
     bingApiKey:
       'ArLmu8JG2PHK_-_zo7yS1WbvDz7PgsoVEgcqFTg8uaH-lsXLcjADCAtnyQB054uq',
     NaipTileUrl:
-      'https://tiles.lulc-staging.ds.io/mosaic/naip.latest/tiles/{z}/{x}/{y}@1x?bidx=1%2C2%2C3'
+      'https://tiles.lulc-staging.ds.io/mosaic/naip.latest/tiles/{z}/{x}/{y}@1x?bidx=1%2C2%2C3',
   },
 };
