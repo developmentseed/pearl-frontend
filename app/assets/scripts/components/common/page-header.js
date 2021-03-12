@@ -60,7 +60,7 @@ const PrimarySection = styled.div`
   display: grid;
   align-items: center;
   justify-content: space-between;
-  grid-template-columns: 1fr min-content;
+  grid-template-columns: min-content 1fr;
   grid-gap: 1.5rem;
   * {
     grid-row: 1;
@@ -83,8 +83,13 @@ const SecondarySection = styled.div`
 `;
 
 const PageSpecificControls = styled.div`
-  display: grid;
-  grid-gap: 1.5rem;
+  display: flex;
+  flex-flow: row nowrap;
+  width: 100%;
+  justify-content: flex-end;
+  > * ~ * {
+    margin-left: 1rem;
+  }
 `;
 
 const GlobalMenuLink = styled.a`

@@ -10,9 +10,17 @@ import { Form as BaseForm, FormInput } from '@devseed-ui/form';
 import Prose from '../../styles/type/prose';
 
 const Wrapper = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-gap: ${glsp()};
+  flex: 1;
+  display: flex;
+  flex-flow: row nowrap;
+  /* grid-template-columns: 1fr 1fr;
+  grid-gap: ${glsp()}; */
+  & > *:first-child {
+    margin-right: auto;
+  }
+  > * ~ * {
+    margin-left: ${glsp()};
+  }
 `;
 
 const DropWrapper = styled.div`
@@ -29,7 +37,7 @@ const Form = styled(BaseForm)`
 function SessionOutputControl(props) {
   const { isAuthenticated } = useAuth0();
 
-  const { status, projectName, setProjectName } = props;
+  const { status, projectName, setProjectName, openHelp } = props;
   const [localProjectName, setLocalProjectName] = useState(projectName);
 
   const handleSubmit = (evt) => {
@@ -120,6 +128,15 @@ function SessionOutputControl(props) {
       >
         Export
       </DropdownTrigger>
+
+      <Button
+        variation='base-plain'
+        size='small'
+        useIcon='circle-question'
+        onClick={openHelp}
+      >
+        Help
+      </Button>
     </Wrapper>
   );
 }
@@ -128,6 +145,7 @@ SessionOutputControl.propTypes = {
   status: T.string,
   projectName: T.string,
   setProjectName: T.func,
+  openHelp: T.func,
 };
 
 export default SessionOutputControl;
