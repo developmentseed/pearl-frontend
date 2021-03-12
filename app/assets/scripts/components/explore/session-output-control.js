@@ -8,6 +8,7 @@ import { themeVal, glsp } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
 import { Form as BaseForm, FormInput } from '@devseed-ui/form';
 import Prose from '../../styles/type/prose';
+import InfoButton from '../common/info-button';
 
 const Wrapper = styled.div`
   flex: 1;
@@ -37,9 +38,62 @@ const Form = styled(BaseForm)`
 const StatusHeading = styled(Heading)`
   margin-right: auto;
   span {
+    font-weight: ${themeVal('type.base.weight')};
     color: ${themeVal('color.base')};
   }
 `;
+const ProjectHeading = styled.div`
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  line-height: 1.5;
+  ${Heading} {
+    margin: 0;
+    font-weight: ${themeVal('type.base.weight')};
+  }
+`;
+
+const HeadingInput = styled(FormInput)`
+  margin-left: 0.25rem;
+  background: none;
+  border: 1px solid transparent;
+  font-weight: ${themeVal('type.heading.weight')};
+  &:focus,
+  &:active,
+  .active {
+    border: 1px solid;
+    background: ${themeVal('color.surface')};
+  }
+`;
+
+// function ProjectTitleEditButtons(props) {
+//   const { isAuthenticated } = useAuth0();
+//   const { setViewMode } = props;
+
+//   if (viewMode === viewModes.EDIT_TITLE_MODE) {
+
+//   }
+//   return (
+//     <>
+//       <InfoButton
+//         onClick={() => {
+//           setViewMode(viewModes.EDIT_TITLE_MODE)
+//         }}
+//         hideText
+//         useIcon='pencil'
+//         info={
+//           isAuthenticated
+//             ? 'Change project Name'
+//             : 'Log in to change project name'
+//         }
+//       />
+//     </>
+//   )
+// }
+
+// ProjectTitleEditButtons.propTypes = {
+//   setViewMode: T.func
+// };
 
 function SessionOutputControl(props) {
   const { isAuthenticated } = useAuth0();
@@ -58,7 +112,7 @@ function SessionOutputControl(props) {
 
   return (
     <Wrapper>
-      <Dropdown
+      {/* <Dropdown
         alignment='center'
         direction='down'
         triggerElement={(props) => (
@@ -119,7 +173,51 @@ function SessionOutputControl(props) {
             </Button>
           </Form>
         </DropWrapper>
-      </Dropdown>
+      </Dropdown> */}
+      <ProjectHeading>
+        <Heading variation='base' size='xsmall'>
+          Project:
+        </Heading>
+        <Form onSubmit={handleSubmit}>
+          <HeadingInput
+            name='projectName'
+            placeholder='Untitled Project'
+            onChange={(e) => setLocalProjectName(e.target.value)}
+            value={localProjectName}
+            // disabled={!isAuthenticated}
+          />
+          <InfoButton
+            hideText
+            useIcon='pencil'
+            info={
+              isAuthenticated
+                ? 'Change project Name'
+                : 'Log in to change project name'
+            }
+          />
+          <Button
+            type='submit'
+            size='small'
+            useIcon='tick--small'
+            hideText
+            title='Save'
+          >
+            Save
+          </Button>
+          <Button
+            onClick={clearInput}
+            size='small'
+            useIcon='xmark--small'
+            hideText
+            title='Cancel'
+          >
+            Cancel
+          </Button>
+          {/* <ProjectTitleEditButtons
+            setViewMode={setViewMode}
+          /> */}
+        </Form>
+      </ProjectHeading>
       <StatusHeading
         variation={status === 'OK' ? 'primary' : 'danger'}
         size='xxsmall'
@@ -135,7 +233,7 @@ function SessionOutputControl(props) {
         Help
       </Button>
       <DropdownTrigger
-        variation='base-raised-semidark'
+        variation='base-raised-light'
         useIcon={['download', 'before']}
         title='Open dropdown'
         className='user-options-trigger'
