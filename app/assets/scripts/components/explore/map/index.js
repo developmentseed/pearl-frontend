@@ -10,7 +10,10 @@ import {
   FeatureGroup,
   ImageOverlay,
 } from 'react-leaflet';
+import GlobalContext from '../../../context/global';
 import { ExploreContext, viewModes } from '../../../context/explore';
+import { MapContext } from '../../../context/map';
+
 import GeoCoder from '../../common/map/geocoder';
 import { themeVal, multiply } from '@devseed-ui/theme-provider';
 import FreeDraw, { ALL } from 'leaflet-freedraw';
@@ -61,10 +64,8 @@ function areaFromBounds(bbox) {
 }
 
 function Map() {
-  // const [] = useState(null);
+  const { map, setMap, mapLayers, setMapLayers } = useContext(MapContext);
   const {
-    map,
-    setMap,
     apiLimits,
     aoiRef,
     previousViewMode,
@@ -74,6 +75,10 @@ function Map() {
     viewMode,
     predictions,
   } = useContext(ExploreContext);
+
+  const { mosaicList } = useContext(GlobalContext);
+
+  const { mosaics } = mosaicList.isReady() ? mosaicList.getData() : {};
 
   useEffect(() => {
     if (!map) return;
@@ -156,29 +161,42 @@ function Map() {
           }
         }}
       >
+        <TileLayer
+          attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+          url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+          maxZoom={18}
+        />
+
+        {mosaics &&
+          mosaics.map((layer) => (
+            <TileLayer
+              key={layer}
+              attribution='&copy; NAIP'
+              url={config.tileUrlTemplate.replace('{LAYER_NAME}', layer)}
+              minZoom={12}
+              maxZoom={18}
+              eventHandlers={{
+                add: (v) => {
+                  setMapLayers({
+                    ...mapLayers,
+                    [layer]: v.target,
+                  });
+                },
+              }}
+            />
+          ))}
+
         {predictions &&
           !predictions.error &&
           predictions.data.map((p) => (
             <ImageOverlay key={p.key} url={p.image} bounds={p.bounds} />
           ))}
-
-        <TileLayer
-          attribution='&copy; NAIP'
-          url={config.NaipTileUrl}
-          minZoom={12}
-          maxZoom={18}
-        />
-        <TileLayer
-          attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-          url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-          maxZoom={11}
-        />
         <FeatureGroup>
           <GeoCoder />
         </FeatureGroup>
       </MapContainer>
     ),
-    [viewMode, apiLimits, predictions] // eslint-disable-line react-hooks/exhaustive-deps
+    [viewMode, apiLimits, mosaics, predictions] // eslint-disable-line react-hooks/exhaustive-deps
   );
 
   return (
