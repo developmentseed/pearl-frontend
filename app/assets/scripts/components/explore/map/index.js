@@ -10,6 +10,8 @@ import { ExploreContext } from '../../../context/explore';
 import { MapContext, viewModes } from '../../../context/map';
 
 import GeoCoder from '../../common/map/geocoder';
+import CenterMap from '../../common/map/center-map';
+
 import { themeVal, multiply } from '@devseed-ui/theme-provider';
 import FreeDraw, { ALL } from 'leaflet-freedraw';
 import AoiDrawControl from './aoi-draw-control';
@@ -188,6 +190,7 @@ function Map() {
           ))}
         <FeatureGroup>
           <GeoCoder />
+          {aoiRef && <CenterMap aoiRef={aoiRef} />}
         </FeatureGroup>
       </MapContainer>
     ),
