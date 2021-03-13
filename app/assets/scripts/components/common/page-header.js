@@ -19,7 +19,7 @@ const { appTitle } = config;
 
 const PageHead = styled.header`
   background-color: ${themeVal('color.baseAlphaA')};
-  color: ${themeVal('color.baseLight')};
+  color: ${themeVal('color.base')};
   position: sticky;
   z-index: 20;
   padding: ${multiply(themeVal('layout.space'), 0.625)} 0;

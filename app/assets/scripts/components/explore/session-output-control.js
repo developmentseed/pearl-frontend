@@ -6,37 +6,18 @@ import { Dropdown, DropdownTrigger } from '../../styles/dropdown';
 import { Button } from '@devseed-ui/button';
 import { themeVal, glsp } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
-import { Form as BaseForm, FormInput } from '@devseed-ui/form';
-import Prose from '../../styles/type/prose';
+import { Form, FormInput } from '@devseed-ui/form';
 import InfoButton from '../common/info-button';
 
 const Wrapper = styled.div`
   flex: 1;
-  display: flex;
-  flex-flow: row nowrap;
-  /* grid-template-columns: 1fr 1fr;
-  grid-gap: ${glsp()}; */
-  & > *:first-child {
-    margin-right: auto;
-  }
-  > * ~ * {
-    margin-left: ${glsp()};
-  }
-`;
-
-const DropWrapper = styled.div`
-  padding: ${glsp()};
-`;
-const Form = styled(BaseForm)`
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  input {
-    grid-column: 1 / -1;
-  }
+  grid-template-columns: 1fr 1fr auto;
+  grid-gap: 1rem;
 `;
 
 const StatusHeading = styled(Heading)`
-  margin-right: auto;
+  font-size: 0.875rem;
   span {
     font-weight: ${themeVal('type.base.weight')};
     color: ${themeVal('color.base')};
@@ -48,177 +29,99 @@ const ProjectHeading = styled.div`
   align-items: center;
   line-height: 1.5;
   ${Heading} {
-    margin: 0;
-    font-weight: ${themeVal('type.base.weight')};
+    margin: 0 0.25rem;
+    height: auto;
+    padding: 0.25rem 0.5rem;
+    line-height: 1.5rem;
+    border: 1px solid transparent;
+    border-radius: 0.25rem;
+    &:hover {
+      border: 1px solid ${themeVal('color.baseAlphaE')};
+    }
+  }
+  ${Form} {
+    grid-gap: 0.5rem;
+    align-items: center;
+    justify-items: center;
   }
 `;
 
 const HeadingInput = styled(FormInput)`
   margin-left: 0.25rem;
-  background: none;
-  border: 1px solid transparent;
   font-weight: ${themeVal('type.heading.weight')};
-  &:focus,
-  &:active,
-  .active {
-    border: 1px solid;
-    background: ${themeVal('color.surface')};
-  }
 `;
-
-// function ProjectTitleEditButtons(props) {
-//   const { isAuthenticated } = useAuth0();
-//   const { setViewMode } = props;
-
-//   if (viewMode === viewModes.EDIT_TITLE_MODE) {
-
-//   }
-//   return (
-//     <>
-//       <InfoButton
-//         onClick={() => {
-//           setViewMode(viewModes.EDIT_TITLE_MODE)
-//         }}
-//         hideText
-//         useIcon='pencil'
-//         info={
-//           isAuthenticated
-//             ? 'Change project Name'
-//             : 'Log in to change project name'
-//         }
-//       />
-//     </>
-//   )
-// }
-
-// ProjectTitleEditButtons.propTypes = {
-//   setViewMode: T.func
-// };
 
 function SessionOutputControl(props) {
   const { isAuthenticated } = useAuth0();
 
   const { status, projectName, setProjectName, openHelp } = props;
   const [localProjectName, setLocalProjectName] = useState(projectName);
+  const [titleEditMode, setTitleEditMode] = useState(false);
 
   const handleSubmit = (evt) => {
     evt.preventDefault();
     const name = evt.target.elements.projectName.value;
     setProjectName(name);
+    setTitleEditMode(false);
   };
   const clearInput = () => {
-    setLocalProjectName(projectName);
+    setLocalProjectName(projectName || '');
+    setTitleEditMode(false);
   };
 
   return (
     <Wrapper>
-      {/* <Dropdown
-        alignment='center'
-        direction='down'
-        triggerElement={(props) => (
-          <DropdownTrigger
-            variation='base-raised-dark'
-            useIcon={['circle-tick', 'before']}
-            title='Open dropdown'
-            className='user-options-trigger'
-            size='small'
-            {...props}
-            disabled={!isAuthenticated}
-          >
-            Save
-          </DropdownTrigger>
-        )}
-        className='global__dropdown'
-      >
-        <DropWrapper>
-          <Heading useAlt>{projectName}</Heading>
+      <ProjectHeading>
+        <p>Project:</p>
+        {!titleEditMode ? (
+          <>
+            <Heading
+              variation={localProjectName ? 'primary' : 'baseAlphaE'}
+              size='xsmall'
+              onClick={() => isAuthenticated && setTitleEditMode(true)}
+              title={!isAuthenticated && 'Log in to set project name'}
+            >
+              {localProjectName || 'Untitled Project'}
+            </Heading>
+            <InfoButton
+              size='small'
+              useIcon='pencil'
+              info={
+                isAuthenticated
+                  ? localProjectName
+                    ? 'Edit project Name'
+                    : 'Set Project Name'
+                  : 'Log in to set project name'
+              }
+              onClick={() => isAuthenticated && setTitleEditMode(true)}
+            />
+          </>
+        ) : (
           <Form onSubmit={handleSubmit}>
-            <FormInput
-              type='string'
+            <HeadingInput
               name='projectName'
-              placeholder='Enter project name'
+              placeholder='Set Project Name'
               onChange={(e) => setLocalProjectName(e.target.value)}
               value={localProjectName}
+              disabled={!isAuthenticated}
             />
-            <Prose
-              style={{
-                gridColumn: '1 / -1',
-              }}
-              size='small'
-            >
-              Projects contain your saved AOI, current checkpoint, and all
-              resutls refinements that you have applied
-            </Prose>
-            <Button
+            <InfoButton
               type='submit'
-              style={{
-                gridColumn: '1 / 2',
-              }}
-              variation='base-raised-light'
               size='small'
               useIcon='tick--small'
-            >
-              Save
-            </Button>
-            <Button
+              info='Confirm project name'
+            />
+            <InfoButton
               onClick={clearInput}
-              variation='base-raised-light'
               size='small'
               useIcon='xmark--small'
-              style={{
-                gridColumn: '2 / -1',
-              }}
-            >
-              Cancel
-            </Button>
+              info='Cancel'
+            />
           </Form>
-        </DropWrapper>
-      </Dropdown> */}
-      <ProjectHeading>
-        <Heading variation='base' size='xsmall'>
-          Project:
-        </Heading>
-        <Form onSubmit={handleSubmit}>
-          <HeadingInput
-            name='projectName'
-            placeholder='Untitled Project'
-            onChange={(e) => setLocalProjectName(e.target.value)}
-            value={localProjectName}
-            // disabled={!isAuthenticated}
-          />
-          <InfoButton
-            hideText
-            useIcon='pencil'
-            info={
-              isAuthenticated
-                ? 'Change project Name'
-                : 'Log in to change project name'
-            }
-          />
-          <Button
-            type='submit'
-            size='small'
-            useIcon='tick--small'
-            hideText
-            title='Save'
-          >
-            Save
-          </Button>
-          <Button
-            onClick={clearInput}
-            size='small'
-            useIcon='xmark--small'
-            hideText
-            title='Cancel'
-          >
-            Cancel
-          </Button>
-          {/* <ProjectTitleEditButtons
-            setViewMode={setViewMode}
-          /> */}
-        </Form>
+        )}
       </ProjectHeading>
       <StatusHeading
+        // TODO: replace status 'OK' with API active instance response
         variation={status === 'OK' ? 'primary' : 'danger'}
         size='xxsmall'
       >
