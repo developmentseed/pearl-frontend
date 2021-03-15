@@ -110,12 +110,14 @@ function SessionOutputControl(props) {
               size='small'
               useIcon='tick--small'
               info='Confirm project name'
+              id='project-name__confirm'
             />
             <InfoButton
               onClick={clearInput}
               size='small'
               useIcon='xmark--small'
               info='Cancel'
+              id='project-name__cancel'
             />
           </Form>
         )}

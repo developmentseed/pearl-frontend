@@ -394,6 +394,7 @@ function PrimePanel() {
                 }}
                 visuallyDisabled={!applyState}
                 info={applyTooltip}
+                id='applyButton'
               >
                 {applyText}
               </InfoButton>

@@ -141,7 +141,6 @@ function PageHeader(props) {
                   to='/'
                   useIcon='house'
                   title='Visit the home page'
-                  data-tip={appTitle}
                 >
                   <span>{appTitle}</span>
                 </GlobalMenuLink>
