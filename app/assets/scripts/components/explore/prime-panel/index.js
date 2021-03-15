@@ -334,14 +334,19 @@ function PrimePanel() {
                   <RetrainModel
                     name='retrain model'
                     classList={availableClasses}
+                    id='retrain-tab-trigger'
                   />
                 )}
 
-                <PlaceholderPanelSection name='Refine Results'>
+                <PlaceholderPanelSection
+                  name='Refine Results'
+                  id='refine-tab-trigger'
+                >
                   <PlaceholderMessage>Refine results</PlaceholderMessage>
                 </PlaceholderPanelSection>
                 <LayersPanel
                   name='layers'
+                  id='layers-tab-trigger'
                   layers={availableLayers}
                   baseLayerNames={
                     mosaicList.isReady() ? mosaicList.getData().mosaics : []
@@ -368,6 +373,7 @@ function PrimePanel() {
                 style={{
                   gridColumn: '1 / 2',
                 }}
+                id='reset-button-trigger'
               >
                 Reset
               </Button>
@@ -378,6 +384,7 @@ function PrimePanel() {
                 style={{
                   gridColumn: '2 / -1',
                 }}
+                id='undo-button-trigger'
               >
                 Undo
               </Button>
@@ -392,6 +399,7 @@ function PrimePanel() {
                 onClick={runInference}
                 visuallyDisabled={!allowInferenceRun}
                 info={applyTooltip}
+                id='apply-button-trigger'
               >
                 Run Model
               </InfoButton>
