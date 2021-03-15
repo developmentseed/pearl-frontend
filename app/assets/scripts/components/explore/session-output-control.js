@@ -79,7 +79,9 @@ function SessionOutputControl(props) {
               variation={localProjectName ? 'primary' : 'baseAlphaE'}
               size='xsmall'
               onClick={() => isAuthenticated && setTitleEditMode(true)}
-              title={!isAuthenticated && 'Log in to set project name'}
+              title={
+                !isAuthenticated ? 'Log in to set project name' : 'Project name'
+              }
             >
               {localProjectName || 'Untitled Project'}
             </Heading>
@@ -150,6 +152,15 @@ function SessionOutputControl(props) {
       >
         Export
       </DropdownTrigger>
+
+      <Button
+        variation='base-plain'
+        size='small'
+        useIcon='circle-question'
+        onClick={openHelp}
+      >
+        Help
+      </Button>
     </Wrapper>
   );
 }

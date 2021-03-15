@@ -41,6 +41,7 @@ export function ExploreProvider(props) {
   const { restApiClient } = useContext(GlobalContext);
 
   const [currentProject, setCurrentProject] = useState(null);
+
   const [aoiRef, setAoiRef] = useState(null);
   const [aoiArea, setAoiArea] = useState(null);
   const [viewMode, setViewMode] = useState(viewModes.BROWSE_MODE);

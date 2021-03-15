@@ -199,6 +199,7 @@ function AoiEditButtons(props) {
         );
       }}
       title='Draw Area of Interest'
+      id='edit-aoi-trigger'
       useIcon='pencil'
     >
       Select AOI
@@ -309,6 +310,7 @@ function PrimePanel() {
                   <EditButton
                     data-cy='show-select-model-button'
                     useIcon='swap-horizontal'
+                    id='select-model-trigger'
                     onClick={function () {
                       setShowSelectModelModal(true);
                     }}
@@ -325,21 +327,29 @@ function PrimePanel() {
                 {predictions && !predictions.error && predictions.fetched ? (
                   <RetrainModel
                     name='retrain model'
+                    tabId='retrain-tab-trigger'
                     classList={availableClasses}
                   />
                 ) : (
-                  <PlaceholderPanelSection name='Retrain Model'>
+                  <PlaceholderPanelSection
+                    name='Retrain Model'
+                    tabId='retrain-tab-trigger'
+                  >
                     <PlaceholderMessage>
                       Click &quot;Run Inference&quot; to generate the class LULC
                       map for your AOI
                     </PlaceholderMessage>
                   </PlaceholderPanelSection>
                 )}
-                <PlaceholderPanelSection name='Refine Results'>
+                <PlaceholderPanelSection
+                  name='Refine Results'
+                  tabId='refine-tab-trigger'
+                >
                   <PlaceholderMessage>Refine results</PlaceholderMessage>
                 </PlaceholderPanelSection>
                 <LayersPanel
                   name='layers'
+                  tabId='layers-tab-trigger'
                   layers={availableLayers}
                   baseLayerNames={
                     mosaicList.isReady() ? mosaicList.getData().mosaics : []
@@ -366,6 +376,7 @@ function PrimePanel() {
                 style={{
                   gridColumn: '1 / 2',
                 }}
+                id='reset-button-trigger'
               >
                 Reset
               </Button>
@@ -376,6 +387,7 @@ function PrimePanel() {
                 style={{
                   gridColumn: '2 / -1',
                 }}
+                id='undo-button-trigger'
               >
                 Undo
               </Button>
@@ -390,7 +402,7 @@ function PrimePanel() {
                 onClick={runInference}
                 visuallyDisabled={!allowInferenceRun}
                 info={applyTooltip}
-                id='applyButton'
+                id='apply-button-trigger'
               >
                 Run Model
               </InfoButton>
