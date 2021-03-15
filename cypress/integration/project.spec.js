@@ -1,7 +1,7 @@
 // / <reference types="Cypress" />
-describe('The Explore Page', () => {
+describe('The Project Page', () => {
   before(() => {
-    cy.visit('/explore');
+    cy.visit('/project/new');
   });
 
   it('successfully loads', () => {

@@ -17,6 +17,7 @@ import { glsp } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
 import { StyledNavLink } from '../../../styles/links';
 import toasts from '../../common/toasts';
+import { useHistory } from 'react-router';
 const ProjectsBody = styled(InpageBodyInner)`
   display: grid;
   grid-template-columns: 1fr 4fr;
@@ -57,6 +58,7 @@ const NavPane = styled.div`
 const NavList = styled.ol``;
 
 function Projects(props) {
+  const history = useHistory();
   const { projectsList } = props;
   const { projects } = projectsList.isReady() ? projectsList.getData() : {};
   return (
@@ -76,11 +78,11 @@ function Projects(props) {
               <InpageTitle>Projects</InpageTitle>
               <Button
                 forwardedAs={StyledNavLink}
-                to='/explore'
+                to='/project/new'
                 variation='primary-raised-light'
                 size='large'
                 useIcon={['plus', 'after']}
-                title='Launch application'
+                title='Start a new project'
                 style={{
                   alignSelf: 'center',
                 }}
@@ -171,7 +173,9 @@ function Projects(props) {
                         ),
                       }}
                       size='large'
-                      // onClick = set current project
+                      onClick={() => {
+                        history.push(`/project/${proj.id}`);
+                      }}
                     />
                   )}
                 />

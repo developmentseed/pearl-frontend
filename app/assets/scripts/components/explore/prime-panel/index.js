@@ -1,10 +1,9 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext } from 'react';
 import styled from 'styled-components';
 import { themeVal, glsp } from '@devseed-ui/theme-provider';
 import { Button } from '@devseed-ui/button';
 import T from 'prop-types';
 import { useAuth0 } from '@auth0/auth0-react';
-
 import Panel from '../../common/panel';
 import {
   PanelBlock,
@@ -21,8 +20,8 @@ import {
   ModalFooter as BaseModalFooter,
 } from '@devseed-ui/modal';
 import { PlaceholderMessage } from '../../../styles/placeholder.js';
-import { ExploreContext } from '../../../context/explore';
-import { MapContext, viewModes } from '../../../context/map';
+import { ExploreContext, viewModes } from '../../../context/explore';
+import { MapContext } from '../../../context/map';
 import GlobalContext from '../../../context/global';
 
 import TabbedBlock from '../../common/tabbed-block-body';
@@ -220,90 +219,41 @@ AoiEditButtons.propTypes = {
 };
 
 function PrimePanel() {
-  const { apiLimits } = useContext(ExploreContext);
-
   const { isAuthenticated } = useAuth0();
 
   const {
-    selectedModel,
-    setSelectedModel,
-    modelsList,
-    mosaicList,
-  } = useContext(GlobalContext);
-
-  const {
-    map,
-    mapLayers,
-    aoiBounds,
-    setAoiBounds,
     viewMode,
     setViewMode,
+    currentProject,
+    selectedModel,
+    setSelectedModel,
+    inference,
     aoiRef,
     setAoiRef,
     aoiArea,
-  } = useContext(MapContext);
+    apiLimits,
+    runInference,
+  } = useContext(ExploreContext);
+
+  const { modelsList, mosaicList } = useContext(GlobalContext);
+
+  const { map, mapLayers, aoiBounds, setAoiBounds } = useContext(MapContext);
 
   const [showSelectModelModal, setShowSelectModelModal] = useState(false);
-  const [inference, setInference] = useState(true);
 
-  const [applyText, setApplyText] = useState();
-  const [applyState, setApplyState] = useState();
-  const [applyTooltip, setApplyTooltip] = useState();
-
-  useEffect(() => {
-    if (!aoiArea || !selectedModel) {
-      /* pre-AOI selected */
-      setApplyState(false);
-      setApplyTooltip('Select AOI to run model');
-    } else if (!inference) {
-      /* AOI selected, inference not yet applied */
-      setApplyState(true);
-      setApplyTooltip(null);
-    } /*else if (checkpoint) {
-      //assume inference = false when checkpoint is !undefined
-      setApplyState(true);
-      setApplyTooltip(null);
-       setApplyText('Retrain Checkpoint')
-    }*/
-
-    /* No Retraining samples selected, AOI changed */
-    // Retraining samples not implemented yet
-
-    setApplyText('Run Model');
-  }, [aoiArea /* retraining samples, checkoint */, selectedModel]);
-
-  useEffect(() => {
-    if (inference) {
-      /* No Retraining samples selected, AOI unchanged*/
-      setApplyState(false);
-      setApplyText('Retrain Model');
-      setApplyTooltip('Select retraining samples to retrain model');
-    }
-  }, [inference /* retraining samples */]);
-
-  /*
-  useEffect(() => {
-    // Retraining Samples selected
-    if (retraining samples) {
-      setApplyState(true)
-      setApplyText('Retrain Model')
-      setApplyTooltip('Retrain model with your selected samples')
-
-    }
-  }, [retraining samples ])
-  */
-
-  /* Check point based settings
-  useEffect(() => {
-    if (checkpoint) {
-      //Post-retraining (Checkpoint), AOI unchanged
-      setApplyState(false)
-      setApplyText('Retrain Checkpoint')
-      setApplyTooltip('Select retraining samples to retrain checkpoint')
-    }
-  }, [checkpoint])
-  */
   const { models } = modelsList.isReady() && modelsList.getData();
+
+  // Enable/disable "Run Inference" button
+  const allowInferenceRun =
+    viewMode === viewModes.BROWSE_MODE &&
+    aoiRef &&
+    aoiArea > 0 &&
+    selectedModel;
+
+  // "Run Inference" button
+  const applyTooltip = currentProject
+    ? 'Run inference for this model'
+    : 'Create project and run model';
 
   return (
     <>
@@ -437,16 +387,11 @@ function PrimePanel() {
                 style={{
                   gridColumn: '1 / -1',
                 }}
-                onClick={() => {
-                  if (!applyState) {
-                    return;
-                  }
-                  setInference(true);
-                }}
-                visuallyDisabled={!applyState}
+                onClick={runInference}
+                visuallyDisabled={!allowInferenceRun}
                 info={applyTooltip}
               >
-                {applyText}
+                Run Model
               </InfoButton>
             </PanelControls>
           </StyledPanelBlock>
