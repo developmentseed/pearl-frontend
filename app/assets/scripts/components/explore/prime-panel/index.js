@@ -331,7 +331,10 @@ function PrimePanel() {
                     classList={availableClasses}
                   />
                 ) : (
-                  <PlaceholderPanelSection name='Retrain Model'>
+                  <PlaceholderPanelSection
+                    name='Retrain Model'
+                    tabId='retrain-tab-trigger'
+                  >
                     <PlaceholderMessage>
                       Click &quot;Run Inference&quot; to generate the class LULC
                       map for your AOI
