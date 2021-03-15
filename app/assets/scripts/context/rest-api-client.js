@@ -45,6 +45,10 @@ class RestApiClient {
     return this.post('project', data);
   }
 
+  getModel(id) {
+    return this.get(`model/${id}`);
+  }
+
   createInstance(projectId) {
     return this.post(`project/${projectId}/instance`, {});
   }
