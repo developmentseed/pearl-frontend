@@ -4,20 +4,27 @@ import { convertArea } from '@turf/helpers';
 import tArea from '@turf/area';
 import tBboxPolygon from '@turf/bbox-polygon';
 import SizeAwareElement from '../../common/size-aware-element';
-import { MapContainer, TileLayer, FeatureGroup } from 'react-leaflet';
+import {
+  MapContainer,
+  TileLayer,
+  FeatureGroup,
+  ImageOverlay,
+} from 'react-leaflet';
 import GlobalContext from '../../../context/global';
 import { ExploreContext, viewModes } from '../../../context/explore';
 import { MapContext } from '../../../context/map';
 
 import GeoCoder from '../../common/map/geocoder';
+import CenterMap from '../../common/map/center-map';
+
 import { themeVal, multiply } from '@devseed-ui/theme-provider';
 import FreeDraw, { ALL } from 'leaflet-freedraw';
 import AoiDrawControl from './aoi-draw-control';
 import AoiEditControl from './aoi-edit-control';
 import config from '../../../config';
 
-const center = [38.942, -95.449];
-const zoom = 4;
+const center = [38.83428180092151, -79.37724530696869];
+const zoom = 15;
 const freeDraw = new FreeDraw({
   mode: ALL,
 });
@@ -59,16 +66,18 @@ function areaFromBounds(bbox) {
 }
 
 function Map() {
-  const { map, setMap, mapLayers, setMapLayers } = useContext(MapContext);
   const {
-    apiLimits,
     aoiRef,
     previousViewMode,
     setAoiRef,
     setAoiArea,
     setViewMode,
     viewMode,
+    predictions,
+    apiLimits,
   } = useContext(ExploreContext);
+
+  const { map, setMap, mapLayers, setMapLayers } = useContext(MapContext);
 
   const { mosaicList } = useContext(GlobalContext);
 
@@ -91,13 +100,17 @@ function Map() {
         break;
       case viewModes.BROWSE_MODE:
         if (map) {
-          map.aoi.control.draw.disable();
-          map.aoi.control.edit.disable();
-          if (
-            previousViewMode === viewModes.CREATE_AOI_MODE ||
-            previousViewMode === viewModes.EDIT_AOI_MODE
-          ) {
-            map.fitBounds(aoiRef.getBounds(), { padding: [25, 25] });
+          if (aoiRef) {
+            // Only disable if something has been drawn
+            map.aoi.control.draw.disable();
+            map.aoi.control.edit.disable();
+            if (
+              previousViewMode === viewModes.CREATE_AOI_MODE ||
+              previousViewMode === viewModes.EDIT_AOI_MODE
+            ) {
+              // On confirm, zoom to bounds
+              map.fitBounds(aoiRef.getBounds(), { padding: [25, 25] });
+            }
           }
         }
         break;
@@ -107,7 +120,7 @@ function Map() {
       default:
         break;
     }
-  }, [viewMode]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [viewMode, aoiRef]); // eslint-disable-line react-hooks/exhaustive-deps
 
   /**
    * Add/update AOI controls on API metadata change.
@@ -179,12 +192,19 @@ function Map() {
               }}
             />
           ))}
+
+        {predictions &&
+          !predictions.error &&
+          predictions.data.map((p) => (
+            <ImageOverlay key={p.key} url={p.image} bounds={p.bounds} />
+          ))}
         <FeatureGroup>
           <GeoCoder />
+          {aoiRef && <CenterMap aoiRef={aoiRef} />}
         </FeatureGroup>
       </MapContainer>
     ),
-    [viewMode, apiLimits, mosaics] // eslint-disable-line react-hooks/exhaustive-deps
+    [viewMode, apiLimits, mosaics, predictions] // eslint-disable-line react-hooks/exhaustive-deps
   );
 
   return (

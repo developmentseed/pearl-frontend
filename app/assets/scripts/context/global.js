@@ -7,10 +7,11 @@ import {
   createQueryApiGetReducer,
   queryApiGet,
 } from '../reducers/api';
-import { createQueryApiPostReducer, queryApiPost } from '../reducers/api';
+import { createQueryApiPostReducer } from '../reducers/api';
 import useLocalStorage from '@rooks/use-localstorage';
 import config from '../config';
 import { useAuth0 } from '@auth0/auth0-react';
+import RestApiClient from './rest-api-client';
 
 const GlobalContext = createContext({});
 export function GlobalContextProvider(props) {
@@ -22,6 +23,7 @@ export function GlobalContextProvider(props) {
     isLoading: auth0IsLoading,
   } = useAuth0();
   const [apiToken, setApiToken, removeApiToken] = useLocalStorage();
+  const [restApiClient, setRestApiClient] = useState();
 
   const [restApiHealth, dispatchRestApiStatus] = useReducer(
     createRestApiHealthReducer,
@@ -44,7 +46,6 @@ export function GlobalContextProvider(props) {
     initialApiRequestState
   );
 
-  const [selectedModel, setSelectedModel] = useState(null);
   const [currentProjectName, setCurrentProjectName] = useState(null);
 
   const [currentProject, dispatchProject] = useReducer(
@@ -106,6 +107,10 @@ export function GlobalContextProvider(props) {
       return;
     }
 
+    // Create API Client
+    const restApiClient = new RestApiClient({ apiToken });
+    setRestApiClient(restApiClient);
+
     queryApiGet({ token: apiToken, endpoint: 'model' })(dispatchModelsList);
     queryApiGet({ token: apiToken, endpoint: 'project' })(dispatchProjectsList);
     queryApiGet({ token: apiToken, endpoint: 'mosaic' })(dispatchMosaicList);
@@ -123,45 +128,13 @@ export function GlobalContextProvider(props) {
     }
   }, [apiToken, currentProject]);
 
-  /* Post updates to the API */
-  useEffect(() => {
-    /*
-     * When project name and model have both been set, automatically create a new project
-     */
-
-    /* eslint-disable no-console */
-    if (currentProject.isReady()) {
-      console.error(
-        'Project name update not supported by api. Change is front end only'
-      );
-      return;
-    } else if (currentProjectName && selectedModel) {
-      queryApiPost({
-        endpoint: 'project',
-        token: apiToken,
-        query: {
-          name: currentProjectName,
-          model_id: selectedModel.id,
-          mosaic: 'naip.latest',
-        },
-      })(dispatchProject);
-    } else {
-      if (!currentProjectName) {
-        console.error('Project name not set');
-      }
-      if (!selectedModel) {
-        console.error('Model not selected');
-      }
-    }
-    /* eslint-enable no-console */
-  }, [currentProjectName, selectedModel]); // eslint-disable-line react-hooks/exhaustive-deps
-
   return (
     <>
       <GlobalContext.Provider
         value={{
           restApiHealth,
           apiToken,
+          restApiClient,
           modelsList,
           projectsList,
           projectCheckpoints,
@@ -170,9 +143,6 @@ export function GlobalContextProvider(props) {
 
           dispatchProject,
           currentProject,
-
-          selectedModel,
-          setSelectedModel,
 
           currentProjectName,
           setCurrentProjectName,

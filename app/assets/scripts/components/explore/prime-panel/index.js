@@ -1,10 +1,9 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext } from 'react';
 import styled from 'styled-components';
 import { themeVal, glsp } from '@devseed-ui/theme-provider';
 import { Button } from '@devseed-ui/button';
 import T from 'prop-types';
 import { useAuth0 } from '@auth0/auth0-react';
-
 import Panel from '../../common/panel';
 import {
   PanelBlock,
@@ -77,7 +76,17 @@ const ModalFooter = styled(BaseModalFooter)`
 `;
 
 function AoiEditButtons(props) {
-  const { setViewMode, viewMode, aoiRef, aoiArea, apiLimits } = props;
+  const {
+    setViewMode,
+    viewMode,
+    aoiRef,
+    aoiArea,
+    aoiBounds,
+    setAoiBounds,
+    apiLimits,
+    map,
+    setAoiRef,
+  } = props;
 
   const [activeModal, setActiveModal] = useState(false);
 
@@ -92,6 +101,7 @@ function AoiEditButtons(props) {
           onClick={function () {
             if (!apiLimits || apiLimits.live_inference > aoiArea) {
               setViewMode(viewModes.BROWSE_MODE);
+              setAoiBounds(aoiRef.getBounds());
             } else if (apiLimits.max_inference > aoiArea) {
               setActiveModal('no-live-inference');
             } else {
@@ -103,7 +113,30 @@ function AoiEditButtons(props) {
         >
           Select AOI
         </EditButton>
-        <EditButton useIcon='xmark'>Select AOI</EditButton>
+        <EditButton
+          onClick={() => {
+            setViewMode(viewModes.BROWSE_MODE);
+            if (aoiBounds) {
+              // editing is canceled
+              aoiRef.setBounds(aoiBounds);
+            } else {
+              // Drawing canceled
+              map.aoi.control.draw.disable();
+
+              //Edit mode is enabled as soon as draw is done
+              map.aoi.control.edit.disable();
+
+              //Layer must be removed from the map
+              map.aoi.control.draw.clear();
+
+              // Layer ref set to null, will be recreated when draw is attempted again
+              setAoiRef(null);
+            }
+          }}
+          useIcon='xmark'
+        >
+          Select AOI
+        </EditButton>
         {activeModal && (
           <Modal
             id='confirm-area-size'
@@ -137,6 +170,7 @@ function AoiEditButtons(props) {
                     onClick={() => {
                       setActiveModal(false);
                       setViewMode(viewModes.BROWSE_MODE);
+                      setAoiBounds(aoiRef.getBounds());
                     }}
                   >
                     Proceed anyway
@@ -177,87 +211,50 @@ AoiEditButtons.propTypes = {
   setViewMode: T.func,
   viewMode: T.string,
   aoiRef: T.object,
+  setAoiRef: T.func,
+  aoiBounds: T.object,
+  setAoiBounds: T.func,
   aoiArea: T.oneOfType([T.bool, T.number]),
   apiLimits: T.oneOfType([T.bool, T.object]),
+  map: T.object,
 };
 
 function PrimePanel() {
-  const { viewMode, setViewMode, aoiRef, aoiArea, apiLimits } = useContext(
-    ExploreContext
-  );
-
   const { isAuthenticated } = useAuth0();
 
   const {
+    viewMode,
+    setViewMode,
+    currentProject,
     selectedModel,
     setSelectedModel,
-    modelsList,
-    mosaicList,
-  } = useContext(GlobalContext);
+    inference,
+    aoiRef,
+    setAoiRef,
+    aoiArea,
+    apiLimits,
+    runInference,
+  } = useContext(ExploreContext);
 
-  const { map, mapLayers } = useContext(MapContext);
+  const { modelsList, mosaicList } = useContext(GlobalContext);
+
+  const { map, mapLayers, aoiBounds, setAoiBounds } = useContext(MapContext);
 
   const [showSelectModelModal, setShowSelectModelModal] = useState(false);
-  const [inference, setInference] = useState(true);
 
-  const [applyText, setApplyText] = useState();
-  const [applyState, setApplyState] = useState();
-  const [applyTooltip, setApplyTooltip] = useState();
-
-  useEffect(() => {
-    if (!aoiArea || !selectedModel) {
-      /* pre-AOI selected */
-      setApplyState(false);
-      setApplyTooltip('Select AOI to run model');
-    } else if (!inference) {
-      /* AOI selected, inference not yet applied */
-      setApplyState(true);
-      setApplyTooltip(null);
-    } /*else if (checkpoint) {
-      //assume inference = false when checkpoint is !undefined
-      setApplyState(true);
-      setApplyTooltip(null);
-       setApplyText('Retrain Checkpoint')
-    }*/
-
-    /* No Retraining samples selected, AOI changed */
-    // Retraining samples not implemented yet
-
-    setApplyText('Run Model');
-  }, [aoiArea /* retraining samples, checkoint */, selectedModel]);
-
-  useEffect(() => {
-    if (inference) {
-      /* No Retraining samples selected, AOI unchanged*/
-      setApplyState(false);
-      setApplyText('Retrain Model');
-      setApplyTooltip('Select retraining samples to retrain model');
-    }
-  }, [inference /* retraining samples */]);
-
-  /*
-  useEffect(() => {
-    // Retraining Samples selected
-    if (retraining samples) {
-      setApplyState(true)
-      setApplyText('Retrain Model')
-      setApplyTooltip('Retrain model with your selected samples')
-
-    }
-  }, [retraining samples ])
-  */
-
-  /* Check point based settings
-  useEffect(() => {
-    if (checkpoint) {
-      //Post-retraining (Checkpoint), AOI unchanged
-      setApplyState(false)
-      setApplyText('Retrain Checkpoint')
-      setApplyTooltip('Select retraining samples to retrain checkpoint')
-    }
-  }, [checkpoint])
-  */
   const { models } = modelsList.isReady() && modelsList.getData();
+
+  // Enable/disable "Run Inference" button
+  const allowInferenceRun =
+    viewMode === viewModes.BROWSE_MODE &&
+    aoiRef &&
+    aoiArea > 0 &&
+    selectedModel;
+
+  // "Run Inference" button
+  const applyTooltip = currentProject
+    ? 'Run inference for this model'
+    : 'Create project and run model';
 
   return (
     <>
@@ -285,7 +282,11 @@ function PrimePanel() {
                   <AoiEditButtons
                     setViewMode={setViewMode}
                     aoiRef={aoiRef}
+                    setAoiRef={setAoiRef}
+                    map={map}
                     aoiArea={aoiArea}
+                    setAoiBounds={setAoiBounds}
+                    aoiBounds={aoiBounds}
                     viewMode={viewMode}
                     apiLimits={apiLimits}
                   />
@@ -388,16 +389,11 @@ function PrimePanel() {
                 style={{
                   gridColumn: '1 / -1',
                 }}
-                onClick={() => {
-                  if (!applyState) {
-                    return;
-                  }
-                  setInference(true);
-                }}
-                visuallyDisabled={!applyState}
+                onClick={runInference}
+                visuallyDisabled={!allowInferenceRun}
                 info={applyTooltip}
               >
-                {applyText}
+                Run Model
               </InfoButton>
             </PanelControls>
           </StyledPanelBlock>

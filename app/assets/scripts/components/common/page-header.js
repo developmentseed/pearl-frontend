@@ -158,12 +158,12 @@ function PageHeader(props) {
                 </Button>
                 <Button
                   forwardedAs={StyledNavLink}
-                  to='/explore'
+                  to='/project/new'
                   variation='primary-raised-dark'
                   useIcon='globe'
-                  title='Launch application'
+                  title='Start a new project'
                 >
-                  Launch Application
+                  Start a new project
                 </Button>
               </PageSpecificControls>
             )}
