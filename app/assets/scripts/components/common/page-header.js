@@ -19,7 +19,7 @@ const { appTitle } = config;
 
 const PageHead = styled.header`
   background-color: ${themeVal('color.baseAlphaA')};
-  color: ${themeVal('color.baseLight')};
+  color: ${themeVal('color.base')};
   position: sticky;
   z-index: 20;
   padding: ${multiply(themeVal('layout.space'), 0.625)} 0;
@@ -60,11 +60,10 @@ const PrimarySection = styled.div`
   display: grid;
   align-items: center;
   justify-content: space-between;
-  grid-template-columns: 1fr min-content;
+  grid-template-columns: min-content 1fr;
   grid-gap: 1.5rem;
   * {
     grid-row: 1;
-    width: min-content;
   }
 `;
 
@@ -83,8 +82,13 @@ const SecondarySection = styled.div`
 `;
 
 const PageSpecificControls = styled.div`
-  display: grid;
-  grid-gap: 1.5rem;
+  display: flex;
+  flex-flow: row nowrap;
+  width: 100%;
+  justify-content: flex-end;
+  > * ~ * {
+    margin-left: 1rem;
+  }
 `;
 
 const GlobalMenuLink = styled.a`
@@ -137,7 +141,6 @@ function PageHeader(props) {
                   to='/'
                   useIcon='house'
                   title='Visit the home page'
-                  data-tip={appTitle}
                 >
                   <span>{appTitle}</span>
                 </GlobalMenuLink>
