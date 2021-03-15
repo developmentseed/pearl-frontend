@@ -33,7 +33,7 @@ function SessionTimeoutModal({ revealed }) {
             end it to save and exit
           </Prose>
           <Button
-            variation='primary-raised-light'
+            variation='danger-raised-light'
             size='medium'
             useIcon='xmark--small'
             style={{

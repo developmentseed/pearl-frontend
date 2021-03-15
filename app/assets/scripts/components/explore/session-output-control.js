@@ -2,133 +2,165 @@ import React, { useState, useContext, useEffect } from 'react';
 import styled from 'styled-components';
 import { useAuth0 } from '@auth0/auth0-react';
 import T from 'prop-types';
-import { Dropdown, DropdownTrigger } from '../../styles/dropdown';
+import { DropdownTrigger } from '../../styles/dropdown';
 import { Button } from '@devseed-ui/button';
-import { glsp } from '@devseed-ui/theme-provider';
+import { themeVal, glsp } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
-import { Form as BaseForm, FormInput } from '@devseed-ui/form';
-import Prose from '../../styles/type/prose';
+import { Form, FormInput } from '@devseed-ui/form';
+import InfoButton from '../common/info-button';
 import { ExploreContext } from '../../context/explore';
 
 const Wrapper = styled.div`
+  flex: 1;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr auto;
   grid-gap: ${glsp()};
 `;
 
-const DropWrapper = styled.div`
-  padding: ${glsp()};
+const StatusHeading = styled(Heading)`
+  font-size: 0.875rem;
+  span {
+    font-weight: ${themeVal('type.base.weight')};
+    color: ${themeVal('color.base')};
+  }
 `;
-const Form = styled(BaseForm)`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  input {
-    grid-column: 1 / -1;
+const ProjectHeading = styled.div`
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  line-height: 1.5;
+  ${Heading} {
+    margin: 0 ${glsp(0.25)};
+    height: auto;
+    padding: ${glsp(0.25)} ${glsp(0.5)};
+    line-height: 1.5rem;
+    border: 1px solid transparent;
+    border-radius: 0.25rem;
+    &:hover {
+      border: 1px solid ${themeVal('color.baseAlphaE')};
+    }
+  }
+  ${Form} {
+    grid-gap: ${glsp(0.5)};
+    align-items: center;
+    justify-items: center;
   }
 `;
 
-function SessionOutputControl(props) {
-  const { isAuthenticated } = useAuth0();
+const HeadingInput = styled(FormInput)`
+  margin-left: ${glsp(0.25)};
+  font-weight: ${themeVal('type.heading.weight')};
+`;
 
-  const { status } = props;
+function SessionOutputControl(props) {
+  const { status, projectName, openHelp } = props;
+
+  const { isAuthenticated } = useAuth0();
 
   const { updateProjectName, currentProject, selectedModel } = useContext(
     ExploreContext
   );
-
   const initialName = currentProject ? currentProject.name : 'Untitled';
-  const [localProjectName, setLocalProjectName] = useState(initialName);
 
+  const [localProjectName, setLocalProjectName] = useState(projectName);
+  const [titleEditMode, setTitleEditMode] = useState(false);
   useEffect(() => setLocalProjectName(initialName), [initialName]);
 
   const handleSubmit = (evt) => {
     evt.preventDefault();
     const name = evt.target.elements.projectName.value;
     updateProjectName(name);
+    setTitleEditMode(false);
   };
+
   const clearInput = () => {
     setLocalProjectName(initialName);
+    setTitleEditMode(false);
+  };
+  const getEditInfo = () => {
+    if (!isAuthenticated) {
+      return 'Log in to set project name';
+    } else if (!selectedModel) {
+      return 'Model must be selected to set project name';
+    } else if (localProjectName) {
+      return 'Edit project Name';
+    } else {
+      return 'Set Project Name';
+    }
   };
 
   return (
     <Wrapper>
-      <Button variation='base-plain' disabled size='small'>
-        Session Status: {status || 'None Provided'}
-      </Button>
-
-      <Dropdown
-        alignment='center'
-        direction='down'
-        triggerElement={(props) => {
-          const disabled = !isAuthenticated || !selectedModel;
-          return (
-            <DropdownTrigger
-              variation='base-raised-dark'
-              useIcon={['circle-tick', 'before']}
-              title='Open dropdown'
-              className='user-options-trigger'
-              size='small'
-              {...props}
-              onClick={(t) => {
-                /* eslint-disable-next-line */
-                isAuthenticated && selectedModel && props.onClick(t);
+      <ProjectHeading>
+        <p>Project:</p>
+        {!titleEditMode ? (
+          <>
+            <Heading
+              variation={localProjectName ? 'primary' : 'baseAlphaE'}
+              size='xsmall'
+              onClick={() => {
+                isAuthenticated && selectedModel && setTitleEditMode(true);
               }}
-              visuallyDisabled={disabled}
-              info={disabled ? 'Select model to save the project' : null}
-              id='save-project'
+              title={
+                !isAuthenticated ? 'Log in to set project name' : 'Project name'
+              }
             >
-              Save
-            </DropdownTrigger>
-          );
-        }}
-        className='global__dropdown'
-      >
-        <DropWrapper>
-          <Heading useAlt>{localProjectName}</Heading>
+              {localProjectName || 'Untitled Project'}
+            </Heading>
+            <InfoButton
+              size='small'
+              useIcon='pencil'
+              hideText
+              info={getEditInfo()}
+              onClick={() => {
+                isAuthenticated && selectedModel && setTitleEditMode(true);
+              }}
+            />
+          </>
+        ) : (
           <Form onSubmit={handleSubmit}>
-            <FormInput
-              type='string'
+            <HeadingInput
               name='projectName'
-              placeholder='Enter project name'
+              placeholder='Set Project Name'
               onChange={(e) => setLocalProjectName(e.target.value)}
               value={localProjectName}
+              disabled={!isAuthenticated}
+              autoFocus
             />
-            <Prose
-              style={{
-                gridColumn: '1 / -1',
-              }}
-              size='small'
-            >
-              Projects contain your saved AOI, current checkpoint, and all
-              resutls refinements that you have applied
-            </Prose>
             <Button
               type='submit'
-              style={{
-                gridColumn: '1 / 2',
-              }}
-              variation='base-raised-light'
               size='small'
               useIcon='tick--small'
-            >
-              Save
-            </Button>
+              hideText
+              title='Confirm project name'
+            />
             <Button
               onClick={clearInput}
-              variation='base-raised-light'
               size='small'
               useIcon='xmark--small'
-              style={{
-                gridColumn: '2 / -1',
-              }}
-            >
-              Cancel
-            </Button>
+              hideText
+              title='Cancel'
+            />
           </Form>
-        </DropWrapper>
-      </Dropdown>
+        )}
+      </ProjectHeading>
+      <StatusHeading
+        // TODO: replace status 'OK' with API active instance response
+        variation={status === 'OK' ? 'primary' : 'danger'}
+        size='xxsmall'
+      >
+        <span>Session Status:</span> {status || 'None Provided'}
+      </StatusHeading>
+      <Button
+        variation='base-plain'
+        size='small'
+        useIcon='circle-question'
+        onClick={openHelp}
+      >
+        Help
+      </Button>
       <DropdownTrigger
-        variation='base-raised-semidark'
+        variation='base-raised-light'
         useIcon={['download', 'before']}
         title='Open dropdown'
         className='user-options-trigger'
@@ -146,6 +178,7 @@ SessionOutputControl.propTypes = {
   status: T.string,
   projectName: T.string,
   setProjectName: T.func,
+  openHelp: T.func,
 };
 
 export default SessionOutputControl;

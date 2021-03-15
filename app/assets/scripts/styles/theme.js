@@ -1,9 +1,10 @@
 import { rgba } from 'polished';
 
 let color = {
-  baseLight: '#F7F7F7',
+  baseLight: '#FFFFFF',
   baseDark: '#121826',
   primary: '#07A68C',
+  baseLightDark: '#F0F4FF',
   primaryDark: '#09CEAD',
   secondary: '#F7C948',
   tertiary: '#42A6D1',
@@ -16,8 +17,8 @@ color = {
   background: color.baseLight,
   surface: color.baseLight,
   link: color.primary,
-  danger: color.secondary,
-  warning: color.quaternary,
+  danger: color.quaternary,
+  warning: color.secondary,
   success: color.primary,
   info: color.tertiary,
 };
@@ -53,7 +54,7 @@ const type = {
     regular: 400,
     medium: 600,
     bold: 700,
-    weight: 300,
+    weight: 400,
     antialiasing: true,
   },
   heading: {

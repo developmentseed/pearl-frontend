@@ -390,6 +390,7 @@ function PrimePanel() {
                 onClick={() => allowInferenceRun && runInference()}
                 visuallyDisabled={!allowInferenceRun}
                 info={applyTooltip}
+                id='applyButton'
               >
                 Run Model
               </InfoButton>
