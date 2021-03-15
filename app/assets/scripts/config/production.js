@@ -5,7 +5,7 @@ module.exports = {
     appTitle: 'MS LULC',
     appDescription: 'Microsoft Land Use/Land Classification project.',
     restApiEndpoint: 'https://api.lulc.ds.io',
-    websocketEndpoint: 'ws://localhost:1999',
+    websocketEndpoint: 'wss://socket.lulc.ds.io',
     auth0Domain: 'dev-y5qeoqlh.us.auth0.com',
     clientId: 'cnTAr7SyMGYu4qDLaw5rEGy4G0sn4Htn',
     audience: 'https://api.lulc.ds.io',
