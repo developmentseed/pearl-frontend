@@ -33,7 +33,7 @@ const steps = [
     content:
       'Run the model over your selected area of interest to infer land cover classes.',
     disableBeacon: true,
-    placement: 'right',
+    placement: 'right-end',
     spotlightClicks: true,
   },
   {
