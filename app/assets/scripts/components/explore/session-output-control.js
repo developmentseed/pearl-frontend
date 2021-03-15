@@ -32,7 +32,9 @@ function SessionOutputControl(props) {
 
   const { status } = props;
 
-  const { updateProjectName, currentProject } = useContext(ExploreContext);
+  const { updateProjectName, currentProject, selectedModel } = useContext(
+    ExploreContext
+  );
 
   const initialName = currentProject ? currentProject.name : 'Untitled';
   const [localProjectName, setLocalProjectName] = useState(initialName);
@@ -57,19 +59,28 @@ function SessionOutputControl(props) {
       <Dropdown
         alignment='center'
         direction='down'
-        triggerElement={(props) => (
-          <DropdownTrigger
-            variation='base-raised-dark'
-            useIcon={['circle-tick', 'before']}
-            title='Open dropdown'
-            className='user-options-trigger'
-            size='small'
-            {...props}
-            disabled={!isAuthenticated}
-          >
-            Save
-          </DropdownTrigger>
-        )}
+        triggerElement={(props) => {
+          const disabled = !isAuthenticated || !selectedModel;
+          return (
+            <DropdownTrigger
+              variation='base-raised-dark'
+              useIcon={['circle-tick', 'before']}
+              title='Open dropdown'
+              className='user-options-trigger'
+              size='small'
+              {...props}
+              onClick={(t) => {
+                /* eslint-disable-next-line */
+                isAuthenticated && selectedModel && props.onClick(t);
+              }}
+              visuallyDisabled={disabled}
+              info={disabled ? 'Select model to save the project' : null}
+              id='save-project'
+            >
+              Save
+            </DropdownTrigger>
+          );
+        }}
         className='global__dropdown'
       >
         <DropWrapper>

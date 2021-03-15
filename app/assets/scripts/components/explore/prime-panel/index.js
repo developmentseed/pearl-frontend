@@ -387,7 +387,7 @@ function PrimePanel() {
                 style={{
                   gridColumn: '1 / -1',
                 }}
-                onClick={runInference}
+                onClick={() => allowInferenceRun && runInference()}
                 visuallyDisabled={!allowInferenceRun}
                 info={applyTooltip}
               >
