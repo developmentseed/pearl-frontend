@@ -1,10 +1,14 @@
 import L from 'leaflet';
 
 class AoiDrawControl {
-  constructor(map, events) {
+  constructor(map, initializationShape, events) {
     this._map = map;
     this.onDrawEnd = events.onDrawEnd;
     this.onDrawChange = events.onDrawChange;
+    this.onInitialize = events.onInitialize;
+    if (initializationShape) {
+      this.initialize(initializationShape)
+    }
   }
 
   clear() {
@@ -13,6 +17,17 @@ class AoiDrawControl {
       this._shape = null;
     }
   }
+
+  // Draw control is initialized with a shape
+  initialize(bounds) {
+
+    //this._start = L.LatLng(bounds[0][0], bounds[0][1])
+    //this._end= L.LatLng(bounds[1][0], bounds[1][1])
+
+    this._shape = L.rectangle(bounds).addTo(this._map);
+    this.onInitialize(this.getBbox(), this._shape)
+  }
+
   getEventLatLng(event) {
     const {
       latlng: { lng, lat },
@@ -81,6 +96,7 @@ class AoiDrawControl {
   disable() {
     this._map.off('mousedown', this._onMouseDown, this);
   }
+
 }
 
 export default AoiDrawControl;
