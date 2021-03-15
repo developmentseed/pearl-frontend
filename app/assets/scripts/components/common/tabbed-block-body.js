@@ -89,12 +89,12 @@ function TabbedBlock(props) {
       <TabbedBlockHeader as='nav' role='navigation'>
         <ul>
           {Children.map(children, (child, ind) => {
-            const { name, icon } = child.props;
+            const { name, icon, tabId } = child.props;
             return (
               <li key={name}>
                 <Tab
                   as='a'
-                  id={`${name}-tab`}
+                  id={tabId || `${name}-tab`}
                   active={ind === activeTab}
                   useIcon={icon}
                   title='Show menu'

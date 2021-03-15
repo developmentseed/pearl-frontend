@@ -170,6 +170,15 @@ function SessionOutputControl(props) {
       >
         Export
       </DropdownTrigger>
+
+      <Button
+        variation='base-plain'
+        size='small'
+        useIcon='circle-question'
+        onClick={openHelp}
+      >
+        Help
+      </Button>
     </Wrapper>
   );
 }
