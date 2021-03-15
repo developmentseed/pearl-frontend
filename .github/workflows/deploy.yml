@@ -58,9 +58,17 @@ jobs:
         run: yarn build
         
       - name: Azure Login
+        if: github.ref == 'refs/heads/develop'
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Azure Login
+        if: github.ref == 'refs/heads/main'
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS_PROD }}
+
 
       - name: Upload to blob storage
         if: github.ref == 'refs/heads/develop'
