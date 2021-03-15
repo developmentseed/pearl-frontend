@@ -11,9 +11,7 @@ module.exports = {
     audience: 'https://api.lulc.ds.io',
     bingApiKey:
       'ArLmu8JG2PHK_-_zo7yS1WbvDz7PgsoVEgcqFTg8uaH-lsXLcjADCAtnyQB054uq',
-    NaipTileUrl:
-      'https://tiles.lulc.ds.io/mosaic/naip.latest/tiles/{z}/{x}/{y}@1x?bidx=1%2C2%2C3',
     tileUrlTemplate:
-      'https://tiles.lulc.ds.io/mosaic/{LAYER_NAME}/tiles/{z}/{x}/{y}@1x?bidx=1%2C2%2C3',
+    'https://api.lulc.ds.io/api/mosaic/{LAYER_NAME}/tiles/{z}/{x}/{y}.png?bidx=1%2C2%2C3'
   },
 };
