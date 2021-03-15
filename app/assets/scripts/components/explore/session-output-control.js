@@ -86,6 +86,7 @@ function SessionOutputControl(props) {
             <InfoButton
               size='small'
               useIcon='pencil'
+              hideText
               info={
                 isAuthenticated
                   ? localProjectName
@@ -105,19 +106,19 @@ function SessionOutputControl(props) {
               value={localProjectName}
               disabled={!isAuthenticated}
             />
-            <InfoButton
+            <Button
               type='submit'
               size='small'
               useIcon='tick--small'
-              info='Confirm project name'
-              id='project-name__confirm'
+              hideText
+              title='Confirm project name'
             />
-            <InfoButton
+            <Button
               onClick={clearInput}
               size='small'
               useIcon='xmark--small'
-              info='Cancel'
-              id='project-name__cancel'
+              hideText
+              title='Cancel'
             />
           </Form>
         )}
