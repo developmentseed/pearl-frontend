@@ -51,6 +51,7 @@ export function ExploreProvider(props) {
 
   // Aoi shape that is requested from API. used to initialize
   // Leaflet layer in the front end
+  // eslint-disable-next-line
   const [aoiInitializer, setAoiInitializer] = useState(null);
 
   const [viewMode, setViewMode] = useState(viewModes.BROWSE_MODE);
@@ -95,16 +96,21 @@ export function ExploreProvider(props) {
 
           setCurrentProject(project);
 
-          const model = await restApiClient.get(`model/${project.model_id}`);
+          const model = await restApiClient.getModel(project.model_id);
 
           setSelectedModel(model);
 
+          /* TODO 
+           * This code is untested.
+           * Once inference is run on a project, the API will
+           * return an AOI here
           const aois = await restApiClient.get(`project/${project.id}/aoi`);
 
           if (aois.total > 0) {
             const latest = aois.pop();
             setAoiInitializer(latest);
           }
+          */
         } catch (error) {
           toasts.error('Error loading project, please try again later.');
         } finally {
