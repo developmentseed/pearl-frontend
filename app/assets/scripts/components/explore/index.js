@@ -11,17 +11,12 @@ import SessionOutputControl from './session-output-control';
 import GlobalContext from '../../context/global';
 
 function Explore() {
-  const { currentProjectName, setCurrentProjectName } = useContext(
-    GlobalContext
-  );
   return (
     <App pageTitle='Explore'>
       <ExploreProvider>
         <MapProvider>
           <PageHeader>
             <SessionOutputControl
-              projectName={currentProjectName || 'Untitled Project'}
-              setProjectName={setCurrentProjectName}
             />
           </PageHeader>
           <PageBody role='main'>

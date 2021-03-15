@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import styled from 'styled-components';
 import { useAuth0 } from '@auth0/auth0-react';
 import T from 'prop-types';
@@ -8,6 +8,7 @@ import { glsp } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
 import { Form as BaseForm, FormInput } from '@devseed-ui/form';
 import Prose from '../../styles/type/prose';
+import { ExploreContext } from '../../context/explore';
 
 const Wrapper = styled.div`
   display: grid;
@@ -29,16 +30,24 @@ const Form = styled(BaseForm)`
 function SessionOutputControl(props) {
   const { isAuthenticated } = useAuth0();
 
-  const { status, projectName, setProjectName } = props;
-  const [localProjectName, setLocalProjectName] = useState(projectName);
+  const { status } = props;
+
+  const { updateProjectName, currentProject } = useContext(ExploreContext);
+
+  const initialName = currentProject ? currentProject.name : 'Untitled';
+  const [localProjectName, setLocalProjectName] = useState(initialName);
+
+  useEffect(() => setLocalProjectName(initialName), [initialName]);
+
+
 
   const handleSubmit = (evt) => {
     evt.preventDefault();
     const name = evt.target.elements.projectName.value;
-    setProjectName(name);
+    updateProjectName(name);
   };
   const clearInput = () => {
-    setLocalProjectName(projectName);
+    setLocalProjectName(initialName);
   };
 
   return (
@@ -66,7 +75,7 @@ function SessionOutputControl(props) {
         className='global__dropdown'
       >
         <DropWrapper>
-          <Heading useAlt>{projectName}</Heading>
+          <Heading useAlt>{localProjectName}</Heading>
           <Form onSubmit={handleSubmit}>
             <FormInput
               type='string'

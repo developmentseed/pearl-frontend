@@ -125,6 +125,32 @@ export function ExploreProvider(props) {
     }
   }, [predictions]);
 
+  async function updateProjectName(projectName) {
+    if (restApiClient) {
+      let project = currentProject;
+
+      //Create project if one does not already exist
+      if (!project) {
+        try {
+          showGlobalLoadingMessage('Creating project...');
+          project = await restApiClient.createProject({
+            model_id: selectedModel.id,
+            mosaic: 'naip.latest',
+            name: projectName,
+          });
+          setCurrentProject(project);
+          history.push(`/project/${project.id}`);
+          hideGlobalLoading();
+        } catch (error) {
+          hideGlobalLoading();
+          toasts.error('Could not create project, please try again later.');
+        }
+      } else {
+        // just update project name
+      }
+    }
+  }
+
   async function runInference() {
     if (restApiClient) {
       let project = currentProject;
@@ -188,19 +214,26 @@ export function ExploreProvider(props) {
         predictions,
         apiLimits:
           apiMeta.isReady() && !apiMeta.hasError() && apiMeta.getData().limits,
+
         previousViewMode,
         viewMode,
         setViewMode,
+
         aoiRef,
         setAoiRef,
         aoiArea,
         setAoiArea,
+
         currentInstance,
         setCurrentInstance,
+
         currentProject,
         setCurrentProject,
+
         selectedModel,
         setSelectedModel,
+
+        updateProjectName,
         runInference,
       }}
     >
