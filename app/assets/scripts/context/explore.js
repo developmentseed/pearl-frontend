@@ -42,16 +42,16 @@ export function ExploreProvider(props) {
 
   const [currentProject, setCurrentProject] = useState(null);
 
-  // Reference to Leaflet Rectangle layer created by 
+  // Reference to Leaflet Rectangle layer created by
   // AOI draw control
   const [aoiRef, setAoiRef] = useState(null);
 
   // Float value that records square area of aoi
   const [aoiArea, setAoiArea] = useState(null);
 
-  // Aoi shape that is requested from API. used to initialize 
+  // Aoi shape that is requested from API. used to initialize
   // Leaflet layer in the front end
-  const [aoiInitializer, setAoiInitializer] = useState(null)
+  const [aoiInitializer, setAoiInitializer] = useState(null);
 
   const [viewMode, setViewMode] = useState(viewModes.BROWSE_MODE);
   const [selectedModel, setSelectedModel] = useState(null);
@@ -96,11 +96,9 @@ export function ExploreProvider(props) {
 
           const aois = await restApiClient.get(`project/${project.id}/aoi`);
 
-          const bounds = [[38, -79], [38.4,-78.9]]
-          setAoiInitializer(bounds)
           if (aois.total > 0) {
-            const latest = aois.pop()
-            //aoiRef.setBounds(latest.bounds)
+            const latest = aois.pop();
+            setAoiInitializer(latest);
           }
         } catch (error) {
           toasts.error('Error loading project, please try again later.');
@@ -113,7 +111,6 @@ export function ExploreProvider(props) {
       loadProject();
     }
   }, [restApiClient]); // eslint-disable-line react-hooks/exhaustive-deps
-
 
   // If API is unreachable, redirect to home
   useEffect(() => {
