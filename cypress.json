@@ -1,0 +1,7 @@
+{
+  "baseUrl": "http://localhost:9000/",
+  "experimentalFetchPolyfill": true,
+  "chromeWebSecurity": false,
+  "defaultCommandTimeout": 7000
+}
+
