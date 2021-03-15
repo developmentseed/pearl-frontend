@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import styled from 'styled-components';
 import { useAuth0 } from '@auth0/auth0-react';
 import T from 'prop-types';
@@ -8,6 +8,7 @@ import { themeVal, glsp } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
 import { Form, FormInput } from '@devseed-ui/form';
 import InfoButton from '../common/info-button';
+import { ExploreContext } from '../../context/explore';
 
 const Wrapper = styled.div`
   flex: 1;
@@ -52,21 +53,40 @@ const HeadingInput = styled(FormInput)`
 `;
 
 function SessionOutputControl(props) {
+  const { status, projectName, openHelp } = props;
+
   const { isAuthenticated } = useAuth0();
 
-  const { status, projectName, setProjectName, openHelp } = props;
+  const { updateProjectName, currentProject, selectedModel } = useContext(
+    ExploreContext
+  );
+  const initialName = currentProject ? currentProject.name : 'Untitled';
+
   const [localProjectName, setLocalProjectName] = useState(projectName);
   const [titleEditMode, setTitleEditMode] = useState(false);
+  useEffect(() => setLocalProjectName(initialName), [initialName]);
 
   const handleSubmit = (evt) => {
     evt.preventDefault();
     const name = evt.target.elements.projectName.value;
-    setProjectName(name);
+    updateProjectName(name);
     setTitleEditMode(false);
   };
+
   const clearInput = () => {
-    setLocalProjectName(projectName || '');
+    setLocalProjectName(initialName);
     setTitleEditMode(false);
+  };
+  const getEditInfo = () => {
+    if (!isAuthenticated) {
+      return 'Log in to set project name';
+    } else if (!selectedModel) {
+      return 'Model must be selected to set project name';
+    } else if (localProjectName) {
+      return 'Edit project Name';
+    } else {
+      return 'Set Project Name';
+    }
   };
 
   return (
@@ -78,7 +98,9 @@ function SessionOutputControl(props) {
             <Heading
               variation={localProjectName ? 'primary' : 'baseAlphaE'}
               size='xsmall'
-              onClick={() => isAuthenticated && setTitleEditMode(true)}
+              onClick={() => {
+                isAuthenticated && selectedModel && setTitleEditMode(true);
+              }}
               title={
                 !isAuthenticated ? 'Log in to set project name' : 'Project name'
               }
@@ -89,14 +111,10 @@ function SessionOutputControl(props) {
               size='small'
               useIcon='pencil'
               hideText
-              info={
-                isAuthenticated
-                  ? localProjectName
-                    ? 'Edit project Name'
-                    : 'Set Project Name'
-                  : 'Log in to set project name'
-              }
-              onClick={() => isAuthenticated && setTitleEditMode(true)}
+              info={getEditInfo()}
+              onClick={() => {
+                isAuthenticated && selectedModel && setTitleEditMode(true);
+              }}
             />
           </>
         ) : (

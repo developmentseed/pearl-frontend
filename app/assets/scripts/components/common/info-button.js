@@ -10,11 +10,12 @@ const StyledTooltip = styled(ReactTooltip)`
   z-index: 1001;
 `;
 
-function InfoButton(props) {
+const InfoButton = React.forwardRef((props, ref) => {
   const { info, id, useIcon, width } = props;
   return (
     <>
       <Button
+        ref={ref}
         useIcon={useIcon || 'circle-information'}
         data-tip
         data-for={id}
@@ -30,8 +31,9 @@ function InfoButton(props) {
       )}
     </>
   );
-}
+});
 
+InfoButton.displayName = 'InfoButton';
 InfoButton.propTypes = {
   info: T.string,
   id: T.string,

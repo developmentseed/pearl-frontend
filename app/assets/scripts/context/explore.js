@@ -42,8 +42,18 @@ export function ExploreProvider(props) {
 
   const [currentProject, setCurrentProject] = useState(null);
 
+  // Reference to Leaflet Rectangle layer created by
+  // AOI draw control
   const [aoiRef, setAoiRef] = useState(null);
+
+  // Float value that records square area of aoi
   const [aoiArea, setAoiArea] = useState(null);
+
+  // Aoi shape that is requested from API. used to initialize
+  // Leaflet layer in the front end
+  // eslint-disable-next-line
+  const [aoiInitializer, setAoiInitializer] = useState(null);
+
   const [viewMode, setViewMode] = useState(viewModes.BROWSE_MODE);
   const [selectedModel, setSelectedModel] = useState(null);
   const [availableClasses, setAvailableClasses] = useState(null);
@@ -83,7 +93,24 @@ export function ExploreProvider(props) {
         try {
           // Get project metadata
           const project = await restApiClient.getProject(projectId);
+
           setCurrentProject(project);
+
+          const model = await restApiClient.getModel(project.model_id);
+
+          setSelectedModel(model);
+
+          /* TODO 
+           * This code is untested.
+           * Once inference is run on a project, the API will
+           * return an AOI here
+          const aois = await restApiClient.get(`project/${project.id}/aoi`);
+
+          if (aois.total > 0) {
+            const latest = aois.pop();
+            setAoiInitializer(latest);
+          }
+          */
         } catch (error) {
           toasts.error('Error loading project, please try again later.');
         } finally {
@@ -126,6 +153,35 @@ export function ExploreProvider(props) {
       }
     }
   }, [predictions]);
+
+  async function updateProjectName(projectName) {
+    if (restApiClient) {
+      let project = currentProject;
+
+      //Create project if one does not already exist
+      if (!project) {
+        try {
+          showGlobalLoadingMessage('Creating project...');
+          project = await restApiClient.createProject({
+            model_id: selectedModel.id,
+            mosaic: 'naip.latest',
+            name: projectName,
+          });
+          setCurrentProject(project);
+          history.push(`/project/${project.id}`);
+          hideGlobalLoading();
+        } catch (error) {
+          hideGlobalLoading();
+          toasts.error('Could not create project, please try again later.');
+        }
+      } else {
+        // just update project name
+        restApiClient.patch(`project/${project.id}`, {
+          name: projectName,
+        });
+      }
+    }
+  }
 
   async function runInference() {
     if (restApiClient) {
@@ -201,19 +257,27 @@ export function ExploreProvider(props) {
         predictions,
         apiLimits:
           apiMeta.isReady() && !apiMeta.hasError() && apiMeta.getData().limits,
+
         previousViewMode,
         viewMode,
         setViewMode,
+
         aoiRef,
         setAoiRef,
         aoiArea,
         setAoiArea,
+        aoiInitializer,
+
         currentInstance,
         setCurrentInstance,
+
         currentProject,
         setCurrentProject,
+
         selectedModel,
         setSelectedModel,
+
+        updateProjectName,
         availableClasses,
         runInference,
       }}
