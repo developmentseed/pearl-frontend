@@ -324,7 +324,10 @@ function PrimePanel() {
             <PanelBlockBody>
               <TabbedBlock>
                 {!inference ? (
-                  <PlaceholderPanelSection name='Retrain Model'>
+                  <PlaceholderPanelSection
+                    name='Retrain Model'
+                    tabId='retrain-tab-trigger'
+                  >
                     <PlaceholderMessage>
                       Click &quot;Run Inference&quot; to generate the class LULC
                       map for your AOI
@@ -334,19 +337,19 @@ function PrimePanel() {
                   <RetrainModel
                     name='retrain model'
                     classList={availableClasses}
-                    id='retrain-tab-trigger'
+                    tabId='retrain-tab-trigger'
                   />
                 )}
 
                 <PlaceholderPanelSection
                   name='Refine Results'
-                  id='refine-tab-trigger'
+                  tabId='refine-tab-trigger'
                 >
                   <PlaceholderMessage>Refine results</PlaceholderMessage>
                 </PlaceholderPanelSection>
                 <LayersPanel
                   name='layers'
-                  id='layers-tab-trigger'
+                  tabId='layers-tab-trigger'
                   layers={availableLayers}
                   baseLayerNames={
                     mosaicList.isReady() ? mosaicList.getData().mosaics : []

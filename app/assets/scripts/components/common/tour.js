@@ -21,7 +21,8 @@ const steps = [
   {
     title: 'Select model',
     target: '#select-model-trigger',
-    content: 'Land cover segmentation models are selected for you by default according to your selected region. To see details about the model selected or to choose a different model, click the model swap icon to view available model information.',
+    content:
+      'Land cover segmentation models are selected for you by default according to your selected region. To see details about the model selected or to choose a different model, click the model swap icon to view available model information.',
     disableBeacon: true,
     placement: 'right',
     spotlightClicks: true,
@@ -55,7 +56,7 @@ const steps = [
   },
   {
     title: 'Layer controls',
-    target: '#layer-tab-trigger',
+    target: '#layers-tab-trigger',
     content:
       'View available base imagery layers and modify the inference layer opacity.',
     disableBeacon: true,
