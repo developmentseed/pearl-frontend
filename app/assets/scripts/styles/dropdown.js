@@ -2,7 +2,6 @@ import styled from 'styled-components';
 import { themeVal, multiply } from '@devseed-ui/theme-provider';
 import collecticon from '@devseed-ui/collecticons';
 import BaseDropdown from '@devseed-ui/dropdown';
-import { Button } from '@devseed-ui/button';
 import InfoButton from '../components/common/info-button';
 
 export const DropdownHeader = styled.header`

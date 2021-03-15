@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import App from '../common/app';
 import ExploreComponent from './explore';
 import PageHeader from '../common/page-header';
@@ -8,7 +8,6 @@ import { MapProvider } from '../../context/map';
 
 import SessionTimeoutModal from '../common/timeout-modal';
 import SessionOutputControl from './session-output-control';
-import GlobalContext from '../../context/global';
 
 function Explore() {
   return (
@@ -16,8 +15,7 @@ function Explore() {
       <ExploreProvider>
         <MapProvider>
           <PageHeader>
-            <SessionOutputControl
-            />
+            <SessionOutputControl />
           </PageHeader>
           <PageBody role='main'>
             <ExploreComponent />
