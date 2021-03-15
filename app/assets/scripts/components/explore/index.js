@@ -20,7 +20,7 @@ function Explore() {
         <MapProvider>
           <PageHeader>
             <SessionOutputControl
-              projectName={currentProjectName || 'Untitled Project'}
+              projectName={currentProjectName}
               setProjectName={setCurrentProjectName}
               openHelp={() => setTourStep(0)}
             />

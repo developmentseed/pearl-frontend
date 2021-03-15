@@ -46,6 +46,7 @@ export function ExploreProvider(props) {
   const [aoiArea, setAoiArea] = useState(null);
   const [viewMode, setViewMode] = useState(viewModes.BROWSE_MODE);
   const [selectedModel, setSelectedModel] = useState(null);
+  const [availableClasses, setAvailableClasses] = useState(null);
 
   const previousViewMode = usePrevious(viewMode);
   const [predictions, dispatchPredictions] = useReducer(
@@ -144,7 +145,18 @@ export function ExploreProvider(props) {
         } catch (error) {
           hideGlobalLoading();
           toasts.error('Could not create project, please try again later.');
+          return; // abort inference run
         }
+      }
+
+      try {
+        showGlobalLoadingMessage('Fetching classes...');
+        const { classes } = await restApiClient.getModel(selectedModel.id);
+        setAvailableClasses(classes);
+      } catch (error) {
+        hideGlobalLoading();
+        toasts.error('Could fetch model classes, please try again later.');
+        return; // abort inference run
       }
 
       // Request a new instance if none is available.
@@ -202,6 +214,7 @@ export function ExploreProvider(props) {
         setCurrentProject,
         selectedModel,
         setSelectedModel,
+        availableClasses,
         runInference,
       }}
     >

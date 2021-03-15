@@ -37,7 +37,7 @@ import {
 import { EditButton } from '../../../styles/button';
 import InfoButton from '../../common/info-button';
 
-import { availableLayers, availableClasses } from '../sample-data';
+import { availableLayers } from '../sample-data';
 import { formatThousands } from '../../../utils/format';
 
 const PlaceholderPanelSection = styled.div`
@@ -228,12 +228,13 @@ function PrimePanel() {
     currentProject,
     selectedModel,
     setSelectedModel,
-    inference,
+    availableClasses,
     aoiRef,
     setAoiRef,
     aoiArea,
     apiLimits,
     runInference,
+    predictions,
   } = useContext(ExploreContext);
 
   const { modelsList, mosaicList } = useContext(GlobalContext);
@@ -323,24 +324,20 @@ function PrimePanel() {
             </PanelBlockHeader>
             <PanelBlockBody>
               <TabbedBlock>
-                {!inference ? (
-                  <PlaceholderPanelSection
-                    name='Retrain Model'
+                {predictions && !predictions.error && predictions.fetched ? (
+                  <RetrainModel
+                    name='retrain model'
                     tabId='retrain-tab-trigger'
-                  >
+                    classList={availableClasses}
+                  />
+                ) : (
+                  <PlaceholderPanelSection name='Retrain Model'>
                     <PlaceholderMessage>
                       Click &quot;Run Inference&quot; to generate the class LULC
                       map for your AOI
                     </PlaceholderMessage>
                   </PlaceholderPanelSection>
-                ) : (
-                  <RetrainModel
-                    name='retrain model'
-                    classList={availableClasses}
-                    tabId='retrain-tab-trigger'
-                  />
                 )}
-
                 <PlaceholderPanelSection
                   name='Refine Results'
                   tabId='refine-tab-trigger'
