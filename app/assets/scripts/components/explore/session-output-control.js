@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useAuth0 } from '@auth0/auth0-react';
 import T from 'prop-types';
-import { Dropdown, DropdownTrigger } from '../../styles/dropdown';
+import { DropdownTrigger } from '../../styles/dropdown';
 import { Button } from '@devseed-ui/button';
 import { themeVal, glsp } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
@@ -13,7 +13,7 @@ const Wrapper = styled.div`
   flex: 1;
   display: grid;
   grid-template-columns: 1fr 1fr auto;
-  grid-gap: 1rem;
+  grid-gap: ${glsp()};
 `;
 
 const StatusHeading = styled(Heading)`
@@ -29,9 +29,9 @@ const ProjectHeading = styled.div`
   align-items: center;
   line-height: 1.5;
   ${Heading} {
-    margin: 0 0.25rem;
+    margin: 0 ${glsp(0.25)};
     height: auto;
-    padding: 0.25rem 0.5rem;
+    padding: ${glsp(0.25)} ${glsp(0.5)};
     line-height: 1.5rem;
     border: 1px solid transparent;
     border-radius: 0.25rem;
@@ -40,14 +40,14 @@ const ProjectHeading = styled.div`
     }
   }
   ${Form} {
-    grid-gap: 0.5rem;
+    grid-gap: ${glsp(0.5)};
     align-items: center;
     justify-items: center;
   }
 `;
 
 const HeadingInput = styled(FormInput)`
-  margin-left: 0.25rem;
+  margin-left: ${glsp(0.25)};
   font-weight: ${themeVal('type.heading.weight')};
 `;
 
