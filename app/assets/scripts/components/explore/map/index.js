@@ -4,10 +4,15 @@ import { convertArea } from '@turf/helpers';
 import tArea from '@turf/area';
 import tBboxPolygon from '@turf/bbox-polygon';
 import SizeAwareElement from '../../common/size-aware-element';
-import { MapContainer, TileLayer, FeatureGroup } from 'react-leaflet';
+import {
+  MapContainer,
+  TileLayer,
+  FeatureGroup,
+  ImageOverlay,
+} from 'react-leaflet';
 import GlobalContext from '../../../context/global';
-import { ExploreContext } from '../../../context/explore';
-import { MapContext, viewModes } from '../../../context/map';
+import { ExploreContext, viewModes } from '../../../context/explore';
+import { MapContext } from '../../../context/map';
 
 import GeoCoder from '../../common/map/geocoder';
 import CenterMap from '../../common/map/center-map';
@@ -18,8 +23,8 @@ import AoiDrawControl from './aoi-draw-control';
 import AoiEditControl from './aoi-edit-control';
 import config from '../../../config';
 
-const center = [38.942, -95.449];
-const zoom = 4;
+const center = [38.83428180092151, -79.37724530696869];
+const zoom = 15;
 const freeDraw = new FreeDraw({
   mode: ALL,
 });
@@ -62,18 +67,17 @@ function areaFromBounds(bbox) {
 
 function Map() {
   const {
-    map,
-    setMap,
-    mapLayers,
-    setMapLayers,
     aoiRef,
     previousViewMode,
     setAoiRef,
     setAoiArea,
     setViewMode,
     viewMode,
-  } = useContext(MapContext);
-  const { apiLimits } = useContext(ExploreContext);
+    predictions,
+    apiLimits,
+  } = useContext(ExploreContext);
+
+  const { map, setMap, mapLayers, setMapLayers } = useContext(MapContext);
 
   const { mosaicList } = useContext(GlobalContext);
 
@@ -188,13 +192,19 @@ function Map() {
               }}
             />
           ))}
+
+        {predictions &&
+          !predictions.error &&
+          predictions.data.map((p) => (
+            <ImageOverlay key={p.key} url={p.image} bounds={p.bounds} />
+          ))}
         <FeatureGroup>
           <GeoCoder />
           {aoiRef && <CenterMap aoiRef={aoiRef} />}
         </FeatureGroup>
       </MapContainer>
     ),
-    [viewMode, apiLimits, mosaics] // eslint-disable-line react-hooks/exhaustive-deps
+    [viewMode, apiLimits, mosaics, predictions] // eslint-disable-line react-hooks/exhaustive-deps
   );
 
   return (
