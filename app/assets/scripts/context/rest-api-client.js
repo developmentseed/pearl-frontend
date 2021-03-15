@@ -37,6 +37,10 @@ class RestApiClient {
     return this.fetch('POST', path, data);
   }
 
+  patch(path, data) {
+    return this.fetch('PATCH', path, data);
+  }
+
   getProject(id) {
     return this.get(`project/${id}`);
   }

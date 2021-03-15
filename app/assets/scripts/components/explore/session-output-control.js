@@ -39,8 +39,6 @@ function SessionOutputControl(props) {
 
   useEffect(() => setLocalProjectName(initialName), [initialName]);
 
-
-
   const handleSubmit = (evt) => {
     evt.preventDefault();
     const name = evt.target.elements.projectName.value;

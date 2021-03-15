@@ -147,6 +147,9 @@ export function ExploreProvider(props) {
         }
       } else {
         // just update project name
+        restApiClient.patch(`project/${project.id}`, {
+          name: projectName,
+        });
       }
     }
   }
