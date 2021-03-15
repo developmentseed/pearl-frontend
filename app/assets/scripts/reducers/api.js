@@ -58,8 +58,8 @@ export const createApiMetaReducer = wrapLogReducer(makeAPIReducer('API_META'));
 export function queryApiGet({ endpoint, id, subPath, token, name }) {
   let headers;
   if (token) {
-    headers: {
-      Authorization: `Bearer ${token}`
+    {
+      `Bearer ${token}`;
     }
   }
   const queryApiGetActions = makeAbortableActions(

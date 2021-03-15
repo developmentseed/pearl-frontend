@@ -12,6 +12,6 @@ module.exports = {
     bingApiKey:
       'ArLmu8JG2PHK_-_zo7yS1WbvDz7PgsoVEgcqFTg8uaH-lsXLcjADCAtnyQB054uq',
     tileUrlTemplate:
-    'https://api.lulc.ds.io/api/mosaic/{LAYER_NAME}/tiles/{z}/{x}/{y}.png?bidx=1%2C2%2C3'
+      'https://api.lulc.ds.io/api/mosaic/{LAYER_NAME}/tiles/{z}/{x}/{y}.png?bidx=1%2C2%2C3',
   },
 };
