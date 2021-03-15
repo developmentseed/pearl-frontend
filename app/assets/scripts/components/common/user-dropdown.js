@@ -61,7 +61,7 @@ const StyledLink = filterComponentProps(Link, propsToFilter);
 
 function UserDropdown() {
   const location = useLocation();
-  const { isAuthenticated, loginWithRedirect, logout } = useAuth0();
+  const { isAuthenticated, loginWithRedirect, logout, user } = useAuth0();
   const logoutWithRedirect = () =>
     logout({
       returnTo: window.location.origin,
@@ -103,7 +103,7 @@ function UserDropdown() {
           <>
             <DropdownHeader>
               <p>Hello</p>
-              <h1>Sylvan Couvert</h1>
+              <h1>{user.name}</h1>
             </DropdownHeader>
             <DropdownBody>
               <li>
