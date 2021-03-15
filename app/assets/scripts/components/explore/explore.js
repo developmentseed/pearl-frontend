@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import {
   Inpage,
@@ -14,6 +14,8 @@ import Map from './map';
 
 import Tour from '../common/tour';
 import GlobalContext from '../../context/global';
+import { ExploreContext } from '../../context/explore';
+import { tourSteps } from './tour';
 
 const ExploreBody = styled(InpageBody)`
   display: grid;
@@ -23,6 +25,21 @@ const ExploreBody = styled(InpageBody)`
 const ExploreCarto = styled.section``;
 function Explore() {
   const { tourStep, setTourStep } = useContext(GlobalContext);
+  const { apiLimits } = useContext(ExploreContext);
+  const [steps, setSteps] = useState(null);
+
+  useEffect(() => {
+    if (apiLimits) {
+      const steps = tourSteps.map((s) => {
+        const content = s.content
+          .replace('{LIVE_INFERENCE_MAX_AREA}', apiLimits.live_inference)
+          .replace('{INFERENCE_MAX_AREA}', apiLimits.max_inference);
+
+        return { ...s, content };
+      });
+      setSteps(steps);
+    }
+  }, [apiLimits]);
   return (
     <>
       <Inpage isMapCentric>
@@ -46,7 +63,9 @@ function Explore() {
             data-cy='secondary-panel'
           />
         </ExploreBody>
-        <Tour tourStep={tourStep} setTourStep={setTourStep} />
+        {steps && (
+          <Tour steps={steps} tourStep={tourStep} setTourStep={setTourStep} />
+        )}
       </Inpage>
     </>
   );
