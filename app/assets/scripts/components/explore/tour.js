@@ -38,7 +38,7 @@ export const tourSteps = [
     title: 'Refine Results',
     target: '#refine-tab-trigger',
     content:
-      'After running inference, use the refinment tools to change classes directly on your map. Fill in specified areas with a single class, or select a previous model checkpoint to  Select points or draw polygons to identify pixels to reclassify with alternate classses.',
+      'After running inference, use the refinment tools to change classes directly on your map. Fill in specified areas with a single class, or select a previous model checkpoint to run inference in your drawn area with an alternate trained model checkpoint.',
     disableBeacon: true,
     placement: 'right',
     spotlightClicks: true,
