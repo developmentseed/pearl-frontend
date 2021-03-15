@@ -105,6 +105,7 @@ function SessionOutputControl(props) {
               onChange={(e) => setLocalProjectName(e.target.value)}
               value={localProjectName}
               disabled={!isAuthenticated}
+              autoFocus
             />
             <Button
               type='submit'
