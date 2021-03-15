@@ -94,6 +94,10 @@ export function ExploreProvider(props) {
 
           setCurrentProject(project);
 
+          const model = await restApiClient.get(`model/${project.model_id}`);
+
+          setSelectedModel(model);
+
           const aois = await restApiClient.get(`project/${project.id}/aoi`);
 
           if (aois.total > 0) {
