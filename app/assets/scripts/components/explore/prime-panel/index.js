@@ -352,7 +352,9 @@ function PrimePanel() {
                   tabId='layers-tab-trigger'
                   layers={availableLayers}
                   baseLayerNames={
-                    mosaicList.isReady() ? mosaicList.getData().mosaics : []
+                    mosaicList.isReady() && !mosaicList.hasError()
+                      ? mosaicList.getData().mosaics
+                      : []
                   }
                   onSliderChange={(name, value) => {
                     mapLayers[name].setOpacity(value);
