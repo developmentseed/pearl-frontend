@@ -96,6 +96,7 @@ class AoiDrawControl {
         this._shape.setBounds([this._start, this._end]);
       }
       this.onDrawChange(this.getBbox());
+      // Update polygon color based on area size
       this.onDrawChange(this.setAreaColor());
     }
 

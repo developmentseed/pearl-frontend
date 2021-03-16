@@ -161,6 +161,8 @@ class AoiEditControl {
     this._moveMarker.setLatLng(bounds.getCenter());
 
     this.onBoundsChange();
+
+    // Update polygon color based on area size
     this.setAreaColor();
   }
 
