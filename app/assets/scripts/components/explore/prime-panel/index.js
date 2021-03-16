@@ -37,7 +37,7 @@ import {
 import { EditButton } from '../../../styles/button';
 import InfoButton from '../../common/info-button';
 
-import { availableLayers, availableClasses } from '../sample-data';
+import { availableLayers } from '../sample-data';
 import { formatThousands } from '../../../utils/format';
 
 const PlaceholderPanelSection = styled.div`
@@ -199,6 +199,7 @@ function AoiEditButtons(props) {
         );
       }}
       title='Draw Area of Interest'
+      id='edit-aoi-trigger'
       useIcon='pencil'
     >
       Select AOI
@@ -227,12 +228,13 @@ function PrimePanel() {
     currentProject,
     selectedModel,
     setSelectedModel,
-    inference,
+    availableClasses,
     aoiRef,
     setAoiRef,
     aoiArea,
     apiLimits,
     runInference,
+    predictions,
   } = useContext(ExploreContext);
 
   const { modelsList, mosaicList } = useContext(GlobalContext);
@@ -308,6 +310,7 @@ function PrimePanel() {
                   <EditButton
                     data-cy='show-select-model-button'
                     useIcon='swap-horizontal'
+                    id='select-model-trigger'
                     onClick={function () {
                       setShowSelectModelModal(true);
                     }}
@@ -321,28 +324,37 @@ function PrimePanel() {
             </PanelBlockHeader>
             <PanelBlockBody>
               <TabbedBlock>
-                {!inference ? (
-                  <PlaceholderPanelSection name='Retrain Model'>
+                {predictions && !predictions.error && predictions.fetched ? (
+                  <RetrainModel
+                    name='retrain model'
+                    tabId='retrain-tab-trigger'
+                    classList={availableClasses}
+                  />
+                ) : (
+                  <PlaceholderPanelSection
+                    name='Retrain Model'
+                    tabId='retrain-tab-trigger'
+                  >
                     <PlaceholderMessage>
                       Click &quot;Run Inference&quot; to generate the class LULC
                       map for your AOI
                     </PlaceholderMessage>
                   </PlaceholderPanelSection>
-                ) : (
-                  <RetrainModel
-                    name='retrain model'
-                    classList={availableClasses}
-                  />
                 )}
-
-                <PlaceholderPanelSection name='Refine Results'>
+                <PlaceholderPanelSection
+                  name='Refine Results'
+                  tabId='refine-tab-trigger'
+                >
                   <PlaceholderMessage>Refine results</PlaceholderMessage>
                 </PlaceholderPanelSection>
                 <LayersPanel
                   name='layers'
+                  tabId='layers-tab-trigger'
                   layers={availableLayers}
                   baseLayerNames={
-                    mosaicList.isReady() ? mosaicList.getData().mosaics : []
+                    mosaicList.isReady() && !mosaicList.hasError()
+                      ? mosaicList.getData().mosaics
+                      : []
                   }
                   onSliderChange={(name, value) => {
                     mapLayers[name].setOpacity(value);
@@ -366,6 +378,7 @@ function PrimePanel() {
                 style={{
                   gridColumn: '1 / 2',
                 }}
+                id='reset-button-trigger'
               >
                 Reset
               </Button>
@@ -376,6 +389,7 @@ function PrimePanel() {
                 style={{
                   gridColumn: '2 / -1',
                 }}
+                id='undo-button-trigger'
               >
                 Undo
               </Button>
@@ -387,9 +401,10 @@ function PrimePanel() {
                 style={{
                   gridColumn: '1 / -1',
                 }}
-                onClick={runInference}
+                onClick={() => allowInferenceRun && runInference()}
                 visuallyDisabled={!allowInferenceRun}
                 info={applyTooltip}
+                id='apply-button-trigger'
               >
                 Run Model
               </InfoButton>

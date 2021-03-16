@@ -5,24 +5,19 @@ import PageHeader from '../common/page-header';
 import { PageBody } from '../../styles/page';
 import { ExploreProvider } from '../../context/explore';
 import { MapProvider } from '../../context/map';
+import GlobalContext from '../../context/global';
 
 import SessionTimeoutModal from '../common/timeout-modal';
 import SessionOutputControl from './session-output-control';
-import GlobalContext from '../../context/global';
 
 function Explore() {
-  const { currentProjectName, setCurrentProjectName } = useContext(
-    GlobalContext
-  );
+  const { setTourStep } = useContext(GlobalContext);
   return (
     <App pageTitle='Explore'>
       <ExploreProvider>
         <MapProvider>
           <PageHeader>
-            <SessionOutputControl
-              projectName={currentProjectName || 'Untitled Project'}
-              setProjectName={setCurrentProjectName}
-            />
+            <SessionOutputControl openHelp={() => setTourStep(0)} />
           </PageHeader>
           <PageBody role='main'>
             <ExploreComponent />

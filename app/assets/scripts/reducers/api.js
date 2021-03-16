@@ -56,8 +56,11 @@ export const createApiMetaReducer = wrapLogReducer(makeAPIReducer('API_META'));
  *                called CHECKPOINT not PROJECT
  */
 export function queryApiGet({ endpoint, id, subPath, token, name }) {
-  if (!token) {
-    throw new Error(`Token required for ${endpoint}`);
+  let headers;
+  if (token) {
+    headers = {
+      Authorization: `Bearer ${token}`,
+    };
   }
   const queryApiGetActions = makeAbortableActions(
     `API_GET_${(name || endpoint).toUpperCase()}`
@@ -72,9 +75,7 @@ export function queryApiGet({ endpoint, id, subPath, token, name }) {
   return makeFetchThunk({
     url,
     options: {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      headers: headers,
       method: 'GET',
     },
     requestFn: queryApiGetActions.request,

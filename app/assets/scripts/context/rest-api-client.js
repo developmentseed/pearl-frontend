@@ -37,12 +37,20 @@ class RestApiClient {
     return this.fetch('POST', path, data);
   }
 
+  patch(path, data) {
+    return this.fetch('PATCH', path, data);
+  }
+
   getProject(id) {
     return this.get(`project/${id}`);
   }
 
   createProject(data) {
     return this.post('project', data);
+  }
+
+  getModel(id) {
+    return this.get(`model/${id}`);
   }
 
   createInstance(projectId) {
