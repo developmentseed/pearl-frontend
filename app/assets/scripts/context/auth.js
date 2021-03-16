@@ -56,6 +56,7 @@ AuthProvider.propTypes = {
 const actions = {
   REQUEST_LOGIN: 'REQUEST_LOGIN',
   RECEIVE_LOGIN: 'RECEIVE_LOGIN',
+  LOGOUT: 'LOGOUT',
 };
 
 const initialState = {
