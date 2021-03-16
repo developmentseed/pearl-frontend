@@ -32,8 +32,13 @@ const ProjectsBody = styled(InpageBodyInner)`
 `;
 const CardResults = styled.div`
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: 1fr;
+  grid-auto-rows: auto 1fr;
   grid-gap: 1rem;
+  ${media.mediumUp`
+    grid-template-columns: 2fr 1fr;
+    grid-auto-rows: auto;
+  `}
 `;
 
 const FormInputGroup = styled.div`
@@ -62,12 +67,14 @@ const NavPane = styled.div`
   }
 `;
 const NavList = styled.ol`
-  text-align: center;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-around;
   > * {
     padding: ${glsp(0.5)};
   }
   ${media.mediumUp`
-    text-align: left;
+    flex-flow: column;
   `}
 `;
 
@@ -181,7 +188,7 @@ function Projects(props) {
                               useIcon={['download', 'after']}
                               size='small'
                             >
-                              Download
+                              Download Map
                             </Button>
                           </CardResults>
                         ),
