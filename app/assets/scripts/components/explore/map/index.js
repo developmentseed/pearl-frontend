@@ -18,6 +18,7 @@ import GeoCoder from '../../common/map/geocoder';
 import CenterMap from '../../common/map/center-map';
 
 import { themeVal, multiply } from '@devseed-ui/theme-provider';
+import theme from '../../../styles/theme';
 import FreeDraw, { ALL } from 'leaflet-freedraw';
 import AoiDrawControl from './aoi-draw-control';
 import AoiEditControl from './aoi-edit-control';
@@ -70,6 +71,7 @@ function Map() {
     aoiRef,
     previousViewMode,
     setAoiRef,
+    aoiArea,
     setAoiArea,
     aoiInitializer,
 
@@ -162,6 +164,26 @@ function Map() {
       },
     });
   }, [map, aoiInitializer, apiLimits]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Update color on area size change during draw
+  useEffect(() => {
+    if (!aoiRef) {
+      return;
+    }
+    if (aoiArea > apiLimits.max_inference) {
+      aoiRef.setStyle({
+        color: theme.main.color.danger,
+      });
+    } else if (aoiArea > apiLimits.live_inference) {
+      aoiRef.setStyle({
+        color: theme.main.color.warning,
+      });
+    } else {
+      aoiRef.setStyle({
+        color: theme.main.color.info,
+      });
+    }
+  }, [aoiArea, apiLimits, aoiRef]);
 
   const displayMap = useMemo(
     () => (

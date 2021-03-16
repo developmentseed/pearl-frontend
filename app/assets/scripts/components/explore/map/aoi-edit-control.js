@@ -1,10 +1,5 @@
 import L from 'leaflet';
 
-import theme from '../../../styles/theme';
-import { convertArea } from '@turf/helpers';
-import tArea from '@turf/area';
-import tBboxPolygon from '@turf/bbox-polygon';
-
 const icons = {
   moveIcon: new L.DivIcon({
     iconSize: new L.Point(8, 8),
@@ -15,16 +10,6 @@ const icons = {
     className: 'leaflet-div-icon leaflet-editing-icon leaflet-edit-resize',
   }),
 };
-
-/**
- * Get area from bbox
- *
- * @param {array} bbox extent in minX, minY, maxX, maxY order
- */
-function areaFromBounds(bbox) {
-  const poly = tBboxPolygon(bbox);
-  return convertArea(tArea(poly), 'meters', 'kilometers');
-}
 
 class AoiEditControl {
   constructor(map, apiLimits, { onBoundsChange, onBoundsChangeEnd }) {
@@ -48,26 +33,6 @@ class AoiEditControl {
   _getBbox() {
     const { _southWest, _northEast } = this._shape.getBounds();
     return [_southWest.lng, _southWest.lat, _northEast.lng, _northEast.lat];
-  }
-
-  // Set polygon color based on area
-  setAreaColor(color) {
-    if (areaFromBounds(this._getBbox()) > this._apiLimits.max_inference) {
-      this._shape.setStyle({
-        color: theme.main.color.danger,
-      });
-    } else if (
-      areaFromBounds(this._getBbox()) > this._apiLimits.live_inference
-    ) {
-      this._shape.setStyle({
-        color: theme.main.color.warning,
-      });
-    } else {
-      this._shape.setStyle({
-        color: theme.main.color.info,
-      });
-    }
-    return color;
   }
 
   _createMoveMarker() {
@@ -161,9 +126,6 @@ class AoiEditControl {
     this._moveMarker.setLatLng(bounds.getCenter());
 
     this.onBoundsChange();
-
-    // Update polygon color based on area size
-    this.setAreaColor();
   }
 
   _move(newCenter) {

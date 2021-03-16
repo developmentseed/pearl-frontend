@@ -1,20 +1,5 @@
 import L from 'leaflet';
 
-import theme from '../../../styles/theme';
-import { convertArea } from '@turf/helpers';
-import tArea from '@turf/area';
-import tBboxPolygon from '@turf/bbox-polygon';
-
-/**
- * Get area from bbox
- *
- * @param {array} bbox extent in minX, minY, maxX, maxY order
- */
-function areaFromBounds(bbox) {
-  const poly = tBboxPolygon(bbox);
-  return convertArea(tArea(poly), 'meters', 'kilometers');
-}
-
 class AoiDrawControl {
   constructor(map, initializationShape, apiLimits, events) {
     this._map = map;
@@ -58,26 +43,6 @@ class AoiDrawControl {
     return [_southWest.lng, _southWest.lat, _northEast.lng, _northEast.lat];
   }
 
-  // Set polygon color based on area
-  setAreaColor(color) {
-    if (areaFromBounds(this.getBbox()) > this._apiLimits.max_inference) {
-      this._shape.setStyle({
-        color: theme.main.color.danger,
-      });
-    } else if (
-      areaFromBounds(this.getBbox()) > this._apiLimits.live_inference
-    ) {
-      this._shape.setStyle({
-        color: theme.main.color.warning,
-      });
-    } else {
-      this._shape.setStyle({
-        color: theme.main.color.info,
-      });
-    }
-    return color;
-  }
-
   _onMouseDown(event) {
     this._map.dragging.disable();
     this._map.off('mousedown', this._onMouseDown, this);
@@ -86,18 +51,12 @@ class AoiDrawControl {
     // Update rectangle on mouse move
     function onMouseMove(event) {
       this._end = this.getEventLatLng(event);
-      let color;
       if (!this._shape) {
-        this._shape = L.rectangle([this._start, this._end], {
-          color: color,
-          weight: '1',
-        }).addTo(this._map);
+        this._shape = L.rectangle([this._start, this._end]).addTo(this._map);
       } else {
         this._shape.setBounds([this._start, this._end]);
       }
       this.onDrawChange(this.getBbox());
-      // Update polygon color based on area size
-      this.onDrawChange(this.setAreaColor());
     }
 
     // Listen to mouseUp: if the user has drawn a bbox, call drawEnd,
