@@ -60,6 +60,7 @@ export function GlobalContextProvider(props) {
 
   useEffect(() => {
     queryRestApiHealth()(dispatchRestApiStatus);
+    queryApiGet({ endpoint: 'mosaic' })(dispatchMosaicList);
     const visited = localStorage.getItem('site-tour');
     if (visited !== null) {
       setTourStep(Number(visited));
@@ -113,7 +114,6 @@ export function GlobalContextProvider(props) {
 
     queryApiGet({ token: apiToken, endpoint: 'model' })(dispatchModelsList);
     queryApiGet({ token: apiToken, endpoint: 'project' })(dispatchProjectsList);
-    queryApiGet({ token: apiToken, endpoint: 'mosaic' })(dispatchMosaicList);
   }, [apiToken]);
 
   useEffect(() => {
