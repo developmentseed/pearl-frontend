@@ -71,13 +71,17 @@ function Map() {
     previousViewMode,
     setAoiRef,
     setAoiArea,
+    aoiInitializer,
+
     setViewMode,
     viewMode,
     predictions,
     apiLimits,
   } = useContext(ExploreContext);
 
-  const { map, setMap, mapLayers, setMapLayers } = useContext(MapContext);
+  const { map, setMap, mapLayers, setMapLayers, setAoiBounds } = useContext(
+    MapContext
+  );
 
   const { mosaicList } = useContext(GlobalContext);
 
@@ -103,7 +107,9 @@ function Map() {
           if (aoiRef) {
             // Only disable if something has been drawn
             map.aoi.control.draw.disable();
-            map.aoi.control.edit.disable();
+            if (map.aoi.control.edit._shape) {
+              map.aoi.control.edit.disable();
+            }
             if (
               previousViewMode === viewModes.CREATE_AOI_MODE ||
               previousViewMode === viewModes.EDIT_AOI_MODE
@@ -134,7 +140,12 @@ function Map() {
     };
 
     // Draw control, for creating an AOI
-    map.aoi.control.draw = new AoiDrawControl(map, {
+    map.aoi.control.draw = new AoiDrawControl(map, aoiInitializer, {
+      onInitialize: (bbox, shape) => {
+        setAoiRef(shape);
+        setAoiBounds(shape.getBounds());
+        setAoiArea(areaFromBounds(bbox));
+      },
       onDrawChange: (bbox) => {
         setAoiArea(areaFromBounds(bbox));
       },
@@ -150,7 +161,7 @@ function Map() {
         setAoiArea(areaFromBounds(bbox));
       },
     });
-  }, [map, apiLimits]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [map, aoiInitializer, apiLimits]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const displayMap = useMemo(
     () => (
