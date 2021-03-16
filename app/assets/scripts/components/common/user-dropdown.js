@@ -83,7 +83,7 @@ function UserDropdown() {
         </Button>
       ) : (
         <Dropdown
-          alignment='center'
+          alignment='right'
           direction='down'
           triggerElement={(props) => (
             <DropdownTrigger
