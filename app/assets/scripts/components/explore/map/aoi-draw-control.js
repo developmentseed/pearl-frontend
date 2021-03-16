@@ -1,6 +1,5 @@
 import L from 'leaflet';
 
-// import { themeVal } from '@devseed-ui/theme-provider';
 import theme from '../../../styles/theme';
 import { convertArea } from '@turf/helpers';
 import tArea from '@turf/area';
@@ -59,6 +58,7 @@ class AoiDrawControl {
     return [_southWest.lng, _southWest.lat, _northEast.lng, _northEast.lat];
   }
 
+  // Set polygon color based on area
   setAreaColor(color) {
     if (areaFromBounds(this.getBbox()) > this._apiLimits.max_inference) {
       this._shape.setStyle({

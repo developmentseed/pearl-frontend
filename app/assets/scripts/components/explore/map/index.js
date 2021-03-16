@@ -156,7 +156,7 @@ function Map() {
     });
 
     // Edit AOI control
-    map.aoi.control.edit = new AoiEditControl(map, {
+    map.aoi.control.edit = new AoiEditControl(map, apiLimits, {
       onBoundsChange: (bbox) => {
         setAoiArea(areaFromBounds(bbox));
       },

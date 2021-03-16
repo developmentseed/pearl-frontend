@@ -1,5 +1,10 @@
 import L from 'leaflet';
 
+import theme from '../../../styles/theme';
+import { convertArea } from '@turf/helpers';
+import tArea from '@turf/area';
+import tBboxPolygon from '@turf/bbox-polygon';
+
 const icons = {
   moveIcon: new L.DivIcon({
     iconSize: new L.Point(8, 8),
@@ -11,13 +16,24 @@ const icons = {
   }),
 };
 
+/**
+ * Get area from bbox
+ *
+ * @param {array} bbox extent in minX, minY, maxX, maxY order
+ */
+function areaFromBounds(bbox) {
+  const poly = tBboxPolygon(bbox);
+  return convertArea(tArea(poly), 'meters', 'kilometers');
+}
+
 class AoiEditControl {
-  constructor(map, { onBoundsChange, onBoundsChangeEnd }) {
+  constructor(map, apiLimits, { onBoundsChange, onBoundsChangeEnd }) {
     this._map = map;
     this.onBoundsChangeEnd = () =>
       onBoundsChangeEnd && onBoundsChangeEnd(this._getBbox());
     this.onBoundsChange = () =>
       onBoundsChange && onBoundsChange(this._getBbox());
+    this._apiLimits = apiLimits;
   }
 
   enable(shape) {
@@ -32,6 +48,26 @@ class AoiEditControl {
   _getBbox() {
     const { _southWest, _northEast } = this._shape.getBounds();
     return [_southWest.lng, _southWest.lat, _northEast.lng, _northEast.lat];
+  }
+
+  // Set polygon color based on area
+  setAreaColor(color) {
+    if (areaFromBounds(this._getBbox()) > this._apiLimits.max_inference) {
+      this._shape.setStyle({
+        color: theme.main.color.danger,
+      });
+    } else if (
+      areaFromBounds(this._getBbox()) > this._apiLimits.live_inference
+    ) {
+      this._shape.setStyle({
+        color: theme.main.color.warning,
+      });
+    } else {
+      this._shape.setStyle({
+        color: theme.main.color.info,
+      });
+    }
+    return color;
   }
 
   _createMoveMarker() {
@@ -125,6 +161,7 @@ class AoiEditControl {
     this._moveMarker.setLatLng(bounds.getCenter());
 
     this.onBoundsChange();
+    this.setAreaColor();
   }
 
   _move(newCenter) {
