@@ -38,6 +38,9 @@ export const DropdownItem = styled.a`
     ${({ useIcon }) => useIcon && collecticon(useIcon)}
   }
 
+  :visited {
+    color: ${themeVal('color.base')};
+  }
   :hover {
     color: ${themeVal('color.primary')};
     opacity: 1;
