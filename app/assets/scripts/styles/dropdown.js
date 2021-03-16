@@ -31,14 +31,17 @@ export const DropdownItem = styled.a`
   padding: ${multiply(themeVal('layout.space'), 0.25)}
     ${themeVal('layout.space')};
   grid-gap: ${themeVal('layout.space')};
-  color: ${themeVal('color.primary')};
-
+  font-weight: ${themeVal('type.heading.weight')};
+  color: ${themeVal('color.base')};
+  transition: all 0.16s ease-in-out;
   ::before {
     ${({ useIcon }) => useIcon && collecticon(useIcon)}
   }
 
   :hover {
-    background: ${themeVal('color.baseAlphaD')};
+    color: ${themeVal('color.primary')};
+    opacity: 1;
+    background: ${themeVal('color.primaryAlphaA')};
   }
 `;
 export const DropdownFooter = styled.footer`

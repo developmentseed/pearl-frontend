@@ -76,7 +76,7 @@ function UserDropdown() {
         <Button
           variation='primary-raised-light'
           className='button-class'
-          title='Log in to save and access projects'
+          title='sample button'
           onClick={() => loginWithRedirect({ prompt: 'consent' })}
         >
           Log in

@@ -30,6 +30,7 @@ color = {
   baseAlphaC: rgba(color.base, 0.08),
   baseAlphaD: rgba(color.base, 0.16),
   baseAlphaE: rgba(color.base, 0.32),
+  primaryAlphaA: rgba(color.primary, 0.04),
   silkLight: `radial-gradient(farthest-side, ${color.baseLight}, ${rgba(
     color.baseLight,
     0.64
