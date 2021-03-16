@@ -59,6 +59,25 @@ class AoiDrawControl {
     return [_southWest.lng, _southWest.lat, _northEast.lng, _northEast.lat];
   }
 
+  setAreaColor(color) {
+    if (areaFromBounds(this.getBbox()) > this._apiLimits.max_inference) {
+      this._shape.setStyle({
+        color: theme.main.color.danger,
+      });
+    } else if (
+      areaFromBounds(this.getBbox()) > this._apiLimits.live_inference
+    ) {
+      this._shape.setStyle({
+        color: theme.main.color.warning,
+      });
+    } else {
+      this._shape.setStyle({
+        color: theme.main.color.info,
+      });
+    }
+    return color;
+  }
+
   _onMouseDown(event) {
     this._map.dragging.disable();
     this._map.off('mousedown', this._onMouseDown, this);
@@ -67,7 +86,7 @@ class AoiDrawControl {
     // Update rectangle on mouse move
     function onMouseMove(event) {
       this._end = this.getEventLatLng(event);
-      let color = theme.main.color.info;
+      let color;
       if (!this._shape) {
         this._shape = L.rectangle([this._start, this._end], {
           color: color,
@@ -76,18 +95,8 @@ class AoiDrawControl {
       } else {
         this._shape.setBounds([this._start, this._end]);
       }
-
       this.onDrawChange(this.getBbox());
-      if (areaFromBounds(this.getBbox()) > this._apiLimits.max_inference) {
-        color = theme.main.color.danger;
-      } else if (
-        areaFromBounds(this.getBbox()) > this._apiLimits.live_inference
-      ) {
-        color = theme.main.color.warning;
-      } else {
-        color = theme.main.color.info;
-      }
-      console.log(color);
+      this.onDrawChange(this.setAreaColor());
     }
 
     // Listen to mouseUp: if the user has drawn a bbox, call drawEnd,
