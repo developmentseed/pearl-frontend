@@ -61,7 +61,15 @@ const NavPane = styled.div`
     content: '-';
   }
 `;
-const NavList = styled.ol``;
+const NavList = styled.ol`
+  text-align: center;
+  > * {
+    padding: ${glsp(0.5)};
+  }
+  ${media.mediumUp`
+    text-align: left;
+  `}
+`;
 
 function Projects(props) {
   const history = useHistory();
