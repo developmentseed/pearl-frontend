@@ -111,6 +111,7 @@ function SessionOutputControl(props) {
               size='small'
               useIcon='pencil'
               hideText
+              id='project-edit-trigger'
               info={getEditInfo()}
               onClick={() => {
                 isAuthenticated && selectedModel && setTitleEditMode(true);
@@ -162,7 +163,7 @@ function SessionOutputControl(props) {
       <DropdownTrigger
         variation='base-raised-light'
         useIcon={['download', 'before']}
-        title='Open dropdown'
+        title='Export map'
         className='user-options-trigger'
         size='medium'
         {...props}
@@ -170,15 +171,6 @@ function SessionOutputControl(props) {
       >
         Export
       </DropdownTrigger>
-
-      <Button
-        variation='base-plain'
-        size='small'
-        useIcon='circle-question'
-        onClick={openHelp}
-      >
-        Help
-      </Button>
     </Wrapper>
   );
 }
