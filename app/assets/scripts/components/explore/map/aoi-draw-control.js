@@ -1,7 +1,23 @@
 import L from 'leaflet';
 
+// import { themeVal } from '@devseed-ui/theme-provider';
+import theme from '../../../styles/theme';
+import { convertArea } from '@turf/helpers';
+import tArea from '@turf/area';
+import tBboxPolygon from '@turf/bbox-polygon';
+
+/**
+ * Get area from bbox
+ *
+ * @param {array} bbox extent in minX, minY, maxX, maxY order
+ */
+function areaFromBounds(bbox) {
+  const poly = tBboxPolygon(bbox);
+  return convertArea(tArea(poly), 'meters', 'kilometers');
+}
+
 class AoiDrawControl {
-  constructor(map, initializationShape, events) {
+  constructor(map, initializationShape, apiLimits, events) {
     this._map = map;
     this.onDrawEnd = events.onDrawEnd;
     this.onDrawChange = events.onDrawChange;
@@ -9,6 +25,7 @@ class AoiDrawControl {
     if (initializationShape) {
       this.initialize(initializationShape);
     }
+    this._apiLimits = apiLimits;
   }
 
   clear() {
@@ -50,14 +67,27 @@ class AoiDrawControl {
     // Update rectangle on mouse move
     function onMouseMove(event) {
       this._end = this.getEventLatLng(event);
-
+      let color = theme.main.color.info;
       if (!this._shape) {
-        this._shape = L.rectangle([this._start, this._end]).addTo(this._map);
+        this._shape = L.rectangle([this._start, this._end], {
+          color: color,
+          weight: '1',
+        }).addTo(this._map);
       } else {
         this._shape.setBounds([this._start, this._end]);
       }
 
       this.onDrawChange(this.getBbox());
+      if (areaFromBounds(this.getBbox()) > this._apiLimits.max_inference) {
+        color = theme.main.color.danger;
+      } else if (
+        areaFromBounds(this.getBbox()) > this._apiLimits.live_inference
+      ) {
+        color = theme.main.color.warning;
+      } else {
+        color = theme.main.color.info;
+      }
+      console.log(color);
     }
 
     // Listen to mouseUp: if the user has drawn a bbox, call drawEnd,

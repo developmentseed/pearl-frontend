@@ -140,7 +140,7 @@ function Map() {
     };
 
     // Draw control, for creating an AOI
-    map.aoi.control.draw = new AoiDrawControl(map, aoiInitializer, {
+    map.aoi.control.draw = new AoiDrawControl(map, aoiInitializer, apiLimits, {
       onInitialize: (bbox, shape) => {
         setAoiRef(shape);
         setAoiBounds(shape.getBounds());
