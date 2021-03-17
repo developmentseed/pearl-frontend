@@ -298,7 +298,7 @@ function PrimePanel() {
                 <HeadOptionHeadline>
                   <Subheading>Selected Model</Subheading>
                 </HeadOptionHeadline>
-                <SubheadingStrong>
+                <SubheadingStrong data-cy='select-model-label'>
                   {(selectedModel && selectedModel.name) ||
                     (isAuthenticated
                       ? models && models.length

@@ -1,29 +1,34 @@
 // / <reference types="Cypress" />
 describe('The Project Page', () => {
   before(() => {
+    cy.clearLocalStorage();
     cy.visit('/project/new');
   });
 
-  it('successfully loads', () => {
+  it('Successfully loads not-logged in state ', () => {
     cy.get('body');
     cy.get('header');
-  });
 
-  it('Renders 2 panels', () => {
     cy.get('[data-cy=primary-panel]').should('exist');
     cy.get('[data-cy=secondary-panel]').should('exist');
-  });
-
-  it('Renders a map', () => {
     cy.get('[data-cy=leaflet-map]').should('exist');
+
+    cy.get('[data-cy=select-model-label]').should(
+      'have.text',
+      'Login to select model'
+    );
   });
 
-  // TODO re-enable this test when staging API is available for testing
-  // it('Display select model modal on click', () => {
-  //   cy.get('[data-cy=show-select-model-button]');
-  //
-  //   // Ideally we should use data-cy prop, but the Model doesn't support it.
-  //   // Ticketed here: https://github.com/developmentseed/ui-library-seed/issues/175
-  //   cy.get('[id=select-model-modal]').should('exist');
-  // });
+  it('Allow model select after login ', () => {
+    cy.loginByAuth0Api(
+      Cypress.env('auth0_username'),
+      Cypress.env('auth0_password')
+    );
+    cy.visit('/project/new');
+
+    cy.get('[data-cy=select-model-label]').should(
+      'not.have.text',
+      'Login to select model'
+    );
+  });
 });
