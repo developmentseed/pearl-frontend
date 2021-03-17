@@ -99,14 +99,10 @@ function AoiEditButtons(props) {
       <>
         <EditButton
           onClick={function () {
-            const aoiAreaInSquareMeters = aoiArea * 1e6;
-            if (
-              !apiLimits ||
-              apiLimits.live_inference > aoiAreaInSquareMeters
-            ) {
+            if (!apiLimits || apiLimits.live_inference > aoiArea) {
               setViewMode(viewModes.BROWSE_MODE);
               setAoiBounds(aoiRef.getBounds());
-            } else if (apiLimits.max_inference > aoiAreaInSquareMeters) {
+            } else if (apiLimits.max_inference > aoiArea) {
               setActiveModal('no-live-inference');
             } else {
               setActiveModal('area-too-large');
@@ -278,7 +274,7 @@ function PrimePanel() {
                 </HeadOptionHeadline>
                 <SubheadingStrong>
                   {aoiArea && aoiArea > 0
-                    ? `${formatThousands(aoiArea)} km2`
+                    ? `${formatThousands(aoiArea / 1e6)} km2`
                     : viewMode === viewModes.CREATE_AOI_MODE
                     ? 'Drag on map to select'
                     : 'None selected - Draw area on map'}

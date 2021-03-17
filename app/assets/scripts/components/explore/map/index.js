@@ -1,6 +1,5 @@
 import React, { useMemo, useContext, useEffect } from 'react';
 import styled from 'styled-components';
-import { convertArea } from '@turf/helpers';
 import tArea from '@turf/area';
 import tBboxPolygon from '@turf/bbox-polygon';
 import SizeAwareElement from '../../common/size-aware-element';
@@ -62,7 +61,7 @@ const Container = styled.div`
  */
 function areaFromBounds(bbox) {
   const poly = tBboxPolygon(bbox);
-  return convertArea(tArea(poly), 'meters', 'kilometers');
+  return tArea(poly);
 }
 
 function Map() {
