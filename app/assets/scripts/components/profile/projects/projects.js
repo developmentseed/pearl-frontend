@@ -13,21 +13,32 @@ import {
   InpageBodyInner,
 } from '../../../styles/inpage';
 import { Form, FormInput } from '@devseed-ui/form';
-import { glsp } from '@devseed-ui/theme-provider';
+import { glsp, media } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
 import { StyledNavLink } from '../../../styles/links';
 import toasts from '../../common/toasts';
 import { useHistory } from 'react-router';
 const ProjectsBody = styled(InpageBodyInner)`
   display: grid;
-  grid-template-columns: 1fr 4fr;
-  padding: 0 ${glsp(4)};
+  grid-template-columns: 1fr;
+  grid-auto-rows: auto 1fr;
+  grid-gap: ${glsp()};
+  padding: 0 ${glsp(4)} ${glsp(4)};
   min-height: 100%;
+  ${media.mediumUp`
+    grid-template-columns: 1fr 4fr;
+    grid-auto-rows: auto;
+  `}
 `;
 const CardResults = styled.div`
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: 1fr;
+  grid-auto-rows: auto 1fr;
   grid-gap: 1rem;
+  ${media.mediumUp`
+    grid-template-columns: 2fr 1fr;
+    grid-auto-rows: auto;
+  `}
 `;
 
 const FormInputGroup = styled.div`
@@ -55,7 +66,17 @@ const NavPane = styled.div`
     content: '-';
   }
 `;
-const NavList = styled.ol``;
+const NavList = styled.ol`
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-around;
+  > * {
+    padding: ${glsp(0.5)};
+  }
+  ${media.mediumUp`
+    flex-flow: column;
+  `}
+`;
 
 function Projects(props) {
   const history = useHistory();
@@ -167,7 +188,7 @@ function Projects(props) {
                               useIcon={['download', 'after']}
                               size='small'
                             >
-                              Download
+                              Download Map
                             </Button>
                           </CardResults>
                         ),
