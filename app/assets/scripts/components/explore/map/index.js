@@ -23,12 +23,17 @@ import FreeDraw, { ALL } from 'leaflet-freedraw';
 import AoiDrawControl from './aoi-draw-control';
 import AoiEditControl from './aoi-edit-control';
 import config from '../../../config';
+import { inRange } from '../../../utils/utils';
 
 const center = [38.83428180092151, -79.37724530696869];
 const zoom = 15;
 const freeDraw = new FreeDraw({
   mode: ALL,
 });
+
+const MAX = 3;
+const NO_LIVE = 2;
+const LIVE = 1;
 
 const Container = styled.div`
   height: 100%;
@@ -148,6 +153,9 @@ function Map() {
         setAoiBounds(shape.getBounds());
         setAoiArea(areaFromBounds(bbox));
       },
+      onDrawStart: (shape) => {
+        setAoiRef(shape);
+      },
       onDrawChange: (bbox) => {
         setAoiArea(areaFromBounds(bbox));
       },
@@ -170,18 +178,27 @@ function Map() {
     if (!aoiRef) {
       return;
     }
-    if (aoiArea > apiLimits.max_inference) {
+
+    const { max_inference, live_inference } = apiLimits;
+
+    if (inRange(aoiArea, max_inference, Infinity) && aoiRef.status !== MAX) {
       aoiRef.setStyle({
         color: theme.main.color.danger,
       });
-    } else if (aoiArea > apiLimits.live_inference) {
+      aoiRef.status = MAX;
+    } else if (
+      inRange(aoiArea, live_inference, max_inference) &&
+      aoiRef.status !== NO_LIVE
+    ) {
       aoiRef.setStyle({
         color: theme.main.color.warning,
       });
-    } else {
+      aoiRef.status = NO_LIVE;
+    } else if (inRange(aoiArea, 0, live_inference) && aoiRef.status !== LIVE) {
       aoiRef.setStyle({
         color: theme.main.color.info,
       });
+      aoiRef.status = LIVE;
     }
   }, [aoiArea, apiLimits, aoiRef]);
 

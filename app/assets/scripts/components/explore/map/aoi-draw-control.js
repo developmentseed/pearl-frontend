@@ -5,6 +5,7 @@ class AoiDrawControl {
     this._map = map;
     this.onDrawEnd = events.onDrawEnd;
     this.onDrawChange = events.onDrawChange;
+    this.onDrawStart = events.onDrawStart;
     this.onInitialize = events.onInitialize;
     if (initializationShape) {
       this.initialize(initializationShape);
@@ -53,9 +54,11 @@ class AoiDrawControl {
       this._end = this.getEventLatLng(event);
       if (!this._shape) {
         this._shape = L.rectangle([this._start, this._end]).addTo(this._map);
+        this.onDrawStart(this._shape);
       } else {
         this._shape.setBounds([this._start, this._end]);
       }
+
       this.onDrawChange(this.getBbox());
     }
 
