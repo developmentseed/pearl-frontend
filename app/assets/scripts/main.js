@@ -3,12 +3,11 @@ import React, { useEffect } from 'react';
 import { DevseedUiThemeProvider } from '@devseed-ui/theme-provider';
 
 import { render } from 'react-dom';
-import { Auth0Provider, withAuthenticationRequired } from '@auth0/auth0-react';
+import { withAuthenticationRequired } from '@auth0/auth0-react';
 import GlobalStyles from './styles/global';
 import ErrorBoundary from './fatal-error-boundary';
 import { Router, Route, Switch } from 'react-router-dom';
 import history from './history';
-import config from './config';
 
 import theme from './styles/theme';
 
@@ -25,11 +24,6 @@ import Projects from './components/profile/projects';
 import Maps from './components/profile/maps';
 import { AuthProvider } from './context/auth';
 
-const onRedirectCallback = (appState) => {
-  // Use the router's history module to replace the url
-  history.replace(appState?.returnTo || window.location.pathname);
-};
-
 // eslint-disable-next-line react/prop-types
 const ProtectedRoute = ({ component, ...args }) => (
   <Route component={withAuthenticationRequired(component)} {...args} />
@@ -45,39 +39,32 @@ function Root() {
   }, []);
 
   return (
-    <Auth0Provider
-      domain={config.auth0Domain}
-      clientId={config.clientId}
-      redirectUri={window.location.origin}
-      onRedirectCallback={onRedirectCallback}
-    >
-      <AuthProvider>
-        <ErrorBoundary>
-          <Router history={history}>
-            <DevseedUiThemeProvider theme={theme.main}>
-              <GlobalLoadingProvider />
-              <GlobalContextProvider>
-                <CollecticonsGlobalStyle />
-                <GlobalStyles />
-                <Switch>
-                  <Route exact path='/' component={Home} />
-                  <Route path='/project/:projectId' component={Explore} />
-                  <ProtectedRoute exact path='/profile/maps' component={Maps} />
-                  <ProtectedRoute
-                    exact
-                    path='/profile/projects'
-                    component={Projects}
-                  />
-                  <Route path='/about' component={About} />
-                  <Route path='*' component={UhOh} />
-                </Switch>
-                <ToastContainerCustom />
-              </GlobalContextProvider>
-            </DevseedUiThemeProvider>
-          </Router>
-        </ErrorBoundary>
-      </AuthProvider>
-    </Auth0Provider>
+    <AuthProvider>
+      <ErrorBoundary>
+        <Router history={history}>
+          <DevseedUiThemeProvider theme={theme.main}>
+            <GlobalLoadingProvider />
+            <GlobalContextProvider>
+              <CollecticonsGlobalStyle />
+              <GlobalStyles />
+              <Switch>
+                <Route exact path='/' component={Home} />
+                <Route path='/project/:projectId' component={Explore} />
+                <ProtectedRoute exact path='/profile/maps' component={Maps} />
+                <ProtectedRoute
+                  exact
+                  path='/profile/projects'
+                  component={Projects}
+                />
+                <Route path='/about' component={About} />
+                <Route path='*' component={UhOh} />
+              </Switch>
+              <ToastContainerCustom />
+            </GlobalContextProvider>
+          </DevseedUiThemeProvider>
+        </Router>
+      </ErrorBoundary>
+    </AuthProvider>
   );
 }
 

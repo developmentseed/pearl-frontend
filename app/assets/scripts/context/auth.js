@@ -1,10 +1,19 @@
 import React, { createContext, useEffect, useReducer } from 'react';
 import T from 'prop-types';
-import { useAuth0 } from '@auth0/auth0-react';
+import { Auth0Provider, useAuth0 } from '@auth0/auth0-react';
+import config from '../config';
+
+const onRedirectCallback = (appState) => {
+  // Use the router's history module to replace the url
+  history.replace(appState?.returnTo || window.location.pathname);
+};
 
 export const AuthContext = createContext({});
 
-export function AuthProvider(props) {
+/**
+ * Inner provider to be wrapped by Auth0 provider
+ */
+function InnerAuthProvider(props) {
   const { isAuthenticated, user, isLoading } = useAuth0(initialState);
   const [authState, dispatchAuthState] = useReducer(authReducer, {});
 
@@ -46,6 +55,26 @@ export function AuthProvider(props) {
     >
       {props.children}
     </AuthContext.Provider>
+  );
+}
+
+InnerAuthProvider.propTypes = {
+  children: T.node,
+};
+
+/**
+ * AuthProvider
+ */
+export function AuthProvider(props) {
+  return (
+    <Auth0Provider
+      domain={config.auth0Domain}
+      clientId={config.clientId}
+      redirectUri={window.location.origin}
+      onRedirectCallback={onRedirectCallback}
+    >
+      <InnerAuthProvider>{props.children}</InnerAuthProvider>
+    </Auth0Provider>
   );
 }
 
