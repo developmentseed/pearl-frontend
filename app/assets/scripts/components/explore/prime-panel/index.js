@@ -145,14 +145,20 @@ function AoiEditButtons(props) {
             closeButton={false}
             renderHeadline={() => (
               <ModalHeadline>
-                <h1>Save Area</h1>
+                {activeModal === 'no-live-inference' ? (
+                  <h1>Save Area</h1>
+                ) : (
+                  <h1>Area too large</h1>
+                )}
               </ModalHeadline>
             )}
             content={
               activeModal === 'no-live-inference' ? (
                 <div>
                   Live inference is not available for areas larger than{' '}
-                  {formatThousands(apiLimits.live_inference)} km2.
+                  {formatThousands(apiLimits.live_inference)} km2. You can run
+                  inference on this AOI as a background process, or resize to a
+                  smaller size to engage in retraining and run live inference.
                 </div>
               ) : (
                 <div>
