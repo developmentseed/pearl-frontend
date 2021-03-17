@@ -99,11 +99,9 @@ function AoiEditButtons(props) {
       <>
         <EditButton
           onClick={function () {
-            if (!apiLimits || apiLimits.live_inference > aoiArea) {
+            if (!apiLimits || apiLimits.max_inference > aoiArea) {
               setViewMode(viewModes.BROWSE_MODE);
               setAoiBounds(aoiRef.getBounds());
-            } else if (apiLimits.max_inference > aoiArea) {
-              setActiveModal('no-live-inference');
             } else {
               setActiveModal('area-too-large');
             }
