@@ -32,8 +32,8 @@ function Explore() {
     if (apiLimits) {
       const steps = tourSteps.map((s) => {
         const content = s.content
-          .replace('{LIVE_INFERENCE_MAX_AREA}', apiLimits.live_inference)
-          .replace('{INFERENCE_MAX_AREA}', apiLimits.max_inference);
+          .replace('{LIVE_INFERENCE_MAX_AREA}', apiLimits.live_inference / 1e6)
+          .replace('{INFERENCE_MAX_AREA}', apiLimits.max_inference / 1e6);
 
         return { ...s, content };
       });
