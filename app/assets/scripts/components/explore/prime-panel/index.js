@@ -331,15 +331,12 @@ function PrimePanel() {
                     classList={availableClasses}
                   />
                 ) : (
-                  <PlaceholderPanelSection
-                    name='Retrain Model'
+                  <RetrainModel
+                    name='retrain model'
                     tabId='retrain-tab-trigger'
-                  >
-                    <PlaceholderMessage>
-                      Click &quot;Run Inference&quot; to generate the class LULC
-                      map for your AOI
-                    </PlaceholderMessage>
-                  </PlaceholderPanelSection>
+                    placeholderItems={3}
+                    placeholderMessage={`Click "Run Inference" to generate the class LULC map for your AOI`}
+                  />
                 )}
                 <PlaceholderPanelSection
                   name='Refine Results'

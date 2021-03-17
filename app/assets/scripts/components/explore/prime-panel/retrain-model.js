@@ -5,6 +5,7 @@ import styled, { css } from 'styled-components';
 import { glsp, themeVal } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
 import collecticon from '@devseed-ui/collecticons';
+import { PlaceholderMessage } from '../../../styles/placeholder.js';
 
 const ClassList = styled.div`
   display: grid;
@@ -44,6 +45,21 @@ const Class = styled.div`
       color: ${themeVal('color.base')};
     }
   }
+
+  ${(placeholder) =>
+    placeholder &&
+    css`
+      align-items: stretch;
+      padding: ${glsp(0.5)} 0;
+      & > * {
+        background: ${themeVal('color.baseAlphaD')};
+      }
+      ${Heading} {
+        align-self: center;
+        width: 10rem;
+        height: 1rem;
+      }
+    `}
 `;
 const Thumbnail = styled.div`
   width: ${glsp(1.5)};
@@ -72,34 +88,48 @@ const Wrapper = styled.div`
 `;
 
 function RetrainModel(props) {
-  const { classList, className } = props;
+  const { classList, className, placeholderItems, placeholderMessage } = props;
   const [selectedClass, setSelectedClass] = useState({});
   return (
     <Wrapper className={className}>
       <Heading useAlt>Classes</Heading>
       <ClassList>
-        {classList.map((c) => (
-          <Class
-            key={c.name}
-            onClick={() => {
-              setSelectedClass(c);
-            }}
-            selected={c.name === selectedClass.name}
-          >
-            <Thumbnail color={c.color} />
-            <Heading size='xsmall'>{c.name}</Heading>
+        {classList &&
+          classList.map((c) => (
+            <Class
+              key={c.name}
+              onClick={() => {
+                setSelectedClass(c);
+              }}
+              selected={c.name === selectedClass.name}
+            >
+              <Thumbnail color={c.color} />
+              <Heading size='xsmall'>{c.name}</Heading>
 
-            <Button useIcon='cog' hideText variation='base-plain'>
-              Options
-            </Button>
-          </Class>
-        ))}
+              <Button useIcon='cog' hideText variation='base-plain'>
+                Options
+              </Button>
+            </Class>
+          ))}
+        {placeholderItems && (
+          <>
+            {Array.from(Array(placeholderItems)).map((i) => (
+              <Class key={i} placeholder>
+                <Thumbnail />
+                <Heading size='xsmall' />
+                <Button disabled size='small' variation='base-plain' />
+              </Class>
+            ))}
+            <PlaceholderMessage>{placeholderMessage}</PlaceholderMessage>
+          </>
+        )}
       </ClassList>
-
-      <Class className='add__class' muted as={Button}>
-        <Thumbnail useIcon='plus' outline />
-        <Heading size='xsmall'>Add Class</Heading>
-      </Class>
+      {classList && (
+        <Class className='add__class' muted as={Button}>
+          <Thumbnail useIcon='plus' outline />
+          <Heading size='xsmall'>Add Class</Heading>
+        </Class>
+      )}
     </Wrapper>
   );
 }
@@ -107,5 +137,7 @@ function RetrainModel(props) {
 RetrainModel.propTypes = {
   classList: T.array,
   className: T.string,
+  placeholderItems: T.bool,
+  placeholderMessage: T.string,
 };
 export default RetrainModel;
