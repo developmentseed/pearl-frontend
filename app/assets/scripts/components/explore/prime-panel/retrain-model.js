@@ -15,10 +15,15 @@ const Class = styled.div`
   display: grid;
   grid-template-columns: min-content auto min-content;
   grid-gap: ${glsp(1)};
-  padding: ${glsp(0.5)} 0;
+  padding: 0;
+  align-items: center;
+  background: none;
+  border: none;
+  outline: none;
   ${Heading} {
     margin: 0;
     align-self: center;
+    text-align: left;
   }
 
   ${({ muted }) =>
@@ -27,10 +32,22 @@ const Class = styled.div`
       color: ${themeVal('color.baseAlphaE')};
       border-color: ${themeVal('color.baseAlphaE')};
     `};
+  &.add__class {
+    transition: all 0.16s ease-out 0s;
+    padding: ${glsp(0.5)} 0;
+    span {
+      display: grid;
+      grid-template-columns: min-content auto min-content;
+      grid-gap: ${glsp(1)};
+    }
+    :hover {
+      color: ${themeVal('color.base')};
+    }
+  }
 `;
 const Thumbnail = styled.div`
-  width: ${glsp(2)};
-  height: ${glsp(2)};
+  width: ${glsp(1.5)};
+  height: ${glsp(1.5)};
   background: ${({ color }) => color};
   display: grid;
   justify-content: center;
@@ -79,7 +96,7 @@ function RetrainModel(props) {
         ))}
       </ClassList>
 
-      <Class className='add__class' muted>
+      <Class className='add__class' muted as={Button}>
         <Thumbnail useIcon='plus' outline />
         <Heading size='xsmall'>Add Class</Heading>
       </Class>
