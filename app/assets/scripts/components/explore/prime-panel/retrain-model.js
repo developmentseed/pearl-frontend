@@ -10,6 +10,10 @@ import { PlaceholderMessage } from '../../../styles/placeholder.js';
 const ClassList = styled.div`
   display: grid;
   grid-gap: ${glsp(0.5)};
+
+  ${PlaceholderMessage} {
+    padding: 50% 2rem;
+  }
 `;
 
 const Class = styled.div`

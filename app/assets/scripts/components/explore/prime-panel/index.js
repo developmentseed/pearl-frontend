@@ -257,6 +257,15 @@ function PrimePanel() {
     ? 'Run inference for this model'
     : 'Create project and run model';
 
+  // Retrain Panel Tab Empty State message
+
+  const retrainPlaceholderMessage =
+    !aoiRef && !selectedModel
+      ? `Define an Area of Interest to run models at your selected location`
+      : !selectedModel
+      ? `Select a model to use for inference`
+      : `Click the "Run Model" button to generate the class LULC map for your AOI`;
+
   return (
     <>
       <Panel
@@ -335,7 +344,7 @@ function PrimePanel() {
                     name='retrain model'
                     tabId='retrain-tab-trigger'
                     placeholderItems={3}
-                    placeholderMessage={`Click "Run Inference" to generate the class LULC map for your AOI`}
+                    placeholderMessage={retrainPlaceholderMessage}
                   />
                 )}
                 <PlaceholderPanelSection
