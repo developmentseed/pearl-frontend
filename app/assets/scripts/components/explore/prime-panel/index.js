@@ -234,6 +234,7 @@ function PrimePanel() {
     currentProject,
     checkpointList,
     selectedCheckpoint,
+    setSelectedCheckpoint,
     selectedModel,
     setSelectedModel,
     availableClasses,
@@ -334,7 +335,11 @@ function PrimePanel() {
                 <HeadOptionHeadline>
                   <Subheading>Checkpoint</Subheading>
                 </HeadOptionHeadline>
-                <SubheadingStrong>Checkpoint Selection</SubheadingStrong>
+                <SubheadingStrong>
+                  {selectedCheckpoint
+                    ? selectedCheckpoint.name
+                    : 'Checkpoint Selection'}
+                </SubheadingStrong>
                 <HeadOptionToolbar>
                   <Dropdown
                     alignment='right'
@@ -371,7 +376,11 @@ function PrimePanel() {
                           checkpointList.map((ckpt) => (
                             <DropdownItem
                               key={ckpt.id}
-                              checked={ckpt.id == selectedCheckpoint.id}
+                              checked={
+                                ckpt.id ==
+                                (selectedCheckpoint && selectedCheckpoint.id)
+                              }
+                              onClick={() => setSelectedCheckpoint(ckpt)}
                             >
                               {ckpt.name}
                             </DropdownItem>

@@ -45,7 +45,7 @@ export function ExploreProvider(props) {
 
   // Selected checkpoint is a checkpoint object
   // Should contain a name and id when set
-  const [selectedCheckpoint, setSelectedCheckpoint] = useState({});
+  const [selectedCheckpoint, setSelectedCheckpoint] = useState(null);
 
   // Reference to Leaflet Rectangle layer created by
   // AOI draw control
