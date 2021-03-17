@@ -28,7 +28,12 @@ import TabbedBlock from '../../common/tabbed-block-body';
 import RetrainModel from './retrain-model';
 
 import LayersPanel from '../layers-panel';
-
+import {
+  Dropdown,
+  DropdownHeader,
+  DropdownBody,
+  DropdownItem,
+} from '../../../styles/dropdown';
 import {
   HeadOption,
   HeadOptionHeadline,
@@ -227,6 +232,8 @@ function PrimePanel() {
     viewMode,
     setViewMode,
     currentProject,
+    checkpointList,
+    selectedCheckpoint,
     selectedModel,
     setSelectedModel,
     availableClasses,
@@ -329,13 +336,49 @@ function PrimePanel() {
                 </HeadOptionHeadline>
                 <SubheadingStrong>Checkpoint Selection</SubheadingStrong>
                 <HeadOptionToolbar>
-                  <EditButton
-                    data-cy='show-select-checkpoint-button'
-                    useIcon='swap-horizontal'
-                    title='Edit Checkpoint'
+                  <Dropdown
+                    alignment='right'
+                    direction='down'
+                    triggerElement={(props) => (
+                      <EditButton
+                        data-cy='show-select-checkpoint-button'
+                        useIcon='swap-horizontal'
+                        title='Edit Checkpoint'
+                        {...props}
+                        info={
+                          checkpointList ? null : 'No Checkpoints available'
+                        }
+                        visuallyDisabled={!checkpointList}
+                        onClick={() => {
+                          if (checkpointList) {
+                            /* eslint-disable-next-line */
+                            props.onClick();
+                          }
+                        }}
+                        id='checkpoint-list-trigger'
+                      >
+                        Edit Checkpoint Selection
+                      </EditButton>
+                    )}
+                    className='global__dropdown'
                   >
-                    Edit Checkpoint Selection
-                  </EditButton>
+                    <>
+                      <DropdownHeader unshaded>
+                        <p>Checkpoints</p>
+                      </DropdownHeader>
+                      <DropdownBody selectable>
+                        {checkpointList?.length &&
+                          checkpointList.map((ckpt) => (
+                            <DropdownItem
+                              key={ckpt.id}
+                              checked={ckpt.id == selectedCheckpoint.id}
+                            >
+                              {ckpt.name}
+                            </DropdownItem>
+                          ))}
+                      </DropdownBody>
+                    </>
+                  </Dropdown>
                 </HeadOptionToolbar>
               </HeadOption>
             </PanelBlockHeader>

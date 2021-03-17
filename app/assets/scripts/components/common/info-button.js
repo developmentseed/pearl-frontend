@@ -4,10 +4,12 @@ import ReactTooltip from 'react-tooltip';
 import { Button } from '@devseed-ui/button';
 import styled from 'styled-components';
 const StyledTooltip = styled(ReactTooltip)`
-  width: ${({ width }) => width || 'auto'};
-  /* Z index set to 1000 to go over shadow scroll bar
+  &.__react_component_tooltip {
+    width: ${({ width }) => width || 'auto'};
+    /* Z index set to 1000 to go over shadow scroll bar
    * which has z-index 1000 */
-  z-index: 1001;
+    z-index: 1001;
+  }
 `;
 
 const InfoButton = React.forwardRef((props, ref) => {

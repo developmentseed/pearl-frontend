@@ -41,6 +41,11 @@ export function ExploreProvider(props) {
   const { restApiClient } = useContext(GlobalContext);
 
   const [currentProject, setCurrentProject] = useState(null);
+  const [checkpointList, setCheckpointList] = useState(null);
+
+  // Selected checkpoint is a checkpoint object
+  // Should contain a name and id when set
+  const [selectedCheckpoint, setSelectedCheckpoint] = useState({});
 
   // Reference to Leaflet Rectangle layer created by
   // AOI draw control
@@ -71,6 +76,44 @@ export function ExploreProvider(props) {
     initialApiRequestState
   );
 
+  async function loadProject() {
+    if (projectId !== 'new') {
+      showGlobalLoadingMessage('Loading project...');
+      try {
+        // Get project metadata
+        const project = await restApiClient.getProject(projectId);
+
+        setCurrentProject(project);
+
+        const model = await restApiClient.getModel(project.model_id);
+
+        setSelectedModel(model);
+
+        const checkpoints = await restApiClient.getCheckpoints(projectId);
+        if (checkpoints.total > 0) {
+          // Save checkpoints if any exist, else leave as null
+          setCheckpointList(checkpoints);
+        }
+
+        /* TODO 
+           * This code is untested.
+           * Once inference is run on a project, the API will
+           * return an AOI here
+          const aois = await restApiClient.get(`project/${project.id}/aoi`);
+
+          if (aois.total > 0) {
+            const latest = aois.pop();
+            setAoiInitializer(latest);
+          }
+          */
+      } catch (error) {
+        toasts.error('Error loading project, please try again later.');
+      } finally {
+        hideGlobalLoading();
+      }
+    }
+  }
+
   useEffect(() => {
     showGlobalLoadingMessage('Checking API status...');
     queryApiMeta()(dispatchApiMeta);
@@ -87,39 +130,9 @@ export function ExploreProvider(props) {
 
   // Load project meta on load and api client ready
   useEffect(() => {
-    async function loadProject() {
-      if (projectId !== 'new') {
-        showGlobalLoadingMessage('Loading project...');
-        try {
-          // Get project metadata
-          const project = await restApiClient.getProject(projectId);
-
-          setCurrentProject(project);
-
-          const model = await restApiClient.getModel(project.model_id);
-
-          setSelectedModel(model);
-
-          /* TODO 
-           * This code is untested.
-           * Once inference is run on a project, the API will
-           * return an AOI here
-          const aois = await restApiClient.get(`project/${project.id}/aoi`);
-
-          if (aois.total > 0) {
-            const latest = aois.pop();
-            setAoiInitializer(latest);
-          }
-          */
-        } catch (error) {
-          toasts.error('Error loading project, please try again later.');
-        } finally {
-          hideGlobalLoading();
-        }
-      }
-    }
     if (restApiClient) {
       loadProject();
+      //loadCheckpoints();
     }
   }, [restApiClient]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -273,6 +286,10 @@ export function ExploreProvider(props) {
 
         currentProject,
         setCurrentProject,
+
+        checkpointList,
+        selectedCheckpoint,
+        setSelectedCheckpoint,
 
         selectedModel,
         setSelectedModel,
