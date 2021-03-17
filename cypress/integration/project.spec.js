@@ -21,8 +21,8 @@ describe('The Project Page', () => {
 
   it('Allow model select after login ', () => {
     cy.loginByAuth0Api(
-      Cypress.env('auth0_username'),
-      Cypress.env('auth0_password')
+      Cypress.env('AUTH0_USERNAME'),
+      Cypress.env('AUTH0_PASSWORD')
     );
     cy.visit('/project/new');
 

@@ -3,13 +3,13 @@
  */
 Cypress.Commands.add('loginByAuth0Api', (username, password) => {
   cy.log(`Logging in as ${username}`);
-  const client_id = Cypress.env('auth0_client_id');
-  const audience = Cypress.env('auth0_audience');
-  const scope = Cypress.env('auth0_scope');
+  const client_id = Cypress.env('AUTH0_CLIENT_ID');
+  const audience = Cypress.env('AUTH0_AUDIENCE');
+  const scope = Cypress.env('AUTH0_SCORE');
 
   cy.request({
     method: 'POST',
-    url: `https://${Cypress.env('auth0_domain')}/oauth/token`,
+    url: `https://${Cypress.env('AUTH0_DOMAIN')}/oauth/token`,
     body: {
       grant_type: 'password',
       username,
