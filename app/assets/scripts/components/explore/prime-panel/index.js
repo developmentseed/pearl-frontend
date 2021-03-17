@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import { themeVal, glsp } from '@devseed-ui/theme-provider';
 import { Button } from '@devseed-ui/button';
 import T from 'prop-types';
-import { useAuth0 } from '@auth0/auth0-react';
 import Panel from '../../common/panel';
 import {
   PanelBlock,
@@ -39,6 +38,7 @@ import InfoButton from '../../common/info-button';
 
 import { availableLayers } from '../sample-data';
 import { formatThousands } from '../../../utils/format';
+import { AuthContext } from '../../../context/auth';
 
 const PlaceholderPanelSection = styled.div`
   padding: ${glsp()};
@@ -220,7 +220,7 @@ AoiEditButtons.propTypes = {
 };
 
 function PrimePanel() {
-  const { isAuthenticated } = useAuth0();
+  const { isAuthenticated } = useContext(AuthContext);
 
   const {
     viewMode,

@@ -1,6 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
 import styled from 'styled-components';
-import { useAuth0 } from '@auth0/auth0-react';
 import T from 'prop-types';
 import { DropdownTrigger } from '../../styles/dropdown';
 import { Button } from '@devseed-ui/button';
@@ -9,6 +8,7 @@ import { Heading } from '@devseed-ui/typography';
 import { Form, FormInput } from '@devseed-ui/form';
 import InfoButton from '../common/info-button';
 import { ExploreContext } from '../../context/explore';
+import { AuthContext } from '../../context/auth';
 
 const Wrapper = styled.div`
   flex: 1;
@@ -55,7 +55,7 @@ const HeadingInput = styled(FormInput)`
 function SessionOutputControl(props) {
   const { status, projectName, openHelp } = props;
 
-  const { isAuthenticated } = useAuth0();
+  const { isAuthenticated } = useContext(AuthContext);
 
   const { updateProjectName, currentProject, selectedModel } = useContext(
     ExploreContext

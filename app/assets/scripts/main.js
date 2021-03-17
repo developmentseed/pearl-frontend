@@ -23,6 +23,7 @@ import GlobalLoadingProvider from '@devseed-ui/global-loading';
 import { ToastContainerCustom } from './components/common/toasts';
 import Projects from './components/profile/projects';
 import Maps from './components/profile/maps';
+import { AuthProvider } from './context/auth';
 
 const onRedirectCallback = (appState) => {
   // Use the router's history module to replace the url
@@ -50,30 +51,32 @@ function Root() {
       redirectUri={window.location.origin}
       onRedirectCallback={onRedirectCallback}
     >
-      <ErrorBoundary>
-        <Router history={history}>
-          <DevseedUiThemeProvider theme={theme.main}>
-            <GlobalLoadingProvider />
-            <GlobalContextProvider>
-              <CollecticonsGlobalStyle />
-              <GlobalStyles />
-              <Switch>
-                <Route exact path='/' component={Home} />
-                <Route path='/project/:projectId' component={Explore} />
-                <ProtectedRoute exact path='/profile/maps' component={Maps} />
-                <ProtectedRoute
-                  exact
-                  path='/profile/projects'
-                  component={Projects}
-                />
-                <Route path='/about' component={About} />
-                <Route path='*' component={UhOh} />
-              </Switch>
-              <ToastContainerCustom />
-            </GlobalContextProvider>
-          </DevseedUiThemeProvider>
-        </Router>
-      </ErrorBoundary>
+      <AuthProvider>
+        <ErrorBoundary>
+          <Router history={history}>
+            <DevseedUiThemeProvider theme={theme.main}>
+              <GlobalLoadingProvider />
+              <GlobalContextProvider>
+                <CollecticonsGlobalStyle />
+                <GlobalStyles />
+                <Switch>
+                  <Route exact path='/' component={Home} />
+                  <Route path='/project/:projectId' component={Explore} />
+                  <ProtectedRoute exact path='/profile/maps' component={Maps} />
+                  <ProtectedRoute
+                    exact
+                    path='/profile/projects'
+                    component={Projects}
+                  />
+                  <Route path='/about' component={About} />
+                  <Route path='*' component={UhOh} />
+                </Switch>
+                <ToastContainerCustom />
+              </GlobalContextProvider>
+            </DevseedUiThemeProvider>
+          </Router>
+        </ErrorBoundary>
+      </AuthProvider>
     </Auth0Provider>
   );
 }
