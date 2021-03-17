@@ -322,6 +322,22 @@ function PrimePanel() {
                   </EditButton>
                 </HeadOptionToolbar>
               </HeadOption>
+
+              <HeadOption>
+                <HeadOptionHeadline>
+                  <Subheading>Checkpoint</Subheading>
+                </HeadOptionHeadline>
+                <SubheadingStrong>Checkpoint Selection</SubheadingStrong>
+                <HeadOptionToolbar>
+                  <EditButton
+                    data-cy='show-select-checkpoint-button'
+                    useIcon='swap-horizontal'
+                    title='Edit Checkpoint'
+                  >
+                    Edit Checkpoint Selection
+                  </EditButton>
+                </HeadOptionToolbar>
+              </HeadOption>
             </PanelBlockHeader>
             <PanelBlockBody>
               <TabbedBlock>
