@@ -4,5 +4,5 @@ export default {
   audience: 'https://api.lulc-staging.ds.io',
   websocketEndpoint: 'wss://socket.lulc-staging.ds.io',
   tileUrlTemplate:
-    'https://api.lulc-staging.ds.io/api/mosaic/{LAYER_NAME}/tiles/{z}/{x}/{y}.png?bidx=1%2C2%2C3',
+    'https://tiles.lulc-staging.ds.io/mosaic/{LAYER_NAME}/tiles/{z}/{x}/{y}.png?bidx=1%2C2%2C3',
 };
