@@ -5,8 +5,8 @@ export const HeadOption = styled.div`
   display: grid;
   grid-template-columns: 1fr min-content;
   box-shadow: 0px 1px 0px 0px ${themeVal('color.baseAlphaC')};
-  gap: 0.5rem;
-  padding-bottom: ${glsp()};
+  gap: 0.25rem;
+  padding-bottom: ${glsp(0.75)};
 `;
 
 export const HeadOptionHeadline = styled.div`

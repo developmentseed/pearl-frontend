@@ -56,7 +56,7 @@ const StyledPanelBlock = styled(PanelBlock)`
 
 const PanelBlockHeader = styled(BasePanelBlockHeader)`
   display: grid;
-  grid-gap: ${glsp()};
+  grid-gap: ${glsp(0.75)};
 `;
 
 const PanelControls = styled(PanelBlockFooter)`
