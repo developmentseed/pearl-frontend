@@ -12,7 +12,7 @@ const ClassList = styled.div`
   grid-gap: ${glsp(0.5)};
 
   ${PlaceholderMessage} {
-    padding: 50% 2rem;
+    padding: 2rem;
   }
 `;
 
@@ -20,8 +20,8 @@ const Class = styled.div`
   display: grid;
   grid-template-columns: min-content auto min-content;
   grid-gap: ${glsp(1)};
-  padding: 0;
-  align-items: center;
+  padding-bottom: ${({ placeholder }) => placeholder && glsp()};
+  align-items: ${({ placeholder }) => (placeholder ? 'stretch' : 'center')};
   background: none;
   border: none;
   outline: none;
@@ -29,6 +29,11 @@ const Class = styled.div`
     margin: 0;
     align-self: center;
     text-align: left;
+    background: ${({ placeholder }) =>
+      placeholder ? themeVal('color.baseAlphaD') : 'none'};
+    width: ${({ placeholder }) => (placeholder ? '10rem' : 'initial')};
+    height: ${({ placeholder }) => (placeholder ? '1rem' : 'auto')};
+    line-height: 1;
   }
 
   ${({ muted }) =>
@@ -49,26 +54,11 @@ const Class = styled.div`
       color: ${themeVal('color.base')};
     }
   }
-
-  ${(placeholder) =>
-    placeholder &&
-    css`
-      align-items: stretch;
-      padding: ${glsp(0.5)} 0;
-      & > * {
-        background: ${themeVal('color.baseAlphaD')};
-      }
-      ${Heading} {
-        align-self: center;
-        width: 10rem;
-        height: 1rem;
-      }
-    `}
 `;
 const Thumbnail = styled.div`
   width: ${glsp(1.5)};
   height: ${glsp(1.5)};
-  background: ${({ color }) => color};
+  background: ${({ color }) => color || themeVal('color.baseAlphaD')};
   display: grid;
   justify-content: center;
   align-content: center;
@@ -80,6 +70,7 @@ const Thumbnail = styled.div`
   ${({ useIcon }) =>
     useIcon &&
     css`
+      background: none;
       ::before {
         ${({ useIcon }) => useIcon && collecticon(useIcon)}
       }
@@ -115,13 +106,17 @@ function RetrainModel(props) {
               </Button>
             </Class>
           ))}
-        {placeholderItems && (
+        {!classList && placeholderItems && (
           <>
             {Array.from(Array(placeholderItems)).map((i) => (
               <Class key={i} placeholder>
                 <Thumbnail />
                 <Heading size='xsmall' />
-                <Button disabled size='small' variation='base-plain' />
+                <Button
+                  disabled
+                  size='small'
+                  variation='base-raised-semidark'
+                />
               </Class>
             ))}
             <PlaceholderMessage>{placeholderMessage}</PlaceholderMessage>
@@ -141,7 +136,7 @@ function RetrainModel(props) {
 RetrainModel.propTypes = {
   classList: T.array,
   className: T.string,
-  placeholderItems: T.bool,
+  placeholderItems: T.number,
   placeholderMessage: T.string,
 };
 export default RetrainModel;
