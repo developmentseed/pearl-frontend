@@ -409,6 +409,17 @@ function PrimePanel() {
               >
                 Run Model
               </InfoButton>
+              <InfoButton
+                variation='primary-plain'
+                size='medium'
+                useIcon='pencil'
+                style={{
+                  gridColumn: '1 / -1',
+                }}
+                id='rename-button-trigger'
+              >
+                Save Checkpoint
+              </InfoButton>
             </PanelControls>
           </StyledPanelBlock>
         }
