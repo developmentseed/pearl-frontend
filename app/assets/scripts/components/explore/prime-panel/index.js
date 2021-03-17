@@ -260,11 +260,11 @@ function PrimePanel() {
   // Retrain Panel Tab Empty State message
 
   const retrainPlaceholderMessage =
-    !aoiRef && !selectedModel
-      ? `Define an Area of Interest to run models at your selected location`
-      : !selectedModel
+    aoiRef && aoiArea > 0 && selectedModel
+      ? `Click the "Run Model" button to generate the class LULC map for your AOI`
+      : aoiRef && aoiArea > 0 && !selectedModel
       ? `Select a model to use for inference`
-      : `Click the "Run Model" button to generate the class LULC map for your AOI`;
+      : `Define an Area of Interest to run models at your selected location`;
 
   return (
     <>
