@@ -18,11 +18,12 @@ function InnerAuthProvider(props) {
   const [authState, dispatchAuthState] = useReducer(authReducer, {});
 
   if (window.Cypress) {
+    const auth0Cypress = JSON.parse(localStorage.getItem('auth0Cypress'));
     // eslint-disable-next-line react-hooks/rules-of-hooks
     useEffect(() => {
       dispatchAuthState({
         type: actions.RECEIVE_LOGIN,
-        data: localStorage('auth0Cypress'),
+        data: auth0Cypress,
       });
     }, []);
   } else {
