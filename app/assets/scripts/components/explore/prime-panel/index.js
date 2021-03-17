@@ -99,9 +99,15 @@ function AoiEditButtons(props) {
       <>
         <EditButton
           onClick={function () {
-            if (!apiLimits || apiLimits.max_inference > aoiArea) {
+            const aoiAreaInSquareMeters = aoiArea * 1e6;
+            if (
+              !apiLimits ||
+              apiLimits.live_inference > aoiAreaInSquareMeters
+            ) {
               setViewMode(viewModes.BROWSE_MODE);
               setAoiBounds(aoiRef.getBounds());
+            } else if (apiLimits.max_inference > aoiAreaInSquareMeters) {
+              setActiveModal('no-live-inference');
             } else {
               setActiveModal('area-too-large');
             }
@@ -150,12 +156,12 @@ function AoiEditButtons(props) {
               activeModal === 'no-live-inference' ? (
                 <div>
                   Live inference is not available for areas larger than{' '}
-                  {formatThousands(apiLimits.live_inference)} km2.
+                  {formatThousands(apiLimits.live_inference / 1e6)} km2.
                 </div>
               ) : (
                 <div>
                   Area size is limited to{' '}
-                  {formatThousands(apiLimits.max_inference)} km2.
+                  {formatThousands(apiLimits.max_inference / 1e6)} km2.
                 </div>
               )
             }
