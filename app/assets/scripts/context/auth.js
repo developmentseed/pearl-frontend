@@ -3,18 +3,13 @@ import T from 'prop-types';
 import { Auth0Provider, useAuth0 } from '@auth0/auth0-react';
 import config from '../config';
 
-const onRedirectCallback = (appState) => {
-  // Use the router's history module to replace the url
-  history.replace(appState?.returnTo || window.location.pathname);
-};
-
 export const AuthContext = createContext({});
 
 /**
  * Inner provider to be wrapped by Auth0 provider
  */
 function InnerAuthProvider(props) {
-  const { isAuthenticated, user, isLoading } = useAuth0(initialState);
+  const { isAuthenticated, user, isLoading } = useAuth0();
   const [authState, dispatchAuthState] = useReducer(authReducer, {});
 
   if (window.Cypress) {
@@ -69,6 +64,10 @@ InnerAuthProvider.propTypes = {
  * AuthProvider
  */
 export function AuthProvider(props) {
+  const onRedirectCallback = () => {
+    window.location = window.location.pathname;
+  };
+
   return (
     <Auth0Provider
       domain={config.auth0Domain}
