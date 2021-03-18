@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import { themeVal, glsp } from '@devseed-ui/theme-provider';
 import { Button } from '@devseed-ui/button';
 import T from 'prop-types';
-import { useAuth0 } from '@auth0/auth0-react';
 import Panel from '../../common/panel';
 import {
   PanelBlock,
@@ -39,6 +38,7 @@ import InfoButton from '../../common/info-button';
 
 import { availableLayers } from '../sample-data';
 import { formatThousands } from '../../../utils/format';
+import { AuthContext } from '../../../context/auth';
 
 const PlaceholderPanelSection = styled.div`
   padding: ${glsp()};
@@ -156,14 +156,14 @@ function AoiEditButtons(props) {
               activeModal === 'no-live-inference' ? (
                 <div>
                   Live inference is not available for areas larger than{' '}
-                  {formatThousands(apiLimits.live_inference)} km2. You can run
+                  {formatThousands(apiLimits.live_inference / 1e6)} km². You can run
                   inference on this AOI as a background process, or resize to a
                   smaller size to engage in retraining and run live inference.
                 </div>
               ) : (
                 <div>
                   Area size is limited to{' '}
-                  {formatThousands(apiLimits.max_inference)} km2.
+                  {formatThousands(apiLimits.max_inference / 1e6)} km².
                 </div>
               )
             }
@@ -226,7 +226,7 @@ AoiEditButtons.propTypes = {
 };
 
 function PrimePanel() {
-  const { isAuthenticated } = useAuth0();
+  const { isAuthenticated } = useContext(AuthContext);
 
   const {
     viewMode,
@@ -280,7 +280,7 @@ function PrimePanel() {
                 </HeadOptionHeadline>
                 <SubheadingStrong>
                   {aoiArea && aoiArea > 0
-                    ? `${formatThousands(aoiArea)} km2`
+                    ? `${formatThousands(aoiArea / 1e6)} km2`
                     : viewMode === viewModes.CREATE_AOI_MODE
                     ? 'Drag on map to select'
                     : 'None selected - Draw area on map'}
@@ -304,7 +304,7 @@ function PrimePanel() {
                 <HeadOptionHeadline>
                   <Subheading>Selected Model</Subheading>
                 </HeadOptionHeadline>
-                <SubheadingStrong>
+                <SubheadingStrong data-cy='select-model-label'>
                   {(selectedModel && selectedModel.name) ||
                     (isAuthenticated
                       ? models && models.length
@@ -358,7 +358,9 @@ function PrimePanel() {
                   tabId='layers-tab-trigger'
                   layers={availableLayers}
                   baseLayerNames={
-                    mosaicList.isReady() ? mosaicList.getData().mosaics : []
+                    mosaicList.isReady() && !mosaicList.hasError()
+                      ? mosaicList.getData().mosaics
+                      : []
                   }
                   onSliderChange={(name, value) => {
                     mapLayers[name].setOpacity(value);
