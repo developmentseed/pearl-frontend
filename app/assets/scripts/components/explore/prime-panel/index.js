@@ -156,9 +156,10 @@ function AoiEditButtons(props) {
               activeModal === 'no-live-inference' ? (
                 <div>
                   Live inference is not available for areas larger than{' '}
-                  {formatThousands(apiLimits.live_inference / 1e6)} km². You can run
-                  inference on this AOI as a background process, or resize to a
-                  smaller size to engage in retraining and run live inference.
+                  {formatThousands(apiLimits.live_inference / 1e6)} km². You can
+                  run inference on this AOI as a background process, or resize
+                  to a smaller size to engage in retraining and run live
+                  inference.
                 </div>
               ) : (
                 <div>
