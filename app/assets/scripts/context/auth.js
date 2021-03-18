@@ -64,7 +64,6 @@ InnerAuthProvider.propTypes = {
  * AuthProvider
  */
 export function AuthProvider(props) {
-
   const onRedirectCallback = () => {
     window.location = window.location.pathname;
   };
