@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Button } from '@devseed-ui/button';
 import CardList, { Card } from './card-list';
 import { Modal as BaseModal } from '@devseed-ui/modal';
@@ -25,6 +25,7 @@ import { useAuth0 } from '@auth0/auth0-react';
 
 import { availableCheckpoints } from '../explore/sample-data';
 import { filterComponentProps } from '../../styles/utils/general';
+import { AuthContext } from '../../context/auth';
 
 const Modal = styled(BaseModal)`
   .modal__contents {
@@ -61,7 +62,8 @@ const StyledLink = filterComponentProps(Link, propsToFilter);
 
 function UserDropdown() {
   const location = useLocation();
-  const { isAuthenticated, loginWithRedirect, logout, user } = useAuth0();
+  const { loginWithRedirect, logout } = useAuth0();
+  const { isAuthenticated, user } = useContext(AuthContext);
   const logoutWithRedirect = () =>
     logout({
       returnTo: window.location.origin,
@@ -83,7 +85,7 @@ function UserDropdown() {
         </Button>
       ) : (
         <Dropdown
-          alignment='center'
+          alignment='right'
           direction='down'
           triggerElement={(props) => (
             <DropdownTrigger

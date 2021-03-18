@@ -1,6 +1,5 @@
 import React, { useMemo, useContext, useEffect } from 'react';
 import styled from 'styled-components';
-import { convertArea } from '@turf/helpers';
 import tArea from '@turf/area';
 import tBboxPolygon from '@turf/bbox-polygon';
 import SizeAwareElement from '../../common/size-aware-element';
@@ -18,16 +17,22 @@ import GeoCoder from '../../common/map/geocoder';
 import CenterMap from '../../common/map/center-map';
 
 import { themeVal, multiply } from '@devseed-ui/theme-provider';
+import theme from '../../../styles/theme';
 import FreeDraw, { ALL } from 'leaflet-freedraw';
 import AoiDrawControl from './aoi-draw-control';
 import AoiEditControl from './aoi-edit-control';
 import config from '../../../config';
+import { inRange } from '../../../utils/utils';
 
 const center = [38.83428180092151, -79.37724530696869];
 const zoom = 15;
 const freeDraw = new FreeDraw({
   mode: ALL,
 });
+
+const MAX = 3;
+const NO_LIVE = 2;
+const LIVE = 1;
 
 const Container = styled.div`
   height: 100%;
@@ -62,7 +67,7 @@ const Container = styled.div`
  */
 function areaFromBounds(bbox) {
   const poly = tBboxPolygon(bbox);
-  return convertArea(tArea(poly), 'meters', 'kilometers');
+  return tArea(poly);
 }
 
 function Map() {
@@ -70,6 +75,7 @@ function Map() {
     aoiRef,
     previousViewMode,
     setAoiRef,
+    aoiArea,
     setAoiArea,
     aoiInitializer,
 
@@ -140,11 +146,14 @@ function Map() {
     };
 
     // Draw control, for creating an AOI
-    map.aoi.control.draw = new AoiDrawControl(map, aoiInitializer, {
+    map.aoi.control.draw = new AoiDrawControl(map, aoiInitializer, apiLimits, {
       onInitialize: (bbox, shape) => {
         setAoiRef(shape);
         setAoiBounds(shape.getBounds());
         setAoiArea(areaFromBounds(bbox));
+      },
+      onDrawStart: (shape) => {
+        setAoiRef(shape);
       },
       onDrawChange: (bbox) => {
         setAoiArea(areaFromBounds(bbox));
@@ -156,12 +165,41 @@ function Map() {
     });
 
     // Edit AOI control
-    map.aoi.control.edit = new AoiEditControl(map, {
+    map.aoi.control.edit = new AoiEditControl(map, apiLimits, {
       onBoundsChange: (bbox) => {
         setAoiArea(areaFromBounds(bbox));
       },
     });
   }, [map, aoiInitializer, apiLimits]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Update color on area size change during draw
+  useEffect(() => {
+    if (!aoiRef) {
+      return;
+    }
+
+    const { max_inference, live_inference } = apiLimits;
+
+    if (inRange(aoiArea, max_inference, Infinity) && aoiRef.status !== MAX) {
+      aoiRef.setStyle({
+        color: theme.main.color.danger,
+      });
+      aoiRef.status = MAX;
+    } else if (
+      inRange(aoiArea, live_inference, max_inference) &&
+      aoiRef.status !== NO_LIVE
+    ) {
+      aoiRef.setStyle({
+        color: theme.main.color.warning,
+      });
+      aoiRef.status = NO_LIVE;
+    } else if (inRange(aoiArea, 0, live_inference) && aoiRef.status !== LIVE) {
+      aoiRef.setStyle({
+        color: theme.main.color.info,
+      });
+      aoiRef.status = LIVE;
+    }
+  }, [aoiArea, apiLimits, aoiRef]);
 
   const displayMap = useMemo(
     () => (

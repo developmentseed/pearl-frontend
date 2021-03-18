@@ -90,9 +90,17 @@ export const CardWrapper = styled.article`
   cursor: pointer;
   transition: all 0.16s ease 0s;
   &:hover {
-    box-shadow: 0 0 16px 4px ${themeVal('color.baseAlphaA')},
-      0 8px 24px -8px ${themeVal('color.baseAlphaB')};
-    transform: translate(0, -0.125rem);
+    ${({ hoverTransform }) =>
+      hoverTransform
+        ? css`
+            transform: translate(0, -0.125rem);
+            box-shadow: 0 0 16px 4px ${themeVal('color.baseAlphaA')},
+              0 8px 24px -8px ${themeVal('color.baseAlphaB')};
+          `
+        : css`
+            box-shadow: 0 0 16px 4px ${themeVal('color.baseAlphaB')},
+              0 8px 24px -8px ${themeVal('color.baseAlphaC')};
+          `}
   }
 `;
 
@@ -105,6 +113,7 @@ export const Card = ({
   cardMedia,
   details,
   expanded,
+  hoverTransform,
 }) => {
   return (
     <CardWrapper
@@ -113,6 +122,7 @@ export const Card = ({
       onClick={onClick}
       expanded={expanded}
       cardMedia={cardMedia}
+      hoverTransform={hoverTransform}
     >
       {cardMedia && (
         <CardMedia borderlessMedia={borderlessMedia}>{cardMedia}</CardMedia>
@@ -132,6 +142,7 @@ Card.propTypes = {
   cardMedia: T.node,
   details: T.object,
   expanded: T.bool,
+  hoverTransform: T.bool,
 };
 
 const CardListContainer = styled.ol`
