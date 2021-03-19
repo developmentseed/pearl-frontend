@@ -120,7 +120,6 @@ export function ExploreProvider(props) {
             ]);
           }
         } catch (error) {
-          console.log(error);
           toasts.error('Error loading project, please try again later.');
         } finally {
           hideGlobalLoading();
