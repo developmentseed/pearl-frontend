@@ -16,7 +16,7 @@ function InnerAuthProvider(props) {
     error: auth0Error,
     user,
     isLoading,
-    getAccessTokenWithPopup,
+    getAccessTokenSilently,
   } = useAuth0();
   const [authState, dispatchAuthState] = useReducer(authReducer, {});
 
@@ -48,7 +48,7 @@ function InnerAuthProvider(props) {
 
       async function getApiToken() {
         try {
-          const token = await getAccessTokenWithPopup({
+          const token = await getAccessTokenSilently({
             audience: config.audience,
           });
           dispatchAuthState({
