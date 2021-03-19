@@ -1,7 +1,12 @@
 const {
   restApiEndpoint,
 } = require('../../app/assets/scripts/config/testing').default;
-const apiEndpoint = (route) => `${restApiEndpoint}/${route}`;
+
+const FAKE_API_TOKEN = 'FAKE_API_TOKEN';
+
+const authHeaders = {
+  Authorization: `Bearer ${FAKE_API_TOKEN}`,
+};
 
 /**
  * Fake user login
@@ -10,7 +15,7 @@ Cypress.Commands.add('fakeLogin', () => {
   window.localStorage.setItem(
     'auth0Cypress',
     JSON.stringify({
-      access_token: 'fake_access_token',
+      apiToken: FAKE_API_TOKEN,
       user: {
         name: 'Test User',
       },
@@ -22,12 +27,44 @@ Cypress.Commands.add('fakeLogin', () => {
  * Stub network requests
  */
 Cypress.Commands.add('startServer', () => {
-  cy.intercept(apiEndpoint('health'), { fixture: 'server/health.json' });
-  cy.intercept(apiEndpoint('api/mosaic'), {
-    fixture: 'server/api/mosaic.json',
-  });
-  cy.intercept(apiEndpoint('api/model'), {
-    fixture: 'server/api/model.json',
-  });
-  cy.intercept(apiEndpoint('api'), { fixture: 'server/api.json' });
+  // GET /health
+  cy.intercept(
+    {
+      host: restApiEndpoint,
+      path: '/health',
+    },
+    { fixture: 'server/health.json' }
+  );
+
+  // GET /api
+  cy.intercept(
+    {
+      host: restApiEndpoint,
+      path: '/api',
+    },
+    { fixture: 'server/api.json' }
+  );
+
+  // GET /api/mosaic
+  cy.intercept(
+    {
+      host: restApiEndpoint,
+      path: '/api/mosaic',
+    },
+    {
+      fixture: 'server/api/mosaic.json',
+    }
+  );
+
+  // GET /api/models with auth headers
+  cy.intercept(
+    {
+      host: restApiEndpoint,
+      path: '/api/model',
+      headers: authHeaders,
+    },
+    {
+      fixture: 'server/api/model.json',
+    }
+  );
 });

@@ -2,6 +2,8 @@ import React, { createContext, useEffect, useReducer } from 'react';
 import T from 'prop-types';
 import { Auth0Provider, useAuth0 } from '@auth0/auth0-react';
 import config from '../config';
+import logger from '../utils/logger';
+import history from '../history';
 
 export const AuthContext = createContext({});
 
@@ -9,7 +11,13 @@ export const AuthContext = createContext({});
  * Inner provider to be wrapped by Auth0 provider
  */
 function InnerAuthProvider(props) {
-  const { isAuthenticated, user, isLoading } = useAuth0();
+  const {
+    isAuthenticated,
+    error: auth0Error,
+    user,
+    isLoading,
+    getAccessTokenWithPopup,
+  } = useAuth0();
   const [authState, dispatchAuthState] = useReducer(authReducer, {});
 
   if (window.Cypress) {
@@ -24,25 +32,51 @@ function InnerAuthProvider(props) {
       }, []);
     }
   } else {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
+    /* eslint-disable react-hooks/rules-of-hooks */
     useEffect(() => {
-      if (isLoading) {
+      const lsAuthState = window.localStorage.getItem('authState');
+      if (lsAuthState) {
         dispatchAuthState({
-          type: actions.REQUEST_LOGIN,
-        });
-      } else if (isAuthenticated) {
-        dispatchAuthState({
-          type: actions.RECEIVE_LOGIN,
-          data: {
-            user,
-          },
-        });
-      } else {
-        dispatchAuthState({
-          type: actions.LOGOUT,
+          type: actions.LOAD_AUTH_STATE,
+          data: JSON.parse(lsAuthState),
         });
       }
-    }, [isAuthenticated, user, isLoading]);
+    }, []);
+
+    useEffect(() => {
+      if (isLoading) return;
+
+      async function getApiToken() {
+        try {
+          const token = await getAccessTokenWithPopup({
+            audience: config.audience,
+          });
+          dispatchAuthState({
+            type: actions.RECEIVE_LOGIN,
+            data: {
+              user,
+              apiToken: token,
+            },
+          });
+        } catch (error) {
+          logger('login error');
+          logger(error);
+        }
+      }
+
+      if (isAuthenticated !== authState.isAuthenticated) {
+        if (isAuthenticated) {
+          dispatchAuthState({
+            type: actions.REQUEST_LOGIN,
+          });
+          getApiToken();
+        } else {
+          dispatchAuthState({
+            type: actions.LOGOUT,
+          });
+        }
+      }
+    }, [isLoading, isAuthenticated, auth0Error]);
   }
 
   return (
@@ -64,8 +98,8 @@ InnerAuthProvider.propTypes = {
  * AuthProvider
  */
 export function AuthProvider(props) {
-  const onRedirectCallback = () => {
-    window.location = window.location.pathname;
+  const onRedirectCallback = (appState) => {
+    history.replace(appState?.returnTo || window.location.pathname);
   };
 
   return (
@@ -85,6 +119,7 @@ AuthProvider.propTypes = {
 };
 
 const actions = {
+  LOAD_AUTH_STATE: 'LOAD_AUTH_STATE',
   REQUEST_LOGIN: 'REQUEST_LOGIN',
   RECEIVE_LOGIN: 'RECEIVE_LOGIN',
   LOGOUT: 'LOGOUT',
@@ -97,26 +132,47 @@ const initialState = {
 };
 
 const authReducer = function (state, action) {
-  const { data } = action;
-  switch (action.type) {
-    case actions.REQUEST_LOGIN:
-      return {
+  const { type, data } = action;
+  let newState;
+
+  logger(type);
+  logger(data);
+  switch (type) {
+    case actions.LOAD_AUTH_STATE: {
+      return data;
+    }
+    case actions.REQUEST_LOGIN: {
+      newState = {
         ...initialState,
         isLoading: true,
       };
-    case actions.RECEIVE_LOGIN:
-      return {
+      break;
+    }
+    case actions.RECEIVE_LOGIN: {
+      newState = {
         isLoading: false,
         error: false,
         isAuthenticated: true,
         ...data,
       };
-    case actions.LOGOUT:
-      return {
+      break;
+    }
+    case actions.LOGOUT: {
+      newState = {
         ...initialState,
         isAuthenticated: false,
       };
+      break;
+    }
     default:
       throw new Error('Unexpected error.');
   }
+
+  // Persist auth state to local storage it not using Cypress
+  if (!window.Cypress) {
+    logger({ newState });
+    window.localStorage.setItem('authState', JSON.stringify(newState));
+  }
+
+  return newState;
 };
