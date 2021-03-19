@@ -54,6 +54,7 @@ export function ExploreProvider(props) {
   // Leaflet layer in the front end
   // eslint-disable-next-line
   const [aoiInitializer, setAoiInitializer] = useState(null);
+  const [aoiList, setAoiList] = useState([]);
 
   const [viewMode, setViewMode] = useState(viewModes.BROWSE_MODE);
   const [selectedModel, setSelectedModel] = useState(null);
@@ -101,23 +102,11 @@ export function ExploreProvider(props) {
 
           setSelectedModel(model);
 
-          /* TODO
-           * This code is untested.
-           * Once inference is run on a project, the API will
-           * return an AOI here
-           */
           const aois = await restApiClient.get(`project/${project.id}/aoi`);
-
+          setAoiList(aois.aois);
           if (aois.total > 0) {
             const latest = aois.aois.pop();
-            const latestAoi = await restApiClient.get(
-              `project/${project.id}/aoi/${latest.id}`
-            );
-            const [lonMin, latMin, lonMax, latMax] = tBbox(latestAoi.bounds);
-            setAoiInitializer([
-              [latMin, lonMin],
-              [latMax, lonMax],
-            ]);
+            loadAoi(project, latest.id);
           }
         } catch (error) {
           toasts.error('Error loading project, please try again later.');
@@ -156,12 +145,35 @@ export function ExploreProvider(props) {
       }
     } else {
       hideGlobalLoading();
+
+      if (predictions.fetched) {
+        restApiClient
+          .get(`project/${currentProject.id}/aoi`)
+          .then((aois) => setAoiList(aois.aois));
+      }
+
+      // Update aoi List with newest aoi
+      // If predictions is ready, restApiClient must be ready
+
       if (predictions.error) {
         toasts.error('An inference error occurred, please try again later.');
       }
     }
-  }, [predictions]);
+  }, [predictions, restApiClient, currentProject]);
 
+  async function loadAoi(project, aoiId) {
+    const aoi = await restApiClient.get(`project/${project.id}/aoi/${aoiId}`);
+    const [lonMin, latMin, lonMax, latMax] = tBbox(aoi.bounds);
+    const bounds = [
+      [latMin, lonMin],
+      [latMax, lonMax],
+    ];
+    if (aoiRef) {
+      aoiRef.setBounds(bounds);
+    } else {
+      setAoiInitializer(bounds);
+    }
+  }
   async function updateProjectName(projectName) {
     if (restApiClient) {
       let project = currentProject;
@@ -275,6 +287,9 @@ export function ExploreProvider(props) {
         aoiArea,
         setAoiArea,
         aoiInitializer,
+        aoiList,
+
+        loadAoi,
 
         currentInstance,
         setCurrentInstance,

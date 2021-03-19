@@ -14,6 +14,7 @@ import { ExploreContext, viewModes } from '../../../context/explore';
 import { MapContext } from '../../../context/map';
 
 import GeoCoder from '../../common/map/geocoder';
+import { BOUNDS_PADDING } from '../../common/map/constants';
 import CenterMap from '../../common/map/center-map';
 
 import { themeVal, multiply } from '@devseed-ui/theme-provider';
@@ -121,7 +122,7 @@ function Map() {
               previousViewMode === viewModes.EDIT_AOI_MODE
             ) {
               // On confirm, zoom to bounds
-              map.fitBounds(aoiRef.getBounds(), { padding: [25, 25] });
+              map.fitBounds(aoiRef.getBounds(), { padding: BOUNDS_PADDING });
             }
           }
         }
@@ -151,6 +152,8 @@ function Map() {
         setAoiRef(shape);
         setAoiBounds(shape.getBounds());
         setAoiArea(areaFromBounds(bbox));
+
+        map.fitBounds(shape.getBounds(), { padding: BOUNDS_PADDING });
       },
       onDrawStart: (shape) => {
         setAoiRef(shape);

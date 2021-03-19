@@ -19,6 +19,14 @@ import {
   ModalFooter as BaseModalFooter,
 } from '@devseed-ui/modal';
 import { PlaceholderMessage } from '../../../styles/placeholder.js';
+
+import {
+  Dropdown,
+  DropdownBody,
+  DropdownItem,
+  DropdownTrigger,
+} from '../../../styles/dropdown';
+
 import { ExploreContext, viewModes } from '../../../context/explore';
 import { MapContext } from '../../../context/map';
 import GlobalContext from '../../../context/global';
@@ -239,6 +247,8 @@ function PrimePanel() {
     aoiRef,
     setAoiRef,
     aoiArea,
+    loadAoi,
+    aoiList,
     apiLimits,
     runInference,
     predictions,
@@ -298,6 +308,38 @@ function PrimePanel() {
                     viewMode={viewMode}
                     apiLimits={apiLimits}
                   />
+                  <Dropdown
+                    alignment='right'
+                    direction='down'
+                    triggerElement={(props) => (
+                      <DropdownTrigger
+                        variation='primary-raised-light'
+                        useIcon='plus'
+                        title='Select aoi'
+                        className='user-options-trigger'
+                        size='medium'
+                        hideText
+                        {...props}
+                      >
+                        Select Aoi
+                      </DropdownTrigger>
+                    )}
+                  >
+                    <>
+                      <DropdownBody>
+                        {aoiList.map((a) => (
+                          <DropdownItem
+                            key={a.id}
+                            onClick={() => {
+                              loadAoi(currentProject, a.id);
+                            }}
+                          >
+                            {`${a.name} ${a.id} ${a.created}`}
+                          </DropdownItem>
+                        ))}
+                      </DropdownBody>
+                    </>
+                  </Dropdown>
                 </HeadOptionToolbar>
               </HeadOption>
 
