@@ -73,6 +73,12 @@ The site will automatically refresh since it is bundled with livereload.
 
 The app is using cypress to perform end-to-end testing. New tests should be added to `cypress/integrations/*.spec.js`.
 
+Start the front-end in testing mode:
+
+```sh
+yarn run serve:testing
+```
+
 To run tests using cypress gui:
 
 ```sh
