@@ -59,7 +59,7 @@ Cypress.Commands.add('startServer', () => {
     }
   );
 
-  // GET /api/models with auth headers
+  // GET /api/models
   cy.intercept(
     {
       host: restApiEndpoint,
@@ -68,6 +68,43 @@ Cypress.Commands.add('startServer', () => {
     },
     {
       fixture: 'server/api/model.json',
+    }
+  );
+
+  // GET /api/project
+  cy.intercept(
+    {
+      host: restApiEndpoint,
+      path: '/api/project',
+      headers: authHeaders,
+    },
+    {
+      body: {
+        total: 3,
+        projects: [
+          { id: 1, name: 'Untitled', created: '2021-01-19T12:47:07.838Z' },
+          { id: 2, name: 'Untitled', created: '2021-02-19T12:47:07.838Z' },
+          { id: 3, name: 'Untitled', created: '2021-03-19T12:47:07.838Z' },
+        ],
+      },
+    }
+  );
+
+  // GET /api/project/1
+  cy.intercept(
+    {
+      host: restApiEndpoint,
+      path: '/api/project/1',
+      headers: authHeaders,
+    },
+    {
+      body: {
+        id: 1,
+        name: 'Untitled',
+        model_id: 1,
+        mosaic: 'naip.latest',
+        created: '2021-03-19T12:47:07.838Z',
+      },
     }
   );
 });

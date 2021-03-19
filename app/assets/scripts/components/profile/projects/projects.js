@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext, useEffect, useReducer } from 'react';
 import styled from 'styled-components';
 import T from 'prop-types';
 import { Button } from '@devseed-ui/button';
@@ -18,6 +18,9 @@ import { Heading } from '@devseed-ui/typography';
 import { StyledNavLink } from '../../../styles/links';
 import toasts from '../../common/toasts';
 import { useHistory } from 'react-router';
+import { AuthContext } from '../../../context/auth';
+import { createQueryApiGetReducer, queryApiGet } from '../../../reducers/api';
+import { initialApiRequestState } from '../../../reducers/reduxeed';
 const ProjectsBody = styled(InpageBodyInner)`
   display: grid;
   grid-template-columns: 1fr;
@@ -78,9 +81,24 @@ const NavList = styled.ol`
   `}
 `;
 
-function Projects(props) {
+function Projects() {
   const history = useHistory();
-  const { projectsList } = props;
+
+  const { apiToken } = useContext(AuthContext);
+
+  const [projectsList, dispatchProjectsList] = useReducer(
+    createQueryApiGetReducer('project'),
+    initialApiRequestState
+  );
+
+  useEffect(() => {
+    if (apiToken) {
+      queryApiGet({ token: apiToken, endpoint: 'project' })(
+        dispatchProjectsList
+      );
+    }
+  }, [apiToken]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const { projects } = projectsList.isReady() ? projectsList.getData() : {};
   return (
     <>
