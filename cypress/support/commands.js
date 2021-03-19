@@ -1,3 +1,8 @@
+const {
+  restApiEndpoint,
+} = require('../../app/assets/scripts/config/testing').default;
+const apiEndpoint = (route) => `${restApiEndpoint}/${route}`;
+
 /**
  * Fake user login
  */
@@ -17,9 +22,12 @@ Cypress.Commands.add('fakeLogin', () => {
  * Stub network requests
  */
 Cypress.Commands.add('startServer', () => {
-  const apiEndpoint = (route) => `http://localhost:2000/${route}`;
-  cy.server();
-  cy.route('GET', apiEndpoint('health'), 'fixture:server/health.json');
-  cy.route('GET', apiEndpoint('api'), 'fixture:server/api.json');
-  cy.route('GET', apiEndpoint('api/mosaic'), 'fixture:server/api/mosaic.json');
+  cy.intercept(apiEndpoint('health'), { fixture: 'server/health.json' });
+  cy.intercept(apiEndpoint('api/mosaic'), {
+    fixture: 'server/api/mosaic.json',
+  });
+  cy.intercept(apiEndpoint('api/model'), {
+    fixture: 'server/api/model.json',
+  });
+  cy.intercept(apiEndpoint('api'), { fixture: 'server/api.json' });
 });
