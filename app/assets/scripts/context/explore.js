@@ -20,6 +20,7 @@ import predictionsReducer, {
   initialPredictionsState,
 } from '../reducers/predictions';
 import usePrevious from '../utils/use-previous';
+import tBbox from '@turf/bbox';
 
 /**
  * Explore View Modes
@@ -100,17 +101,24 @@ export function ExploreProvider(props) {
 
           setSelectedModel(model);
 
-          /* TODO 
+          /* TODO
            * This code is untested.
            * Once inference is run on a project, the API will
            * return an AOI here
+           */
           const aois = await restApiClient.get(`project/${project.id}/aoi`);
 
           if (aois.total > 0) {
-            const latest = aois.pop();
-            setAoiInitializer(latest);
+            const latest = aois.aois.pop();
+            const latestAoi = await restApiClient.get(
+              `project/${project.id}/aoi/${latest.id}`
+            );
+            const [lonMin, latMin, lonMax, latMax] = tBbox(latestAoi.bounds);
+            setAoiInitializer([
+              [latMin, lonMin],
+              [latMax, lonMax],
+            ]);
           }
-          */
         } catch (error) {
           toasts.error('Error loading project, please try again later.');
         } finally {
