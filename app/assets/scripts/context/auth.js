@@ -20,29 +20,21 @@ function InnerAuthProvider(props) {
   } = useAuth0();
   const [authState, dispatchAuthState] = useReducer(authReducer, {});
 
-  if (window.Cypress) {
-    const auth0Cypress = localStorage.getItem('auth0Cypress');
-    if (auth0Cypress) {
-      // eslint-disable-next-line react-hooks/rules-of-hooks
-      useEffect(() => {
-        dispatchAuthState({
-          type: actions.RECEIVE_LOGIN,
-          data: JSON.parse(auth0Cypress),
-        });
-      }, []);
+  useEffect(() => {
+    const lsAuthState = window.localStorage.getItem('authState');
+    if (lsAuthState) {
+      dispatchAuthState({
+        type: actions.LOAD_AUTH_STATE,
+        data: JSON.parse(lsAuthState),
+      });
     }
-  } else {
-    /* eslint-disable react-hooks/rules-of-hooks */
-    useEffect(() => {
-      const lsAuthState = window.localStorage.getItem('authState');
-      if (lsAuthState) {
-        dispatchAuthState({
-          type: actions.LOAD_AUTH_STATE,
-          data: JSON.parse(lsAuthState),
-        });
-      }
-    }, []);
+  }, []);
 
+  /**
+   * Disable Auth0 hooks when testing.
+   */
+  if (!window.Cypress) {
+    /* eslint-disable react-hooks/rules-of-hooks */
     useEffect(() => {
       if (isLoading) return;
 
@@ -76,7 +68,7 @@ function InnerAuthProvider(props) {
           });
         }
       }
-    }, [isLoading, isAuthenticated, auth0Error]);
+    }, [isLoading, isAuthenticated, auth0Error]); // eslint-disable-line react-hooks/exhaustive-deps
   }
 
   return (

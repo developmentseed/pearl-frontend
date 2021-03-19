@@ -13,8 +13,11 @@ const authHeaders = {
  */
 Cypress.Commands.add('fakeLogin', () => {
   window.localStorage.setItem(
-    'auth0Cypress',
+    'authState',
     JSON.stringify({
+      isLoading: false,
+      error: false,
+      isAuthenticated: true,
       apiToken: FAKE_API_TOKEN,
       user: {
         name: 'Test User',
