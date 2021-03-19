@@ -1,11 +1,4 @@
-export const initialPredictionsState = {
-  fetching: false,
-  fetched: false,
-  receivedAt: null,
-  error: null,
-  data: [],
-};
-
+import { initialApiRequestState } from './reduxeed';
 export const actions = {
   START_PREDICTION: 'START_PREDICTION',
   RECEIVE_PREDICTION: 'RECEIVE_PREDICTION',
@@ -18,7 +11,7 @@ export default function (state, action) {
   switch (action.type) {
     case actions.START_PREDICTION:
       return {
-        ...initialPredictionsState,
+        ...initialApiRequestState,
         fetching: true,
         processed: 0,
         receivedAt: Date.now(),
