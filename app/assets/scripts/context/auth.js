@@ -51,7 +51,6 @@ function InnerAuthProvider(props) {
             },
           });
         } catch (error) {
-          logger('login error');
           logger(error);
         }
       }
@@ -127,8 +126,6 @@ const authReducer = function (state, action) {
   const { type, data } = action;
   let newState;
 
-  logger(type);
-  logger(data);
   switch (type) {
     case actions.LOAD_AUTH_STATE: {
       return data;
@@ -162,7 +159,6 @@ const authReducer = function (state, action) {
 
   // Persist auth state to local storage it not using Cypress
   if (!window.Cypress) {
-    logger({ newState });
     window.localStorage.setItem('authState', JSON.stringify(newState));
   }
 
