@@ -2,7 +2,8 @@
 module.exports = {
   default: {
     environment: 'testing',
-    appTitle: 'MS LULC',
-    appDescription: 'Microsoft Land Use/Land Classification project.',
+    audience: 'http://localhost:2000',
+    restApiEndpoint: 'http://localhost:2000',
+    websocketEndpoint: 'ws://localhost:1999',
   },
 };
