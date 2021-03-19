@@ -72,7 +72,6 @@ function Map() {
     setAoiRef,
     setAoiArea,
     aoiInitializer,
-
     setViewMode,
     viewMode,
     predictions,
@@ -204,11 +203,12 @@ function Map() {
             />
           ))}
 
-        {predictions &&
-          !predictions.error &&
-          predictions.data.map((p) => (
-            <ImageOverlay key={p.key} url={p.image} bounds={p.bounds} />
-          ))}
+        {predictions.isReady() &&
+          predictions
+            .getData()
+            .map((p) => (
+              <ImageOverlay key={p.key} url={p.image} bounds={p.bounds} />
+            ))}
         <FeatureGroup>
           <GeoCoder />
           {aoiRef && <CenterMap aoiRef={aoiRef} />}

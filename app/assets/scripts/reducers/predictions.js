@@ -1,11 +1,3 @@
-export const initialPredictionsState = {
-  fetching: false,
-  fetched: false,
-  receivedAt: null,
-  error: null,
-  data: [],
-};
-
 export const actions = {
   START_PREDICTION: 'START_PREDICTION',
   RECEIVE_PREDICTION: 'RECEIVE_PREDICTION',

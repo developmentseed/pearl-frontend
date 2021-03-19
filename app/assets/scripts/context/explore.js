@@ -16,9 +16,7 @@ import toasts from '../components/common/toasts';
 import { useHistory, useParams } from 'react-router-dom';
 import WebsocketClient from './websocket-client';
 import GlobalContext from './global';
-import predictionsReducer, {
-  initialPredictionsState,
-} from '../reducers/predictions';
+import predictionsReducer from '../reducers/predictions';
 import usePrevious from '../utils/use-previous';
 
 /**
@@ -61,7 +59,7 @@ export function ExploreProvider(props) {
   const previousViewMode = usePrevious(viewMode);
   const [predictions, dispatchPredictions] = useReducer(
     predictionsReducer,
-    initialPredictionsState
+    initialApiRequestState
   );
   const [currentInstance, setCurrentInstance] = useState(null);
   const [websocketClient, setWebsocketClient] = useState(null);

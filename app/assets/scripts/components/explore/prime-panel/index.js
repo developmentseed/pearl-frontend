@@ -258,13 +258,20 @@ function PrimePanel() {
     : 'Create project and run model';
 
   // Retrain Panel Tab Empty State message
-
-  const retrainPlaceholderMessage =
-    aoiRef && aoiArea > 0 && selectedModel
-      ? `Click the "Run Model" button to generate the class LULC map for your AOI`
-      : aoiRef && aoiArea > 0 && !selectedModel
-      ? `Select a model to use for inference`
-      : `Define an Area of Interest to run models at your selected location`;
+  //
+  const retrainPlaceHolderMessage = () => {
+    if (predictions.isReady()) {
+      // If predictions are ready, do not need a placeholder
+      return null;
+    }
+    if (aoiRef && selectedModel) {
+      return `Click the "Run Model" button to generate the class LULC map for your AOI`;
+    } else if (aoiRef && !selectedModel) {
+      return `Select a model to use for inference`;
+    } else {
+      return `Define an Area of Interest to run models at your selected location`;
+    }
+  };
 
   return (
     <>
@@ -333,20 +340,12 @@ function PrimePanel() {
             </PanelBlockHeader>
             <PanelBlockBody>
               <TabbedBlock>
-                {predictions && !predictions.error && predictions.fetched ? (
-                  <RetrainModel
-                    name='retrain model'
-                    tabId='retrain-tab-trigger'
-                    classList={availableClasses}
-                  />
-                ) : (
-                  <RetrainModel
-                    name='retrain model'
-                    tabId='retrain-tab-trigger'
-                    placeholderItems={3}
-                    placeholderMessage={retrainPlaceholderMessage}
-                  />
-                )}
+                <RetrainModel
+                  name='retrain model'
+                  tabId='retrain-tab-trigger'
+                  placeholderMessage={retrainPlaceHolderMessage()}
+                  classList={availableClasses}
+                />
                 <PlaceholderPanelSection
                   name='Refine Results'
                   tabId='refine-tab-trigger'

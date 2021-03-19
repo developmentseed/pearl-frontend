@@ -83,7 +83,7 @@ const Wrapper = styled.div`
 `;
 
 function RetrainModel(props) {
-  const { classList, className, placeholderItems, placeholderMessage } = props;
+  const { classList, className, placeholderMessage } = props;
   const [selectedClass, setSelectedClass] = useState({});
   return (
     <Wrapper className={className}>
@@ -106,10 +106,14 @@ function RetrainModel(props) {
               </Button>
             </Class>
           ))}
-        {!classList && placeholderItems && (
+        {!classList && placeholderMessage && (
           <>
-            {Array.from(Array(placeholderItems)).map((i) => (
-              <Class key={i} placeholder>
+            {[1, 2, 3].map((i) => (
+              // +true workaround
+              // Styled components will try to pass true to the DOM element
+              // assing a + casts it to int which is logically equivalent
+              // but does not cause the DOM error
+              <Class key={i} placeholder={+true}>
                 <Thumbnail />
                 <Heading size='xsmall' />
                 <Button
@@ -136,7 +140,6 @@ function RetrainModel(props) {
 RetrainModel.propTypes = {
   classList: T.array,
   className: T.string,
-  placeholderItems: T.number,
   placeholderMessage: T.string,
 };
 export default RetrainModel;
