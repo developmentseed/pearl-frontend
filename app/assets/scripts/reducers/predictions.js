@@ -8,6 +8,7 @@ export const actions = {
 
 export default function (state, action) {
   const { data } = action;
+
   switch (action.type) {
     case actions.START_PREDICTION:
       return {
@@ -15,6 +16,9 @@ export default function (state, action) {
         fetching: true,
         processed: 0,
         receivedAt: Date.now(),
+        data: {
+          predictions: [],
+        },
       };
     case actions.RECEIVE_PREDICTION: {
       // Get bounds
@@ -22,7 +26,7 @@ export default function (state, action) {
 
       // Build prediction object
       const prediction = {
-        key: state.data.length + 1,
+        key: state.data.predictions.length + 1,
         image: `data:image/png;base64,${data.image}`,
         bounds: [
           [minY, minX],
@@ -36,7 +40,9 @@ export default function (state, action) {
         processed: data.processed,
         total: data.total,
         receivedAt: Date.now(),
-        data: state.data.concat(prediction),
+        data: {
+          predictions: (state.data.predictions || []).concat(prediction),
+        },
       };
     }
     case actions.COMPLETE_PREDICTION:
