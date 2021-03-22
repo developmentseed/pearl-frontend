@@ -241,12 +241,12 @@ function Map() {
             />
           ))}
 
-        {predictions.isReady() &&
-          predictions
-            .getData()
-            .map((p) => (
-              <ImageOverlay key={p.key} url={p.image} bounds={p.bounds} />
-            ))}
+        {predictions &&
+          predictions.data &&
+          predictions.data.predictions &&
+          predictions.data.predictions.map((p) => (
+            <ImageOverlay key={p.key} url={p.image} bounds={p.bounds} />
+          ))}
         <FeatureGroup>
           <GeoCoder />
           {aoiRef && <CenterMap aoiRef={aoiRef} />}
