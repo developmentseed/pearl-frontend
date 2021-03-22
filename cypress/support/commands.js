@@ -1,32 +1,73 @@
+const {
+  restApiEndpoint,
+} = require('../../app/assets/scripts/config/testing').default;
+
+const FAKE_API_TOKEN = 'FAKE_API_TOKEN';
+
+const authHeaders = {
+  Authorization: `Bearer ${FAKE_API_TOKEN}`,
+};
+
 /**
- * Command login(username, password)
+ * Fake user login
  */
-Cypress.Commands.add('loginByAuth0Api', (username, password) => {
-  cy.log(`Logging in as ${username}`);
-  const client_id = Cypress.env('AUTH0_CLIENT_ID');
-  const audience = Cypress.env('AUTH0_AUDIENCE');
-  const scope = Cypress.env('AUTH0_SCOPE');
+Cypress.Commands.add('fakeLogin', () => {
+  window.localStorage.setItem(
+    'authState',
+    JSON.stringify({
+      isLoading: false,
+      error: false,
+      isAuthenticated: true,
+      apiToken: FAKE_API_TOKEN,
+      user: {
+        name: 'Test User',
+      },
+    })
+  );
+});
 
-  cy.request({
-    method: 'POST',
-    url: `https://${Cypress.env('AUTH0_DOMAIN')}/oauth/token`,
-    body: {
-      grant_type: 'password',
-      username,
-      password,
-      audience,
-      scope,
-      client_id,
+/**
+ * Stub network requests
+ */
+Cypress.Commands.add('startServer', () => {
+  // GET /health
+  cy.intercept(
+    {
+      host: restApiEndpoint,
+      path: '/health',
     },
-  }).then(({ body: { access_token, expires_in, id_token } }) => {
-    const auth0Cypress = {
-      user: JSON.parse(
-        Buffer.from(id_token.split('.')[1], 'base64').toString('ascii')
-      ),
-      access_token,
-      expires_in,
-    };
+    { fixture: 'server/health.json' }
+  );
 
-    window.localStorage.setItem('auth0Cypress', JSON.stringify(auth0Cypress));
-  });
+  // GET /api
+  cy.intercept(
+    {
+      host: restApiEndpoint,
+      path: '/api',
+    },
+    { fixture: 'server/api.json' }
+  );
+
+  // GET /api/mosaic
+  cy.intercept(
+    {
+      host: restApiEndpoint,
+      path: '/api/mosaic',
+    },
+    {
+      fixture: 'server/api/mosaic.json',
+    }
+  );
+
+  // GET /api/models with auth headers
+  cy.intercept(
+    {
+      host: restApiEndpoint,
+      path: '/api/model',
+      headers: authHeaders,
+    },
+    {
+      fixture: 'server/api/model.json',
+    }
+  );
 });

@@ -79,7 +79,7 @@ function UserDropdown() {
           variation='primary-raised-light'
           className='button-class'
           title='sample button'
-          onClick={() => loginWithRedirect({ prompt: 'consent' })}
+          onClick={() => loginWithRedirect()}
         >
           Log in
         </Button>

@@ -73,7 +73,11 @@ The site will automatically refresh since it is bundled with livereload.
 
 The app is using cypress to perform end-to-end testing. New tests should be added to `cypress/integrations/*.spec.js`.
 
-It is required to provide Auth0 configuration to test authenticated states. Copy [cypress.env-example.json](cypress.env-example.json) to `cypress.env.json` and fill the credentials before running tests.
+Start the front-end in testing mode:
+
+```sh
+yarn run serve:testing
+```
 
 To run tests using cypress gui:
 

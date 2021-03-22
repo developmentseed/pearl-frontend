@@ -1,11 +1,12 @@
 // / <reference types="Cypress" />
 describe('The Project Page', () => {
-  before(() => {
+  beforeEach(() => {
     cy.clearLocalStorage();
-    cy.visit('/project/new');
+    cy.startServer();
   });
 
   it('Successfully loads not-logged in state ', () => {
+    cy.visit('/project/new');
     cy.get('body');
     cy.get('header');
 
@@ -20,10 +21,7 @@ describe('The Project Page', () => {
   });
 
   it('Allow model select after login ', () => {
-    cy.loginByAuth0Api(
-      Cypress.env('AUTH0_USERNAME'),
-      Cypress.env('AUTH0_PASSWORD')
-    );
+    cy.fakeLogin();
     cy.visit('/project/new');
 
     cy.get('[data-cy=select-model-label]').should(

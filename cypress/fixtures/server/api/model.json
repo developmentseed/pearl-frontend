@@ -1,0 +1,12 @@
+{
+  "models": [
+    {
+      "id": 1,
+      "created": "2021-03-09T11:38:37.169Z",
+      "active": true,
+      "uid": 1,
+      "name": "NAIP Supervised",
+      "bounds": [null, null, null, null]
+    }
+  ]
+}
