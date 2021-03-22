@@ -407,6 +407,7 @@ function PrimePanel() {
               </Button>
 
               <InfoButton
+                data-cy={allowInferenceRun ? 'run-model-button' : 'disabled'}
                 variation='primary-raised-dark'
                 size='medium'
                 useIcon='tick--small'
@@ -433,7 +434,7 @@ function PrimePanel() {
         data={models || []}
         renderCard={(model) => (
           <Card
-            id={`model-${model.name}-card`}
+            id={`model-${model.id}-card`}
             key={model.name}
             title={model.name}
             size='large'
