@@ -99,6 +99,15 @@ export function ExploreProvider(props) {
 
           setSelectedModel(model);
 
+          const activeInstances = await restApiClient.getActiveInstances(projectId);
+          if (activeInstances.total > 0) {
+            const instanceItem = activeInstances.instances[0];
+            const instance = await restApiClient.getInstance(projectId, instanceItem.id);
+            setCurrentInstance(instance);
+          }
+
+
+
           /* TODO
            * This code is untested.
            * Once inference is run on a project, the API will
@@ -226,7 +235,11 @@ export function ExploreProvider(props) {
         try {
           // Create instance
           showGlobalLoadingMessage('Requesting instance...');
-          instance = await restApiClient.createInstance(project.id);
+          if (currentInstance) {
+            instance = currentInstance;
+          } else {
+            instance = await restApiClient.createInstance(project.id);
+          }
 
           // Setup websocket
           showGlobalLoadingMessage('Connecting to instance...');
