@@ -99,14 +99,17 @@ export function ExploreProvider(props) {
 
           setSelectedModel(model);
 
-          const activeInstances = await restApiClient.getActiveInstances(projectId);
+          const activeInstances = await restApiClient.getActiveInstances(
+            projectId
+          );
           if (activeInstances.total > 0) {
             const instanceItem = activeInstances.instances[0];
-            const instance = await restApiClient.getInstance(projectId, instanceItem.id);
+            const instance = await restApiClient.getInstance(
+              projectId,
+              instanceItem.id
+            );
             setCurrentInstance(instance);
           }
-
-
 
           /* TODO
            * This code is untested.
