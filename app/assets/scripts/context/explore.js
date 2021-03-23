@@ -56,9 +56,7 @@ export function ExploreProvider(props) {
 
   const [viewMode, setViewMode] = useState(viewModes.BROWSE_MODE);
   const [selectedModel, setSelectedModel] = useState(null);
-  const { currentCheckpoint, dispatchCurrentCheckpoint } = useContext(
-    CheckpointContext
-  );
+  const { dispatchCurrentCheckpoint } = useContext(CheckpointContext);
 
   const previousViewMode = usePrevious(viewMode);
   const [predictions, dispatchPredictions] = useReducer(

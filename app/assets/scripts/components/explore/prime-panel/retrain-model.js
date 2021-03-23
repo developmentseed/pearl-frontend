@@ -151,7 +151,6 @@ function RetrainModel(props) {
 }
 
 RetrainModel.propTypes = {
-  classList: T.array,
   className: T.string,
   placeholderMessage: T.string,
 };

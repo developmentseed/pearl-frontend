@@ -228,7 +228,5 @@ function Projects() {
   );
 }
 
-Projects.propTypes = {
-  projectsList: T.object,
-};
+Projects.propTypes = {};
 export default Projects;
