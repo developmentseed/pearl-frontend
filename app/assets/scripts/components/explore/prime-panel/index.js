@@ -185,7 +185,7 @@ function PrimePanel() {
                         <DropdownItem
                           key={a.id}
                           onClick={() => {
-                            loadAoi(currentProject, a.id).then((bounds) =>
+                            loadAoi(currentProject, a).then((bounds) =>
                               map.fitBounds(bounds, { padding: BOUNDS_PADDING })
                             );
                           }}

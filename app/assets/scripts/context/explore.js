@@ -115,7 +115,7 @@ export function ExploreProvider(props) {
           setAoiList(aois.aois);
           if (aois.total > 0) {
             const latest = aois.aois.lastItem;
-            loadAoi(project, latest.id);
+            loadAoi(project, latest);
           }
         } catch (error) {
           toasts.error('Error loading project, please try again later.');
@@ -181,8 +181,10 @@ export function ExploreProvider(props) {
     setAoiName(null);
   }
 
-  async function loadAoi(project, aoiId) {
-    const aoi = await restApiClient.get(`project/${project.id}/aoi/${aoiId}`);
+  async function loadAoi(project, aoiObject) {
+    const aoi = await restApiClient.get(
+      `project/${project.id}/aoi/${aoiObject.id}`
+    );
     const [lonMin, latMin, lonMax, latMax] = tBbox(aoi.bounds);
     const bounds = [
       [latMin, lonMin],
@@ -190,21 +192,27 @@ export function ExploreProvider(props) {
     ];
 
     if (aoiRef) {
-      // loading an aoi
+      // Load existing aoi that was returned by the api
       aoiRef.setBounds(bounds);
       setAoiBounds(aoiRef.getBounds());
+      setAoiName(aoiObject.name);
+      /*
       reverseGeoCode([lonMin, latMin, lonMax, latMax]).then((name) =>
         setAoiName(name)
-      );
+      );*/
     } else {
       // initializing map with first aoi
       setAoiInitializer(bounds);
+      setAoiName(aoiObject.name);
+      /*
       reverseGeoCode([lonMin, latMin, lonMax, latMax]).then((name) =>
         setAoiName(name)
-      );
+      );*/
     }
     return bounds;
   }
+
+  function checkAoiName(name, aoiList) {}
   async function updateProjectName(projectName) {
     if (restApiClient) {
       let project = currentProject;
@@ -357,20 +365,58 @@ export function ExploreProvider(props) {
   }, [aoiRef]);
 
   /*
-   * Reverse geocode when bounds change aka when AOI is confirmed
+   *
+   * At this time we can also check to see if name needs to be incremented
    */
+        /*
+         * If AOI was just edited by the user, we need to increment
+         * the name.
+         * AOIs are tracked on backed as a grouped object of
+         * AOI geometry AND model ID
+         *
+         * On frontend, assume that same name == same geometry.
+         */
+
   useEffect(() => {
     if (!aoiBounds) {
       return;
+    } else if (
+      viewMode === viewModes.BROWSE_MODE &&
+      (previousViewMode === viewModes.EDIT_AOI_MODE ||
+        previousViewMode === viewModes.CREATE_AOI_MODE)
+    ) {
+      const bounds = [
+        aoiBounds.getWest(),
+        aoiBounds.getSouth(),
+        aoiBounds.getEast(),
+        aoiBounds.getNorth(),
+      ];
+
+      reverseGeoCode(bounds).then((name) => {
+        let lastInstance;
+        aoiList
+          .sort((a, b) => {
+            if (a.name < b.name) return -1;
+            else if (a.name > b.name) return 1;
+            else return 0;
+          })
+          .forEach((a) => {
+            return (lastInstance = a.name.includes(name)
+              ? a.name
+              : lastInstance);
+          });
+        if (lastInstance) {
+          if (lastInstance.includes('#')) {
+            const [n, version] = lastInstance.split('#').map(w => w.trim());
+            name = `${n} #${Number(version) + 1}`;
+          } else {
+            name = `${name} #${1}`;
+          }
+        }
+        setAoiName(name);
+      });
     }
-    const bounds = [
-      aoiBounds.getWest(),
-      aoiBounds.getSouth(),
-      aoiBounds.getEast(),
-      aoiBounds.getNorth(),
-    ];
-    reverseGeoCode(bounds).then((name) => setAoiName(name));
-  }, [aoiBounds]);
+  }, [aoiBounds, aoiList, viewMode, previousViewMode]);
 
   return (
     <ExploreContext.Provider
