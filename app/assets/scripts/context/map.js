@@ -7,7 +7,6 @@ export function MapProvider(props) {
   const [map, setMap] = useState();
   const [mapLayers, setMapLayers] = useState({});
 
-
   return (
     <MapContext.Provider
       value={{
@@ -16,7 +15,6 @@ export function MapProvider(props) {
 
         mapLayers,
         setMapLayers,
-
       }}
     >
       {props.children}

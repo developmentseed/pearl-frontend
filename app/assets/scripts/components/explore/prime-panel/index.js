@@ -1,6 +1,7 @@
 import React, { useState, useContext } from 'react';
 import styled, { css } from 'styled-components';
 import { themeVal, glsp } from '@devseed-ui/theme-provider';
+import { Heading } from '@devseed-ui/typography';
 import { Button } from '@devseed-ui/button';
 import collecticon from '@devseed-ui/collecticons';
 import T from 'prop-types';
@@ -284,16 +285,32 @@ function PrimePanel() {
     ? 'Run inference for this model'
     : 'Create project and run model';
 
-  const renderAoiHeader = () => {
+  const renderAoiHeader = (triggerProps) => {
+    let header;
+    let area;
     if (aoiArea && aoiArea > 0 && viewMode === viewModes.EDIT_AOI_MODE) {
-      return `${formatThousands(aoiArea / 1e6)} km2`;
+      header = `${formatThousands(aoiArea / 1e6)} km2`;
     } else if (aoiName) {
-      return aoiName
+      header = aoiName;
+      area = `${formatThousands(aoiArea / 1e6)} km2`;
     } else if (viewMode === viewModes.CREATE_AOI_MODE) {
-      return 'Drag on map to select';
+      header = 'Drag on map to select';
     } else {
-      return 'None selected - Draw area on map';
+      header = 'None selected - Draw area on map';
     }
+
+    return (
+      <>
+        <SubheadingStrong {...triggerProps} useIcon='chevron-down--small'>
+          {header}
+        </SubheadingStrong>
+        {area && (
+          <Heading className='subtitle' useAlt>
+            {area}
+          </Heading>
+        )}
+      </>
+    );
   };
 
   return (
@@ -307,7 +324,7 @@ function PrimePanel() {
         bodyContent={
           <StyledPanelBlock>
             <PanelBlockHeader>
-              <HeadOption>
+              <HeadOption hasSubtitle>
                 <HeadOptionHeadline>
                   <Subheading>Selected Area </Subheading>
                 </HeadOptionHeadline>
@@ -315,16 +332,10 @@ function PrimePanel() {
                 <Dropdown
                   alignment='left'
                   direction='down'
-                  triggerElement={(props) => (
-                    <SubheadingStrong {...props} useIcon='chevron-down--small'>
-                      {/*aoiArea && aoiArea > 0
-                        ? `${formatThousands(aoiArea / 1e6)} km2`
-                        : viewMode === viewModes.CREATE_AOI_MODE
-                        ? 'Drag on map to select'
-                        : 'None selected - Draw area on map'*/}
-                      {renderAoiHeader()}
-                    </SubheadingStrong>
-                  )}
+                  triggerElement={
+                    (triggerProps) => renderAoiHeader(triggerProps)
+                    /* eslint-disable-next-line */
+                  }
                 >
                   <>
                     <DropdownBody>

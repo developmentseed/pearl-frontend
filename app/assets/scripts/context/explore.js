@@ -178,7 +178,6 @@ export function ExploreProvider(props) {
       [latMax, lonMax],
     ];
 
-
     if (aoiRef) {
       aoiRef.setBounds(bounds);
     } else {
@@ -246,9 +245,8 @@ export function ExploreProvider(props) {
       }
     )
       .then((res) => res.json())
-      .catch((err) => {
+      .catch(() => {
         toasts.error('Error querying address');
-        console.error('Error reading address, err');
         return null;
       });
 
@@ -257,8 +255,6 @@ export function ExploreProvider(props) {
       // Use first result if there are any
       name = address.resourceSets[0].resources[0].address.locality;
     }
-    console.log(name)
-
     // else leave name undefined, should be set by user
     setAoiName(name);
   }
@@ -342,7 +338,7 @@ export function ExploreProvider(props) {
    */
   useEffect(() => {
     if (!aoiBounds) {
-      return
+      return;
     }
     const bounds = [
       aoiBounds.getWest(),
