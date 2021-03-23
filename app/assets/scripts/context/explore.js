@@ -242,6 +242,7 @@ export function ExploreProvider(props) {
           const newWebsocketClient = new WebsocketClient({
             token: instance.token,
             dispatchPredictions,
+            dispatchCurrentCheckpoint,
             onConnected: () =>
               newWebsocketClient.requestPrediction('A name', aoiRef),
           });
