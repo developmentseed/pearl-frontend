@@ -112,7 +112,7 @@ export function ExploreProvider(props) {
           setSelectedModel(model);
 
           const aois = await restApiClient.get(`project/${project.id}/aoi`);
-          setAoiList(aois.aois);
+          setAoiList(filterAoiList(aois.aois));
           if (aois.total > 0) {
             const latest = aois.aois.lastItem;
             loadAoi(project, latest);
@@ -158,7 +158,7 @@ export function ExploreProvider(props) {
       if (predictions.fetched) {
         restApiClient
           .get(`project/${currentProject.id}/aoi`)
-          .then((aois) => setAoiList(aois.aois));
+          .then((aois) => setAoiList(filterAoiList(aois.aois)));
       }
 
       // Update aoi List with newest aoi
@@ -179,6 +179,27 @@ export function ExploreProvider(props) {
     setAoiBounds(null);
     setAoiArea(null);
     setAoiName(null);
+  }
+
+  /*
+   * Filter the aoi list to have unique names
+   * Back end doesn't care if aoi's are submitted with duplicate names.
+   * On frontend, assume that equivalent name -> equivalent geometry
+   * Only update the name if the geometry has been edited
+   *
+   */
+  function filterAoiList(aoiList) {
+    const aois = new Map();
+    aoiList.forEach((a) => {
+      if (aois.has(a.name)) {
+        if (aois.get(a.name).created > a.created) {
+          aois.set(a.name, a);
+        }
+      } else {
+        aois.set(a.name, a);
+      }
+    });
+    return Array.from(aois.values());
   }
 
   async function loadAoi(project, aoiObject) {
@@ -212,7 +233,6 @@ export function ExploreProvider(props) {
     return bounds;
   }
 
-  function checkAoiName(name, aoiList) {}
   async function updateProjectName(projectName) {
     if (restApiClient) {
       let project = currentProject;
@@ -368,14 +388,14 @@ export function ExploreProvider(props) {
    *
    * At this time we can also check to see if name needs to be incremented
    */
-        /*
-         * If AOI was just edited by the user, we need to increment
-         * the name.
-         * AOIs are tracked on backed as a grouped object of
-         * AOI geometry AND model ID
-         *
-         * On frontend, assume that same name == same geometry.
-         */
+  /*
+   * If AOI was just edited by the user, we need to increment
+   * the name.
+   * AOIs are tracked on backed as a grouped object of
+   * AOI geometry AND model ID
+   *
+   * On frontend, assume that same name == same geometry.
+   */
 
   useEffect(() => {
     if (!aoiBounds) {
@@ -407,7 +427,7 @@ export function ExploreProvider(props) {
           });
         if (lastInstance) {
           if (lastInstance.includes('#')) {
-            const [n, version] = lastInstance.split('#').map(w => w.trim());
+            const [n, version] = lastInstance.split('#').map((w) => w.trim());
             name = `${n} #${Number(version) + 1}`;
           } else {
             name = `${name} #${1}`;
