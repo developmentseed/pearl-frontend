@@ -21,7 +21,7 @@ import {
   DropdownHeader,
   DropdownBody,
   DropdownItem,
-  DropdownFooter
+  DropdownFooter,
 } from '../../../styles/dropdown';
 
 import { ExploreContext, viewModes } from '../../../context/explore';
@@ -195,18 +195,15 @@ function PrimePanel() {
                   }
                 >
                   <>
-                    <DropdownHeader unshaded
-
-                    >
-                      <Heading useAlt
-                      size='xsmall'
-                      >Available Areas of Interest</Heading>
+                    <DropdownHeader unshaded>
+                      <Heading useAlt size='xsmall'>
+                        Available Areas of Interest
+                      </Heading>
                     </DropdownHeader>
                     <DropdownBody>
                       {aoiList.map((a) => (
-                        <li>
+                        <li key={a.id}>
                           <DropdownItem
-                            key={a.id}
                             onClick={() => {
                               loadAoi(currentProject, a).then((bounds) =>
                                 map.fitBounds(bounds, {
@@ -220,8 +217,7 @@ function PrimePanel() {
                         </li>
                       ))}
                     </DropdownBody>
-                    <DropdownFooter
-                    >
+                    <DropdownFooter>
                       <DropdownItem
                         muted
                         useIcon='plus'
