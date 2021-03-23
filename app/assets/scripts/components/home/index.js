@@ -14,6 +14,7 @@ import { Button } from '@devseed-ui/button';
 import { Heading } from '@devseed-ui/typography';
 import { themeVal, media, glsp } from '@devseed-ui/theme-provider';
 import GlobalContext from '../../context/global';
+import { StyledLink } from '../../styles/links';
 import config from '../../config';
 const { baseUrl } = config;
 
@@ -126,6 +127,7 @@ function Home() {
               size='xlarge'
               variation='achromic-glass'
               to='/about'
+              as={StyledLink}
               title='Visit About page'
             >
               Read More
@@ -135,6 +137,7 @@ function Home() {
               size='xlarge'
               variation='primary-raised-dark'
               to='/project/new'
+              as={StyledLink}
               title='Start a new project'
             >
               Launch App
