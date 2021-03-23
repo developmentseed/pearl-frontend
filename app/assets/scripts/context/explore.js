@@ -20,6 +20,7 @@ import predictionsReducer from '../reducers/predictions';
 import usePrevious from '../utils/use-previous';
 import tBbox from '@turf/bbox';
 import { actions, CheckpointContext } from './checkpoint';
+import logger from '../utils/logger';
 
 /**
  * Explore View Modes
@@ -101,6 +102,23 @@ export function ExploreProvider(props) {
           const model = await restApiClient.getModel(project.model_id);
 
           setSelectedModel(model);
+          try {
+            const activeInstances = await restApiClient.getActiveInstances(
+              projectId
+            );
+            if (activeInstances.total > 0) {
+              const instanceItem = activeInstances.instances[0];
+              const instance = await restApiClient.getInstance(
+                projectId,
+                instanceItem.id
+              );
+              setCurrentInstance(instance);
+            }
+          } catch (error) {
+            // If this request fails, let it fail silently.
+            // But, we log an error to the console.
+            logger('Active instance check FAILED', error);
+          }
 
           /* TODO
            * This code is untested.
@@ -236,7 +254,12 @@ export function ExploreProvider(props) {
         try {
           // Create instance
           showGlobalLoadingMessage('Requesting instance...');
-          instance = await restApiClient.createInstance(project.id);
+          if (currentInstance) {
+            instance = currentInstance;
+          } else {
+            instance = await restApiClient.createInstance(project.id);
+          }
+
           // Setup websocket
           showGlobalLoadingMessage('Connecting to instance...');
           const newWebsocketClient = new WebsocketClient({
