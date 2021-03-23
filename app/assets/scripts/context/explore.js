@@ -170,6 +170,17 @@ export function ExploreProvider(props) {
     }
   }, [predictions, restApiClient, currentProject]);
 
+  /*
+   * Re-init aoi state variables
+   */
+  function createNewAoi() {
+    setViewMode(viewModes.CREATE_AOI_MODE);
+    setAoiRef(null);
+    setAoiBounds(null);
+    setAoiArea(null);
+    setAoiName(null);
+  }
+
   async function loadAoi(project, aoiId) {
     const aoi = await restApiClient.get(`project/${project.id}/aoi/${aoiId}`);
     const [lonMin, latMin, lonMax, latMax] = tBbox(aoi.bounds);
@@ -367,6 +378,8 @@ export function ExploreProvider(props) {
         aoiName,
         aoiInitializer,
         aoiList,
+
+        createNewAoi,
 
         aoiBounds,
         setAoiBounds,

@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { themeVal, multiply } from '@devseed-ui/theme-provider';
 import collecticon from '@devseed-ui/collecticons';
 import BaseDropdown from '@devseed-ui/dropdown';
@@ -46,6 +46,12 @@ export const DropdownItem = styled.a`
     opacity: 1;
     background: ${themeVal('color.primaryAlphaA')};
   }
+
+  ${({ muted }) =>
+    muted &&
+    css`
+      color: ${themeVal('color.baseAlphaD')};
+    `}
 `;
 export const DropdownFooter = styled.footer`
   border-top: 1px solid ${themeVal('color.baseAlphaD')};

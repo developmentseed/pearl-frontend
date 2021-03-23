@@ -24,6 +24,7 @@ function CenterMap({ aoiRef }) {
   useEffect(() => {
     const center = new CenterControl({ position: 'topleft' });
     center.addTo(map);
+    return () => center.remove(map);
   }, [map]);
   return null;
 }
