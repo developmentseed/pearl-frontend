@@ -120,6 +120,7 @@
     "leaflet": "^1.7.1",
     "leaflet-geosearch": "^3.2.1",
     "lodash.defaultsdeep": "^4.6.1",
+    "lodash.differencewith": "^4.5.0",
     "lodash.get": "^4.4.2",
     "lodash.isequal": "^4.5.0",
     "lodash.uniq": "^4.5.0",

@@ -257,13 +257,26 @@ function Map() {
             (sampleClass) =>
               sampleClass.geometry &&
               sampleClass.geometry.coordinates &&
-              sampleClass.geometry.coordinates.map(([lat, lon]) => (
+              sampleClass.geometry.coordinates.map(([lat, lng]) => (
                 <Circle
-                  key={JSON.stringify([lat, lon])}
+                  key={JSON.stringify([lat, lng])}
                   pathOptions={{
                     color: sampleClass.color,
                   }}
-                  center={[lon, lat]}
+                  eventHandlers={{
+                    click: (e) => {
+                      e.originalEvent.preventDefault();
+                      dispatchCurrentCheckpoint({
+                        type: actions.REMOVE_POINT_SAMPLE,
+                        data: {
+                          className: sampleClass.name,
+                          lat,
+                          lng,
+                        },
+                      });
+                    },
+                  }}
+                  center={[lng, lat]}
                   radius={10}
                 />
               ))

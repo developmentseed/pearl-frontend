@@ -2,6 +2,7 @@ import React, { createContext, useReducer } from 'react';
 import T from 'prop-types';
 import uniqWith from 'lodash.uniqwith';
 import isEqual from 'lodash.isequal';
+import differenceWith from 'lodash.differencewith';
 export const CheckpointContext = createContext({});
 
 export function CheckpointProvider(props) {
@@ -30,6 +31,7 @@ export const actions = {
   RECEIVE_METADATA: 'RECEIVE_METADATA',
   SET_ACTIVE_CLASS: 'SET_ACTIVE_CLASS',
   ADD_POINT_SAMPLE: 'ADD_POINT_SAMPLE',
+  REMOVE_POINT_SAMPLE: 'REMOVE_POINT_SAMPLE',
 };
 
 function checkpointReducer(state, action) {
@@ -70,6 +72,32 @@ function checkpointReducer(state, action) {
           ...currentClass.geometry,
           coordinates: uniqWith(
             currentClass.geometry.coordinates.concat([[lng, lat]]),
+            isEqual
+          ),
+        },
+      };
+      // Return with updated class
+      return {
+        ...state,
+        classes: {
+          ...state.classes,
+          [state.activeClass]: updatedClass,
+        },
+      };
+    }
+    case actions.REMOVE_POINT_SAMPLE: {
+      // Get coords
+      const { lat, lng } = action.data;
+
+      // Merge coords into class
+      const currentClass = state.classes[state.activeClass];
+      const updatedClass = {
+        ...currentClass,
+        geometry: {
+          ...currentClass.geometry,
+          coordinates: differenceWith(
+            currentClass.geometry.coordinates,
+            [[lat, lng]],
             isEqual
           ),
         },
