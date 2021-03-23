@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import T from 'prop-types';
 import { DropdownTrigger } from '../../styles/dropdown';
 import { Button } from '@devseed-ui/button';
-import { themeVal, glsp } from '@devseed-ui/theme-provider';
+import { themeVal, glsp, media } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
 import { Form, FormInput } from '@devseed-ui/form';
 import InfoButton from '../common/info-button';
@@ -15,6 +15,10 @@ const Wrapper = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr auto;
   grid-gap: ${glsp()};
+  align-items: center;
+  ${media.mediumDown`
+    grid-template-columns: 1fr auto;
+  `}
 `;
 
 const StatusHeading = styled(Heading)`
@@ -23,12 +27,20 @@ const StatusHeading = styled(Heading)`
     font-weight: ${themeVal('type.base.weight')};
     color: ${themeVal('color.base')};
   }
+  ${media.mediumDown`
+    display: none;
+  `}
 `;
 const ProjectHeading = styled.div`
   display: flex;
   flex-flow: row nowrap;
   align-items: center;
   line-height: 1.5;
+  p {
+    ${media.mediumDown`
+      display: none;
+    `}
+  }
   ${Heading} {
     margin: 0 ${glsp(0.25)};
     height: auto;
@@ -36,6 +48,8 @@ const ProjectHeading = styled.div`
     line-height: 1.5rem;
     border: 1px solid transparent;
     border-radius: 0.25rem;
+    max-height: 2rem;
+    overflow: hidden;
     &:hover {
       border: 1px solid ${themeVal('color.baseAlphaE')};
     }
@@ -161,7 +175,7 @@ function SessionOutputControl(props) {
         Help
       </Button>
       <DropdownTrigger
-        variation='base-raised-light'
+        variation='primary-raised-light'
         useIcon={['download', 'before']}
         title='Export map'
         className='user-options-trigger'

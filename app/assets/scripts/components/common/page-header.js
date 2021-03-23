@@ -24,6 +24,7 @@ const PageHead = styled.header`
   z-index: 20;
   padding: ${multiply(themeVal('layout.space'), 0.625)} 0;
   max-width: 100vw;
+  max-height: 3.5rem;
   overflow: hidden;
 `;
 
