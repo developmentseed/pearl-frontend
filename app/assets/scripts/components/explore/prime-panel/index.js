@@ -39,6 +39,7 @@ import InfoButton from '../../common/info-button';
 import { availableLayers } from '../sample-data';
 import { formatThousands } from '../../../utils/format';
 import { AuthContext } from '../../../context/auth';
+import { CheckpointContext } from '../../../context/checkpoint';
 
 const PlaceholderPanelSection = styled.div`
   padding: ${glsp()};
@@ -240,8 +241,11 @@ function PrimePanel() {
     aoiArea,
     apiLimits,
     runInference,
+    retrain,
     predictions,
   } = useContext(ExploreContext);
+
+  const { currentCheckpoint } = useContext(CheckpointContext);
 
   const { modelsList, mosaicList } = useContext(GlobalContext);
 
@@ -412,12 +416,16 @@ function PrimePanel() {
                 style={{
                   gridColumn: '1 / -1',
                 }}
-                onClick={() => allowInferenceRun && runInference()}
+                onClick={() => {
+                  allowInferenceRun && !currentCheckpoint
+                    ? runInference()
+                    : retrain();
+                }}
                 visuallyDisabled={!allowInferenceRun}
                 info={applyTooltip}
                 id='apply-button-trigger'
               >
-                Run Model
+                {!currentCheckpoint ? 'Run Model' : 'Retrain'}
               </InfoButton>
             </PanelControls>
           </StyledPanelBlock>

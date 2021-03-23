@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useReducer } from 'react';
 import styled from 'styled-components';
-import T from 'prop-types';
 import { Button } from '@devseed-ui/button';
 import CardList, { Card } from '../../common/card-list';
 import {
@@ -228,5 +227,4 @@ function Projects() {
   );
 }
 
-Projects.propTypes = {};
 export default Projects;

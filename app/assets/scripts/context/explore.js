@@ -56,7 +56,9 @@ export function ExploreProvider(props) {
 
   const [viewMode, setViewMode] = useState(viewModes.BROWSE_MODE);
   const [selectedModel, setSelectedModel] = useState(null);
-  const { dispatchCurrentCheckpoint } = useContext(CheckpointContext);
+  const { currentCheckpoint, dispatchCurrentCheckpoint } = useContext(
+    CheckpointContext
+  );
 
   const previousViewMode = usePrevious(viewMode);
   const [predictions, dispatchPredictions] = useReducer(
@@ -257,6 +259,18 @@ export function ExploreProvider(props) {
     }
   }
 
+  async function retrain() {
+    websocketClient.send(
+      JSON.stringify({
+        action: 'model#retrain',
+        data: {
+          name: 'a name',
+          classes: Object.values(currentCheckpoint.classes),
+        },
+      })
+    );
+  }
+
   useEffect(() => {
     if (!aoiRef) {
       setAoiArea(null);
@@ -292,6 +306,7 @@ export function ExploreProvider(props) {
         updateProjectName,
 
         runInference,
+        retrain,
       }}
     >
       {props.children}

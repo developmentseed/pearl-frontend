@@ -34,7 +34,7 @@ function checkpointReducer(state, action) {
   switch (action.type) {
     case actions.SET_CHECKPOINT:
       return {
-        activeClass: Object.keys(action.data.classes)[0],
+        activeClass: action.data.classes[0].name,
         classes: action.data.classes.reduce((acc, c) => {
           acc[c.name] = {
             ...c,
