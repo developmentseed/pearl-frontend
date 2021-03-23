@@ -16,7 +16,7 @@ import { themeVal, media, glsp } from '@devseed-ui/theme-provider';
 import GlobalContext from '../../context/global';
 import { StyledLink } from '../../styles/links';
 import config from '../../config';
-const { baseUrl } = config;
+const { environment, baseUrl } = config;
 
 const HomeBody = styled(InpageBody)`
   display: flex;
@@ -87,7 +87,6 @@ const StatusSection = styled.section`
   display: flex;
   justify-content: space-between;
   font-size: 0.875rem;
-  opacity: 0.64;
   margin: ${glsp(1.5)} ${glsp()};
   > * {
     margin-right: ${glsp()};
@@ -144,10 +143,12 @@ function Home() {
             </Button>
           </HomeCTA>
         </HomeIntro>
-        <StatusSection>
-          <strong>Status </strong>
-          <p>API: {renderRestApiHealth(restApiHealth)}</p>
-        </StatusSection>
+        {environment !== 'production' && (
+          <StatusSection>
+            <strong>Status </strong>
+            <p>API: {renderRestApiHealth(restApiHealth)}</p>
+          </StatusSection>
+        )}
       </HomeBody>
     </App>
   );
