@@ -247,8 +247,12 @@ function Map() {
 
         {predictions &&
           !predictions.error &&
-          predictions.data.map((p) => (
-            <ImageOverlay key={p.key} url={p.image} bounds={p.bounds} />
+          predictions.data.slice(0, 1).map((p) => (
+            <ImageOverlay key={p.key} url={p.image} bounds={p.bounds} interactive={true}
+              eventHandlers={{
+                mouseover: v => console.log(v)
+              }}
+            />
           ))}
         <FeatureGroup>
           <GeoCoder />
