@@ -235,7 +235,6 @@ function PrimePanel() {
     currentProject,
     selectedModel,
     setSelectedModel,
-    availableClasses,
     aoiRef,
     setAoiRef,
     aoiArea,
@@ -252,9 +251,9 @@ function PrimePanel() {
 
   const { models } = modelsList.isReady() && modelsList.getData();
 
-  // Enable/disable "Run Inference" button
+  // Check if AOI and selected model are defined, and if view mode is runnable
   const allowInferenceRun =
-    viewMode === viewModes.BROWSE_MODE &&
+    [viewModes.BROWSE_MODE, viewModes.ADD_CLASS_SAMPLES].includes(viewMode) &&
     aoiRef &&
     aoiArea > 0 &&
     selectedModel;
@@ -351,7 +350,6 @@ function PrimePanel() {
                   name='retrain model'
                   tabId='retrain-tab-trigger'
                   placeholderMessage={retrainPlaceHolderMessage()}
-                  classList={availableClasses}
                 />
                 <PlaceholderPanelSection
                   name='Refine Results'
