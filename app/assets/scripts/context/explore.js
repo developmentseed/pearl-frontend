@@ -114,7 +114,7 @@ export function ExploreProvider(props) {
           const aois = await restApiClient.get(`project/${project.id}/aoi`);
           setAoiList(aois.aois);
           if (aois.total > 0) {
-            const latest = aois.aois.pop();
+            const latest = aois.aois.lastItem;
             loadAoi(project, latest.id);
           }
         } catch (error) {
@@ -190,11 +190,20 @@ export function ExploreProvider(props) {
     ];
 
     if (aoiRef) {
+      // loading an aoi
       aoiRef.setBounds(bounds);
+      setAoiBounds(aoiRef.getBounds());
+      reverseGeoCode([lonMin, latMin, lonMax, latMax]).then((name) =>
+        setAoiName(name)
+      );
     } else {
+      // initializing map with first aoi
       setAoiInitializer(bounds);
-      reverseGeoCode([lonMin, latMin, lonMax, latMax]);
+      reverseGeoCode([lonMin, latMin, lonMax, latMax]).then((name) =>
+        setAoiName(name)
+      );
     }
+    return bounds;
   }
   async function updateProjectName(projectName) {
     if (restApiClient) {
@@ -265,9 +274,12 @@ export function ExploreProvider(props) {
     if (address && address.resourceSets[0].estimatedTotal) {
       // Use first result if there are any
       name = address.resourceSets[0].resources[0].address.locality;
+    } else {
+      toasts.warn('AOI not geocodable, generic name used');
+      name = 'Non-geocodable aoi';
     }
     // else leave name undefined, should be set by user
-    setAoiName(name);
+    return name;
   }
 
   async function runInference() {
@@ -357,7 +369,7 @@ export function ExploreProvider(props) {
       aoiBounds.getEast(),
       aoiBounds.getNorth(),
     ];
-    reverseGeoCode(bounds);
+    reverseGeoCode(bounds).then((name) => setAoiName(name));
   }, [aoiBounds]);
 
   return (

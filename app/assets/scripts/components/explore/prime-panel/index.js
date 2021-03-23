@@ -16,7 +16,12 @@ import SelectModal from '../../common/select-modal';
 import { Card } from '../../common/card-list';
 import { PlaceholderMessage } from '../../../styles/placeholder.js';
 
-import { Dropdown, DropdownBody, DropdownItem } from '../../../styles/dropdown';
+import {
+  Dropdown,
+  DropdownHeader,
+  DropdownBody,
+  DropdownItem,
+} from '../../../styles/dropdown';
 
 import { ExploreContext, viewModes } from '../../../context/explore';
 import { MapContext } from '../../../context/map';
@@ -26,7 +31,7 @@ import TabbedBlock from '../../common/tabbed-block-body';
 import RetrainModel from './retrain-model';
 
 import LayersPanel from '../layers-panel';
-
+import { BOUNDS_PADDING } from '../../common/map/constants';
 import {
   HeadOption,
   HeadOptionHeadline,
@@ -174,12 +179,15 @@ function PrimePanel() {
                   }
                 >
                   <>
+                    <DropdownHeader>Saved AOIs</DropdownHeader>
                     <DropdownBody>
                       {aoiList.map((a) => (
                         <DropdownItem
                           key={a.id}
                           onClick={() => {
-                            loadAoi(currentProject, a.id);
+                            loadAoi(currentProject, a.id).then((bounds) =>
+                              map.fitBounds(bounds, { padding: BOUNDS_PADDING })
+                            );
                           }}
                         >
                           {`${a.name}`}
