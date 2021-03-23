@@ -67,7 +67,7 @@ const HeadingInput = styled(FormInput)`
 `;
 
 function SessionOutputControl(props) {
-  const { status, projectName, openHelp } = props;
+  const { status, projectName, openHelp, isMediumDown } = props;
 
   const { isAuthenticated } = useContext(AuthContext);
 
@@ -171,6 +171,7 @@ function SessionOutputControl(props) {
         size='small'
         useIcon='circle-question'
         onClick={openHelp}
+        hideText={isMediumDown}
       >
         Help
       </Button>
@@ -182,6 +183,7 @@ function SessionOutputControl(props) {
         size='medium'
         {...props}
         disabled={!isAuthenticated}
+        hideText={isMediumDown}
       >
         Export
       </DropdownTrigger>
@@ -194,6 +196,7 @@ SessionOutputControl.propTypes = {
   projectName: T.string,
   setProjectName: T.func,
   openHelp: T.func,
+  isMediumDown: T.bool,
 };
 
 export default SessionOutputControl;
