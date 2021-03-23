@@ -159,7 +159,7 @@ function Map() {
       },
       onDrawEnd: (bbox, shape) => {
         setAoiRef(shape);
-        setViewMode(viewModes.EDIT_AOI_MODE);
+        setViewMode(viewModes.BROWSE_MODE);
       },
     });
 
