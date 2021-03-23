@@ -19,6 +19,7 @@ import GlobalContext from './global';
 import predictionsReducer from '../reducers/predictions';
 import usePrevious from '../utils/use-previous';
 import tBbox from '@turf/bbox';
+import logger from '../utils/logger';
 
 /**
  * Explore View Modes
@@ -113,9 +114,7 @@ export function ExploreProvider(props) {
           } catch (error) {
             // If this request fails, let it fail silently.
             // But, we log an error to the console.
-
-            // eslint-disable-next-line no-console
-            console.log('Active instance check FAILED', error);
+            logger('Active instance check FAILED', error);
           }
 
           /* TODO
