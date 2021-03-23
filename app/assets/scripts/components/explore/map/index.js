@@ -182,8 +182,6 @@ function Map() {
     if (inRange(aoiArea, max_inference, Infinity) && aoiRef.status !== MAX) {
       aoiRef.setStyle({
         color: theme.main.color.danger,
-        weight: 5,
-        fillOpacity: 0,
       });
       aoiRef.status = MAX;
     } else if (
@@ -192,15 +190,11 @@ function Map() {
     ) {
       aoiRef.setStyle({
         color: theme.main.color.warning,
-        weight: 5,
-        fillOpacity: 0,
       });
       aoiRef.status = NO_LIVE;
     } else if (inRange(aoiArea, 0, live_inference) && aoiRef.status !== LIVE) {
       aoiRef.setStyle({
         color: theme.main.color.info,
-        weight: 5,
-        fillOpacity: 0,
       });
       aoiRef.status = LIVE;
     }

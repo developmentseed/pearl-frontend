@@ -53,7 +53,10 @@ class AoiDrawControl {
     function onMouseMove(event) {
       this._end = this.getEventLatLng(event);
       if (!this._shape) {
-        this._shape = L.rectangle([this._start, this._end]).addTo(this._map);
+        this._shape = L.rectangle([this._start, this._end], {
+          weight: 5,
+          fillOpacity: 0,
+        }).addTo(this._map);
         this.onDrawStart(this._shape);
       } else {
         this._shape.setBounds([this._start, this._end]);
