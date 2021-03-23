@@ -98,17 +98,24 @@ export function ExploreProvider(props) {
           const model = await restApiClient.getModel(project.model_id);
 
           setSelectedModel(model);
-
-          const activeInstances = await restApiClient.getActiveInstances(
-            projectId
-          );
-          if (activeInstances.total > 0) {
-            const instanceItem = activeInstances.instances[0];
-            const instance = await restApiClient.getInstance(
-              projectId,
-              instanceItem.id
+          try {
+            const activeInstances = await restApiClient.getActiveInstances(
+              projectId
             );
-            setCurrentInstance(instance);
+            if (activeInstances.total > 0) {
+              const instanceItem = activeInstances.instances[0];
+              const instance = await restApiClient.getInstance(
+                projectId,
+                instanceItem.id
+              );
+              setCurrentInstance(instance);
+            }
+          } catch (error) {
+            // If this request fails, let it fail silently.
+            // But, we log an error to the console.
+
+            // eslint-disable-next-line no-console
+            console.log('Active instance check FAILED', error);
           }
 
           /* TODO
