@@ -23,6 +23,8 @@ const PageHead = styled.header`
   position: sticky;
   z-index: 20;
   padding: ${multiply(themeVal('layout.space'), 0.625)} 0;
+  max-width: 100vw;
+  overflow: hidden;
 `;
 
 const PageHeadInner = styled.div`
