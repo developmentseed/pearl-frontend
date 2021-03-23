@@ -162,7 +162,7 @@ function Map() {
       },
       onDrawEnd: (bbox, shape) => {
         setAoiRef(shape);
-        setViewMode(viewModes.EDIT_AOI_MODE);
+        setViewMode(viewModes.BROWSE_MODE);
       },
     });
 
@@ -245,14 +245,10 @@ function Map() {
           ))}
 
         {predictions &&
-          !predictions.error &&
-          predictions.data.map((p) => (
-            <ImageOverlay
-              key={p.key}
-              url={p.image}
-              bounds={p.bounds}
-              interactive={true}
-            />
+          predictions.data &&
+          predictions.data.predictions &&
+          predictions.data.predictions.map((p) => (
+            <ImageOverlay key={p.key} url={p.image} bounds={p.bounds} />
           ))}
         <FeatureGroup>
           <GeoCoder />

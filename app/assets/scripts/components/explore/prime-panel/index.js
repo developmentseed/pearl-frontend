@@ -153,6 +153,21 @@ function PrimePanel() {
       </>
     );
   };
+  // Retrain Panel Tab Empty State message
+  //
+  const retrainPlaceHolderMessage = () => {
+    if (predictions.isReady()) {
+      // If predictions are ready, do not need a placeholder
+      return null;
+    }
+    if (aoiRef && selectedModel) {
+      return `Click the "Run Model" button to generate the class LULC map for your AOI`;
+    } else if (aoiRef && !selectedModel) {
+      return `Select a model to use for inference`;
+    } else {
+      return `Define an Area of Interest to run models at your selected location`;
+    }
+  };
 
   return (
     <>
@@ -254,23 +269,12 @@ function PrimePanel() {
             </PanelBlockHeader>
             <PanelBlockBody>
               <TabbedBlock>
-                {predictions && !predictions.error && predictions.fetched ? (
-                  <RetrainModel
-                    name='retrain model'
-                    tabId='retrain-tab-trigger'
-                    classList={availableClasses}
-                  />
-                ) : (
-                  <PlaceholderPanelSection
-                    name='Retrain Model'
-                    tabId='retrain-tab-trigger'
-                  >
-                    <PlaceholderMessage>
-                      Click &quot;Run Inference&quot; to generate the class LULC
-                      map for your AOI
-                    </PlaceholderMessage>
-                  </PlaceholderPanelSection>
-                )}
+                <RetrainModel
+                  name='retrain model'
+                  tabId='retrain-tab-trigger'
+                  placeholderMessage={retrainPlaceHolderMessage()}
+                  classList={availableClasses}
+                />
                 <PlaceholderPanelSection
                   name='Refine Results'
                   tabId='refine-tab-trigger'

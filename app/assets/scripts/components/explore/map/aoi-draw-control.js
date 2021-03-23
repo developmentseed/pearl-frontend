@@ -53,7 +53,10 @@ class AoiDrawControl {
     function onMouseMove(event) {
       this._end = this.getEventLatLng(event);
       if (!this._shape) {
-        this._shape = L.rectangle([this._start, this._end]).addTo(this._map);
+        this._shape = L.rectangle([this._start, this._end], {
+          weight: 4,
+          fillOpacity: 0.4,
+        }).addTo(this._map);
         this.onDrawStart(this._shape);
       } else {
         this._shape.setBounds([this._start, this._end]);
@@ -67,6 +70,7 @@ class AoiDrawControl {
     function onMouseUp() {
       // Turn off the mousemove handler in all cases
       // on the mouseUp action
+      this._shape.setStyle({ fillOpacity: 0 });
       this._map.off('mousemove', onMouseMove, this);
 
       // We need to enable dragging to get the
