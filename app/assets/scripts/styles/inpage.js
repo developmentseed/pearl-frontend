@@ -4,7 +4,7 @@ import {
   visuallyHidden,
   truncated,
   themeVal,
-  multiply,
+  glsp,
   rgba,
 } from '@devseed-ui/theme-provider';
 import { headingAlt } from '@devseed-ui/typography';
@@ -44,10 +44,7 @@ export const InpageHeaderInner = styled.div`
   display: flex;
   flex-flow: row nowrap;
   align-items: flex-end;
-  padding: ${multiply(themeVal('layout.space'), 4)}
-    ${multiply(themeVal('layout.space'), 4)}
-    ${multiply(themeVal('layout.space'), 2)}
-    ${multiply(themeVal('layout.space'), 4)};
+  padding: ${glsp(4)} ${glsp(4)} ${glsp(2)};
   max-width: ${themeVal('layout.max')};
   margin: 0 auto;
 `;
@@ -66,7 +63,7 @@ export const InpageToolbar = styled.div`
   display: flex;
   flex-flow: row nowrap;
   align-items: center;
-  padding-left: ${multiply(themeVal('layout.space'), 2)};
+  padding-left: ${glsp(2)};
   margin-left: auto;
 `;
 
@@ -74,7 +71,7 @@ export const InpageTitleWrapper = styled.div`
   display: flex;
   flex-flow: row nowrap;
   min-width: 0;
-  margin-bottom: ${multiply(themeVal('layout.space'), 1.5)};
+  margin-bottom: ${glsp(1.5)};
 `;
 
 export const InpageTitle = styled.h1`
@@ -97,9 +94,8 @@ export const InpageBody = styled.div`
 `;
 
 export const InpageBodyInner = styled.div`
-  padding: 0 ${multiply(themeVal('layout.space'), 4)}
-    ${multiply(themeVal('layout.space'), 4)}
-    ${multiply(themeVal('layout.space'), 4)};
+  padding: ${glsp(4)};
+  padding-top: 0;
   max-width: ${themeVal('layout.max')};
   margin: 0 auto;
 `;
