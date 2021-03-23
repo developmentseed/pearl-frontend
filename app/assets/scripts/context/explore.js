@@ -6,6 +6,7 @@ import React, {
   useContext,
 } from 'react';
 import T from 'prop-types';
+import config from '../config';
 import { initialApiRequestState } from '../reducers/reduxeed';
 import { createApiMetaReducer, queryApiMeta } from '../reducers/api';
 import {
@@ -21,6 +22,7 @@ import usePrevious from '../utils/use-previous';
 import tBbox from '@turf/bbox';
 import { actions, CheckpointContext } from './checkpoint';
 import logger from '../utils/logger';
+import get from 'lodash.get';
 
 /**
  * Explore View Modes
@@ -289,10 +291,27 @@ export function ExploreProvider(props) {
       return;
     }
 
+    // Check if all classes have the minimum number of samples
+    const classes = Object.values(currentCheckpoint.classes);
+    for (let i = 0; i < classes.length; i++) {
+      const aClass = classes[i];
+      const sampleCount = get(aClass, 'geometry.coordinates.length', 0);
+      if (sampleCount < config.minSampleCount) {
+        toasts.error(
+          `A minimum of ${config.minSampleCount} samples is required for every class.`,
+          {
+            autoClose: 3000,
+          }
+        );
+        return;
+      }
+    }
+
+    // If check pass, retrain
     showGlobalLoadingMessage('Retraining...');
     websocketClient.requestRetrain({
       name: 'a name',
-      classes: Object.values(currentCheckpoint.classes),
+      classes,
     });
   }
 

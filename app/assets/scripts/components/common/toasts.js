@@ -36,6 +36,7 @@ export const ToastContainerCustom = () => (
 
 const defaultOptions = {
   autoClose: false,
+  hideProgressBar: true,
 };
 
 const toasts = {
