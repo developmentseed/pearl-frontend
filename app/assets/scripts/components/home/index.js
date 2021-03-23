@@ -122,13 +122,20 @@ function Home() {
             imagery (e.g. NAIP) hosted on Microsoft Azure.
           </Lead>
           <HomeCTA>
-            <Button size='xlarge' variation='achromic-glass'>
+            <Button
+              size='xlarge'
+              variation='achromic-glass'
+              to='/about'
+              title='Visit About page'
+            >
               Read More
             </Button>
             <Button
               useIcon={['chevron-right', 'after']}
               size='xlarge'
               variation='primary-raised-dark'
+              to='/project/new'
+              title='Start a new project'
             >
               Launch App
             </Button>
