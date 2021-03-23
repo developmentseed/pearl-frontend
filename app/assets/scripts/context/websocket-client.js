@@ -37,7 +37,6 @@ class WebsocketClient extends WebSocket {
           this.isConnected = false;
           break;
         case 'model#checkpoint':
-          console.log('received checkpoint');
           dispatchCurrentCheckpoint({
             type: checkpointActions.RECEIVE_METADATA,
             data: eventData.data,

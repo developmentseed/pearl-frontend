@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
 import T from 'prop-types';
+import get from 'lodash.get';
 import { Button } from '@devseed-ui/button';
 import styled, { css } from 'styled-components';
 import { glsp, themeVal } from '@devseed-ui/theme-provider';
@@ -109,7 +110,7 @@ function RetrainModel(props) {
             >
               <Thumbnail color={c.color} />
               <Heading size='xsmall'>
-                {c.name}
+                {c.name} ({get(c, 'geometry.coordinates.length', 0)} samples)
                 {currentCheckpoint.activeClass === c.name ? ' (Active)' : ''}
               </Heading>
 

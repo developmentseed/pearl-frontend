@@ -48,7 +48,6 @@ function checkpointReducer(state, action) {
         }, {}),
       };
     case actions.RECEIVE_METADATA:
-      console.log(action.data);
       return {
         ...state,
         ...action.data,
