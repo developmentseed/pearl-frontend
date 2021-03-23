@@ -257,6 +257,7 @@ export function ExploreProvider(props) {
       // Use first result if there are any
       name = address.resourceSets[0].resources[0].address.locality;
     }
+    console.log(name)
 
     // else leave name undefined, should be set by user
     setAoiName(name);
@@ -367,6 +368,7 @@ export function ExploreProvider(props) {
         setAoiRef,
         aoiArea,
         setAoiArea,
+        aoiName,
         aoiInitializer,
         aoiList,
 

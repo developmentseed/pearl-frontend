@@ -26,7 +26,7 @@ export const DropdownBody = styled.ul`
 `;
 export const DropdownItem = styled.a`
   display: grid;
-  grid-template-columns: min-content max-content;
+  grid-template-columns: max-content max-content;
   justify-items: start;
   padding: ${multiply(themeVal('layout.space'), 0.25)}
     ${themeVal('layout.space')};

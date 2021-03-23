@@ -1,7 +1,8 @@
 import React, { useState, useContext } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { themeVal, glsp } from '@devseed-ui/theme-provider';
 import { Button } from '@devseed-ui/button';
+import collecticon from '@devseed-ui/collecticons';
 import T from 'prop-types';
 import Panel from '../../common/panel';
 import {
@@ -20,12 +21,7 @@ import {
 } from '@devseed-ui/modal';
 import { PlaceholderMessage } from '../../../styles/placeholder.js';
 
-import {
-  Dropdown,
-  DropdownBody,
-  DropdownItem,
-  DropdownTrigger,
-} from '../../../styles/dropdown';
+import { Dropdown, DropdownBody, DropdownItem } from '../../../styles/dropdown';
 
 import { ExploreContext, viewModes } from '../../../context/explore';
 import { MapContext } from '../../../context/map';
@@ -56,6 +52,17 @@ const SubheadingStrong = styled.h3`
   color: ${themeVal('color.base')};
   font-size: 1.125rem;
   line-height: 1.5rem;
+
+  ${({ useIcon }) =>
+    useIcon &&
+    css`
+      display: grid;
+      grid-template-columns: max-content max-content;
+      grid-gap: 1rem;
+      &::after {
+        ${collecticon(useIcon)}
+      }
+    `}
 `;
 
 const StyledPanelBlock = styled(PanelBlock)`
@@ -247,17 +254,19 @@ function PrimePanel() {
     aoiRef,
     setAoiRef,
     aoiArea,
+    aoiName,
     loadAoi,
     aoiList,
     apiLimits,
     runInference,
     predictions,
-    aoiBounds, setAoiBounds
+    aoiBounds,
+    setAoiBounds,
   } = useContext(ExploreContext);
 
   const { modelsList, mosaicList } = useContext(GlobalContext);
 
-  const { map, mapLayers,  } = useContext(MapContext);
+  const { map, mapLayers } = useContext(MapContext);
 
   const [showSelectModelModal, setShowSelectModelModal] = useState(false);
 
@@ -275,6 +284,18 @@ function PrimePanel() {
     ? 'Run inference for this model'
     : 'Create project and run model';
 
+  const renderAoiHeader = () => {
+    if (aoiArea && aoiArea > 0 && viewMode === viewModes.EDIT_AOI_MODE) {
+      return `${formatThousands(aoiArea / 1e6)} km2`;
+    } else if (aoiName) {
+      return aoiName
+    } else if (viewMode === viewModes.CREATE_AOI_MODE) {
+      return 'Drag on map to select';
+    } else {
+      return 'None selected - Draw area on map';
+    }
+  };
+
   return (
     <>
       <Panel
@@ -290,13 +311,37 @@ function PrimePanel() {
                 <HeadOptionHeadline>
                   <Subheading>Selected Area </Subheading>
                 </HeadOptionHeadline>
-                <SubheadingStrong>
-                  {aoiArea && aoiArea > 0
-                    ? `${formatThousands(aoiArea / 1e6)} km2`
-                    : viewMode === viewModes.CREATE_AOI_MODE
-                    ? 'Drag on map to select'
-                    : 'None selected - Draw area on map'}
-                </SubheadingStrong>
+
+                <Dropdown
+                  alignment='left'
+                  direction='down'
+                  triggerElement={(props) => (
+                    <SubheadingStrong {...props} useIcon='chevron-down--small'>
+                      {/*aoiArea && aoiArea > 0
+                        ? `${formatThousands(aoiArea / 1e6)} km2`
+                        : viewMode === viewModes.CREATE_AOI_MODE
+                        ? 'Drag on map to select'
+                        : 'None selected - Draw area on map'*/}
+                      {renderAoiHeader()}
+                    </SubheadingStrong>
+                  )}
+                >
+                  <>
+                    <DropdownBody>
+                      {aoiList.map((a) => (
+                        <DropdownItem
+                          key={a.id}
+                          onClick={() => {
+                            loadAoi(currentProject, a.id);
+                          }}
+                        >
+                          {`${a.name}`}
+                        </DropdownItem>
+                      ))}
+                    </DropdownBody>
+                  </>
+                </Dropdown>
+
                 <HeadOptionToolbar>
                   <AoiEditButtons
                     setViewMode={setViewMode}
@@ -309,38 +354,6 @@ function PrimePanel() {
                     viewMode={viewMode}
                     apiLimits={apiLimits}
                   />
-                  <Dropdown
-                    alignment='right'
-                    direction='down'
-                    triggerElement={(props) => (
-                      <DropdownTrigger
-                        variation='primary-raised-light'
-                        useIcon='plus'
-                        title='Select aoi'
-                        className='user-options-trigger'
-                        size='medium'
-                        hideText
-                        {...props}
-                      >
-                        Select Aoi
-                      </DropdownTrigger>
-                    )}
-                  >
-                    <>
-                      <DropdownBody>
-                        {aoiList.map((a) => (
-                          <DropdownItem
-                            key={a.id}
-                            onClick={() => {
-                              loadAoi(currentProject, a.id);
-                            }}
-                          >
-                            {`${a.name} ${a.id} ${a.created}`}
-                          </DropdownItem>
-                        ))}
-                      </DropdownBody>
-                    </>
-                  </Dropdown>
                 </HeadOptionToolbar>
               </HeadOption>
 
