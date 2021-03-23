@@ -252,9 +252,6 @@ function Map() {
               url={p.image}
               bounds={p.bounds}
               interactive={true}
-              eventHandlers={{
-                mouseover: (v) => console.log(v),
-              }}
             />
           ))}
         <FeatureGroup>
