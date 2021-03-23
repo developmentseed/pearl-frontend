@@ -106,6 +106,18 @@ class WebsocketClient extends WebSocket {
     this.dispatchPredictions({ type: predictionsActions.START_PREDICTION });
   }
 
+  requestRetrain(data) {
+    this.dispatchPredictions({
+      type: predictionsActions.START_PREDICTION,
+    });
+    this.send(
+      JSON.stringify({
+        action: 'model#retrain',
+        data,
+      })
+    );
+  }
+
   /**
    * Send message to terminate
    * @param {String} name

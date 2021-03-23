@@ -261,15 +261,16 @@ export function ExploreProvider(props) {
   }
 
   async function retrain() {
-    websocketClient.send(
-      JSON.stringify({
-        action: 'model#retrain',
-        data: {
-          name: 'a name',
-          classes: Object.values(currentCheckpoint.classes),
-        },
-      })
-    );
+    if (!websocketClient) {
+      toasts.error('No instance available.');
+      return;
+    }
+
+    showGlobalLoadingMessage('Retraining...');
+    websocketClient.requestRetrain({
+      name: 'a name',
+      classes: Object.values(currentCheckpoint.classes),
+    });
   }
 
   useEffect(() => {
