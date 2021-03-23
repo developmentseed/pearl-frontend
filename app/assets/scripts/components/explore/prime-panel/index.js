@@ -21,6 +21,7 @@ import {
   DropdownHeader,
   DropdownBody,
   DropdownItem,
+  DropdownFooter
 } from '../../../styles/dropdown';
 
 import { ExploreContext, viewModes } from '../../../context/explore';
@@ -194,20 +195,33 @@ function PrimePanel() {
                   }
                 >
                   <>
-                    <DropdownHeader>Saved AOIs</DropdownHeader>
+                    <DropdownHeader unshaded
+
+                    >
+                      <Heading useAlt
+                      size='xsmall'
+                      >Available Areas of Interest</Heading>
+                    </DropdownHeader>
                     <DropdownBody>
                       {aoiList.map((a) => (
-                        <DropdownItem
-                          key={a.id}
-                          onClick={() => {
-                            loadAoi(currentProject, a).then((bounds) =>
-                              map.fitBounds(bounds, { padding: BOUNDS_PADDING })
-                            );
-                          }}
-                        >
-                          {`${a.name}`}
-                        </DropdownItem>
+                        <li>
+                          <DropdownItem
+                            key={a.id}
+                            onClick={() => {
+                              loadAoi(currentProject, a).then((bounds) =>
+                                map.fitBounds(bounds, {
+                                  padding: BOUNDS_PADDING,
+                                })
+                              );
+                            }}
+                          >
+                            {`${a.name}`}
+                          </DropdownItem>
+                        </li>
                       ))}
+                    </DropdownBody>
+                    <DropdownFooter
+                    >
                       <DropdownItem
                         muted
                         useIcon='plus'
@@ -220,7 +234,7 @@ function PrimePanel() {
                       >
                         Add AOI
                       </DropdownItem>
-                    </DropdownBody>
+                    </DropdownFooter>
                   </>
                 </Dropdown>
 

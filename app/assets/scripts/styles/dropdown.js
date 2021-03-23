@@ -5,6 +5,11 @@ import BaseDropdown from '@devseed-ui/dropdown';
 import InfoButton from '../components/common/info-button';
 
 export const DropdownHeader = styled.header`
+  ${({ unshaded }) =>
+    !unshaded &&
+    css`
+      background: ${themeVal('color.baseAlphaB')};
+    `}
   background: ${themeVal('color.baseAlphaB')};
   display: grid;
   padding: ${multiply(themeVal('layout.space'), 0.5)}
@@ -14,7 +19,6 @@ export const DropdownHeader = styled.header`
     font-size: ${multiply(themeVal('type.base.size'), 0.75)};
   }
   h1 {
-    font-size: ${themeVal('type.base.size')};
     margin: 0;
   }
 `;
