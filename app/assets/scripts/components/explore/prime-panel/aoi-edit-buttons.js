@@ -76,7 +76,6 @@ export function AoiEditButtons(props) {
                 map.aoi.control.edit.disable();
               }
 
-
               //Layer must be removed from the map
               map.aoi.control.draw.clear();
 
