@@ -21,6 +21,10 @@ import predictionsReducer, {
 } from '../reducers/predictions';
 import usePrevious from '../utils/use-previous';
 import tBbox from '@turf/bbox';
+import tBboxPolygon from '@turf/bbox-polygon';
+import tCentroid from '@turf/centroid';
+
+import config from '../config';
 
 /**
  * Explore View Modes
@@ -50,11 +54,16 @@ export function ExploreProvider(props) {
   // Float value that records square area of aoi
   const [aoiArea, setAoiArea] = useState(null);
 
+  const [aoiName, setAoiName] = useState(null);
+
   // Aoi shape that is requested from API. used to initialize
   // Leaflet layer in the front end
   // eslint-disable-next-line
   const [aoiInitializer, setAoiInitializer] = useState(null);
   const [aoiList, setAoiList] = useState([]);
+
+  //L.LatLngBounds object, set when aoi is confirmed
+  const [aoiBounds, setAoiBounds] = useState(null);
 
   const [viewMode, setViewMode] = useState(viewModes.BROWSE_MODE);
   const [selectedModel, setSelectedModel] = useState(null);
@@ -168,10 +177,13 @@ export function ExploreProvider(props) {
       [latMin, lonMin],
       [latMax, lonMax],
     ];
+
+
     if (aoiRef) {
       aoiRef.setBounds(bounds);
     } else {
       setAoiInitializer(bounds);
+      reverseGeoCode([lonMin, latMin, lonMax, latMax]);
     }
   }
   async function updateProjectName(projectName) {
@@ -201,6 +213,54 @@ export function ExploreProvider(props) {
         });
       }
     }
+  }
+
+  /*
+   * Reverse geocode using Bing
+   *
+   * @param bbox - should be turf bbox [minx, miny, maxX, maxY] or polygon feature
+   */
+  async function reverseGeoCode(bbox) {
+    /*
+    if (!aoiBounds) {
+      console.error('defined bounds before reverse geocoding')
+    }*/
+
+    let center;
+    if (Array.isArray(bbox)) {
+      // Need to create a polygon
+      center = tCentroid(tBboxPolygon(bbox));
+      console.log(center);
+    } else {
+      // ASsume a polygon feature is provided
+      center = tCentroid(bbox);
+    }
+
+    const [lon, lat] = center.geometry.coordinates;
+
+    const address = await fetch(
+      `${config.bingSearchUrl}/Locations/${lat},${lon}?radius=${config.reverseGeocodeRadius}&includeEntityTypes=address&key=${config.bingApiKey}`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    )
+      .then((res) => res.json())
+      .catch((err) => {
+        toasts.error('Error querying address');
+        console.error('Error reading address, err');
+        return null;
+      });
+
+    let name;
+    if (address && address.resourceSets[0].estimatedTotal) {
+      // Use first result if there are any
+      name = address.resourceSets[0].resources[0].address.locality;
+    }
+
+    // else leave name undefined, should be set by user
+    setAoiName(name);
   }
 
   async function runInference() {
@@ -235,6 +295,12 @@ export function ExploreProvider(props) {
         return; // abort inference run
       }
 
+      if (!aoiName) {
+        hideGlobalLoading();
+        toasts.error('AOI Name must be set before running inference');
+        return; // abort inference run
+      }
+
       // Request a new instance if none is available.
       if (!websocketClient) {
         try {
@@ -248,7 +314,7 @@ export function ExploreProvider(props) {
             token: instance.token,
             dispatchPredictions,
             onConnected: () =>
-              newWebsocketClient.requestPrediction('A name', aoiRef),
+              newWebsocketClient.requestPrediction(aoiName, aoiRef),
           });
 
           setWebsocketClient(newWebsocketClient);
@@ -260,7 +326,7 @@ export function ExploreProvider(props) {
         }
       } else {
         // Send message with existing websocket
-        websocketClient.requestPrediction('A name', aoiRef);
+        websocketClient.requestPrediction(aoiName, aoiRef);
       }
     }
   }
@@ -270,6 +336,22 @@ export function ExploreProvider(props) {
       setAoiArea(null);
     }
   }, [aoiRef]);
+
+  /*
+   * Reverse geocode when bounds change aka when AOI is confirmed
+   */
+  useEffect(() => {
+    if (!aoiBounds) {
+      return
+    }
+    const bounds = [
+      aoiBounds.getWest(),
+      aoiBounds.getSouth(),
+      aoiBounds.getEast(),
+      aoiBounds.getNorth(),
+    ];
+    reverseGeoCode(bounds);
+  }, [aoiBounds]);
 
   return (
     <ExploreContext.Provider
@@ -289,6 +371,9 @@ export function ExploreProvider(props) {
         aoiInitializer,
         aoiList,
 
+        aoiBounds,
+        setAoiBounds,
+
         loadAoi,
 
         currentInstance,
@@ -303,6 +388,7 @@ export function ExploreProvider(props) {
         updateProjectName,
         availableClasses,
         runInference,
+        reverseGeoCode,
       }}
     >
       {props.children}

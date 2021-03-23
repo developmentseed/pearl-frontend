@@ -252,11 +252,12 @@ function PrimePanel() {
     apiLimits,
     runInference,
     predictions,
+    aoiBounds, setAoiBounds
   } = useContext(ExploreContext);
 
   const { modelsList, mosaicList } = useContext(GlobalContext);
 
-  const { map, mapLayers, aoiBounds, setAoiBounds } = useContext(MapContext);
+  const { map, mapLayers,  } = useContext(MapContext);
 
   const [showSelectModelModal, setShowSelectModelModal] = useState(false);
 

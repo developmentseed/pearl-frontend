@@ -7,8 +7,6 @@ export function MapProvider(props) {
   const [map, setMap] = useState();
   const [mapLayers, setMapLayers] = useState({});
 
-  //L.LatLngBounds object, set when aoi is confirmed
-  const [aoiBounds, setAoiBounds] = useState(null);
 
   return (
     <MapContext.Provider
@@ -19,8 +17,6 @@ export function MapProvider(props) {
         mapLayers,
         setMapLayers,
 
-        aoiBounds,
-        setAoiBounds,
       }}
     >
       {props.children}

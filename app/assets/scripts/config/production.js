@@ -11,6 +11,8 @@ module.exports = {
     audience: 'https://api.lulc.ds.io',
     bingApiKey:
       'ArLmu8JG2PHK_-_zo7yS1WbvDz7PgsoVEgcqFTg8uaH-lsXLcjADCAtnyQB054uq',
+    bingSearchUrl: 'https://dev.virtualearth.net/REST/v1',
+    reverseGeocodeRadius: 1,
     tileUrlTemplate:
       'https://tiles.lulc.ds.io/mosaic/{LAYER_NAME}/tiles/{z}/{x}/{y}.png?bidx=1%2C2%2C3',
   },

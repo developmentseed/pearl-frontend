@@ -79,6 +79,7 @@ function Map() {
     aoiArea,
     setAoiArea,
     aoiInitializer,
+    setAoiBounds,
 
     setViewMode,
     viewMode,
@@ -86,9 +87,7 @@ function Map() {
     apiLimits,
   } = useContext(ExploreContext);
 
-  const { map, setMap, mapLayers, setMapLayers, setAoiBounds } = useContext(
-    MapContext
-  );
+  const { map, setMap, mapLayers, setMapLayers } = useContext(MapContext);
 
   const { mosaicList } = useContext(GlobalContext);
 
@@ -248,9 +247,13 @@ function Map() {
         {predictions &&
           !predictions.error &&
           predictions.data.slice(0, 1).map((p) => (
-            <ImageOverlay key={p.key} url={p.image} bounds={p.bounds} interactive={true}
+            <ImageOverlay
+              key={p.key}
+              url={p.image}
+              bounds={p.bounds}
+              interactive={true}
               eventHandlers={{
-                mouseover: v => console.log(v)
+                mouseover: (v) => console.log(v),
               }}
             />
           ))}
