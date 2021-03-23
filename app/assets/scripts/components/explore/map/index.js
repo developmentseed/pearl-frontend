@@ -246,14 +246,15 @@ function Map() {
 
         {predictions &&
           !predictions.error &&
-          predictions.data.slice(0, 1).map((p) => (
-            <ImageOverlay
-              key={p.key}
-              url={p.image}
-              bounds={p.bounds}
-              interactive={true}
-            />
-          ))}
+          predictions.data
+            .map((p) => (
+              <ImageOverlay
+                key={p.key}
+                url={p.image}
+                bounds={p.bounds}
+                interactive={true}
+              />
+            ))}
         <FeatureGroup>
           <GeoCoder />
           {aoiRef && <CenterMap aoiRef={aoiRef} />}

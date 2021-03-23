@@ -230,7 +230,6 @@ export function ExploreProvider(props) {
     if (Array.isArray(bbox)) {
       // Need to create a polygon
       center = tCentroid(tBboxPolygon(bbox));
-      console.log(center);
     } else {
       // ASsume a polygon feature is provided
       center = tCentroid(bbox);
