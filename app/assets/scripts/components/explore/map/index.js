@@ -259,7 +259,7 @@ function Map() {
               sampleClass.geometry.coordinates &&
               sampleClass.geometry.coordinates.map(([lat, lon]) => (
                 <Circle
-                  key={JSON.stringify(lat)}
+                  key={JSON.stringify([lat, lon])}
                   pathOptions={{
                     color: sampleClass.color,
                   }}

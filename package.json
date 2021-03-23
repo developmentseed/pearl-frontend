@@ -122,6 +122,8 @@
     "lodash.defaultsdeep": "^4.6.1",
     "lodash.get": "^4.4.2",
     "lodash.isequal": "^4.5.0",
+    "lodash.uniq": "^4.5.0",
+    "lodash.uniqwith": "^4.5.0",
     "polished": "^4.0.3",
     "prop-types": "^15.7.2",
     "react": "^17.0.1",

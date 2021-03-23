@@ -1,6 +1,7 @@
 import React, { createContext, useReducer } from 'react';
 import T from 'prop-types';
-
+import uniqWith from 'lodash.uniqwith';
+import isEqual from 'lodash.isequal';
 export const CheckpointContext = createContext({});
 
 export function CheckpointProvider(props) {
@@ -67,7 +68,10 @@ function checkpointReducer(state, action) {
         ...currentClass,
         geometry: {
           ...currentClass.geometry,
-          coordinates: currentClass.geometry.coordinates.concat([[lng, lat]]),
+          coordinates: uniqWith(
+            currentClass.geometry.coordinates.concat([[lng, lat]]),
+            isEqual
+          ),
         },
       };
 
