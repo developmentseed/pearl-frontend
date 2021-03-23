@@ -124,7 +124,9 @@ function AoiEditButtons(props) {
               map.aoi.control.draw.disable();
 
               //Edit mode is enabled as soon as draw is done
-              map.aoi.control.edit.disable();
+              if (map.aoi.control.edit._shape) {
+                map.aoi.control.edit.disable();
+              }
 
               //Layer must be removed from the map
               map.aoi.control.draw.clear();
