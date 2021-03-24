@@ -4,6 +4,7 @@ export const actions = {
   RECEIVE_PREDICTION: 'RECEIVE_PREDICTION',
   COMPLETE_PREDICTION: 'COMPLETE_PREDICTION',
   FAILED_PREDICTION: 'FAILED_PREDICTION',
+  CLEAR_PREDICTION: 'CLEAR_PREDICTION'
 };
 
 function wrapApiResult(stateData) {
@@ -12,10 +13,7 @@ function wrapApiResult(stateData) {
   return {
     ...stateData,
     raw: () => stateData,
-    isReady: (log) => {
-      //ready
-      if (log)
-        console.log(fetched, fetching, ready)
+    isReady: () => {
       return ready
     },
     hasError: () => ready && !!error,
@@ -66,8 +64,6 @@ export default function (state, action) {
       });
     }
     case actions.COMPLETE_PREDICTION:
-      console.log('COMPLETE')
-      console.log(state)
 
       return wrapApiResult({
         ...state,
@@ -75,8 +71,12 @@ export default function (state, action) {
         fetching: false,
         fetched: true,
       });
+    case actions.CLEAR_PREDICTION:
+      console.log('CLEAR')
+      return wrapApiResult({
+        ...initialApiRequestState,
+      })
     case actions.FAILED_PREDICTION:
-      console.log('FAIL')
       return wrapApiResult({
         ...state,
         fetching: false,

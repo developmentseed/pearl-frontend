@@ -17,7 +17,9 @@ import toasts from '../components/common/toasts';
 import { useHistory, useParams } from 'react-router-dom';
 import WebsocketClient from './websocket-client';
 import GlobalContext from './global';
-import predictionsReducer from '../reducers/predictions';
+import predictionsReducer, {
+  actions as predictionActions,
+} from '../reducers/predictions';
 import usePrevious from '../utils/use-previous';
 import tBbox from '@turf/bbox';
 import tBboxPolygon from '@turf/bbox-polygon';
@@ -181,7 +183,7 @@ export function ExploreProvider(props) {
           `Receiving images: ${processed} of ${total}...`
         );
       }
-    } else if (predictions.isReady()){
+    } else if (predictions.isReady()) {
       hideGlobalLoading();
 
       // Update aoi List with newest aoi
@@ -193,7 +195,6 @@ export function ExploreProvider(props) {
         });
       }
 
-
       if (predictions.error) {
         toasts.error('An inference error occurred, please try again later.');
       } else {
@@ -203,10 +204,13 @@ export function ExploreProvider(props) {
   }, [predictions, restApiClient, currentProject]);
 
   useEffect(() => {
-    console.log(viewMode)
-    return () => console.log(viewMode)
-  }, [viewMode])
-
+    if (predictions.isReady()) {
+      if (viewMode === viewModes.BROWSE_MODE &&
+        previousViewMode === viewModes.EDIT_AOI_MODE) {
+        dispatchPredictions({type: predictionActions.CLEAR_PREDICTION})
+      }
+    }
+  }, [viewMode, previousViewMode, predictions]);
 
   /*
    * Re-init aoi state variables
@@ -217,6 +221,16 @@ export function ExploreProvider(props) {
     setAoiBounds(null);
     setAoiArea(null);
     setAoiName(null);
+
+    //clear inference tiles
+    dispatchCurrentCheckpoint({
+      type: actions.RESET_CHECKPOINT,
+    });
+
+    //clear inference tiles
+    dispatchPredictions({
+      type: predictionActions.CLEAR_PREDICTION,
+    });
   }
 
   /*

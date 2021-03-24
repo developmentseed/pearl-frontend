@@ -234,10 +234,6 @@ function PrimePanel() {
                           //Layer must be removed from the map
                           map.aoi.control.draw.clear();
 
-                          //clear inference tiles
-                          dispatchCurrentCheckpoint({
-                            type: actions.RESET_CHECKPOINT
-                          })
                         }}
                         data-cy='add-aoi-button'
                       >
