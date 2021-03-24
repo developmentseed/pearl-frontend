@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, { useContext } from 'react';
 import T from 'prop-types';
+import get from 'lodash.get';
 import { Button } from '@devseed-ui/button';
 import styled, { css } from 'styled-components';
 import { glsp, themeVal } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
 import collecticon from '@devseed-ui/collecticons';
 import { PlaceholderMessage } from '../../../styles/placeholder.js';
+import { CheckpointContext, actions } from '../../../context/checkpoint.js';
 
 const ClassList = styled.div`
   display: grid;
@@ -83,30 +85,42 @@ const Wrapper = styled.div`
 `;
 
 function RetrainModel(props) {
-  const { classList, className, placeholderMessage } = props;
-  const [selectedClass, setSelectedClass] = useState({});
+  const { className, placeholderMessage } = props;
+
+  const { currentCheckpoint, dispatchCurrentCheckpoint } = useContext(
+    CheckpointContext
+  );
+
   return (
     <Wrapper className={className}>
       <Heading useAlt>Classes</Heading>
       <ClassList>
-        {classList &&
-          classList.map((c) => (
+        {currentCheckpoint &&
+          currentCheckpoint.classes &&
+          Object.values(currentCheckpoint.classes).map((c) => (
             <Class
               key={c.name}
               onClick={() => {
-                setSelectedClass(c);
+                dispatchCurrentCheckpoint({
+                  type: actions.SET_ACTIVE_CLASS,
+                  data: c.name,
+                });
               }}
-              selected={c.name === selectedClass.name}
+              selected={currentCheckpoint.activeClass === c.name}
             >
               <Thumbnail color={c.color} />
-              <Heading size='xsmall'>{c.name}</Heading>
+              <Heading size='xsmall'>
+                {c.name} ({get(c, 'geometry.coordinates.length', 0)} samples)
+                {currentCheckpoint.activeClass === c.name ? ' (Active)' : ''}
+              </Heading>
 
               <Button useIcon='cog' hideText variation='base-plain'>
                 Options
               </Button>
             </Class>
           ))}
-        {!classList && placeholderMessage && (
+
+        {!currentCheckpoint && placeholderMessage && (
           <>
             {[1, 2, 3].map((i) => (
               // +true workaround
@@ -127,7 +141,7 @@ function RetrainModel(props) {
           </>
         )}
       </ClassList>
-      {classList && (
+      {currentCheckpoint && (
         <Class className='add__class' muted as={Button}>
           <Thumbnail useIcon='plus' outline />
           <Heading size='xsmall'>Add Class</Heading>
@@ -138,7 +152,6 @@ function RetrainModel(props) {
 }
 
 RetrainModel.propTypes = {
-  classList: T.array,
   className: T.string,
   placeholderMessage: T.string,
 };

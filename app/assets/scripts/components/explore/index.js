@@ -9,22 +9,25 @@ import GlobalContext from '../../context/global';
 
 import SessionTimeoutModal from '../common/timeout-modal';
 import SessionOutputControl from './session-output-control';
+import { CheckpointProvider } from '../../context/checkpoint';
 
 function Explore() {
   const { setTourStep } = useContext(GlobalContext);
   return (
     <App pageTitle='Explore'>
-      <ExploreProvider>
-        <MapProvider>
-          <PageHeader>
-            <SessionOutputControl openHelp={() => setTourStep(0)} />
-          </PageHeader>
-          <PageBody role='main'>
-            <ExploreComponent />
-          </PageBody>
-          <SessionTimeoutModal revealed={false} />
-        </MapProvider>
-      </ExploreProvider>
+      <CheckpointProvider>
+        <ExploreProvider>
+          <MapProvider>
+            <PageHeader>
+              <SessionOutputControl openHelp={() => setTourStep(0)} />
+            </PageHeader>
+            <PageBody role='main'>
+              <ExploreComponent />
+            </PageBody>
+            <SessionTimeoutModal revealed={false} />
+          </MapProvider>
+        </ExploreProvider>
+      </CheckpointProvider>
     </App>
   );
 }

@@ -8,6 +8,7 @@ import {
   TileLayer,
   FeatureGroup,
   ImageOverlay,
+  Circle,
 } from 'react-leaflet';
 import GlobalContext from '../../../context/global';
 import { ExploreContext, viewModes } from '../../../context/explore';
@@ -18,17 +19,14 @@ import CenterMap from '../../common/map/center-map';
 
 import { themeVal, multiply } from '@devseed-ui/theme-provider';
 import theme from '../../../styles/theme';
-import FreeDraw, { ALL } from 'leaflet-freedraw';
 import AoiDrawControl from './aoi-draw-control';
 import AoiEditControl from './aoi-edit-control';
 import config from '../../../config';
 import { inRange } from '../../../utils/utils';
+import { CheckpointContext, actions } from '../../../context/checkpoint';
 
 const center = [38.83428180092151, -79.37724530696869];
 const zoom = 15;
-const freeDraw = new FreeDraw({
-  mode: ALL,
-});
 
 const MAX = 3;
 const NO_LIVE = 2;
@@ -89,15 +87,21 @@ function Map() {
   );
 
   const { mosaicList } = useContext(GlobalContext);
+  const { currentCheckpoint, dispatchCurrentCheckpoint } = useContext(
+    CheckpointContext
+  );
 
   const { mosaics } = mosaicList.isReady() ? mosaicList.getData() : {};
 
+  function addClassSample(e) {
+    dispatchCurrentCheckpoint({
+      type: actions.ADD_POINT_SAMPLE,
+      data: e.latlng,
+    });
+  }
+
   useEffect(() => {
     if (!map) return;
-
-    if (previousViewMode === viewModes.EDIT_CLASS_MODE) {
-      map.removeLayer(freeDraw);
-    }
 
     switch (viewMode) {
       case viewModes.CREATE_AOI_MODE:
@@ -125,8 +129,8 @@ function Map() {
           }
         }
         break;
-      case viewModes.EDIT_CLASS_MODE:
-        map.addLayer(freeDraw);
+      case viewModes.ADD_CLASS_SAMPLES:
+        map.on('click', addClassSample);
         break;
       default:
         break;
@@ -221,7 +225,6 @@ function Map() {
           url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
           maxZoom={18}
         />
-
         {mosaics &&
           mosaics.map((layer) => (
             <TileLayer
@@ -247,13 +250,44 @@ function Map() {
           predictions.data.predictions.map((p) => (
             <ImageOverlay key={p.key} url={p.image} bounds={p.bounds} />
           ))}
+
+        {currentCheckpoint &&
+          currentCheckpoint.classes &&
+          Object.values(currentCheckpoint.classes).map(
+            (sampleClass) =>
+              sampleClass.geometry &&
+              sampleClass.geometry.coordinates &&
+              sampleClass.geometry.coordinates.map(([lat, lng]) => (
+                <Circle
+                  key={JSON.stringify([lat, lng])}
+                  pathOptions={{
+                    color: sampleClass.color,
+                  }}
+                  eventHandlers={{
+                    click: (e) => {
+                      e.originalEvent.preventDefault();
+                      dispatchCurrentCheckpoint({
+                        type: actions.REMOVE_POINT_SAMPLE,
+                        data: {
+                          className: sampleClass.name,
+                          lat,
+                          lng,
+                        },
+                      });
+                    },
+                  }}
+                  center={[lng, lat]}
+                  radius={10}
+                />
+              ))
+          )}
         <FeatureGroup>
           <GeoCoder />
           {aoiRef && <CenterMap aoiRef={aoiRef} />}
         </FeatureGroup>
       </MapContainer>
     ),
-    [viewMode, apiLimits, mosaics, predictions] // eslint-disable-line react-hooks/exhaustive-deps
+    [viewMode, apiLimits, mosaics, predictions, currentCheckpoint] // eslint-disable-line react-hooks/exhaustive-deps
   );
 
   return (
