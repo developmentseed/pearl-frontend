@@ -1,9 +1,6 @@
 import { useMapEvent } from 'react-leaflet';
-export default function ModalMapEvents(props) {
-  const { events }  = props;
-
-  Object.entries(events).forEach(([event, func]) => {
-    const map = useMapEvent(event, func);
-  });
+export default function ModalMapEvent(props) {
+  const { event, func}  = props;
+  useMapEvent(event, func);
   return null;
 }

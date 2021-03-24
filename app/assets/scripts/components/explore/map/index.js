@@ -25,7 +25,7 @@ import AoiEditControl from './aoi-edit-control';
 import config from '../../../config';
 import { inRange } from '../../../utils/utils';
 import { CheckpointContext, actions } from '../../../context/checkpoint';
-import ModalMapEvents from './modal-events';
+import ModalMapEvent from './modal-events';
 
 const center = [38.83428180092151, -79.37724530696869];
 const zoom = 15;
@@ -97,13 +97,13 @@ function Map() {
 
   const addClassSample = (e) => {
     if (viewMode !== viewModes.ADD_CLASS_SAMPLES) {
-      return
+      return;
     }
     dispatchCurrentCheckpoint({
       type: actions.ADD_POINT_SAMPLE,
       data: e.latlng,
     });
-  }
+  };
 
   useEffect(() => {
     if (!map) return;
@@ -227,15 +227,9 @@ function Map() {
           }
         }}
       >
-        <ModalMapEvents
-          events={{
-            click: (e) => {
-              if (viewMode === viewModes.ADD_CLASS_SAMPLES) {
-                addClassSample(e)
-              }
-            }
-          }}
-        />
+        {viewMode === viewModes.ADD_CLASS_SAMPLES && (
+          <ModalMapEvent event='click' func={addClassSample} />
+        )}
         <TileLayer
           attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
           url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
