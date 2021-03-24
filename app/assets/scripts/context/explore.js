@@ -164,9 +164,12 @@ export function ExploreProvider(props) {
   }, [apiMeta]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (!predictions) return;
+    console.log(predictions.fetched)
+
+    //if (!predictions.isReady()) return;
 
     if (predictions.fetching) {
+      console.log('fetchign')
       const { processed, total } = predictions;
       if (!total) {
         showGlobalLoadingMessage(`Waiting for predictions...`);
@@ -176,14 +179,22 @@ export function ExploreProvider(props) {
         );
       }
     } else {
+      console.log('not fetching')
       hideGlobalLoading();
       if (predictions.error) {
         toasts.error('An inference error occurred, please try again later.');
       } else {
         setViewMode(viewModes.ADD_CLASS_SAMPLES);
+        loadMetrics()
       }
     }
-  }, [predictions]);
+  }, [predictions, currentCheckpoint]);
+
+  async function loadMetrics() {
+    console.log(restApiClient)
+    console.log(currentCheckpoint)
+
+  }
 
   async function updateProjectName(projectName) {
     if (restApiClient) {
@@ -268,8 +279,10 @@ export function ExploreProvider(props) {
             token: instance.token,
             dispatchPredictions,
             dispatchCurrentCheckpoint,
-            onConnected: () =>
-              newWebsocketClient.requestPrediction('A name', aoiRef),
+            onConnected: () => {
+              hideGlobalLoading()
+              newWebsocketClient.requestPrediction('A name', aoiRef)
+            }
           });
           setWebsocketClient(newWebsocketClient);
         } catch (error) {

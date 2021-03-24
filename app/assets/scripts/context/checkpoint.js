@@ -50,6 +50,9 @@ function checkpointReducer(state, action) {
           return acc;
         }, {}),
       };
+    case actions.RECEIVE_METRICS:
+      console.log(state, action)
+      return state
     case actions.RECEIVE_METADATA:
       return {
         ...state,
