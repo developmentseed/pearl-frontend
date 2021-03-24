@@ -44,10 +44,6 @@ export function ExploreProvider(props) {
   const [currentProject, setCurrentProject] = useState(null);
   const [checkpointList, setCheckpointList] = useState(null);
 
-  // Selected checkpoint is a checkpoint object
-  // Should contain a name and id when set
-  const [selectedCheckpoint, setSelectedCheckpoint] = useState(null);
-
   // Reference to Leaflet Rectangle layer created by
   // AOI draw control
   const [aoiRef, setAoiRef] = useState(null);
@@ -329,8 +325,6 @@ export function ExploreProvider(props) {
         setCurrentProject,
 
         checkpointList,
-        selectedCheckpoint,
-        setSelectedCheckpoint,
 
         selectedModel,
         setSelectedModel,

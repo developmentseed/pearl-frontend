@@ -44,7 +44,7 @@ import InfoButton from '../../common/info-button';
 import { availableLayers } from '../sample-data';
 import { formatThousands } from '../../../utils/format';
 import { AuthContext } from '../../../context/auth';
-import { CheckpointContext } from '../../../context/checkpoint';
+import { useCheckpoint } from '../../../context/checkpoint';
 
 const PlaceholderPanelSection = styled.div`
   padding: ${glsp()};
@@ -243,8 +243,6 @@ function PrimePanel() {
     setViewMode,
     currentProject,
     checkpointList,
-    selectedCheckpoint,
-    setSelectedCheckpoint,
     selectedModel,
     setSelectedModel,
     aoiRef,
@@ -256,7 +254,7 @@ function PrimePanel() {
     predictions,
   } = useContext(ExploreContext);
 
-  const { currentCheckpoint } = useContext(CheckpointContext);
+  const { currentCheckpoint, fetchCurrentCheckpoint } = useCheckpoint();
 
   const { modelsList, mosaicList } = useContext(GlobalContext);
 
@@ -365,8 +363,8 @@ function PrimePanel() {
                 </HeadOptionHeadline>
                 <SubheadingStrong>
                   {checkpointList
-                    ? selectedCheckpoint
-                      ? selectedCheckpoint.name
+                    ? currentCheckpoint
+                      ? currentCheckpoint.name
                       : 'No checkpoint selected'
                     : 'No checkpoints available'}
                 </SubheadingStrong>
@@ -403,9 +401,14 @@ function PrimePanel() {
                               key={ckpt.id}
                               checked={
                                 ckpt.id ==
-                                (selectedCheckpoint && selectedCheckpoint.id)
+                                (currentCheckpoint && currentCheckpoint.id)
                               }
-                              onClick={() => setSelectedCheckpoint(ckpt)}
+                              onClick={() =>
+                                fetchCurrentCheckpoint(
+                                  currentProject.id,
+                                  ckpt.id
+                                )
+                              }
                             >
                               {ckpt.name}
                             </DropdownItem>

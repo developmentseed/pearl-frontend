@@ -1,8 +1,10 @@
-import React, { createContext, useReducer } from 'react';
+import React, { createContext, useContext, useMemo, useReducer } from 'react';
 import T from 'prop-types';
 import uniqWith from 'lodash.uniqwith';
 import isEqual from 'lodash.isequal';
 import differenceWith from 'lodash.differencewith';
+import { useRestApiClient } from './auth';
+import toasts from '../components/common/toasts';
 export const CheckpointContext = createContext({});
 
 export function CheckpointProvider(props) {
@@ -38,6 +40,7 @@ function checkpointReducer(state, action) {
   switch (action.type) {
     case actions.SET_CHECKPOINT:
       return {
+        ...action.data,
         activeClass: action.data.classes[0].name,
         classes: action.data.classes.reduce((acc, c) => {
           acc[c.name] = {
@@ -116,3 +119,49 @@ function checkpointReducer(state, action) {
       throw new Error('Unexpected error.');
   }
 }
+
+// Check if consumer function is used properly
+const useCheckContext = (fnName) => {
+  const context = useContext(CheckpointContext);
+
+  if (!context) {
+    throw new Error(
+      `The \`${fnName}\` hook must be used inside the <CheckpointContext> component's context.`
+    );
+  }
+
+  return context;
+};
+
+// Expose current checkpoint to consumer. This should be preferable way of consuming
+// a single checkpoint, by avoiding using useContext(CheckpointContext) directly.
+export const useCheckpoint = () => {
+  const { restApiClient } = useRestApiClient();
+  const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckContext(
+    'useCheckpoint'
+  );
+
+  return useMemo(
+    () => ({
+      currentCheckpoint,
+      fetchCurrentCheckpoint: async (projectId, checkpointId) => {
+        try {
+          const checkpoint = await restApiClient.getCheckpoint(
+            projectId,
+            checkpointId
+          );
+
+          dispatchCurrentCheckpoint({
+            type: actions.SET_CHECKPOINT,
+            data: checkpoint,
+          });
+        } catch (error) {
+          toasts.error(
+            'Could not load checkpoint meta, please try again later.'
+          );
+        }
+      },
+    }),
+    [restApiClient, currentCheckpoint, dispatchCurrentCheckpoint]
+  );
+};

@@ -57,6 +57,10 @@ class RestApiClient {
     return this.get(`model/${id}`);
   }
 
+  getCheckpoint(projectId, checkpointId) {
+    return this.get(`project/${projectId}/checkpoint/${checkpointId}`);
+  }
+
   getCheckpoints(projectId) {
     return this.get(`project/${projectId}/checkpoint`);
   }
