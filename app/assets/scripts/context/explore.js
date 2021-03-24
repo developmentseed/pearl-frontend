@@ -96,10 +96,10 @@ export function ExploreProvider(props) {
       const model = await restApiClient.getModel(project.model_id);
       setSelectedModel(model);
 
-      const checkpoints = await restApiClient.getCheckpoints(projectId);
-      if (checkpoints.total > 0) {
+      const checkpointsMeta = await restApiClient.getCheckpoints(projectId);
+      if (checkpointsMeta.total > 0) {
         // Save checkpoints if any exist, else leave as null
-        setCheckpointList(checkpoints);
+        setCheckpointList(checkpointsMeta.checkpoints);
       }
 
       const activeInstances = await restApiClient.getActiveInstances(projectId);

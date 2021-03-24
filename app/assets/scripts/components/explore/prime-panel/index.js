@@ -364,9 +364,11 @@ function PrimePanel() {
                   <Subheading>Checkpoint</Subheading>
                 </HeadOptionHeadline>
                 <SubheadingStrong>
-                  {selectedCheckpoint
-                    ? selectedCheckpoint.name
-                    : 'Checkpoint Selection'}
+                  {checkpointList
+                    ? selectedCheckpoint
+                      ? selectedCheckpoint.name
+                      : 'No checkpoint selected'
+                    : 'No checkpoints available'}
                 </SubheadingStrong>
                 <HeadOptionToolbar>
                   <Dropdown
@@ -376,18 +378,13 @@ function PrimePanel() {
                       <EditButton
                         data-cy='show-select-checkpoint-button'
                         useIcon='swap-horizontal'
-                        title='Edit Checkpoint'
-                        {...props}
-                        info={
-                          checkpointList ? null : 'No Checkpoints available'
+                        title={
+                          checkpointList
+                            ? 'Change checkpoint'
+                            : 'Run model to create first checkpoint'
                         }
-                        visuallyDisabled={!checkpointList}
-                        onClick={() => {
-                          if (checkpointList) {
-                            /* eslint-disable-next-line */
-                            props.onClick();
-                          }
-                        }}
+                        {...props}
+                        onClick={() => checkpointList && props.onClick()} // eslint-disable-line
                         id='checkpoint-list-trigger'
                       >
                         Edit Checkpoint Selection
