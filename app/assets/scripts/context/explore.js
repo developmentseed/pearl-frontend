@@ -363,7 +363,7 @@ export function ExploreProvider(props) {
       name = address.resourceSets[0].resources[0].address.locality;
     } else {
       toasts.warn('AOI not geocodable, generic name used');
-      name = 'Non-geocodable aoi';
+      name = 'Area';
     }
     // else leave name undefined, should be set by user
     return name;
