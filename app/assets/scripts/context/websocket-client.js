@@ -29,7 +29,7 @@ class WebsocketClient extends WebSocket {
           break;
         case 'info#disconnected':
           this.isConnected = false;
-          this.isReconnect = true
+          this.isReconnect = true;
           break;
         case 'model#prediction':
           dispatchPredictions({

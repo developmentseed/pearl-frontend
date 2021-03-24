@@ -256,7 +256,7 @@ export function ExploreProvider(props) {
             token: instance.token,
             dispatchPredictions,
             onConnected: () =>
-              newWebsocketClient.requestPrediction('A name', aoiRef)
+              newWebsocketClient.requestPrediction('A name', aoiRef),
           });
 
           setWebsocketClient(newWebsocketClient);
