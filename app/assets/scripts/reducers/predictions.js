@@ -72,7 +72,6 @@ export default function (state, action) {
         fetched: true,
       });
     case actions.CLEAR_PREDICTION:
-      console.log('CLEAR')
       return wrapApiResult({
         ...initialApiRequestState,
       })

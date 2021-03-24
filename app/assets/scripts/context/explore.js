@@ -208,6 +208,11 @@ export function ExploreProvider(props) {
       if (viewMode === viewModes.BROWSE_MODE &&
         previousViewMode === viewModes.EDIT_AOI_MODE) {
         dispatchPredictions({type: predictionActions.CLEAR_PREDICTION})
+
+        dispatchCurrentCheckpoint({
+          type: actions.RESET_CHECKPOINT,
+        });
+
       }
     }
   }, [viewMode, previousViewMode, predictions]);
