@@ -115,6 +115,7 @@ export function ExploreProvider(props) {
 
           setSelectedModel(model);
 
+          showGlobalLoadingMessage('Loading AOIs...');
           const aois = await restApiClient.get(`project/${project.id}/aoi`);
 
           const filteredList = filterAoiList(aois.aois);
