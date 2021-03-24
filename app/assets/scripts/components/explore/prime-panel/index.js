@@ -108,9 +108,7 @@ function PrimePanel() {
     setAoiBounds,
   } = useContext(ExploreContext);
 
-  const { currentCheckpoint } = useContext(
-    CheckpointContext
-  );
+  const { currentCheckpoint } = useContext(CheckpointContext);
 
   const { modelsList, mosaicList } = useContext(GlobalContext);
 
@@ -135,7 +133,7 @@ function PrimePanel() {
   const renderAoiHeader = (triggerProps) => {
     let header;
     let area;
-    let disabled
+    let disabled;
     if (aoiArea && aoiArea > 0 && viewMode === viewModes.EDIT_AOI_MODE) {
       header = `${formatThousands(aoiArea / 1e6)} km2`;
     } else if (aoiName) {
@@ -152,11 +150,8 @@ function PrimePanel() {
       useIcon: null,
     };
 
-    
-    if (viewMode === viewModes.EDIT_AOI_MODE
-      || aoiList.length === 0
-    ) {
-      disabled = true
+    if (viewMode === viewModes.EDIT_AOI_MODE || aoiList.length === 0) {
+      disabled = true;
     }
 
     return (
@@ -165,7 +160,7 @@ function PrimePanel() {
           data-cy='aoi-selection-trigger'
           {...triggerProps}
           useIcon='chevron-down--small'
-          {... disabled ? disabledProps : {}}
+          {...(disabled ? disabledProps : {})}
         >
           {header}
         </SubheadingStrong>

@@ -284,11 +284,22 @@ export function ExploreProvider(props) {
       aoiRef.setBounds(bounds);
       setAoiBounds(aoiRef.getBounds());
       setAoiName(aoiObject.name);
+      setViewMode(viewModes.BROWSE_MODE);
+      if (predictions.isReady) {
+        dispatchPredictions({ type: predictionActions.CLEAR_PREDICTION });
+      }
+
+      if (currentCheckpoint) {
+        dispatchCurrentCheckpoint({
+          type: actions.RESET_CHECKPOINT,
+        });
+      }
     } else {
       // initializing map with first aoi
       setAoiInitializer(bounds);
       setAoiName(aoiObject.name);
     }
+
     hideGlobalLoading();
     return bounds;
   }
