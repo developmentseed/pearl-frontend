@@ -6,6 +6,7 @@ import React, {
   useContext,
 } from 'react';
 import T from 'prop-types';
+import config from '../config';
 import { initialApiRequestState } from '../reducers/reduxeed';
 import { createApiMetaReducer, queryApiMeta } from '../reducers/api';
 import {
@@ -22,8 +23,9 @@ import tBbox from '@turf/bbox';
 import tBboxPolygon from '@turf/bbox-polygon';
 import tCentroid from '@turf/centroid';
 
-import config from '../config';
+import { actions, CheckpointContext } from './checkpoint';
 import logger from '../utils/logger';
+import get from 'lodash.get';
 
 /**
  * Explore View Modes
@@ -32,7 +34,7 @@ export const viewModes = {
   BROWSE_MODE: 'BROWSE_MODE',
   CREATE_AOI_MODE: 'CREATE_AOI_MODE',
   EDIT_AOI_MODE: 'EDIT_AOI_MODE',
-  EDIT_CLASS_MODE: 'EDIT_CLASS_MODE',
+  ADD_CLASS_SAMPLES: 'ADD_CLASS_SAMPLES',
 };
 
 /**
@@ -66,7 +68,9 @@ export function ExploreProvider(props) {
 
   const [viewMode, setViewMode] = useState(viewModes.BROWSE_MODE);
   const [selectedModel, setSelectedModel] = useState(null);
-  const [availableClasses, setAvailableClasses] = useState(null);
+  const { currentCheckpoint, dispatchCurrentCheckpoint } = useContext(
+    CheckpointContext
+  );
 
   const previousViewMode = usePrevious(viewMode);
   const [predictions, dispatchPredictions] = useReducer(
@@ -128,9 +132,10 @@ export function ExploreProvider(props) {
           }
 
           const aois = await restApiClient.get(`project/${project.id}/aoi`);
-          setAoiList(filterAoiList(aois.aois));
+          const filteredList = filterAoiList(aois.aois)
+          setAoiList(filteredList);
           if (aois.total > 0) {
-            const latest = aois.aois.lastItem;
+            const latest = filteredList[filteredList.length - 1]
             loadAoi(project, latest);
           }
         } catch (error) {
@@ -157,7 +162,7 @@ export function ExploreProvider(props) {
   }, [apiMeta]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (!predictions) return;
+    if (!predictions.isReady()) return;
 
     if (predictions.fetching) {
       const { processed, total } = predictions;
@@ -182,6 +187,8 @@ export function ExploreProvider(props) {
 
       if (predictions.error) {
         toasts.error('An inference error occurred, please try again later.');
+      } else {
+        setViewMode(viewModes.ADD_CLASS_SAMPLES);
       }
     }
   }, [predictions, restApiClient, currentProject]);
@@ -227,6 +234,7 @@ export function ExploreProvider(props) {
    */
 
   async function loadAoi(project, aoiObject) {
+    showGlobalLoadingMessage('Loading AOI')
     const aoi = await restApiClient.get(
       `project/${project.id}/aoi/${aoiObject.id}`
     );
@@ -241,19 +249,12 @@ export function ExploreProvider(props) {
       aoiRef.setBounds(bounds);
       setAoiBounds(aoiRef.getBounds());
       setAoiName(aoiObject.name);
-      /*
-      reverseGeoCode([lonMin, latMin, lonMax, latMax]).then((name) =>
-        setAoiName(name)
-      );*/
     } else {
       // initializing map with first aoi
       setAoiInitializer(bounds);
       setAoiName(aoiObject.name);
-      /*
-      reverseGeoCode([lonMin, latMin, lonMax, latMax]).then((name) =>
-        setAoiName(name)
-      );*/
     }
+    hideGlobalLoading()
     return bounds;
   }
 
@@ -359,7 +360,12 @@ export function ExploreProvider(props) {
       try {
         showGlobalLoadingMessage('Fetching classes...');
         const { classes } = await restApiClient.getModel(selectedModel.id);
-        setAvailableClasses(classes);
+        dispatchCurrentCheckpoint({
+          type: actions.SET_CHECKPOINT,
+          data: {
+            classes,
+          },
+        });
       } catch (error) {
         hideGlobalLoading();
         toasts.error('Could fetch model classes, please try again later.');
@@ -388,10 +394,10 @@ export function ExploreProvider(props) {
           const newWebsocketClient = new WebsocketClient({
             token: instance.token,
             dispatchPredictions,
+            dispatchCurrentCheckpoint,
             onConnected: () =>
               newWebsocketClient.requestPrediction(aoiName, aoiRef),
           });
-
           setWebsocketClient(newWebsocketClient);
         } catch (error) {
           hideGlobalLoading();
@@ -404,6 +410,36 @@ export function ExploreProvider(props) {
         websocketClient.requestPrediction(aoiName, aoiRef);
       }
     }
+  }
+
+  async function retrain() {
+    if (!websocketClient) {
+      toasts.error('No instance available.');
+      return;
+    }
+
+    // Check if all classes have the minimum number of samples
+    const classes = Object.values(currentCheckpoint.classes);
+    for (let i = 0; i < classes.length; i++) {
+      const aClass = classes[i];
+      const sampleCount = get(aClass, 'geometry.coordinates.length', 0);
+      if (sampleCount < config.minSampleCount) {
+        toasts.error(
+          `A minimum of ${config.minSampleCount} samples is required for every class.`,
+          {
+            autoClose: 3000,
+          }
+        );
+        return;
+      }
+    }
+
+    // If check pass, retrain
+    showGlobalLoadingMessage('Retraining...');
+    websocketClient.requestRetrain({
+      name: 'a name',
+      classes,
+    });
   }
 
   useEffect(() => {
@@ -499,9 +535,10 @@ export function ExploreProvider(props) {
         setSelectedModel,
 
         updateProjectName,
-        availableClasses,
+
         runInference,
         reverseGeoCode,
+        retrain,
       }}
     >
       {props.children}

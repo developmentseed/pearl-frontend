@@ -24,9 +24,15 @@ import Projects from './components/profile/projects';
 import Maps from './components/profile/maps';
 import { AuthProvider } from './context/auth';
 
-// eslint-disable-next-line react/prop-types
-const ProtectedRoute = ({ component, ...args }) => (
-  <Route component={withAuthenticationRequired(component)} {...args} />
+const ProtectedRoute = (
+  { component, ...args } // eslint-disable-line react/prop-types
+) => (
+  <Route
+    component={
+      window.Cypress ? component : withAuthenticationRequired(component)
+    }
+    {...args}
+  />
 );
 
 // Root component.

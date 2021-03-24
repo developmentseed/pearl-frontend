@@ -1,8 +1,15 @@
 import config from '../config';
 import logger from '../utils/logger';
-import { actions } from '../reducers/predictions';
+const { actions: predictionsActions } = require('../reducers/predictions');
+const { actions: checkpointActions } = require('../context/checkpoint');
+
 class WebsocketClient extends WebSocket {
-  constructor({ token, onConnected, dispatchPredictions }) {
+  constructor({
+    token,
+    onConnected,
+    dispatchPredictions,
+    dispatchCurrentCheckpoint,
+  }) {
     super(config.websocketEndpoint + `?token=${token}`);
 
     this.isConnected = false;
@@ -29,20 +36,26 @@ class WebsocketClient extends WebSocket {
         case 'info#disconnected':
           this.isConnected = false;
           break;
+        case 'model#checkpoint':
+          dispatchCurrentCheckpoint({
+            type: checkpointActions.RECEIVE_METADATA,
+            data: eventData.data,
+          });
+          break;
         case 'model#prediction':
           dispatchPredictions({
-            type: actions.RECEIVE_PREDICTION,
+            type: predictionsActions.RECEIVE_PREDICTION,
             data: eventData.data,
           });
           break;
         case 'model#prediction#complete':
           dispatchPredictions({
-            type: actions.COMPLETE_PREDICTION,
+            type: predictionsActions.COMPLETE_PREDICTION,
           });
           break;
         case 'error':
           dispatchPredictions({
-            type: actions.FAILED_PREDICTION,
+            type: predictionsActions.FAILED_PREDICTION,
           });
           break;
         default:
@@ -90,7 +103,19 @@ class WebsocketClient extends WebSocket {
     this.send(JSON.stringify(message));
 
     // Update state
-    this.dispatchPredictions({ type: actions.START_PREDICTION });
+    this.dispatchPredictions({ type: predictionsActions.START_PREDICTION });
+  }
+
+  requestRetrain(data) {
+    this.dispatchPredictions({
+      type: predictionsActions.START_PREDICTION,
+    });
+    this.send(
+      JSON.stringify({
+        action: 'model#retrain',
+        data,
+      })
+    );
   }
 
   /**
