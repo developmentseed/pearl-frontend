@@ -6,6 +6,7 @@ class WebsocketClient extends WebSocket {
     super(config.websocketEndpoint + `?token=${token}`);
 
     this.isConnected = false;
+    this.isReconnect = false;
     this.dispatchPredictions = dispatchPredictions;
 
     /**
@@ -24,10 +25,11 @@ class WebsocketClient extends WebSocket {
       switch (eventData.message) {
         case 'info#connected':
           this.isConnected = true;
-          if (onConnected) onConnected();
+          if (onConnected && !this.isReconnect) onConnected();
           break;
         case 'info#disconnected':
           this.isConnected = false;
+          this.isReconnect = true
           break;
         case 'model#prediction':
           dispatchPredictions({

@@ -255,12 +255,8 @@ export function ExploreProvider(props) {
           const newWebsocketClient = new WebsocketClient({
             token: instance.token,
             dispatchPredictions,
-            onConnected: () => {
-              logger('reconnected, prediction already fetched, doing nothing.');
-              if (!predictions.fetched && !predictions.fetching) {
-                newWebsocketClient.requestPrediction('A name', aoiRef);
-              }
-            }
+            onConnected: () =>
+              newWebsocketClient.requestPrediction('A name', aoiRef)
           });
 
           setWebsocketClient(newWebsocketClient);
