@@ -8,7 +8,6 @@ import React, {
 import T from 'prop-types';
 import config from '../config';
 import { initialApiRequestState } from '../reducers/reduxeed';
-import { createApiMetaReducer, queryApiMeta } from '../reducers/api';
 import {
   showGlobalLoadingMessage,
   hideGlobalLoading,
@@ -21,7 +20,6 @@ import predictionsReducer from '../reducers/predictions';
 import usePrevious from '../utils/use-previous';
 import tBbox from '@turf/bbox';
 import { actions, CheckpointContext } from './checkpoint';
-import logger from '../utils/logger';
 import get from 'lodash.get';
 
 /**
@@ -76,65 +74,63 @@ export function ExploreProvider(props) {
   const [currentInstance, setCurrentInstance] = useState(null);
   const [websocketClient, setWebsocketClient] = useState(null);
 
-  const [apiMeta, dispatchApiMeta] = useReducer(
-    createApiMetaReducer,
-    initialApiRequestState
-  );
+  const [apiMeta, setApiMeta] = useState();
 
-  async function loadProject() {
-    if (projectId !== 'new') {
-      showGlobalLoadingMessage('Loading project...');
-      try {
-        // Get project metadata
-        const project = await restApiClient.getProject(projectId);
-        setCurrentProject(project);
+  async function loadInitialData() {
+    showGlobalLoadingMessage('Loading configuration...');
+    const apiMeta = await restApiClient.getApiMeta();
+    setApiMeta(apiMeta);
 
-        const model = await restApiClient.getModel(project.model_id);
-        setSelectedModel(model);
+    // Bypass loading project when new
+    if (projectId === 'new') {
+      hideGlobalLoading();
+      return;
+    }
 
-        const checkpoints = await restApiClient.getCheckpoints(projectId);
-        if (checkpoints.total > 0) {
-          // Save checkpoints if any exist, else leave as null
-          setCheckpointList(checkpoints);
-        }
+    showGlobalLoadingMessage('Loading project...');
+    try {
+      // Get project metadata
+      const project = await restApiClient.getProject(projectId);
+      setCurrentProject(project);
 
-        const activeInstances = await restApiClient.getActiveInstances(
-          projectId
-        );
-        if (activeInstances.total > 0) {
-          const instanceItem = activeInstances.instances[0];
-          const instance = await restApiClient.getInstance(
-            projectId,
-            instanceItem.id
-          );
-          setCurrentInstance(instance);
-        }
+      const model = await restApiClient.getModel(project.model_id);
+      setSelectedModel(model);
 
-        const aois = await restApiClient.get(`project/${project.id}/aoi`);
-
-        if (aois.total > 0) {
-          const latest = aois.aois.pop();
-          const latestAoi = await restApiClient.get(
-            `project/${project.id}/aoi/${latest.id}`
-          );
-          const [lonMin, latMin, lonMax, latMax] = tBbox(latestAoi.bounds);
-          setAoiInitializer([
-            [latMin, lonMin],
-            [latMax, lonMax],
-          ]);
-        }
-      } catch (error) {
-        toasts.error('Error loading project, please try again later.');
-      } finally {
-        hideGlobalLoading();
+      const checkpoints = await restApiClient.getCheckpoints(projectId);
+      if (checkpoints.total > 0) {
+        // Save checkpoints if any exist, else leave as null
+        setCheckpointList(checkpoints);
       }
+
+      const activeInstances = await restApiClient.getActiveInstances(projectId);
+      if (activeInstances.total > 0) {
+        const instanceItem = activeInstances.instances[0];
+        const instance = await restApiClient.getInstance(
+          projectId,
+          instanceItem.id
+        );
+        setCurrentInstance(instance);
+      }
+
+      const aois = await restApiClient.get(`project/${project.id}/aoi`);
+
+      if (aois.total > 0) {
+        const latest = aois.aois.pop();
+        const latestAoi = await restApiClient.get(
+          `project/${project.id}/aoi/${latest.id}`
+        );
+        const [lonMin, latMin, lonMax, latMax] = tBbox(latestAoi.bounds);
+        setAoiInitializer([
+          [latMin, lonMin],
+          [latMax, lonMax],
+        ]);
+      }
+    } catch (error) {
+      toasts.error('Error loading project, please try again later.');
+    } finally {
+      hideGlobalLoading();
     }
   }
-
-  useEffect(() => {
-    showGlobalLoadingMessage('Checking API status...');
-    queryApiMeta()(dispatchApiMeta);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     return () => {
@@ -148,21 +144,9 @@ export function ExploreProvider(props) {
   // Load project meta on load and api client ready
   useEffect(() => {
     if (restApiClient) {
-      loadProject();
-      //loadCheckpoints();
+      loadInitialData();
     }
   }, [restApiClient]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // If API is unreachable, redirect to home
-  useEffect(() => {
-    if (!apiMeta.isReady()) return;
-
-    hideGlobalLoading();
-    if (apiMeta.hasError()) {
-      toasts.error('API is unavailable, please try again later.');
-      history.push('/');
-    }
-  }, [apiMeta]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!predictions) return;
@@ -326,8 +310,7 @@ export function ExploreProvider(props) {
     <ExploreContext.Provider
       value={{
         predictions,
-        apiLimits:
-          apiMeta.isReady() && !apiMeta.hasError() && apiMeta.getData().limits,
+        apiLimits: apiMeta && apiMeta.limits,
 
         previousViewMode,
         viewMode,
