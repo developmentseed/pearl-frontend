@@ -218,6 +218,14 @@ export function ExploreProvider(props) {
     return Array.from(aois.values());
   }
 
+  /*
+   * Utility function to load AOI
+   * @param project - current project object
+   * @param aoiObject - object containing aoi id and name
+   *                  Objects of this format are returned by
+   *                  aoi listing endpoint
+   */
+
   async function loadAoi(project, aoiObject) {
     const aoi = await restApiClient.get(
       `project/${project.id}/aoi/${aoiObject.id}`
@@ -294,7 +302,7 @@ export function ExploreProvider(props) {
       // Need to create a polygon
       center = tCentroid(tBboxPolygon(bbox));
     } else {
-      // ASsume a polygon feature is provided
+      // Assume a polygon feature is provided
       center = tCentroid(bbox);
     }
 
@@ -405,16 +413,13 @@ export function ExploreProvider(props) {
   }, [aoiRef]);
 
   /*
+   * This useEffect GeoCodes an AOI after it is created.
+   * On the front end we assume that any AOI with the same name
+   * from the backend, will have the same geometry.
    *
-   * At this time we can also check to see if name needs to be incremented
-   */
-  /*
-   * If AOI was just edited by the user, we need to increment
-   * the name.
-   * AOIs are tracked on backed as a grouped object of
-   * AOI geometry AND model ID
+   * To deal with this, any AOI that has the same geocoding as an existing one will be incremented.
    *
-   * On frontend, assume that same name == same geometry.
+   * i.e. Seneca Rocks, Seneca Rocks #1, Seneca Rocks #2...etc
    */
 
   useEffect(() => {

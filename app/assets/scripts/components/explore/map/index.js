@@ -162,6 +162,7 @@ function Map() {
       },
       onDrawEnd: (bbox, shape) => {
         setAoiRef(shape);
+        setAoiBounds(shape.getBounds());
         setViewMode(viewModes.BROWSE_MODE);
       },
     });
