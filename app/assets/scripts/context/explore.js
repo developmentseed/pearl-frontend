@@ -110,34 +110,22 @@ export function ExploreProvider(props) {
 
           setCurrentProject(project);
 
+          showGlobalLoadingMessage('Loading Model...');
           const model = await restApiClient.getModel(project.model_id);
 
           setSelectedModel(model);
-          try {
-            const activeInstances = await restApiClient.getActiveInstances(
-              projectId
-            );
-            if (activeInstances.total > 0) {
-              const instanceItem = activeInstances.instances[0];
-              const instance = await restApiClient.getInstance(
-                projectId,
-                instanceItem.id
-              );
-              setCurrentInstance(instance);
-            }
-          } catch (error) {
-            // If this request fails, let it fail silently.
-            // But, we log an error to the console.
-            logger('Active instance check FAILED', error);
-          }
 
           const aois = await restApiClient.get(`project/${project.id}/aoi`);
+
           const filteredList = filterAoiList(aois.aois);
           setAoiList(filteredList);
           if (aois.total > 0) {
             const latest = filteredList[filteredList.length - 1];
             loadAoi(project, latest);
           }
+
+          showGlobalLoadingMessage('Checking for existing instance');
+          await loadActiveInstance();
         } catch (error) {
           toasts.error('Error loading project, please try again later.');
         } finally {
@@ -149,6 +137,27 @@ export function ExploreProvider(props) {
       loadProject();
     }
   }, [restApiClient]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  async function loadActiveInstance() {
+    try {
+      const activeInstances = await restApiClient.getActiveInstances(projectId);
+
+      if (activeInstances.total > 0) {
+        const instanceItem = activeInstances.instances[0];
+        const instance = await restApiClient.getInstance(
+          projectId,
+          instanceItem.id
+        );
+        setCurrentInstance(instance);
+        return instance;
+      }
+    } catch (error) {
+      // If this request fails, let it fail silently.
+      // But, we log an error to the console.
+      logger('Active instance check FAILED', error);
+      return error;
+    }
+  }
 
   // If API is unreachable, redirect to home
   useEffect(() => {
@@ -177,9 +186,7 @@ export function ExploreProvider(props) {
       hideGlobalLoading();
 
       if (predictions.fetched) {
-        restApiClient
-          .get(`project/${currentProject.id}/aoi`)
-          .then((aois) => setAoiList(filterAoiList(aois.aois)));
+        restApiClient.then((aois) => setAoiList(filterAoiList(aois.aois)));
       }
 
       // Update aoi List with newest aoi
@@ -395,8 +402,10 @@ export function ExploreProvider(props) {
             token: instance.token,
             dispatchPredictions,
             dispatchCurrentCheckpoint,
-            onConnected: () =>
-              newWebsocketClient.requestPrediction(aoiName, aoiRef),
+            onConnected: () => {
+              hideGlobalLoading();
+              newWebsocketClient.requestPrediction(aoiName, aoiRef);
+            },
           });
           setWebsocketClient(newWebsocketClient);
         } catch (error) {
