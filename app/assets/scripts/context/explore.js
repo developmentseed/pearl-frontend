@@ -172,7 +172,7 @@ export function ExploreProvider(props) {
   }, [apiMeta]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (!predictions.isReady()) return;
+    //if (!predictions.isReady()) return;
 
     if (predictions.fetching) {
       const { processed, total } = predictions;
@@ -187,7 +187,12 @@ export function ExploreProvider(props) {
       hideGlobalLoading();
 
       if (predictions.fetched) {
-        restApiClient.then((aois) => setAoiList(filterAoiList(aois.aois)));
+        restApiClient
+          .get(`project/${currentProject.id}/aoi/`)
+          .then((aois) => {
+            console.log(aois);
+            setAoiList(filterAoiList(aois.aois));
+          });
       }
 
       // Update aoi List with newest aoi
