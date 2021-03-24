@@ -146,7 +146,11 @@ function PrimePanel() {
 
     return (
       <>
-        <SubheadingStrong {...triggerProps} useIcon='chevron-down--small'>
+        <SubheadingStrong
+          data-cy='aoi-selection-trigger'
+          {...triggerProps}
+          useIcon='chevron-down--small'
+        >
           {header}
         </SubheadingStrong>
         {area && (
@@ -230,6 +234,7 @@ function PrimePanel() {
                           //Layer must be removed from the map
                           map.aoi.control.draw.clear();
                         }}
+                        data-cy='add-aoi-button'
                       >
                         Add AOI
                       </DropdownItem>
