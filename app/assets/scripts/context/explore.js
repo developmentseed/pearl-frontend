@@ -132,10 +132,10 @@ export function ExploreProvider(props) {
           }
 
           const aois = await restApiClient.get(`project/${project.id}/aoi`);
-          const filteredList = filterAoiList(aois.aois)
+          const filteredList = filterAoiList(aois.aois);
           setAoiList(filteredList);
           if (aois.total > 0) {
-            const latest = filteredList[filteredList.length - 1]
+            const latest = filteredList[filteredList.length - 1];
             loadAoi(project, latest);
           }
         } catch (error) {
@@ -234,7 +234,7 @@ export function ExploreProvider(props) {
    */
 
   async function loadAoi(project, aoiObject) {
-    showGlobalLoadingMessage('Loading AOI')
+    showGlobalLoadingMessage('Loading AOI');
     const aoi = await restApiClient.get(
       `project/${project.id}/aoi/${aoiObject.id}`
     );
@@ -254,7 +254,7 @@ export function ExploreProvider(props) {
       setAoiInitializer(bounds);
       setAoiName(aoiObject.name);
     }
-    hideGlobalLoading()
+    hideGlobalLoading();
     return bounds;
   }
 
