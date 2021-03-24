@@ -1,10 +1,10 @@
-import { initialApiRequestState } from './reduxeed'; 
+import { initialApiRequestState } from './reduxeed';
 export const actions = {
   START_PREDICTION: 'START_PREDICTION',
   RECEIVE_PREDICTION: 'RECEIVE_PREDICTION',
   COMPLETE_PREDICTION: 'COMPLETE_PREDICTION',
   FAILED_PREDICTION: 'FAILED_PREDICTION',
-  CLEAR_PREDICTION: 'CLEAR_PREDICTION'
+  CLEAR_PREDICTION: 'CLEAR_PREDICTION',
 };
 
 function wrapApiResult(stateData) {
@@ -14,14 +14,12 @@ function wrapApiResult(stateData) {
     ...stateData,
     raw: () => stateData,
     isReady: () => {
-      return ready
+      return ready;
     },
     hasError: () => ready && !!error,
     getData: (def = {}) => (ready ? data.results || data : def),
     getMeta: (def = {}) => (ready ? data.meta : def),
-
   };
-
 }
 
 export default function (state, action) {
@@ -64,7 +62,6 @@ export default function (state, action) {
       });
     }
     case actions.COMPLETE_PREDICTION:
-
       return wrapApiResult({
         ...state,
         receivedAt: Date.now(),
@@ -74,7 +71,7 @@ export default function (state, action) {
     case actions.CLEAR_PREDICTION:
       return wrapApiResult({
         ...initialApiRequestState,
-      })
+      });
     case actions.FAILED_PREDICTION:
       return wrapApiResult({
         ...state,

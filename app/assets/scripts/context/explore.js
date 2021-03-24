@@ -205,14 +205,15 @@ export function ExploreProvider(props) {
 
   useEffect(() => {
     if (predictions.isReady()) {
-      if (viewMode === viewModes.BROWSE_MODE &&
-        previousViewMode === viewModes.EDIT_AOI_MODE) {
-        dispatchPredictions({type: predictionActions.CLEAR_PREDICTION})
+      if (
+        viewMode === viewModes.BROWSE_MODE &&
+        previousViewMode === viewModes.EDIT_AOI_MODE
+      ) {
+        dispatchPredictions({ type: predictionActions.CLEAR_PREDICTION });
 
         dispatchCurrentCheckpoint({
           type: actions.RESET_CHECKPOINT,
         });
-
       }
     }
   }, [viewMode, previousViewMode, predictions]);

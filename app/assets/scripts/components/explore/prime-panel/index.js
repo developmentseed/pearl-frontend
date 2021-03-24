@@ -44,7 +44,7 @@ import InfoButton from '../../common/info-button';
 import { availableLayers } from '../sample-data';
 import { formatThousands } from '../../../utils/format';
 import { AuthContext } from '../../../context/auth';
-import { CheckpointContext, actions } from '../../../context/checkpoint';
+import { CheckpointContext } from '../../../context/checkpoint';
 
 import { AoiEditButtons } from './aoi-edit-buttons';
 
@@ -108,7 +108,7 @@ function PrimePanel() {
     setAoiBounds,
   } = useContext(ExploreContext);
 
-  const { currentCheckpoint, dispatchCurrentCheckpoint } = useContext(
+  const { currentCheckpoint } = useContext(
     CheckpointContext
   );
 
@@ -135,6 +135,7 @@ function PrimePanel() {
   const renderAoiHeader = (triggerProps) => {
     let header;
     let area;
+    let disabled
     if (aoiArea && aoiArea > 0 && viewMode === viewModes.EDIT_AOI_MODE) {
       header = `${formatThousands(aoiArea / 1e6)} km2`;
     } else if (aoiName) {
@@ -151,13 +152,20 @@ function PrimePanel() {
       useIcon: null,
     };
 
+    
+    if (viewMode === viewModes.EDIT_AOI_MODE
+      || aoiList.length === 0
+    ) {
+      disabled = true
+    }
+
     return (
       <>
         <SubheadingStrong
           data-cy='aoi-selection-trigger'
           {...triggerProps}
           useIcon='chevron-down--small'
-          {...(viewMode === viewModes.EDIT_AOI_MODE ? disabledProps : {})}
+          {... disabled ? disabledProps : {}}
         >
           {header}
         </SubheadingStrong>
@@ -232,21 +240,23 @@ function PrimePanel() {
                         </li>
                       ))}
                     </DropdownBody>
-                    <DropdownFooter>
-                      <DropdownItem
-                        muted
-                        useIcon='plus'
-                        onClick={() => {
-                          createNewAoi();
-                          map.aoi.control.draw.disable();
-                          //Layer must be removed from the map
-                          map.aoi.control.draw.clear();
-                        }}
-                        data-cy='add-aoi-button'
-                      >
-                        Add AOI
-                      </DropdownItem>
-                    </DropdownFooter>
+                    {(currentCheckpoint || aoiList.length > 0) && (
+                      <DropdownFooter>
+                        <DropdownItem
+                          muted
+                          useIcon='plus'
+                          onClick={() => {
+                            createNewAoi();
+                            map.aoi.control.draw.disable();
+                            //Layer must be removed from the map
+                            map.aoi.control.draw.clear();
+                          }}
+                          data-cy='add-aoi-button'
+                        >
+                          Add AOI
+                        </DropdownItem>
+                      </DropdownFooter>
+                    )}
                   </>
                 </Dropdown>
 
