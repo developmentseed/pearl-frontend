@@ -6,6 +6,7 @@ import React, {
   useContext,
 } from 'react';
 import T from 'prop-types';
+import config from '../config';
 import { initialApiRequestState } from '../reducers/reduxeed';
 import { createApiMetaReducer, queryApiMeta } from '../reducers/api';
 import {
@@ -19,6 +20,9 @@ import GlobalContext from './global';
 import predictionsReducer from '../reducers/predictions';
 import usePrevious from '../utils/use-previous';
 import tBbox from '@turf/bbox';
+import { actions, CheckpointContext } from './checkpoint';
+import logger from '../utils/logger';
+import get from 'lodash.get';
 
 /**
  * Explore View Modes
@@ -27,7 +31,7 @@ export const viewModes = {
   BROWSE_MODE: 'BROWSE_MODE',
   CREATE_AOI_MODE: 'CREATE_AOI_MODE',
   EDIT_AOI_MODE: 'EDIT_AOI_MODE',
-  EDIT_CLASS_MODE: 'EDIT_CLASS_MODE',
+  ADD_CLASS_SAMPLES: 'ADD_CLASS_SAMPLES',
 };
 
 /**
@@ -55,7 +59,9 @@ export function ExploreProvider(props) {
 
   const [viewMode, setViewMode] = useState(viewModes.BROWSE_MODE);
   const [selectedModel, setSelectedModel] = useState(null);
-  const [availableClasses, setAvailableClasses] = useState(null);
+  const { currentCheckpoint, dispatchCurrentCheckpoint } = useContext(
+    CheckpointContext
+  );
 
   const previousViewMode = usePrevious(viewMode);
   const [predictions, dispatchPredictions] = useReducer(
@@ -98,6 +104,23 @@ export function ExploreProvider(props) {
           const model = await restApiClient.getModel(project.model_id);
 
           setSelectedModel(model);
+          try {
+            const activeInstances = await restApiClient.getActiveInstances(
+              projectId
+            );
+            if (activeInstances.total > 0) {
+              const instanceItem = activeInstances.instances[0];
+              const instance = await restApiClient.getInstance(
+                projectId,
+                instanceItem.id
+              );
+              setCurrentInstance(instance);
+            }
+          } catch (error) {
+            // If this request fails, let it fail silently.
+            // But, we log an error to the console.
+            logger('Active instance check FAILED', error);
+          }
 
           /* TODO
            * This code is untested.
@@ -156,6 +179,8 @@ export function ExploreProvider(props) {
       hideGlobalLoading();
       if (predictions.error) {
         toasts.error('An inference error occurred, please try again later.');
+      } else {
+        setViewMode(viewModes.ADD_CLASS_SAMPLES);
       }
     }
   }, [predictions]);
@@ -214,7 +239,12 @@ export function ExploreProvider(props) {
       try {
         showGlobalLoadingMessage('Fetching classes...');
         const { classes } = await restApiClient.getModel(selectedModel.id);
-        setAvailableClasses(classes);
+        dispatchCurrentCheckpoint({
+          type: actions.SET_CHECKPOINT,
+          data: {
+            classes,
+          },
+        });
       } catch (error) {
         hideGlobalLoading();
         toasts.error('Could fetch model classes, please try again later.');
@@ -226,17 +256,21 @@ export function ExploreProvider(props) {
         try {
           // Create instance
           showGlobalLoadingMessage('Requesting instance...');
-          instance = await restApiClient.createInstance(project.id);
+          if (currentInstance) {
+            instance = currentInstance;
+          } else {
+            instance = await restApiClient.createInstance(project.id);
+          }
 
           // Setup websocket
           showGlobalLoadingMessage('Connecting to instance...');
           const newWebsocketClient = new WebsocketClient({
             token: instance.token,
             dispatchPredictions,
+            dispatchCurrentCheckpoint,
             onConnected: () =>
               newWebsocketClient.requestPrediction('A name', aoiRef),
           });
-
           setWebsocketClient(newWebsocketClient);
         } catch (error) {
           hideGlobalLoading();
@@ -249,6 +283,36 @@ export function ExploreProvider(props) {
         websocketClient.requestPrediction('A name', aoiRef);
       }
     }
+  }
+
+  async function retrain() {
+    if (!websocketClient) {
+      toasts.error('No instance available.');
+      return;
+    }
+
+    // Check if all classes have the minimum number of samples
+    const classes = Object.values(currentCheckpoint.classes);
+    for (let i = 0; i < classes.length; i++) {
+      const aClass = classes[i];
+      const sampleCount = get(aClass, 'geometry.coordinates.length', 0);
+      if (sampleCount < config.minSampleCount) {
+        toasts.error(
+          `A minimum of ${config.minSampleCount} samples is required for every class.`,
+          {
+            autoClose: 3000,
+          }
+        );
+        return;
+      }
+    }
+
+    // If check pass, retrain
+    showGlobalLoadingMessage('Retraining...');
+    websocketClient.requestRetrain({
+      name: 'a name',
+      classes,
+    });
   }
 
   useEffect(() => {
@@ -284,8 +348,9 @@ export function ExploreProvider(props) {
         setSelectedModel,
 
         updateProjectName,
-        availableClasses,
+
         runInference,
+        retrain,
       }}
     >
       {props.children}

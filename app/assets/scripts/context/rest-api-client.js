@@ -60,6 +60,10 @@ class RestApiClient {
   getInstance(projectId, instanceId) {
     return this.get(`project/${projectId}/instance/${instanceId}`);
   }
+
+  getActiveInstances(projectId) {
+    return this.get(`project/${projectId}/instance/?status=active`);
+  }
 }
 
 export default RestApiClient;

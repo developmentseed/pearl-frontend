@@ -39,6 +39,7 @@ import InfoButton from '../../common/info-button';
 import { availableLayers } from '../sample-data';
 import { formatThousands } from '../../../utils/format';
 import { AuthContext } from '../../../context/auth';
+import { CheckpointContext } from '../../../context/checkpoint';
 
 const PlaceholderPanelSection = styled.div`
   padding: ${glsp()};
@@ -124,7 +125,9 @@ function AoiEditButtons(props) {
               map.aoi.control.draw.disable();
 
               //Edit mode is enabled as soon as draw is done
-              map.aoi.control.edit.disable();
+              if (map.aoi.control.edit._shape) {
+                map.aoi.control.edit.disable();
+              }
 
               //Layer must be removed from the map
               map.aoi.control.draw.clear();
@@ -235,14 +238,16 @@ function PrimePanel() {
     currentProject,
     selectedModel,
     setSelectedModel,
-    availableClasses,
     aoiRef,
     setAoiRef,
     aoiArea,
     apiLimits,
     runInference,
+    retrain,
     predictions,
   } = useContext(ExploreContext);
+
+  const { currentCheckpoint } = useContext(CheckpointContext);
 
   const { modelsList, mosaicList } = useContext(GlobalContext);
 
@@ -252,9 +257,9 @@ function PrimePanel() {
 
   const { models } = modelsList.isReady() && modelsList.getData();
 
-  // Enable/disable "Run Inference" button
+  // Check if AOI and selected model are defined, and if view mode is runnable
   const allowInferenceRun =
-    viewMode === viewModes.BROWSE_MODE &&
+    [viewModes.BROWSE_MODE, viewModes.ADD_CLASS_SAMPLES].includes(viewMode) &&
     aoiRef &&
     aoiArea > 0 &&
     selectedModel;
@@ -351,7 +356,6 @@ function PrimePanel() {
                   name='retrain model'
                   tabId='retrain-tab-trigger'
                   placeholderMessage={retrainPlaceHolderMessage()}
-                  classList={availableClasses}
                 />
                 <PlaceholderPanelSection
                   name='Refine Results'
@@ -407,18 +411,23 @@ function PrimePanel() {
               </Button>
 
               <InfoButton
+                data-cy={allowInferenceRun ? 'run-model-button' : 'disabled'}
                 variation='primary-raised-dark'
                 size='medium'
                 useIcon='tick--small'
                 style={{
                   gridColumn: '1 / -1',
                 }}
-                onClick={() => allowInferenceRun && runInference()}
+                onClick={() => {
+                  allowInferenceRun && !currentCheckpoint
+                    ? runInference()
+                    : retrain();
+                }}
                 visuallyDisabled={!allowInferenceRun}
                 info={applyTooltip}
                 id='apply-button-trigger'
               >
-                Run Model
+                {!currentCheckpoint ? 'Run Model' : 'Retrain'}
               </InfoButton>
             </PanelControls>
           </StyledPanelBlock>
@@ -433,7 +442,7 @@ function PrimePanel() {
         data={models || []}
         renderCard={(model) => (
           <Card
-            id={`model-${model.name}-card`}
+            id={`model-${model.id}-card`}
             key={model.name}
             title={model.name}
             size='large'
