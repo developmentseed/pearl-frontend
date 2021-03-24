@@ -1,14 +1,16 @@
 import L from 'leaflet';
 
 class AoiDrawControl {
-  constructor(map, initializationShape, events) {
+  constructor(map, initializationShape, apiLimits, events) {
     this._map = map;
     this.onDrawEnd = events.onDrawEnd;
     this.onDrawChange = events.onDrawChange;
+    this.onDrawStart = events.onDrawStart;
     this.onInitialize = events.onInitialize;
     if (initializationShape) {
       this.initialize(initializationShape);
     }
+    this._apiLimits = apiLimits;
   }
 
   clear() {
@@ -50,9 +52,12 @@ class AoiDrawControl {
     // Update rectangle on mouse move
     function onMouseMove(event) {
       this._end = this.getEventLatLng(event);
-
       if (!this._shape) {
-        this._shape = L.rectangle([this._start, this._end]).addTo(this._map);
+        this._shape = L.rectangle([this._start, this._end], {
+          weight: 4,
+          fillOpacity: 0.4,
+        }).addTo(this._map);
+        this.onDrawStart(this._shape);
       } else {
         this._shape.setBounds([this._start, this._end]);
       }
@@ -65,6 +70,7 @@ class AoiDrawControl {
     function onMouseUp() {
       // Turn off the mousemove handler in all cases
       // on the mouseUp action
+      this._shape.setStyle({ fillOpacity: 0 });
       this._map.off('mousemove', onMouseMove, this);
 
       // We need to enable dragging to get the

@@ -1,4 +1,10 @@
-import React, { createContext, useEffect, useReducer, useState } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useReducer,
+  useState,
+} from 'react';
 import T from 'prop-types';
 import { initialApiRequestState } from '../reducers/reduxeed';
 import {
@@ -8,21 +14,14 @@ import {
   queryApiGet,
 } from '../reducers/api';
 import { createQueryApiPostReducer } from '../reducers/api';
-import useLocalStorage from '@rooks/use-localstorage';
-import config from '../config';
-import { useAuth0 } from '@auth0/auth0-react';
 import RestApiClient from './rest-api-client';
+import { AuthContext } from './auth';
 
 const GlobalContext = createContext({});
 export function GlobalContextProvider(props) {
+  const { apiToken } = useContext(AuthContext);
   const [tourStep, setTourStep] = useState(0);
 
-  const {
-    isAuthenticated,
-    getAccessTokenWithPopup,
-    isLoading: auth0IsLoading,
-  } = useAuth0();
-  const [apiToken, setApiToken, removeApiToken] = useLocalStorage();
   const [restApiClient, setRestApiClient] = useState();
 
   const [restApiHealth, dispatchRestApiStatus] = useReducer(
@@ -33,11 +32,6 @@ export function GlobalContextProvider(props) {
   /* User data Reducers */
   const [modelsList, dispatchModelsList] = useReducer(
     createQueryApiGetReducer('model'),
-    initialApiRequestState
-  );
-
-  const [projectsList, dispatchProjectsList] = useReducer(
-    createQueryApiGetReducer('project'),
     initialApiRequestState
   );
 
@@ -68,35 +62,6 @@ export function GlobalContextProvider(props) {
 
   useEffect(() => {
     /*
-     * Request api access token via Auth0
-     */
-    async function getApiToken() {
-      const token = await getAccessTokenWithPopup({
-        audience: config.audience,
-      }).catch((err) =>
-        /* eslint-disable-next-line no-console */
-        console.error(err)
-      );
-
-      if (token) {
-        setApiToken(token);
-      }
-    }
-
-    const { isReady, hasError } = restApiHealth;
-    if (isReady() && !hasError() && !auth0IsLoading) {
-      if (isAuthenticated && !apiToken) {
-        // Get API token if user has signed in
-        getApiToken();
-      } else if (!isAuthenticated && apiToken) {
-        // Clear it on sign off
-        removeApiToken();
-      }
-    }
-  }, [restApiHealth, isAuthenticated, auth0IsLoading]); // eslint-disable-line
-
-  useEffect(() => {
-    /*
      * Request user data when api token is available
      */
     if (!apiToken) {
@@ -108,7 +73,6 @@ export function GlobalContextProvider(props) {
     setRestApiClient(restApiClient);
 
     queryApiGet({ token: apiToken, endpoint: 'model' })(dispatchModelsList);
-    queryApiGet({ token: apiToken, endpoint: 'project' })(dispatchProjectsList);
   }, [apiToken]);
 
   return (
@@ -116,10 +80,8 @@ export function GlobalContextProvider(props) {
       <GlobalContext.Provider
         value={{
           restApiHealth,
-          apiToken,
           restApiClient,
           modelsList,
-          projectsList,
 
           mosaicList,
 

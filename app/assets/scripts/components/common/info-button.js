@@ -18,6 +18,7 @@ const InfoButton = React.forwardRef((props, ref) => {
     <>
       <Button
         ref={ref}
+        data-cy={props['data-cy']}
         useIcon={useIcon || 'circle-information'}
         data-tip
         data-for={id}
@@ -42,6 +43,7 @@ InfoButton.propTypes = {
   children: T.node,
   useIcon: T.oneOfType([T.string, T.array]),
   width: T.string,
+  'data-cy': T.string,
 };
 
 export default InfoButton;

@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import { themeVal, glsp } from '@devseed-ui/theme-provider';
 import { Button } from '@devseed-ui/button';
 import T from 'prop-types';
-import { useAuth0 } from '@auth0/auth0-react';
 import Panel from '../../common/panel';
 import {
   PanelBlock,
@@ -44,6 +43,8 @@ import InfoButton from '../../common/info-button';
 
 import { availableLayers } from '../sample-data';
 import { formatThousands } from '../../../utils/format';
+import { AuthContext } from '../../../context/auth';
+import { CheckpointContext } from '../../../context/checkpoint';
 
 const PlaceholderPanelSection = styled.div`
   padding: ${glsp()};
@@ -130,7 +131,9 @@ function AoiEditButtons(props) {
               map.aoi.control.draw.disable();
 
               //Edit mode is enabled as soon as draw is done
-              map.aoi.control.edit.disable();
+              if (map.aoi.control.edit._shape) {
+                map.aoi.control.edit.disable();
+              }
 
               //Layer must be removed from the map
               map.aoi.control.draw.clear();
@@ -151,19 +154,26 @@ function AoiEditButtons(props) {
             closeButton={false}
             renderHeadline={() => (
               <ModalHeadline>
-                <h1>Save Area</h1>
+                {activeModal === 'no-live-inference' ? (
+                  <h1>Save Area</h1>
+                ) : (
+                  <h1>Area too large</h1>
+                )}
               </ModalHeadline>
             )}
             content={
               activeModal === 'no-live-inference' ? (
                 <div>
                   Live inference is not available for areas larger than{' '}
-                  {formatThousands(apiLimits.live_inference)} km2.
+                  {formatThousands(apiLimits.live_inference / 1e6)} km². You can
+                  run inference on this AOI as a background process, or resize
+                  to a smaller size to engage in retraining and run live
+                  inference.
                 </div>
               ) : (
                 <div>
                   Area size is limited to{' '}
-                  {formatThousands(apiLimits.max_inference)} km2.
+                  {formatThousands(apiLimits.max_inference / 1e6)} km².
                 </div>
               )
             }
@@ -226,7 +236,7 @@ AoiEditButtons.propTypes = {
 };
 
 function PrimePanel() {
-  const { isAuthenticated } = useAuth0();
+  const { isAuthenticated } = useContext(AuthContext);
 
   const {
     viewMode,
@@ -237,14 +247,16 @@ function PrimePanel() {
     setSelectedCheckpoint,
     selectedModel,
     setSelectedModel,
-    availableClasses,
     aoiRef,
     setAoiRef,
     aoiArea,
     apiLimits,
     runInference,
+    retrain,
     predictions,
   } = useContext(ExploreContext);
+
+  const { currentCheckpoint } = useContext(CheckpointContext);
 
   const { modelsList, mosaicList } = useContext(GlobalContext);
 
@@ -254,9 +266,9 @@ function PrimePanel() {
 
   const { models } = modelsList.isReady() && modelsList.getData();
 
-  // Enable/disable "Run Inference" button
+  // Check if AOI and selected model are defined, and if view mode is runnable
   const allowInferenceRun =
-    viewMode === viewModes.BROWSE_MODE &&
+    [viewModes.BROWSE_MODE, viewModes.ADD_CLASS_SAMPLES].includes(viewMode) &&
     aoiRef &&
     aoiArea > 0 &&
     selectedModel;
@@ -265,6 +277,22 @@ function PrimePanel() {
   const applyTooltip = currentProject
     ? 'Run inference for this model'
     : 'Create project and run model';
+
+  // Retrain Panel Tab Empty State message
+  //
+  const retrainPlaceHolderMessage = () => {
+    if (predictions.isReady()) {
+      // If predictions are ready, do not need a placeholder
+      return null;
+    }
+    if (aoiRef && selectedModel) {
+      return `Click the "Run Model" button to generate the class LULC map for your AOI`;
+    } else if (aoiRef && !selectedModel) {
+      return `Select a model to use for inference`;
+    } else {
+      return `Define an Area of Interest to run models at your selected location`;
+    }
+  };
 
   return (
     <>
@@ -283,7 +311,7 @@ function PrimePanel() {
                 </HeadOptionHeadline>
                 <SubheadingStrong>
                   {aoiArea && aoiArea > 0
-                    ? `${formatThousands(aoiArea)} km2`
+                    ? `${formatThousands(aoiArea / 1e6)} km2`
                     : viewMode === viewModes.CREATE_AOI_MODE
                     ? 'Drag on map to select'
                     : 'None selected - Draw area on map'}
@@ -307,7 +335,7 @@ function PrimePanel() {
                 <HeadOptionHeadline>
                   <Subheading>Selected Model</Subheading>
                 </HeadOptionHeadline>
-                <SubheadingStrong>
+                <SubheadingStrong data-cy='select-model-label'>
                   {(selectedModel && selectedModel.name) ||
                     (isAuthenticated
                       ? models && models.length
@@ -393,23 +421,11 @@ function PrimePanel() {
             </PanelBlockHeader>
             <PanelBlockBody>
               <TabbedBlock>
-                {predictions && !predictions.error && predictions.fetched ? (
-                  <RetrainModel
-                    name='retrain model'
-                    tabId='retrain-tab-trigger'
-                    classList={availableClasses}
-                  />
-                ) : (
-                  <PlaceholderPanelSection
-                    name='Retrain Model'
-                    tabId='retrain-tab-trigger'
-                  >
-                    <PlaceholderMessage>
-                      Click &quot;Run Inference&quot; to generate the class LULC
-                      map for your AOI
-                    </PlaceholderMessage>
-                  </PlaceholderPanelSection>
-                )}
+                <RetrainModel
+                  name='retrain model'
+                  tabId='retrain-tab-trigger'
+                  placeholderMessage={retrainPlaceHolderMessage()}
+                />
                 <PlaceholderPanelSection
                   name='Refine Results'
                   tabId='refine-tab-trigger'
@@ -464,18 +480,23 @@ function PrimePanel() {
               </Button>
 
               <InfoButton
+                data-cy={allowInferenceRun ? 'run-model-button' : 'disabled'}
                 variation='primary-raised-dark'
                 size='medium'
                 useIcon='tick--small'
                 style={{
                   gridColumn: '1 / -1',
                 }}
-                onClick={() => allowInferenceRun && runInference()}
+                onClick={() => {
+                  allowInferenceRun && !currentCheckpoint
+                    ? runInference()
+                    : retrain();
+                }}
                 visuallyDisabled={!allowInferenceRun}
                 info={applyTooltip}
                 id='apply-button-trigger'
               >
-                Run Model
+                {!currentCheckpoint ? 'Run Model' : 'Retrain'}
               </InfoButton>
               <InfoButton
                 variation='primary-plain'
@@ -501,7 +522,7 @@ function PrimePanel() {
         data={models || []}
         renderCard={(model) => (
           <Card
-            id={`model-${model.name}-card`}
+            id={`model-${model.id}-card`}
             key={model.name}
             title={model.name}
             size='large'

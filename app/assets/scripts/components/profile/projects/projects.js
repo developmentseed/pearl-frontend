@@ -1,6 +1,5 @@
-import React from 'react';
+import React, { useContext, useEffect, useReducer } from 'react';
 import styled from 'styled-components';
-import T from 'prop-types';
 import { Button } from '@devseed-ui/button';
 import CardList, { Card } from '../../common/card-list';
 import {
@@ -13,21 +12,35 @@ import {
   InpageBodyInner,
 } from '../../../styles/inpage';
 import { Form, FormInput } from '@devseed-ui/form';
-import { glsp } from '@devseed-ui/theme-provider';
+import { glsp, media } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
 import { StyledNavLink } from '../../../styles/links';
 import toasts from '../../common/toasts';
 import { useHistory } from 'react-router';
+import { AuthContext } from '../../../context/auth';
+import { createQueryApiGetReducer, queryApiGet } from '../../../reducers/api';
+import { initialApiRequestState } from '../../../reducers/reduxeed';
 const ProjectsBody = styled(InpageBodyInner)`
   display: grid;
-  grid-template-columns: 1fr 4fr;
-  padding: 0 ${glsp(4)};
+  grid-template-columns: 1fr;
+  grid-auto-rows: auto 1fr;
+  grid-gap: ${glsp()};
+  padding: 0 ${glsp(4)} ${glsp(4)};
   min-height: 100%;
+  ${media.mediumUp`
+    grid-template-columns: 1fr 4fr;
+    grid-auto-rows: auto;
+  `}
 `;
 const CardResults = styled.div`
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: 1fr;
+  grid-auto-rows: auto 1fr;
   grid-gap: 1rem;
+  ${media.mediumUp`
+    grid-template-columns: 2fr 1fr;
+    grid-auto-rows: auto;
+  `}
 `;
 
 const FormInputGroup = styled.div`
@@ -55,11 +68,36 @@ const NavPane = styled.div`
     content: '-';
   }
 `;
-const NavList = styled.ol``;
+const NavList = styled.ol`
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-around;
+  > * {
+    padding: ${glsp(0.5)};
+  }
+  ${media.mediumUp`
+    flex-flow: column;
+  `}
+`;
 
-function Projects(props) {
+function Projects() {
   const history = useHistory();
-  const { projectsList } = props;
+
+  const { apiToken } = useContext(AuthContext);
+
+  const [projectsList, dispatchProjectsList] = useReducer(
+    createQueryApiGetReducer('project'),
+    initialApiRequestState
+  );
+
+  useEffect(() => {
+    if (apiToken) {
+      queryApiGet({ token: apiToken, endpoint: 'project' })(
+        dispatchProjectsList
+      );
+    }
+  }, [apiToken]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const { projects } = projectsList.isReady() ? projectsList.getData() : {};
   return (
     <>
@@ -167,7 +205,7 @@ function Projects(props) {
                               useIcon={['download', 'after']}
                               size='small'
                             >
-                              Download
+                              Download Map
                             </Button>
                           </CardResults>
                         ),
@@ -189,7 +227,4 @@ function Projects(props) {
   );
 }
 
-Projects.propTypes = {
-  projectsList: T.object,
-};
 export default Projects;

@@ -56,6 +56,7 @@ module.exports = {
 ```
 
 #### Dependencies
+
 This project uses components from the DevSeed UI Library. Library collecticons are included and can be used in both library and local components. The gulp file still runs a task to compile compile local icons. To add a custom icon, add to `icons/collecticons` and import `collecticon` from `./app/scripts/styles/collecticons/index.js`.
 
 #### Starting the app
@@ -70,7 +71,13 @@ The site will automatically refresh since it is bundled with livereload.
 
 ## Testing
 
-The app is using cypress to perform end-to-end testing. New tests should be added to `cypress/integrations/*.spec.js`. 
+The app is using cypress to perform end-to-end testing. New tests should be added to `cypress/integrations/*.spec.js`.
+
+Start the front-end in testing mode:
+
+```sh
+yarn run serve:testing
+```
 
 To run tests using cypress gui:
 

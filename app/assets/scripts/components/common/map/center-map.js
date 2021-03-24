@@ -23,7 +23,7 @@ function CenterMap({ aoiRef }) {
   useEffect(() => {
     const center = new CenterControl({ position: 'topleft' });
     center.addTo(map);
-  }, [map]);
+  }, [map]); // eslint-disable-line react-hooks/exhaustive-deps
   return null;
 }
 

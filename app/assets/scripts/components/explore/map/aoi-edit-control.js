@@ -12,12 +12,13 @@ const icons = {
 };
 
 class AoiEditControl {
-  constructor(map, { onBoundsChange, onBoundsChangeEnd }) {
+  constructor(map, apiLimits, { onBoundsChange, onBoundsChangeEnd }) {
     this._map = map;
     this.onBoundsChangeEnd = () =>
       onBoundsChangeEnd && onBoundsChangeEnd(this._getBbox());
     this.onBoundsChange = () =>
       onBoundsChange && onBoundsChange(this._getBbox());
+    this._apiLimits = apiLimits;
   }
 
   enable(shape) {
