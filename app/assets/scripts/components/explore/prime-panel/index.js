@@ -44,7 +44,7 @@ import InfoButton from '../../common/info-button';
 import { availableLayers } from '../sample-data';
 import { formatThousands } from '../../../utils/format';
 import { AuthContext } from '../../../context/auth';
-import { CheckpointContext } from '../../../context/checkpoint';
+import { CheckpointContext, actions} from '../../../context/checkpoint';
 
 import { AoiEditButtons } from './aoi-edit-buttons';
 
@@ -108,7 +108,7 @@ function PrimePanel() {
     setAoiBounds,
   } = useContext(ExploreContext);
 
-  const { currentCheckpoint } = useContext(CheckpointContext);
+  const { currentCheckpoint, dispatchCurrentCheckpoint } = useContext(CheckpointContext);
 
   const { modelsList, mosaicList } = useContext(GlobalContext);
 
@@ -233,6 +233,11 @@ function PrimePanel() {
                           map.aoi.control.draw.disable();
                           //Layer must be removed from the map
                           map.aoi.control.draw.clear();
+
+                          //clear inference tiles
+                          dispatchCurrentCheckpoint({
+                            type: actions.RESET_CHECKPOINT
+                          })
                         }}
                         data-cy='add-aoi-button'
                       >

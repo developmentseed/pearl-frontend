@@ -32,6 +32,7 @@ export const actions = {
   SET_ACTIVE_CLASS: 'SET_ACTIVE_CLASS',
   ADD_POINT_SAMPLE: 'ADD_POINT_SAMPLE',
   REMOVE_POINT_SAMPLE: 'REMOVE_POINT_SAMPLE',
+  RESET_CHECKPOINT: 'RESET_CHECKPOINT'
 };
 
 function checkpointReducer(state, action) {
@@ -111,6 +112,9 @@ function checkpointReducer(state, action) {
           [state.activeClass]: updatedClass,
         },
       };
+    }
+    case actions.RESET_CHECKPOINT: {
+      return
     }
     default:
       throw new Error('Unexpected error.');

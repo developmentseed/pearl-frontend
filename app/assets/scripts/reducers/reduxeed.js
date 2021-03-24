@@ -383,7 +383,12 @@ function wrapper(stateData) {
   const ready = fetched && !fetching;
   return {
     raw: () => stateData,
-    isReady: () => ready,
+    isReady: (log) => {
+      //ready
+      if (log)
+        console.log(fetched, fetching, ready)
+      return ready
+    },
     hasError: () => ready && !!error,
     getData: (def = {}) => (ready ? data.results || data : def),
     getMeta: (def = {}) => (ready ? data.meta : def),

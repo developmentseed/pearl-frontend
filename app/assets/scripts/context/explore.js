@@ -172,8 +172,6 @@ export function ExploreProvider(props) {
   }, [apiMeta]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    //if (!predictions.isReady()) return;
-
     if (predictions.fetching) {
       const { processed, total } = predictions;
       if (!total) {
@@ -183,20 +181,18 @@ export function ExploreProvider(props) {
           `Receiving images: ${processed} of ${total}...`
         );
       }
-    } else {
+    } else if (predictions.isReady()){
       hideGlobalLoading();
-
-      if (predictions.fetched) {
-        restApiClient
-          .get(`project/${currentProject.id}/aoi/`)
-          .then((aois) => {
-            console.log(aois);
-            setAoiList(filterAoiList(aois.aois));
-          });
-      }
 
       // Update aoi List with newest aoi
       // If predictions is ready, restApiClient must be ready
+
+      if (predictions.fetched) {
+        restApiClient.get(`project/${currentProject.id}/aoi/`).then((aois) => {
+          setAoiList(filterAoiList(aois.aois));
+        });
+      }
+
 
       if (predictions.error) {
         toasts.error('An inference error occurred, please try again later.');
@@ -205,6 +201,12 @@ export function ExploreProvider(props) {
       }
     }
   }, [predictions, restApiClient, currentProject]);
+
+  useEffect(() => {
+    console.log(viewMode)
+    return () => console.log(viewMode)
+  }, [viewMode])
+
 
   /*
    * Re-init aoi state variables
