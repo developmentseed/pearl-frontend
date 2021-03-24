@@ -24,12 +24,16 @@ const HomeBody = styled(InpageBody)`
   align-items: center;
   color: ${themeVal('color.surface')};
 
-  background-image: url('${baseUrl}/assets/graphics/content/home-bg--largeUp.jpg'),
+  background-image: linear-gradient(to top right, #040a15, rgba(4, 10, 21, 0)),
+    url('${baseUrl}/assets/graphics/content/home-bg--largeUp.jpg'),
     linear-gradient(225deg, #040a15, #070f1c);
-  background-repeat: no-repeat, no-repeat;
-  background-size: cover, cover;
-  background-position: 25vw 0vw, center;
+  background-repeat: no-repeat, no-repeat, no-repeat;
+  background-size: cover, cover, cover;
+  background-position: center, 25vw 0vw, center;
   ${media.xlargeUp`
+    background-image: 
+    url('${baseUrl}/assets/graphics/content/home-bg--largeUp.jpg'),
+    linear-gradient(225deg, #040a15, #070f1c);
     background-size: contain, cover;
     background-position: calc(100% + 20vw) 0, center;
   `}
