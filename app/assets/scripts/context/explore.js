@@ -17,10 +17,15 @@ import toasts from '../components/common/toasts';
 import { useHistory, useParams } from 'react-router-dom';
 import WebsocketClient from './websocket-client';
 import GlobalContext from './global';
-import predictionsReducer from '../reducers/predictions';
+import predictionsReducer, {
+  actions as predictionActions,
+} from '../reducers/predictions';
 import usePrevious from '../utils/use-previous';
 import tBbox from '@turf/bbox';
-import { actions, CheckpointContext } from './checkpoint';
+import tBboxPolygon from '@turf/bbox-polygon';
+import tCentroid from '@turf/centroid';
+
+import { actions as checkpointActions, CheckpointContext } from './checkpoint';
 import logger from '../utils/logger';
 import get from 'lodash.get';
 
@@ -52,10 +57,16 @@ export function ExploreProvider(props) {
   // Float value that records square area of aoi
   const [aoiArea, setAoiArea] = useState(null);
 
+  const [aoiName, setAoiName] = useState(null);
+
   // Aoi shape that is requested from API. used to initialize
   // Leaflet layer in the front end
   // eslint-disable-next-line
   const [aoiInitializer, setAoiInitializer] = useState(null);
+  const [aoiList, setAoiList] = useState([]);
+
+  //L.LatLngBounds object, set when aoi is confirmed
+  const [aoiBounds, setAoiBounds] = useState(null);
 
   const [viewMode, setViewMode] = useState(viewModes.BROWSE_MODE);
   const [selectedModel, setSelectedModel] = useState(null);
@@ -101,45 +112,23 @@ export function ExploreProvider(props) {
 
           setCurrentProject(project);
 
+          showGlobalLoadingMessage('Loading Model...');
           const model = await restApiClient.getModel(project.model_id);
 
           setSelectedModel(model);
-          try {
-            const activeInstances = await restApiClient.getActiveInstances(
-              projectId
-            );
-            if (activeInstances.total > 0) {
-              const instanceItem = activeInstances.instances[0];
-              const instance = await restApiClient.getInstance(
-                projectId,
-                instanceItem.id
-              );
-              setCurrentInstance(instance);
-            }
-          } catch (error) {
-            // If this request fails, let it fail silently.
-            // But, we log an error to the console.
-            logger('Active instance check FAILED', error);
-          }
 
-          /* TODO
-           * This code is untested.
-           * Once inference is run on a project, the API will
-           * return an AOI here
-           */
+          showGlobalLoadingMessage('Loading AOIs...');
           const aois = await restApiClient.get(`project/${project.id}/aoi`);
 
+          const filteredList = filterAoiList(aois.aois);
+          setAoiList(filteredList);
           if (aois.total > 0) {
-            const latest = aois.aois.pop();
-            const latestAoi = await restApiClient.get(
-              `project/${project.id}/aoi/${latest.id}`
-            );
-            const [lonMin, latMin, lonMax, latMax] = tBbox(latestAoi.bounds);
-            setAoiInitializer([
-              [latMin, lonMin],
-              [latMax, lonMax],
-            ]);
+            const latest = filteredList[filteredList.length - 1];
+            loadAoi(project, latest);
           }
+
+          showGlobalLoadingMessage('Checking for existing instance');
+          await loadActiveInstance();
         } catch (error) {
           toasts.error('Error loading project, please try again later.');
         } finally {
@@ -151,6 +140,27 @@ export function ExploreProvider(props) {
       loadProject();
     }
   }, [restApiClient]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  async function loadActiveInstance() {
+    try {
+      const activeInstances = await restApiClient.getActiveInstances(projectId);
+
+      if (activeInstances.total > 0) {
+        const instanceItem = activeInstances.instances[0];
+        const instance = await restApiClient.getInstance(
+          projectId,
+          instanceItem.id
+        );
+        setCurrentInstance(instance);
+        return instance;
+      }
+    } catch (error) {
+      // If this request fails, let it fail silently.
+      // But, we log an error to the console.
+      logger('Active instance check FAILED', error);
+      return error;
+    }
+  }
 
   // If API is unreachable, redirect to home
   useEffect(() => {
@@ -164,12 +174,7 @@ export function ExploreProvider(props) {
   }, [apiMeta]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    console.log(predictions.fetched)
-
-    //if (!predictions.isReady()) return;
-
     if (predictions.fetching) {
-      console.log('fetchign')
       const { processed, total } = predictions;
       if (!total) {
         showGlobalLoadingMessage(`Waiting for predictions...`);
@@ -178,9 +183,18 @@ export function ExploreProvider(props) {
           `Receiving images: ${processed} of ${total}...`
         );
       }
-    } else {
-      console.log('not fetching')
+    } else if (predictions.isReady()) {
       hideGlobalLoading();
+
+      // Update aoi List with newest aoi
+      // If predictions is ready, restApiClient must be ready
+
+      if (predictions.fetched) {
+        restApiClient.get(`project/${currentProject.id}/aoi/`).then((aois) => {
+          setAoiList(filterAoiList(aois.aois));
+        });
+      }
+
       if (predictions.error) {
         toasts.error('An inference error occurred, please try again later.');
       } else {
@@ -188,12 +202,122 @@ export function ExploreProvider(props) {
         loadMetrics()
       }
     }
-  }, [predictions, currentCheckpoint]);
+  }, [predictions, restApiClient, currentProject]);
+
 
   async function loadMetrics() {
-    console.log(restApiClient)
-    console.log(currentCheckpoint)
+    await restApiClient.get(`project/${currentProject.id}/checkpoint/${currentCheckpoint.checkpoint_id}`).then((ckpt) => {
+      if (ckpt.analytics) {
+        console.log(ckpt.analytics)
+        dispatchCurrentCheckpoint({
+          type: checkpointActions.RECEIVE_ANALYTICS,
+          data: { analytics: ckpt.analytics}
+        })
+      }
+    })
+      
+  }
 
+
+  useEffect(() => {
+    if (predictions.isReady()) {
+      if (
+        viewMode === viewModes.BROWSE_MODE &&
+        previousViewMode === viewModes.EDIT_AOI_MODE
+      ) {
+        dispatchPredictions({ type: predictionActions.CLEAR_PREDICTION });
+
+        dispatchCurrentCheckpoint({
+          type: checkointActions.RESET_CHECKPOINT,
+        });
+      }
+    }
+  }, [viewMode, previousViewMode, predictions]);
+
+  /*
+   * Re-init aoi state variables
+   */
+  function createNewAoi() {
+    setViewMode(viewModes.CREATE_AOI_MODE);
+    setAoiRef(null);
+    setAoiBounds(null);
+    setAoiArea(null);
+    setAoiName(null);
+
+    //clear inference tiles
+    dispatchCurrentCheckpoint({
+      type:checkpointActions.RESET_CHECKPOINT,
+    });
+
+    //clear inference tiles
+    dispatchPredictions({
+      type: predictionActions.CLEAR_PREDICTION,
+    });
+  }
+
+  /*
+   * Filter the aoi list to have unique names
+   * Back end doesn't care if aoi's are submitted with duplicate names.
+   * On frontend, assume that equivalent name -> equivalent geometry
+   * Only update the name if the geometry has been edited
+   *
+   */
+  function filterAoiList(aoiList) {
+    const aois = new Map();
+    aoiList.forEach((a) => {
+      if (aois.has(a.name)) {
+        if (aois.get(a.name).created > a.created) {
+          aois.set(a.name, a);
+        }
+      } else {
+        aois.set(a.name, a);
+      }
+    });
+    return Array.from(aois.values());
+  }
+
+  /*
+   * Utility function to load AOI
+   * @param project - current project object
+   * @param aoiObject - object containing aoi id and name
+   *                  Objects of this format are returned by
+   *                  aoi listing endpoint
+   */
+
+  async function loadAoi(project, aoiObject) {
+    showGlobalLoadingMessage('Loading AOI');
+    const aoi = await restApiClient.get(
+      `project/${project.id}/aoi/${aoiObject.id}`
+    );
+    const [lonMin, latMin, lonMax, latMax] = tBbox(aoi.bounds);
+    const bounds = [
+      [latMin, lonMin],
+      [latMax, lonMax],
+    ];
+
+    if (aoiRef) {
+      // Load existing aoi that was returned by the api
+      aoiRef.setBounds(bounds);
+      setAoiBounds(aoiRef.getBounds());
+      setAoiName(aoiObject.name);
+      setViewMode(viewModes.BROWSE_MODE);
+      if (predictions.isReady) {
+        dispatchPredictions({ type: predictionActions.CLEAR_PREDICTION });
+      }
+
+      if (currentCheckpoint) {
+        dispatchCurrentCheckpoint({
+          type: checkpointActions.RESET_CHECKPOINT,
+        });
+      }
+    } else {
+      // initializing map with first aoi
+      setAoiInitializer(bounds);
+      setAoiName(aoiObject.name);
+    }
+
+    hideGlobalLoading();
+    return bounds;
   }
 
   async function updateProjectName(projectName) {
@@ -225,6 +349,54 @@ export function ExploreProvider(props) {
     }
   }
 
+  /*
+   * Reverse geocode using Bing
+   *
+   * @param bbox - should be turf bbox [minx, miny, maxX, maxY] or polygon feature
+   */
+  async function reverseGeoCode(bbox) {
+    /*
+    if (!aoiBounds) {
+      console.error('defined bounds before reverse geocoding')
+    }*/
+
+    let center;
+    if (Array.isArray(bbox)) {
+      // Need to create a polygon
+      center = tCentroid(tBboxPolygon(bbox));
+    } else {
+      // Assume a polygon feature is provided
+      center = tCentroid(bbox);
+    }
+
+    const [lon, lat] = center.geometry.coordinates;
+
+    const address = await fetch(
+      `${config.bingSearchUrl}/Locations/${lat},${lon}?radius=${config.reverseGeocodeRadius}&includeEntityTypes=address&key=${config.bingApiKey}`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    )
+      .then((res) => res.json())
+      .catch(() => {
+        toasts.error('Error querying address');
+        return null;
+      });
+
+    let name;
+    if (address && address.resourceSets[0].estimatedTotal) {
+      // Use first result if there are any
+      name = address.resourceSets[0].resources[0].address.locality;
+    } else {
+      toasts.warn('AOI not geocodable, generic name used');
+      name = 'Area';
+    }
+    // else leave name undefined, should be set by user
+    return name;
+  }
+
   async function runInference() {
     if (restApiClient) {
       let project = currentProject;
@@ -251,7 +423,7 @@ export function ExploreProvider(props) {
         showGlobalLoadingMessage('Fetching classes...');
         const { classes } = await restApiClient.getModel(selectedModel.id);
         dispatchCurrentCheckpoint({
-          type: actions.SET_CHECKPOINT,
+          type: checkpointActions.SET_CHECKPOINT,
           data: {
             classes,
           },
@@ -259,6 +431,12 @@ export function ExploreProvider(props) {
       } catch (error) {
         hideGlobalLoading();
         toasts.error('Could fetch model classes, please try again later.');
+        return; // abort inference run
+      }
+
+      if (!aoiName) {
+        hideGlobalLoading();
+        toasts.error('AOI Name must be set before running inference');
         return; // abort inference run
       }
 
@@ -280,9 +458,9 @@ export function ExploreProvider(props) {
             dispatchPredictions,
             dispatchCurrentCheckpoint,
             onConnected: () => {
-              hideGlobalLoading()
-              newWebsocketClient.requestPrediction('A name', aoiRef)
-            }
+              hideGlobalLoading();
+              newWebsocketClient.requestPrediction(aoiName, aoiRef);
+            },
           });
           setWebsocketClient(newWebsocketClient);
         } catch (error) {
@@ -293,7 +471,7 @@ export function ExploreProvider(props) {
         }
       } else {
         // Send message with existing websocket
-        websocketClient.requestPrediction('A name', aoiRef);
+        websocketClient.requestPrediction(aoiName, aoiRef);
       }
     }
   }
@@ -334,6 +512,57 @@ export function ExploreProvider(props) {
     }
   }, [aoiRef]);
 
+  /*
+   * This useEffect GeoCodes an AOI after it is created.
+   * On the front end we assume that any AOI with the same name
+   * from the backend, will have the same geometry.
+   *
+   * To deal with this, any AOI that has the same geocoding as an existing one will be incremented.
+   *
+   * i.e. Seneca Rocks, Seneca Rocks #1, Seneca Rocks #2...etc
+   */
+
+  useEffect(() => {
+    if (!aoiBounds) {
+      return;
+    } else if (
+      viewMode === viewModes.BROWSE_MODE &&
+      (previousViewMode === viewModes.EDIT_AOI_MODE ||
+        previousViewMode === viewModes.CREATE_AOI_MODE)
+    ) {
+      const bounds = [
+        aoiBounds.getWest(),
+        aoiBounds.getSouth(),
+        aoiBounds.getEast(),
+        aoiBounds.getNorth(),
+      ];
+
+      reverseGeoCode(bounds).then((name) => {
+        let lastInstance;
+        aoiList
+          .sort((a, b) => {
+            if (a.name < b.name) return -1;
+            else if (a.name > b.name) return 1;
+            else return 0;
+          })
+          .forEach((a) => {
+            return (lastInstance = a.name.includes(name)
+              ? a.name
+              : lastInstance);
+          });
+        if (lastInstance) {
+          if (lastInstance.includes('#')) {
+            const [n, version] = lastInstance.split('#').map((w) => w.trim());
+            name = `${n} #${Number(version) + 1}`;
+          } else {
+            name = `${name} #${1}`;
+          }
+        }
+        setAoiName(name);
+      });
+    }
+  }, [aoiBounds, aoiList, viewMode, previousViewMode]);
+
   return (
     <ExploreContext.Provider
       value={{
@@ -349,7 +578,16 @@ export function ExploreProvider(props) {
         setAoiRef,
         aoiArea,
         setAoiArea,
+        aoiName,
         aoiInitializer,
+        aoiList,
+
+        createNewAoi,
+
+        aoiBounds,
+        setAoiBounds,
+
+        loadAoi,
 
         currentInstance,
         setCurrentInstance,
@@ -363,6 +601,7 @@ export function ExploreProvider(props) {
         updateProjectName,
 
         runInference,
+        reverseGeoCode,
         retrain,
       }}
     >

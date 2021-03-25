@@ -15,6 +15,8 @@ import Map from './map';
 import Tour from '../common/tour';
 import GlobalContext from '../../context/global';
 import { ExploreContext } from '../../context/explore';
+import { CheckpointContext } from '../../context/checkpoint';
+
 import { tourSteps } from './tour';
 
 const ExploreBody = styled(InpageBody)`
@@ -26,6 +28,8 @@ const ExploreCarto = styled.section``;
 function Explore() {
   const { tourStep, setTourStep } = useContext(GlobalContext);
   const { apiLimits } = useContext(ExploreContext);
+
+  const { currentCheckpoint } = useContext(CheckpointContext);
   const [steps, setSteps] = useState(null);
 
   useEffect(() => {
@@ -59,7 +63,13 @@ function Explore() {
             collapsible
             direction='right'
             initialState={true}
-            bodyContent={<div>Secondary panel</div>}
+            bodyContent={
+              <>
+                {
+                  currentCheckpoint && currentCheckpoint.analytics
+                }
+              </>
+            }
             data-cy='secondary-panel'
           />
         </ExploreBody>

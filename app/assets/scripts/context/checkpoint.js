@@ -29,9 +29,12 @@ CheckpointProvider.propTypes = {
 export const actions = {
   SET_CHECKPOINT: 'SET_CHECKPOINT',
   RECEIVE_METADATA: 'RECEIVE_METADATA',
+  RECEIVE_AOI_INFO: 'RECEIVE_AOI_INFO',
+  RECEIVE_ANALYTICS : 'RECEIVE_ANALYTICS',
   SET_ACTIVE_CLASS: 'SET_ACTIVE_CLASS',
   ADD_POINT_SAMPLE: 'ADD_POINT_SAMPLE',
   REMOVE_POINT_SAMPLE: 'REMOVE_POINT_SAMPLE',
+  RESET_CHECKPOINT: 'RESET_CHECKPOINT',
 };
 
 function checkpointReducer(state, action) {
@@ -50,9 +53,19 @@ function checkpointReducer(state, action) {
           return acc;
         }, {}),
       };
+    case actions.RECEIVE_AOI_INFO:
+      return {
+        ...state,
+        ...action.data
+      }
     case actions.RECEIVE_METRICS:
-      console.log(state, action)
       return state
+    case actions.RECEIVE_ANALYTICS:
+      console.log(action.data)
+      return {
+        ...state,
+        ...action.data
+      }
     case actions.RECEIVE_METADATA:
       return {
         ...state,
@@ -114,6 +127,9 @@ function checkpointReducer(state, action) {
           [state.activeClass]: updatedClass,
         },
       };
+    }
+    case actions.RESET_CHECKPOINT: {
+      return;
     }
     default:
       throw new Error('Unexpected error.');

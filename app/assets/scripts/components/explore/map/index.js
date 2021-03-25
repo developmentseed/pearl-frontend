@@ -15,6 +15,7 @@ import { ExploreContext, viewModes } from '../../../context/explore';
 import { MapContext } from '../../../context/map';
 
 import GeoCoder from '../../common/map/geocoder';
+import { BOUNDS_PADDING } from '../../common/map/constants';
 import CenterMap from '../../common/map/center-map';
 
 import { themeVal, multiply } from '@devseed-ui/theme-provider';
@@ -24,6 +25,7 @@ import AoiEditControl from './aoi-edit-control';
 import config from '../../../config';
 import { inRange } from '../../../utils/utils';
 import { CheckpointContext, actions } from '../../../context/checkpoint';
+import ModalMapEvent from './modal-events';
 
 const center = [38.83428180092151, -79.37724530696869];
 const zoom = 15;
@@ -76,15 +78,15 @@ function Map() {
     aoiArea,
     setAoiArea,
     aoiInitializer,
+    setAoiBounds,
+
     setViewMode,
     viewMode,
     predictions,
     apiLimits,
   } = useContext(ExploreContext);
 
-  const { map, setMap, mapLayers, setMapLayers, setAoiBounds } = useContext(
-    MapContext
-  );
+  const { map, setMap, mapLayers, setMapLayers } = useContext(MapContext);
 
   const { mosaicList } = useContext(GlobalContext);
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useContext(
@@ -93,12 +95,15 @@ function Map() {
 
   const { mosaics } = mosaicList.isReady() ? mosaicList.getData() : {};
 
-  function addClassSample(e) {
+  const addClassSample = (e) => {
+    if (viewMode !== viewModes.ADD_CLASS_SAMPLES) {
+      return;
+    }
     dispatchCurrentCheckpoint({
       type: actions.ADD_POINT_SAMPLE,
       data: e.latlng,
     });
-  }
+  };
 
   useEffect(() => {
     if (!map) return;
@@ -124,13 +129,12 @@ function Map() {
               previousViewMode === viewModes.EDIT_AOI_MODE
             ) {
               // On confirm, zoom to bounds
-              map.fitBounds(aoiRef.getBounds(), { padding: [25, 25] });
+              map.fitBounds(aoiRef.getBounds(), { padding: BOUNDS_PADDING });
             }
           }
         }
         break;
       case viewModes.ADD_CLASS_SAMPLES:
-        map.on('click', addClassSample);
         break;
       default:
         break;
@@ -154,6 +158,8 @@ function Map() {
         setAoiRef(shape);
         setAoiBounds(shape.getBounds());
         setAoiArea(areaFromBounds(bbox));
+
+        map.fitBounds(shape.getBounds(), { padding: BOUNDS_PADDING });
       },
       onDrawStart: (shape) => {
         setAoiRef(shape);
@@ -163,6 +169,7 @@ function Map() {
       },
       onDrawEnd: (bbox, shape) => {
         setAoiRef(shape);
+        setAoiBounds(shape.getBounds());
         setViewMode(viewModes.BROWSE_MODE);
       },
     });
@@ -220,6 +227,9 @@ function Map() {
           }
         }}
       >
+        {viewMode === viewModes.ADD_CLASS_SAMPLES && (
+          <ModalMapEvent event='click' func={addClassSample} />
+        )}
         <TileLayer
           attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
           url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'

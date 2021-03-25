@@ -1,8 +1,9 @@
 import React, { useState, useContext } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { themeVal, glsp } from '@devseed-ui/theme-provider';
+import { Heading } from '@devseed-ui/typography';
 import { Button } from '@devseed-ui/button';
-import T from 'prop-types';
+import collecticon from '@devseed-ui/collecticons';
 import Panel from '../../common/panel';
 import {
   PanelBlock,
@@ -13,12 +14,16 @@ import {
 import { Subheading } from '../../../styles/type/heading';
 import SelectModal from '../../common/select-modal';
 import { Card } from '../../common/card-list';
-import {
-  Modal,
-  ModalHeadline,
-  ModalFooter as BaseModalFooter,
-} from '@devseed-ui/modal';
 import { PlaceholderMessage } from '../../../styles/placeholder.js';
+
+import {
+  Dropdown,
+  DropdownHeader,
+  DropdownBody,
+  DropdownItem,
+  DropdownFooter,
+} from '../../../styles/dropdown';
+
 import { ExploreContext, viewModes } from '../../../context/explore';
 import { MapContext } from '../../../context/map';
 import GlobalContext from '../../../context/global';
@@ -27,7 +32,7 @@ import TabbedBlock from '../../common/tabbed-block-body';
 import RetrainModel from './retrain-model';
 
 import LayersPanel from '../layers-panel';
-
+import { BOUNDS_PADDING } from '../../common/map/constants';
 import {
   HeadOption,
   HeadOptionHeadline,
@@ -41,6 +46,8 @@ import { formatThousands } from '../../../utils/format';
 import { AuthContext } from '../../../context/auth';
 import { CheckpointContext } from '../../../context/checkpoint';
 
+import { AoiEditButtons } from './aoi-edit-buttons';
+
 const PlaceholderPanelSection = styled.div`
   padding: ${glsp()};
 `;
@@ -49,6 +56,17 @@ const SubheadingStrong = styled.h3`
   color: ${themeVal('color.base')};
   font-size: 1.125rem;
   line-height: 1.5rem;
+
+  ${({ useIcon }) =>
+    useIcon &&
+    css`
+      display: grid;
+      grid-template-columns: max-content max-content;
+      grid-gap: 1rem;
+      &::after {
+        ${collecticon(useIcon)}
+      }
+    `}
 `;
 
 const StyledPanelBlock = styled(PanelBlock)`
@@ -66,169 +84,6 @@ const PanelControls = styled(PanelBlockFooter)`
   grid-gap: ${glsp()};
 `;
 
-const ModalFooter = styled(BaseModalFooter)`
-  padding: ${glsp(2)} 0 0 0;
-  > button,
-  ${Button} {
-    flex: 1;
-    margin: 0;
-    border-radius: 0;
-  }
-`;
-
-function AoiEditButtons(props) {
-  const {
-    setViewMode,
-    viewMode,
-    aoiRef,
-    aoiArea,
-    aoiBounds,
-    setAoiBounds,
-    apiLimits,
-    map,
-    setAoiRef,
-  } = props;
-
-  const [activeModal, setActiveModal] = useState(false);
-
-  // Display confirm/cancel buttons when AOI edition is active
-  if (
-    viewMode === viewModes.CREATE_AOI_MODE ||
-    viewMode === viewModes.EDIT_AOI_MODE
-  ) {
-    return (
-      <>
-        <EditButton
-          onClick={function () {
-            if (!apiLimits || apiLimits.live_inference > aoiArea) {
-              setViewMode(viewModes.BROWSE_MODE);
-              setAoiBounds(aoiRef.getBounds());
-            } else if (apiLimits.max_inference > aoiArea) {
-              setActiveModal('no-live-inference');
-            } else {
-              setActiveModal('area-too-large');
-            }
-          }}
-          title='Set Area of Interest'
-          useIcon='tick'
-        >
-          Select AOI
-        </EditButton>
-        <EditButton
-          onClick={() => {
-            setViewMode(viewModes.BROWSE_MODE);
-            if (aoiBounds) {
-              // editing is canceled
-              aoiRef.setBounds(aoiBounds);
-            } else {
-              // Drawing canceled
-              map.aoi.control.draw.disable();
-
-              //Edit mode is enabled as soon as draw is done
-              if (map.aoi.control.edit._shape) {
-                map.aoi.control.edit.disable();
-              }
-
-              //Layer must be removed from the map
-              map.aoi.control.draw.clear();
-
-              // Layer ref set to null, will be recreated when draw is attempted again
-              setAoiRef(null);
-            }
-          }}
-          useIcon='xmark'
-        >
-          Select AOI
-        </EditButton>
-        {activeModal && (
-          <Modal
-            id='confirm-area-size'
-            revealed={true}
-            size='small'
-            closeButton={false}
-            renderHeadline={() => (
-              <ModalHeadline>
-                {activeModal === 'no-live-inference' ? (
-                  <h1>Save Area</h1>
-                ) : (
-                  <h1>Area too large</h1>
-                )}
-              </ModalHeadline>
-            )}
-            content={
-              activeModal === 'no-live-inference' ? (
-                <div>
-                  Live inference is not available for areas larger than{' '}
-                  {formatThousands(apiLimits.live_inference / 1e6)} km². You can
-                  run inference on this AOI as a background process, or resize
-                  to a smaller size to engage in retraining and run live
-                  inference.
-                </div>
-              ) : (
-                <div>
-                  Area size is limited to{' '}
-                  {formatThousands(apiLimits.max_inference / 1e6)} km².
-                </div>
-              )
-            }
-            renderFooter={() => (
-              <ModalFooter>
-                {activeModal && activeModal !== 'area-too-large' && (
-                  <Button
-                    size='xlarge'
-                    variation='base-plain'
-                    onClick={() => {
-                      setActiveModal(false);
-                      setViewMode(viewModes.BROWSE_MODE);
-                      setAoiBounds(aoiRef.getBounds());
-                    }}
-                  >
-                    Proceed anyway
-                  </Button>
-                )}
-                <Button
-                  size='xlarge'
-                  variation='primary-plain'
-                  onClick={() => setActiveModal(false)}
-                >
-                  Keep editing
-                </Button>
-              </ModalFooter>
-            )}
-          />
-        )}
-      </>
-    );
-  }
-
-  return (
-    <EditButton
-      onClick={() => {
-        setViewMode(
-          !aoiRef ? viewModes.CREATE_AOI_MODE : viewModes.EDIT_AOI_MODE
-        );
-      }}
-      title='Draw Area of Interest'
-      id='edit-aoi-trigger'
-      useIcon='pencil'
-    >
-      Select AOI
-    </EditButton>
-  );
-}
-
-AoiEditButtons.propTypes = {
-  setViewMode: T.func,
-  viewMode: T.string,
-  aoiRef: T.object,
-  setAoiRef: T.func,
-  aoiBounds: T.object,
-  setAoiBounds: T.func,
-  aoiArea: T.oneOfType([T.bool, T.number]),
-  apiLimits: T.oneOfType([T.bool, T.object]),
-  map: T.object,
-};
-
 function PrimePanel() {
   const { isAuthenticated } = useContext(AuthContext);
 
@@ -241,17 +96,23 @@ function PrimePanel() {
     aoiRef,
     setAoiRef,
     aoiArea,
+    createNewAoi,
+    aoiName,
+    loadAoi,
+    aoiList,
     apiLimits,
     runInference,
     retrain,
     predictions,
+    aoiBounds,
+    setAoiBounds,
   } = useContext(ExploreContext);
 
   const { currentCheckpoint } = useContext(CheckpointContext);
 
   const { modelsList, mosaicList } = useContext(GlobalContext);
 
-  const { map, mapLayers, aoiBounds, setAoiBounds } = useContext(MapContext);
+  const { map, mapLayers } = useContext(MapContext);
 
   const [showSelectModelModal, setShowSelectModelModal] = useState(false);
 
@@ -269,6 +130,48 @@ function PrimePanel() {
     ? 'Run inference for this model'
     : 'Create project and run model';
 
+  const renderAoiHeader = (triggerProps) => {
+    let header;
+    let area;
+    let disabled;
+    if (aoiArea && aoiArea > 0 && viewMode === viewModes.EDIT_AOI_MODE) {
+      header = `${formatThousands(aoiArea / 1e6)} km2`;
+    } else if (aoiName) {
+      header = aoiName;
+      area = `${formatThousands(aoiArea / 1e6)} km2`;
+    } else if (viewMode === viewModes.CREATE_AOI_MODE) {
+      header = 'Drag on map to select';
+    } else {
+      header = 'None selected - Draw area on map';
+    }
+
+    const disabledProps = {
+      onClick: () => null,
+      useIcon: null,
+    };
+
+    if (viewMode === viewModes.EDIT_AOI_MODE || aoiList.length === 0) {
+      disabled = true;
+    }
+
+    return (
+      <>
+        <SubheadingStrong
+          data-cy='aoi-selection-trigger'
+          {...triggerProps}
+          useIcon='chevron-down--small'
+          {...(disabled ? disabledProps : {})}
+        >
+          {header}
+        </SubheadingStrong>
+        {area && (
+          <Heading className='subtitle' useAlt>
+            {area}
+          </Heading>
+        )}
+      </>
+    );
+  };
   // Retrain Panel Tab Empty State message
   //
   const retrainPlaceHolderMessage = () => {
@@ -296,17 +199,62 @@ function PrimePanel() {
         bodyContent={
           <StyledPanelBlock>
             <PanelBlockHeader>
-              <HeadOption>
+              <HeadOption hasSubtitle>
                 <HeadOptionHeadline>
                   <Subheading>Selected Area </Subheading>
                 </HeadOptionHeadline>
-                <SubheadingStrong>
-                  {aoiArea && aoiArea > 0
-                    ? `${formatThousands(aoiArea / 1e6)} km2`
-                    : viewMode === viewModes.CREATE_AOI_MODE
-                    ? 'Drag on map to select'
-                    : 'None selected - Draw area on map'}
-                </SubheadingStrong>
+
+                <Dropdown
+                  alignment='left'
+                  direction='down'
+                  triggerElement={
+                    (triggerProps) => renderAoiHeader(triggerProps)
+                    /* eslint-disable-next-line */
+                  }
+                >
+                  <>
+                    <DropdownHeader unshaded>
+                      <Heading useAlt size='xsmall'>
+                        Available Areas of Interest
+                      </Heading>
+                    </DropdownHeader>
+                    <DropdownBody>
+                      {aoiList.map((a) => (
+                        <li key={a.id}>
+                          <DropdownItem
+                            onClick={() => {
+                              loadAoi(currentProject, a).then((bounds) =>
+                                map.fitBounds(bounds, {
+                                  padding: BOUNDS_PADDING,
+                                })
+                              );
+                            }}
+                          >
+                            {`${a.name}`}
+                          </DropdownItem>
+                        </li>
+                      ))}
+                    </DropdownBody>
+                    {(currentCheckpoint || aoiList.length > 0) && (
+                      <DropdownFooter>
+                        <DropdownItem
+                          muted
+                          useIcon='plus'
+                          onClick={() => {
+                            createNewAoi();
+                            map.aoi.control.draw.disable();
+                            //Layer must be removed from the map
+                            map.aoi.control.draw.clear();
+                          }}
+                          data-cy='add-aoi-button'
+                        >
+                          Add AOI
+                        </DropdownItem>
+                      </DropdownFooter>
+                    )}
+                  </>
+                </Dropdown>
+
                 <HeadOptionToolbar>
                   <AoiEditButtons
                     setViewMode={setViewMode}
