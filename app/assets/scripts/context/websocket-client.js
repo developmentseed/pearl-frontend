@@ -31,8 +31,10 @@ class WebsocketClient extends WebSocket {
       switch (eventData.message) {
         case 'info#connected':
           this.isConnected = true;
-          if (onConnected && !this.hasRunOnConnect)
-            this.hasRunOnConnect = true && onConnected();
+          if (onConnected && !this.hasRunOnConnect) {
+            this.hasRunOnConnect = true;
+            onConnected();
+          }
           break;
         case 'info#disconnected':
           this.isConnected = false;
