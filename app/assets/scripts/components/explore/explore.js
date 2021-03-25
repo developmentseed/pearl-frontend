@@ -10,6 +10,8 @@ import {
 } from '../../styles/inpage';
 import Panel from '../common/panel';
 import PrimePanel from './prime-panel';
+import SecPanel from './sec-panel';
+
 import Map from './map';
 
 import Tour from '../common/tour';
@@ -59,18 +61,8 @@ function Explore() {
           <ExploreCarto>
             <Map />
           </ExploreCarto>
-          <Panel
-            collapsible
-            direction='right'
-            initialState={true}
-            bodyContent={
-              <>
-                {
-                  currentCheckpoint && currentCheckpoint.analytics
-                }
-              </>
-            }
-            data-cy='secondary-panel'
+          <SecPanel
+            analytics={currentCheckpoint && currentCheckpoint.analytics}
           />
         </ExploreBody>
         {steps && (
