@@ -10,6 +10,7 @@ export const DropdownHeader = styled.header`
     css`
       background: ${themeVal('color.baseAlphaB')};
     `}
+  background: ${themeVal('color.baseAlphaB')};
   display: grid;
   padding: ${multiply(themeVal('layout.space'), 0.5)}
     ${themeVal('layout.space')};
@@ -18,7 +19,6 @@ export const DropdownHeader = styled.header`
     font-size: ${multiply(themeVal('type.base.size'), 0.75)};
   }
   h1 {
-    font-size: ${themeVal('type.base.size')};
     margin: 0;
   }
 `;
@@ -59,6 +59,12 @@ export const DropdownItem = styled.a`
     opacity: 1;
     background: ${themeVal('color.primaryAlphaA')};
   }
+
+  ${({ muted }) =>
+    muted &&
+    css`
+      color: ${themeVal('color.baseAlphaD')};
+    `}
 `;
 export const DropdownFooter = styled.footer`
   border-top: 1px solid ${themeVal('color.baseAlphaD')};

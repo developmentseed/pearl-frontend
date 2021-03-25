@@ -221,14 +221,16 @@ class AoiEditControl {
 
     if (shape._map) {
       this._unbindMarker(this._moveMarker);
-
-      for (var i = 0, l = this._resizeMarkers.length; i < l; i++) {
-        this._unbindMarker(this._resizeMarkers[i]);
+      if (this._resizeMarkers) {
+        for (var i = 0, l = this._resizeMarkers.length; i < l; i++) {
+          this._unbindMarker(this._resizeMarkers[i]);
+        }
+        this._resizeMarkers = null;
       }
-      this._resizeMarkers = null;
-
-      this._map.removeLayer(this._markerGroup);
-      delete this._markerGroup;
+      if (this._markerGroup) {
+        this._map.removeLayer(this._markerGroup);
+        delete this._markerGroup;
+      }
     }
 
     this._map = null;
