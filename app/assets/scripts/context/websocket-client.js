@@ -11,10 +11,9 @@ class WebsocketClient extends WebSocket {
     dispatchCurrentCheckpoint,
   }) {
     super(config.websocketEndpoint + `?token=${token}`);
-
     this.isConnected = false;
-    this.isReconnect = false;
     this.dispatchPredictions = dispatchPredictions;
+    this.hasRunOnConnect = false;
 
     /**
      * Add listener to process messages received
@@ -32,11 +31,11 @@ class WebsocketClient extends WebSocket {
       switch (eventData.message) {
         case 'info#connected':
           this.isConnected = true;
-          if (onConnected && !this.isReconnect) onConnected();
+          if (onConnected && !this.hasRunOnConnect)
+            this.hasRunOnConnect = true && onConnected();
           break;
         case 'info#disconnected':
           this.isConnected = false;
-          this.isReconnect = true;
           break;
         case 'model#checkpoint':
           dispatchCurrentCheckpoint({
