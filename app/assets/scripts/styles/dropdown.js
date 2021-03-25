@@ -1,10 +1,15 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { themeVal, multiply } from '@devseed-ui/theme-provider';
 import collecticon from '@devseed-ui/collecticons';
 import BaseDropdown from '@devseed-ui/dropdown';
 import InfoButton from '../components/common/info-button';
 
 export const DropdownHeader = styled.header`
+  ${({ unshaded }) =>
+    !unshaded &&
+    css`
+      background: ${themeVal('color.baseAlphaB')};
+    `}
   background: ${themeVal('color.baseAlphaB')};
   display: grid;
   padding: ${multiply(themeVal('layout.space'), 0.5)}
@@ -14,7 +19,6 @@ export const DropdownHeader = styled.header`
     font-size: ${multiply(themeVal('type.base.size'), 0.75)};
   }
   h1 {
-    font-size: ${themeVal('type.base.size')};
     margin: 0;
   }
 `;
@@ -26,7 +30,7 @@ export const DropdownBody = styled.ul`
 `;
 export const DropdownItem = styled.a`
   display: grid;
-  grid-template-columns: min-content max-content;
+  grid-template-columns: max-content max-content;
   justify-items: start;
   padding: ${multiply(themeVal('layout.space'), 0.25)}
     ${themeVal('layout.space')};
@@ -46,6 +50,12 @@ export const DropdownItem = styled.a`
     opacity: 1;
     background: ${themeVal('color.primaryAlphaA')};
   }
+
+  ${({ muted }) =>
+    muted &&
+    css`
+      color: ${themeVal('color.baseAlphaD')};
+    `}
 `;
 export const DropdownFooter = styled.footer`
   border-top: 1px solid ${themeVal('color.baseAlphaD')};

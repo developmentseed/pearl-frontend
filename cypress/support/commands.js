@@ -24,6 +24,7 @@ Cypress.Commands.add('fakeLogin', () => {
       },
     })
   );
+  window.localStorage.setItem('site-tour', -1);
 });
 
 /**

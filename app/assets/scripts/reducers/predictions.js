@@ -4,14 +4,30 @@ export const actions = {
   RECEIVE_PREDICTION: 'RECEIVE_PREDICTION',
   COMPLETE_PREDICTION: 'COMPLETE_PREDICTION',
   FAILED_PREDICTION: 'FAILED_PREDICTION',
+  CLEAR_PREDICTION: 'CLEAR_PREDICTION',
 };
+
+function wrapApiResult(stateData) {
+  const { fetched, fetching, data, error } = stateData;
+  const ready = fetched && !fetching;
+  return {
+    ...stateData,
+    raw: () => stateData,
+    isReady: () => {
+      return ready;
+    },
+    hasError: () => ready && !!error,
+    getData: (def = {}) => (ready ? data.results || data : def),
+    getMeta: (def = {}) => (ready ? data.meta : def),
+  };
+}
 
 export default function (state, action) {
   const { data } = action;
 
   switch (action.type) {
     case actions.START_PREDICTION:
-      return {
+      return wrapApiResult({
         ...initialApiRequestState,
         fetching: true,
         processed: 0,
@@ -19,7 +35,7 @@ export default function (state, action) {
         data: {
           predictions: [],
         },
-      };
+      });
     case actions.RECEIVE_PREDICTION: {
       // Get bounds
       const [minX, minY, maxX, maxY] = data.bounds;
@@ -35,7 +51,7 @@ export default function (state, action) {
       };
 
       // Add it to state
-      return {
+      return wrapApiResult({
         ...state,
         processed: data.processed,
         total: data.total,
@@ -43,22 +59,26 @@ export default function (state, action) {
         data: {
           predictions: (state.data.predictions || []).concat(prediction),
         },
-      };
+      });
     }
     case actions.COMPLETE_PREDICTION:
-      return {
+      return wrapApiResult({
         ...state,
         receivedAt: Date.now(),
         fetching: false,
         fetched: true,
-      };
+      });
+    case actions.CLEAR_PREDICTION:
+      return wrapApiResult({
+        ...initialApiRequestState,
+      });
     case actions.FAILED_PREDICTION:
-      return {
+      return wrapApiResult({
         ...state,
         fetching: false,
         fetched: false,
         error: true,
-      };
+      });
     default:
       throw new Error('Unexpected error.');
   }

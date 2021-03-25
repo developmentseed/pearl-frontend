@@ -105,7 +105,7 @@ function UserDropdown() {
           <>
             <DropdownHeader>
               <p>Hello</p>
-              <h1>{user.name}</h1>
+              <Heading>{user.name}</Heading>
             </DropdownHeader>
             <DropdownBody>
               <li>
