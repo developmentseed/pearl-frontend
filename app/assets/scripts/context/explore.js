@@ -96,15 +96,15 @@ export function ExploreProvider(props) {
 
     try {
       // Get project metadata
-      showGlobalLoadingMessage('Loading project metadata...');
+      showGlobalLoadingMessage('Fetching project metadata...');
       const project = await restApiClient.getProject(projectId);
       setCurrentProject(project);
 
-      showGlobalLoadingMessage('Loading model...');
+      showGlobalLoadingMessage('Fetching model...');
       const model = await restApiClient.getModel(project.model_id);
       setSelectedModel(model);
 
-      showGlobalLoadingMessage('Loading areas of interest...');
+      showGlobalLoadingMessage('Fetching areas of interest...');
       const aois = await restApiClient.get(`project/${project.id}/aoi`);
 
       const filteredList = filterAoiList(aois.aois);
@@ -114,23 +114,23 @@ export function ExploreProvider(props) {
         loadAoi(project, latest);
       }
 
-      showGlobalLoadingMessage('Checking for existing instance...');
+      showGlobalLoadingMessage('Fetching checkpoints...');
       const checkpointsMeta = await restApiClient.getCheckpoints(projectId);
       if (checkpointsMeta.total > 0) {
         // Save checkpoints if any exist, else leave as null
         setCheckpointList(checkpointsMeta.checkpoints);
       }
 
+      showGlobalLoadingMessage('Looking for active GPU instances...');
+      let instance;
       const activeInstances = await restApiClient.getActiveInstances(projectId);
       if (activeInstances.total > 0) {
         const instanceItem = activeInstances.instances[0];
-        const instance = await restApiClient.getInstance(
-          projectId,
-          instanceItem.id
-        );
-        setCurrentInstance(instance);
+        instance = await restApiClient.getInstance(projectId, instanceItem.id);
+      } else {
+        instance = await restApiClient.createInstance(project.id);
       }
-
+      setCurrentInstance(instance);
     } catch (error) {
       toasts.error('Error loading project, please try again later.');
     } finally {
@@ -362,6 +362,40 @@ export function ExploreProvider(props) {
     return name;
   }
 
+  async function initInstanceWebsocket(projectId, onConnected) {
+    // Request a new instance if none is available.
+    if (!websocketClient) {
+      try {
+        // Create instance
+        showGlobalLoadingMessage('Connecting to GPU instance...');
+        let instance;
+        if (currentInstance) {
+          instance = currentInstance;
+        } else {
+          instance = await restApiClient.createInstance(projectId);
+        }
+
+        // Setup websocket
+        showGlobalLoadingMessage('Creating websocket...');
+        const newWebsocketClient = new WebsocketClient({
+          token: instance.token,
+          dispatchPredictions,
+          dispatchCurrentCheckpoint,
+          onConnected: () => onConnected(newWebsocketClient),
+        });
+        setWebsocketClient(newWebsocketClient);
+      } catch (error) {
+        hideGlobalLoading();
+        toasts.error(
+          'Error while creating an instance, please try again later.'
+        );
+      }
+    } else {
+      // Send message with existing websocket
+      onConnected(websocketClient);
+    }
+  }
+
   async function runInference() {
     if (restApiClient) {
       let project = currentProject;
@@ -405,48 +439,14 @@ export function ExploreProvider(props) {
         return; // abort inference run
       }
 
-      // Request a new instance if none is available.
-      if (!websocketClient) {
-        try {
-          // Create instance
-          showGlobalLoadingMessage('Requesting instance...');
-          if (currentInstance) {
-            instance = currentInstance;
-          } else {
-            instance = await restApiClient.createInstance(project.id);
-          }
-
-          // Setup websocket
-          showGlobalLoadingMessage('Connecting to instance...');
-          const newWebsocketClient = new WebsocketClient({
-            token: instance.token,
-            dispatchPredictions,
-            dispatchCurrentCheckpoint,
-            onConnected: () => {
-              hideGlobalLoading();
-              newWebsocketClient.requestPrediction(aoiName, aoiRef);
-            },
-          });
-          setWebsocketClient(newWebsocketClient);
-        } catch (error) {
-          hideGlobalLoading();
-          toasts.error(
-            'Error while creating an instance, please try again later.'
-          );
-        }
-      } else {
-        // Send message with existing websocket
-        websocketClient.requestPrediction(aoiName, aoiRef);
-      }
+      // Send prediction request via Websocket
+      initInstanceWebsocket(project.id, (ws) => {
+        ws.requestPrediction(aoiName, aoiRef);
+      });
     }
   }
 
   async function retrain() {
-    if (!websocketClient) {
-      toasts.error('No instance available.');
-      return;
-    }
-
     // Check if all classes have the minimum number of samples
     const classes = Object.values(currentCheckpoint.classes);
     for (let i = 0; i < classes.length; i++) {
@@ -463,11 +463,13 @@ export function ExploreProvider(props) {
       }
     }
 
-    // If check pass, retrain
+    // Send retrain request via Websocket
     showGlobalLoadingMessage('Retraining...');
-    websocketClient.requestRetrain({
-      name: 'a name',
-      classes,
+    initInstanceWebsocket(currentProject.id, (ws) => {
+      ws.requestRetrain({
+        name: 'a name',
+        classes,
+      });
     });
   }
 
