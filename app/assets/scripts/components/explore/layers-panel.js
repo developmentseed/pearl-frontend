@@ -6,6 +6,7 @@ import { Heading } from '@devseed-ui/typography';
 import { themeVal, glsp } from '@devseed-ui/theme-provider';
 import InputRange from 'react-input-range';
 import { Accordion, AccordionFold as BaseFold } from '@devseed-ui/accordion';
+import throttle from 'lodash.throttle';
 
 const Wrapper = styled.div`
   display: grid;
@@ -173,9 +174,9 @@ function LayersPanel(props) {
         <Layer
           key='prediction-layer'
           layer={{ name: 'LULC Inference' }}
-          onSliderChange={(name, value) => {
+          onSliderChange={throttle((name, value) => {
             setPredictionLayerOpacity(value);
-          }}
+          }, 100)}
           onVisibilityToggle={onPredictionLayerVisibilityToggle}
         />
       )}
