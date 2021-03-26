@@ -305,11 +305,9 @@ function PrimePanel() {
                   <Subheading>Checkpoint</Subheading>
                 </HeadOptionHeadline>
                 <SubheadingStrong>
-                  {checkpointList
-                    ? currentCheckpoint
-                      ? `${currentCheckpoint.name} (${currentCheckpoint.id})`
-                      : 'No checkpoint selected'
-                    : 'No checkpoints available'}
+                  {currentCheckpoint && currentCheckpoint.id
+                    ? `${currentCheckpoint.name} (${currentCheckpoint.id})`
+                    : '-'}
                 </SubheadingStrong>
                 <HeadOptionToolbar>
                   <Dropdown
