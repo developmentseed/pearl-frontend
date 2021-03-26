@@ -473,10 +473,7 @@ export function ExploreProvider(props) {
       const sampleCount = get(aClass, 'geometry.coordinates.length', 0);
       if (sampleCount < config.minSampleCount) {
         toasts.error(
-          `A minimum of ${config.minSampleCount} samples is required for every class.`,
-          {
-            autoClose: 3000,
-          }
+          `A minimum of ${config.minSampleCount} samples is required for every class.`
         );
         return;
       }
