@@ -313,7 +313,7 @@ function Map() {
       predictions,
       currentCheckpoint,
       predictionLayerSettings,
-    ] // eslint-disable-line react-hooks/exhaustive-deps
+    ]
   );
 
   return (
