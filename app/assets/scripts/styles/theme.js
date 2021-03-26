@@ -47,7 +47,7 @@ const type = {
     size: '1rem',
     line: '1.5',
     color: color.base,
-    family: '"Titillium Web", sans-serif',
+    family: '"Titillium Web", Titillium Web, sans-serif',
     style: 'normal',
     settings: 'normal',
     case: 'none',
@@ -59,7 +59,7 @@ const type = {
     antialiasing: true,
   },
   heading: {
-    family: '"Titillium Web", sans-serif',
+    family: '"Titillium Web", Titillium Web, sans-serif',
     style: 'normal',
     settings: 'normal',
     case: 'none',
@@ -71,7 +71,7 @@ const type = {
     textTransform: 'none',
   },
   button: {
-    family: '"Open Sans", sans-serif',
+    family: '"Titillium Web", Titillium Web, sans-serif',
     style: 'normal',
     settings: 'normal',
     case: 'none',
