@@ -12,7 +12,8 @@ import {
 } from 'react-leaflet';
 import GlobalContext from '../../../context/global';
 import { ExploreContext, viewModes } from '../../../context/explore';
-import { MapContext } from '../../../context/map';
+//import { MapContext } from '../../../context/map';
+import { useMap, useMapLayers, usePredictionLayer} from '../../../context/map';
 
 import GeoCoder from '../../common/map/geocoder';
 import { BOUNDS_PADDING } from '../../common/map/constants';
@@ -86,6 +87,7 @@ function Map() {
     apiLimits,
   } = useContext(ExploreContext);
 
+  /*
   const {
     map,
     setMap,
@@ -93,6 +95,12 @@ function Map() {
     setMapLayers,
     predictionLayerOpacity,
   } = useContext(MapContext);
+  */
+
+  const { map, setMap } = useMap();
+  const { mapLayers, setMapLayers } = useMapLayers();
+  const { predictionLayerSettings } = usePredictionLayer();
+
 
   const { mosaicList } = useContext(GlobalContext);
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useContext(
@@ -268,7 +276,7 @@ function Map() {
               key={p.key}
               url={p.image}
               bounds={p.bounds}
-              opacity={predictionLayerOpacity}
+              opacity={predictionLayerSettings.opacity}
             />
           ))}
 
@@ -314,7 +322,7 @@ function Map() {
       mosaics,
       predictions,
       currentCheckpoint,
-      predictionLayerOpacity,
+      predictionLayerSettings
     ] // eslint-disable-line react-hooks/exhaustive-deps
   );
 

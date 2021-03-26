@@ -1,4 +1,4 @@
-import React, { createContext, useState } from 'react';
+import React, { useContext, useMemo, createContext, useState } from 'react';
 import T from 'prop-types';
 
 export const MapContext = createContext({});
@@ -6,7 +6,11 @@ export const MapContext = createContext({});
 export function MapProvider(props) {
   const [map, setMap] = useState();
   const [mapLayers, setMapLayers] = useState({});
-  const [predictionLayerOpacity, setPredictionLayerOpacity] = useState(1);
+
+  const [predictionLayerSettings, setPredictionLayerSettings] = useState({
+    opacity: 1,
+    visible: true,
+  });
 
   return (
     <MapContext.Provider
@@ -17,8 +21,8 @@ export function MapProvider(props) {
         mapLayers,
         setMapLayers,
 
-        predictionLayerOpacity,
-        setPredictionLayerOpacity,
+        predictionLayerSettings,
+        setPredictionLayerSettings,
       }}
     >
       {props.children}
@@ -28,4 +32,52 @@ export function MapProvider(props) {
 
 MapProvider.propTypes = {
   children: T.node,
+};
+
+// Check if consumer function is used properly
+const useMapContext = (fnName) => {
+  const context = useContext(MapContext);
+
+  if (!context) {
+    throw new Error(
+      `The \`${fnName}\` hook must be used inside the <MapContext> component's context.`
+    );
+  }
+
+  return context;
+};
+
+export const useMap = () => {
+  const { map, setMap } = useMapContext('useMap');
+  return useMemo(
+    () => ({
+      map,
+      setMap,
+    }),
+    [map]
+  );
+};
+
+export const useMapLayers = () => {
+  const { mapLayers, setMapLayers } = useMapContext('useMap');
+  return useMemo(
+    () => ({
+      mapLayers,
+      setMapLayers,
+    }),
+    [mapLayers]
+  );
+};
+
+export const usePredictionLayer = () => {
+  const { predictionLayerSettings, setPredictionLayerSettings } = useMapContext(
+    'useMap'
+  );
+  return useMemo(
+    () => ({
+      predictionLayerSettings,
+      setPredictionLayerSettings,
+    }),
+    [predictionLayerSettings]
+  );
 };
