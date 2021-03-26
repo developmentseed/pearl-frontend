@@ -48,6 +48,9 @@ import { CheckpointContext } from '../../../context/checkpoint';
 
 import { AoiEditButtons } from './aoi-edit-buttons';
 
+const SelectAoiTrigger = styled.div`
+  cursor: pointer;
+`;
 const PlaceholderPanelSection = styled.div`
   padding: ${glsp()};
 `;
@@ -155,7 +158,7 @@ function PrimePanel() {
     }
 
     return (
-      <>
+      <SelectAoiTrigger>
         <SubheadingStrong
           data-cy='aoi-selection-trigger'
           {...triggerProps}
@@ -169,7 +172,7 @@ function PrimePanel() {
             {area}
           </Heading>
         )}
-      </>
+      </SelectAoiTrigger>
     );
   };
   // Retrain Panel Tab Empty State message
