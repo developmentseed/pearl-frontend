@@ -25,7 +25,6 @@ import {
 } from '../../../styles/dropdown';
 
 import { ExploreContext, viewModes } from '../../../context/explore';
-//import { MapContext } from '../../../context/map';
 import { useMap, useMapLayers, usePredictionLayer } from '../../../context/map';
 import GlobalContext from '../../../context/global';
 

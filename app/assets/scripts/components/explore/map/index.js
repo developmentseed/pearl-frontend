@@ -12,7 +12,6 @@ import {
 } from 'react-leaflet';
 import GlobalContext from '../../../context/global';
 import { ExploreContext, viewModes } from '../../../context/explore';
-//import { MapContext } from '../../../context/map';
 import { useMap, useMapLayers, usePredictionLayer } from '../../../context/map';
 
 import GeoCoder from '../../common/map/geocoder';
@@ -86,16 +85,6 @@ function Map() {
     predictions,
     apiLimits,
   } = useContext(ExploreContext);
-
-  /*
-  const {
-    map,
-    setMap,
-    mapLayers,
-    setMapLayers,
-    predictionLayerOpacity,
-  } = useContext(MapContext);
-  */
 
   const { map, setMap } = useMap();
   const { mapLayers, setMapLayers } = useMapLayers();
@@ -324,7 +313,7 @@ function Map() {
       predictions,
       currentCheckpoint,
       predictionLayerSettings,
-    ] // eslint-disable-line react-hooks/exhaustive-deps
+    ]
   );
 
   return (
