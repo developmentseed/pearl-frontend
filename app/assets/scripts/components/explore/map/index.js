@@ -86,7 +86,13 @@ function Map() {
     apiLimits,
   } = useContext(ExploreContext);
 
-  const { map, setMap, mapLayers, setMapLayers, predictionLayerOpacity, setPredictionLayerOpacity } = useContext(MapContext);
+  const {
+    map,
+    setMap,
+    mapLayers,
+    setMapLayers,
+    predictionLayerOpacity,
+  } = useContext(MapContext);
 
   const { mosaicList } = useContext(GlobalContext);
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useContext(
@@ -302,7 +308,14 @@ function Map() {
         </FeatureGroup>
       </MapContainer>
     ),
-    [viewMode, apiLimits, mosaics, predictions, currentCheckpoint, predictionLayerOpacity] // eslint-disable-line react-hooks/exhaustive-deps
+    [
+      viewMode,
+      apiLimits,
+      mosaics,
+      predictions,
+      currentCheckpoint,
+      predictionLayerOpacity,
+    ] // eslint-disable-line react-hooks/exhaustive-deps
   );
 
   return (

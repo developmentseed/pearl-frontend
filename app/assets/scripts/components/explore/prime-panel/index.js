@@ -112,7 +112,12 @@ function PrimePanel() {
 
   const { modelsList, mosaicList } = useContext(GlobalContext);
 
-  const { map, mapLayers, predictionLayerOpacity, setPredictionLayerOpacity } = useContext(MapContext);
+  const {
+    map,
+    mapLayers,
+    predictionLayerOpacity,
+    setPredictionLayerOpacity,
+  } = useContext(MapContext);
 
   const [showSelectModelModal, setShowSelectModelModal] = useState(false);
 
