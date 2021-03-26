@@ -112,7 +112,7 @@ function PrimePanel() {
 
   const { modelsList, mosaicList } = useContext(GlobalContext);
 
-  const { map, mapLayers } = useContext(MapContext);
+  const { map, mapLayers, predictionLayerOpacity, setPredictionLayerOpacity } = useContext(MapContext);
 
   const [showSelectModelModal, setShowSelectModelModal] = useState(false);
 
@@ -315,6 +315,8 @@ function PrimePanel() {
                   name='layers'
                   tabId='layers-tab-trigger'
                   layers={availableLayers}
+                  predictionLayerOpacity={predictionLayerOpacity}
+                  setPredictionLayerOpacity={setPredictionLayerOpacity}
                   baseLayerNames={
                     mosaicList.isReady() && !mosaicList.hasError()
                       ? mosaicList.getData().mosaics

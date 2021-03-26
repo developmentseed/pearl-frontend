@@ -86,7 +86,7 @@ function Map() {
     apiLimits,
   } = useContext(ExploreContext);
 
-  const { map, setMap, mapLayers, setMapLayers } = useContext(MapContext);
+  const { map, setMap, mapLayers, setMapLayers, predictionLayerOpacity, setPredictionLayerOpacity } = useContext(MapContext);
 
   const { mosaicList } = useContext(GlobalContext);
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useContext(
@@ -258,7 +258,12 @@ function Map() {
           predictions.data &&
           predictions.data.predictions &&
           predictions.data.predictions.map((p) => (
-            <ImageOverlay key={p.key} url={p.image} bounds={p.bounds} />
+            <ImageOverlay
+              key={p.key}
+              url={p.image}
+              bounds={p.bounds}
+              opacity={predictionLayerOpacity}
+            />
           ))}
 
         {currentCheckpoint &&
@@ -297,7 +302,7 @@ function Map() {
         </FeatureGroup>
       </MapContainer>
     ),
-    [viewMode, apiLimits, mosaics, predictions, currentCheckpoint] // eslint-disable-line react-hooks/exhaustive-deps
+    [viewMode, apiLimits, mosaics, predictions, currentCheckpoint, predictionLayerOpacity] // eslint-disable-line react-hooks/exhaustive-deps
   );
 
   return (

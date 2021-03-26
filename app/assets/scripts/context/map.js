@@ -6,6 +6,7 @@ export const MapContext = createContext({});
 export function MapProvider(props) {
   const [map, setMap] = useState();
   const [mapLayers, setMapLayers] = useState({});
+  const [predictionLayerOpacity, setPredictionLayerOpacity] = useState(1);
 
   return (
     <MapContext.Provider
@@ -15,6 +16,9 @@ export function MapProvider(props) {
 
         mapLayers,
         setMapLayers,
+
+        predictionLayerOpacity,
+        setPredictionLayerOpacity,
       }}
     >
       {props.children}
