@@ -241,7 +241,6 @@ function PrimePanel() {
                     {(currentCheckpoint || aoiList.length > 0) && (
                       <DropdownFooter>
                         <DropdownItem
-                          muted
                           useIcon='plus'
                           onClick={() => {
                             createNewAoi();
