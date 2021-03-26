@@ -54,30 +54,30 @@ export const useMap = () => {
       map,
       setMap,
     }),
-    [map]
+    [map, setMap]
   );
 };
 
 export const useMapLayers = () => {
-  const { mapLayers, setMapLayers } = useMapContext('useMap');
+  const { mapLayers, setMapLayers } = useMapContext('useMapLayers');
   return useMemo(
     () => ({
       mapLayers,
       setMapLayers,
     }),
-    [mapLayers]
+    [mapLayers, setMapLayers]
   );
 };
 
 export const usePredictionLayer = () => {
   const { predictionLayerSettings, setPredictionLayerSettings } = useMapContext(
-    'useMap'
+    'usePredictionLayer'
   );
   return useMemo(
     () => ({
       predictionLayerSettings,
       setPredictionLayerSettings,
     }),
-    [predictionLayerSettings]
+    [predictionLayerSettings, setPredictionLayerSettings]
   );
 };

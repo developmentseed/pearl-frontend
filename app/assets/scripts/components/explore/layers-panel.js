@@ -150,7 +150,9 @@ function LayersPanel(props) {
     className,
     onSliderChange,
     onVisibilityToggle,
+    onPredictionLayerVisibilityToggle,
     setPredictionLayerOpacity,
+    predictionReady,
   } = props;
 
   const categorizedLayers = layers.reduce((cats, layer) => {
@@ -167,14 +169,16 @@ function LayersPanel(props) {
 
   return (
     <div className={className}>
-      <Layer
-        key='prediction-layer'
-        layer={{ name: 'LULC Inference' }}
-        onSliderChange={(name, value) => {
-          setPredictionLayerOpacity(value);
-        }}
-        onVisibilityToggle={onVisibilityToggle}
-      />
+      {predictionReady && (
+        <Layer
+          key='prediction-layer'
+          layer={{ name: 'LULC Inference' }}
+          onSliderChange={(name, value) => {
+            setPredictionLayerOpacity(value);
+          }}
+          onVisibilityToggle={onPredictionLayerVisibilityToggle}
+        />
+      )}
       <Accordion
         className={className}
         allowMultiple
@@ -228,6 +232,8 @@ LayersPanel.propTypes = {
   onSliderChange: T.func,
   onVisibilityToggle: T.func,
   setPredictionLayerOpacity: T.func,
+  onPredictionLayerVisibilityToggle: T.func,
+  predictionReady: T.bool,
 };
 
 export default LayersPanel;

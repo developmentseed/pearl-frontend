@@ -13,7 +13,7 @@ import {
 import GlobalContext from '../../../context/global';
 import { ExploreContext, viewModes } from '../../../context/explore';
 //import { MapContext } from '../../../context/map';
-import { useMap, useMapLayers, usePredictionLayer} from '../../../context/map';
+import { useMap, useMapLayers, usePredictionLayer } from '../../../context/map';
 
 import GeoCoder from '../../common/map/geocoder';
 import { BOUNDS_PADDING } from '../../common/map/constants';
@@ -100,7 +100,6 @@ function Map() {
   const { map, setMap } = useMap();
   const { mapLayers, setMapLayers } = useMapLayers();
   const { predictionLayerSettings } = usePredictionLayer();
-
 
   const { mosaicList } = useContext(GlobalContext);
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useContext(
@@ -268,15 +267,17 @@ function Map() {
             />
           ))}
 
-        {predictions &&
-          predictions.data &&
-          predictions.data.predictions &&
+        {predictions.data.predictions &&
           predictions.data.predictions.map((p) => (
             <ImageOverlay
               key={p.key}
               url={p.image}
               bounds={p.bounds}
-              opacity={predictionLayerSettings.opacity}
+              opacity={
+                predictionLayerSettings.visible
+                  ? predictionLayerSettings.opacity
+                  : 0
+              }
             />
           ))}
 
@@ -322,7 +323,7 @@ function Map() {
       mosaics,
       predictions,
       currentCheckpoint,
-      predictionLayerSettings
+      predictionLayerSettings,
     ] // eslint-disable-line react-hooks/exhaustive-deps
   );
 

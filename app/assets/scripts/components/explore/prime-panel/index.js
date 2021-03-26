@@ -331,12 +331,20 @@ function PrimePanel() {
                   name='layers'
                   tabId='layers-tab-trigger'
                   layers={availableLayers}
+                  predictionReady={predictions.isReady()}
                   predictionLayerOpacity={predictionLayerSettings.opacity}
-                  setPredictionLayerOpacity={(v) =>
+                  onPredictionLayerVisibilityToggle={() => {
+                    setPredictionLayerSettings({
+                      ...predictionLayerSettings,
+                      visible: !predictionLayerSettings.visible,
+                    });
+                  }}
+                  setPredictionLayerOpacity={(v) => {
                     setPredictionLayerSettings({
                       ...predictionLayerSettings,
                       opacity: v,
-                    })}
+                    });
+                  }}
                   baseLayerNames={
                     mosaicList.isReady() && !mosaicList.hasError()
                       ? mosaicList.getData().mosaics
