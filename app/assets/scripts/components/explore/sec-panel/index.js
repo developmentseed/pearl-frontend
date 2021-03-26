@@ -22,10 +22,7 @@ function SecPanel(props) {
       initialState={true}
       bodyContent={
         <Body>
-          {checkpoint && checkpoint.analytics && (
-            <ClassDistribitionChart checkpoint={checkpoint} />
-          )}
-          <div>Panel</div>
+          <ClassDistribitionChart checkpoint={checkpoint} />
         </Body>
       }
       data-cy='secondary-panel'
