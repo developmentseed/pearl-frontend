@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import T from 'prop-types';
 import styled from 'styled-components';
 import { Button } from '@devseed-ui/button';
+import InfoButton from '../../components/common/info-button';
 import { Heading } from '@devseed-ui/typography';
 import { themeVal, glsp } from '@devseed-ui/theme-provider';
 import InputRange from 'react-input-range';
@@ -18,6 +19,11 @@ const LayerWrapper = styled.div`
   ${Button} {
     place-self: center;
     max-width: ${glsp(1)};
+  }
+  ${Button}:last-child {
+    place-self: center;
+    max-width: ${glsp(1)};
+    grid-column: 4;
   }
 `;
 
@@ -53,7 +59,7 @@ const AccordionFold = styled(BaseFold)`
   }
 `;
 
-function Layer({ layer, onSliderChange, onVisibilityToggle }) {
+function Layer({ layer, onSliderChange, onVisibilityToggle, info }) {
   const [value, setValue] = useState(1);
   const [visible, setVisible] = useState(true);
   return (
@@ -75,14 +81,18 @@ function Layer({ layer, onSliderChange, onVisibilityToggle }) {
           step={0.1}
         />
       </SliderWrapper>
-      <Button
-        variation='base-plain'
-        size='small'
-        hideText
-        useIcon='circle-information'
-      >
-        Info
-      </Button>
+
+      {info && (
+        <InfoButton
+          variation='base-plain'
+          size='small'
+          hideText
+          useIcon='circle-information'
+          info={info}
+        >
+          Info
+        </InfoButton>
+      )}
       <Button
         variation='base-plain'
         size='small'
@@ -103,6 +113,7 @@ Layer.propTypes = {
   layer: T.object,
   onSliderChange: T.func,
   onVisibilityToggle: T.func,
+  info: T.string,
 };
 
 function Category({
@@ -127,6 +138,7 @@ function Category({
               layer={layer}
               onSliderChange={onSliderChange}
               onVisibilityToggle={onVisibilityToggle}
+              info={layer.info}
             />
           ))}
         </Wrapper>
