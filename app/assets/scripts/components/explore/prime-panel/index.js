@@ -315,6 +315,7 @@ function PrimePanel() {
                   <Dropdown
                     alignment='right'
                     direction='down'
+                    data-dropdown='click.close'
                     triggerElement={(props) => (
                       <EditButton
                         data-cy='show-select-checkpoint-button'
