@@ -199,25 +199,26 @@ export function ExploreProvider(props) {
         toasts.error('An inference error occurred, please try again later.');
       } else {
         setViewMode(viewModes.ADD_CLASS_SAMPLES);
-        loadMetrics()
+        loadMetrics();
       }
     }
   }, [predictions, restApiClient, currentProject]);
 
-
   async function loadMetrics() {
-    await restApiClient.get(`project/${currentProject.id}/checkpoint/${currentCheckpoint.checkpoint_id}`).then((ckpt) => {
-      if (ckpt.analytics) {
-        console.log(ckpt.analytics)
-        dispatchCurrentCheckpoint({
-          type: checkpointActions.RECEIVE_ANALYTICS,
-          data: { analytics: ckpt.analytics}
-        })
-      }
-    })
-      
+    await restApiClient
+      .get(
+        `project/${currentProject.id}/checkpoint/${currentCheckpoint.checkpoint_id}`
+      )
+      .then((ckpt) => {
+        if (ckpt.analytics) {
+          console.log(ckpt.analytics);
+          dispatchCurrentCheckpoint({
+            type: checkpointActions.RECEIVE_ANALYTICS,
+            data: { analytics: ckpt.analytics },
+          });
+        }
+      });
   }
-
 
   useEffect(() => {
     if (predictions.isReady()) {
@@ -228,7 +229,7 @@ export function ExploreProvider(props) {
         dispatchPredictions({ type: predictionActions.CLEAR_PREDICTION });
 
         dispatchCurrentCheckpoint({
-          type: checkointActions.RESET_CHECKPOINT,
+          type: checkpointActions.RESET_CHECKPOINT,
         });
       }
     }
@@ -246,7 +247,7 @@ export function ExploreProvider(props) {
 
     //clear inference tiles
     dispatchCurrentCheckpoint({
-      type:checkpointActions.RESET_CHECKPOINT,
+      type: checkpointActions.RESET_CHECKPOINT,
     });
 
     //clear inference tiles

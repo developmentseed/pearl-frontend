@@ -61,7 +61,6 @@ function checkpointReducer(state, action) {
     case actions.RECEIVE_METRICS:
       return state
     case actions.RECEIVE_ANALYTICS:
-      console.log(action.data)
       return {
         ...state,
         ...action.data
