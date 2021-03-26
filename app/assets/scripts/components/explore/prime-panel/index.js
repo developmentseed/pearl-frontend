@@ -223,7 +223,7 @@ function PrimePanel() {
                     </DropdownHeader>
                     <DropdownBody>
                       {aoiList.map((a) => (
-                        <li key={a.id}>
+                        <li key={a.id} data-dropdown='click.close'>
                           <DropdownItem
                             onClick={() => {
                               loadAoi(currentProject, a).then((bounds) =>
@@ -250,6 +250,7 @@ function PrimePanel() {
                             map.aoi.control.draw.clear();
                           }}
                           data-cy='add-aoi-button'
+                          data-dropdown='click.close'
                         >
                           Add AOI
                         </DropdownItem>
