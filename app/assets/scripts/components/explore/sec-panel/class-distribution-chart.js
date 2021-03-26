@@ -8,7 +8,7 @@ import { round } from '../../../utils/format';
 
 const Wrapper = styled.div`
   display: grid;
-  grid-template-rows: 1fr auto;
+  grid-template-rows: ${glsp(7.5)} auto;
   grid-gap: ${glsp(1)};
 `;
 const Summary = styled.ol`

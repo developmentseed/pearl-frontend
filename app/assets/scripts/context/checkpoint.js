@@ -30,7 +30,7 @@ export const actions = {
   SET_CHECKPOINT: 'SET_CHECKPOINT',
   RECEIVE_METADATA: 'RECEIVE_METADATA',
   RECEIVE_AOI_INFO: 'RECEIVE_AOI_INFO',
-  RECEIVE_ANALYTICS : 'RECEIVE_ANALYTICS',
+  RECEIVE_ANALYTICS: 'RECEIVE_ANALYTICS',
   SET_ACTIVE_CLASS: 'SET_ACTIVE_CLASS',
   ADD_POINT_SAMPLE: 'ADD_POINT_SAMPLE',
   REMOVE_POINT_SAMPLE: 'REMOVE_POINT_SAMPLE',
@@ -56,15 +56,15 @@ function checkpointReducer(state, action) {
     case actions.RECEIVE_AOI_INFO:
       return {
         ...state,
-        ...action.data
-      }
+        ...action.data,
+      };
     case actions.RECEIVE_METRICS:
-      return state
+      return state;
     case actions.RECEIVE_ANALYTICS:
       return {
         ...state,
-        ...action.data
-      }
+        ...action.data,
+      };
     case actions.RECEIVE_METADATA:
       return {
         ...state,

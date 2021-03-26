@@ -8,7 +8,6 @@ import {
   InpageTitle,
   InpageBody,
 } from '../../styles/inpage';
-import Panel from '../common/panel';
 import PrimePanel from './prime-panel';
 import SecPanel from './sec-panel';
 
@@ -61,9 +60,7 @@ function Explore() {
           <ExploreCarto>
             <Map />
           </ExploreCarto>
-          <SecPanel
-            checkpoint={currentCheckpoint}
-          />
+          <SecPanel checkpoint={currentCheckpoint} />
         </ExploreBody>
         {steps && (
           <Tour steps={steps} tourStep={tourStep} setTourStep={setTourStep} />

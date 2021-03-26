@@ -211,7 +211,6 @@ export function ExploreProvider(props) {
       )
       .then((ckpt) => {
         if (ckpt.analytics) {
-          console.log(ckpt.analytics);
           dispatchCurrentCheckpoint({
             type: checkpointActions.RECEIVE_ANALYTICS,
             data: { analytics: ckpt.analytics },
@@ -502,7 +501,7 @@ export function ExploreProvider(props) {
     // If check pass, retrain
     showGlobalLoadingMessage('Retraining...');
     websocketClient.requestRetrain({
-      name: 'a name',
+      name: aoiName,
       classes,
     });
   }
