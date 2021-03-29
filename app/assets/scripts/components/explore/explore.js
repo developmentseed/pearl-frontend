@@ -60,9 +60,7 @@ function Explore() {
           <ExploreCarto>
             <Map />
           </ExploreCarto>
-          {currentCheckpoint && currentCheckpoint.analytics && (
-            <SecPanel checkpoint={currentCheckpoint} />
-          )}
+          {currentCheckpoint && <SecPanel checkpoint={currentCheckpoint} />}
         </ExploreBody>
         {steps && (
           <Tour steps={steps} tourStep={tourStep} setTourStep={setTourStep} />

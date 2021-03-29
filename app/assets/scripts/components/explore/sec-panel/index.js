@@ -4,6 +4,7 @@ import T from 'prop-types';
 import styled from 'styled-components';
 import Panel from '../../common/panel';
 import { PanelBlockBody } from '../../common/panel-block';
+import Prose from '../../../styles/type/prose';
 
 import { glsp } from '@devseed-ui/theme-provider';
 
@@ -22,7 +23,11 @@ function SecPanel(props) {
       initialState={true}
       bodyContent={
         <Body>
-          <ClassDistribitionChart checkpoint={checkpoint} />
+          {checkpoint.analytics ? (
+            <ClassDistribitionChart checkpoint={checkpoint} />
+          ) : (
+            <Prose>Retrain to see metrics.</Prose>
+          )}
         </Body>
       }
       data-cy='secondary-panel'
