@@ -196,7 +196,7 @@ export function ExploreProvider(props) {
   async function loadMetrics() {
     await restApiClient
       .get(
-        `project/${currentProject.id}/checkpoint/${currentCheckpoint.checkpoint_id}`
+        `project/${currentProject.id}/checkpoint/${currentCheckpoint.id}`
       )
       .then((ckpt) => {
         if (ckpt.analytics) {
@@ -342,7 +342,7 @@ export function ExploreProvider(props) {
     try {
       showGlobalLoadingMessage('Updating checkpoint name');
       await restApiClient.patch(
-        `/project/${currentProject.id}/checkpoint/${currentCheckpoint.checkpoint_id}`,
+        `/project/${currentProject.id}/checkpoint/${currentCheckpoint.id}`,
         {
           name,
           bookmarked: true,
@@ -579,7 +579,6 @@ export const useWebsocketClient = () => {
           }
 
           // Setup websocket
-          showGlobalLoadingMessage('Creating websocket...');
           const newWebsocketClient = new WebsocketClient({
             token: instance.token,
             dispatchPredictions,

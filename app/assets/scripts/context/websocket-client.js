@@ -43,7 +43,7 @@ class WebsocketClient extends WebSocket {
           dispatchCurrentCheckpoint({
             type: checkpointActions.RECEIVE_AOI_INFO,
             data: {
-              checkpoint_id: eventData.data.checkpoint_id,
+              id: eventData.data.checkpoint_id,
               name: eventData.data.name,
             },
           });

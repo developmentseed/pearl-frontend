@@ -122,7 +122,7 @@ function PrimePanel() {
 
   const { runInference, retrain } = useWebsocketClient();
 
-  const { currentCheckpoint, applyCurrentCheckpoint } = useCheckpoint();
+  const { currentCheckpoint, applyCheckpoint } = useCheckpoint();
 
   const { modelsList, mosaicList } = useContext(GlobalContext);
 
@@ -331,8 +331,8 @@ function PrimePanel() {
                   <Subheading>Checkpoint</Subheading>
                 </HeadOptionHeadline>
                 <SubheadingStrong>
-                  {currentCheckpoint && currentCheckpoint.checkpoint_id
-                    ? `${currentCheckpoint.name} (${currentCheckpoint.checkpoint_id})`
+                  {currentCheckpoint && currentCheckpoint.id
+                    ? `${currentCheckpoint.name} (${currentCheckpoint.id})`
                     : '-'}
                 </SubheadingStrong>
                 <HeadOptionToolbar>
@@ -371,12 +371,9 @@ function PrimePanel() {
                                 ckpt.id ==
                                 (currentCheckpoint && currentCheckpoint.id)
                               }
-                              onClick={() => {
-                                applyCurrentCheckpoint(
-                                  currentProject.id,
-                                  ckpt.id
-                                );
-                              }}
+                              onClick={() =>
+                                applyCheckpoint(currentProject.id, ckpt.id)
+                              }
                             >
                               {ckpt.name} ({ckpt.id})
                             </DropdownItem>
