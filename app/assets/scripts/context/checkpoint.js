@@ -4,7 +4,9 @@ import uniqWith from 'lodash.uniqwith';
 import isEqual from 'lodash.isequal';
 import differenceWith from 'lodash.differencewith';
 import { useRestApiClient } from './auth';
+import { useWebsocketClient } from './explore';
 import toasts from '../components/common/toasts';
+import logger from '../utils/logger';
 export const CheckpointContext = createContext({});
 
 export function CheckpointProvider(props) {
@@ -141,6 +143,7 @@ const useCheckContext = (fnName) => {
 // a single checkpoint, by avoiding using useContext(CheckpointContext) directly.
 export const useCheckpoint = () => {
   const { restApiClient } = useRestApiClient();
+  const { sendWebsocketMessage } = useWebsocketClient();
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckContext(
     'useCheckpoint'
   );
@@ -148,7 +151,7 @@ export const useCheckpoint = () => {
   return useMemo(
     () => ({
       currentCheckpoint,
-      fetchCurrentCheckpoint: async (projectId, checkpointId) => {
+      applyCurrentCheckpoint: async (projectId, checkpointId) => {
         try {
           const checkpoint = await restApiClient.getCheckpoint(
             projectId,
@@ -159,13 +162,26 @@ export const useCheckpoint = () => {
             type: actions.SET_CHECKPOINT,
             data: checkpoint,
           });
+
+          sendWebsocketMessage({
+            action: 'model#checkpoint',
+            data: {
+              id: checkpointId,
+            },
+          });
         } catch (error) {
+          logger(error);
           toasts.error(
             'Could not load checkpoint meta, please try again later.'
           );
         }
       },
     }),
-    [restApiClient, currentCheckpoint, dispatchCurrentCheckpoint]
+    [
+      restApiClient,
+      sendWebsocketMessage,
+      currentCheckpoint,
+      dispatchCurrentCheckpoint,
+    ]
   );
 };

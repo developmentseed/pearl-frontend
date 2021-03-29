@@ -24,7 +24,11 @@ import {
   DropdownFooter,
 } from '../../../styles/dropdown';
 
-import { ExploreContext, viewModes } from '../../../context/explore';
+import {
+  ExploreContext,
+  useWebsocketClient,
+  viewModes,
+} from '../../../context/explore';
 import { useMap, useMapLayers, usePredictionLayer } from '../../../context/map';
 import GlobalContext from '../../../context/global';
 
@@ -106,26 +110,16 @@ function PrimePanel() {
     loadAoi,
     aoiList,
     apiLimits,
-    runInference,
-    retrain,
     predictions,
     aoiBounds,
     setAoiBounds,
   } = useContext(ExploreContext);
 
-  const { currentCheckpoint, fetchCurrentCheckpoint } = useCheckpoint();
+  const { runInference, retrain } = useWebsocketClient();
+
+  const { currentCheckpoint, applyCurrentCheckpoint } = useCheckpoint();
 
   const { modelsList, mosaicList } = useContext(GlobalContext);
-
-  /*
-  const {
-    map,
-    mapLayers,
-    predictionLayerOpacity,
-    setPredictionLayerOpacity,
-  } = useContext(MapContext);
-
-*/
 
   const { map } = useMap();
   const { mapLayers } = useMapLayers();
@@ -364,7 +358,7 @@ function PrimePanel() {
                                 (currentCheckpoint && currentCheckpoint.id)
                               }
                               onClick={() =>
-                                fetchCurrentCheckpoint(
+                                applyCurrentCheckpoint(
                                   currentProject.id,
                                   ckpt.id
                                 )

@@ -4,10 +4,12 @@ import React, {
   useEffect,
   useReducer,
   useContext,
+  useMemo,
 } from 'react';
 import T from 'prop-types';
 import config from '../config';
 import { initialApiRequestState } from '../reducers/reduxeed';
+import { useRestApiClient } from './auth';
 import {
   showGlobalLoadingMessage,
   hideGlobalLoading,
@@ -26,6 +28,7 @@ import tCentroid from '@turf/centroid';
 
 import { actions, CheckpointContext } from './checkpoint';
 import get from 'lodash.get';
+import logger from '../utils/logger';
 
 /**
  * Explore View Modes
@@ -362,114 +365,6 @@ export function ExploreProvider(props) {
     return name;
   }
 
-  async function initInstanceWebsocket(projectId, onConnected) {
-    // Request a new instance if none is available.
-    if (!websocketClient) {
-      try {
-        // Create instance
-        showGlobalLoadingMessage('Connecting to GPU instance...');
-        let instance;
-        if (currentInstance) {
-          instance = currentInstance;
-        } else {
-          instance = await restApiClient.createInstance(projectId);
-        }
-
-        // Setup websocket
-        showGlobalLoadingMessage('Creating websocket...');
-        const newWebsocketClient = new WebsocketClient({
-          token: instance.token,
-          dispatchPredictions,
-          dispatchCurrentCheckpoint,
-          onConnected: () => onConnected(newWebsocketClient),
-        });
-        setWebsocketClient(newWebsocketClient);
-      } catch (error) {
-        hideGlobalLoading();
-        toasts.error(
-          'Error while creating an instance, please try again later.'
-        );
-      }
-    } else {
-      // Send message with existing websocket
-      onConnected(websocketClient);
-    }
-  }
-
-  async function runInference() {
-    if (restApiClient) {
-      let project = currentProject;
-      let instance;
-
-      if (!project) {
-        try {
-          showGlobalLoadingMessage('Creating project...');
-          project = await restApiClient.createProject({
-            model_id: selectedModel.id,
-            mosaic: 'naip.latest',
-            name: 'Untitled',
-          });
-          setCurrentProject(project);
-          history.push(`/project/${project.id}`);
-        } catch (error) {
-          hideGlobalLoading();
-          toasts.error('Could not create project, please try again later.');
-          return; // abort inference run
-        }
-      }
-
-      try {
-        showGlobalLoadingMessage('Fetching classes...');
-        const { classes } = await restApiClient.getModel(selectedModel.id);
-        dispatchCurrentCheckpoint({
-          type: actions.SET_CHECKPOINT,
-          data: {
-            classes,
-          },
-        });
-      } catch (error) {
-        hideGlobalLoading();
-        toasts.error('Could fetch model classes, please try again later.');
-        return; // abort inference run
-      }
-
-      if (!aoiName) {
-        hideGlobalLoading();
-        toasts.error('AOI Name must be set before running inference');
-        return; // abort inference run
-      }
-
-      // Send prediction request via Websocket
-      initInstanceWebsocket(project.id, (ws) => {
-        ws.requestPrediction(aoiName, aoiRef);
-      });
-    }
-  }
-
-  async function retrain() {
-    // Check if all classes have the minimum number of samples
-    const classes = Object.values(currentCheckpoint.classes);
-    for (let i = 0; i < classes.length; i++) {
-      const aClass = classes[i];
-      const sampleCount = get(aClass, 'geometry.coordinates.length', 0);
-      if (sampleCount < config.minSampleCount) {
-        toasts.error(
-          `A minimum of ${config.minSampleCount} samples is required for every class.`
-        );
-        return;
-      }
-    }
-
-    // Send retrain request via Websocket
-    showGlobalLoadingMessage('Retraining...');
-    initInstanceWebsocket(currentProject.id, (ws) => {
-      ws.requestRetrain({
-        name: 'a name',
-        classes,
-      });
-    });
-  }
-
   useEffect(() => {
     if (!aoiRef) {
       setAoiArea(null);
@@ -558,16 +453,20 @@ export function ExploreProvider(props) {
         currentProject,
         setCurrentProject,
 
+        dispatchPredictions,
         checkpointList,
+        currentCheckpoint,
+        dispatchCurrentCheckpoint,
 
         selectedModel,
         setSelectedModel,
 
         updateProjectName,
 
-        runInference,
         reverseGeoCode,
-        retrain,
+
+        websocketClient,
+        setWebsocketClient,
       }}
     >
       {props.children}
@@ -577,4 +476,216 @@ export function ExploreProvider(props) {
 
 ExploreProvider.propTypes = {
   children: T.node,
+};
+
+// Check if consumer function is used properly
+const useExploreContext = (fnName) => {
+  const context = useContext(ExploreContext);
+
+  if (!context) {
+    throw new Error(
+      `The \`${fnName}\` hook must be used inside the <ExploreContext> component's context.`
+    );
+  }
+
+  return context;
+};
+
+export const useWebsocketClient = () => {
+  const history = useHistory();
+  const { restApiClient } = useRestApiClient();
+  const {
+    aoiName,
+    aoiRef,
+    websocketClient,
+    setWebsocketClient,
+    selectedModel,
+    dispatchPredictions,
+    currentInstance,
+    currentCheckpoint,
+    dispatchCurrentCheckpoint,
+    currentProject,
+    setCurrentProject,
+  } = useExploreContext('useWebsocket');
+
+  const sendWebsocketMessage = useMemo(
+    () => async (...args) => {
+      let message;
+      let projectId;
+      if (typeof args[1] !== 'undefined') {
+        projectId = args[0];
+        message = args[1];
+      } else {
+        projectId = currentProject.id;
+        message = args[0];
+      }
+
+      // Request a new instance if none is available.
+      if (!websocketClient) {
+        try {
+          // Create instance
+          showGlobalLoadingMessage('Connecting to GPU instance...');
+          let instance;
+          if (currentInstance) {
+            instance = currentInstance;
+          } else {
+            instance = await restApiClient.createInstance(projectId);
+          }
+
+          // Setup websocket
+          showGlobalLoadingMessage('Creating websocket...');
+          const newWebsocketClient = new WebsocketClient({
+            token: instance.token,
+            dispatchPredictions,
+            dispatchCurrentCheckpoint,
+            onConnected: () => {
+              newWebsocketClient.send(JSON.stringify(message));
+            },
+          });
+          setWebsocketClient(newWebsocketClient);
+        } catch (error) {
+          logger(error);
+          hideGlobalLoading();
+          toasts.error(
+            'Error while creating an instance, please try again later.'
+          );
+        }
+      } else {
+        // Send message with existing websocket
+        websocketClient.send(JSON.stringify(message));
+      }
+    },
+    [
+      currentInstance,
+      currentProject,
+      dispatchCurrentCheckpoint,
+      dispatchPredictions,
+      restApiClient,
+      setWebsocketClient,
+      websocketClient,
+    ]
+  );
+
+  return useMemo(
+    () => ({
+      websocketClient,
+      sendWebsocketMessage,
+      runInference: async function () {
+        if (restApiClient) {
+          let project = currentProject;
+
+          if (!project) {
+            try {
+              showGlobalLoadingMessage('Creating project...');
+              project = await restApiClient.createProject({
+                model_id: selectedModel.id,
+                mosaic: 'naip.latest',
+                name: 'Untitled',
+              });
+              setCurrentProject(project);
+              history.push(`/project/${project.id}`);
+            } catch (error) {
+              logger(error);
+              hideGlobalLoading();
+              toasts.error('Could not create project, please try again later.');
+              return; // abort inference run
+            }
+          }
+
+          try {
+            showGlobalLoadingMessage('Fetching classes...');
+            const { classes } = await restApiClient.getModel(selectedModel.id);
+            dispatchCurrentCheckpoint({
+              type: actions.SET_CHECKPOINT,
+              data: {
+                classes,
+              },
+            });
+          } catch (error) {
+            logger(error);
+            hideGlobalLoading();
+            toasts.error('Could fetch model classes, please try again later.');
+            return; // abort inference run
+          }
+
+          if (!aoiName) {
+            hideGlobalLoading();
+            toasts.error('AOI Name must be set before running inference');
+            return; // abort inference run
+          }
+
+          // Get bbox polygon from AOI
+          const {
+            _southWest: { lng: minX, lat: minY },
+            _northEast: { lng: maxX, lat: maxY },
+          } = aoiRef.getBounds();
+
+          const polygon = {
+            type: 'Polygon',
+            coordinates: [
+              [
+                [minX, minY],
+                [maxX, minY],
+                [maxX, maxY],
+                [minX, maxY],
+                [minX, minY],
+              ],
+            ],
+          };
+
+          // Compose message
+          const message = {
+            action: 'model#prediction',
+            data: {
+              name: aoiName,
+              polygon,
+            },
+          };
+
+          sendWebsocketMessage(project.id, message);
+          dispatchPredictions({ type: predictionActions.START_PREDICTION });
+        }
+      },
+      retrain: async function () {
+        // Check if all classes have the minimum number of samples
+        const classes = Object.values(currentCheckpoint.classes);
+        for (let i = 0; i < classes.length; i++) {
+          const aClass = classes[i];
+          const sampleCount = get(aClass, 'geometry.coordinates.length', 0);
+          if (sampleCount < config.minSampleCount) {
+            toasts.error(
+              `A minimum of ${config.minSampleCount} samples is required for every class.`
+            );
+            return;
+          }
+        }
+
+        showGlobalLoadingMessage('Retraining...');
+        dispatchPredictions({
+          type: predictionActions.START_PREDICTION,
+        });
+        sendWebsocketMessage({
+          action: 'model#retrain',
+          data: {
+            name: 'a name',
+            classes,
+          },
+        });
+      },
+    }),
+    [
+      aoiName,
+      aoiRef,
+      currentProject,
+      currentCheckpoint,
+      dispatchPredictions,
+      dispatchCurrentCheckpoint,
+      history,
+      restApiClient,
+      selectedModel,
+      sendWebsocketMessage,
+      setCurrentProject,
+      websocketClient,
+    ]
+  );
 };

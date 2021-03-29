@@ -70,58 +70,6 @@ class WebsocketClient extends WebSocket {
   }
 
   /**
-   * Send message to start a prediction run
-   * @param {String} name
-   * @param {Object} polygon
-   */
-  requestPrediction(name, aoiRef) {
-    // Get bbox polygon from AOI
-    const {
-      _southWest: { lng: minX, lat: minY },
-      _northEast: { lng: maxX, lat: maxY },
-    } = aoiRef.getBounds();
-    const polygon = {
-      type: 'Polygon',
-      coordinates: [
-        [
-          [minX, minY],
-          [maxX, minY],
-          [maxX, maxY],
-          [minX, maxY],
-          [minX, minY],
-        ],
-      ],
-    };
-
-    // Compose message
-    const message = {
-      action: 'model#prediction',
-      data: {
-        name,
-        polygon,
-      },
-    };
-
-    // Send
-    this.send(JSON.stringify(message));
-
-    // Update state
-    this.dispatchPredictions({ type: predictionsActions.START_PREDICTION });
-  }
-
-  requestRetrain(data) {
-    this.dispatchPredictions({
-      type: predictionsActions.START_PREDICTION,
-    });
-    this.send(
-      JSON.stringify({
-        action: 'model#retrain',
-        data,
-      })
-    );
-  }
-
-  /**
    * Send message to terminate
    * @param {String} name
    * @param {Object} polygon
