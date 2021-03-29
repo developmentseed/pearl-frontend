@@ -4,6 +4,8 @@ import { themeVal, glsp } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
 import { Button } from '@devseed-ui/button';
 import collecticon from '@devseed-ui/collecticons';
+import { Form, FormInput } from '@devseed-ui/form';
+
 import Panel from '../../common/panel';
 import {
   PanelBlock,
@@ -113,6 +115,7 @@ function PrimePanel() {
     predictions,
     aoiBounds,
     setAoiBounds,
+    updateCheckpointName
   } = useContext(ExploreContext);
 
   const { runInference, retrain } = useWebsocketClient();
@@ -466,17 +469,47 @@ function PrimePanel() {
               >
                 {!currentCheckpoint ? 'Run Model' : 'Retrain'}
               </InfoButton>
-              <InfoButton
-                variation='primary-plain'
-                size='medium'
-                useIcon='pencil'
-                style={{
-                  gridColumn: '1 / -1',
-                }}
-                id='rename-button-trigger'
+              <Dropdown
+                alignment='right'
+                direction='up'
+                triggerElement={(triggerProps) => (
+                  <InfoButton
+                    variation='primary-plain'
+                    size='medium'
+                    useIcon='pencil'
+                    style={{
+                      gridColumn: '1 / -1',
+                    }}
+                    id='rename-button-trigger'
+                    {...triggerProps}
+                    disabled={!currentCheckpoint}
+                  >
+                    Save Checkpoint
+                  </InfoButton>
+                )}
               >
-                Save Checkpoint
-              </InfoButton>
+                <>
+                  <Heading useAlt>Checkpoint name:</Heading>
+                  <Form onSubmit={(evt) => {
+                    evt.preventDefault()
+                    const name = evt.target.elements.checkpointName.value;
+                    updateCheckpointName(name)
+                  }}>
+                    <FormInput
+                      name='checkpointName'
+                      placeholder='Set Checkpoint Name'
+                      autoFocus
+                    />
+                    <Button
+                      type='submit'
+                      size='small'
+                      useIcon='tick--small'
+                      hideText
+                      title='Confirm project name'
+                    />
+                  </Form>
+                </>
+              </Dropdown>
             </PanelControls>
           </StyledPanelBlock>
         }

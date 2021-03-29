@@ -26,7 +26,7 @@ import tBbox from '@turf/bbox';
 import tBboxPolygon from '@turf/bbox-polygon';
 import tCentroid from '@turf/centroid';
 
-import { checkpointActions, CheckpointContext } from './checkpoint';
+import { actions as checkpointActions, CheckpointContext } from './checkpoint';
 import get from 'lodash.get';
 import logger from '../utils/logger';
 
@@ -333,6 +333,21 @@ export function ExploreProvider(props) {
     }
   }
 
+  async function updateCheckpointName(name) {
+    try {
+      showGlobalLoadingMessage('Updating checkpoint name');
+      console.log(currentCheckpoint)
+      const rest = await restApiClient.patch(`/project/${currentProject.id}/checkpoint/${currentCheckpoint.checkpoint_id}`, {
+        name,
+        bookmarked: true,
+      })
+      console.log(rest)
+      hideGlobalLoading()
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   /*
    * Reverse geocode using Bing
    *
@@ -479,6 +494,7 @@ export function ExploreProvider(props) {
         setSelectedModel,
 
         updateProjectName,
+        updateCheckpointName,
 
         reverseGeoCode,
 
