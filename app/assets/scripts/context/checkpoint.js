@@ -7,6 +7,11 @@ import { useRestApiClient } from './auth';
 import { useWebsocketClient } from './explore';
 import toasts from '../components/common/toasts';
 import logger from '../utils/logger';
+import {
+  showGlobalLoadingMessage,
+  hideGlobalLoading,
+} from '@devseed-ui/global-loading';
+
 export const CheckpointContext = createContext({});
 
 export function CheckpointProvider(props) {
@@ -151,8 +156,9 @@ export const useCheckpoint = () => {
   return useMemo(
     () => ({
       currentCheckpoint,
-      applyCurrentCheckpoint: async (projectId, checkpointId) => {
+      applyCheckpoint: async (projectId, checkpointId) => {
         try {
+          showGlobalLoadingMessage('Applying checkpoint...');
           const checkpoint = await restApiClient.getCheckpoint(
             projectId,
             checkpointId
@@ -169,6 +175,8 @@ export const useCheckpoint = () => {
               id: checkpointId,
             },
           });
+
+          hideGlobalLoading();
         } catch (error) {
           logger(error);
           toasts.error(

@@ -533,7 +533,6 @@ export const useWebsocketClient = () => {
           }
 
           // Setup websocket
-          showGlobalLoadingMessage('Creating websocket...');
           const newWebsocketClient = new WebsocketClient({
             token: instance.token,
             dispatchPredictions,

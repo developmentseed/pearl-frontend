@@ -117,7 +117,7 @@ function PrimePanel() {
 
   const { runInference, retrain } = useWebsocketClient();
 
-  const { currentCheckpoint, applyCurrentCheckpoint } = useCheckpoint();
+  const { currentCheckpoint, applyCheckpoint } = useCheckpoint();
 
   const { modelsList, mosaicList } = useContext(GlobalContext);
 
@@ -358,10 +358,7 @@ function PrimePanel() {
                                 (currentCheckpoint && currentCheckpoint.id)
                               }
                               onClick={() =>
-                                applyCurrentCheckpoint(
-                                  currentProject.id,
-                                  ckpt.id
-                                )
+                                applyCheckpoint(currentProject.id, ckpt.id)
                               }
                             >
                               {ckpt.name} ({ckpt.id})
