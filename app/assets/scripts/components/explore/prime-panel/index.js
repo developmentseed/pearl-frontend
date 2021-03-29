@@ -93,7 +93,9 @@ const PanelControls = styled(PanelBlockFooter)`
   grid-gap: ${glsp()};
   padding-bottom: ${glsp(2)};
 `;
-
+const SaveCheckpoint = styled(DropdownBody)`
+  padding: ${glsp(0.5)};
+`;
 function PrimePanel() {
   const { isAuthenticated } = useContext(AuthContext);
 
@@ -497,7 +499,7 @@ function PrimePanel() {
                   </InfoButton>
                 )}
               >
-                <>
+                <SaveCheckpoint>
                   <Heading useAlt>Checkpoint name:</Heading>
                   <Form
                     onSubmit={(evt) => {
@@ -518,11 +520,12 @@ function PrimePanel() {
                       size='small'
                       useIcon='tick--small'
                       title='Rename checkpoint'
+                      data-dropdown='click.close'
                     >
                       Rename Checkpoint
                     </Button>
                   </Form>
-                </>
+                </SaveCheckpoint>
               </Dropdown>
             </PanelControls>
           </StyledPanelBlock>
