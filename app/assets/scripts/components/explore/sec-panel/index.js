@@ -3,15 +3,26 @@ import ClassDistribitionChart from './class-distribution-chart';
 import T from 'prop-types';
 import styled from 'styled-components';
 import Panel from '../../common/panel';
-import { PanelBlockBody } from '../../common/panel-block';
-import Prose from '../../../styles/type/prose';
+import {
+  PanelBlock,
+  PanelBlockHeader,
+  PanelBlockBody,
+} from '../../common/panel-block';
+import { Heading } from '@devseed-ui/typography';
+import { Subheading } from '../../../styles/type/heading';
+import { PlaceholderMessage } from '../../../styles/placeholder.js';
 
 import { glsp } from '@devseed-ui/theme-provider';
 
+const Block = styled(PanelBlock)`
+  grid-template-rows: 2rem 1fr 1fr;
+`;
+
 const Body = styled(PanelBlockBody)`
-  display: flex;
   justify-content: flex-start;
-  padding: ${glsp(1)} ${glsp(1.5)};
+  ${PanelBlockHeader} {
+    margin-bottom: ${glsp(0.5)};
+  }
 `;
 
 function SecPanel(props) {
@@ -22,13 +33,25 @@ function SecPanel(props) {
       direction='right'
       initialState={true}
       bodyContent={
-        <Body>
+        <Block>
+          <PanelBlockHeader>
+            <Heading size='xsmall'>Analysis</Heading>
+          </PanelBlockHeader>
           {checkpoint.analytics ? (
-            <ClassDistribitionChart checkpoint={checkpoint} />
+            <>
+              <Body>
+                <PanelBlockHeader>
+                  <Subheading>Class Distribution</Subheading>
+                </PanelBlockHeader>
+                <ClassDistribitionChart checkpoint={checkpoint} />
+              </Body>
+            </>
           ) : (
-            <Prose>Retrain to see metrics.</Prose>
+            <PanelBlockBody>
+              <PlaceholderMessage>Retrain to see metrics.</PlaceholderMessage>
+            </PanelBlockBody>
           )}
-        </Body>
+        </Block>
       }
       data-cy='secondary-panel'
     />
