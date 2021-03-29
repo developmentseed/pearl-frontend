@@ -50,10 +50,10 @@ function checkpointReducer(state, action) {
       return {
         ...action.data,
         activeClass: action.data.classes[0].name,
-        classes: action.data.classes.reduce((acc, c) => {
+        classes: action.data.classes.reduce((acc, c, i) => {
           acc[c.name] = {
             ...c,
-            geometry: {
+            geometry: (action.data.geoms && action.data.geoms[i]) || {
               type: 'MultiPoint',
               coordinates: [],
             },
