@@ -32,6 +32,7 @@ CheckpointProvider.propTypes = {
 
 export const actions = {
   SET_CHECKPOINT: 'SET_CHECKPOINT',
+  SET_CHECKPOINT_NAME: 'SET_CHECKPOINT_NAME',
   RECEIVE_METADATA: 'RECEIVE_METADATA',
   RECEIVE_AOI_INFO: 'RECEIVE_AOI_INFO',
   RECEIVE_ANALYTICS: 'RECEIVE_ANALYTICS',
@@ -57,6 +58,11 @@ function checkpointReducer(state, action) {
           };
           return acc;
         }, {}),
+      };
+    case actions.SET_CHECKPOINT_NAME:
+      return {
+        ...state,
+        ...action.data,
       };
     case actions.RECEIVE_AOI_INFO:
       return {

@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import styled, { css } from 'styled-components';
 import { themeVal, glsp } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
@@ -132,7 +132,9 @@ function PrimePanel() {
   } = usePredictionLayer();
 
   const [showSelectModelModal, setShowSelectModelModal] = useState(false);
-  const [localCheckpointName, setLocalCheckpointName] = useState('');
+  const [localCheckpointName, setLocalCheckpointName] = useState(
+    (currentCheckpoint && currentCheckpoint.name) || ''
+  );
 
   const { models } = modelsList.isReady() && modelsList.getData();
 
@@ -205,6 +207,12 @@ function PrimePanel() {
       return `Define an Area of Interest to run models at your selected location`;
     }
   };
+
+  useEffect(() => {
+    if (currentCheckpoint && currentCheckpoint.name) {
+      setLocalCheckpointName(currentCheckpoint.name);
+    }
+  }, [currentCheckpoint && currentCheckpoint.name]);
 
   return (
     <>
@@ -321,8 +329,8 @@ function PrimePanel() {
                   <Subheading>Checkpoint</Subheading>
                 </HeadOptionHeadline>
                 <SubheadingStrong>
-                  {currentCheckpoint && currentCheckpoint.id
-                    ? `${currentCheckpoint.name} (${currentCheckpoint.id})`
+                  {currentCheckpoint && currentCheckpoint.checkpoint_id
+                    ? `${currentCheckpoint.name} (${currentCheckpoint.checkpoint_id})`
                     : '-'}
                 </SubheadingStrong>
                 <HeadOptionToolbar>
@@ -361,12 +369,12 @@ function PrimePanel() {
                                 ckpt.id ==
                                 (currentCheckpoint && currentCheckpoint.id)
                               }
-                              onClick={() =>
+                              onClick={() => {
                                 applyCurrentCheckpoint(
                                   currentProject.id,
                                   ckpt.id
-                                )
-                              }
+                                );
+                              }}
                             >
                               {ckpt.name} ({ckpt.id})
                             </DropdownItem>
@@ -501,11 +509,7 @@ function PrimePanel() {
                     <FormInput
                       name='checkpointName'
                       placeholder='Set Checkpoint Name'
-                      value={
-                        currentCheckpoint
-                          ? currentCheckpoint.name
-                          : localCheckpointName
-                      }
+                      value={localCheckpointName}
                       onChange={(e) => setLocalCheckpointName(e.target.value)}
                       autoFocus
                     />

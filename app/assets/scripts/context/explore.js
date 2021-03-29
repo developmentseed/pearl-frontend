@@ -118,11 +118,7 @@ export function ExploreProvider(props) {
       }
 
       showGlobalLoadingMessage('Fetching checkpoints...');
-      const checkpointsMeta = await restApiClient.getCheckpoints(projectId);
-      if (checkpointsMeta.total > 0) {
-        // Save checkpoints if any exist, else leave as null
-        setCheckpointList(checkpointsMeta.checkpoints);
-      }
+      await loadCheckpointList(projectId);
 
       showGlobalLoadingMessage('Looking for active GPU instances...');
       let instance;
@@ -139,6 +135,15 @@ export function ExploreProvider(props) {
     } finally {
       hideGlobalLoading();
     }
+  }
+
+  async function loadCheckpointList(projectId) {
+    const checkpointsMeta = await restApiClient.getCheckpoints(projectId);
+    if (checkpointsMeta.total > 0) {
+      // Save checkpoints if any exist, else leave as null
+      setCheckpointList(checkpointsMeta.checkpoints);
+    }
+    return checkpointsMeta;
   }
 
   useEffect(() => {
@@ -336,15 +341,24 @@ export function ExploreProvider(props) {
   async function updateCheckpointName(name) {
     try {
       showGlobalLoadingMessage('Updating checkpoint name');
-      console.log(currentCheckpoint)
-      const rest = await restApiClient.patch(`/project/${currentProject.id}/checkpoint/${currentCheckpoint.checkpoint_id}`, {
-        name,
-        bookmarked: true,
-      })
-      console.log(rest)
-      hideGlobalLoading()
+      await restApiClient.patch(
+        `/project/${currentProject.id}/checkpoint/${currentCheckpoint.checkpoint_id}`,
+        {
+          name,
+          bookmarked: true,
+        }
+      );
+      dispatchCurrentCheckpoint({
+        type: checkpointActions.SET_CHECKPOINT_NAME,
+        data: {
+          name,
+        },
+      });
+
+      loadCheckpointList(currentProject.id);
+      hideGlobalLoading();
     } catch (error) {
-      console.log(error)
+      toasts.error('Error updating checkpoint');
     }
   }
 
@@ -395,7 +409,6 @@ export function ExploreProvider(props) {
     // else leave name undefined, should be set by user
     return name;
   }
-
 
   useEffect(() => {
     if (!aoiRef) {

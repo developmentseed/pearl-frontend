@@ -42,7 +42,10 @@ class WebsocketClient extends WebSocket {
         case 'model#aoi':
           dispatchCurrentCheckpoint({
             type: checkpointActions.RECEIVE_AOI_INFO,
-            data: { checkpoint_id: eventData.data.checkpoint_id },
+            data: {
+              checkpoint_id: eventData.data.checkpoint_id,
+              name: eventData.data.name,
+            },
           });
           break;
 
