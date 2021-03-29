@@ -115,7 +115,7 @@ function PrimePanel() {
     predictions,
     aoiBounds,
     setAoiBounds,
-    updateCheckpointName
+    updateCheckpointName,
   } = useContext(ExploreContext);
 
   const { runInference, retrain } = useWebsocketClient();
@@ -132,6 +132,7 @@ function PrimePanel() {
   } = usePredictionLayer();
 
   const [showSelectModelModal, setShowSelectModelModal] = useState(false);
+  const [localCheckpointName, setLocalCheckpointName] = useState('');
 
   const { models } = modelsList.isReady() && modelsList.getData();
 
@@ -490,23 +491,32 @@ function PrimePanel() {
               >
                 <>
                   <Heading useAlt>Checkpoint name:</Heading>
-                  <Form onSubmit={(evt) => {
-                    evt.preventDefault()
-                    const name = evt.target.elements.checkpointName.value;
-                    updateCheckpointName(name)
-                  }}>
+                  <Form
+                    onSubmit={(evt) => {
+                      evt.preventDefault();
+                      const name = evt.target.elements.checkpointName.value;
+                      updateCheckpointName(name);
+                    }}
+                  >
                     <FormInput
                       name='checkpointName'
                       placeholder='Set Checkpoint Name'
+                      value={
+                        currentCheckpoint
+                          ? currentCheckpoint.name
+                          : localCheckpointName
+                      }
+                      onChange={(e) => setLocalCheckpointName(e.target.value)}
                       autoFocus
                     />
                     <Button
                       type='submit'
                       size='small'
                       useIcon='tick--small'
-                      hideText
-                      title='Confirm project name'
-                    />
+                      title='Rename checkpoint'
+                    >
+                      Rename Checkpoint
+                    </Button>
                   </Form>
                 </>
               </Dropdown>
