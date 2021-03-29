@@ -1,9 +1,11 @@
-import React, { useState, useContext } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import styled, { css } from 'styled-components';
 import { themeVal, glsp } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
 import { Button } from '@devseed-ui/button';
 import collecticon from '@devseed-ui/collecticons';
+import { Form, FormInput } from '@devseed-ui/form';
+
 import Panel from '../../common/panel';
 import {
   PanelBlock,
@@ -91,7 +93,9 @@ const PanelControls = styled(PanelBlockFooter)`
   grid-gap: ${glsp()};
   padding-bottom: ${glsp(2)};
 `;
-
+const SaveCheckpoint = styled(DropdownBody)`
+  padding: ${glsp(0.5)};
+`;
 function PrimePanel() {
   const { isAuthenticated } = useContext(AuthContext);
 
@@ -113,6 +117,7 @@ function PrimePanel() {
     predictions,
     aoiBounds,
     setAoiBounds,
+    updateCheckpointName,
   } = useContext(ExploreContext);
 
   const { runInference, retrain } = useWebsocketClient();
@@ -129,6 +134,9 @@ function PrimePanel() {
   } = usePredictionLayer();
 
   const [showSelectModelModal, setShowSelectModelModal] = useState(false);
+  const [localCheckpointName, setLocalCheckpointName] = useState(
+    (currentCheckpoint && currentCheckpoint.name) || ''
+  );
 
   const { models } = modelsList.isReady() && modelsList.getData();
 
@@ -201,6 +209,12 @@ function PrimePanel() {
       return `Define an Area of Interest to run models at your selected location`;
     }
   };
+
+  useEffect(() => {
+    if (currentCheckpoint && currentCheckpoint.name) {
+      setLocalCheckpointName(currentCheckpoint.name);
+    }
+  }, [currentCheckpoint && currentCheckpoint.name]);
 
   return (
     <>
@@ -357,9 +371,9 @@ function PrimePanel() {
                                 ckpt.id ==
                                 (currentCheckpoint && currentCheckpoint.id)
                               }
-                              onClick={() =>
-                                applyCheckpoint(currentProject.id, ckpt.id)
-                              }
+                              onClick={() => {
+                                applyCheckpoint(currentProject.id, ckpt.id);
+                              }}
                             >
                               {ckpt.name} ({ckpt.id})
                             </DropdownItem>
@@ -463,17 +477,53 @@ function PrimePanel() {
               >
                 {!currentCheckpoint ? 'Run Model' : 'Retrain'}
               </InfoButton>
-              <InfoButton
-                variation='primary-plain'
-                size='medium'
-                useIcon='pencil'
-                style={{
-                  gridColumn: '1 / -1',
-                }}
-                id='rename-button-trigger'
+              <Dropdown
+                alignment='right'
+                direction='up'
+                triggerElement={(triggerProps) => (
+                  <InfoButton
+                    variation='primary-plain'
+                    size='medium'
+                    useIcon='pencil'
+                    style={{
+                      gridColumn: '1 / -1',
+                    }}
+                    id='rename-button-trigger'
+                    {...triggerProps}
+                    disabled={!currentCheckpoint}
+                  >
+                    Save Checkpoint
+                  </InfoButton>
+                )}
               >
-                Save Checkpoint
-              </InfoButton>
+                <SaveCheckpoint>
+                  <Heading useAlt>Checkpoint name:</Heading>
+                  <Form
+                    onSubmit={(evt) => {
+                      evt.preventDefault();
+                      const name = evt.target.elements.checkpointName.value;
+                      updateCheckpointName(name);
+                    }}
+                  >
+                    <FormInput
+                      name='checkpointName'
+                      placeholder='Set Checkpoint Name'
+                      value={localCheckpointName}
+                      onChange={(e) => setLocalCheckpointName(e.target.value)}
+                      autoFocus
+                    />
+                    <Button
+                      type='submit'
+                      size='small'
+                      useIcon='tick--small'
+                      title='Rename checkpoint'
+                      data-dropdown='click.close'
+                    >
+                      Rename Checkpoint
+                    </Button>
+                  </Form>
+                </SaveCheckpoint>
+              </Dropdown>
             </PanelControls>
           </StyledPanelBlock>
         }

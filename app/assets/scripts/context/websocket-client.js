@@ -39,6 +39,16 @@ class WebsocketClient extends WebSocket {
         case 'info#disconnected':
           this.isConnected = false;
           break;
+        case 'model#aoi':
+          dispatchCurrentCheckpoint({
+            type: checkpointActions.RECEIVE_AOI_INFO,
+            data: {
+              id: eventData.data.checkpoint_id,
+              name: eventData.data.name,
+            },
+          });
+          break;
+
         case 'model#checkpoint':
           dispatchCurrentCheckpoint({
             type: checkpointActions.RECEIVE_METADATA,

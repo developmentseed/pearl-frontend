@@ -26,7 +26,7 @@ import tBbox from '@turf/bbox';
 import tBboxPolygon from '@turf/bbox-polygon';
 import tCentroid from '@turf/centroid';
 
-import { actions, CheckpointContext } from './checkpoint';
+import { actions as checkpointActions, CheckpointContext } from './checkpoint';
 import get from 'lodash.get';
 import logger from '../utils/logger';
 
@@ -118,11 +118,7 @@ export function ExploreProvider(props) {
       }
 
       showGlobalLoadingMessage('Fetching checkpoints...');
-      const checkpointsMeta = await restApiClient.getCheckpoints(projectId);
-      if (checkpointsMeta.total > 0) {
-        // Save checkpoints if any exist, else leave as null
-        setCheckpointList(checkpointsMeta.checkpoints);
-      }
+      await loadCheckpointList(projectId);
 
       showGlobalLoadingMessage('Looking for active GPU instances...');
       let instance;
@@ -139,6 +135,15 @@ export function ExploreProvider(props) {
     } finally {
       hideGlobalLoading();
     }
+  }
+
+  async function loadCheckpointList(projectId) {
+    const checkpointsMeta = await restApiClient.getCheckpoints(projectId);
+    if (checkpointsMeta.total > 0) {
+      // Save checkpoints if any exist, else leave as null
+      setCheckpointList(checkpointsMeta.checkpoints);
+    }
+    return checkpointsMeta;
   }
 
   useEffect(() => {
@@ -183,9 +188,23 @@ export function ExploreProvider(props) {
         toasts.error('An inference error occurred, please try again later.');
       } else {
         setViewMode(viewModes.ADD_CLASS_SAMPLES);
+        loadMetrics();
       }
     }
   }, [predictions, restApiClient, currentProject]);
+
+  async function loadMetrics() {
+    await restApiClient
+      .get(`project/${currentProject.id}/checkpoint/${currentCheckpoint.id}`)
+      .then((ckpt) => {
+        if (ckpt.analytics) {
+          dispatchCurrentCheckpoint({
+            type: checkpointActions.RECEIVE_ANALYTICS,
+            data: { analytics: ckpt.analytics },
+          });
+        }
+      });
+  }
 
   useEffect(() => {
     if (predictions.isReady()) {
@@ -196,7 +215,7 @@ export function ExploreProvider(props) {
         dispatchPredictions({ type: predictionActions.CLEAR_PREDICTION });
 
         dispatchCurrentCheckpoint({
-          type: actions.RESET_CHECKPOINT,
+          type: checkpointActions.RESET_CHECKPOINT,
         });
       }
     }
@@ -214,7 +233,7 @@ export function ExploreProvider(props) {
 
     //clear inference tiles
     dispatchCurrentCheckpoint({
-      type: actions.RESET_CHECKPOINT,
+      type: checkpointActions.RESET_CHECKPOINT,
     });
 
     //clear inference tiles
@@ -275,7 +294,7 @@ export function ExploreProvider(props) {
 
       if (currentCheckpoint) {
         dispatchCurrentCheckpoint({
-          type: actions.RESET_CHECKPOINT,
+          type: checkpointActions.RESET_CHECKPOINT,
         });
       }
     } else {
@@ -314,6 +333,30 @@ export function ExploreProvider(props) {
           name: projectName,
         });
       }
+    }
+  }
+
+  async function updateCheckpointName(name) {
+    try {
+      showGlobalLoadingMessage('Updating checkpoint name');
+      await restApiClient.patch(
+        `/project/${currentProject.id}/checkpoint/${currentCheckpoint.id}`,
+        {
+          name,
+          bookmarked: true,
+        }
+      );
+      dispatchCurrentCheckpoint({
+        type: checkpointActions.SET_CHECKPOINT_NAME,
+        data: {
+          name,
+        },
+      });
+
+      loadCheckpointList(currentProject.id);
+      hideGlobalLoading();
+    } catch (error) {
+      toasts.error('Error updating checkpoint');
     }
   }
 
@@ -462,6 +505,7 @@ export function ExploreProvider(props) {
         setSelectedModel,
 
         updateProjectName,
+        updateCheckpointName,
 
         reverseGeoCode,
 
@@ -595,7 +639,7 @@ export const useWebsocketClient = () => {
             showGlobalLoadingMessage('Fetching classes...');
             const { classes } = await restApiClient.getModel(selectedModel.id);
             dispatchCurrentCheckpoint({
-              type: actions.SET_CHECKPOINT,
+              type: checkpointActions.SET_CHECKPOINT,
               data: {
                 classes,
               },
