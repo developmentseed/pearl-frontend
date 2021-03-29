@@ -25,7 +25,7 @@ import {
 } from '../../../styles/dropdown';
 
 import { ExploreContext, viewModes } from '../../../context/explore';
-import { MapContext } from '../../../context/map';
+import { useMap, useMapLayers, usePredictionLayer } from '../../../context/map';
 import GlobalContext from '../../../context/global';
 
 import TabbedBlock from '../../common/tabbed-block-body';
@@ -48,6 +48,9 @@ import { useCheckpoint } from '../../../context/checkpoint';
 
 import { AoiEditButtons } from './aoi-edit-buttons';
 
+const SelectAoiTrigger = styled.div`
+  cursor: pointer;
+`;
 const PlaceholderPanelSection = styled.div`
   padding: ${glsp()};
 `;
@@ -114,7 +117,22 @@ function PrimePanel() {
 
   const { modelsList, mosaicList } = useContext(GlobalContext);
 
-  const { map, mapLayers } = useContext(MapContext);
+  /*
+  const {
+    map,
+    mapLayers,
+    predictionLayerOpacity,
+    setPredictionLayerOpacity,
+  } = useContext(MapContext);
+
+*/
+
+  const { map } = useMap();
+  const { mapLayers } = useMapLayers();
+  const {
+    predictionLayerSettings,
+    setPredictionLayerSettings,
+  } = usePredictionLayer();
 
   const [showSelectModelModal, setShowSelectModelModal] = useState(false);
 
@@ -157,7 +175,7 @@ function PrimePanel() {
     }
 
     return (
-      <>
+      <SelectAoiTrigger>
         <SubheadingStrong
           data-cy='aoi-selection-trigger'
           {...triggerProps}
@@ -171,7 +189,7 @@ function PrimePanel() {
             {area}
           </Heading>
         )}
-      </>
+      </SelectAoiTrigger>
     );
   };
   // Retrain Panel Tab Empty State message
@@ -222,7 +240,7 @@ function PrimePanel() {
                     </DropdownHeader>
                     <DropdownBody>
                       {aoiList.map((a) => (
-                        <li key={a.id}>
+                        <li key={a.id} data-dropdown='click.close'>
                           <DropdownItem
                             onClick={() => {
                               loadAoi(currentProject, a).then((bounds) =>
@@ -240,7 +258,6 @@ function PrimePanel() {
                     {(currentCheckpoint || aoiList.length > 0) && (
                       <DropdownFooter>
                         <DropdownItem
-                          muted
                           useIcon='plus'
                           onClick={() => {
                             createNewAoi();
@@ -249,6 +266,7 @@ function PrimePanel() {
                             map.aoi.control.draw.clear();
                           }}
                           data-cy='add-aoi-button'
+                          data-dropdown='click.close'
                         >
                           Add AOI
                         </DropdownItem>
@@ -378,6 +396,20 @@ function PrimePanel() {
                   name='layers'
                   tabId='layers-tab-trigger'
                   layers={availableLayers}
+                  predictionReady={predictions.isReady()}
+                  predictionLayerOpacity={predictionLayerSettings.opacity}
+                  onPredictionLayerVisibilityToggle={() => {
+                    setPredictionLayerSettings({
+                      ...predictionLayerSettings,
+                      visible: !predictionLayerSettings.visible,
+                    });
+                  }}
+                  setPredictionLayerOpacity={(v) => {
+                    setPredictionLayerSettings({
+                      ...predictionLayerSettings,
+                      opacity: v,
+                    });
+                  }}
                   baseLayerNames={
                     mosaicList.isReady() && !mosaicList.hasError()
                       ? mosaicList.getData().mosaics
