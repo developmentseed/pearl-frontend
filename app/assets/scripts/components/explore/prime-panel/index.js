@@ -25,7 +25,7 @@ import {
 } from '../../../styles/dropdown';
 
 import { ExploreContext, viewModes } from '../../../context/explore';
-import { MapContext } from '../../../context/map';
+import { useMap, useMapLayers, usePredictionLayer } from '../../../context/map';
 import GlobalContext from '../../../context/global';
 
 import TabbedBlock from '../../common/tabbed-block-body';
@@ -115,7 +115,22 @@ function PrimePanel() {
 
   const { modelsList, mosaicList } = useContext(GlobalContext);
 
-  const { map, mapLayers } = useContext(MapContext);
+  /*
+  const {
+    map,
+    mapLayers,
+    predictionLayerOpacity,
+    setPredictionLayerOpacity,
+  } = useContext(MapContext);
+
+*/
+
+  const { map } = useMap();
+  const { mapLayers } = useMapLayers();
+  const {
+    predictionLayerSettings,
+    setPredictionLayerSettings,
+  } = usePredictionLayer();
 
   const [showSelectModelModal, setShowSelectModelModal] = useState(false);
 
@@ -318,6 +333,20 @@ function PrimePanel() {
                   name='layers'
                   tabId='layers-tab-trigger'
                   layers={availableLayers}
+                  predictionReady={predictions.isReady()}
+                  predictionLayerOpacity={predictionLayerSettings.opacity}
+                  onPredictionLayerVisibilityToggle={() => {
+                    setPredictionLayerSettings({
+                      ...predictionLayerSettings,
+                      visible: !predictionLayerSettings.visible,
+                    });
+                  }}
+                  setPredictionLayerOpacity={(v) => {
+                    setPredictionLayerSettings({
+                      ...predictionLayerSettings,
+                      opacity: v,
+                    });
+                  }}
                   baseLayerNames={
                     mosaicList.isReady() && !mosaicList.hasError()
                       ? mosaicList.getData().mosaics

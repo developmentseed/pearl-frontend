@@ -25,7 +25,7 @@ function CenterMap({ aoiRef }) {
     const center = new CenterControl({ position: 'topleft' });
     center.addTo(map);
     return () => center.remove(map);
-  }, [map]);
+  }, [map]); // eslint-disable-line react-hooks/exhaustive-deps
   return null;
 }
 

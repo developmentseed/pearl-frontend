@@ -12,7 +12,7 @@ import {
 } from 'react-leaflet';
 import GlobalContext from '../../../context/global';
 import { ExploreContext, viewModes } from '../../../context/explore';
-import { MapContext } from '../../../context/map';
+import { useMap, useMapLayers, usePredictionLayer } from '../../../context/map';
 
 import GeoCoder from '../../common/map/geocoder';
 import { BOUNDS_PADDING } from '../../common/map/constants';
@@ -86,7 +86,9 @@ function Map() {
     apiLimits,
   } = useContext(ExploreContext);
 
-  const { map, setMap, mapLayers, setMapLayers } = useContext(MapContext);
+  const { map, setMap } = useMap();
+  const { mapLayers, setMapLayers } = useMapLayers();
+  const { predictionLayerSettings } = usePredictionLayer();
 
   const { mosaicList } = useContext(GlobalContext);
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useContext(
@@ -254,11 +256,18 @@ function Map() {
             />
           ))}
 
-        {predictions &&
-          predictions.data &&
-          predictions.data.predictions &&
+        {predictions.data.predictions &&
           predictions.data.predictions.map((p) => (
-            <ImageOverlay key={p.key} url={p.image} bounds={p.bounds} />
+            <ImageOverlay
+              key={p.key}
+              url={p.image}
+              bounds={p.bounds}
+              opacity={
+                predictionLayerSettings.visible
+                  ? predictionLayerSettings.opacity
+                  : 0
+              }
+            />
           ))}
 
         {currentCheckpoint &&
@@ -297,7 +306,14 @@ function Map() {
         </FeatureGroup>
       </MapContainer>
     ),
-    [viewMode, apiLimits, mosaics, predictions, currentCheckpoint] // eslint-disable-line react-hooks/exhaustive-deps
+    [
+      viewMode,
+      apiLimits,
+      mosaics,
+      predictions,
+      currentCheckpoint,
+      predictionLayerSettings,
+    ]
   );
 
   return (

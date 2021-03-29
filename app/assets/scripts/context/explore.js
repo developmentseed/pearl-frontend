@@ -216,7 +216,7 @@ export function ExploreProvider(props) {
         });
       }
     }
-  }, [viewMode, previousViewMode, predictions]);
+  }, [viewMode, previousViewMode, predictions]); // eslint-disable-line react-hooks/exhaustive-deps
 
   /*
    * Re-init aoi state variables
