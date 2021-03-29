@@ -195,9 +195,7 @@ export function ExploreProvider(props) {
 
   async function loadMetrics() {
     await restApiClient
-      .get(
-        `project/${currentProject.id}/checkpoint/${currentCheckpoint.id}`
-      )
+      .get(`project/${currentProject.id}/checkpoint/${currentCheckpoint.id}`)
       .then((ckpt) => {
         if (ckpt.analytics) {
           dispatchCurrentCheckpoint({

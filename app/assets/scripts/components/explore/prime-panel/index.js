@@ -371,9 +371,9 @@ function PrimePanel() {
                                 ckpt.id ==
                                 (currentCheckpoint && currentCheckpoint.id)
                               }
-                              onClick={() =>
-                                applyCheckpoint(currentProject.id, ckpt.id)
-                              }
+                              onClick={() => {
+                                applyCheckpoint(currentProject.id, ckpt.id);
+                              }}
                             >
                               {ckpt.name} ({ckpt.id})
                             </DropdownItem>
