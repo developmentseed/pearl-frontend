@@ -333,7 +333,7 @@ function PrimePanel() {
                 <SubheadingStrong>
                   {currentCheckpoint && currentCheckpoint.id
                     ? `${currentCheckpoint.name} (${currentCheckpoint.id})`
-                    : '-'}
+                    : 'Run and retrain model to create checkpoints'}
                 </SubheadingStrong>
                 <HeadOptionToolbar>
                   <Dropdown
