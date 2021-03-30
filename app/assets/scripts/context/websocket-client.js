@@ -47,6 +47,12 @@ class WebsocketClient extends WebSocket {
               name: eventData.data.name,
             },
           });
+          dispatchPredictions({
+            type: predictionsActions.RECEIVE_AOI_META,
+            data: {
+              id: eventData.data.id,
+            }
+          });
           break;
 
         case 'model#checkpoint':
@@ -55,6 +61,7 @@ class WebsocketClient extends WebSocket {
             data: eventData.data,
           });
           break;
+
         case 'model#prediction':
           dispatchPredictions({
             type: predictionsActions.RECEIVE_PREDICTION,

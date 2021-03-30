@@ -1,7 +1,10 @@
 import { initialApiRequestState } from './reduxeed';
+import logger from '../utils/logger';
+
 export const actions = {
   START_PREDICTION: 'START_PREDICTION',
   RECEIVE_PREDICTION: 'RECEIVE_PREDICTION',
+  RECEIVE_AOI_META: 'RECEIVE_AOI_META',
   COMPLETE_PREDICTION: 'COMPLETE_PREDICTION',
   FAILED_PREDICTION: 'FAILED_PREDICTION',
   CLEAR_PREDICTION: 'CLEAR_PREDICTION',
@@ -34,32 +37,52 @@ export default function (state, action) {
         receivedAt: Date.now(),
         data: {
           predictions: [],
+          aoiId: null,
         },
       });
-    case actions.RECEIVE_PREDICTION: {
-      // Get bounds
-      const [minX, minY, maxX, maxY] = data.bounds;
 
-      // Build prediction object
-      const prediction = {
-        key: state.data.predictions.length + 1,
-        image: `data:image/png;base64,${data.image}`,
-        bounds: [
-          [minY, minX],
-          [maxY, maxX],
-        ],
-      };
-
-      // Add it to state
+    case actions.RECEIVE_AOI_META:
       return wrapApiResult({
         ...state,
-        processed: data.processed,
-        total: data.total,
-        receivedAt: Date.now(),
         data: {
-          predictions: (state.data.predictions || []).concat(prediction),
+          ...state.data,
+          aoiId: data.id,
         },
       });
+
+    case actions.RECEIVE_PREDICTION: {
+      // Get bounds
+      const predictionAoiId = data.aoi;
+      const currentAoiId = state.data.aoiId;
+
+      // only process prediction if AOI ID matches current AOI ID
+      if (predictionAoiId === currentAoiId) {
+        const [minX, minY, maxX, maxY] = data.bounds;
+
+        // Build prediction object
+        const prediction = {
+          key: state.data.predictions.length + 1,
+          image: `data:image/png;base64,${data.image}`,
+          bounds: [
+            [minY, minX],
+            [maxY, maxX],
+          ],
+        };
+
+        // Add it to state
+        return wrapApiResult({
+          ...state,
+          processed: data.processed,
+          total: data.total,
+          receivedAt: Date.now(),
+          data: {
+            ...state.data,
+            predictions: (state.data.predictions || []).concat(prediction),
+          },
+        });
+      } else {
+        logger('Received prediction for previous AOI', data);
+      }
     }
     case actions.COMPLETE_PREDICTION:
       return wrapApiResult({
