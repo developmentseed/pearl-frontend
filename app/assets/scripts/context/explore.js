@@ -33,7 +33,7 @@ import logger from '../utils/logger';
 /**
  * Explore View Modes
  */
-export const viewModes = {
+const allViewModes = {
   BROWSE_MODE: 'BROWSE_MODE',
   CREATE_AOI_MODE: 'CREATE_AOI_MODE',
   EDIT_AOI_MODE: 'EDIT_AOI_MODE',
@@ -70,7 +70,7 @@ export function ExploreProvider(props) {
   //L.LatLngBounds object, set when aoi is confirmed
   const [aoiBounds, setAoiBounds] = useState(null);
 
-  const [viewMode, setViewMode] = useState(viewModes.BROWSE_MODE);
+  const [viewMode, setViewMode] = useState(allViewModes.BROWSE_MODE);
   const [selectedModel, setSelectedModel] = useState(null);
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useContext(
     CheckpointContext
@@ -178,7 +178,7 @@ export function ExploreProvider(props) {
       if (predictions.error) {
         toasts.error('An inference error occurred, please try again later.');
       } else {
-        setViewMode(viewModes.ADD_CLASS_SAMPLES);
+        setViewMode(allViewModes.ADD_CLASS_SAMPLES);
         loadMetrics();
       }
     }
@@ -200,8 +200,8 @@ export function ExploreProvider(props) {
   useEffect(() => {
     if (predictions.isReady()) {
       if (
-        viewMode === viewModes.BROWSE_MODE &&
-        previousViewMode === viewModes.EDIT_AOI_MODE
+        viewMode === allViewModes.BROWSE_MODE &&
+        previousViewMode === allViewModes.EDIT_AOI_MODE
       ) {
         dispatchPredictions({ type: predictionActions.CLEAR_PREDICTION });
 
@@ -216,7 +216,7 @@ export function ExploreProvider(props) {
    * Re-init aoi state variables
    */
   function createNewAoi() {
-    setViewMode(viewModes.CREATE_AOI_MODE);
+    setViewMode(allViewModes.CREATE_AOI_MODE);
     setAoiRef(null);
     setAoiBounds(null);
     setAoiArea(null);
@@ -278,7 +278,7 @@ export function ExploreProvider(props) {
       aoiRef.setBounds(bounds);
       setAoiBounds(aoiRef.getBounds());
       setAoiName(aoiObject.name);
-      setViewMode(viewModes.BROWSE_MODE);
+      setViewMode(allViewModes.BROWSE_MODE);
       if (predictions.isReady) {
         dispatchPredictions({ type: predictionActions.CLEAR_PREDICTION });
       }
@@ -419,9 +419,9 @@ export function ExploreProvider(props) {
     if (!aoiBounds) {
       return;
     } else if (
-      viewMode === viewModes.BROWSE_MODE &&
-      (previousViewMode === viewModes.EDIT_AOI_MODE ||
-        previousViewMode === viewModes.CREATE_AOI_MODE)
+      viewMode === allViewModes.BROWSE_MODE &&
+      (previousViewMode === allViewModes.EDIT_AOI_MODE ||
+        previousViewMode === allViewModes.CREATE_AOI_MODE)
     ) {
       const bounds = [
         aoiBounds.getWest(),
@@ -524,6 +524,19 @@ const useExploreContext = (fnName) => {
   }
 
   return context;
+};
+
+export const useViewMode = () => {
+  const { viewMode, setViewMode } = useExploreContext('useViewMode');
+
+  return useMemo(
+    () => ({
+      viewMode,
+      setViewMode,
+      allViewModes,
+    }),
+    [viewMode, setViewMode]
+  );
 };
 
 export const useProject = () => {

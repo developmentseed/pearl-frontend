@@ -28,8 +28,8 @@ import {
 
 import {
   ExploreContext,
+  useViewMode,
   useWebsocketClient,
-  viewModes,
 } from '../../../context/explore';
 import { useMap, useMapLayers, usePredictionLayer } from '../../../context/map';
 import GlobalContext from '../../../context/global';
@@ -98,10 +98,9 @@ const SaveCheckpoint = styled(DropdownBody)`
 `;
 function PrimePanel() {
   const { isAuthenticated } = useContext(AuthContext);
+  const { viewMode, setViewMode, allViewModes } = useViewMode();
 
   const {
-    viewMode,
-    setViewMode,
     currentProject,
     checkpointList,
     selectedModel,
@@ -142,7 +141,9 @@ function PrimePanel() {
 
   // Check if AOI and selected model are defined, and if view mode is runnable
   const allowInferenceRun =
-    [viewModes.BROWSE_MODE, viewModes.ADD_CLASS_SAMPLES].includes(viewMode) &&
+    [allViewModes.BROWSE_MODE, allViewModes.ADD_CLASS_SAMPLES].includes(
+      viewMode
+    ) &&
     aoiRef &&
     aoiArea > 0 &&
     selectedModel;
@@ -156,12 +157,12 @@ function PrimePanel() {
     let header;
     let area;
     let disabled;
-    if (aoiArea && aoiArea > 0 && viewMode === viewModes.EDIT_AOI_MODE) {
+    if (aoiArea && aoiArea > 0 && viewMode === allViewModes.EDIT_AOI_MODE) {
       header = `${formatThousands(aoiArea / 1e6)} km2`;
     } else if (aoiName) {
       header = aoiName;
       area = `${formatThousands(aoiArea / 1e6)} km2`;
-    } else if (viewMode === viewModes.CREATE_AOI_MODE) {
+    } else if (viewMode === allViewModes.CREATE_AOI_MODE) {
       header = 'Drag on map to select';
     } else {
       header = 'None selected - Draw area on map';
@@ -172,7 +173,7 @@ function PrimePanel() {
       useIcon: null,
     };
 
-    if (viewMode === viewModes.EDIT_AOI_MODE || aoiList.length === 0) {
+    if (viewMode === allViewModes.EDIT_AOI_MODE || aoiList.length === 0) {
       disabled = true;
     }
 
@@ -214,7 +215,7 @@ function PrimePanel() {
     if (currentCheckpoint && currentCheckpoint.name) {
       setLocalCheckpointName(currentCheckpoint.name);
     }
-  }, [currentCheckpoint && currentCheckpoint.name]);
+  }, [currentCheckpoint]);
 
   return (
     <>

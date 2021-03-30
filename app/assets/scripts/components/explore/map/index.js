@@ -11,7 +11,7 @@ import {
   Circle,
 } from 'react-leaflet';
 import GlobalContext from '../../../context/global';
-import { ExploreContext, viewModes } from '../../../context/explore';
+import { ExploreContext, useViewMode } from '../../../context/explore';
 import { useMap, useMapLayers, usePredictionLayer } from '../../../context/map';
 
 import GeoCoder from '../../common/map/geocoder';
@@ -80,11 +80,11 @@ function Map() {
     aoiInitializer,
     setAoiBounds,
 
-    setViewMode,
-    viewMode,
     predictions,
     apiLimits,
   } = useContext(ExploreContext);
+
+  const { viewMode, setViewMode, allViewModes } = useViewMode();
 
   const { map, setMap } = useMap();
   const { mapLayers, setMapLayers } = useMapLayers();
@@ -97,28 +97,18 @@ function Map() {
 
   const { mosaics } = mosaicList.isReady() ? mosaicList.getData() : {};
 
-  const addClassSample = (e) => {
-    if (viewMode !== viewModes.ADD_CLASS_SAMPLES) {
-      return;
-    }
-    dispatchCurrentCheckpoint({
-      type: actions.ADD_POINT_SAMPLE,
-      data: e.latlng,
-    });
-  };
-
   useEffect(() => {
     if (!map) return;
 
     switch (viewMode) {
-      case viewModes.CREATE_AOI_MODE:
+      case allViewModes.CREATE_AOI_MODE:
         map.aoi.control.draw.enable();
         break;
-      case viewModes.EDIT_AOI_MODE:
+      case allViewModes.EDIT_AOI_MODE:
         map.aoi.control.draw.disable();
         map.aoi.control.edit.enable(aoiRef);
         break;
-      case viewModes.BROWSE_MODE:
+      case allViewModes.BROWSE_MODE:
         if (map) {
           if (aoiRef) {
             // Only disable if something has been drawn
@@ -127,16 +117,14 @@ function Map() {
               map.aoi.control.edit.disable();
             }
             if (
-              previousViewMode === viewModes.CREATE_AOI_MODE ||
-              previousViewMode === viewModes.EDIT_AOI_MODE
+              previousViewMode === allViewModes.CREATE_AOI_MODE ||
+              previousViewMode === allViewModes.EDIT_AOI_MODE
             ) {
               // On confirm, zoom to bounds
               map.fitBounds(aoiRef.getBounds(), { padding: BOUNDS_PADDING });
             }
           }
         }
-        break;
-      case viewModes.ADD_CLASS_SAMPLES:
         break;
       default:
         break;
@@ -172,7 +160,7 @@ function Map() {
       onDrawEnd: (bbox, shape) => {
         setAoiRef(shape);
         setAoiBounds(shape.getBounds());
-        setViewMode(viewModes.BROWSE_MODE);
+        setViewMode(allViewModes.BROWSE_MODE);
       },
     });
 
@@ -229,8 +217,19 @@ function Map() {
           }
         }}
       >
-        {viewMode === viewModes.ADD_CLASS_SAMPLES && (
-          <ModalMapEvent event='click' func={addClassSample} />
+        {viewMode === allViewModes.ADD_CLASS_SAMPLES && (
+          <ModalMapEvent
+            event='click'
+            func={(e) => {
+              if (viewMode !== allViewModes.ADD_CLASS_SAMPLES) {
+                return;
+              }
+              dispatchCurrentCheckpoint({
+                type: actions.ADD_POINT_SAMPLE,
+                data: e.latlng,
+              });
+            }}
+          />
         )}
         <TileLayer
           attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
@@ -307,12 +306,17 @@ function Map() {
       </MapContainer>
     ),
     [
-      viewMode,
-      apiLimits,
-      mosaics,
-      predictions,
+      allViewModes,
+      aoiRef,
       currentCheckpoint,
+      dispatchCurrentCheckpoint,
+      mapLayers,
+      mosaics,
       predictionLayerSettings,
+      predictions,
+      setMap,
+      setMapLayers,
+      viewMode,
     ]
   );
 
