@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { Button } from '@devseed-ui/button';
 import { glsp } from '@devseed-ui/theme-provider';
 import { EditButton } from '../../../styles/button';
-import { useViewMode } from '../../../context/explore';
+import { useMap } from '../../../context/explore';
 import T from 'prop-types';
 import { formatThousands } from '../../../utils/format';
 
@@ -24,7 +24,7 @@ const ModalFooter = styled(BaseModalFooter)`
 `;
 
 export function AoiEditButtons(props) {
-  const { viewMode, setViewMode, allViewModes } = useViewMode();
+  const { setMode, mapModes } = useMap();
 
   const {
     aoiRef,
@@ -40,15 +40,15 @@ export function AoiEditButtons(props) {
 
   // Display confirm/cancel buttons when AOI edition is active
   if (
-    viewMode === allViewModes.CREATE_AOI_MODE ||
-    viewMode === allViewModes.EDIT_AOI_MODE
+    map.mode === mapModes.CREATE_AOI_MODE ||
+    map.mode === mapModes.EDIT_AOI_MODE
   ) {
     return (
       <>
         <EditButton
           onClick={function () {
             if (!apiLimits || apiLimits.live_inference > aoiArea) {
-              setViewMode(allViewModes.BROWSE_MODE);
+              setMode(mapModes.BROWSE_MODE);
               setAoiBounds(aoiRef.getBounds());
             } else if (apiLimits.max_inference > aoiArea) {
               setActiveModal('no-live-inference');
@@ -63,7 +63,7 @@ export function AoiEditButtons(props) {
         </EditButton>
         <EditButton
           onClick={() => {
-            setViewMode(allViewModes.BROWSE_MODE);
+            setMode(mapModes.BROWSE_MODE);
             if (aoiBounds) {
               // editing is canceled
               aoiRef.setBounds(aoiBounds);
@@ -126,7 +126,7 @@ export function AoiEditButtons(props) {
                     variation='base-plain'
                     onClick={() => {
                       setActiveModal(false);
-                      setViewMode(allViewModes.BROWSE_MODE);
+                      setMode(mapModes.BROWSE_MODE);
                       setAoiBounds(aoiRef.getBounds());
                     }}
                   >
@@ -151,8 +151,8 @@ export function AoiEditButtons(props) {
   return (
     <EditButton
       onClick={() => {
-        setViewMode(
-          !aoiRef ? allViewModes.CREATE_AOI_MODE : allViewModes.EDIT_AOI_MODE
+        setMode(
+          !aoiRef ? mapModes.CREATE_AOI_MODE : mapModes.EDIT_AOI_MODE
         );
       }}
       title='Draw Area of Interest'

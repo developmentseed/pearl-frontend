@@ -94,6 +94,38 @@ function RetrainModel(props) {
   return (
     <Wrapper className={className}>
       <Heading useAlt>Classes</Heading>
+      <section>
+        <Button
+          variation='primary-raised-light'
+          size='medium'
+          useIcon='crosshair'
+          style={{
+            gridColumn: '3 / 1',
+          }}
+        >
+          Add Point Sample
+        </Button>
+        <Button
+          variation='primary-raised-light'
+          size='medium'
+          useIcon='pencil'
+          style={{
+            gridColumn: '3 / 2',
+          }}
+        >
+          Add Sample Area
+        </Button>
+        <Button
+          variation='primary-raised-light'
+          size='medium'
+          useIcon='xmark'
+          style={{
+            gridColumn: '3 / -1',
+          }}
+        >
+          Delete
+        </Button>
+      </section>
       <ClassList>
         {currentCheckpoint &&
           currentCheckpoint.classes &&

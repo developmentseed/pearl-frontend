@@ -28,7 +28,6 @@ import {
 
 import {
   ExploreContext,
-  useViewMode,
   useWebsocketClient,
 } from '../../../context/explore';
 import { useMap, useMapLayers, usePredictionLayer } from '../../../context/map';
@@ -98,7 +97,7 @@ const SaveCheckpoint = styled(DropdownBody)`
 `;
 function PrimePanel() {
   const { isAuthenticated } = useContext(AuthContext);
-  const { viewMode, setViewMode, allViewModes } = useViewMode();
+  const { map, mapModes } = useMap();
 
   const {
     currentProject,
@@ -125,7 +124,6 @@ function PrimePanel() {
 
   const { modelsList, mosaicList } = useContext(GlobalContext);
 
-  const { map } = useMap();
   const { mapLayers } = useMapLayers();
   const {
     predictionLayerSettings,
@@ -141,9 +139,7 @@ function PrimePanel() {
 
   // Check if AOI and selected model are defined, and if view mode is runnable
   const allowInferenceRun =
-    [allViewModes.BROWSE_MODE, allViewModes.ADD_CLASS_SAMPLES].includes(
-      viewMode
-    ) &&
+    [mapModes.BROWSE_MODE, mapModes.ADD_CLASS_SAMPLES].includes(map.mode) &&
     aoiRef &&
     aoiArea > 0 &&
     selectedModel;
@@ -157,12 +153,12 @@ function PrimePanel() {
     let header;
     let area;
     let disabled;
-    if (aoiArea && aoiArea > 0 && viewMode === allViewModes.EDIT_AOI_MODE) {
+    if (aoiArea && aoiArea > 0 && map.mode === mapModes.EDIT_AOI_MODE) {
       header = `${formatThousands(aoiArea / 1e6)} km2`;
     } else if (aoiName) {
       header = aoiName;
       area = `${formatThousands(aoiArea / 1e6)} km2`;
-    } else if (viewMode === allViewModes.CREATE_AOI_MODE) {
+    } else if (map.mode === mapModes.CREATE_AOI_MODE) {
       header = 'Drag on map to select';
     } else {
       header = 'None selected - Draw area on map';
@@ -173,7 +169,7 @@ function PrimePanel() {
       useIcon: null,
     };
 
-    if (viewMode === allViewModes.EDIT_AOI_MODE || aoiList.length === 0) {
+    if (map.mode === mapModes.EDIT_AOI_MODE || aoiList.length === 0) {
       disabled = true;
     }
 
@@ -286,14 +282,11 @@ function PrimePanel() {
 
                 <HeadOptionToolbar>
                   <AoiEditButtons
-                    setViewMode={setViewMode}
                     aoiRef={aoiRef}
                     setAoiRef={setAoiRef}
-                    map={map}
                     aoiArea={aoiArea}
                     setAoiBounds={setAoiBounds}
                     aoiBounds={aoiBounds}
-                    viewMode={viewMode}
                     apiLimits={apiLimits}
                   />
                 </HeadOptionToolbar>
