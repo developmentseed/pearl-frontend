@@ -12,7 +12,7 @@ import {
 } from 'react-leaflet';
 import GlobalContext from '../../../context/global';
 import { ExploreContext, viewModes } from '../../../context/explore';
-import { useMap, useMapLayers, usePredictionLayer } from '../../../context/map';
+import { useMap, useMapLayers, useUserLayers, usePredictionLayer } from '../../../context/map';
 
 import GeoCoder from '../../common/map/geocoder';
 import { BOUNDS_PADDING } from '../../common/map/constants';
@@ -89,6 +89,8 @@ function Map() {
   const { map, setMap } = useMap();
   const { mapLayers, setMapLayers } = useMapLayers();
   const { predictionLayerSettings } = usePredictionLayer();
+  const { userLayers} = useUserLayers();
+
 
   const { mosaicList } = useContext(GlobalContext);
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useContext(
@@ -249,7 +251,11 @@ function Map() {
                 add: (v) => {
                   setMapLayers({
                     ...mapLayers,
-                    [layer]: v.target,
+                    [layer]: {
+                      layer: v.target,
+                      active: true,
+                      name: layer
+                    },
                   });
                 },
               }}
@@ -263,8 +269,8 @@ function Map() {
               url={p.image}
               bounds={p.bounds}
               opacity={
-                predictionLayerSettings.visible
-                  ? predictionLayerSettings.opacity
+                userLayers.predictions.visible
+                  ? userLayers.predictions.opacity
                   : 0
               }
             />
@@ -282,6 +288,12 @@ function Map() {
                   pathOptions={{
                     color: sampleClass.color,
                   }}
+                  opacity={
+                    userLayers.retrainingSamples.visible
+                      ? userLayers.retrainingSamples.opacity
+                      : 0
+                  }
+
                   eventHandlers={{
                     click: (e) => {
                       e.originalEvent.preventDefault();
@@ -313,6 +325,7 @@ function Map() {
       predictions,
       currentCheckpoint,
       predictionLayerSettings,
+      userLayers
     ]
   );
 

@@ -25,7 +25,12 @@ import {
 } from '../../../styles/dropdown';
 
 import { ExploreContext, viewModes } from '../../../context/explore';
-import { useMap, useMapLayers, usePredictionLayer } from '../../../context/map';
+import {
+  useMap,
+  useMapLayers,
+  useUserLayers,
+  usePredictionLayer,
+} from '../../../context/map';
 import GlobalContext from '../../../context/global';
 
 import TabbedBlock from '../../common/tabbed-block-body';
@@ -131,6 +136,8 @@ function PrimePanel() {
     predictionLayerSettings,
     setPredictionLayerSettings,
   } = usePredictionLayer();
+
+  const { userLayers, setUserLayers } = useUserLayers();
 
   const [showSelectModelModal, setShowSelectModelModal] = useState(false);
 
@@ -332,7 +339,9 @@ function PrimePanel() {
                 <LayersPanel
                   name='layers'
                   tabId='layers-tab-trigger'
-                  layers={availableLayers}
+                  mapLayers={mapLayers}
+                  userLayers={userLayers}
+                  /*
                   predictionReady={predictions.isReady()}
                   predictionLayerOpacity={predictionLayerSettings.opacity}
                   onPredictionLayerVisibilityToggle={() => {
@@ -346,21 +355,43 @@ function PrimePanel() {
                       ...predictionLayerSettings,
                       opacity: v,
                     });
-                  }}
-                  baseLayerNames={
-                    mosaicList.isReady() && !mosaicList.hasError()
-                      ? mosaicList.getData().mosaics
-                      : []
-                  }
-                  onSliderChange={(name, value) => {
-                    mapLayers[name].setOpacity(value);
-                  }}
-                  onVisibilityToggle={(name, value) => {
-                    if (value) {
-                      map.addLayer(mapLayers[name]);
+                   }}*/
+                  onSliderChange={(layer, value) => {
+                    if (layer.layer) {
+                      // Map Layer
+                      layer.layer.setOpacity(value);
                     } else {
-                      map.removeLayer(mapLayers[name]);
+                      // User layer
+                      setUserLayers({
+                        ...userLayers,
+                        [layer.id]: {
+                          ...layer,
+                          opacity: value,
+                        },
+                      });
                     }
+                  }}
+                  onVisibilityToggle={(layer, value) => {
+
+                    if (layer.layer) {
+                      // Map Layer
+                      if (value) {
+                        map.addLayer(layer.layer);
+                      } else {
+                        map.removeLayer(layer.layer)
+                      }
+
+                    } else {
+                      // User layer
+                      setUserLayers({
+                        ...userLayers,
+                        [layer.id]: {
+                          ...layer,
+                          visible: !layer.visible,
+                        },
+                      });
+                    }
+
                   }}
                 />
               </TabbedBlock>

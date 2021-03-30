@@ -12,6 +12,21 @@ export function MapProvider(props) {
     visible: true,
   });
 
+  const [userLayers, setUserLayers] = useState({
+    predictions: {
+      opacity: 1,
+      visible: true,
+      active: false,
+      id: 'predictions'
+    },
+    retrainingSamples: {
+      opacity: 1,
+      visible: true,
+      active: false,
+      id: 'retrainingSamples'
+    },
+  });
+
   return (
     <MapContext.Provider
       value={{
@@ -23,6 +38,9 @@ export function MapProvider(props) {
 
         predictionLayerSettings,
         setPredictionLayerSettings,
+
+        userLayers,
+        setUserLayers,
       }}
     >
       {props.children}
@@ -66,6 +84,17 @@ export const useMapLayers = () => {
       setMapLayers,
     }),
     [mapLayers, setMapLayers]
+  );
+};
+
+export const useUserLayers = () => {
+  const { userLayers, setUserLayers } = useMapContext('useUserLayers');
+  return useMemo(
+    () => ({
+      userLayers,
+      setUserLayers,
+    }),
+    [userLayers, setUserLayers]
   );
 };
 

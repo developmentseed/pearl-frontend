@@ -59,7 +59,7 @@ const AccordionFold = styled(BaseFold)`
   }
 `;
 
-function Layer({ layer, onSliderChange, onVisibilityToggle, info }) {
+function Layer({ layer, onSliderChange, onVisibilityToggle, info, name}) {
   const [value, setValue] = useState(1);
   const [visible, setVisible] = useState(true);
   return (
@@ -67,12 +67,12 @@ function Layer({ layer, onSliderChange, onVisibilityToggle, info }) {
       <IconPlaceholder />
       <SliderWrapper>
         <Heading as='h4' size='xsmall'>
-          {layer.name}
+          {name}
         </Heading>
         <InputRange
           onChange={(v) => {
             setValue(v);
-            onSliderChange(layer.name, v);
+            onSliderChange(layer, v);
           }}
           value={value}
           formatLabel={() => null}
@@ -100,7 +100,7 @@ function Layer({ layer, onSliderChange, onVisibilityToggle, info }) {
         useIcon={visible ? 'eye' : 'eye-disabled'}
         onClick={() => {
           setVisible(!visible);
-          onVisibilityToggle(layer.name, !visible);
+          onVisibilityToggle(layer, !visible);
         }}
       >
         Info
@@ -132,9 +132,10 @@ function Category({
       setFoldExpanded={setExpanded}
       renderBody={() => (
         <Wrapper>
-          {layers.map((layer) => (
+          {Object.entries(layers).map(([key, layer]) => (
             <Layer
-              key={`${category}-${layer.name}`}
+              key={`${category}-${layer.name || key}`}
+              name={layer.name || key } 
               layer={layer}
               onSliderChange={onSliderChange}
               onVisibilityToggle={onVisibilityToggle}
@@ -158,8 +159,8 @@ Category.propTypes = {
 
 function LayersPanel(props) {
   const {
-    layers,
-    baseLayerNames,
+    mapLayers,
+    userLayers,
     className,
     onSliderChange,
     onVisibilityToggle,
@@ -168,64 +169,44 @@ function LayersPanel(props) {
     predictionReady,
   } = props;
 
-  const categorizedLayers = layers.reduce((cats, layer) => {
-    if (!cats[layer.category]) {
-      cats[layer.category] = [];
-    }
-    cats[layer.category].push(layer);
-    return cats;
-  }, {});
 
-  const baseLayers = baseLayerNames.map((n) => ({
-    name: n,
-  }));
 
   return (
     <div className={className}>
-      {predictionReady && (
-        <Layer
-          key='prediction-layer'
-          layer={{ name: 'LULC Inference' }}
-          onSliderChange={throttle((name, value) => {
-            setPredictionLayerOpacity(value);
-          }, 100)}
-          onVisibilityToggle={onPredictionLayerVisibilityToggle}
-        />
-      )}
       <Accordion
         className={className}
         allowMultiple
-        foldCount={Object.keys(categorizedLayers).length}
+        foldCount={2}
         initialState={[
           true,
-          ...Object.keys(categorizedLayers)
-            .slice(1)
-            .map(() => false),
+          true
         ]}
       >
         {
           ({ checkExpanded, setExpanded }) => (
             <>
-              {Object.entries(categorizedLayers).map(([cat, layers], index) => (
-                <Category
-                  key={cat}
-                  checkExpanded={() => checkExpanded(index)}
-                  setExpanded={(v) => setExpanded(index, v)}
-                  category={cat}
-                  layers={layers}
-                  onSliderChange={onSliderChange}
-                  onVisibilityToggle={onVisibilityToggle}
-                />
-              ))}
               <Category
                 checkExpanded={() => {
-                  return checkExpanded(Object.keys(categorizedLayers).length);
+                  return checkExpanded(0)
                 }}
-                setExpanded={(v) => {
-                  return setExpanded(Object.keys(categorizedLayers).length, v);
+                setExpanded={() => {
+                  return setExpanded(0)
+                }}
+                category='User Layers'
+                layers={userLayers}
+                onSliderChange={onSliderChange}
+                onVisibilityToggle={onVisibilityToggle}
+              />
+
+              <Category
+                checkExpanded={() => {
+                  return checkExpanded(1)
+                }}
+                setExpanded={() => {
+                  return setExpanded(1)
                 }}
                 category='Base Satellite Imagery'
-                layers={baseLayers}
+                layers={mapLayers}
                 onSliderChange={onSliderChange}
                 onVisibilityToggle={onVisibilityToggle}
               />
