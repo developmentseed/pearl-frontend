@@ -25,9 +25,9 @@
     <meta property='og:description' content='{{appDescription}}' />
     
     <!-- build:css /assets/styles/vendor.css -->
-    <link rel='preload'  href='{{baseurl}}/assets/fonts/TitilliumWeb-Regular.woff2' as='font' type='font/woff2' crossorigin>
+    <link rel='preload'  href='{{baseurl}}/assets/fonts/TitilliumWeb.woff2' as='font' type='font/woff2' crossorigin>
     <link rel='preconnect' href='https://fonts.gstatic.com'>
-    <link rel='stylesheet' href='https://fonts.googleapis.com/css2?family=Titillium+Web-Regular:wght@300;400;700&display=swap'>
+    <link rel='stylesheet' href='https://fonts.googleapis.com/css2?family=Titillium+Web:wght@300;400;700&display=swap'>
     <link rel='stylesheet' href='../node_modules/leaflet/dist/leaflet.css' />
     <link rel='stylesheet' href='../node_modules/leaflet-geosearch/assets/css/leaflet.css' />
     <link rel="stylesheet" href="../node_modules/react-input-range/lib/css/input-range/input-range.css" />
@@ -40,7 +40,7 @@
     <style>
       @font-face {
         font-family: 'Titillium Web', Titillium Web;
-        src: url({{baseurl}}/assets/fonts/TitilliumWeb-Regular.woff2) format('woff2');
+        src: url({{baseurl}}/assets/fonts/TitilliumWeb.woff2) format('woff2');
         font-weight: 400;
         font-display: swap;
       }
@@ -98,18 +98,6 @@
       if (isIE) {
         document.body.innerHTML =
           'Unfortunately, your browser is not currently supported.<br />Recommended browsers: Edge, Firefox, Safari, Chrome';
-      }
-    </script>
-    <script>
-      // Font preloading technique from: https://www.zachleat.com/web/css-tricks-web-fonts/
-      if( "fonts" in document ) {
-          var regular = new FontFace("Titillium Web", "url({{baseurl}}/assets/fonts/TitilliumWeb-Regular.woff2) format('woff2')");
-
-          Promise.all([regular.load()]).then(function(fonts) {
-              fonts.forEach(function(font) {
-                  document.fonts.add(font);
-              });
-          });
       }
     </script>
 
