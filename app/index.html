@@ -103,7 +103,7 @@
     <script>
       // Font preloading technique from: https://www.zachleat.com/web/css-tricks-web-fonts/
       if( "fonts" in document ) {
-          var regular = new FontFace("Titillium Web", "url(/assets/fonts/TitilliumWeb-Regular.woff2) format('woff2')");
+          var regular = new FontFace("Titillium Web", "url({{baseurl}}/assets/fonts/TitilliumWeb-Regular.woff2) format('woff2')");
 
           Promise.all([regular.load()]).then(function(fonts) {
               fonts.forEach(function(font) {
