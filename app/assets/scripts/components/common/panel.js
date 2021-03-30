@@ -36,9 +36,11 @@ export const PanelSelf = styled.section`
       z-index: 15;
 
       ${media.largeUp`
-      width: ${fitContent ? 'fit-content' : '16rem'};
-
-    `}
+        width: ${fitContent ? 'fit-content' : '16rem'};
+      `}
+      ${media.xlargeUp`
+        width: ${fitContent ? 'fit-content' : '22rem'};
+      `}
     `}
 `;
 
