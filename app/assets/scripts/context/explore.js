@@ -526,6 +526,19 @@ const useExploreContext = (fnName) => {
   return context;
 };
 
+export const useProject = () => {
+  const { aoiName, aoiRef, currentProject } = useExploreContext('useProject');
+
+  return useMemo(
+    () => ({
+      currentProject,
+      aoiName,
+      aoiRef,
+    }),
+    [currentProject, aoiName, aoiRef]
+  );
+};
+
 export const useWebsocketClient = () => {
   const history = useHistory();
   const { restApiClient } = useRestApiClient();

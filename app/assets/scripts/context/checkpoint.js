@@ -4,7 +4,7 @@ import uniqWith from 'lodash.uniqwith';
 import isEqual from 'lodash.isequal';
 import differenceWith from 'lodash.differencewith';
 import { useRestApiClient } from './auth';
-import { useWebsocketClient } from './explore';
+import { useProject, useWebsocketClient } from './explore';
 import toasts from '../components/common/toasts';
 import logger from '../utils/logger';
 import {
@@ -168,6 +168,7 @@ const useCheckContext = (fnName) => {
 // a single checkpoint, by avoiding using useContext(CheckpointContext) directly.
 export const useCheckpoint = () => {
   const { restApiClient } = useRestApiClient();
+  const { currentProject, aoiRef, aoiName } = useProject();
   const { sendWebsocketMessage } = useWebsocketClient();
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckContext(
     'useCheckpoint'
@@ -196,6 +197,36 @@ export const useCheckpoint = () => {
             },
           });
 
+          // Get bbox polygon from AOI
+          const {
+            _southWest: { lng: minX, lat: minY },
+            _northEast: { lng: maxX, lat: maxY },
+          } = aoiRef.getBounds();
+
+          const polygon = {
+            type: 'Polygon',
+            coordinates: [
+              [
+                [minX, minY],
+                [maxX, minY],
+                [maxX, maxY],
+                [minX, maxY],
+                [minX, minY],
+              ],
+            ],
+          };
+
+          // Compose message
+          const message = {
+            action: 'model#prediction',
+            data: {
+              name: aoiName,
+              polygon,
+            },
+          };
+
+          sendWebsocketMessage(currentProject.id, message);
+
           hideGlobalLoading();
         } catch (error) {
           logger(error);
@@ -206,6 +237,9 @@ export const useCheckpoint = () => {
       },
     }),
     [
+      aoiName,
+      aoiRef,
+      currentProject,
       restApiClient,
       sendWebsocketMessage,
       currentCheckpoint,
