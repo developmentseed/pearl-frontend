@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import styled, { css } from 'styled-components';
 import { themeVal, glsp } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
@@ -50,7 +50,6 @@ import { availableLayers } from '../sample-data';
 import { formatThousands } from '../../../utils/format';
 import { AuthContext } from '../../../context/auth';
 import { CheckpointContext } from '../../../context/checkpoint';
-
 import { AoiEditButtons } from './aoi-edit-buttons';
 
 const SelectAoiTrigger = styled.div`
@@ -212,6 +211,21 @@ function PrimePanel() {
       return `Define an Area of Interest to run models at your selected location`;
     }
   };
+
+  useEffect(() => {
+    if (predictions.isReady()) {
+      const layers = Object.entries(userLayers).reduce((accum, [k,v]) => {
+        return {
+          ...accum,
+          [k]: {
+            ...v,
+            active: true
+          }
+        }
+      }, {})
+      setUserLayers(layers)
+    }
+  }, [predictions])
 
   return (
     <>

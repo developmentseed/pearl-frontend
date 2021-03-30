@@ -17,13 +17,13 @@ export function MapProvider(props) {
       opacity: 1,
       visible: true,
       active: false,
-      id: 'predictions'
+      id: 'predictions',
     },
     retrainingSamples: {
       opacity: 1,
       visible: true,
       active: false,
-      id: 'retrainingSamples'
+      id: 'retrainingSamples',
     },
   });
 

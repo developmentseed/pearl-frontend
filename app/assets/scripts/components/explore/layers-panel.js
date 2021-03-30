@@ -132,7 +132,7 @@ function Category({
       setFoldExpanded={setExpanded}
       renderBody={() => (
         <Wrapper>
-          {Object.entries(layers).map(([key, layer]) => (
+          {Object.entries(layers).filter(([key, layer]) => layer.active).map(([key, layer]) => (
             <Layer
               key={`${category}-${layer.name || key}`}
               name={layer.name || key } 

@@ -12,7 +12,12 @@ import {
 } from 'react-leaflet';
 import GlobalContext from '../../../context/global';
 import { ExploreContext, viewModes } from '../../../context/explore';
-import { useMap, useMapLayers, useUserLayers, usePredictionLayer } from '../../../context/map';
+import {
+  useMap,
+  useMapLayers,
+  useUserLayers,
+  usePredictionLayer,
+} from '../../../context/map';
 
 import GeoCoder from '../../common/map/geocoder';
 import { BOUNDS_PADDING } from '../../common/map/constants';
@@ -89,8 +94,7 @@ function Map() {
   const { map, setMap } = useMap();
   const { mapLayers, setMapLayers } = useMapLayers();
   const { predictionLayerSettings } = usePredictionLayer();
-  const { userLayers} = useUserLayers();
-
+  const { userLayers } = useUserLayers();
 
   const { mosaicList } = useContext(GlobalContext);
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useContext(
@@ -254,7 +258,7 @@ function Map() {
                     [layer]: {
                       layer: v.target,
                       active: true,
-                      name: layer
+                      name: layer,
                     },
                   });
                 },
@@ -287,13 +291,10 @@ function Map() {
                   key={JSON.stringify([lat, lng])}
                   pathOptions={{
                     color: sampleClass.color,
-                  }}
-                  opacity={
-                    userLayers.retrainingSamples.visible
+                    opacity: userLayers.retrainingSamples.visible
                       ? userLayers.retrainingSamples.opacity
-                      : 0
-                  }
-
+                      : 0,
+                  }}
                   eventHandlers={{
                     click: (e) => {
                       e.originalEvent.preventDefault();
@@ -325,7 +326,7 @@ function Map() {
       predictions,
       currentCheckpoint,
       predictionLayerSettings,
-      userLayers
+      userLayers,
     ]
   );
 
