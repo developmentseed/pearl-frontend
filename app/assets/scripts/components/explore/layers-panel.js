@@ -59,7 +59,7 @@ const AccordionFold = styled(BaseFold)`
   }
 `;
 
-function Layer({ layer, onSliderChange, onVisibilityToggle, info, name}) {
+function Layer({ layer, onSliderChange, onVisibilityToggle, info, name }) {
   const [value, setValue] = useState(1);
   const [visible, setVisible] = useState(true);
   return (
@@ -70,10 +70,10 @@ function Layer({ layer, onSliderChange, onVisibilityToggle, info, name}) {
           {name}
         </Heading>
         <InputRange
-          onChange={(v) => {
+          onChange={throttle((v) => {
             setValue(v);
             onSliderChange(layer, v);
-          }}
+          }, 500)}
           value={value}
           formatLabel={() => null}
           minValue={0}
@@ -114,6 +114,7 @@ Layer.propTypes = {
   onSliderChange: T.func,
   onVisibilityToggle: T.func,
   info: T.string,
+  name: T.string,
 };
 
 function Category({
@@ -124,6 +125,9 @@ function Category({
   onSliderChange,
   onVisibilityToggle,
 }) {
+  if (!Object.values(layers).find((f) => f.active)) {
+    return null;
+  }
   return (
     <AccordionFold
       id={`${category}-fold`}
@@ -132,16 +136,18 @@ function Category({
       setFoldExpanded={setExpanded}
       renderBody={() => (
         <Wrapper>
-          {Object.entries(layers).filter(([key, layer]) => layer.active).map(([key, layer]) => (
-            <Layer
-              key={`${category}-${layer.name || key}`}
-              name={layer.name || key } 
-              layer={layer}
-              onSliderChange={onSliderChange}
-              onVisibilityToggle={onVisibilityToggle}
-              info={layer.info}
-            />
-          ))}
+          {Object.entries(layers)
+            .filter(([, layer]) => layer.active)
+            .map(([key, layer]) => (
+              <Layer
+                key={`${category}-${layer.name || key}`}
+                name={layer.name || key}
+                layer={layer}
+                onSliderChange={onSliderChange}
+                onVisibilityToggle={onVisibilityToggle}
+                info={layer.info}
+              />
+            ))}
         </Wrapper>
       )}
     />
@@ -152,7 +158,7 @@ Category.propTypes = {
   checkExpanded: T.func,
   setExpanded: T.func,
   category: T.string,
-  layers: T.array,
+  layers: T.object,
   onSliderChange: T.func,
   onVisibilityToggle: T.func,
 };
@@ -164,12 +170,7 @@ function LayersPanel(props) {
     className,
     onSliderChange,
     onVisibilityToggle,
-    onPredictionLayerVisibilityToggle,
-    setPredictionLayerOpacity,
-    predictionReady,
   } = props;
-
-
 
   return (
     <div className={className}>
@@ -177,20 +178,17 @@ function LayersPanel(props) {
         className={className}
         allowMultiple
         foldCount={2}
-        initialState={[
-          true,
-          true
-        ]}
+        initialState={[true, true]}
       >
         {
           ({ checkExpanded, setExpanded }) => (
             <>
               <Category
                 checkExpanded={() => {
-                  return checkExpanded(0)
+                  return checkExpanded(0);
                 }}
                 setExpanded={() => {
-                  return setExpanded(0)
+                  return setExpanded(0);
                 }}
                 category='User Layers'
                 layers={userLayers}
@@ -200,10 +198,10 @@ function LayersPanel(props) {
 
               <Category
                 checkExpanded={() => {
-                  return checkExpanded(1)
+                  return checkExpanded(1);
                 }}
                 setExpanded={() => {
-                  return setExpanded(1)
+                  return setExpanded(1);
                 }}
                 category='Base Satellite Imagery'
                 layers={mapLayers}
@@ -220,14 +218,11 @@ function LayersPanel(props) {
 }
 
 LayersPanel.propTypes = {
-  layers: T.array,
+  mapLayers: T.object,
+  userLayers: T.object,
   className: T.string,
-  baseLayerNames: T.array,
   onSliderChange: T.func,
   onVisibilityToggle: T.func,
-  setPredictionLayerOpacity: T.func,
-  onPredictionLayerVisibilityToggle: T.func,
-  predictionReady: T.bool,
 };
 
 export default LayersPanel;

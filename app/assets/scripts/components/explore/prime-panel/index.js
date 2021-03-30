@@ -25,12 +25,7 @@ import {
 } from '../../../styles/dropdown';
 
 import { ExploreContext, viewModes } from '../../../context/explore';
-import {
-  useMap,
-  useMapLayers,
-  useUserLayers,
-  usePredictionLayer,
-} from '../../../context/map';
+import { useMap, useMapLayers, useUserLayers } from '../../../context/map';
 import GlobalContext from '../../../context/global';
 
 import TabbedBlock from '../../common/tabbed-block-body';
@@ -46,7 +41,6 @@ import {
 import { EditButton } from '../../../styles/button';
 import InfoButton from '../../common/info-button';
 
-import { availableLayers } from '../sample-data';
 import { formatThousands } from '../../../utils/format';
 import { AuthContext } from '../../../context/auth';
 import { CheckpointContext } from '../../../context/checkpoint';
@@ -117,7 +111,7 @@ function PrimePanel() {
 
   const { currentCheckpoint } = useContext(CheckpointContext);
 
-  const { modelsList, mosaicList } = useContext(GlobalContext);
+  const { modelsList } = useContext(GlobalContext);
 
   /*
   const {
@@ -131,10 +125,6 @@ function PrimePanel() {
 
   const { map } = useMap();
   const { mapLayers } = useMapLayers();
-  const {
-    predictionLayerSettings,
-    setPredictionLayerSettings,
-  } = usePredictionLayer();
 
   const { userLayers, setUserLayers } = useUserLayers();
 
@@ -214,18 +204,18 @@ function PrimePanel() {
 
   useEffect(() => {
     if (predictions.isReady()) {
-      const layers = Object.entries(userLayers).reduce((accum, [k,v]) => {
+      const layers = Object.entries(userLayers).reduce((accum, [k, v]) => {
         return {
           ...accum,
           [k]: {
             ...v,
-            active: true
-          }
-        }
-      }, {})
-      setUserLayers(layers)
+            active: true,
+          },
+        };
+      }, {});
+      setUserLayers(layers);
     }
-  }, [predictions])
+  }, [predictions]);
 
   return (
     <>
@@ -386,15 +376,13 @@ function PrimePanel() {
                     }
                   }}
                   onVisibilityToggle={(layer, value) => {
-
                     if (layer.layer) {
                       // Map Layer
                       if (value) {
                         map.addLayer(layer.layer);
                       } else {
-                        map.removeLayer(layer.layer)
+                        map.removeLayer(layer.layer);
                       }
-
                     } else {
                       // User layer
                       setUserLayers({
@@ -405,7 +393,6 @@ function PrimePanel() {
                         },
                       });
                     }
-
                   }}
                 />
               </TabbedBlock>
