@@ -3,7 +3,7 @@ import { Bar } from 'react-chartjs-2';
 import styled from 'styled-components';
 import T from 'prop-types';
 import Prose from '../../../styles/type/prose';
-import { glsp } from '@devseed-ui/theme-provider';
+import { glsp, themeVal } from '@devseed-ui/theme-provider';
 import { round } from '../../../utils/format';
 
 const Wrapper = styled.div`
@@ -15,7 +15,7 @@ const Summary = styled.ol`
   display: grid;
 `;
 const ChartContainer = styled.div`
-  background-color: #dbdbdb;
+  background-color: ${themeVal('color.baseAlphaC')};
   max-width: 100%;
 `;
 const ClassItem = styled.li`
