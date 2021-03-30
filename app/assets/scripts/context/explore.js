@@ -146,15 +146,6 @@ export function ExploreProvider(props) {
     return checkpointsMeta;
   }
 
-  useEffect(() => {
-    return () => {
-      // Terminate instance on page unmount
-      if (websocketClient) {
-        websocketClient.terminateInstance();
-      }
-    };
-  }, [websocketClient]);
-
   // Load project meta on load and api client ready
   useEffect(() => {
     if (restApiClient) {

@@ -78,18 +78,6 @@ class WebsocketClient extends WebSocket {
       }
     });
   }
-
-  /**
-   * Send message to terminate
-   * @param {String} name
-   * @param {Object} polygon
-   */
-  terminateInstance() {
-    const message = {
-      action: 'instance#terminate',
-    };
-    this.send(JSON.stringify(message));
-  }
 }
 
 export default WebsocketClient;
