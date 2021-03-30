@@ -82,6 +82,7 @@ export default function (state, action) {
         });
       } else {
         logger('Received prediction for previous AOI', data);
+        return state;
       }
     }
     case actions.COMPLETE_PREDICTION:
