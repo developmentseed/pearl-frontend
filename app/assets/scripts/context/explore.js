@@ -8,7 +8,7 @@ import React, {
 } from 'react';
 import T from 'prop-types';
 import config from '../config';
-import { initialApiRequestState } from '../reducers/reduxeed';
+import { initialApiRequestState } from './reducers/reduxeed';
 import { useRestApiClient } from './auth';
 import {
   showGlobalLoadingMessage,
@@ -20,7 +20,7 @@ import WebsocketClient from './websocket-client';
 import GlobalContext from './global';
 import predictionsReducer, {
   actions as predictionActions,
-} from '../reducers/predictions';
+} from './reducers/predictions';
 import usePrevious from '../utils/use-previous';
 import tBbox from '@turf/bbox';
 import tBboxPolygon from '@turf/bbox-polygon';

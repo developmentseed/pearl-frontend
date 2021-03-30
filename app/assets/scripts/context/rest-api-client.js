@@ -1,5 +1,5 @@
 import config from '../config';
-import { fetchJSON } from '../reducers/reduxeed';
+import { fetchJSON } from './reducers/reduxeed';
 const { restApiEndpoint } = config;
 
 class RestApiClient {

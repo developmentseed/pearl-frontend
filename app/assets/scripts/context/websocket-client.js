@@ -1,6 +1,6 @@
 import config from '../config';
 import logger from '../utils/logger';
-const { actions: predictionsActions } = require('../reducers/predictions');
+const { actions: predictionsActions } = require('./reducers/predictions');
 const { actions: checkpointActions } = require('../context/checkpoint');
 
 class WebsocketClient extends WebSocket {

@@ -6,14 +6,14 @@ import React, {
   useState,
 } from 'react';
 import T from 'prop-types';
-import { initialApiRequestState } from '../reducers/reduxeed';
+import { initialApiRequestState } from './reducers/reduxeed';
 import {
   createRestApiHealthReducer,
   queryRestApiHealth,
   createQueryApiGetReducer,
   queryApiGet,
-} from '../reducers/api';
-import { createQueryApiPostReducer } from '../reducers/api';
+} from './reducers/api';
+import { createQueryApiPostReducer } from './reducers/api';
 import RestApiClient from './rest-api-client';
 import { AuthContext } from './auth';
 

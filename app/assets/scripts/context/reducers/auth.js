@@ -4,7 +4,7 @@ import {
   makeAbortableAPIReducer,
   wrapLogReducer,
 } from './reduxeed';
-import config from '../config';
+import config from '../../config';
 const { restApiEndpoint } = config;
 
 /**
