@@ -28,7 +28,7 @@ import AoiDrawControl from './aoi-draw-control';
 import AoiEditControl from './aoi-edit-control';
 import config from '../../../config';
 import { inRange } from '../../../utils/utils';
-import { CheckpointContext, actions } from '../../../context/checkpoint';
+import { useCheckpoint, actions } from '../../../context/checkpoint';
 import ModalMapEvent from './modal-events';
 
 const center = [38.83428180092151, -79.37724530696869];
@@ -94,9 +94,7 @@ function Map() {
   const { predictionLayerSettings } = usePredictionLayer();
 
   const { mosaicList } = useContext(GlobalContext);
-  const { currentCheckpoint, dispatchCurrentCheckpoint } = useContext(
-    CheckpointContext
-  );
+  const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
 
   const { mosaics } = mosaicList.isReady() ? mosaicList.getData() : {};
 

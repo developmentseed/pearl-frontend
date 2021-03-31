@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import T from 'prop-types';
 import get from 'lodash.get';
 import { Button } from '@devseed-ui/button';
@@ -7,7 +7,8 @@ import { glsp, themeVal } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
 import collecticon from '@devseed-ui/collecticons';
 import { PlaceholderMessage } from '../../../styles/placeholder.js';
-import { CheckpointContext, actions } from '../../../context/checkpoint.js';
+import { actions, useCheckpoint } from '../../../context/checkpoint.js';
+import { useMapState } from '../../../context/explore.js';
 
 const ClassList = styled.div`
   display: grid;
@@ -87,70 +88,88 @@ const Wrapper = styled.div`
 function RetrainModel(props) {
   const { className, placeholderMessage } = props;
 
-  const { currentCheckpoint, dispatchCurrentCheckpoint } = useContext(
-    CheckpointContext
-  );
+  const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
+
+  const { setMapMode, mapModes, mapState } = useMapState();
 
   return (
     <Wrapper className={className}>
       <Heading useAlt>Classes</Heading>
-      <section>
-        <Button
-          variation='primary-raised-light'
-          size='medium'
-          useIcon='crosshair'
-          style={{
-            gridColumn: '3 / 1',
-          }}
-        >
-          Add Point Sample
-        </Button>
-        <Button
-          variation='primary-raised-light'
-          size='medium'
-          useIcon='pencil'
-          style={{
-            gridColumn: '3 / 2',
-          }}
-        >
-          Add Sample Area
-        </Button>
-        <Button
-          variation='primary-raised-light'
-          size='medium'
-          useIcon='xmark'
-          style={{
-            gridColumn: '3 / -1',
-          }}
-        >
-          Delete
-        </Button>
-      </section>
-      <ClassList>
-        {currentCheckpoint &&
-          currentCheckpoint.classes &&
-          Object.values(currentCheckpoint.classes).map((c) => (
-            <Class
-              key={c.name}
-              onClick={() => {
-                dispatchCurrentCheckpoint({
-                  type: actions.SET_ACTIVE_CLASS,
-                  data: c.name,
-                });
-              }}
-              selected={currentCheckpoint.activeClass === c.name}
-            >
-              <Thumbnail color={c.color} />
-              <Heading size='xsmall'>
-                {c.name} ({get(c, 'geometry.coordinates.length', 0)} samples)
-                {currentCheckpoint.activeClass === c.name ? ' (Active)' : ''}
-              </Heading>
 
-              <Button useIcon='cog' hideText variation='base-plain'>
-                Options
+      <ClassList>
+        {currentCheckpoint && currentCheckpoint.classes && (
+          <>
+            <section>
+              <Button
+                variation={
+                  mapState.mode === mapModes.ADD_SAMPLE_POINT
+                    ? 'primary-raised-dark'
+                    : 'primary-raised-light'
+                }
+                size='medium'
+                useIcon='crosshair'
+                style={{
+                  gridColumn: '3 / 1',
+                }}
+                onClick={() => setMapMode(mapModes.ADD_SAMPLE_POINT)}
+              >
+                Add Point
               </Button>
-            </Class>
-          ))}
+              <Button
+                variation={
+                  mapState.mode === mapModes.ADD_SAMPLE_POLYGON
+                    ? 'primary-raised-dark'
+                    : 'primary-raised-light'
+                }
+                size='medium'
+                useIcon='pencil'
+                style={{
+                  gridColumn: '3 / 2',
+                }}
+                onClick={() => setMapMode(mapModes.ADD_SAMPLE_POLYGON)}
+              >
+                Add Polygon
+              </Button>
+              <Button
+                variation={
+                  mapState.mode === mapModes.REMOVE_SAMPLE
+                    ? 'primary-raised-dark'
+                    : 'primary-raised-light'
+                }
+                size='medium'
+                useIcon='xmark'
+                style={{
+                  gridColumn: '3 / -1',
+                }}
+                onClick={() => setMapMode(mapModes.REMOVE_SAMPLE)}
+              >
+                Delete
+              </Button>
+            </section>
+            {Object.values(currentCheckpoint.classes).map((c) => (
+              <Class
+                key={c.name}
+                onClick={() => {
+                  dispatchCurrentCheckpoint({
+                    type: actions.SET_ACTIVE_CLASS,
+                    data: c.name,
+                  });
+                }}
+                selected={currentCheckpoint.activeClass === c.name}
+              >
+                <Thumbnail color={c.color} />
+                <Heading size='xsmall'>
+                  {c.name} ({get(c, 'geometry.coordinates.length', 0)} samples)
+                  {currentCheckpoint.activeClass === c.name ? ' (Active)' : ''}
+                </Heading>
+
+                <Button useIcon='cog' hideText variation='base-plain'>
+                  Options
+                </Button>
+              </Class>
+            ))}
+          </>
+        )}
 
         {!currentCheckpoint && placeholderMessage && (
           <>

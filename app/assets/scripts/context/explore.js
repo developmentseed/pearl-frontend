@@ -26,7 +26,7 @@ import tBbox from '@turf/bbox';
 import tBboxPolygon from '@turf/bbox-polygon';
 import tCentroid from '@turf/centroid';
 
-import { actions as checkpointActions, CheckpointContext } from './checkpoint';
+import { actions as checkpointActions, checkpointReducer } from './checkpoint';
 import get from 'lodash.get';
 import logger from '../utils/logger';
 
@@ -65,8 +65,9 @@ export function ExploreProvider(props) {
   });
 
   const [selectedModel, setSelectedModel] = useState(null);
-  const { currentCheckpoint, dispatchCurrentCheckpoint } = useContext(
-    CheckpointContext
+
+  const [currentCheckpoint, dispatchCurrentCheckpoint] = useReducer(
+    checkpointReducer
   );
 
   const [predictions, dispatchPredictions] = useReducer(
@@ -489,6 +490,7 @@ export function ExploreProvider(props) {
 
         dispatchPredictions,
         checkpointList,
+
         currentCheckpoint,
         dispatchCurrentCheckpoint,
 

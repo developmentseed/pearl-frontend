@@ -1,39 +1,20 @@
-import React, { createContext, useContext, useMemo, useReducer } from 'react';
-import T from 'prop-types';
+import { useContext, useMemo } from 'react';
 import uniqWith from 'lodash.uniqwith';
 import isEqual from 'lodash.isequal';
 import differenceWith from 'lodash.differencewith';
 import { useRestApiClient } from './auth';
-import { useProject, useMapState, useWebsocketClient } from './explore';
+import {
+  useProject,
+  useMapState,
+  useWebsocketClient,
+  ExploreContext,
+} from './explore';
 import toasts from '../components/common/toasts';
 import logger from '../utils/logger';
 import {
   showGlobalLoadingMessage,
   hideGlobalLoading,
 } from '@devseed-ui/global-loading';
-
-export const CheckpointContext = createContext({});
-
-export function CheckpointProvider(props) {
-  const [currentCheckpoint, dispatchCurrentCheckpoint] = useReducer(
-    checkpointReducer
-  );
-
-  return (
-    <CheckpointContext.Provider
-      value={{
-        currentCheckpoint,
-        dispatchCurrentCheckpoint,
-      }}
-    >
-      {props.children}
-    </CheckpointContext.Provider>
-  );
-}
-
-CheckpointProvider.propTypes = {
-  children: T.node,
-};
 
 export const actions = {
   SET_CHECKPOINT: 'SET_CHECKPOINT',
@@ -47,7 +28,7 @@ export const actions = {
   RESET_CHECKPOINT: 'RESET_CHECKPOINT',
 };
 
-function checkpointReducer(state, action) {
+export function checkpointReducer(state, action) {
   switch (action.type) {
     case actions.SET_CHECKPOINT:
       return {
@@ -153,7 +134,7 @@ function checkpointReducer(state, action) {
 
 // Check if consumer function is used properly
 const useCheckContext = (fnName) => {
-  const context = useContext(CheckpointContext);
+  const context = useContext(ExploreContext);
 
   if (!context) {
     throw new Error(
@@ -164,8 +145,6 @@ const useCheckContext = (fnName) => {
   return context;
 };
 
-// Expose current checkpoint to consumer. This should be preferable way of consuming
-// a single checkpoint, by avoiding using useContext(CheckpointContext) directly.
 export const useCheckpoint = () => {
   const { setMapMode, mapModes } = useMapState();
   const { restApiClient } = useRestApiClient();
@@ -228,7 +207,7 @@ export const useCheckpoint = () => {
 
           sendWebsocketMessage(currentProject.id, message);
 
-          setMapMode(mapModes.ADD_CLASS_SAMPLES);
+          setMapMode(mapModes.ADD_POINT_SAMPLES);
 
           hideGlobalLoading();
         } catch (error) {

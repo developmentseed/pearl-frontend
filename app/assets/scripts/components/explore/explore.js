@@ -16,7 +16,7 @@ import Map from './map';
 import Tour from '../common/tour';
 import GlobalContext from '../../context/global';
 import { ExploreContext } from '../../context/explore';
-import { CheckpointContext } from '../../context/checkpoint';
+import { useCheckpoint } from '../../context/checkpoint';
 
 import { tourSteps } from './tour';
 
@@ -30,7 +30,7 @@ function Explore() {
   const { tourStep, setTourStep } = useContext(GlobalContext);
   const { apiLimits } = useContext(ExploreContext);
 
-  const { currentCheckpoint } = useContext(CheckpointContext);
+  const { currentCheckpoint } = useCheckpoint();
   const [steps, setSteps] = useState(null);
 
   useEffect(() => {
