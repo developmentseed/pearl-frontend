@@ -60,7 +60,7 @@ const AccordionFold = styled(BaseFold)`
 `;
 
 function Layer({ layer, onSliderChange, onVisibilityToggle, info, name }) {
-  const [value, setValue] = useState(1);
+  const [value, setValue] = useState(layer.opacity || 1);
   const [visible, setVisible] = useState(true);
   return (
     <LayerWrapper>
