@@ -51,7 +51,7 @@ class WebsocketClient extends WebSocket {
             type: predictionsActions.RECEIVE_AOI_META,
             data: {
               id: eventData.data.id,
-            }
+            },
           });
           break;
 
