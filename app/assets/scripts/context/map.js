@@ -12,6 +12,10 @@ export function MapProvider(props) {
     visible: true,
   });
 
+  /*
+   * Object tracking user layers to be controlled in frontend.
+   * Add objects here to control new layers
+   */
   const [userLayers, setUserLayers] = useState({
     predictions: {
       opacity: 1,

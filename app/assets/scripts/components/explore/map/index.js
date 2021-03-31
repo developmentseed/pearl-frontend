@@ -27,6 +27,8 @@ import { inRange } from '../../../utils/utils';
 import { CheckpointContext, actions } from '../../../context/checkpoint';
 import ModalMapEvent from './modal-events';
 
+import VectorLayer from '../../common/map/vector-layer';
+
 const center = [38.83428180092151, -79.37724530696869];
 const zoom = 15;
 
@@ -83,13 +85,14 @@ function Map() {
     viewMode,
     predictions,
     apiLimits,
+    currentProject,
   } = useContext(ExploreContext);
 
   const { map, setMap } = useMap();
   const { mapLayers, setMapLayers } = useMapLayers();
   const { userLayers } = useUserLayers();
 
-  const { mosaicList } = useContext(GlobalContext);
+  const { mosaicList, restApiClient } = useContext(GlobalContext);
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useContext(
     CheckpointContext
   );
@@ -259,6 +262,19 @@ function Map() {
             />
           ))}
 
+        {currentCheckpoint && currentCheckpoint.checkpoint_id && (
+          <VectorLayer
+            url={`${config.restApiEndpoint}/api/project/${currentProject.id}/checkpoint/${currentCheckpoint.checkpoint_id}/tiles/{z}/{x}/{y}.mvt`}
+            token={restApiClient.accessToken}
+            pane='markerPane'
+            opacity={
+              userLayers.retrainingSamples.visible
+                ? userLayers.retrainingSamples.opacity
+                : 0
+            }
+          />
+        )}
+
         {predictions.data.predictions &&
           predictions.data.predictions.map((p) => (
             <ImageOverlay
@@ -284,12 +300,6 @@ function Map() {
                   key={JSON.stringify([lat, lng])}
                   pathOptions={{
                     color: sampleClass.color,
-                    opacity: userLayers.retrainingSamples.visible
-                      ? userLayers.retrainingSamples.opacity
-                      : 0,
-                    fillOpacity: userLayers.retrainingSamples.visible
-                      ? userLayers.retrainingSamples.opacity
-                      : 0,
                   }}
                   eventHandlers={{
                     click: (e) => {
@@ -323,6 +333,8 @@ function Map() {
       currentCheckpoint,
       userLayers,
       mapLayers,
+      restApiClient,
+      currentProject,
     ]
   );
 
