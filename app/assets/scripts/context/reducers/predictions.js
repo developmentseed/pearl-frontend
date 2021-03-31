@@ -1,5 +1,5 @@
 import { initialApiRequestState } from './reduxeed';
-import logger from '../utils/logger';
+import logger from '../../utils/logger';
 
 export const actions = {
   START_PREDICTION: 'START_PREDICTION',
