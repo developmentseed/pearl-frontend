@@ -25,7 +25,7 @@ export function MapProvider(props) {
       name: 'Prediction Results',
     },
     retrainingSamples: {
-      opacity: 0.5,
+      opacity: 1,
       visible: true,
       active: false,
       id: 'retrainingSamples',
