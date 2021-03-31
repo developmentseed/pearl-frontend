@@ -221,11 +221,11 @@ function Map() {
           }
         }}
       >
-        {mapState.mode === mapModes.ADD_CLASS_SAMPLES && (
+        {mapState.mode === mapModes.ADD_SAMPLE_POINT && (
           <ModalMapEvent
             event='click'
             func={(e) => {
-              if (mapState.mode !== mapModes.ADD_CLASS_SAMPLES) {
+              if (mapState.mode !== mapModes.ADD_SAMPLE_POINT) {
                 return;
               }
               dispatchCurrentCheckpoint({

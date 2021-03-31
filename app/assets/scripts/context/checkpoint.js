@@ -157,6 +157,7 @@ export const useCheckpoint = () => {
   return useMemo(
     () => ({
       currentCheckpoint,
+      dispatchCurrentCheckpoint,
       applyCheckpoint: async (projectId, checkpointId) => {
         try {
           showGlobalLoadingMessage('Applying checkpoint...');
@@ -207,7 +208,7 @@ export const useCheckpoint = () => {
 
           sendWebsocketMessage(currentProject.id, message);
 
-          setMapMode(mapModes.ADD_POINT_SAMPLES);
+          setMapMode(mapModes.ADD_SAMPLE_POINT);
 
           hideGlobalLoading();
         } catch (error) {
