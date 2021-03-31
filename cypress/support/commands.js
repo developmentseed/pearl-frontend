@@ -141,6 +141,23 @@ Cypress.Commands.add('startServer', () => {
         model_id: 1,
         mosaic: 'naip.latest',
         created: '2021-03-19T12:47:07.838Z',
+        aois: [
+          {
+            created: '2021-03-25T15:50:31.124Z',
+            id: 1,
+            name: 'Seneca Rocks',
+            storage: true,
+          },
+        ],
+        checkpoints: [
+          {
+            bookmarked: false,
+            created: '2021-03-25T15:50:30.986Z',
+            id: 57,
+            name: 'Seneca Rocks',
+            storage: true,
+          },
+        ],
       },
     }
   );
