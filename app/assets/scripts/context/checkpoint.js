@@ -138,7 +138,7 @@ const useCheckContext = (fnName) => {
 
   if (!context) {
     throw new Error(
-      `The \`${fnName}\` hook must be used inside the <CheckpointContext> component's context.`
+      `The \`${fnName}\` hook must be used inside the <ExploreContext> component's context.`
     );
   }
 
