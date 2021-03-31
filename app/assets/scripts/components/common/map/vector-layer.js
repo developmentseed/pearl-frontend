@@ -24,7 +24,7 @@ function VectorLayer(props) {
           fill: true,
           fillColor: '#9bc2c4',
           fillOpacity: 1,
-          radius: 5
+          radius: 5,
         },
       },
     };
