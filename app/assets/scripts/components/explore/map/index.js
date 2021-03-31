@@ -84,7 +84,7 @@ function Map() {
     setAoiArea,
     aoiInitializer,
     setAoiBounds,
-
+    currentProject,
     setViewMode,
     viewMode,
     predictions,
@@ -280,10 +280,18 @@ function Map() {
             />
           ))}
 
+        {currentCheckpoint && currentCheckpoint.checkpoint_id && (
+          <VectorLayer
+            url={`${config.restApiEndpoint}/project/${currentProject.id}/checkpoint/${currentCheckpoint.checkpoint_id}/tiles/{z}/{x}/{y}.mvt`}
+            minZoom={12}
+            maxZoom={18}
+          />
+        )}
+
         {currentCheckpoint &&
           currentCheckpoint.classes &&
           Object.values(currentCheckpoint.classes).map(
-            (sampleClass) =>
+            (sampleClass) => 
               sampleClass.geometry &&
               sampleClass.geometry.coordinates &&
               sampleClass.geometry.coordinates.map(([lat, lng]) => (
