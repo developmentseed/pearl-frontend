@@ -29,8 +29,8 @@ import {
 import {
   ExploreContext,
   useWebsocketClient,
+  useMapState,
 } from '../../../context/explore';
-import { useMap, useMapLayers, usePredictionLayer } from '../../../context/map';
 import GlobalContext from '../../../context/global';
 
 import TabbedBlock from '../../common/tabbed-block-body';
@@ -52,6 +52,11 @@ import { AuthContext } from '../../../context/auth';
 import { useCheckpoint } from '../../../context/checkpoint';
 
 import { AoiEditButtons } from './aoi-edit-buttons';
+import {
+  useMapLayers,
+  useMapRef,
+  usePredictionLayer,
+} from '../../../context/map';
 
 const SelectAoiTrigger = styled.div`
   cursor: pointer;
@@ -97,7 +102,8 @@ const SaveCheckpoint = styled(DropdownBody)`
 `;
 function PrimePanel() {
   const { isAuthenticated } = useContext(AuthContext);
-  const { map, mapModes } = useMap();
+  const { mapState, mapModes } = useMapState();
+  const { mapRef } = useMapRef();
 
   const {
     currentProject,
@@ -139,7 +145,9 @@ function PrimePanel() {
 
   // Check if AOI and selected model are defined, and if view mode is runnable
   const allowInferenceRun =
-    [mapModes.BROWSE_MODE, mapModes.ADD_CLASS_SAMPLES].includes(map.mode) &&
+    [mapModes.BROWSE_MODE, mapModes.ADD_CLASS_SAMPLES].includes(
+      mapState.mode
+    ) &&
     aoiRef &&
     aoiArea > 0 &&
     selectedModel;
@@ -153,12 +161,12 @@ function PrimePanel() {
     let header;
     let area;
     let disabled;
-    if (aoiArea && aoiArea > 0 && map.mode === mapModes.EDIT_AOI_MODE) {
+    if (aoiArea && aoiArea > 0 && mapState.mode === mapModes.EDIT_AOI_MODE) {
       header = `${formatThousands(aoiArea / 1e6)} km2`;
     } else if (aoiName) {
       header = aoiName;
       area = `${formatThousands(aoiArea / 1e6)} km2`;
-    } else if (map.mode === mapModes.CREATE_AOI_MODE) {
+    } else if (mapState.mode === mapModes.CREATE_AOI_MODE) {
       header = 'Drag on map to select';
     } else {
       header = 'None selected - Draw area on map';
@@ -169,7 +177,7 @@ function PrimePanel() {
       useIcon: null,
     };
 
-    if (map.mode === mapModes.EDIT_AOI_MODE || aoiList.length === 0) {
+    if (mapState.mode === mapModes.EDIT_AOI_MODE || aoiList.length === 0) {
       disabled = true;
     }
 
@@ -249,7 +257,7 @@ function PrimePanel() {
                           <DropdownItem
                             onClick={() => {
                               loadAoi(currentProject, a).then((bounds) =>
-                                map.fitBounds(bounds, {
+                                mapRef.fitBounds(bounds, {
                                   padding: BOUNDS_PADDING,
                                 })
                               );
@@ -266,9 +274,9 @@ function PrimePanel() {
                           useIcon='plus'
                           onClick={() => {
                             createNewAoi();
-                            map.aoi.control.draw.disable();
+                            mapRef.aoi.control.draw.disable();
                             //Layer must be removed from the map
-                            map.aoi.control.draw.clear();
+                            mapRef.aoi.control.draw.clear();
                           }}
                           data-cy='add-aoi-button'
                           data-dropdown='click.close'
@@ -419,9 +427,9 @@ function PrimePanel() {
                   }}
                   onVisibilityToggle={(name, value) => {
                     if (value) {
-                      map.addLayer(mapLayers[name]);
+                      mapRef.addLayer(mapLayers[name]);
                     } else {
-                      map.removeLayer(mapLayers[name]);
+                      mapRef.removeLayer(mapLayers[name]);
                     }
                   }}
                 />

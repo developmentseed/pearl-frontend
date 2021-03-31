@@ -1,12 +1,19 @@
 import logger from '../../utils/logger';
 
+export const mapModes = {
+  BROWSE_MODE: 'BROWSE_MODE',
+  CREATE_AOI_MODE: 'CREATE_AOI_MODE',
+  EDIT_AOI_MODE: 'EDIT_AOI_MODE',
+  ADD_CLASS_SAMPLES: 'ADD_CLASS_SAMPLES',
+};
+
 export const mapActionTypes = {
   SET_MODE: 'SET_MODE',
   SET_ACTIVE_CLASS: 'SET_ACTIVE_CLASS',
   SET_CLASS_EDIT_MODE: 'SET_CLASS_EDIT_MODE',
 };
 
-export function mapReducer(state, action) {
+export function mapStateReducer(state, action) {
   switch (action.type) {
     case mapActionTypes.SET_MODE:
       return {

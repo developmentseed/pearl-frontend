@@ -21,7 +21,7 @@ import GlobalContext from './global';
 import predictionsReducer, {
   actions as predictionActions,
 } from './reducers/predictions';
-import { mapReducer, mapModes, mapActionTypes } from './reducers/map';
+import { mapStateReducer, mapModes, mapActionTypes } from './reducers/map';
 import tBbox from '@turf/bbox';
 import tBboxPolygon from '@turf/bbox-polygon';
 import tCentroid from '@turf/centroid';
@@ -60,7 +60,9 @@ export function ExploreProvider(props) {
   //L.LatLngBounds object, set when aoi is confirmed
   const [aoiBounds, setAoiBounds] = useState(null);
 
-  const [map, dispatchMap] = useReducer(mapReducer);
+  const [mapState, dispatchMapState] = useReducer(mapStateReducer, {
+    mode: mapModes.BROWSE_MODE,
+  });
 
   const [selectedModel, setSelectedModel] = useState(null);
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useContext(
@@ -168,7 +170,7 @@ export function ExploreProvider(props) {
       if (predictions.error) {
         toasts.error('An inference error occurred, please try again later.');
       } else {
-        dispatchMap({
+        dispatchMapState({
           type: mapActionTypes.SET_MODE,
           data: mapModes.ADD_CLASS_SAMPLES,
         });
@@ -193,8 +195,8 @@ export function ExploreProvider(props) {
   useEffect(() => {
     if (predictions.isReady()) {
       if (
-        map.mode === mapModes.BROWSE_MODE &&
-        map.previousMode === mapModes.EDIT_AOI_MODE
+        mapState.mode === mapModes.BROWSE_MODE &&
+        mapState.previousMode === mapModes.EDIT_AOI_MODE
       ) {
         dispatchPredictions({ type: predictionActions.CLEAR_PREDICTION });
 
@@ -203,13 +205,13 @@ export function ExploreProvider(props) {
         });
       }
     }
-  }, [map, predictions]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [mapState, predictions]); // eslint-disable-line react-hooks/exhaustive-deps
 
   /*
    * Re-init aoi state variables
    */
   function createNewAoi() {
-    dispatchMap({
+    dispatchMapState({
       type: mapActionTypes.CREATE_AOI_MODE,
       data: mapModes.ADD_CLASS_SAMPLES,
     });
@@ -274,7 +276,7 @@ export function ExploreProvider(props) {
       aoiRef.setBounds(bounds);
       setAoiBounds(aoiRef.getBounds());
       setAoiName(aoiObject.name);
-      dispatchMap({
+      dispatchMapState({
         type: mapActionTypes.BROWSE_MODE,
         data: mapModes.ADD_CLASS_SAMPLES,
       });
@@ -418,9 +420,9 @@ export function ExploreProvider(props) {
     if (!aoiBounds) {
       return;
     } else if (
-      map.mode === mapModes.BROWSE_MODE &&
-      (map.previousMode === mapModes.EDIT_AOI_MODE ||
-        map.previousMode === mapModes.CREATE_AOI_MODE)
+      mapState.mode === mapModes.BROWSE_MODE &&
+      (mapState.previousMode === mapModes.EDIT_AOI_MODE ||
+        mapState.previousMode === mapModes.CREATE_AOI_MODE)
     ) {
       const bounds = [
         aoiBounds.getWest(),
@@ -453,7 +455,7 @@ export function ExploreProvider(props) {
         setAoiName(name);
       });
     }
-  }, [map, aoiBounds, aoiList]);
+  }, [mapState, aoiBounds, aoiList]);
 
   return (
     <ExploreContext.Provider
@@ -461,8 +463,8 @@ export function ExploreProvider(props) {
         predictions,
         apiLimits: apiMeta && apiMeta.limits,
 
-        map,
-        dispatchMap,
+        mapState,
+        dispatchMapState,
 
         aoiRef,
         setAoiRef,
@@ -537,23 +539,22 @@ export const useProject = () => {
   );
 };
 
-export const useMap = () => {
-  const { map, dispatchMap } = useExploreContext('useMap');
+export const useMapState = () => {
+  const { mapState, dispatchMapState } = useExploreContext('useMapState');
 
   const setMapMode = (mode) =>
-    dispatchMap({
+    dispatchMapState({
       type: mapActionTypes.SET_MODE,
       data: mode,
     });
 
   return useMemo(
     () => ({
-      map,
+      mapState,
       setMapMode,
       mapModes,
     }),
-
-    [map]
+    [mapState, mapModes]
   );
 };
 

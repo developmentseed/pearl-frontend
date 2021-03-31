@@ -11,8 +11,12 @@ import {
   Circle,
 } from 'react-leaflet';
 import GlobalContext from '../../../context/global';
-import { ExploreContext } from '../../../context/explore';
-import { useMap, useMapLayers, usePredictionLayer } from '../../../context/map';
+import { ExploreContext, useMapState } from '../../../context/explore';
+import {
+  useMapRef,
+  useMapLayers,
+  usePredictionLayer,
+} from '../../../context/map';
 
 import GeoCoder from '../../common/map/geocoder';
 import { BOUNDS_PADDING } from '../../common/map/constants';
@@ -83,7 +87,8 @@ function Map() {
     apiLimits,
   } = useContext(ExploreContext);
 
-  const { map, setViewMode, mapModes } = useMap();
+  const { mapState, mapModes, setMapMode } = useMapState();
+  const { mapRef, setMapRef } = useMapRef();
 
   const { mapLayers, setMapLayers } = useMapLayers();
   const { predictionLayerSettings } = usePredictionLayer();
@@ -96,30 +101,28 @@ function Map() {
   const { mosaics } = mosaicList.isReady() ? mosaicList.getData() : {};
 
   useEffect(() => {
-    if (!map) return;
-
-    switch (map.mode) {
+    switch (mapState.mode) {
       case mapModes.CREATE_AOI_MODE:
-        map.aoi.control.draw.enable();
+        mapRef.aoi.control.draw.enable();
         break;
       case mapModes.EDIT_AOI_MODE:
-        map.aoi.control.draw.disable();
-        map.aoi.control.edit.enable(aoiRef);
+        mapRef.aoi.control.draw.disable();
+        mapRef.aoi.control.edit.enable(aoiRef);
         break;
       case mapModes.BROWSE_MODE:
-        if (map) {
+        if (mapRef) {
           if (aoiRef) {
             // Only disable if something has been drawn
-            map.aoi.control.draw.disable();
-            if (map.aoi.control.edit._shape) {
-              map.aoi.control.edit.disable();
+            mapRef.aoi.control.draw.disable();
+            if (mapRef.aoi.control.edit._shape) {
+              mapRef.aoi.control.edit.disable();
             }
             if (
-              map.previousMode === mapModes.CREATE_AOI_MODE ||
-              map.previousMode === mapModes.EDIT_AOI_MODE
+              mapState.previousMode === mapModes.CREATE_AOI_MODE ||
+              mapState.previousMode === mapModes.EDIT_AOI_MODE
             ) {
               // On confirm, zoom to bounds
-              map.fitBounds(aoiRef.getBounds(), { padding: BOUNDS_PADDING });
+              mapRef.fitBounds(aoiRef.getBounds(), { padding: BOUNDS_PADDING });
             }
           }
         }
@@ -127,48 +130,53 @@ function Map() {
       default:
         break;
     }
-  }, [viewMode, aoiRef]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [mapState.mode, aoiRef]); // eslint-disable-line react-hooks/exhaustive-deps
 
   /**
    * Add/update AOI controls on API metadata change.
    */
   useEffect(() => {
-    if (!map) return;
+    if (!mapRef) return;
 
     // Setup AOI controllers
-    map.aoi = {
+    mapRef.aoi = {
       control: {},
     };
 
     // Draw control, for creating an AOI
-    map.aoi.control.draw = new AoiDrawControl(map, aoiInitializer, apiLimits, {
-      onInitialize: (bbox, shape) => {
-        setAoiRef(shape);
-        setAoiBounds(shape.getBounds());
-        setAoiArea(areaFromBounds(bbox));
+    mapRef.aoi.control.draw = new AoiDrawControl(
+      mapRef,
+      aoiInitializer,
+      apiLimits,
+      {
+        onInitialize: (bbox, shape) => {
+          setAoiRef(shape);
+          setAoiBounds(shape.getBounds());
+          setAoiArea(areaFromBounds(bbox));
 
-        map.fitBounds(shape.getBounds(), { padding: BOUNDS_PADDING });
-      },
-      onDrawStart: (shape) => {
-        setAoiRef(shape);
-      },
-      onDrawChange: (bbox) => {
-        setAoiArea(areaFromBounds(bbox));
-      },
-      onDrawEnd: (bbox, shape) => {
-        setAoiRef(shape);
-        setAoiBounds(shape.getBounds());
-        setViewMode(mapModes.BROWSE_MODE);
-      },
-    });
+          mapRef.fitBounds(shape.getBounds(), { padding: BOUNDS_PADDING });
+        },
+        onDrawStart: (shape) => {
+          setAoiRef(shape);
+        },
+        onDrawChange: (bbox) => {
+          setAoiArea(areaFromBounds(bbox));
+        },
+        onDrawEnd: (bbox, shape) => {
+          setAoiRef(shape);
+          setAoiBounds(shape.getBounds());
+          setMapMode(mapModes.BROWSE_MODE);
+        },
+      }
+    );
 
     // Edit AOI control
-    map.aoi.control.edit = new AoiEditControl(map, apiLimits, {
+    mapRef.aoi.control.edit = new AoiEditControl(mapRef, apiLimits, {
       onBoundsChange: (bbox) => {
         setAoiArea(areaFromBounds(bbox));
       },
     });
-  }, [map, aoiInitializer, apiLimits]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [mapRef, aoiInitializer, apiLimits]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Update color on area size change during draw
   useEffect(() => {
@@ -207,7 +215,7 @@ function Map() {
         style={{ height: '100%' }}
         whenCreated={(m) => {
           // Add map to state
-          setMap(m);
+          setMapRef(m);
 
           if (process.env.NODE_ENV !== 'production') {
             // makes map accessible in console for debugging
@@ -215,11 +223,11 @@ function Map() {
           }
         }}
       >
-        {viewMode === mapModes.ADD_CLASS_SAMPLES && (
+        {mapState.mode === mapModes.ADD_CLASS_SAMPLES && (
           <ModalMapEvent
             event='click'
             func={(e) => {
-              if (map.mode !== mapModes.ADD_CLASS_SAMPLES) {
+              if (mapState.mode !== mapModes.ADD_CLASS_SAMPLES) {
                 return;
               }
               dispatchCurrentCheckpoint({
@@ -311,10 +319,10 @@ function Map() {
       mapLayers,
       mosaics,
       predictionLayerSettings,
-      predictions,
-      setMap,
+      mapState.mode,
+      predictions.data.predictions,
       setMapLayers,
-      viewMode,
+      setMapRef,
     ]
   );
 
@@ -324,8 +332,8 @@ function Map() {
       id='map'
       data-cy='leaflet-map'
       onChange={() => {
-        if (map) {
-          map.invalidateSize();
+        if (mapRef) {
+          mapRef.invalidateSize();
         }
       }}
     >

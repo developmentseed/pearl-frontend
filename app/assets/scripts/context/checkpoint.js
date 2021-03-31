@@ -4,7 +4,7 @@ import uniqWith from 'lodash.uniqwith';
 import isEqual from 'lodash.isequal';
 import differenceWith from 'lodash.differencewith';
 import { useRestApiClient } from './auth';
-import { useProject, useViewMode, useWebsocketClient } from './explore';
+import { useProject, useMapState, useWebsocketClient } from './explore';
 import toasts from '../components/common/toasts';
 import logger from '../utils/logger';
 import {
@@ -167,7 +167,7 @@ const useCheckContext = (fnName) => {
 // Expose current checkpoint to consumer. This should be preferable way of consuming
 // a single checkpoint, by avoiding using useContext(CheckpointContext) directly.
 export const useCheckpoint = () => {
-  const { setViewMode, allViewModes } = useViewMode();
+  const { setMapMode, mapModes } = useMapState();
   const { restApiClient } = useRestApiClient();
   const { currentProject, aoiRef, aoiName } = useProject();
   const { sendWebsocketMessage } = useWebsocketClient();
@@ -228,7 +228,7 @@ export const useCheckpoint = () => {
 
           sendWebsocketMessage(currentProject.id, message);
 
-          setViewMode(allViewModes.ADD_CLASS_SAMPLES);
+          setMapMode(mapModes.ADD_CLASS_SAMPLES);
 
           hideGlobalLoading();
         } catch (error) {
@@ -247,8 +247,8 @@ export const useCheckpoint = () => {
       sendWebsocketMessage,
       currentCheckpoint,
       dispatchCurrentCheckpoint,
-      setViewMode,
-      allViewModes,
+      setMapMode,
+      mapModes,
     ]
   );
 };
