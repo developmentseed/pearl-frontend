@@ -12,7 +12,7 @@ import {
   media,
 } from '@devseed-ui/theme-provider';
 import collecticon from '@devseed-ui/collecticons';
-import UserDropdown from '../common/user-dropdown';
+// import UserDropdown from '../common/user-dropdown';
 import { StyledNavLink, StyledLink } from '../../styles/links';
 
 const { appTitle } = config;
@@ -70,19 +70,19 @@ const PrimarySection = styled.div`
   }
 `;
 
-const SecondarySection = styled.div`
-  border-left: 0.5px solid ${themeVal('color.baseAlphaC')};
-  padding-left: 1.5rem;
-  display: grid;
-  align-items: center;
-  justify-content: space-between;
-  grid-template-columns: min-content min-content;
+// const SecondarySection = styled.div`
+//   border-left: 0.5px solid ${themeVal('color.baseAlphaC')};
+//   padding-left: 1.5rem;
+//   display: grid;
+//   align-items: center;
+//   justify-content: space-between;
+//   grid-template-columns: min-content min-content;
 
-  .user-options-trigger::before {
-    ${collecticon('house')}
-    font-size: ${multiply(themeVal('type.base.size'), 1.125)};
-  }
-`;
+//   .user-options-trigger::before {
+//     ${collecticon('house')}
+//     font-size: ${multiply(themeVal('type.base.size'), 1.125)};
+//   }
+// `;
 
 const PageSpecificControls = styled.div`
   display: flex;
@@ -176,9 +176,9 @@ function PageHeader(props) {
               </PageSpecificControls>
             )}
           </PrimarySection>
-          <SecondarySection>
+          {/* <SecondarySection>
             <UserDropdown />
-          </SecondarySection>
+          </SecondarySection> */}
         </PageNav>
       </PageHeadInner>
     </PageHead>
