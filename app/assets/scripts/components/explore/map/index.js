@@ -26,10 +26,12 @@ import { themeVal, multiply } from '@devseed-ui/theme-provider';
 import theme from '../../../styles/theme';
 import AoiDrawControl from './aoi-draw-control';
 import AoiEditControl from './aoi-edit-control';
+import PolygonDrawControl from './polygon-draw-control';
 import config from '../../../config';
 import { inRange } from '../../../utils/utils';
 import { useCheckpoint, actions } from '../../../context/checkpoint';
 import ModalMapEvent from './modal-events';
+import { map } from 'leaflet';
 
 const center = [38.83428180092151, -79.37724530696869];
 const zoom = 15;
@@ -125,10 +127,28 @@ function Map() {
           }
         }
         break;
+      case mapModes.ADD_SAMPLE_POLYGON:
+        mapRef.polygonDraw.enable(currentCheckpoint.activeClass);
+        break;
       default:
         break;
     }
-  }, [mapState.mode, aoiRef]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [
+    mapState.mode,
+    aoiRef,
+    currentCheckpoint && currentCheckpoint.activeClass,
+  ]);
+
+  // Observe checkpoint classes
+  useEffect(() => {
+    if (!mapRef || !mapRef.polygonDraw) return;
+
+    if (!currentCheckpoint) {
+      mapRef.polygonDraw.clearLayers();
+    } else {
+      mapRef.polygonDraw.setLayers(currentCheckpoint.classes);
+    }
+  }, [mapRef, currentCheckpoint]);
 
   /**
    * Add/update AOI controls on API metadata change.
@@ -212,6 +232,10 @@ function Map() {
         zoom={zoom}
         style={{ height: '100%' }}
         whenCreated={(m) => {
+          const polygonDraw = new PolygonDrawControl(m);
+
+          m.polygonDraw = polygonDraw;
+
           // Add map to state
           setMapRef(m);
 
