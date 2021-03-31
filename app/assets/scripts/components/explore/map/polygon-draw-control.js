@@ -25,6 +25,7 @@ class PolygonDrawControl {
           weight: 3,
           smoothFactor: 1,
         },
+        simplify_tolerance: 0.000001,
         polyline: {
           color: color,
           smoothFactor: 0,
