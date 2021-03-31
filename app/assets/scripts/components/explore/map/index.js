@@ -12,12 +12,7 @@ import {
 } from 'react-leaflet';
 import GlobalContext from '../../../context/global';
 import { ExploreContext, viewModes } from '../../../context/explore';
-import {
-  useMap,
-  useMapLayers,
-  useUserLayers,
-  usePredictionLayer,
-} from '../../../context/map';
+import { useMap, useMapLayers, useUserLayers } from '../../../context/map';
 
 import GeoCoder from '../../common/map/geocoder';
 import { BOUNDS_PADDING } from '../../common/map/constants';
@@ -92,7 +87,6 @@ function Map() {
 
   const { map, setMap } = useMap();
   const { mapLayers, setMapLayers } = useMapLayers();
-  const { predictionLayerSettings } = usePredictionLayer();
   const { userLayers } = useUserLayers();
 
   const { mosaicList } = useContext(GlobalContext);
@@ -293,6 +287,9 @@ function Map() {
                     opacity: userLayers.retrainingSamples.visible
                       ? userLayers.retrainingSamples.opacity
                       : 0,
+                    fillOpacity: userLayers.retrainingSamples.visible
+                      ? userLayers.retrainingSamples.opacity
+                      : 0,
                   }}
                   eventHandlers={{
                     click: (e) => {
@@ -324,8 +321,8 @@ function Map() {
       mosaics,
       predictions,
       currentCheckpoint,
-      predictionLayerSettings,
       userLayers,
+      mapLayers,
     ]
   );
 

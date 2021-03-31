@@ -18,12 +18,14 @@ export function MapProvider(props) {
       visible: true,
       active: false,
       id: 'predictions',
+      name: 'Prediction Results',
     },
     retrainingSamples: {
       opacity: 1,
       visible: true,
       active: false,
       id: 'retrainingSamples',
+      name: 'Retraining Samples',
     },
   });
 
