@@ -1,4 +1,5 @@
-import leafletFreehand from 'leaflet-freehandshapes';
+import L from 'leaflet';
+import 'leaflet-freehandshapes';
 
 class PolygonDrawControl {
   constructor(map) {
@@ -11,7 +12,7 @@ class PolygonDrawControl {
 
   clearLayers() {
     this._group.eachLayer(function (layer) {
-      layer.clearLayers();
+      layer.remove();
     });
   }
 
@@ -32,27 +33,39 @@ class PolygonDrawControl {
         },
       });
 
-      // const drawer = new L.FreeHandShapes();
-
       drawer.category = name;
 
-      drawer.on('layeradd', function (data) {
-        console.log('layeradd', data);
-      });
+      // Handle added polygon
+      // drawer.on('layeradd', function (data) {
+      //   console.log('layeradd', data);
+      // });
+
       this._group.addLayer(drawer);
     });
   }
 
-  enable(layerName) {
+  enableMode(mode, layerName) {
     this._group.eachLayer(function (layer) {
       if (layer.category === layerName) {
         // enable drawing tool for type
-        layer.setMode('add');
+        layer.setMode(mode);
       } else {
         // disables other freehand instances
         layer.setMode('view');
       }
     });
+  }
+
+  enableAdd(layerName) {
+    this.enableMode('add', layerName);
+  }
+
+  enableDelete(layerName) {
+    this.enableMode('delete', layerName);
+  }
+
+  disable() {
+    this._group.eachLayer((layer) => layer.setMode('view'));
   }
 }
 

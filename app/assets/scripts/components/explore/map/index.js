@@ -31,7 +31,6 @@ import config from '../../../config';
 import { inRange } from '../../../utils/utils';
 import { useCheckpoint, actions } from '../../../context/checkpoint';
 import ModalMapEvent from './modal-events';
-import { map } from 'leaflet';
 
 const center = [38.83428180092151, -79.37724530696869];
 const zoom = 15;
@@ -100,6 +99,7 @@ function Map() {
 
   const { mosaics } = mosaicList.isReady() ? mosaicList.getData() : {};
 
+  // Manage changes in map mode
   useEffect(() => {
     switch (mapState.mode) {
       case mapModes.CREATE_AOI_MODE:
@@ -128,9 +128,13 @@ function Map() {
         }
         break;
       case mapModes.ADD_SAMPLE_POLYGON:
-        mapRef.polygonDraw.enable(currentCheckpoint.activeClass);
+        mapRef.polygonDraw.enableAdd(currentCheckpoint.activeClass);
+        break;
+      case mapModes.REMOVE_SAMPLE:
+        mapRef.polygonDraw.enableDelete(currentCheckpoint.activeClass);
         break;
       default:
+        mapRef.polygonDraw.disable();
         break;
     }
   }, [
@@ -139,16 +143,15 @@ function Map() {
     currentCheckpoint && currentCheckpoint.activeClass,
   ]);
 
-  // Observe checkpoint classes
+  // Add polygon layers to be draw when checkpoint has changed
   useEffect(() => {
     if (!mapRef || !mapRef.polygonDraw) return;
 
-    if (!currentCheckpoint) {
-      mapRef.polygonDraw.clearLayers();
-    } else {
+    mapRef.polygonDraw.clearLayers();
+    if (currentCheckpoint) {
       mapRef.polygonDraw.setLayers(currentCheckpoint.classes);
     }
-  }, [mapRef, currentCheckpoint]);
+  }, [currentCheckpoint && currentCheckpoint.id]);
 
   /**
    * Add/update AOI controls on API metadata change.
@@ -310,16 +313,17 @@ function Map() {
                     color: sampleClass.color,
                   }}
                   eventHandlers={{
-                    click: (e) => {
-                      e.originalEvent.preventDefault();
-                      dispatchCurrentCheckpoint({
-                        type: actions.REMOVE_POINT_SAMPLE,
-                        data: {
-                          className: sampleClass.name,
-                          lat,
-                          lng,
-                        },
-                      });
+                    click: () => {
+                      if (mapState.mode === mapModes.REMOVE_SAMPLE) {
+                        dispatchCurrentCheckpoint({
+                          type: actions.REMOVE_POINT_SAMPLE,
+                          data: {
+                            className: sampleClass.name,
+                            lat,
+                            lng,
+                          },
+                        });
+                      }
                     },
                   }}
                   center={[lng, lat]}
