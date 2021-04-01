@@ -793,7 +793,7 @@ export const useInstance = () => {
                   color: c.color,
                   geometry: {
                     type: 'GeometryCollection',
-                    geometries: c.geometry,
+                    geometries: [c.geometry],
                   },
                 };
               }),
