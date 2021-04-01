@@ -47,6 +47,7 @@ const Class = styled.div`
     `};
   &.add__class {
     transition: all 0.16s ease-out 0s;
+    margin-top: ${glsp()};
     padding: ${glsp(0.5)} 0;
     span {
       display: grid;
@@ -56,6 +57,9 @@ const Class = styled.div`
     :hover {
       color: ${themeVal('color.base')};
     }
+  }
+  &.placeholder-class:first-child {
+    margin-top: ${glsp(2)};
   }
 `;
 const Thumbnail = styled.div`
@@ -82,7 +86,17 @@ const Thumbnail = styled.div`
 
 const Wrapper = styled.div`
   display: grid;
-  grid-gap: ${glsp(0.5)};
+  grid-gap: ${glsp()};
+`;
+
+const RetrainTools = styled.section`
+  ${Button} {
+    margin-left: ${glsp(0.25)};
+    margin-right: ${glsp()};
+    padding: 0.25rem 0.75rem 0.25rem 0.5rem;
+    box-shadow: none;
+    border: 2px solid ${themeVal('color.primaryAlphaB')};
+  }
 `;
 
 function RetrainModel(props) {
@@ -94,58 +108,52 @@ function RetrainModel(props) {
 
   return (
     <Wrapper className={className}>
-      <Heading useAlt>Classes</Heading>
-
-      <ClassList>
-        {currentCheckpoint && currentCheckpoint.classes && (
-          <>
-            <section>
-              <Button
-                variation={
-                  mapState.mode === mapModes.ADD_SAMPLE_POINT
-                    ? 'primary-raised-dark'
-                    : 'primary-raised-light'
-                }
-                size='medium'
-                useIcon='crosshair'
-                style={{
-                  gridColumn: '3 / 1',
-                }}
-                onClick={() => setMapMode(mapModes.ADD_SAMPLE_POINT)}
-              >
-                Add Point
-              </Button>
-              <Button
-                variation={
-                  mapState.mode === mapModes.ADD_SAMPLE_POLYGON
-                    ? 'primary-raised-dark'
-                    : 'primary-raised-light'
-                }
-                size='medium'
-                useIcon='pencil'
-                style={{
-                  gridColumn: '3 / 2',
-                }}
-                onClick={() => setMapMode(mapModes.ADD_SAMPLE_POLYGON)}
-              >
-                Add Polygon
-              </Button>
-              <Button
-                variation={
-                  mapState.mode === mapModes.REMOVE_SAMPLE
-                    ? 'primary-raised-dark'
-                    : 'primary-raised-light'
-                }
-                size='medium'
-                useIcon='xmark'
-                style={{
-                  gridColumn: '3 / -1',
-                }}
-                onClick={() => setMapMode(mapModes.REMOVE_SAMPLE)}
-              >
-                Delete
-              </Button>
-            </section>
+      {currentCheckpoint && currentCheckpoint.classes && (
+        <>
+          <RetrainTools>
+            <Heading useAlt>Sample Selection Tools</Heading>
+            <Button
+              variation={
+                mapState.mode === mapModes.ADD_SAMPLE_POLYGON
+                  ? 'primary-raised-dark'
+                  : 'primary-raised-light'
+              }
+              size='small'
+              radius='ellipsoid'
+              useIcon='pencil'
+              onClick={() => setMapMode(mapModes.ADD_SAMPLE_POLYGON)}
+            >
+              Draw
+            </Button>
+            <Button
+              variation={
+                mapState.mode === mapModes.ADD_SAMPLE_POINT
+                  ? 'primary-raised-dark'
+                  : 'primary-raised-light'
+              }
+              size='small'
+              radius='ellipsoid'
+              useIcon='crosshair'
+              onClick={() => setMapMode(mapModes.ADD_SAMPLE_POINT)}
+            >
+              Point
+            </Button>
+            <Button
+              variation={
+                mapState.mode === mapModes.REMOVE_SAMPLE
+                  ? 'primary-raised-dark'
+                  : 'primary-raised-light'
+              }
+              size='small'
+              radius='ellipsoid'
+              useIcon='xmark'
+              onClick={() => setMapMode(mapModes.REMOVE_SAMPLE)}
+            >
+              Delete
+            </Button>
+          </RetrainTools>
+          <ClassList>
+            <Heading useAlt>Classes</Heading>
             {Object.values(currentCheckpoint.classes).map((c) => (
               <Class
                 key={c.name}
@@ -168,30 +176,26 @@ function RetrainModel(props) {
                 </Button>
               </Class>
             ))}
-          </>
-        )}
+          </ClassList>
+        </>
+      )}
 
-        {!currentCheckpoint && placeholderMessage && (
-          <>
-            {[1, 2, 3].map((i) => (
-              // +true workaround
-              // Styled components will try to pass true to the DOM element
-              // assing a + casts it to int which is logically equivalent
-              // but does not cause the DOM error
-              <Class key={i} placeholder={+true}>
-                <Thumbnail />
-                <Heading size='xsmall' />
-                <Button
-                  disabled
-                  size='small'
-                  variation='base-raised-semidark'
-                />
-              </Class>
-            ))}
-            <PlaceholderMessage>{placeholderMessage}</PlaceholderMessage>
-          </>
-        )}
-      </ClassList>
+      {!currentCheckpoint && placeholderMessage && (
+        <ClassList>
+          {[1, 2, 3].map((i) => (
+            // +true workaround
+            // Styled components will try to pass true to the DOM element
+            // assing a + casts it to int which is logically equivalent
+            // but does not cause the DOM error
+            <Class key={i} placeholder={+true} className='placeholder-class'>
+              <Thumbnail />
+              <Heading size='xsmall' />
+              <Button disabled size='small' variation='base-raised-semidark' />
+            </Class>
+          ))}
+          <PlaceholderMessage>{placeholderMessage}</PlaceholderMessage>
+        </ClassList>
+      )}
       {currentCheckpoint && (
         <Class className='add__class' muted as={Button}>
           <Thumbnail useIcon='plus' outline />
