@@ -37,13 +37,15 @@ export function checkpointReducer(state, action) {
         classes: action.data.classes.reduce((acc, c, i) => {
           acc[c.name] = {
             ...c,
-            geometry: (action.data.geoms && action.data.geoms[i]) || {
+            geometry: {
               type: 'MultiPoint',
               coordinates: [],
             },
           };
           return acc;
         }, {}),
+        retrain_geoms: action.data.retrain_geoms,
+        input_geoms: action.data.input_geoms,
       };
     case actions.SET_CHECKPOINT_NAME:
       return {
