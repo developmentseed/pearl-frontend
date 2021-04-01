@@ -349,9 +349,7 @@ function PrimePanel() {
                   <Subheading>Checkpoint</Subheading>
                 </HeadOptionHeadline>
                 <SubheadingStrong>
-                  {
-                    renderCheckpointSelectionHeader()
-                  }
+                  {renderCheckpointSelectionHeader()}
                   {/*currentCheckpoint && currentCheckpoint.id
                     ? `${currentCheckpoint.name} (${currentCheckpoint.id})`
                     : 'Run and retrain model to create checkpoints'*/}
