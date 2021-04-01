@@ -199,6 +199,18 @@ function PrimePanel() {
       </SelectAoiTrigger>
     );
   };
+
+  const renderCheckpointSelectionHeader = () => {
+    if (currentCheckpoint && currentCheckpoint.id) {
+      return `${currentCheckpoint.name} (${currentCheckpoint.id})`;
+    } else if (checkpointList?.length) {
+      return `${checkpointList.length} checkpoint${
+        checkpointList.length > 1 ? 's' : ''
+      } available`;
+    } else {
+      return 'Run and retrain model to create checkpoints';
+    }
+  };
   // Retrain Panel Tab Empty State message
   //
   const retrainPlaceHolderMessage = () => {
@@ -333,9 +345,12 @@ function PrimePanel() {
                   <Subheading>Checkpoint</Subheading>
                 </HeadOptionHeadline>
                 <SubheadingStrong>
-                  {currentCheckpoint && currentCheckpoint.id
+                  {
+                    renderCheckpointSelectionHeader()
+                  }
+                  {/*currentCheckpoint && currentCheckpoint.id
                     ? `${currentCheckpoint.name} (${currentCheckpoint.id})`
-                    : 'Run and retrain model to create checkpoints'}
+                    : 'Run and retrain model to create checkpoints'*/}
                 </SubheadingStrong>
                 <HeadOptionToolbar>
                   <Dropdown
