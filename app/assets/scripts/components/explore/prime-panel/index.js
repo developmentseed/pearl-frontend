@@ -28,7 +28,7 @@ import {
 
 import {
   ExploreContext,
-  useWebsocketClient,
+  useInstance,
   useMapState,
 } from '../../../context/explore';
 import GlobalContext from '../../../context/global';
@@ -124,7 +124,7 @@ function PrimePanel() {
     updateCheckpointName,
   } = useContext(ExploreContext);
 
-  const { runInference, retrain } = useWebsocketClient();
+  const { runInference, retrain } = useInstance();
 
   const { currentCheckpoint, applyCheckpoint } = useCheckpoint();
 
@@ -145,9 +145,13 @@ function PrimePanel() {
 
   // Check if AOI and selected model are defined, and if view mode is runnable
   const allowInferenceRun =
-    [mapModes.BROWSE_MODE, mapModes.ADD_CLASS_SAMPLES].includes(
-      mapState.mode
-    ) &&
+    [
+      mapModes.BROWSE_MODE,
+      mapModes.ADD_CLASS_SAMPLES,
+      mapModes.ADD_SAMPLE_POINT,
+      mapModes.ADD_SAMPLE_POLYGON,
+      mapModes.REMOVE_SAMPLE,
+    ].includes(mapState.mode) &&
     aoiRef &&
     aoiArea > 0 &&
     selectedModel;

@@ -149,7 +149,7 @@ export const useCheckpoint = () => {
   const { setMapMode, mapModes } = useMapState();
   const { restApiClient } = useRestApiClient();
   const { currentProject, aoiRef, aoiName } = useProject();
-  const { sendWebsocketMessage } = useWebsocketClient();
+  // const { sendWebsocketMessage } = useWebsocketClient();
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckContext(
     'useCheckpoint'
   );
@@ -158,73 +158,73 @@ export const useCheckpoint = () => {
     () => ({
       currentCheckpoint,
       dispatchCurrentCheckpoint,
-      applyCheckpoint: async (projectId, checkpointId) => {
-        try {
-          showGlobalLoadingMessage('Applying checkpoint...');
-          const checkpoint = await restApiClient.getCheckpoint(
-            projectId,
-            checkpointId
-          );
+      //   applyCheckpoint: async (projectId, checkpointId) => {
+      //     try {
+      //       showGlobalLoadingMessage('Applying checkpoint...');
+      //       const checkpoint = await restApiClient.getCheckpoint(
+      //         projectId,
+      //         checkpointId
+      //       );
 
-          dispatchCurrentCheckpoint({
-            type: actions.SET_CHECKPOINT,
-            data: checkpoint,
-          });
+      //       dispatchCurrentCheckpoint({
+      //         type: actions.SET_CHECKPOINT,
+      //         data: checkpoint,
+      //       });
 
-          sendWebsocketMessage({
-            action: 'model#checkpoint',
-            data: {
-              id: checkpointId,
-            },
-          });
+      //       sendWebsocketMessage({
+      //         action: 'model#checkpoint',
+      //         data: {
+      //           id: checkpointId,
+      //         },
+      //       });
 
-          // Get bbox polygon from AOI
-          const {
-            _southWest: { lng: minX, lat: minY },
-            _northEast: { lng: maxX, lat: maxY },
-          } = aoiRef.getBounds();
+      //       // Get bbox polygon from AOI
+      //       const {
+      //         _southWest: { lng: minX, lat: minY },
+      //         _northEast: { lng: maxX, lat: maxY },
+      //       } = aoiRef.getBounds();
 
-          const polygon = {
-            type: 'Polygon',
-            coordinates: [
-              [
-                [minX, minY],
-                [maxX, minY],
-                [maxX, maxY],
-                [minX, maxY],
-                [minX, minY],
-              ],
-            ],
-          };
+      //       const polygon = {
+      //         type: 'Polygon',
+      //         coordinates: [
+      //           [
+      //             [minX, minY],
+      //             [maxX, minY],
+      //             [maxX, maxY],
+      //             [minX, maxY],
+      //             [minX, minY],
+      //           ],
+      //         ],
+      //       };
 
-          // Compose message
-          const message = {
-            action: 'model#prediction',
-            data: {
-              name: aoiName,
-              polygon,
-            },
-          };
+      //       // Compose message
+      //       const message = {
+      //         action: 'model#prediction',
+      //         data: {
+      //           name: aoiName,
+      //           polygon,
+      //         },
+      //       };
 
-          sendWebsocketMessage(currentProject.id, message);
+      //       sendWebsocketMessage(currentProject.id, message);
 
-          setMapMode(mapModes.ADD_SAMPLE_POLYGON);
+      //       setMapMode(mapModes.ADD_SAMPLE_POLYGON);
 
-          hideGlobalLoading();
-        } catch (error) {
-          logger(error);
-          toasts.error(
-            'Could not load checkpoint meta, please try again later.'
-          );
-        }
-      },
+      //       hideGlobalLoading();
+      //     } catch (error) {
+      //       logger(error);
+      //       toasts.error(
+      //         'Could not load checkpoint meta, please try again later.'
+      //       );
+      //     }
+      //   },
     }),
     [
       aoiName,
       aoiRef,
       currentProject,
       restApiClient,
-      sendWebsocketMessage,
+      // sendWebsocketMessage,
       currentCheckpoint,
       dispatchCurrentCheckpoint,
       setMapMode,

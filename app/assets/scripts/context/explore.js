@@ -16,7 +16,6 @@ import {
 } from '@devseed-ui/global-loading';
 import toasts from '../components/common/toasts';
 import { useHistory, useParams } from 'react-router-dom';
-import WebsocketClient from './websocket-client';
 import GlobalContext from './global';
 import predictionsReducer, {
   actions as predictionActions,
@@ -26,9 +25,19 @@ import tBbox from '@turf/bbox';
 import tBboxPolygon from '@turf/bbox-polygon';
 import tCentroid from '@turf/centroid';
 
-import { actions as checkpointActions, checkpointReducer } from './checkpoint';
+import {
+  actions as checkpointActions,
+  checkpointReducer,
+  useCheckpoint,
+} from './checkpoint';
 import get from 'lodash.get';
 import logger from '../utils/logger';
+import {
+  instanceReducer,
+  instanceInitialState,
+  messageQueueActionTypes,
+  WebsocketClient,
+} from './instance';
 
 /**
  * Context & Provider
@@ -75,7 +84,6 @@ export function ExploreProvider(props) {
     initialApiRequestState
   );
   const [currentInstance, setCurrentInstance] = useState(null);
-  const [websocketClient, setWebsocketClient] = useState(null);
 
   const [apiMeta, setApiMeta] = useState();
 
@@ -173,7 +181,7 @@ export function ExploreProvider(props) {
       } else {
         dispatchMapState({
           type: mapActionTypes.SET_MODE,
-          data: mapModes.ADD_CLASS_SAMPLES,
+          data: mapModes.ADD_SAMPLE_POLYGON,
         });
         loadMetrics();
       }
@@ -501,9 +509,6 @@ export function ExploreProvider(props) {
         updateCheckpointName,
 
         reverseGeoCode,
-
-        websocketClient,
-        setWebsocketClient,
       }}
     >
       {props.children}
@@ -529,11 +534,17 @@ const useExploreContext = (fnName) => {
 };
 
 export const useProject = () => {
-  const { aoiName, aoiRef, currentProject } = useExploreContext('useProject');
+  const {
+    aoiName,
+    aoiRef,
+    currentProject,
+    setCurrentProject,
+  } = useExploreContext('useProject');
 
   return useMemo(
     () => ({
       currentProject,
+      setCurrentProject,
       aoiName,
       aoiRef,
     }),
@@ -560,85 +571,100 @@ export const useMapState = () => {
   );
 };
 
-export const useWebsocketClient = () => {
-  const history = useHistory();
-  const { restApiClient } = useRestApiClient();
-  const {
-    aoiName,
-    aoiRef,
-    websocketClient,
-    setWebsocketClient,
-    selectedModel,
-    dispatchPredictions,
-    currentInstance,
-    currentCheckpoint,
-    dispatchCurrentCheckpoint,
-    currentProject,
-    setCurrentProject,
-  } = useExploreContext('useWebsocket');
-
-  const sendWebsocketMessage = useMemo(
-    () => async (...args) => {
-      let message;
-      let projectId;
-      if (typeof args[1] !== 'undefined') {
-        projectId = args[0];
-        message = args[1];
-      } else {
-        projectId = currentProject.id;
-        message = args[0];
-      }
-
-      // Request a new instance if none is available.
-      if (!websocketClient) {
-        try {
-          // Create instance
-          showGlobalLoadingMessage('Connecting to GPU instance...');
-          let instance;
-          if (currentInstance) {
-            instance = currentInstance;
-          } else {
-            instance = await restApiClient.createInstance(projectId);
-          }
-
-          // Setup websocket
-          const newWebsocketClient = new WebsocketClient({
-            token: instance.token,
-            dispatchPredictions,
-            dispatchCurrentCheckpoint,
-            onConnected: () => {
-              newWebsocketClient.send(JSON.stringify(message));
-            },
-          });
-          setWebsocketClient(newWebsocketClient);
-        } catch (error) {
-          logger(error);
-          hideGlobalLoading();
-          toasts.error(
-            'Error while creating an instance, please try again later.'
-          );
-        }
-      } else {
-        // Send message with existing websocket
-        websocketClient.send(JSON.stringify(message));
-      }
-    },
-    [
-      currentInstance,
-      currentProject,
-      dispatchCurrentCheckpoint,
-      dispatchPredictions,
-      restApiClient,
-      setWebsocketClient,
-      websocketClient,
-    ]
+export const usePredictions = () => {
+  const { predictions, dispatchPredictions } = useExploreContext(
+    'usePredictions'
   );
 
   return useMemo(
     () => ({
-      websocketClient,
-      sendWebsocketMessage,
-      runInference: async function () {
+      predictions,
+      dispatchPredictions,
+    }),
+    [predictions, dispatchPredictions]
+  );
+};
+
+export const useInstance = () => {
+  const history = useHistory();
+  const { restApiClient } = useRestApiClient();
+  const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
+  const { aoiName, aoiRef, currentProject, setCurrentProject } = useProject();
+  const { dispatchPredictions } = usePredictions();
+  const { selectedModel } = useExploreContext('useWebsocket');
+
+  const [websocketClient, setWebsocketClient] = useState(null);
+
+  const [instance, dispatchInstance] = useReducer(
+    instanceReducer,
+    instanceInitialState
+  );
+
+  // Create a message queue to wait for instance connection
+  const [messageQueue, dispatchMessageQueue] = useReducer(
+    (state, { type, data }) => {
+      switch (type) {
+        case messageQueueActionTypes.ADD: {
+          return state.concat(JSON.stringify(data));
+        }
+        case messageQueueActionTypes.SEND: {
+          websocketClient.send(state[0]);
+          return state.slice(1);
+        }
+        default:
+          logger('Unexpected messageQueue action type: ', type);
+          throw new Error('Unexpected error.');
+      }
+    },
+    []
+  );
+
+  // Listen to instance connection, send queue message if any
+  useEffect(() => {
+    if (websocketClient && instance.connected && messageQueue.length > 0) {
+      dispatchMessageQueue({ type: messageQueueActionTypes.SEND });
+    }
+  }, [websocketClient, instance.connected, messageQueue]);
+
+  async function initInstance(projectId) {
+    // Close existing websocket
+    if (websocketClient) {
+      websocketClient.close();
+    }
+
+    // Fetch active instances for this project
+    const activeInstances = await restApiClient.getActiveInstances(projectId);
+
+    // Get instance token
+    let token;
+    if (activeInstances.total > 0) {
+      const { id: instanceId } = activeInstances.instances[0];
+      token = (await restApiClient.getInstance(projectId, instanceId)).token;
+    } else {
+      token = (await restApiClient.createInstance(projectId)).token;
+    }
+
+    // Use a Promise to stand by for GPU connection
+    return new Promise((resolve, reject) => {
+      const newWebsocketClient = new WebsocketClient({
+        token,
+        dispatchInstance,
+        dispatchCurrentCheckpoint,
+        dispatchPredictions,
+      });
+      newWebsocketClient.addEventListener('open', () => {
+        setWebsocketClient(newWebsocketClient);
+        resolve();
+      });
+      newWebsocketClient.addEventListener('error', () => {
+        reject();
+      });
+    });
+  }
+
+  return useMemo(
+    () => ({
+      runInference: async () => {
         if (restApiClient) {
           let project = currentProject;
 
@@ -682,36 +708,55 @@ export const useWebsocketClient = () => {
             return; // abort inference run
           }
 
-          // Get bbox polygon from AOI
-          const {
-            _southWest: { lng: minX, lat: minY },
-            _northEast: { lng: maxX, lat: maxY },
-          } = aoiRef.getBounds();
+          try {
+            await initInstance(project.id);
+          } catch (error) {
+            logger(error);
+            hideGlobalLoading();
+            toasts.error('Could not create instance, please try again later.');
+          }
 
-          const polygon = {
-            type: 'Polygon',
-            coordinates: [
-              [
-                [minX, minY],
-                [maxX, minY],
-                [maxX, maxY],
-                [minX, maxY],
-                [minX, minY],
+          try {
+            // Get bbox polygon from AOI
+            const {
+              _southWest: { lng: minX, lat: minY },
+              _northEast: { lng: maxX, lat: maxY },
+            } = aoiRef.getBounds();
+
+            const polygon = {
+              type: 'Polygon',
+              coordinates: [
+                [
+                  [minX, minY],
+                  [maxX, minY],
+                  [maxX, maxY],
+                  [minX, maxY],
+                  [minX, minY],
+                ],
               ],
-            ],
-          };
+            };
 
-          // Compose message
-          const message = {
-            action: 'model#prediction',
-            data: {
-              name: aoiName,
-              polygon,
-            },
-          };
+            // Reset predictions state
+            dispatchPredictions({
+              type: predictionActions.START_PREDICTION,
+            });
 
-          sendWebsocketMessage(project.id, message);
-          dispatchPredictions({ type: predictionActions.START_PREDICTION });
+            // Add prediction request to queue
+            dispatchMessageQueue({
+              type: messageQueueActionTypes.ADD,
+              data: {
+                action: 'model#prediction',
+                data: {
+                  name: aoiName,
+                  polygon,
+                },
+              },
+            });
+          } catch (error) {
+            logger(error);
+            hideGlobalLoading();
+            toasts.error('Could not create instance, please try again later.');
+          }
         }
       },
       retrain: async function () {
@@ -729,14 +774,30 @@ export const useWebsocketClient = () => {
         }
 
         showGlobalLoadingMessage('Retraining...');
+
+        // Reset predictions state
         dispatchPredictions({
           type: predictionActions.START_PREDICTION,
         });
-        sendWebsocketMessage({
-          action: 'model#retrain',
+
+        // Add prediction request to queue
+        dispatchMessageQueue({
+          type: messageQueueActionTypes.ADD,
           data: {
-            name: 'a name',
-            classes,
+            action: 'model#retrain',
+            data: {
+              name: aoiName,
+              classes: classes.map((c) => {
+                return {
+                  name: c.name,
+                  color: c.color,
+                  geometry: {
+                    type: 'GeometryCollection',
+                    geometries: c.geometry,
+                  },
+                };
+              }),
+            },
           },
         });
       },
@@ -746,14 +807,11 @@ export const useWebsocketClient = () => {
       aoiRef,
       currentProject,
       currentCheckpoint,
-      dispatchPredictions,
       dispatchCurrentCheckpoint,
-      history,
-      restApiClient,
-      selectedModel,
-      sendWebsocketMessage,
       setCurrentProject,
-      websocketClient,
+      restApiClient,
+      instance,
+      selectedModel,
     ]
   );
 };
