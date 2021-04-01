@@ -158,7 +158,6 @@ export const useCheckpoint = () => {
     () => ({
       currentCheckpoint,
       dispatchCurrentCheckpoint,
-<<<<<<< HEAD
       //   applyCheckpoint: async (projectId, checkpointId) => {
       //     try {
       //       showGlobalLoadingMessage('Applying checkpoint...');
@@ -219,66 +218,6 @@ export const useCheckpoint = () => {
       //       );
       //     }
       //   },
-=======
-      applyCheckpoint: async (projectId, checkpointId) => {
-        try {
-          showGlobalLoadingMessage('Applying checkpoint...');
-          const checkpoint = await restApiClient.getCheckpoint(
-            projectId,
-            checkpointId
-          );
-
-          dispatchCurrentCheckpoint({
-            type: actions.SET_CHECKPOINT,
-            data: checkpoint,
-          });
-
-          sendWebsocketMessage({
-            action: 'model#checkpoint',
-            data: {
-              id: checkpointId,
-            },
-          });
-
-          // Get bbox polygon from AOI
-          const {
-            _southWest: { lng: minX, lat: minY },
-            _northEast: { lng: maxX, lat: maxY },
-          } = aoiRef.getBounds();
-
-          const polygon = {
-            type: 'Polygon',
-            coordinates: [
-              [
-                [minX, minY],
-                [maxX, minY],
-                [maxX, maxY],
-                [minX, maxY],
-                [minX, minY],
-              ],
-            ],
-          };
-
-          // Compose message
-          const message = {
-            action: 'model#prediction',
-            data: {
-              name: aoiName,
-              polygon,
-            },
-          };
-
-          sendWebsocketMessage(currentProject.id, message);
-
-          hideGlobalLoading();
-        } catch (error) {
-          logger(error);
-          toasts.error(
-            'Could not load checkpoint meta, please try again later.'
-          );
-        }
-      },
->>>>>>> 6acfdb0... Don't automatically set mode to polygon mode when applying checkpoint
     }),
     [
       aoiName,
