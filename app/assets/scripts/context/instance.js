@@ -20,9 +20,9 @@ export const instanceInitialState = {
 export function instanceReducer(state, action) {
   const { type, data } = action;
 
-  console.log('instanceReducer')
-  console.log(state)
-  console.log(action)
+  console.log('instanceReducer');
+  console.log(state);
+  console.log(action);
 
   switch (type) {
     case instanceActionTypes.SET_CONNECTION_STATUS: {

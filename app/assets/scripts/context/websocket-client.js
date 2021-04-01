@@ -9,6 +9,7 @@ class WebsocketClient extends WebSocket {
     onConnected,
     dispatchPredictions,
     dispatchCurrentCheckpoint,
+    loadCheckpointList,
   }) {
     super(config.websocketEndpoint + `?token=${token}`);
     this.isConnected = false;
@@ -69,6 +70,7 @@ class WebsocketClient extends WebSocket {
           });
           break;
         case 'model#prediction#complete':
+          loadCheckpointList();
           dispatchPredictions({
             type: predictionsActions.COMPLETE_PREDICTION,
           });

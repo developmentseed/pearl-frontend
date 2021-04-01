@@ -174,6 +174,9 @@ export function ExploreProvider(props) {
         restApiClient.get(`project/${currentProject.id}/aoi/`).then((aois) => {
           setAoiList(filterAoiList(aois.aois));
         });
+        // Refresh checkpoint list, prediction finished
+        // means new checkpoint available
+        loadCheckpointList(currentProject.id);
       }
 
       if (predictions.error) {
@@ -201,6 +204,9 @@ export function ExploreProvider(props) {
       });
   }
 
+  /*
+   * Clear predictions on AOI Edit
+   */
   useEffect(() => {
     if (predictions.isReady()) {
       if (
