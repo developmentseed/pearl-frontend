@@ -208,8 +208,6 @@ export const useCheckpoint = () => {
 
           sendWebsocketMessage(currentProject.id, message);
 
-          setMapMode(mapModes.ADD_SAMPLE_POLYGON);
-
           hideGlobalLoading();
         } catch (error) {
           logger(error);

@@ -145,9 +145,11 @@ function PrimePanel() {
 
   // Check if AOI and selected model are defined, and if view mode is runnable
   const allowInferenceRun =
-    [mapModes.BROWSE_MODE, mapModes.ADD_CLASS_SAMPLES].includes(
-      mapState.mode
-    ) &&
+    [
+      mapModes.BROWSE_MODE,
+      mapModes.ADD_CLASS_SAMPLES,
+      mapModes.ADD_SAMPLE_POLYGON,
+    ].includes(mapState.mode) &&
     aoiRef &&
     aoiArea > 0 &&
     selectedModel;
@@ -345,9 +347,7 @@ function PrimePanel() {
                   <Subheading>Checkpoint</Subheading>
                 </HeadOptionHeadline>
                 <SubheadingStrong>
-                  {
-                    renderCheckpointSelectionHeader()
-                  }
+                  {renderCheckpointSelectionHeader()}
                   {/*currentCheckpoint && currentCheckpoint.id
                     ? `${currentCheckpoint.name} (${currentCheckpoint.id})`
                     : 'Run and retrain model to create checkpoints'*/}
