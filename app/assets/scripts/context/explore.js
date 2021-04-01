@@ -819,8 +819,6 @@ export const useInstance = () => {
             checkpointId
           );
 
-          console.log({checkpoint})
-
           dispatchCurrentCheckpoint({
             type: checkpointActions.SET_CHECKPOINT,
             data: checkpoint,
@@ -836,35 +834,7 @@ export const useInstance = () => {
             },
           });
 
-          // Get bbox polygon from AOI
-          const {
-            _southWest: { lng: minX, lat: minY },
-            _northEast: { lng: maxX, lat: maxY },
-          } = aoiRef.getBounds();
-
-          const polygon = {
-            type: 'Polygon',
-            coordinates: [
-              [
-                [minX, minY],
-                [maxX, minY],
-                [maxX, maxY],
-                [minX, maxY],
-                [minX, minY],
-              ],
-            ],
-          };
-
-          dispatchMessageQueue({
-            type: messageQueueActionTypes.ADD,
-            data: {
-              action: 'model#prediction',
-              data: {
-                name: aoiName,
-                polygon,
-              },
-            },
-          });
+          hideGlobalLoading();
         } catch (error) {
           logger(error);
           toasts.error('Could not load checkpoint, please try again later.');
