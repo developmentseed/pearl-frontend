@@ -21,24 +21,14 @@ import GlobalContext from './global';
 import predictionsReducer, {
   actions as predictionActions,
 } from './reducers/predictions';
-import usePrevious from '../utils/use-previous';
+import { mapStateReducer, mapModes, mapActionTypes } from './reducers/map';
 import tBbox from '@turf/bbox';
 import tBboxPolygon from '@turf/bbox-polygon';
 import tCentroid from '@turf/centroid';
 
-import { actions as checkpointActions, CheckpointContext } from './checkpoint';
+import { actions as checkpointActions, checkpointReducer } from './checkpoint';
 import get from 'lodash.get';
 import logger from '../utils/logger';
-
-/**
- * Explore View Modes
- */
-const allViewModes = {
-  BROWSE_MODE: 'BROWSE_MODE',
-  CREATE_AOI_MODE: 'CREATE_AOI_MODE',
-  EDIT_AOI_MODE: 'EDIT_AOI_MODE',
-  ADD_CLASS_SAMPLES: 'ADD_CLASS_SAMPLES',
-};
 
 /**
  * Context & Provider
@@ -70,13 +60,16 @@ export function ExploreProvider(props) {
   //L.LatLngBounds object, set when aoi is confirmed
   const [aoiBounds, setAoiBounds] = useState(null);
 
-  const [viewMode, setViewMode] = useState(allViewModes.BROWSE_MODE);
+  const [mapState, dispatchMapState] = useReducer(mapStateReducer, {
+    mode: mapModes.BROWSE_MODE,
+  });
+
   const [selectedModel, setSelectedModel] = useState(null);
-  const { currentCheckpoint, dispatchCurrentCheckpoint } = useContext(
-    CheckpointContext
+
+  const [currentCheckpoint, dispatchCurrentCheckpoint] = useReducer(
+    checkpointReducer
   );
 
-  const previousViewMode = usePrevious(viewMode);
   const [predictions, dispatchPredictions] = useReducer(
     predictionsReducer,
     initialApiRequestState
@@ -178,7 +171,10 @@ export function ExploreProvider(props) {
       if (predictions.error) {
         toasts.error('An inference error occurred, please try again later.');
       } else {
-        setViewMode(allViewModes.ADD_CLASS_SAMPLES);
+        dispatchMapState({
+          type: mapActionTypes.SET_MODE,
+          data: mapModes.ADD_CLASS_SAMPLES,
+        });
         loadMetrics();
       }
     }
@@ -200,8 +196,8 @@ export function ExploreProvider(props) {
   useEffect(() => {
     if (predictions.isReady()) {
       if (
-        viewMode === allViewModes.BROWSE_MODE &&
-        previousViewMode === allViewModes.EDIT_AOI_MODE
+        mapState.mode === mapModes.BROWSE_MODE &&
+        mapState.previousMode === mapModes.EDIT_AOI_MODE
       ) {
         dispatchPredictions({ type: predictionActions.CLEAR_PREDICTION });
 
@@ -210,13 +206,16 @@ export function ExploreProvider(props) {
         });
       }
     }
-  }, [viewMode, previousViewMode, predictions]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [mapState, predictions]); // eslint-disable-line react-hooks/exhaustive-deps
 
   /*
    * Re-init aoi state variables
    */
   function createNewAoi() {
-    setViewMode(allViewModes.CREATE_AOI_MODE);
+    dispatchMapState({
+      type: mapActionTypes.CREATE_AOI_MODE,
+      data: mapModes.ADD_CLASS_SAMPLES,
+    });
     setAoiRef(null);
     setAoiBounds(null);
     setAoiArea(null);
@@ -278,7 +277,10 @@ export function ExploreProvider(props) {
       aoiRef.setBounds(bounds);
       setAoiBounds(aoiRef.getBounds());
       setAoiName(aoiObject.name);
-      setViewMode(allViewModes.BROWSE_MODE);
+      dispatchMapState({
+        type: mapActionTypes.BROWSE_MODE,
+        data: mapModes.ADD_CLASS_SAMPLES,
+      });
       if (predictions.isReady) {
         dispatchPredictions({ type: predictionActions.CLEAR_PREDICTION });
       }
@@ -419,9 +421,9 @@ export function ExploreProvider(props) {
     if (!aoiBounds) {
       return;
     } else if (
-      viewMode === allViewModes.BROWSE_MODE &&
-      (previousViewMode === allViewModes.EDIT_AOI_MODE ||
-        previousViewMode === allViewModes.CREATE_AOI_MODE)
+      mapState.mode === mapModes.BROWSE_MODE &&
+      (mapState.previousMode === mapModes.EDIT_AOI_MODE ||
+        mapState.previousMode === mapModes.CREATE_AOI_MODE)
     ) {
       const bounds = [
         aoiBounds.getWest(),
@@ -454,7 +456,7 @@ export function ExploreProvider(props) {
         setAoiName(name);
       });
     }
-  }, [aoiBounds, aoiList, viewMode, previousViewMode]);
+  }, [mapState, aoiBounds, aoiList]);
 
   return (
     <ExploreContext.Provider
@@ -462,9 +464,8 @@ export function ExploreProvider(props) {
         predictions,
         apiLimits: apiMeta && apiMeta.limits,
 
-        previousViewMode,
-        viewMode,
-        setViewMode,
+        mapState,
+        dispatchMapState,
 
         aoiRef,
         setAoiRef,
@@ -489,6 +490,7 @@ export function ExploreProvider(props) {
 
         dispatchPredictions,
         checkpointList,
+
         currentCheckpoint,
         dispatchCurrentCheckpoint,
 
@@ -526,19 +528,6 @@ const useExploreContext = (fnName) => {
   return context;
 };
 
-export const useViewMode = () => {
-  const { viewMode, setViewMode } = useExploreContext('useViewMode');
-
-  return useMemo(
-    () => ({
-      viewMode,
-      setViewMode,
-      allViewModes,
-    }),
-    [viewMode, setViewMode]
-  );
-};
-
 export const useProject = () => {
   const { aoiName, aoiRef, currentProject } = useExploreContext('useProject');
 
@@ -549,6 +538,25 @@ export const useProject = () => {
       aoiRef,
     }),
     [currentProject, aoiName, aoiRef]
+  );
+};
+
+export const useMapState = () => {
+  const { mapState, dispatchMapState } = useExploreContext('useMapState');
+
+  const setMapMode = (mode) =>
+    dispatchMapState({
+      type: mapActionTypes.SET_MODE,
+      data: mode,
+    });
+
+  return useMemo(
+    () => ({
+      mapState,
+      setMapMode,
+      mapModes,
+    }),
+    [mapState, mapModes]
   );
 };
 

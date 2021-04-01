@@ -6516,6 +6516,11 @@ lead@^1.0.0:
   dependencies:
     flush-write-stream "^1.0.2"
 
+leaflet-freehandshapes@^0.3.7:
+  version "0.3.7"
+  resolved "https://registry.yarnpkg.com/leaflet-freehandshapes/-/leaflet-freehandshapes-0.3.7.tgz#fd594a2fa1f47ccda863904fd4ad715805bdc0e5"
+  integrity sha512-1BmcyWFEqMhVeR10Z125EQwIgip/MZIIPFO+/1ZQRd2TpOGq++d/xT/b+ChJjuyIKEJVzBPSi5ymjYW539FUlw==
+
 leaflet-geosearch@^3.2.1:
   version "3.2.1"
   resolved "https://registry.yarnpkg.com/leaflet-geosearch/-/leaflet-geosearch-3.2.1.tgz#d28057e9383af8a11ae4dfc7e159e62265e76b7c"

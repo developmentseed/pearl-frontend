@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { Button } from '@devseed-ui/button';
 import { glsp } from '@devseed-ui/theme-provider';
 import { EditButton } from '../../../styles/button';
-import { useViewMode } from '../../../context/explore';
+import { useMapState } from '../../../context/explore';
 import T from 'prop-types';
 import { formatThousands } from '../../../utils/format';
 
@@ -12,6 +12,7 @@ import {
   ModalHeadline,
   ModalFooter as BaseModalFooter,
 } from '@devseed-ui/modal';
+import { useMapRef } from '../../../context/map';
 
 const ModalFooter = styled(BaseModalFooter)`
   padding: ${glsp(2)} 0 0 0;
@@ -24,7 +25,8 @@ const ModalFooter = styled(BaseModalFooter)`
 `;
 
 export function AoiEditButtons(props) {
-  const { viewMode, setViewMode, allViewModes } = useViewMode();
+  const { mapState, setMapMode, mapModes } = useMapState();
+  const { mapRef } = useMapRef();
 
   const {
     aoiRef,
@@ -32,7 +34,6 @@ export function AoiEditButtons(props) {
     aoiBounds,
     setAoiBounds,
     apiLimits,
-    map,
     setAoiRef,
   } = props;
 
@@ -40,15 +41,15 @@ export function AoiEditButtons(props) {
 
   // Display confirm/cancel buttons when AOI edition is active
   if (
-    viewMode === allViewModes.CREATE_AOI_MODE ||
-    viewMode === allViewModes.EDIT_AOI_MODE
+    mapState.mode === mapModes.CREATE_AOI_MODE ||
+    mapState.mode === mapModes.EDIT_AOI_MODE
   ) {
     return (
       <>
         <EditButton
           onClick={function () {
             if (!apiLimits || apiLimits.live_inference > aoiArea) {
-              setViewMode(allViewModes.BROWSE_MODE);
+              setMapMode(mapModes.BROWSE_MODE);
               setAoiBounds(aoiRef.getBounds());
             } else if (apiLimits.max_inference > aoiArea) {
               setActiveModal('no-live-inference');
@@ -63,21 +64,21 @@ export function AoiEditButtons(props) {
         </EditButton>
         <EditButton
           onClick={() => {
-            setViewMode(allViewModes.BROWSE_MODE);
+            setMapMode(mapModes.BROWSE_MODE);
             if (aoiBounds) {
               // editing is canceled
               aoiRef.setBounds(aoiBounds);
             } else {
               // Drawing canceled
-              map.aoi.control.draw.disable();
+              mapRef.aoi.control.draw.disable();
 
               //Edit mode is enabled as soon as draw is done
-              if (map.aoi.control.edit._shape) {
-                map.aoi.control.edit.disable();
+              if (mapRef.aoi.control.edit._shape) {
+                mapRef.aoi.control.edit.disable();
               }
 
               //Layer must be removed from the map
-              map.aoi.control.draw.clear();
+              mapRef.aoi.control.draw.clear();
 
               // Layer ref set to null, will be recreated when draw is attempted again
               setAoiRef(null);
@@ -126,7 +127,7 @@ export function AoiEditButtons(props) {
                     variation='base-plain'
                     onClick={() => {
                       setActiveModal(false);
-                      setViewMode(allViewModes.BROWSE_MODE);
+                      setMapMode(mapModes.BROWSE_MODE);
                       setAoiBounds(aoiRef.getBounds());
                     }}
                   >
@@ -151,9 +152,7 @@ export function AoiEditButtons(props) {
   return (
     <EditButton
       onClick={() => {
-        setViewMode(
-          !aoiRef ? allViewModes.CREATE_AOI_MODE : allViewModes.EDIT_AOI_MODE
-        );
+        setMapMode(!aoiRef ? mapModes.CREATE_AOI_MODE : mapModes.EDIT_AOI_MODE);
       }}
       title='Draw Area of Interest'
       id='edit-aoi-trigger'
@@ -171,5 +170,4 @@ AoiEditButtons.propTypes = {
   setAoiBounds: T.func,
   aoiArea: T.oneOfType([T.bool, T.number]),
   apiLimits: T.oneOfType([T.bool, T.object]),
-  map: T.object,
 };
