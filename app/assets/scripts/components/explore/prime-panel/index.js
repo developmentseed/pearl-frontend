@@ -124,9 +124,9 @@ function PrimePanel() {
     updateCheckpointName,
   } = useContext(ExploreContext);
 
-  const { runInference, retrain } = useInstance();
+  const { runInference, retrain, applyCheckpoint } = useInstance();
 
-  const { currentCheckpoint, applyCheckpoint } = useCheckpoint();
+  const { currentCheckpoint } = useCheckpoint();
 
   const { modelsList, mosaicList } = useContext(GlobalContext);
 

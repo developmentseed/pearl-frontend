@@ -801,6 +801,75 @@ export const useInstance = () => {
           },
         });
       },
+      applyCheckpoint: async (projectId, checkpointId) => {
+        try {
+          showGlobalLoadingMessage('Applying checkpoint...');
+
+          if (!websocketClient) {
+            await initInstance(projectId);
+          }
+
+          // Reset predictions state
+          dispatchPredictions({
+            type: predictionActions.START_PREDICTION,
+          });
+
+          const checkpoint = await restApiClient.getCheckpoint(
+            projectId,
+            checkpointId
+          );
+
+          console.log({checkpoint})
+
+          dispatchCurrentCheckpoint({
+            type: checkpointActions.SET_CHECKPOINT,
+            data: checkpoint,
+          });
+
+          dispatchMessageQueue({
+            type: messageQueueActionTypes.ADD,
+            data: {
+              action: 'model#checkpoint',
+              data: {
+                id: checkpointId,
+              },
+            },
+          });
+
+          // Get bbox polygon from AOI
+          const {
+            _southWest: { lng: minX, lat: minY },
+            _northEast: { lng: maxX, lat: maxY },
+          } = aoiRef.getBounds();
+
+          const polygon = {
+            type: 'Polygon',
+            coordinates: [
+              [
+                [minX, minY],
+                [maxX, minY],
+                [maxX, maxY],
+                [minX, maxY],
+                [minX, minY],
+              ],
+            ],
+          };
+
+          dispatchMessageQueue({
+            type: messageQueueActionTypes.ADD,
+            data: {
+              action: 'model#prediction',
+              data: {
+                name: aoiName,
+                polygon,
+              },
+            },
+          });
+        } catch (error) {
+          logger(error);
+          toasts.error('Could not load checkpoint, please try again later.');
+        }
+      },
     }),
     [
       aoiName,
