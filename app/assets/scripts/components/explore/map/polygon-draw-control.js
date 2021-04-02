@@ -40,11 +40,11 @@ class PolygonDrawControl {
       // Handle added polygon
       drawer.on('layeradd', (data) => {
         const polygons = this.getLayerAsGeoJSON(data.target);
-        this.onUpdate(name, polygons)
+        this.onUpdate(name, polygons);
       });
       drawer.on('layerremove', (data) => {
         const polygons = this.getLayerAsGeoJSON(data.target);
-        this.onUpdate(name, polygons)
+        this.onUpdate(name, polygons);
       });
       this._group.addLayer(drawer);
     });

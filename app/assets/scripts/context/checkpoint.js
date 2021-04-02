@@ -15,7 +15,7 @@ export const actions = {
   ADD_POINT_SAMPLE: 'ADD_POINT_SAMPLE',
   REMOVE_POINT_SAMPLE: 'REMOVE_POINT_SAMPLE',
   RESET_CHECKPOINT: 'RESET_CHECKPOINT',
-  UPDATE_POLYGONS: 'UPDATE_POLYGONS'
+  UPDATE_POLYGONS: 'UPDATE_POLYGONS',
 };
 
 export function checkpointReducer(state, action) {
@@ -33,7 +33,7 @@ export function checkpointReducer(state, action) {
               type: 'MultiPoint',
               coordinates: [],
             },
-            polygons: []
+            polygons: [],
           };
           return acc;
         }, {}),
@@ -56,7 +56,7 @@ export function checkpointReducer(state, action) {
                 type: 'MultiPoint',
                 coordinates: [],
               },
-              polygons: []
+              polygons: [],
             },
           };
         }, {}),
@@ -80,10 +80,10 @@ export function checkpointReducer(state, action) {
           ...state.classes,
           [action.data.class]: {
             ...state.classes[action.data.class],
-            polygons: action.data.polygons
-          }
-        }
-      }
+            polygons: action.data.polygons,
+          },
+        },
+      };
     case actions.SET_ACTIVE_CLASS:
       return {
         ...state,

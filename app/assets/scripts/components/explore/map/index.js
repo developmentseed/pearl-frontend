@@ -242,10 +242,10 @@ function Map() {
             onUpdate: (className, polygons) =>
               dispatchCurrentCheckpoint({
                 type: actions.UPDATE_POLYGONS,
-                data:  {
+                data: {
                   class: className,
-                  polygons: polygons.map( f => f.geometry)
-                }
+                  polygons: polygons.map((f) => f.geometry),
+                },
               }),
           });
 
