@@ -212,7 +212,7 @@ function PrimePanel() {
         checkpointList.length > 1 ? 's' : ''
       } available`;
     } else {
-      return 'Run and retrain model to create checkpoints';
+      return;
     }
   };
   // Retrain Panel Tab Empty State message
@@ -378,8 +378,8 @@ function PrimePanel() {
                     className='global__dropdown'
                   >
                     <>
-                      <DropdownHeader unshaded>
-                        <p>Checkpoints</p>
+                      <DropdownHeader>
+                        <Heading useAlt>Checkpoints</Heading>
                       </DropdownHeader>
                       <DropdownBody selectable>
                         {checkpointList?.length &&
@@ -499,7 +499,7 @@ function PrimePanel() {
                 {!currentCheckpoint ? 'Run Model' : 'Retrain'}
               </InfoButton>
               <Dropdown
-                alignment='right'
+                alignment='center'
                 direction='up'
                 triggerElement={(triggerProps) => (
                   <InfoButton
@@ -540,7 +540,7 @@ function PrimePanel() {
                       title='Rename checkpoint'
                       data-dropdown='click.close'
                     >
-                      Rename Checkpoint
+                      Save
                     </Button>
                   </Form>
                 </SaveCheckpoint>
