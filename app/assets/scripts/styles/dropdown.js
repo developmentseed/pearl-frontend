@@ -42,6 +42,15 @@ export const DropdownItem = styled.a`
     ${({ useIcon }) => useIcon && collecticon(useIcon)}
   }
 
+  /* Add a tick if checked, may conflict with useIcon */
+  ${({ checked }) =>
+    checked &&
+    css`
+      ::before {
+        ${collecticon('tick')}
+      }
+    `}
+
   :visited {
     color: ${themeVal('color.base')};
   }

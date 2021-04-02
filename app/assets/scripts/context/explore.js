@@ -4,40 +4,40 @@ import React, {
   useEffect,
   useReducer,
   useContext,
+  useMemo,
 } from 'react';
 import T from 'prop-types';
 import config from '../config';
-import { initialApiRequestState } from '../reducers/reduxeed';
-import { createApiMetaReducer, queryApiMeta } from '../reducers/api';
+import { initialApiRequestState } from './reducers/reduxeed';
+import { useRestApiClient } from './auth';
 import {
   showGlobalLoadingMessage,
   hideGlobalLoading,
 } from '@devseed-ui/global-loading';
 import toasts from '../components/common/toasts';
 import { useHistory, useParams } from 'react-router-dom';
-import WebsocketClient from './websocket-client';
 import GlobalContext from './global';
 import predictionsReducer, {
   actions as predictionActions,
-} from '../reducers/predictions';
-import usePrevious from '../utils/use-previous';
+} from './reducers/predictions';
+import { mapStateReducer, mapModes, mapActionTypes } from './reducers/map';
 import tBbox from '@turf/bbox';
 import tBboxPolygon from '@turf/bbox-polygon';
 import tCentroid from '@turf/centroid';
 
-import { actions as checkpointActions, CheckpointContext } from './checkpoint';
-import logger from '../utils/logger';
+import {
+  actions as checkpointActions,
+  checkpointReducer,
+  useCheckpoint,
+} from './checkpoint';
 import get from 'lodash.get';
-
-/**
- * Explore View Modes
- */
-export const viewModes = {
-  BROWSE_MODE: 'BROWSE_MODE',
-  CREATE_AOI_MODE: 'CREATE_AOI_MODE',
-  EDIT_AOI_MODE: 'EDIT_AOI_MODE',
-  ADD_CLASS_SAMPLES: 'ADD_CLASS_SAMPLES',
-};
+import logger from '../utils/logger';
+import {
+  instanceReducer,
+  instanceInitialState,
+  messageQueueActionTypes,
+  WebsocketClient,
+} from './instance';
 
 /**
  * Context & Provider
@@ -49,6 +49,7 @@ export function ExploreProvider(props) {
   const { restApiClient } = useContext(GlobalContext);
 
   const [currentProject, setCurrentProject] = useState(null);
+  const [checkpointList, setCheckpointList] = useState(null);
 
   // Reference to Leaflet Rectangle layer created by
   // AOI draw control
@@ -68,110 +69,90 @@ export function ExploreProvider(props) {
   //L.LatLngBounds object, set when aoi is confirmed
   const [aoiBounds, setAoiBounds] = useState(null);
 
-  const [viewMode, setViewMode] = useState(viewModes.BROWSE_MODE);
+  const [mapState, dispatchMapState] = useReducer(mapStateReducer, {
+    mode: mapModes.BROWSE_MODE,
+  });
+
   const [selectedModel, setSelectedModel] = useState(null);
-  const { currentCheckpoint, dispatchCurrentCheckpoint } = useContext(
-    CheckpointContext
+
+  const [currentCheckpoint, dispatchCurrentCheckpoint] = useReducer(
+    checkpointReducer
   );
 
-  const previousViewMode = usePrevious(viewMode);
   const [predictions, dispatchPredictions] = useReducer(
     predictionsReducer,
     initialApiRequestState
   );
   const [currentInstance, setCurrentInstance] = useState(null);
-  const [websocketClient, setWebsocketClient] = useState(null);
 
-  const [apiMeta, dispatchApiMeta] = useReducer(
-    createApiMetaReducer,
-    initialApiRequestState
-  );
+  const [apiMeta, setApiMeta] = useState();
 
-  useEffect(() => {
-    showGlobalLoadingMessage('Checking API status...');
-    queryApiMeta()(dispatchApiMeta);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  async function loadInitialData() {
+    showGlobalLoadingMessage('Loading configuration...');
+    const apiMeta = await restApiClient.getApiMeta();
+    setApiMeta(apiMeta);
 
-  useEffect(() => {
-    return () => {
-      // Terminate instance on page unmount
-      if (websocketClient) {
-        websocketClient.terminateInstance();
-      }
-    };
-  }, [websocketClient]);
-
-  // Load project meta on load and api client ready
-  useEffect(() => {
-    async function loadProject() {
-      if (projectId !== 'new') {
-        showGlobalLoadingMessage('Loading project...');
-        try {
-          // Get project metadata
-          const project = await restApiClient.getProject(projectId);
-
-          setCurrentProject(project);
-
-          showGlobalLoadingMessage('Loading Model...');
-          const model = await restApiClient.getModel(project.model_id);
-
-          setSelectedModel(model);
-
-          showGlobalLoadingMessage('Loading AOIs...');
-          const aois = await restApiClient.get(`project/${project.id}/aoi`);
-
-          const filteredList = filterAoiList(aois.aois);
-          setAoiList(filteredList);
-          if (aois.total > 0) {
-            const latest = filteredList[filteredList.length - 1];
-            loadAoi(project, latest);
-          }
-
-          showGlobalLoadingMessage('Checking for existing instance');
-          await loadActiveInstance();
-        } catch (error) {
-          toasts.error('Error loading project, please try again later.');
-        } finally {
-          hideGlobalLoading();
-        }
-      }
+    // Bypass loading project when new
+    if (projectId === 'new') {
+      hideGlobalLoading();
+      return;
     }
-    if (restApiClient) {
-      loadProject();
-    }
-  }, [restApiClient]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  async function loadActiveInstance() {
     try {
-      const activeInstances = await restApiClient.getActiveInstances(projectId);
+      // Get project metadata
+      showGlobalLoadingMessage('Fetching project metadata...');
+      const project = await restApiClient.getProject(projectId);
+      setCurrentProject(project);
 
+      showGlobalLoadingMessage('Fetching model...');
+      const model = await restApiClient.getModel(project.model_id);
+      setSelectedModel(model);
+
+      showGlobalLoadingMessage('Fetching areas of interest...');
+      const aois = await restApiClient.get(`project/${project.id}/aoi`);
+
+      const filteredList = filterAoiList(aois.aois);
+      setAoiList(filteredList);
+      if (aois.total > 0) {
+        const latest = filteredList[filteredList.length - 1];
+        loadAoi(project, latest);
+      }
+
+      showGlobalLoadingMessage('Fetching checkpoints...');
+      await loadCheckpointList(projectId);
+
+      showGlobalLoadingMessage('Looking for active GPU instances...');
+      let instance;
+      const activeInstances = await restApiClient.getActiveInstances(projectId);
       if (activeInstances.total > 0) {
         const instanceItem = activeInstances.instances[0];
-        const instance = await restApiClient.getInstance(
-          projectId,
-          instanceItem.id
-        );
-        setCurrentInstance(instance);
-        return instance;
+        instance = await restApiClient.getInstance(projectId, instanceItem.id);
+      } else {
+        instance = await restApiClient.createInstance(project.id);
       }
+      setCurrentInstance(instance);
     } catch (error) {
-      // If this request fails, let it fail silently.
-      // But, we log an error to the console.
-      logger('Active instance check FAILED', error);
-      return error;
+      toasts.error('Error loading project, please try again later.');
+    } finally {
+      hideGlobalLoading();
     }
   }
 
-  // If API is unreachable, redirect to home
-  useEffect(() => {
-    if (!apiMeta.isReady()) return;
-
-    hideGlobalLoading();
-    if (apiMeta.hasError()) {
-      toasts.error('API is unavailable, please try again later.');
-      history.push('/');
+  async function loadCheckpointList(projectId) {
+    const checkpointsMeta = await restApiClient.getCheckpoints(projectId);
+    if (checkpointsMeta.total > 0) {
+      // Save checkpoints if any exist, else leave as null
+      setCheckpointList(checkpointsMeta.checkpoints);
     }
-  }, [apiMeta]); // eslint-disable-line react-hooks/exhaustive-deps
+    return checkpointsMeta;
+  }
+
+  // Load project meta on load and api client ready
+  useEffect(() => {
+    if (restApiClient) {
+      loadInitialData();
+    }
+  }, [restApiClient]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (predictions.fetching) {
@@ -193,12 +174,18 @@ export function ExploreProvider(props) {
         restApiClient.get(`project/${currentProject.id}/aoi/`).then((aois) => {
           setAoiList(filterAoiList(aois.aois));
         });
+        // Refresh checkpoint list, prediction finished
+        // means new checkpoint available
+        loadCheckpointList(currentProject.id);
       }
 
       if (predictions.error) {
         toasts.error('An inference error occurred, please try again later.');
       } else {
-        setViewMode(viewModes.ADD_CLASS_SAMPLES);
+        dispatchMapState({
+          type: mapActionTypes.SET_MODE,
+          data: mapModes.ADD_SAMPLE_POLYGON,
+        });
         loadMetrics();
       }
     }
@@ -206,9 +193,7 @@ export function ExploreProvider(props) {
 
   async function loadMetrics() {
     await restApiClient
-      .get(
-        `project/${currentProject.id}/checkpoint/${currentCheckpoint.checkpoint_id}`
-      )
+      .get(`project/${currentProject.id}/checkpoint/${currentCheckpoint.id}`)
       .then((ckpt) => {
         if (ckpt.analytics) {
           dispatchCurrentCheckpoint({
@@ -219,11 +204,14 @@ export function ExploreProvider(props) {
       });
   }
 
+  /*
+   * Clear predictions on AOI Edit
+   */
   useEffect(() => {
     if (predictions.isReady()) {
       if (
-        viewMode === viewModes.BROWSE_MODE &&
-        previousViewMode === viewModes.EDIT_AOI_MODE
+        mapState.mode === mapModes.BROWSE_MODE &&
+        mapState.previousMode === mapModes.EDIT_AOI_MODE
       ) {
         dispatchPredictions({ type: predictionActions.CLEAR_PREDICTION });
 
@@ -232,13 +220,16 @@ export function ExploreProvider(props) {
         });
       }
     }
-  }, [viewMode, previousViewMode, predictions]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [mapState, predictions]); // eslint-disable-line react-hooks/exhaustive-deps
 
   /*
    * Re-init aoi state variables
    */
   function createNewAoi() {
-    setViewMode(viewModes.CREATE_AOI_MODE);
+    dispatchMapState({
+      type: mapActionTypes.SET_MODE,
+      data: mapModes.CREATE_AOI_MODE,
+    });
     setAoiRef(null);
     setAoiBounds(null);
     setAoiArea(null);
@@ -300,7 +291,10 @@ export function ExploreProvider(props) {
       aoiRef.setBounds(bounds);
       setAoiBounds(aoiRef.getBounds());
       setAoiName(aoiObject.name);
-      setViewMode(viewModes.BROWSE_MODE);
+      dispatchMapState({
+        type: mapActionTypes.BROWSE_MODE,
+        data: mapModes.ADD_CLASS_SAMPLES,
+      });
       if (predictions.isReady) {
         dispatchPredictions({ type: predictionActions.CLEAR_PREDICTION });
       }
@@ -346,6 +340,30 @@ export function ExploreProvider(props) {
           name: projectName,
         });
       }
+    }
+  }
+
+  async function updateCheckpointName(name) {
+    try {
+      showGlobalLoadingMessage('Updating checkpoint name');
+      await restApiClient.patch(
+        `/project/${currentProject.id}/checkpoint/${currentCheckpoint.id}`,
+        {
+          name,
+          bookmarked: true,
+        }
+      );
+      dispatchCurrentCheckpoint({
+        type: checkpointActions.SET_CHECKPOINT_NAME,
+        data: {
+          name,
+        },
+      });
+
+      loadCheckpointList(currentProject.id);
+      hideGlobalLoading();
+    } catch (error) {
+      toasts.error('Error updating checkpoint');
     }
   }
 
@@ -397,112 +415,6 @@ export function ExploreProvider(props) {
     return name;
   }
 
-  async function runInference() {
-    if (restApiClient) {
-      let project = currentProject;
-      let instance;
-
-      if (!project) {
-        try {
-          showGlobalLoadingMessage('Creating project...');
-          project = await restApiClient.createProject({
-            model_id: selectedModel.id,
-            mosaic: 'naip.latest',
-            name: 'Untitled',
-          });
-          setCurrentProject(project);
-          history.push(`/project/${project.id}`);
-        } catch (error) {
-          hideGlobalLoading();
-          toasts.error('Could not create project, please try again later.');
-          return; // abort inference run
-        }
-      }
-
-      try {
-        showGlobalLoadingMessage('Fetching classes...');
-        const { classes } = await restApiClient.getModel(selectedModel.id);
-        dispatchCurrentCheckpoint({
-          type: checkpointActions.SET_CHECKPOINT,
-          data: {
-            classes,
-          },
-        });
-      } catch (error) {
-        hideGlobalLoading();
-        toasts.error('Could fetch model classes, please try again later.');
-        return; // abort inference run
-      }
-
-      if (!aoiName) {
-        hideGlobalLoading();
-        toasts.error('AOI Name must be set before running inference');
-        return; // abort inference run
-      }
-
-      // Request a new instance if none is available.
-      if (!websocketClient) {
-        try {
-          // Create instance
-          showGlobalLoadingMessage('Requesting instance...');
-          if (currentInstance) {
-            instance = currentInstance;
-          } else {
-            instance = await restApiClient.createInstance(project.id);
-          }
-
-          // Setup websocket
-          showGlobalLoadingMessage('Connecting to instance...');
-          const newWebsocketClient = new WebsocketClient({
-            token: instance.token,
-            dispatchPredictions,
-            dispatchCurrentCheckpoint,
-            onConnected: () => {
-              hideGlobalLoading();
-              newWebsocketClient.requestPrediction(aoiName, aoiRef);
-            },
-          });
-          setWebsocketClient(newWebsocketClient);
-        } catch (error) {
-          hideGlobalLoading();
-          toasts.error(
-            'Error while creating an instance, please try again later.'
-          );
-        }
-      } else {
-        // Send message with existing websocket
-        websocketClient.requestPrediction(aoiName, aoiRef);
-      }
-    }
-  }
-
-  async function retrain() {
-    if (!websocketClient) {
-      toasts.error('No instance available.');
-      return;
-    }
-
-    // Check if all classes have the minimum number of samples
-    const classes = Object.values(currentCheckpoint.classes);
-    for (let i = 0; i < classes.length; i++) {
-      const aClass = classes[i];
-      const sampleCount = get(aClass, 'geometry.coordinates.length', 0);
-      if (sampleCount < config.minSampleCount) {
-        toasts.error(
-          `A minimum of ${config.minSampleCount} samples is required for every class.`
-        );
-        return;
-      }
-    }
-
-    // If check pass, retrain
-    showGlobalLoadingMessage('Retraining...');
-    websocketClient.requestRetrain({
-      name: aoiName,
-      classes,
-    });
-  }
-
   useEffect(() => {
     if (!aoiRef) {
       setAoiArea(null);
@@ -523,9 +435,9 @@ export function ExploreProvider(props) {
     if (!aoiBounds) {
       return;
     } else if (
-      viewMode === viewModes.BROWSE_MODE &&
-      (previousViewMode === viewModes.EDIT_AOI_MODE ||
-        previousViewMode === viewModes.CREATE_AOI_MODE)
+      mapState.mode === mapModes.BROWSE_MODE &&
+      (mapState.previousMode === mapModes.EDIT_AOI_MODE ||
+        mapState.previousMode === mapModes.CREATE_AOI_MODE)
     ) {
       const bounds = [
         aoiBounds.getWest(),
@@ -558,18 +470,16 @@ export function ExploreProvider(props) {
         setAoiName(name);
       });
     }
-  }, [aoiBounds, aoiList, viewMode, previousViewMode]);
+  }, [mapState, aoiBounds, aoiList]);
 
   return (
     <ExploreContext.Provider
       value={{
         predictions,
-        apiLimits:
-          apiMeta.isReady() && !apiMeta.hasError() && apiMeta.getData().limits,
+        apiLimits: apiMeta && apiMeta.limits,
 
-        previousViewMode,
-        viewMode,
-        setViewMode,
+        mapState,
+        dispatchMapState,
 
         aoiRef,
         setAoiRef,
@@ -592,14 +502,19 @@ export function ExploreProvider(props) {
         currentProject,
         setCurrentProject,
 
+        dispatchPredictions,
+        checkpointList,
+
+        currentCheckpoint,
+        dispatchCurrentCheckpoint,
+
         selectedModel,
         setSelectedModel,
 
         updateProjectName,
+        updateCheckpointName,
 
-        runInference,
         reverseGeoCode,
-        retrain,
       }}
     >
       {props.children}
@@ -609,4 +524,341 @@ export function ExploreProvider(props) {
 
 ExploreProvider.propTypes = {
   children: T.node,
+};
+
+// Check if consumer function is used properly
+const useExploreContext = (fnName) => {
+  const context = useContext(ExploreContext);
+
+  if (!context) {
+    throw new Error(
+      `The \`${fnName}\` hook must be used inside the <ExploreContext> component's context.`
+    );
+  }
+
+  return context;
+};
+
+export const useProject = () => {
+  const {
+    aoiName,
+    aoiRef,
+    currentProject,
+    setCurrentProject,
+  } = useExploreContext('useProject');
+
+  return useMemo(
+    () => ({
+      currentProject,
+      setCurrentProject,
+      aoiName,
+      aoiRef,
+    }),
+    [currentProject, aoiName, aoiRef]
+  );
+};
+
+export const useMapState = () => {
+  const { mapState, dispatchMapState } = useExploreContext('useMapState');
+
+  const setMapMode = (mode) =>
+    dispatchMapState({
+      type: mapActionTypes.SET_MODE,
+      data: mode,
+    });
+
+  return useMemo(
+    () => ({
+      mapState,
+      setMapMode,
+      mapModes,
+    }),
+    [mapState, mapModes]
+  );
+};
+
+export const usePredictions = () => {
+  const { predictions, dispatchPredictions } = useExploreContext(
+    'usePredictions'
+  );
+
+  return useMemo(
+    () => ({
+      predictions,
+      dispatchPredictions,
+    }),
+    [predictions, dispatchPredictions]
+  );
+};
+
+export const useInstance = () => {
+  const history = useHistory();
+  const { restApiClient } = useRestApiClient();
+  const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
+  const { aoiName, aoiRef, currentProject, setCurrentProject } = useProject();
+  const { dispatchPredictions } = usePredictions();
+  const { selectedModel } = useExploreContext('useWebsocket');
+
+  const [websocketClient, setWebsocketClient] = useState(null);
+
+  const [instance, dispatchInstance] = useReducer(
+    instanceReducer,
+    instanceInitialState
+  );
+
+  // Create a message queue to wait for instance connection
+  const [messageQueue, dispatchMessageQueue] = useReducer(
+    (state, { type, data }) => {
+      switch (type) {
+        case messageQueueActionTypes.ADD: {
+          return state.concat(JSON.stringify(data));
+        }
+        case messageQueueActionTypes.SEND: {
+          websocketClient.send(state[0]);
+          return state.slice(1);
+        }
+        default:
+          logger('Unexpected messageQueue action type: ', type);
+          throw new Error('Unexpected error.');
+      }
+    },
+    []
+  );
+
+  // Listen to instance connection, send queue message if any
+  useEffect(() => {
+    if (websocketClient && instance.connected && messageQueue.length > 0) {
+      dispatchMessageQueue({ type: messageQueueActionTypes.SEND });
+    }
+  }, [websocketClient, instance.connected, messageQueue]);
+
+  async function initInstance(projectId) {
+    // Close existing websocket
+    if (websocketClient) {
+      websocketClient.close();
+    }
+
+    // Fetch active instances for this project
+    const activeInstances = await restApiClient.getActiveInstances(projectId);
+
+    // Get instance token
+    let token;
+    if (activeInstances.total > 0) {
+      const { id: instanceId } = activeInstances.instances[0];
+      token = (await restApiClient.getInstance(projectId, instanceId)).token;
+    } else {
+      token = (await restApiClient.createInstance(projectId)).token;
+    }
+
+    // Use a Promise to stand by for GPU connection
+    return new Promise((resolve, reject) => {
+      const newWebsocketClient = new WebsocketClient({
+        token,
+        dispatchInstance,
+        dispatchCurrentCheckpoint,
+        dispatchPredictions,
+      });
+      newWebsocketClient.addEventListener('open', () => {
+        setWebsocketClient(newWebsocketClient);
+        resolve();
+      });
+      newWebsocketClient.addEventListener('error', () => {
+        reject();
+      });
+    });
+  }
+
+  return useMemo(
+    () => ({
+      runInference: async () => {
+        if (restApiClient) {
+          let project = currentProject;
+
+          if (!project) {
+            try {
+              showGlobalLoadingMessage('Creating project...');
+              project = await restApiClient.createProject({
+                model_id: selectedModel.id,
+                mosaic: 'naip.latest',
+                name: 'Untitled',
+              });
+              setCurrentProject(project);
+              history.push(`/project/${project.id}`);
+            } catch (error) {
+              logger(error);
+              hideGlobalLoading();
+              toasts.error('Could not create project, please try again later.');
+              return; // abort inference run
+            }
+          }
+
+          try {
+            showGlobalLoadingMessage('Fetching classes...');
+            const { classes } = await restApiClient.getModel(selectedModel.id);
+            dispatchCurrentCheckpoint({
+              type: checkpointActions.SET_CHECKPOINT,
+              data: {
+                classes,
+              },
+            });
+          } catch (error) {
+            logger(error);
+            hideGlobalLoading();
+            toasts.error('Could fetch model classes, please try again later.');
+            return; // abort inference run
+          }
+
+          if (!aoiName) {
+            hideGlobalLoading();
+            toasts.error('AOI Name must be set before running inference');
+            return; // abort inference run
+          }
+
+          try {
+            await initInstance(project.id);
+          } catch (error) {
+            logger(error);
+            hideGlobalLoading();
+            toasts.error('Could not create instance, please try again later.');
+          }
+
+          try {
+            // Get bbox polygon from AOI
+            const {
+              _southWest: { lng: minX, lat: minY },
+              _northEast: { lng: maxX, lat: maxY },
+            } = aoiRef.getBounds();
+
+            const polygon = {
+              type: 'Polygon',
+              coordinates: [
+                [
+                  [minX, minY],
+                  [maxX, minY],
+                  [maxX, maxY],
+                  [minX, maxY],
+                  [minX, minY],
+                ],
+              ],
+            };
+
+            // Reset predictions state
+            dispatchPredictions({
+              type: predictionActions.START_PREDICTION,
+            });
+
+            // Add prediction request to queue
+            dispatchMessageQueue({
+              type: messageQueueActionTypes.ADD,
+              data: {
+                action: 'model#prediction',
+                data: {
+                  name: aoiName,
+                  polygon,
+                },
+              },
+            });
+          } catch (error) {
+            logger(error);
+            hideGlobalLoading();
+            toasts.error('Could not create instance, please try again later.');
+          }
+        }
+      },
+      retrain: async function () {
+        // Check if all classes have the minimum number of samples
+        const classes = Object.values(currentCheckpoint.classes);
+        for (let i = 0; i < classes.length; i++) {
+          const aClass = classes[i];
+          const sampleCount =
+            get(aClass, 'points.coordinates.length', 0) +
+            get(aClass, 'polygons.length', 0);
+          if (sampleCount < config.minSampleCount) {
+            toasts.error(
+              `A minimum of ${config.minSampleCount} samples is required for every class.`
+            );
+            return;
+          }
+        }
+
+        showGlobalLoadingMessage('Retraining...');
+
+        // Reset predictions state
+        dispatchPredictions({
+          type: predictionActions.START_PREDICTION,
+        });
+
+        // Add prediction request to queue
+        dispatchMessageQueue({
+          type: messageQueueActionTypes.ADD,
+          data: {
+            action: 'model#retrain',
+            data: {
+              name: aoiName,
+              classes: classes.map((c) => {
+                return {
+                  name: c.name,
+                  color: c.color,
+                  geometry: {
+                    type: 'GeometryCollection',
+                    geometries: [c.points, ...c.polygons],
+                  },
+                };
+              }),
+            },
+          },
+        });
+      },
+      applyCheckpoint: async (projectId, checkpointId) => {
+        try {
+          showGlobalLoadingMessage('Applying checkpoint...');
+
+          if (!websocketClient) {
+            await initInstance(projectId);
+          }
+
+          // Reset predictions state
+          dispatchPredictions({
+            type: predictionActions.START_PREDICTION,
+          });
+
+          const checkpoint = await restApiClient.getCheckpoint(
+            projectId,
+            checkpointId
+          );
+
+          dispatchCurrentCheckpoint({
+            type: checkpointActions.SET_CHECKPOINT,
+            data: checkpoint,
+          });
+
+          dispatchMessageQueue({
+            type: messageQueueActionTypes.ADD,
+            data: {
+              action: 'model#checkpoint',
+              data: {
+                id: checkpointId,
+              },
+            },
+          });
+
+          hideGlobalLoading();
+        } catch (error) {
+          logger(error);
+          toasts.error('Could not load checkpoint, please try again later.');
+        }
+      },
+    }),
+    [
+      aoiName,
+      aoiRef,
+      currentProject,
+      currentCheckpoint,
+      dispatchCurrentCheckpoint,
+      setCurrentProject,
+      restApiClient,
+      instance,
+      selectedModel,
+    ]
+  );
 };

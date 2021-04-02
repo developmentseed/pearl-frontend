@@ -2,19 +2,23 @@ import React from 'react';
 import T from 'prop-types';
 import ReactTooltip from 'react-tooltip';
 import { Button } from '@devseed-ui/button';
+import { LocalButton } from '../../styles/local-button';
 import styled from 'styled-components';
 const StyledTooltip = styled(ReactTooltip)`
-  width: ${({ width }) => width || 'auto'};
-  /* Z index set to 1000 to go over shadow scroll bar
+  &.__react_component_tooltip {
+    width: ${({ width }) => width || 'auto'};
+    /* Z index set to 1000 to go over shadow scroll bar
    * which has z-index 1000 */
-  z-index: 1001;
+    z-index: 1001;
+  }
 `;
 
-const InfoButton = React.forwardRef((props, ref) => {
-  const { info, id, useIcon, width } = props;
+export const InfoButton = React.forwardRef((props, ref) => {
+  const { info, id, useIcon, width, useLocalButton } = props;
+  const ButtonType = useLocalButton ? LocalButton : Button;
   return (
     <>
-      <Button
+      <ButtonType
         ref={ref}
         data-cy={props['data-cy']}
         useIcon={useIcon || 'circle-information'}
@@ -24,7 +28,7 @@ const InfoButton = React.forwardRef((props, ref) => {
         {...props}
       >
         {props.children}
-      </Button>
+      </ButtonType>
       {info && (
         <StyledTooltip width={width} id={id} place='bottom' effect='float'>
           {info}
@@ -40,6 +44,7 @@ InfoButton.propTypes = {
   id: T.string,
   children: T.node,
   useIcon: T.oneOfType([T.string, T.array]),
+  useLocalButton: T.bool,
   width: T.string,
   'data-cy': T.string,
 };

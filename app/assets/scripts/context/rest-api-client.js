@@ -1,5 +1,5 @@
 import config from '../config';
-import { fetchJSON } from '../reducers/reduxeed';
+import { fetchJSON } from './reducers/reduxeed';
 const { restApiEndpoint } = config;
 
 class RestApiClient {
@@ -41,6 +41,10 @@ class RestApiClient {
     return this.fetch('PATCH', path, data);
   }
 
+  getApiMeta() {
+    return this.get('');
+  }
+
   getProject(id) {
     return this.get(`project/${id}`);
   }
@@ -51,6 +55,14 @@ class RestApiClient {
 
   getModel(id) {
     return this.get(`model/${id}`);
+  }
+
+  getCheckpoint(projectId, checkpointId) {
+    return this.get(`project/${projectId}/checkpoint/${checkpointId}`);
+  }
+
+  getCheckpoints(projectId) {
+    return this.get(`project/${projectId}/checkpoint`);
   }
 
   createInstance(projectId) {
