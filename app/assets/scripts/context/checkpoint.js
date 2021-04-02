@@ -3,18 +3,7 @@ import uniqWith from 'lodash.uniqwith';
 import isEqual from 'lodash.isequal';
 import differenceWith from 'lodash.differencewith';
 import { useRestApiClient } from './auth';
-import {
-  useProject,
-  useMapState,
-  useWebsocketClient,
-  ExploreContext,
-} from './explore';
-import toasts from '../components/common/toasts';
-import logger from '../utils/logger';
-import {
-  showGlobalLoadingMessage,
-  hideGlobalLoading,
-} from '@devseed-ui/global-loading';
+import { useProject, useMapState, ExploreContext } from './explore';
 
 export const actions = {
   SET_CHECKPOINT: 'SET_CHECKPOINT',
@@ -34,7 +23,7 @@ export function checkpointReducer(state, action) {
       return {
         ...action.data,
         activeClass: action.data.classes[0].name,
-        classes: action.data.classes.reduce((acc, c, i) => {
+        classes: action.data.classes.reduce((acc, c) => {
           acc[c.name] = {
             ...c,
             geometry: {
