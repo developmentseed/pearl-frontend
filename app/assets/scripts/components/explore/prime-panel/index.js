@@ -44,6 +44,8 @@ import {
   HeadOptionToolbar,
 } from '../../../styles/panel';
 import { EditButton } from '../../../styles/button';
+import { LocalButton } from '../../../styles/local-button';
+
 import InfoButton from '../../common/info-button';
 
 import { availableLayers } from '../sample-data';
@@ -107,7 +109,7 @@ const PanelControls = styled(PanelBlockFooter)`
   padding-bottom: ${glsp(2)};
 `;
 const SaveCheckpoint = styled(DropdownBody)`
-  padding: ${glsp(0.5)};
+  padding: ${glsp()};
 `;
 function PrimePanel() {
   const { isAuthenticated } = useContext(AuthContext);
@@ -221,7 +223,7 @@ function PrimePanel() {
         checkpointList.length > 1 ? 's' : ''
       } available`;
     } else {
-      return 'Run and retrain model to create checkpoints';
+      return;
     }
   };
   // Retrain Panel Tab Empty State message
@@ -519,13 +521,14 @@ function PrimePanel() {
                 {!currentCheckpoint ? 'Run Model' : 'Retrain'}
               </InfoButton>
               <Dropdown
-                alignment='right'
+                alignment='center'
                 direction='up'
                 triggerElement={(triggerProps) => (
                   <InfoButton
                     variation='primary-plain'
                     size='medium'
-                    useIcon='pencil'
+                    useIcon='save-disk'
+                    useLocalButton
                     style={{
                       gridColumn: '1 / -1',
                     }}
@@ -553,15 +556,16 @@ function PrimePanel() {
                       onChange={(e) => setLocalCheckpointName(e.target.value)}
                       autoFocus
                     />
-                    <Button
+                    <LocalButton
                       type='submit'
-                      size='small'
-                      useIcon='tick--small'
+                      // size='small'
+                      variation='primary-plain'
+                      useIcon='save-disk'
                       title='Rename checkpoint'
                       data-dropdown='click.close'
                     >
-                      Rename Checkpoint
-                    </Button>
+                      Save
+                    </LocalButton>
                   </Form>
                 </SaveCheckpoint>
               </Dropdown>

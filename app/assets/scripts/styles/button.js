@@ -1,6 +1,6 @@
 import styled from 'styled-components';
-//import { Button } from '@devseed-ui/button';
-import InfoButton from '../components/common/info-button';
+
+import { InfoButton } from '../components/common/info-button';
 
 /*
  * Styled buttons
