@@ -488,8 +488,6 @@ function PrimePanel() {
                   gridColumn: '1 / -1',
                 }}
                 onClick={() => {
-                  console.log(allowInferenceRun);
-                  console.log(currentCheckpoint);
                   allowInferenceRun && !currentCheckpoint
                     ? runInference()
                     : retrain();
