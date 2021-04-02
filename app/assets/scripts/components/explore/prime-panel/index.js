@@ -82,6 +82,15 @@ const SubheadingStrong = styled.h3`
         ${collecticon(useIcon)}
       }
     `}
+  ${({ onClick }) =>
+    onClick &&
+    css`
+      transition: opacity 0.24s ease 0s;
+      &:hover {
+        cursor: pointer;
+        opacity: 0.64;
+      }
+    `}
 `;
 
 const StyledPanelBlock = styled(PanelBlock)`
@@ -322,7 +331,13 @@ function PrimePanel() {
                 <HeadOptionHeadline>
                   <Subheading>Selected Model</Subheading>
                 </HeadOptionHeadline>
-                <SubheadingStrong data-cy='select-model-label'>
+                <SubheadingStrong
+                  data-cy='select-model-label'
+                  onClick={function () {
+                    setShowSelectModelModal(true);
+                  }}
+                  title='Edit Model'
+                >
                   {(selectedModel && selectedModel.name) ||
                     (isAuthenticated
                       ? models && models.length
@@ -350,59 +365,66 @@ function PrimePanel() {
                 <HeadOptionHeadline>
                   <Subheading>Checkpoint</Subheading>
                 </HeadOptionHeadline>
-                <SubheadingStrong>
-                  {renderCheckpointSelectionHeader()}
-                  {/*currentCheckpoint && currentCheckpoint.id
-                    ? `${currentCheckpoint.name} (${currentCheckpoint.id})`
-                    : 'Run and retrain model to create checkpoints'*/}
-                </SubheadingStrong>
-                <HeadOptionToolbar>
-                  <Dropdown
-                    alignment='right'
-                    direction='down'
-                    data-dropdown='click.close'
-                    triggerElement={(props) => (
-                      <EditButton
-                        data-cy='show-select-checkpoint-button'
-                        useIcon='swap-horizontal'
+                <Dropdown
+                  alignment='right'
+                  direction='down'
+                  triggerElement={(props) => (
+                    <>
+                      <SubheadingStrong
+                        {...props}
+                        onClick={(e) => checkpointList && props.onClick(e)} // eslint-disable-line
                         title={
                           checkpointList
                             ? 'Change checkpoint'
-                            : 'Run model to create first checkpoint'
+                            : 'Run and retrain model to create first checkpoint'
                         }
-                        {...props}
-                        onClick={() => checkpointList && props.onClick()} // eslint-disable-line
-                        id='checkpoint-list-trigger'
                       >
-                        Edit Checkpoint Selection
-                      </EditButton>
-                    )}
-                    className='global__dropdown'
-                  >
-                    <>
-                      <DropdownHeader>
-                        <Heading useAlt>Checkpoints</Heading>
-                      </DropdownHeader>
-                      <DropdownBody selectable>
-                        {checkpointList?.length &&
-                          checkpointList.map((ckpt) => (
-                            <DropdownItem
-                              key={ckpt.id}
-                              checked={
-                                ckpt.id ==
-                                (currentCheckpoint && currentCheckpoint.id)
-                              }
-                              onClick={() => {
-                                applyCheckpoint(currentProject.id, ckpt.id);
-                              }}
-                            >
-                              {ckpt.name} ({ckpt.id})
-                            </DropdownItem>
-                          ))}
-                      </DropdownBody>
+                        {renderCheckpointSelectionHeader()}
+                      </SubheadingStrong>
+                      <HeadOptionToolbar>
+                        <EditButton
+                          data-cy='show-select-checkpoint-button'
+                          useIcon='swap-horizontal'
+                          title={
+                            checkpointList
+                              ? 'Change checkpoint'
+                              : 'Run model to create first checkpoint'
+                          }
+                          id='checkpoint-list-trigger'
+                          {...props}
+                          onClick={(e) => checkpointList && props.onClick(e)} // eslint-disable-line
+                        >
+                          Edit Checkpoint Selection
+                        </EditButton>
+                      </HeadOptionToolbar>
                     </>
-                  </Dropdown>
-                </HeadOptionToolbar>
+                  )}
+                  className='global__dropdown'
+                >
+                  <>
+                    <DropdownHeader unshaded>
+                      <p>Checkpoints</p>
+                    </DropdownHeader>
+                    <DropdownBody selectable>
+                      {checkpointList?.length &&
+                        checkpointList.map((ckpt) => (
+                          <DropdownItem
+                            key={ckpt.id}
+                            data-dropdown='click.close'
+                            checked={
+                              ckpt.id ==
+                              (currentCheckpoint && currentCheckpoint.id)
+                            }
+                            onClick={() => {
+                              applyCheckpoint(currentProject.id, ckpt.id);
+                            }}
+                          >
+                            {ckpt.name} ({ckpt.id})
+                          </DropdownItem>
+                        ))}
+                    </DropdownBody>
+                  </>
+                </Dropdown>
               </HeadOption>
             </PanelBlockHeader>
             <PanelBlockBody>
