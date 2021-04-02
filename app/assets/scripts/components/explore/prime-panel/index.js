@@ -44,6 +44,8 @@ import {
   HeadOptionToolbar,
 } from '../../../styles/panel';
 import { EditButton } from '../../../styles/button';
+import { LocalButton } from '../../../styles/local-button';
+
 import InfoButton from '../../common/info-button';
 
 import { availableLayers } from '../sample-data';
@@ -506,6 +508,7 @@ function PrimePanel() {
                     variation='primary-plain'
                     size='medium'
                     useIcon='save-disk'
+                    useLocalButton
                     style={{
                       gridColumn: '1 / -1',
                     }}
@@ -533,7 +536,7 @@ function PrimePanel() {
                       onChange={(e) => setLocalCheckpointName(e.target.value)}
                       autoFocus
                     />
-                    <Button
+                    <LocalButton
                       type='submit'
                       // size='small'
                       variation='primary-plain'
@@ -542,7 +545,7 @@ function PrimePanel() {
                       data-dropdown='click.close'
                     >
                       Save
-                    </Button>
+                    </LocalButton>
                   </Form>
                 </SaveCheckpoint>
               </Dropdown>
