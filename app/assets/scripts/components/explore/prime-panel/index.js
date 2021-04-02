@@ -223,7 +223,7 @@ function PrimePanel() {
         checkpointList.length > 1 ? 's' : ''
       } available`;
     } else {
-      return;
+      return 'Run model to create first checkpoint';
     }
   };
   // Retrain Panel Tab Empty State message
