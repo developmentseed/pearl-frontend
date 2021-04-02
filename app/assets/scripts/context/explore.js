@@ -770,7 +770,8 @@ export const useInstance = () => {
         const classes = Object.values(currentCheckpoint.classes);
         for (let i = 0; i < classes.length; i++) {
           const aClass = classes[i];
-          const sampleCount = get(aClass, 'points.coordinates.length', 0);
+          const sampleCount = get(aClass, 'points.coordinates.length', 0)
+              + get(aClass, 'polygons.length', 0);
           if (sampleCount < config.minSampleCount) {
             toasts.error(
               `A minimum of ${config.minSampleCount} samples is required for every class.`
@@ -799,7 +800,7 @@ export const useInstance = () => {
                   color: c.color,
                   geometry: {
                     type: 'GeometryCollection',
-                    geometries: [c.points],
+                    geometries: [c.points, ...c.polygons],
                   },
                 };
               }),

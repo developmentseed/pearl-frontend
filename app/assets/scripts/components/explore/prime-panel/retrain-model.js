@@ -167,7 +167,7 @@ function RetrainModel(props) {
               >
                 <Thumbnail color={c.color} />
                 <Heading size='xsmall'>
-                  {c.name} ({get(c, 'points.coordinates.length', 0)} samples)
+                  {c.name} ({get(c, 'points.coordinates.length', 0) + get(c, 'polygons.length', 0)} samples)
                   {currentCheckpoint.activeClass === c.name ? ' (Active)' : ''}
                 </Heading>
 
