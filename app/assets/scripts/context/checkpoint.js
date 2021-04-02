@@ -20,7 +20,6 @@ export const actions = {
 export function checkpointReducer(state, action) {
   switch (action.type) {
     case actions.SET_CHECKPOINT:
-      console.log(action);
       return {
         ...action.data,
         retrain_geoms: action.data.retrain_geoms,

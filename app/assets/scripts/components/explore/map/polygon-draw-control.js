@@ -12,7 +12,7 @@ class PolygonDrawControl {
 
   clearLayers() {
     this._group.eachLayer(function (layer) {
-      layer.remove();
+      layer.clearLayers();
     });
   }
 
