@@ -104,13 +104,16 @@ function Map() {
     switch (mapState.mode) {
       case mapModes.CREATE_AOI_MODE:
         mapRef.aoi.control.draw.enable();
+        mapRef.polygonDraw.disable();
         break;
       case mapModes.EDIT_AOI_MODE:
         mapRef.aoi.control.draw.disable();
         mapRef.aoi.control.edit.enable(aoiRef);
+        mapRef.polygonDraw.disable();
         break;
       case mapModes.BROWSE_MODE:
         if (mapRef) {
+          mapRef.polygonDraw.disable();
           if (aoiRef) {
             // Only disable if something has been drawn
             mapRef.aoi.control.draw.disable();
@@ -235,7 +238,16 @@ function Map() {
         zoom={zoom}
         style={{ height: '100%' }}
         whenCreated={(m) => {
-          const polygonDraw = new PolygonDrawControl(m);
+          const polygonDraw = new PolygonDrawControl(m, {
+            onUpdate: (className, polygons) =>
+              dispatchCurrentCheckpoint({
+                type: actions.UPDATE_POLYGONS,
+                data:  {
+                  class: className,
+                  polygons: polygons.map( f => f.geometry)
+                }
+              }),
+          });
 
           m.polygonDraw = polygonDraw;
 
@@ -304,9 +316,9 @@ function Map() {
           currentCheckpoint.classes &&
           Object.values(currentCheckpoint.classes).map(
             (sampleClass) =>
-              sampleClass.geometry &&
-              sampleClass.geometry.coordinates &&
-              sampleClass.geometry.coordinates.map(([lat, lng]) => (
+              sampleClass.points &&
+              sampleClass.points.coordinates &&
+              sampleClass.points.coordinates.map(([lat, lng]) => (
                 <Circle
                   key={JSON.stringify([lat, lng])}
                   pathOptions={{

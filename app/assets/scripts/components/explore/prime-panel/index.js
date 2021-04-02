@@ -245,6 +245,7 @@ function PrimePanel() {
   useEffect(() => {
     if (currentCheckpoint && currentCheckpoint.name) {
       setLocalCheckpointName(currentCheckpoint.name);
+      console.log(currentCheckpoint)
     }
   }, [currentCheckpoint]);
 

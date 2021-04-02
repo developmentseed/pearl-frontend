@@ -2,12 +2,14 @@ import L from 'leaflet';
 import 'leaflet-freehandshapes';
 
 class PolygonDrawControl {
-  constructor(map) {
+  constructor(map, events) {
     this._map = map;
 
     this._group = new L.LayerGroup();
 
     this._group.addTo(this._map);
+
+    this.onUpdate = events.onUpdate;
   }
 
   clearLayers() {
@@ -36,10 +38,14 @@ class PolygonDrawControl {
       drawer.category = name;
 
       // Handle added polygon
-      // drawer.on('layeradd', function (data) {
-      //   console.log('layeradd', data);
-      // });
-
+      drawer.on('layeradd', (data) => {
+        const polygons = this.getLayerAsGeoJSON(data.target);
+        this.onUpdate(name, polygons)
+      });
+      drawer.on('layerremove', (data) => {
+        const polygons = this.getLayerAsGeoJSON(data.target);
+        this.onUpdate(name, polygons)
+      });
       this._group.addLayer(drawer);
     });
   }
@@ -66,6 +72,13 @@ class PolygonDrawControl {
 
   disable() {
     this._group.eachLayer((layer) => layer.setMode('view'));
+  }
+
+  getLayerAsGeoJSON(layer) {
+    let polygons = layer.getLayers();
+    return polygons.map(function (poly) {
+      return poly.toGeoJSON();
+    });
   }
 }
 

@@ -15,6 +15,7 @@ export const actions = {
   ADD_POINT_SAMPLE: 'ADD_POINT_SAMPLE',
   REMOVE_POINT_SAMPLE: 'REMOVE_POINT_SAMPLE',
   RESET_CHECKPOINT: 'RESET_CHECKPOINT',
+  UPDATE_POLYGONS: 'UPDATE_POLYGONS'
 };
 
 export function checkpointReducer(state, action) {
@@ -28,10 +29,11 @@ export function checkpointReducer(state, action) {
         classes: action.data.classes.reduce((acc, c) => {
           acc[c.name] = {
             ...c,
-            geometry: {
+            points: {
               type: 'MultiPoint',
               coordinates: [],
             },
+            polygons: []
           };
           return acc;
         }, {}),
@@ -50,10 +52,11 @@ export function checkpointReducer(state, action) {
             ...accum,
             [c.name]: {
               ...c,
-              geometry: {
+              points: {
                 type: 'MultiPoint',
                 coordinates: [],
               },
+              polygons: []
             },
           };
         }, {}),
@@ -70,6 +73,17 @@ export function checkpointReducer(state, action) {
         ...state,
         ...action.data,
       };
+    case actions.UPDATE_POLYGONS:
+      return {
+        ...state,
+        classes: {
+          ...state.classes,
+          [action.data.class]: {
+            ...state.classes[action.data.class],
+            polygons: action.data.polygons
+          }
+        }
+      }
     case actions.SET_ACTIVE_CLASS:
       return {
         ...state,
@@ -83,10 +97,10 @@ export function checkpointReducer(state, action) {
       const currentClass = state.classes[state.activeClass];
       const updatedClass = {
         ...currentClass,
-        geometry: {
-          ...currentClass.geometry,
+        points: {
+          ...currentClass.points,
           coordinates: uniqWith(
-            currentClass.geometry.coordinates.concat([[lng, lat]]),
+            currentClass.points.coordinates.concat([[lng, lat]]),
             isEqual
           ),
         },
@@ -108,10 +122,10 @@ export function checkpointReducer(state, action) {
       const currentClass = state.classes[state.activeClass];
       const updatedClass = {
         ...currentClass,
-        geometry: {
+        points: {
           ...currentClass.geometry,
           coordinates: differenceWith(
-            currentClass.geometry.coordinates,
+            currentClass.points.coordinates,
             [[lat, lng]],
             isEqual
           ),
