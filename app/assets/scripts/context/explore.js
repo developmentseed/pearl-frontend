@@ -227,8 +227,8 @@ export function ExploreProvider(props) {
    */
   function createNewAoi() {
     dispatchMapState({
-      type: mapActionTypes.CREATE_AOI_MODE,
-      data: mapModes.ADD_CLASS_SAMPLES,
+      type: mapActionTypes.SET_MODE,
+      data: mapModes.CREATE_AOI_MODE
     });
     setAoiRef(null);
     setAoiBounds(null);
