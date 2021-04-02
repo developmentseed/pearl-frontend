@@ -80,6 +80,15 @@ const SubheadingStrong = styled.h3`
         ${collecticon(useIcon)}
       }
     `}
+  ${({ onClick }) =>
+    onClick &&
+    css`
+      transition: opacity 0.24s ease 0s;
+      &:hover {
+        cursor: pointer;
+        opacity: 0.64;
+      }
+    `}
 `;
 
 const StyledPanelBlock = styled(PanelBlock)`
@@ -320,7 +329,13 @@ function PrimePanel() {
                 <HeadOptionHeadline>
                   <Subheading>Selected Model</Subheading>
                 </HeadOptionHeadline>
-                <SubheadingStrong data-cy='select-model-label'>
+                <SubheadingStrong
+                  data-cy='select-model-label'
+                  onClick={function () {
+                    setShowSelectModelModal(true);
+                  }}
+                  title='Edit Model'
+                >
                   {(selectedModel && selectedModel.name) ||
                     (isAuthenticated
                       ? models && models.length
@@ -348,7 +363,14 @@ function PrimePanel() {
                 <HeadOptionHeadline>
                   <Subheading>Checkpoint</Subheading>
                 </HeadOptionHeadline>
-                <SubheadingStrong>
+                <SubheadingStrong
+                  onClick={() => checkpointList}
+                  title={
+                    checkpointList
+                      ? 'Change checkpoint'
+                      : 'Run and retrain model to create first checkpoint'
+                  }
+                >
                   {renderCheckpointSelectionHeader()}
                   {/*currentCheckpoint && currentCheckpoint.id
                     ? `${currentCheckpoint.name} (${currentCheckpoint.id})`
