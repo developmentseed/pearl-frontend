@@ -20,8 +20,11 @@ export const actions = {
 export function checkpointReducer(state, action) {
   switch (action.type) {
     case actions.SET_CHECKPOINT:
+      console.log(action);
       return {
         ...action.data,
+        retrain_geoms: action.data.retrain_geoms,
+        input_geoms: action.data.input_geoms,
         activeClass: action.data.classes[0].name,
         classes: action.data.classes.reduce((acc, c) => {
           acc[c.name] = {
@@ -33,8 +36,6 @@ export function checkpointReducer(state, action) {
           };
           return acc;
         }, {}),
-        retrain_geoms: action.data.retrain_geoms,
-        input_geoms: action.data.input_geoms,
       };
     case actions.SET_CHECKPOINT_NAME:
       return {
@@ -45,6 +46,18 @@ export function checkpointReducer(state, action) {
       return {
         ...state,
         ...action.data,
+        classes: Object.values(state.classes).reduce((accum, c) => {
+          return {
+            ...accum,
+            [c.name]: {
+              ...c,
+              geometry: {
+                type: 'MultiPoint',
+                coordinates: [],
+              },
+            },
+          };
+        }, {}),
       };
     case actions.RECEIVE_METRICS:
       return state;
