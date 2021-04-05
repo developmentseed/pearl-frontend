@@ -43,7 +43,7 @@ function SecPanel(props) {
           <PanelBlockHeader>
             <Heading size='xsmall'>Analysis</Heading>
           </PanelBlockHeader>
-          {checkpoint.analytics ? (
+          {checkpoint.input_geoms && checkpoint.retrain_geoms ? (
             <PanelBlockScroll>
               <ScrollBodyWrapper>
                 <StyledBlockBody>
