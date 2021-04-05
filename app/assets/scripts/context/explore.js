@@ -396,6 +396,7 @@ export function ExploreProvider(props) {
         headers: {
           'Content-Type': 'application/json',
         },
+        mode: 'cors',
       }
     )
       .then((res) => res.json())
@@ -447,6 +448,7 @@ export function ExploreProvider(props) {
         aoiBounds.getNorth(),
       ];
 
+      showGlobalLoadingMessage('Geocoding AOI...');
       reverseGeoCode(bounds).then((name) => {
         let lastInstance;
         aoiList
@@ -469,6 +471,7 @@ export function ExploreProvider(props) {
           }
         }
         setAoiName(name);
+        hideGlobalLoading();
       });
     }
   }, [mapState, aoiBounds, aoiList]);
