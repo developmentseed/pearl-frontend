@@ -836,8 +836,8 @@ export const useInstance = () => {
             type: checkpointActions.SET_CHECKPOINT,
             data: {
               ...checkpoint,
-              mode: checkpointModes.RETRAIN
-            }
+              mode: checkpointModes.RETRAIN,
+            },
           });
 
           dispatchMessageQueue({
