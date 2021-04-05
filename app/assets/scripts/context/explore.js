@@ -27,6 +27,7 @@ import tCentroid from '@turf/centroid';
 
 import {
   actions as checkpointActions,
+  checkpointModes,
   checkpointReducer,
   useCheckpoint,
 } from './checkpoint';
@@ -531,7 +532,7 @@ ExploreProvider.propTypes = {
 };
 
 // Check if consumer function is used properly
-const useExploreContext = (fnName) => {
+export const useExploreContext = (fnName) => {
   const context = useContext(ExploreContext);
 
   if (!context) {
@@ -833,7 +834,10 @@ export const useInstance = () => {
 
           dispatchCurrentCheckpoint({
             type: checkpointActions.SET_CHECKPOINT,
-            data: checkpoint,
+            data: {
+              ...checkpoint,
+              mode: checkpointModes.RETRAIN
+            }
           });
 
           dispatchMessageQueue({
