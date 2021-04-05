@@ -6,11 +6,12 @@ import {
   checkpointModes,
   actions as checkpointActions,
 } from '../../../context/checkpoint';
-import { ClassList, Class, Thumbnail } from './retrain-refine-styles';
+import { ClassList, Class, Thumbnail, ToolBox as RefineTools } from './retrain-refine-styles';
 import { Heading } from '@devseed-ui/typography';
 import { Button } from '@devseed-ui/button';
 import get from 'lodash.get';
 import { glsp } from '@devseed-ui/theme-provider';
+import { useMapState } from '../../../context/explore.js';
 
 const Wrapper = styled.div`
   display: grid;
@@ -20,9 +21,43 @@ const Wrapper = styled.div`
 function RefineModel(props) {
   const { className } = props;
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
+  const { setMapMode, mapModes, mapState } = useMapState();
+
   return (
     <Wrapper className={className}>
       {currentCheckpoint && currentCheckpoint.mode === checkpointModes.REFINE && (
+        <>
+          <RefineTools>
+            <Heading useAlt>Refinement Tools</Heading>
+            <Button
+              variation={
+                mapState.mode === mapModes.REMOVE_SAMPLE
+                  ? 'primary-raised-dark'
+                  : 'primary-raised-light'
+              }
+              size='small'
+              radius='ellipsoid'
+              useIcon='xmark'
+              onClick={() => setMapMode(mapModes.REMOVE_SAMPLE)}
+            >
+              Delete
+            </Button>
+
+            <Button
+              variation={
+                mapState.mode === mapModes.ADD_SAMPLE_POLYGON
+                  ? 'primary-raised-dark'
+                  : 'primary-raised-light'
+              }
+              size='small'
+              radius='ellipsoid'
+              useIcon='pencil'
+              onClick={() => setMapMode(mapModes.ADD_SAMPLE_POLYGON)}
+            >
+              Draw
+            </Button>
+
+          </RefineTools>
         <ClassList>
           {Object.values(currentCheckpoint.classes).map((c) => (
             <Class
@@ -50,6 +85,7 @@ function RefineModel(props) {
             </Class>
           ))}
         </ClassList>
+        </>
       )}
     </Wrapper>
   );
