@@ -3,6 +3,7 @@ import { PlaceholderMessage } from '../../../styles/placeholder.js';
 import styled, { css } from 'styled-components';
 import { Heading } from '@devseed-ui/typography';
 import collecticon from '@devseed-ui/collecticons';
+import { Button } from '@devseed-ui/button';
 
 export const ClassList = styled.div`
   display: grid;
@@ -77,3 +78,14 @@ export const Thumbnail = styled.div`
       }
     `};
 `;
+
+export const ToolBox = styled.section`
+  ${Button} {
+    margin-left: ${glsp(0.25)};
+    margin-right: ${glsp()};
+    padding: 0.25rem 0.75rem 0.25rem 0.5rem;
+    box-shadow: none;
+    border: 2px solid ${themeVal('color.primaryAlphaB')};
+  }
+`;
+
