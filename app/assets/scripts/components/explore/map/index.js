@@ -29,7 +29,10 @@ import AoiEditControl from './aoi-edit-control';
 import PolygonDrawControl from './polygon-draw-control';
 import config from '../../../config';
 import { inRange } from '../../../utils/utils';
-import { useCheckpoint, actions as checkpointActions } from '../../../context/checkpoint';
+import {
+  useCheckpoint,
+  actions as checkpointActions,
+} from '../../../context/checkpoint';
 import ModalMapEvent from './modal-events';
 
 const center = [38.83428180092151, -79.37724530696869];
@@ -157,9 +160,9 @@ function Map() {
   }, [mapRef, currentCheckpoint && currentCheckpoint.id]);
 
   /*
-   * useEffect fires when mode changes. 
+   * useEffect fires when mode changes.
    * Checkpoint ID is the same so classList should be the same
-  */
+   */
   useEffect(() => {
     if (!mapRef || !mapRef.polygonDraw) return;
 

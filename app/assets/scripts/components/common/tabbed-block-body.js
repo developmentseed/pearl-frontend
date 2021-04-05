@@ -2,12 +2,7 @@ import React, { useState, Children } from 'react';
 import T from 'prop-types';
 import styled, { css } from 'styled-components';
 import { Button } from '@devseed-ui/button';
-import {
-  listReset,
-  themeVal,
-  glsp,
-  visuallyDisabled,
-} from '@devseed-ui/theme-provider';
+import { listReset, themeVal, glsp } from '@devseed-ui/theme-provider';
 
 import {
   PanelBlockScroll as ScrollableBody,

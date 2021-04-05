@@ -88,4 +88,3 @@ export const ToolBox = styled.section`
     border: 2px solid ${themeVal('color.primaryAlphaB')};
   }
 `;
-

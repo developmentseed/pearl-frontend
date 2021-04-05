@@ -8,13 +8,17 @@ import { Heading } from '@devseed-ui/typography';
 import { PlaceholderMessage } from '../../../styles/placeholder.js';
 import { actions, useCheckpoint } from '../../../context/checkpoint.js';
 import { useMapState } from '../../../context/explore.js';
-import { ClassList, Class, Thumbnail, ToolBox as RetrainTools} from './retrain-refine-styles';
+import {
+  ClassList,
+  Class,
+  Thumbnail,
+  ToolBox as RetrainTools,
+} from './retrain-refine-styles';
 
 const Wrapper = styled.div`
   display: grid;
   grid-gap: ${glsp()};
 `;
-
 
 function RetrainModel(props) {
   const { className, placeholderMessage } = props;

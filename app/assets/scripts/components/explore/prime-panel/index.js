@@ -16,7 +16,6 @@ import {
 import { Subheading } from '../../../styles/type/heading';
 import SelectModal from '../../common/select-modal';
 import { Card } from '../../common/card-list';
-import { PlaceholderMessage } from '../../../styles/placeholder.js';
 
 import {
   Dropdown,
@@ -67,9 +66,6 @@ import {
 
 const SelectAoiTrigger = styled.div`
   cursor: pointer;
-`;
-const PlaceholderPanelSection = styled.div`
-  padding: ${glsp()};
 `;
 
 const SubheadingStrong = styled.h3`

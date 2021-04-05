@@ -1,12 +1,17 @@
 import React from 'react';
 import T from 'prop-types';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import {
   useCheckpoint,
   checkpointModes,
   actions as checkpointActions,
 } from '../../../context/checkpoint';
-import { ClassList, Class, Thumbnail, ToolBox as RefineTools } from './retrain-refine-styles';
+import {
+  ClassList,
+  Class,
+  Thumbnail,
+  ToolBox as RefineTools,
+} from './retrain-refine-styles';
 import { Heading } from '@devseed-ui/typography';
 import { Button } from '@devseed-ui/button';
 import get from 'lodash.get';
@@ -17,8 +22,6 @@ const Wrapper = styled.div`
   display: grid;
   grid-gap: ${glsp()};
 `;
-
-
 
 function RefineModel(props) {
   const { className } = props;
@@ -33,20 +36,6 @@ function RefineModel(props) {
             <Heading useAlt>Refinement Tools</Heading>
             <Button
               variation={
-                mapState.mode === mapModes.REMOVE_SAMPLE
-                  ? 'primary-raised-dark'
-                  : 'primary-raised-light'
-              }
-              size='small'
-              radius='ellipsoid'
-              useIcon='xmark'
-              onClick={() => setMapMode(mapModes.REMOVE_SAMPLE)}
-            >
-              Delete
-            </Button>
-
-            <Button
-              variation={
                 mapState.mode === mapModes.ADD_SAMPLE_POLYGON
                   ? 'primary-raised-dark'
                   : 'primary-raised-light'
@@ -58,39 +47,55 @@ function RefineModel(props) {
             >
               Draw
             </Button>
-
-          </RefineTools>
-        <ClassList>
-          {Object.values(currentCheckpoint.classes).map((c) => (
-            <Class
-              key={c.name}
-              onClick={() => {
-                dispatchCurrentCheckpoint({
-                  type: checkpointActions.SET_ACTIVE_CLASS,
-                  data: c.name,
-                });
-              }}
-              selected={currentCheckpoint.activeClass === c.name}
+            <Button
+              variation={
+                mapState.mode === mapModes.REMOVE_SAMPLE
+                  ? 'primary-raised-dark'
+                  : 'primary-raised-light'
+              }
+              size='small'
+              radius='ellipsoid'
+              useIcon='xmark'
+              onClick={() => setMapMode(mapModes.REMOVE_SAMPLE)}
             >
-              <Thumbnail color={c.color} />
-              <Heading size='xsmall'>
-                {c.name} (
-                {get(c, 'points.coordinates.length', 0) +
-                  get(c, 'polygons.length', 0)}{' '}
-                samples)
-                {currentCheckpoint.activeClass === c.name ? ' (Active)' : ''}
-              </Heading>
+              Delete
+            </Button>
+          </RefineTools>
+          <ClassList>
+            {Object.values(currentCheckpoint.classes).map((c) => (
+              <Class
+                key={c.name}
+                onClick={() => {
+                  dispatchCurrentCheckpoint({
+                    type: checkpointActions.SET_ACTIVE_CLASS,
+                    data: c.name,
+                  });
+                }}
+                selected={currentCheckpoint.activeClass === c.name}
+              >
+                <Thumbnail color={c.color} />
+                <Heading size='xsmall'>
+                  {c.name} (
+                  {get(c, 'points.coordinates.length', 0) +
+                    get(c, 'polygons.length', 0)}{' '}
+                  samples)
+                  {currentCheckpoint.activeClass === c.name ? ' (Active)' : ''}
+                </Heading>
 
-              <Button useIcon='cog' hideText variation='base-plain'>
-                Options
-              </Button>
-            </Class>
-          ))}
-        </ClassList>
+                <Button useIcon='cog' hideText variation='base-plain'>
+                  Options
+                </Button>
+              </Class>
+            ))}
+          </ClassList>
         </>
       )}
     </Wrapper>
   );
 }
+
+RefineModel.propTypes = {
+  className: T.string,
+};
 
 export default RefineModel;
