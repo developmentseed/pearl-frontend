@@ -35,6 +35,7 @@ import GlobalContext from '../../../context/global';
 
 import TabbedBlock from '../../common/tabbed-block-body';
 import RetrainModel from './retrain-model';
+import RefineModel from './refine-model';
 
 import LayersPanel from '../layers-panel';
 import { BOUNDS_PADDING } from '../../common/map/constants';
@@ -51,7 +52,11 @@ import InfoButton from '../../common/info-button';
 import { availableLayers } from '../sample-data';
 import { formatThousands } from '../../../utils/format';
 import { AuthContext } from '../../../context/auth';
-import { useCheckpoint } from '../../../context/checkpoint';
+import {
+  useCheckpoint,
+  actions as checkpointActions,
+  checkpointModes,
+} from '../../../context/checkpoint';
 
 import { AoiEditButtons } from './aoi-edit-buttons';
 import {
@@ -137,7 +142,7 @@ function PrimePanel() {
 
   const { runInference, retrain, applyCheckpoint } = useInstance();
 
-  const { currentCheckpoint } = useCheckpoint();
+  const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
 
   const { modelsList, mosaicList } = useContext(GlobalContext);
 
@@ -433,13 +438,32 @@ function PrimePanel() {
                   name='retrain model'
                   tabId='retrain-tab-trigger'
                   placeholderMessage={retrainPlaceHolderMessage()}
+                  onTabClick={() => {
+                    if (currentCheckpoint) {
+                      // If current checkpoint has not been set,
+                      // mode does not need to be set
+                      dispatchCurrentCheckpoint({
+                        type: checkpointActions.SET_CHECKPOINT_MODE,
+                        data: {
+                          mode: checkpointModes.RETRAIN,
+                        },
+                      });
+                    }
+                  }}
                 />
-                <PlaceholderPanelSection
+                <RefineModel
                   name='Refine Results'
                   tabId='refine-tab-trigger'
-                >
-                  <PlaceholderMessage>Refine results</PlaceholderMessage>
-                </PlaceholderPanelSection>
+                  disabled={!currentCheckpoint}
+                  onTabClick={() => {
+                    dispatchCurrentCheckpoint({
+                      type: checkpointActions.SET_CHECKPOINT_MODE,
+                      data: {
+                        mode: checkpointModes.REFINE,
+                      },
+                    });
+                  }}
+                />
                 <LayersPanel
                   name='layers'
                   tabId='layers-tab-trigger'

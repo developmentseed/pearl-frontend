@@ -2,7 +2,12 @@ import React, { useState, Children } from 'react';
 import T from 'prop-types';
 import styled, { css } from 'styled-components';
 import { Button } from '@devseed-ui/button';
-import { listReset, themeVal, glsp } from '@devseed-ui/theme-provider';
+import {
+  listReset,
+  themeVal,
+  glsp,
+  visuallyDisabled,
+} from '@devseed-ui/theme-provider';
 
 import {
   PanelBlockScroll as ScrollableBody,
@@ -94,7 +99,7 @@ function TabbedBlock(props) {
       <TabbedBlockHeader as='nav' role='navigation'>
         <ul>
           {Children.map(children, (child, ind) => {
-            const { name, icon, tabId } = child.props;
+            const { name, icon, tabId, disabled } = child.props;
             return (
               <li key={name}>
                 <Tab
@@ -104,9 +109,13 @@ function TabbedBlock(props) {
                   useIcon={icon}
                   title='Show menu'
                   size='small'
+                  visuallyDisabled={disabled}
                   onClick={(e) => {
                     e.preventDefault();
-                    setActiveTab(ind);
+                    if (!disabled) {
+                      setActiveTab(ind);
+                      child.props.onTabClick && child.props.onTabClick(e);
+                    }
                   }}
                 >
                   {name}

@@ -29,7 +29,7 @@ import AoiEditControl from './aoi-edit-control';
 import PolygonDrawControl from './polygon-draw-control';
 import config from '../../../config';
 import { inRange } from '../../../utils/utils';
-import { useCheckpoint, actions } from '../../../context/checkpoint';
+import { useCheckpoint, actions as checkpointActions } from '../../../context/checkpoint';
 import ModalMapEvent from './modal-events';
 
 const center = [38.83428180092151, -79.37724530696869];
@@ -154,7 +154,19 @@ function Map() {
     if (currentCheckpoint) {
       mapRef.polygonDraw.setLayers(currentCheckpoint.classes);
     }
-  }, [currentCheckpoint && currentCheckpoint.id]);
+  }, [mapRef, currentCheckpoint && currentCheckpoint.id]);
+
+  useEffect(() => {
+    if (!mapRef || !mapRef.polygonDraw) return;
+
+    mapRef.polygonDraw.clearLayers();
+    if (currentCheckpoint) {
+      mapRef.polygonDraw.setLayers(currentCheckpoint.classes);
+      dispatchCurrentCheckpoint({
+        type: checkpointActions.CLEAR_POINT_SAMPLES,
+      });
+    }
+  }, [mapRef, currentCheckpoint && currentCheckpoint.mode]);
 
   /**
    * Add/update AOI controls on API metadata change.
@@ -241,7 +253,7 @@ function Map() {
           const polygonDraw = new PolygonDrawControl(m, {
             onUpdate: (className, polygons) =>
               dispatchCurrentCheckpoint({
-                type: actions.UPDATE_POLYGONS,
+                type: checkpointActions.UPDATE_POLYGONS,
                 data: {
                   class: className,
                   polygons: polygons.map((f) => f.geometry),
@@ -268,7 +280,7 @@ function Map() {
                 return;
               }
               dispatchCurrentCheckpoint({
-                type: actions.ADD_POINT_SAMPLE,
+                type: checkpointActions.ADD_POINT_SAMPLE,
                 data: e.latlng,
               });
             }}
@@ -328,7 +340,7 @@ function Map() {
                     click: () => {
                       if (mapState.mode === mapModes.REMOVE_SAMPLE) {
                         dispatchCurrentCheckpoint({
-                          type: actions.REMOVE_POINT_SAMPLE,
+                          type: checkpointActions.REMOVE_POINT_SAMPLE,
                           data: {
                             className: sampleClass.name,
                             lat,

@@ -8,8 +8,8 @@ import { useProject, useMapState, ExploreContext } from './explore';
 export const checkpointModes = {
   RUN: 'RUN',
   RETRAIN: 'RETRAIN',
-  REFINE: 'REFINE'
-}
+  REFINE: 'REFINE',
+};
 
 export const actions = {
   SET_CHECKPOINT: 'SET_CHECKPOINT',
@@ -21,6 +21,7 @@ export const actions = {
   SET_ACTIVE_CLASS: 'SET_ACTIVE_CLASS',
   ADD_POINT_SAMPLE: 'ADD_POINT_SAMPLE',
   REMOVE_POINT_SAMPLE: 'REMOVE_POINT_SAMPLE',
+  CLEAR_POINT_SAMPLES: 'CLEAR_POINT_SAMPLES',
   RESET_CHECKPOINT: 'RESET_CHECKPOINT',
   UPDATE_POLYGONS: 'UPDATE_POLYGONS',
 };
@@ -54,8 +55,8 @@ export function checkpointReducer(state, action) {
     case actions.SET_CHECKPOINT_MODE:
       return {
         ...state,
-        ...action.data
-      }
+        ...action.data,
+      };
     case actions.RECEIVE_AOI_INFO:
       return {
         ...state,
@@ -152,6 +153,25 @@ export function checkpointReducer(state, action) {
           ...state.classes,
           [state.activeClass]: updatedClass,
         },
+      };
+    }
+
+    case actions.CLEAR_POINT_SAMPLES: {
+      return {
+        ...state,
+        classes: Object.values(state.classes).reduce((accum, c) => {
+          return {
+            ...accum,
+            [c.name]: {
+              ...c,
+              points: {
+                type: 'MultiPoint',
+                coordinates: [],
+              },
+              polygons: [],
+            },
+          };
+        }, {}),
       };
     }
     case actions.RESET_CHECKPOINT: {

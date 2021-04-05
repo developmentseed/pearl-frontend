@@ -101,9 +101,9 @@ export class WebsocketClient extends WebSocket {
           dispatchCurrentCheckpoint({
             type: checkpointActions.SET_CHECKPOINT_MODE,
             data: {
-              mode: checkpointModes.RETRAIN
-            }
-          })
+              mode: checkpointModes.RETRAIN,
+            },
+          });
 
           break;
         default:
