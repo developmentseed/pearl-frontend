@@ -156,12 +156,15 @@ function Map() {
     }
   }, [mapRef, currentCheckpoint && currentCheckpoint.id]);
 
+  /*
+   * useEffect fires when mode changes. 
+   * Checkpoint ID is the same so classList should be the same
+  */
   useEffect(() => {
     if (!mapRef || !mapRef.polygonDraw) return;
 
     mapRef.polygonDraw.clearLayers();
     if (currentCheckpoint) {
-      mapRef.polygonDraw.setLayers(currentCheckpoint.classes);
       dispatchCurrentCheckpoint({
         type: checkpointActions.CLEAR_POINT_SAMPLES,
       });
