@@ -32,6 +32,7 @@ import {
 } from './checkpoint';
 import get from 'lodash.get';
 import logger from '../utils/logger';
+import { wrapLogReducer } from './reducers/utils';
 import {
   instanceReducer,
   instanceInitialState,
@@ -76,7 +77,7 @@ export function ExploreProvider(props) {
   const [selectedModel, setSelectedModel] = useState(null);
 
   const [currentCheckpoint, dispatchCurrentCheckpoint] = useReducer(
-    checkpointReducer
+    wrapLogReducer(checkpointReducer)
   );
 
   const [predictions, dispatchPredictions] = useReducer(

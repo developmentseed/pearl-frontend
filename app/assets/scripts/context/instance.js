@@ -1,6 +1,6 @@
 import config from '../config';
 import logger from '../utils/logger';
-import { actions as checkpointActions } from './checkpoint';
+import { actions as checkpointActions, checkpointModes } from './checkpoint';
 const { actions: predictionsActions } = require('./reducers/predictions');
 
 export const messageQueueActionTypes = {
@@ -98,6 +98,13 @@ export class WebsocketClient extends WebSocket {
           dispatchPredictions({
             type: predictionsActions.COMPLETE_PREDICTION,
           });
+          dispatchCurrentCheckpoint({
+            type: checkpointActions.SET_CHECKPOINT_MODE,
+            data: {
+              mode: checkpointModes.RETRAIN
+            }
+          })
+
           break;
         default:
           logger('Unknown websocket message:');

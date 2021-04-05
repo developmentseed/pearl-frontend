@@ -5,9 +5,16 @@ import differenceWith from 'lodash.differencewith';
 import { useRestApiClient } from './auth';
 import { useProject, useMapState, ExploreContext } from './explore';
 
+export const checkpointModes = {
+  RUN: 'RUN',
+  RETRAIN: 'RETRAIN',
+  REFINE: 'REFINE'
+}
+
 export const actions = {
   SET_CHECKPOINT: 'SET_CHECKPOINT',
   SET_CHECKPOINT_NAME: 'SET_CHECKPOINT_NAME',
+  SET_CHECKPOINT_MODE: 'SET_CHECKPOINT_MODE',
   RECEIVE_METADATA: 'RECEIVE_METADATA',
   RECEIVE_AOI_INFO: 'RECEIVE_AOI_INFO',
   RECEIVE_ANALYTICS: 'RECEIVE_ANALYTICS',
@@ -23,6 +30,7 @@ export function checkpointReducer(state, action) {
     case actions.SET_CHECKPOINT:
       return {
         ...action.data,
+        mode: checkpointModes.RUN,
         retrain_geoms: action.data.retrain_geoms,
         input_geoms: action.data.input_geoms,
         activeClass: action.data.classes[0].name,
@@ -43,6 +51,11 @@ export function checkpointReducer(state, action) {
         ...state,
         ...action.data,
       };
+    case actions.SET_CHECKPOINT_MODE:
+      return {
+        ...state,
+        ...action.data
+      }
     case actions.RECEIVE_AOI_INFO:
       return {
         ...state,

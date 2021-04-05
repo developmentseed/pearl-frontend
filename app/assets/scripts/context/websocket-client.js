@@ -1,7 +1,7 @@
 import config from '../config';
 import logger from '../utils/logger';
 const { actions: predictionsActions } = require('./reducers/predictions');
-const { actions: checkpointActions } = require('../context/checkpoint');
+const { actions: checkpointActions, checkpointModes } = require('../context/checkpoint');
 
 class WebsocketClient extends WebSocket {
   constructor({
@@ -74,6 +74,12 @@ class WebsocketClient extends WebSocket {
           dispatchPredictions({
             type: predictionsActions.COMPLETE_PREDICTION,
           });
+          dispatchCurrentCheckpoint({
+            type: checkpointActions.SET_CHECKPOINT_MODE,
+            data: {
+              mode: checkpointModes.RETRAIN
+            }
+          })
           break;
         case 'error':
           dispatchPredictions({
