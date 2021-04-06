@@ -47,6 +47,7 @@ function RetrainModel(props) {
               size='small'
               radius='ellipsoid'
               useIcon='pencil'
+              disabled={!currentCheckpoint.activeItem}
               onClick={() => setMapMode(mapModes.ADD_SAMPLE_POLYGON)}
             >
               Draw
@@ -60,6 +61,7 @@ function RetrainModel(props) {
               size='small'
               radius='ellipsoid'
               useIcon='crosshair'
+              disabled={!currentCheckpoint.activeItem}
               onClick={() => setMapMode(mapModes.ADD_SAMPLE_POINT)}
             >
               Point
@@ -73,6 +75,7 @@ function RetrainModel(props) {
               size='small'
               radius='ellipsoid'
               useIcon='xmark'
+              disabled={!currentCheckpoint.activeItem}
               onClick={() => setMapMode(mapModes.REMOVE_SAMPLE)}
             >
               Delete

@@ -46,7 +46,39 @@ function RefineModel(props) {
     <Wrapper className={className}>
       {ready ? (
         <>
+          <RefineTools>
+            <Heading useAlt>Refinement Tools</Heading>
+            <Button
+              variation={
+                mapState.mode === mapModes.ADD_SAMPLE_POLYGON
+                  ? 'primary-raised-dark'
+                  : 'primary-raised-light'
+              }
+              size='small'
+              radius='ellipsoid'
+              useIcon='pencil'
+              disabled={!currentCheckpoint.activeItem}
+              onClick={() => setMapMode(mapModes.ADD_SAMPLE_POLYGON)}
+            >
+              Draw
+            </Button>
+            <Button
+              variation={
+                mapState.mode === mapModes.REMOVE_SAMPLE
+                  ? 'primary-raised-dark'
+                  : 'primary-raised-light'
+              }
+              size='small'
+              radius='ellipsoid'
+              useIcon='xmark'
+              disabled={!currentCheckpoint.activeItem}
+              onClick={() => setMapMode(mapModes.REMOVE_SAMPLE)}
+            >
+              Delete
+            </Button>
+          </RefineTools>
           <CheckpointSection>
+            <Heading useAlt>Checkpoint List</Heading>
             <ItemList>
               {checkpointList.map((c) => {
                 const id = `checkpoint-${c.name}-${c.id}`;
@@ -87,37 +119,7 @@ function RefineModel(props) {
             </ItemList>
           </CheckpointSection>
           <Section>
-            <RefineTools>
-              <Heading useAlt>Refinement Tools</Heading>
-              <Button
-                variation={
-                  mapState.mode === mapModes.ADD_SAMPLE_POLYGON
-                    ? 'primary-raised-dark'
-                    : 'primary-raised-light'
-                }
-                size='small'
-                radius='ellipsoid'
-                useIcon='pencil'
-                disabled={!currentCheckpoint.activeItem}
-                onClick={() => setMapMode(mapModes.ADD_SAMPLE_POLYGON)}
-              >
-                Draw
-              </Button>
-              <Button
-                variation={
-                  mapState.mode === mapModes.REMOVE_SAMPLE
-                    ? 'primary-raised-dark'
-                    : 'primary-raised-light'
-                }
-                size='small'
-                radius='ellipsoid'
-                useIcon='xmark'
-                disabled={!currentCheckpoint.activeItem}
-                onClick={() => setMapMode(mapModes.REMOVE_SAMPLE)}
-              >
-                Delete
-              </Button>
-            </RefineTools>
+            <Heading useAlt>Class List</Heading>
             <ItemList>
               {Object.values(currentCheckpoint.classes).map((c) => (
                 <Item
