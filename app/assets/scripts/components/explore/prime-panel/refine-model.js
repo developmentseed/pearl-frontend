@@ -98,9 +98,7 @@ function RefineModel(props) {
                     {get(c, 'points.coordinates.length', 0) +
                       get(c, 'polygons.length', 0)}{' '}
                     samples)
-                    {currentCheckpoint.activeItem === c.name
-                      ? ' (Active)'
-                      : ''}
+                    {currentCheckpoint.activeItem === c.name ? ' (Active)' : ''}
                   </Heading>
 
                   <Button useIcon='cog' hideText variation='base-plain'>
