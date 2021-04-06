@@ -15,6 +15,7 @@ export const actions = {
   SET_CHECKPOINT: 'SET_CHECKPOINT',
   SET_CHECKPOINT_NAME: 'SET_CHECKPOINT_NAME',
   SET_CHECKPOINT_MODE: 'SET_CHECKPOINT_MODE',
+  ADD_CHECKPOINT_BRUSH: 'ADD_CHECKPOINT_BRUSH',
   RECEIVE_METADATA: 'RECEIVE_METADATA',
   RECEIVE_AOI_INFO: 'RECEIVE_AOI_INFO',
   RECEIVE_ANALYTICS: 'RECEIVE_ANALYTICS',
@@ -49,7 +50,7 @@ export function checkpointReducer(state, action) {
         // Polygon brush samples. User defined regions 
         // with which to run inference using arbitrary checkpoint
         // that exists under the current project
-        checkpointPolygons: {}
+        checkpointBrushes: {}
       };
     case actions.SET_CHECKPOINT_NAME:
       return {
@@ -61,10 +62,23 @@ export function checkpointReducer(state, action) {
         ...state,
         ...action.data,
       };
+
+    case actions.ADD_CHECKPOINT_BRUSH:
+      return {
+        ...state,
+        checkpointBrushes: {
+          ...state.checkpointBrushes,
+          [action.data.id]: {
+            checkpoint: action.data.checkpoint,
+            polygons: []
+          }
+        }
+      }
     case actions.RECEIVE_AOI_INFO:
       return {
         ...state,
         ...action.data,
+        checkpointBrushes: {},
         classes: Object.values(state.classes).reduce((accum, c) => {
           return {
             ...accum,

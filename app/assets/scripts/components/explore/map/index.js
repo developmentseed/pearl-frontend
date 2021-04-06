@@ -104,6 +104,7 @@ function Map() {
 
   // Manage changes in map mode
   useEffect(() => {
+    console.log(mapState.mode)
     switch (mapState.mode) {
       case mapModes.CREATE_AOI_MODE:
         mapRef.aoi.control.draw.enable();
@@ -134,6 +135,7 @@ function Map() {
         }
         break;
       case mapModes.ADD_SAMPLE_POLYGON:
+        console.log('enabling')
         mapRef.polygonDraw.enableAdd(currentCheckpoint.activeItem);
         break;
       case mapModes.REMOVE_SAMPLE:

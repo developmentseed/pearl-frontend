@@ -56,6 +56,19 @@ function RefineModel(props) {
                         type: checkpointActions.SET_ACTIVE_CLASS,
                         data: id,
                       });
+                      if (!currentCheckpoint.checkpointBrushes[id]) {
+                        dispatchCurrentCheckpoint({
+                          type: checkpointActions.ADD_CHECKPOINT_BRUSH,
+                          data: {
+                            id,
+                            checkpoint: c
+                          },
+                        });
+                        
+                        // add to checkpoint polygons
+                        // add polygondraw layer
+                      }
+                      //activate 
                     }}
                     selected={currentCheckpoint.activeItem === id}
                   >

@@ -55,15 +55,20 @@ class PolygonDrawControl {
   }
 
   enableMode(mode, layerName) {
+    let present;
     this._group.eachLayer(function (layer) {
       if (layer.category === layerName) {
         // enable drawing tool for type
         layer.setMode(mode);
+        present = true
       } else {
         // disables other freehand instances
         layer.setMode('view');
       }
     });
+    if (!present) {
+      throw new Error(`${layerName} not present in PolygonDraw Group.`)
+    }
   }
 
   enableAdd(layerName) {

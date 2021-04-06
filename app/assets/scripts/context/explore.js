@@ -71,9 +71,12 @@ export function ExploreProvider(props) {
   //L.LatLngBounds object, set when aoi is confirmed
   const [aoiBounds, setAoiBounds] = useState(null);
 
-  const [mapState, dispatchMapState] = useReducer(mapStateReducer, {
-    mode: mapModes.BROWSE_MODE,
-  });
+  const [mapState, dispatchMapState] = useReducer(
+    wrapLogReducer(mapStateReducer),
+    {
+      mode: mapModes.BROWSE_MODE,
+    }
+  );
 
   const [selectedModel, setSelectedModel] = useState(null);
 
