@@ -89,7 +89,7 @@ function RetrainModel(props) {
                     data: c.name,
                   });
                 }}
-                selected={currentCheckpoint.activeClass === c.name}
+                selected={currentCheckpoint.activeItem === c.name}
               >
                 <Thumbnail color={c.color} />
                 <Heading size='xsmall'>
@@ -97,7 +97,7 @@ function RetrainModel(props) {
                   {get(c, 'points.coordinates.length', 0) +
                     get(c, 'polygons.length', 0)}{' '}
                   samples)
-                  {currentCheckpoint.activeClass === c.name ? ' (Active)' : ''}
+                  {currentCheckpoint.activeItem === c.name ? ' (Active)' : ''}
                 </Heading>
 
                 <Button useIcon='cog' hideText variation='base-plain'>

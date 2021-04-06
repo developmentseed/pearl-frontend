@@ -46,12 +46,27 @@ function RefineModel(props) {
         <>
           <CheckpointSection>
             <ItemList>
-              {checkpointList.map((c) => (
-                <Item key={c.id}>
-                  <Thumbnail />
-                  <Heading size='xsmall'>{c.name}</Heading>
-                </Item>
-              ))}
+              {checkpointList.map((c) => {
+                const id = `checkpoint-${c.name}-${c.id}`;
+                return (
+                  <Item
+                    key={c.id}
+                    onClick={() => {
+                      dispatchCurrentCheckpoint({
+                        type: checkpointActions.SET_ACTIVE_CLASS,
+                        data: id,
+                      });
+                    }}
+                    selected={currentCheckpoint.activeItem === id}
+                  >
+                    <Thumbnail />
+                    <Heading size='xsmall'>
+                      {c.name}
+                      {currentCheckpoint.activeItem === id ? ' (Active)' : ''}
+                    </Heading>
+                  </Item>
+                );
+              })}
             </ItemList>
           </CheckpointSection>
           <Section>

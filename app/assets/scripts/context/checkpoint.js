@@ -34,7 +34,7 @@ export function checkpointReducer(state, action) {
         mode: action.data.mode || checkpointModes.RUN,
         retrain_geoms: action.data.retrain_geoms,
         input_geoms: action.data.input_geoms,
-        activeClass: action.data.classes[0].name,
+        activeItem: action.data.classes[0].name,
         classes: action.data.classes.reduce((acc, c) => {
           acc[c.name] = {
             ...c,
@@ -46,6 +46,10 @@ export function checkpointReducer(state, action) {
           };
           return acc;
         }, {}),
+        // Polygon brush samples. User defined regions 
+        // with which to run inference using arbitrary checkpoint
+        // that exists under the current project
+        checkpointPolygons: {}
       };
     case actions.SET_CHECKPOINT_NAME:
       return {
@@ -101,14 +105,14 @@ export function checkpointReducer(state, action) {
     case actions.SET_ACTIVE_CLASS:
       return {
         ...state,
-        activeClass: action.data,
+        activeItem: action.data,
       };
     case actions.ADD_POINT_SAMPLE: {
       // Get coords
       const { lat, lng } = action.data;
 
       // Merge coords into class
-      const currentClass = state.classes[state.activeClass];
+      const currentClass = state.classes[state.activeItem];
       const updatedClass = {
         ...currentClass,
         points: {
@@ -124,7 +128,7 @@ export function checkpointReducer(state, action) {
         ...state,
         classes: {
           ...state.classes,
-          [state.activeClass]: updatedClass,
+          [state.activeItem]: updatedClass,
         },
       };
     }
@@ -133,7 +137,7 @@ export function checkpointReducer(state, action) {
       const { lat, lng } = action.data;
 
       // Merge coords into class
-      const currentClass = state.classes[state.activeClass];
+      const currentClass = state.classes[state.activeItem];
       const updatedClass = {
         ...currentClass,
         points: {
@@ -151,7 +155,7 @@ export function checkpointReducer(state, action) {
         ...state,
         classes: {
           ...state.classes,
-          [state.activeClass]: updatedClass,
+          [state.activeItem]: updatedClass,
         },
       };
     }

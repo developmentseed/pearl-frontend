@@ -134,10 +134,10 @@ function Map() {
         }
         break;
       case mapModes.ADD_SAMPLE_POLYGON:
-        mapRef.polygonDraw.enableAdd(currentCheckpoint.activeClass);
+        mapRef.polygonDraw.enableAdd(currentCheckpoint.activeItem);
         break;
       case mapModes.REMOVE_SAMPLE:
-        mapRef.polygonDraw.enableDelete(currentCheckpoint.activeClass);
+        mapRef.polygonDraw.enableDelete(currentCheckpoint.activeItem);
         break;
       default:
         mapRef.polygonDraw.disable();
@@ -146,7 +146,7 @@ function Map() {
   }, [
     mapState.mode,
     aoiRef,
-    currentCheckpoint && currentCheckpoint.activeClass,
+    currentCheckpoint && currentCheckpoint.activeItem,
   ]);
 
   // Add polygon layers to be draw when checkpoint has changed
