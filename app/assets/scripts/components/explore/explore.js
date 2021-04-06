@@ -8,13 +8,16 @@ import {
   InpageTitle,
   InpageBody,
 } from '../../styles/inpage';
-import Panel from '../common/panel';
 import PrimePanel from './prime-panel';
+import SecPanel from './sec-panel';
+
 import Map from './map';
 
 import Tour from '../common/tour';
 import GlobalContext from '../../context/global';
 import { ExploreContext } from '../../context/explore';
+import { useCheckpoint } from '../../context/checkpoint';
+
 import { tourSteps } from './tour';
 
 const ExploreBody = styled(InpageBody)`
@@ -26,6 +29,8 @@ const ExploreCarto = styled.section``;
 function Explore() {
   const { tourStep, setTourStep } = useContext(GlobalContext);
   const { apiLimits } = useContext(ExploreContext);
+
+  const { currentCheckpoint } = useCheckpoint();
   const [steps, setSteps] = useState(null);
 
   useEffect(() => {
@@ -55,13 +60,7 @@ function Explore() {
           <ExploreCarto>
             <Map />
           </ExploreCarto>
-          <Panel
-            collapsible
-            direction='right'
-            initialState={true}
-            bodyContent={<div>Secondary panel</div>}
-            data-cy='secondary-panel'
-          />
+          {currentCheckpoint && <SecPanel checkpoint={currentCheckpoint} />}
         </ExploreBody>
         {steps && (
           <Tour steps={steps} tourStep={tourStep} setTourStep={setTourStep} />

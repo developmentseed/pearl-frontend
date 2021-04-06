@@ -1,57 +1,82 @@
 import config from '../config';
 import logger from '../utils/logger';
+import { actions as checkpointActions } from './checkpoint';
 const { actions: predictionsActions } = require('./reducers/predictions');
-const { actions: checkpointActions } = require('../context/checkpoint');
 
-class WebsocketClient extends WebSocket {
+export const messageQueueActionTypes = {
+  ADD: 'ADD',
+  SEND: 'SEND',
+};
+
+export const instanceActionTypes = {
+  SET_TOKEN: 'SET_TOKEN',
+  SET_CONNECTION_STATUS: 'SET_CONNECTION_STATUS',
+};
+
+export const instanceInitialState = {
+  connected: false,
+};
+
+export function instanceReducer(state, action) {
+  const { type, data } = action;
+
+  switch (type) {
+    case instanceActionTypes.SET_CONNECTION_STATUS: {
+      return {
+        ...state,
+        connected: data,
+      };
+    }
+    default:
+      logger('Unexpected instance action type: ', { action });
+      throw new Error('Unexpected error.');
+  }
+}
+export class WebsocketClient extends WebSocket {
   constructor({
     token,
-    onConnected,
-    dispatchPredictions,
+    dispatchInstance,
     dispatchCurrentCheckpoint,
-    loadCheckpointList,
+    dispatchPredictions,
   }) {
     super(config.websocketEndpoint + `?token=${token}`);
-    this.isConnected = false;
-    this.dispatchPredictions = dispatchPredictions;
-    this.hasRunOnConnect = false;
 
-    /**
-     * Add listener to process messages received
-     */
     this.addEventListener('message', (event) => {
       if (!event.data) {
         logger('Websocket message with no data', event);
         return;
       }
 
-      // Parse message data
-      const eventData = JSON.parse(event.data);
+      const { message, data } = JSON.parse(event.data);
 
       // On connected, request a prediction
-      switch (eventData.message) {
+      switch (message) {
         case 'info#connected':
-          this.isConnected = true;
-          if (onConnected && !this.hasRunOnConnect) {
-            this.hasRunOnConnect = true;
-            onConnected();
-          }
+          logger('Instance connected.');
+          dispatchInstance({
+            type: instanceActionTypes.SET_CONNECTION_STATUS,
+            data: true,
+          });
           break;
         case 'info#disconnected':
-          this.isConnected = false;
+          logger('Instance disconnected.');
+          dispatchInstance({
+            type: instanceActionTypes.SET_CONNECTION_STATUS,
+            data: false,
+          });
           break;
         case 'model#aoi':
           dispatchCurrentCheckpoint({
             type: checkpointActions.RECEIVE_AOI_INFO,
             data: {
-              id: eventData.data.checkpoint_id,
-              name: eventData.data.name,
+              id: data.checkpoint_id,
+              name: data.name,
             },
           });
           dispatchPredictions({
             type: predictionsActions.RECEIVE_AOI_META,
             data: {
-              id: eventData.data.id,
+              id: data.id,
             },
           });
           break;
@@ -59,25 +84,19 @@ class WebsocketClient extends WebSocket {
         case 'model#checkpoint':
           dispatchCurrentCheckpoint({
             type: checkpointActions.RECEIVE_METADATA,
-            data: eventData.data,
+            data: data,
           });
           break;
 
         case 'model#prediction':
           dispatchPredictions({
             type: predictionsActions.RECEIVE_PREDICTION,
-            data: eventData.data,
+            data: data,
           });
           break;
         case 'model#prediction#complete':
-          loadCheckpointList();
           dispatchPredictions({
             type: predictionsActions.COMPLETE_PREDICTION,
-          });
-          break;
-        case 'error':
-          dispatchPredictions({
-            type: predictionsActions.FAILED_PREDICTION,
           });
           break;
         default:
@@ -88,5 +107,3 @@ class WebsocketClient extends WebSocket {
     });
   }
 }
-
-export default WebsocketClient;

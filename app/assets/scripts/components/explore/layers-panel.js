@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import T from 'prop-types';
 import styled from 'styled-components';
 import { Button } from '@devseed-ui/button';
+import InfoButton from '../../components/common/info-button';
 import { Heading } from '@devseed-ui/typography';
 import { themeVal, glsp } from '@devseed-ui/theme-provider';
 import InputRange from 'react-input-range';
 import { Accordion, AccordionFold as BaseFold } from '@devseed-ui/accordion';
+import throttle from 'lodash.throttle';
 
 const Wrapper = styled.div`
   display: grid;
@@ -17,6 +19,11 @@ const LayerWrapper = styled.div`
   ${Button} {
     place-self: center;
     max-width: ${glsp(1)};
+  }
+  ${Button}:last-child {
+    place-self: center;
+    max-width: ${glsp(1)};
+    grid-column: 4;
   }
 `;
 
@@ -52,7 +59,7 @@ const AccordionFold = styled(BaseFold)`
   }
 `;
 
-function Layer({ layer, onSliderChange, onVisibilityToggle }) {
+function Layer({ layer, onSliderChange, onVisibilityToggle, info }) {
   const [value, setValue] = useState(1);
   const [visible, setVisible] = useState(true);
   return (
@@ -74,14 +81,18 @@ function Layer({ layer, onSliderChange, onVisibilityToggle }) {
           step={0.1}
         />
       </SliderWrapper>
-      <Button
-        variation='base-plain'
-        size='small'
-        hideText
-        useIcon='circle-information'
-      >
-        Info
-      </Button>
+
+      {info && (
+        <InfoButton
+          variation='base-plain'
+          size='small'
+          hideText
+          useIcon='circle-information'
+          info={info}
+        >
+          Info
+        </InfoButton>
+      )}
       <Button
         variation='base-plain'
         size='small'
@@ -102,6 +113,7 @@ Layer.propTypes = {
   layer: T.object,
   onSliderChange: T.func,
   onVisibilityToggle: T.func,
+  info: T.string,
 };
 
 function Category({
@@ -126,6 +138,7 @@ function Category({
               layer={layer}
               onSliderChange={onSliderChange}
               onVisibilityToggle={onVisibilityToggle}
+              info={layer.info}
             />
           ))}
         </Wrapper>
@@ -150,6 +163,9 @@ function LayersPanel(props) {
     className,
     onSliderChange,
     onVisibilityToggle,
+    onPredictionLayerVisibilityToggle,
+    setPredictionLayerOpacity,
+    predictionReady,
   } = props;
 
   const categorizedLayers = layers.reduce((cats, layer) => {
@@ -166,6 +182,16 @@ function LayersPanel(props) {
 
   return (
     <div className={className}>
+      {predictionReady && (
+        <Layer
+          key='prediction-layer'
+          layer={{ name: 'LULC Inference' }}
+          onSliderChange={throttle((name, value) => {
+            setPredictionLayerOpacity(value);
+          }, 100)}
+          onVisibilityToggle={onPredictionLayerVisibilityToggle}
+        />
+      )}
       <Accordion
         className={className}
         allowMultiple
@@ -218,6 +244,9 @@ LayersPanel.propTypes = {
   baseLayerNames: T.array,
   onSliderChange: T.func,
   onVisibilityToggle: T.func,
+  setPredictionLayerOpacity: T.func,
+  onPredictionLayerVisibilityToggle: T.func,
+  predictionReady: T.bool,
 };
 
 export default LayersPanel;

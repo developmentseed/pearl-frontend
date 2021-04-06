@@ -203,7 +203,7 @@ Cypress.Commands.add('startServer', () => {
   cy.intercept(
     {
       host: restApiEndpoint,
-      path: '/api/project/1/instance',
+      path: '/api/project/1/instance/?status=active',
       headers: authHeaders,
     },
     {
