@@ -1,9 +1,16 @@
-import React, { createContext, useEffect, useReducer } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useReducer,
+} from 'react';
 import T from 'prop-types';
 import { Auth0Provider, useAuth0 } from '@auth0/auth0-react';
 import config from '../config';
 import logger from '../utils/logger';
 import history from '../history';
+import RestApiClient from './rest-api-client';
 
 export const AuthContext = createContext({});
 
@@ -163,4 +170,28 @@ const authReducer = function (state, action) {
   }
 
   return newState;
+};
+
+// Check if consumer function is used properly
+const useCheckContext = (fnName) => {
+  const context = useContext(AuthContext);
+
+  if (!context) {
+    throw new Error(
+      `The \`${fnName}\` hook must be used inside the <AuthContext> component's context.`
+    );
+  }
+
+  return context;
+};
+
+// Expose current restApiClient to consumer. We should avoid using useContext()
+// directly on components.
+export const useRestApiClient = () => {
+  const { apiToken } = useCheckContext('useRestApiClient');
+
+  return useMemo(() => {
+    const restApiClient = new RestApiClient({ apiToken });
+    return { restApiClient };
+  }, [apiToken]);
 };

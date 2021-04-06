@@ -4,7 +4,7 @@ import T from 'prop-types';
 export const MapContext = createContext({});
 
 export function MapProvider(props) {
-  const [map, setMap] = useState();
+  const [mapRef, setMapRef] = useState();
   const [mapLayers, setMapLayers] = useState({});
 
   const [predictionLayerSettings, setPredictionLayerSettings] = useState({
@@ -36,8 +36,8 @@ export function MapProvider(props) {
   return (
     <MapContext.Provider
       value={{
-        map,
-        setMap,
+        mapRef,
+        setMapRef,
 
         mapLayers,
         setMapLayers,
@@ -71,14 +71,14 @@ const useMapContext = (fnName) => {
   return context;
 };
 
-export const useMap = () => {
-  const { map, setMap } = useMapContext('useMap');
+export const useMapRef = () => {
+  const { mapRef, setMapRef } = useMapContext('useMapRef');
   return useMemo(
     () => ({
-      map,
-      setMap,
+      mapRef,
+      setMapRef,
     }),
-    [map, setMap]
+    [mapRef, setMapRef]
   );
 };
 

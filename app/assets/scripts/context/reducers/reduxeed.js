@@ -1,5 +1,5 @@
 import get from 'lodash.get';
-import config from '../config';
+import config from '../../config';
 const { environment } = config;
 
 /**
