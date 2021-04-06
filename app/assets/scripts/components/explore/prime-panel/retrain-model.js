@@ -20,6 +20,11 @@ const Wrapper = styled.div`
   grid-gap: ${glsp()};
 `;
 
+/*
+ * Retrain Model
+ * @param ready - true when checkpoint exists and we are in RETRAIN mode
+ */
+
 function RetrainModel(props) {
   const { ready, className, placeholderMessage } = props;
 
@@ -137,5 +142,6 @@ function RetrainModel(props) {
 RetrainModel.propTypes = {
   className: T.string,
   placeholderMessage: T.string,
+  ready: T.bool,
 };
 export default RetrainModel;

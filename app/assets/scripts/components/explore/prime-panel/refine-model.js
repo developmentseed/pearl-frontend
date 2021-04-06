@@ -3,7 +3,6 @@ import T from 'prop-types';
 import styled from 'styled-components';
 import {
   useCheckpoint,
-  checkpointModes,
   actions as checkpointActions,
 } from '../../../context/checkpoint';
 import {
@@ -30,6 +29,10 @@ const CheckpointSection = styled(Section)`
   overflow-y: scroll;
 `;
 
+/*
+ * Refine model
+ * @param ready - true when checkpoint exists and we are in REFINE mode
+*/
 function RefineModel(props) {
   const { className, ready } = props;
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
@@ -37,10 +40,9 @@ function RefineModel(props) {
 
   const { checkpointList } = useExploreContext();
 
-
   return (
     <Wrapper className={className}>
-      {ready? (
+      {ready ? (
         <>
           <CheckpointSection>
             <ItemList>
@@ -122,6 +124,7 @@ function RefineModel(props) {
 
 RefineModel.propTypes = {
   className: T.string,
+  ready: T.bool
 };
 
 export default RefineModel;
