@@ -10,6 +10,7 @@ class PolygonDrawControl {
     this._group.addTo(this._map);
 
     this.onUpdate = events.onUpdate;
+    this.addLayer = this.addLayer.bind(this)
   }
 
   clearLayers() {
@@ -19,35 +20,38 @@ class PolygonDrawControl {
   }
 
   setLayers(layers) {
-    Object.values(layers).forEach(({ name, color }) => {
-      const drawer = new L.FreeHandShapes({
-        polygon: {
-          color: color,
-          fillColor: color,
-          fillOpacity: 0.5,
-          weight: 3,
-          smoothFactor: 1,
-        },
-        simplify_tolerance: 0.000001,
-        polyline: {
-          color: color,
-          smoothFactor: 0,
-        },
-      });
+    Object.values(layers).forEach(this.addLayer)
+  }
 
-      drawer.category = name;
-
-      // Handle added polygon
-      drawer.on('layeradd', (data) => {
-        const polygons = this.getLayerAsGeoJSON(data.target);
-        this.onUpdate(name, polygons);
-      });
-      drawer.on('layerremove', (data) => {
-        const polygons = this.getLayerAsGeoJSON(data.target);
-        this.onUpdate(name, polygons);
-      });
-      this._group.addLayer(drawer);
+  addLayer(layer) {
+    const { name, color } = layer
+    const drawer = new L.FreeHandShapes({
+      polygon: {
+        color: color,
+        fillColor: color,
+        fillOpacity: 0.5,
+        weight: 3,
+        smoothFactor: 1,
+      },
+      simplify_tolerance: 0.000001,
+      polyline: {
+        color: color,
+        smoothFactor: 0,
+      },
     });
+
+    drawer.category = name;
+
+    // Handle added polygon
+    drawer.on('layeradd', (data) => {
+      const polygons = this.getLayerAsGeoJSON(data.target);
+      this.onUpdate(name, polygons);
+    });
+    drawer.on('layerremove', (data) => {
+      const polygons = this.getLayerAsGeoJSON(data.target);
+      this.onUpdate(name, polygons);
+    });
+    this._group.addLayer(drawer);
   }
 
   enableMode(mode, layerName) {
