@@ -17,6 +17,7 @@ import { Button } from '@devseed-ui/button';
 import get from 'lodash.get';
 import { glsp } from '@devseed-ui/theme-provider';
 import { useMapState, useExploreContext } from '../../../context/explore.js';
+import { PlaceholderMessage } from '../../../styles/placeholder';
 
 const Wrapper = styled.div`
   display: grid;
@@ -30,15 +31,16 @@ const CheckpointSection = styled(Section)`
 `;
 
 function RefineModel(props) {
-  const { className } = props;
+  const { className, ready } = props;
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
   const { setMapMode, mapModes, mapState } = useMapState();
 
   const { checkpointList } = useExploreContext();
 
+
   return (
     <Wrapper className={className}>
-      {currentCheckpoint && currentCheckpoint.mode === checkpointModes.REFINE && (
+      {ready? (
         <>
           <CheckpointSection>
             <ItemList>
@@ -109,6 +111,10 @@ function RefineModel(props) {
             </ItemList>
           </Section>
         </>
+      ) : (
+        <PlaceholderMessage>
+          Please submit or clear retraining samples before refining results
+        </PlaceholderMessage>
       )}
     </Wrapper>
   );

@@ -21,7 +21,7 @@ const Wrapper = styled.div`
 `;
 
 function RetrainModel(props) {
-  const { className, placeholderMessage } = props;
+  const { ready, className, placeholderMessage } = props;
 
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
 
@@ -29,7 +29,7 @@ function RetrainModel(props) {
 
   return (
     <Wrapper className={className}>
-      {currentCheckpoint && currentCheckpoint.classes && (
+      {ready && currentCheckpoint.classes && (
         <>
           <RetrainTools>
             <Heading useAlt>Sample Selection Tools</Heading>
@@ -100,6 +100,10 @@ function RetrainModel(props) {
                 </Button>
               </Class>
             ))}
+            <Class className='add__class' muted as={Button}>
+              <Thumbnail useIcon='plus' outline />
+              <Heading size='xsmall'>Add Class</Heading>
+            </Class>
           </ClassList>
         </>
       )}
@@ -120,11 +124,11 @@ function RetrainModel(props) {
           <PlaceholderMessage>{placeholderMessage}</PlaceholderMessage>
         </ClassList>
       )}
-      {currentCheckpoint && (
-        <Class className='add__class' muted as={Button}>
-          <Thumbnail useIcon='plus' outline />
-          <Heading size='xsmall'>Add Class</Heading>
-        </Class>
+
+      {!ready && currentCheckpoint && (
+        <PlaceholderMessage>
+          Please submit or clear retraining samples before refining results
+        </PlaceholderMessage>
       )}
     </Wrapper>
   );

@@ -243,6 +243,27 @@ function PrimePanel() {
     }
   };
 
+  const checkpointHasSamples = () => {
+    if (currentCheckpoint) {
+      const sampleCount = Object.values(currentCheckpoint.classes).reduce(
+        (count, c) => {
+          return count + c.points.coordinates.length + c.polygons.length;
+        },
+        0
+      );
+
+      // There should be no polygon or point samples on the map
+      // User must submit or clear retrain samples before starting refine
+      if (sampleCount > 0) {
+        return false;
+      } else {
+        return true;
+      }
+    } else {
+      return false;
+    }
+  };
+
   useEffect(() => {
     if (currentCheckpoint && currentCheckpoint.name) {
       setLocalCheckpointName(currentCheckpoint.name);
@@ -434,16 +455,25 @@ function PrimePanel() {
                   name='retrain model'
                   tabId='retrain-tab-trigger'
                   placeholderMessage={retrainPlaceHolderMessage()}
+                  ready={
+                    currentCheckpoint &&
+                    currentCheckpoint.mode === checkpointModes.RETRAIN
+                  }
                   onTabClick={() => {
-                    if (currentCheckpoint) {
+                    if (
+                      currentCheckpoint &&
+                      currentCheckpoint.mode != checkpointModes.RETRAIN
+                    ) {
                       // If current checkpoint has not been set,
                       // mode does not need to be set
-                      dispatchCurrentCheckpoint({
-                        type: checkpointActions.SET_CHECKPOINT_MODE,
-                        data: {
-                          mode: checkpointModes.RETRAIN,
-                        },
-                      });
+                      if (checkpointHasSamples()) {
+                        dispatchCurrentCheckpoint({
+                          type: checkpointActions.SET_CHECKPOINT_MODE,
+                          data: {
+                            mode: checkpointModes.RETRAIN,
+                          },
+                        });
+                      }
                     }
                   }}
                 />
@@ -451,13 +481,26 @@ function PrimePanel() {
                   name='Refine Results'
                   tabId='refine-tab-trigger'
                   disabled={!currentCheckpoint}
+                  ready={
+                    currentCheckpoint &&
+                    currentCheckpoint.mode === checkpointModes.REFINE
+                  }
                   onTabClick={() => {
-                    dispatchCurrentCheckpoint({
-                      type: checkpointActions.SET_CHECKPOINT_MODE,
-                      data: {
-                        mode: checkpointModes.REFINE,
-                      },
-                    });
+                    if (
+                      currentCheckpoint &&
+                      currentCheckpoint.mode !== checkpointModes.REFINE
+                    ) {
+                      // If current checkpoint has not been set,
+                      // mode does not need to be set
+                      if (checkpointHasSamples()) {
+                        dispatchCurrentCheckpoint({
+                          type: checkpointActions.SET_CHECKPOINT_MODE,
+                          data: {
+                            mode: checkpointModes.REFINE,
+                          },
+                        });
+                      }
+                    }
                   }}
                 />
                 <LayersPanel

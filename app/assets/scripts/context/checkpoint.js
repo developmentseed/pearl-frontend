@@ -31,7 +31,7 @@ export function checkpointReducer(state, action) {
     case actions.SET_CHECKPOINT:
       return {
         ...action.data,
-        mode: action.data.modes || checkpointModes.RUN,
+        mode: action.data.mode || checkpointModes.RUN,
         retrain_geoms: action.data.retrain_geoms,
         input_geoms: action.data.input_geoms,
         activeClass: action.data.classes[0].name,

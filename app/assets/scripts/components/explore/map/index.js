@@ -166,11 +166,11 @@ function Map() {
   useEffect(() => {
     if (!mapRef || !mapRef.polygonDraw) return;
 
-    mapRef.polygonDraw.clearLayers();
+    //mapRef.polygonDraw.clearLayers();
     if (currentCheckpoint) {
-      dispatchCurrentCheckpoint({
+      /*dispatchCurrentCheckpoint({
         type: checkpointActions.CLEAR_POINT_SAMPLES,
-      });
+      });*/
     }
   }, [mapRef, currentCheckpoint && currentCheckpoint.mode]);
 
