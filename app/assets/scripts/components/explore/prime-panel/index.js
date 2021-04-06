@@ -114,7 +114,7 @@ const SaveCheckpoint = styled(DropdownBody)`
 `;
 function PrimePanel() {
   const { isAuthenticated } = useContext(AuthContext);
-  const { mapState, mapModes } = useMapState();
+  const { mapState, mapModes, setMapMode } = useMapState();
   const { mapRef } = useMapRef();
 
   const {
@@ -245,9 +245,16 @@ function PrimePanel() {
 
   const checkpointHasSamples = () => {
     if (currentCheckpoint) {
-      const sampleCount = Object.values(currentCheckpoint.classes).reduce(
+      let sampleCount = Object.values(currentCheckpoint.classes).reduce(
         (count, c) => {
           return count + c.points.coordinates.length + c.polygons.length;
+        },
+        0
+      );
+
+      sampleCount += Object.values(currentCheckpoint.checkpointBrushes).reduce(
+        (count, c) => {
+          return count + c.polygons.length;
         },
         0
       );
@@ -460,6 +467,11 @@ function PrimePanel() {
                     currentCheckpoint.mode === checkpointModes.RETRAIN
                   }
                   onTabClick={() => {
+                    setMapMode(mapModes.BROWSE_MODE);
+                    dispatchCurrentCheckpoint({
+                      type: checkpointActions.SET_ACTIVE_CLASS,
+                      data: null,
+                    });
                     if (
                       currentCheckpoint &&
                       currentCheckpoint.mode != checkpointModes.RETRAIN
@@ -486,6 +498,12 @@ function PrimePanel() {
                     currentCheckpoint.mode === checkpointModes.REFINE
                   }
                   onTabClick={() => {
+                    setMapMode(mapModes.BROWSE_MODE);
+                    dispatchCurrentCheckpoint({
+                      type: checkpointActions.SET_ACTIVE_CLASS,
+                      data: undefined,
+                    });
+
                     if (
                       currentCheckpoint &&
                       currentCheckpoint.mode !== checkpointModes.REFINE

@@ -104,7 +104,6 @@ function Map() {
 
   // Manage changes in map mode
   useEffect(() => {
-    console.log(mapState.mode)
     switch (mapState.mode) {
       case mapModes.CREATE_AOI_MODE:
         mapRef.aoi.control.draw.enable();
@@ -135,7 +134,6 @@ function Map() {
         }
         break;
       case mapModes.ADD_SAMPLE_POLYGON:
-        console.log('enabling')
         mapRef.polygonDraw.enableAdd(currentCheckpoint.activeItem);
         break;
       case mapModes.REMOVE_SAMPLE:
@@ -259,14 +257,21 @@ function Map() {
         style={{ height: '100%' }}
         whenCreated={(m) => {
           const polygonDraw = new PolygonDrawControl(m, {
-            onUpdate: (className, polygons) =>
+            onUpdate: (name, polygons) => {
+              let isCheckpointPolygon;
+              if (name.includes('checkpoint')) {
+                isCheckpointPolygon = true;
+              }
+              // Assume class polygon
               dispatchCurrentCheckpoint({
                 type: checkpointActions.UPDATE_POLYGONS,
                 data: {
-                  class: className,
+                  name,
+                  isCheckpointPolygon,
                   polygons: polygons.map((f) => f.geometry),
                 },
-              }),
+              });
+            },
           });
 
           m.polygonDraw = polygonDraw;

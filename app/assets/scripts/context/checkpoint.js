@@ -47,10 +47,10 @@ export function checkpointReducer(state, action) {
           };
           return acc;
         }, {}),
-        // Polygon brush samples. User defined regions 
+        // Polygon brush samples. User defined regions
         // with which to run inference using arbitrary checkpoint
         // that exists under the current project
-        checkpointBrushes: {}
+        checkpointBrushes: {},
       };
     case actions.SET_CHECKPOINT_NAME:
       return {
@@ -70,10 +70,10 @@ export function checkpointReducer(state, action) {
           ...state.checkpointBrushes,
           [action.data.id]: {
             checkpoint: action.data.checkpoint,
-            polygons: []
-          }
-        }
-      }
+            polygons: [],
+          },
+        },
+      };
     case actions.RECEIVE_AOI_INFO:
       return {
         ...state,
@@ -106,16 +106,28 @@ export function checkpointReducer(state, action) {
         ...action.data,
       };
     case actions.UPDATE_POLYGONS:
-      return {
-        ...state,
-        classes: {
-          ...state.classes,
-          [action.data.class]: {
-            ...state.classes[action.data.class],
-            polygons: action.data.polygons,
+      if (action.data.isCheckpointPolygon) {
+        return {
+          ...state,
+          checkpointBrushes: {
+            [action.data.name]: {
+              ...state.checkpointBrushes[action.data.name],
+              polygons: action.data.polygons,
+            },
           },
-        },
-      };
+        };
+      } else {
+        return {
+          ...state,
+          classes: {
+            ...state.classes,
+            [action.data.name]: {
+              ...state.classes[action.data.name],
+              polygons: action.data.polygons,
+            },
+          },
+        };
+      }
     case actions.SET_ACTIVE_CLASS:
       return {
         ...state,

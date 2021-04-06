@@ -10,7 +10,7 @@ class PolygonDrawControl {
     this._group.addTo(this._map);
 
     this.onUpdate = events.onUpdate;
-    this.addLayer = this.addLayer.bind(this)
+    this.addLayer = this.addLayer.bind(this);
   }
 
   clearLayers() {
@@ -20,11 +20,11 @@ class PolygonDrawControl {
   }
 
   setLayers(layers) {
-    Object.values(layers).forEach(this.addLayer)
+    Object.values(layers).forEach(this.addLayer);
   }
 
   addLayer(layer) {
-    const { name, color } = layer
+    const { name, color } = layer;
     const drawer = new L.FreeHandShapes({
       polygon: {
         color: color,
@@ -60,14 +60,14 @@ class PolygonDrawControl {
       if (layer.category === layerName) {
         // enable drawing tool for type
         layer.setMode(mode);
-        present = true
+        present = true;
       } else {
         // disables other freehand instances
         layer.setMode('view');
       }
     });
     if (!present) {
-      throw new Error(`${layerName} not present in PolygonDraw Group.`)
+      throw new Error(`${layerName} not present in PolygonDraw Group.`);
     }
   }
 

@@ -16,6 +16,7 @@ import { Button } from '@devseed-ui/button';
 import get from 'lodash.get';
 import { glsp } from '@devseed-ui/theme-provider';
 import { useMapState, useExploreContext } from '../../../context/explore.js';
+import { useMapRef } from '../../../context/map';
 import { PlaceholderMessage } from '../../../styles/placeholder';
 
 const Wrapper = styled.div`
@@ -37,6 +38,7 @@ function RefineModel(props) {
   const { className, ready } = props;
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
   const { setMapMode, mapModes, mapState } = useMapState();
+  const { mapRef } = useMapRef();
 
   const { checkpointList } = useExploreContext();
 
@@ -52,23 +54,25 @@ function RefineModel(props) {
                   <Item
                     key={c.id}
                     onClick={() => {
-                      dispatchCurrentCheckpoint({
-                        type: checkpointActions.SET_ACTIVE_CLASS,
-                        data: id,
-                      });
                       if (!currentCheckpoint.checkpointBrushes[id]) {
                         dispatchCurrentCheckpoint({
                           type: checkpointActions.ADD_CHECKPOINT_BRUSH,
                           data: {
                             id,
-                            checkpoint: c
+                            checkpoint: c,
                           },
                         });
-                        
-                        // add to checkpoint polygons
-                        // add polygondraw layer
+
+                        mapRef.polygonDraw.addLayer({
+                          name: id,
+                          color: '#efefef',
+                        });
                       }
-                      //activate 
+
+                      dispatchCurrentCheckpoint({
+                        type: checkpointActions.SET_ACTIVE_CLASS,
+                        data: id,
+                      });
                     }}
                     selected={currentCheckpoint.activeItem === id}
                   >
@@ -94,6 +98,7 @@ function RefineModel(props) {
                 size='small'
                 radius='ellipsoid'
                 useIcon='pencil'
+                disabled={!currentCheckpoint.activeItem}
                 onClick={() => setMapMode(mapModes.ADD_SAMPLE_POLYGON)}
               >
                 Draw
@@ -107,6 +112,7 @@ function RefineModel(props) {
                 size='small'
                 radius='ellipsoid'
                 useIcon='xmark'
+                disabled={!currentCheckpoint.activeItem}
                 onClick={() => setMapMode(mapModes.REMOVE_SAMPLE)}
               >
                 Delete
