@@ -32,7 +32,7 @@ const CheckpointSection = styled(Section)`
 /*
  * Refine model
  * @param ready - true when checkpoint exists and we are in REFINE mode
-*/
+ */
 function RefineModel(props) {
   const { className, ready } = props;
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
@@ -124,7 +124,7 @@ function RefineModel(props) {
 
 RefineModel.propTypes = {
   className: T.string,
-  ready: T.bool
+  ready: T.bool,
 };
 
 export default RefineModel;
