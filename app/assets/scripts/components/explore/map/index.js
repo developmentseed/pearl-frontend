@@ -134,10 +134,14 @@ function Map() {
         }
         break;
       case mapModes.ADD_SAMPLE_POLYGON:
-        mapRef.polygonDraw.enableAdd(currentCheckpoint.activeItem);
+        if (currentCheckpoint.activeItem) {
+          mapRef.polygonDraw.enableAdd(currentCheckpoint.activeItem);
+        }
         break;
       case mapModes.REMOVE_SAMPLE:
-        mapRef.polygonDraw.enableDelete(currentCheckpoint.activeItem);
+        if (currentCheckpoint.activeItem) {
+          mapRef.polygonDraw.enableDelete(currentCheckpoint.activeItem);
+        }
         break;
       default:
         mapRef.polygonDraw.disable();
