@@ -54,10 +54,11 @@ class PolygonDrawControl {
     });
     drawer.on('layerremove', (data) => {
       // should not update history when merging
-      console.log(data)
       const polygons = this.getLayerAsGeoJSON(data.target);
 
-      if (!this.manualMode) {
+      if (!this.manualMode && drawer.mode ===  'delete') {
+        console.log('remove update')
+        console.log(drawer)
         this.onUpdate(name, polygons);
       }
     });
