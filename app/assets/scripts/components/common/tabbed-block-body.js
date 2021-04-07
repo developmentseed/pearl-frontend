@@ -1,7 +1,7 @@
 import React, { useState, Children } from 'react';
 import T from 'prop-types';
 import styled, { css } from 'styled-components';
-import { Button } from '@devseed-ui/button';
+import InfoButton from '../common/info-button';
 import { listReset, themeVal, glsp } from '@devseed-ui/theme-provider';
 
 import {
@@ -10,7 +10,7 @@ import {
 } from './panel-block';
 import { headingAlt } from '@devseed-ui/typography';
 
-const Tab = styled(Button)`
+const Tab = styled(InfoButton)`
   display: inline-flex;
   user-select: none;
   position: relative;
@@ -94,17 +94,17 @@ function TabbedBlock(props) {
       <TabbedBlockHeader as='nav' role='navigation'>
         <ul>
           {Children.map(children, (child, ind) => {
-            const { name, icon, tabId, disabled } = child.props;
+            const { name, icon, tabId, disabled, tabTooltip } = child.props;
             return (
               <li key={name}>
                 <Tab
-                  as='a'
                   id={tabId || `${name}-tab`}
                   active={ind === activeTab}
                   useIcon={icon}
                   title='Show menu'
                   size='small'
                   visuallyDisabled={disabled}
+                  info={disabled && tabTooltip}
                   onClick={(e) => {
                     e.preventDefault();
                     if (!disabled) {

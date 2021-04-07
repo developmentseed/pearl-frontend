@@ -497,6 +497,7 @@ function PrimePanel() {
                     currentCheckpoint &&
                     currentCheckpoint.mode === checkpointModes.REFINE
                   }
+                  tabTooltip='Refine is not available until model has been run or retrained.'
                   onTabClick={() => {
                     if (currentCheckpoint) {
                       setMapMode(mapModes.BROWSE_MODE);
