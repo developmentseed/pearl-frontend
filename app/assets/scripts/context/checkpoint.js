@@ -37,18 +37,22 @@ export function checkpointReducer(state, action) {
         mode: action.data.mode || checkpointModes.RUN,
         retrain_geoms: action.data.retrain_geoms,
         input_geoms: action.data.input_geoms,
-        activeItem: action.data.classes ? action.data.classes[0].name : undefined,
-        classes: action.data.classes ? action.data.classes.reduce((acc, c) => {
-          acc[c.name] = {
-            ...c,
-            points: {
-              type: 'MultiPoint',
-              coordinates: [],
-            },
-            polygons: [],
-          };
-          return acc;
-        }, {}) : (state.classes || {}),
+        activeItem: action.data.classes
+          ? action.data.classes[0].name
+          : undefined,
+        classes: action.data.classes
+          ? action.data.classes.reduce((acc, c) => {
+              acc[c.name] = {
+                ...c,
+                points: {
+                  type: 'MultiPoint',
+                  coordinates: [],
+                },
+                polygons: [],
+              };
+              return acc;
+            }, {})
+          : state.classes || {},
         // Polygon brush samples. User defined regions
         // with which to run inference using arbitrary checkpoint
         // that exists under the current project
