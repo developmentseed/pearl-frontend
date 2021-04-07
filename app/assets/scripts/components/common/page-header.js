@@ -4,18 +4,17 @@ import T from 'prop-types';
 import config from '../../config';
 
 import { Button } from '@devseed-ui/button';
-import { Heading } from '@devseed-ui/typography';
 import {
   themeVal,
-  rgba,
   visuallyHidden,
   multiply,
   media,
+  glsp,
 } from '@devseed-ui/theme-provider';
-import collecticon from '@devseed-ui/collecticons';
 import { StyledNavLink, StyledLink } from '../../styles/links';
+// import AppLogo from '../../../icons/app-logo.svg';
 
-const { appTitle, appLongTitle } = config;
+const { appTitle, appLongTitle, baseUrl } = config;
 
 const PageHead = styled.header`
   background-color: ${themeVal('color.baseAlphaA')};
@@ -68,25 +67,6 @@ const PrimarySection = styled.div`
   }
 `;
 
-const AppHeading = styled(Heading)`
-  display: flex;
-  flex-flow: column nowrap;
-  letter-spacing: 4px;
-  margin: 0;
-  text-transform: uppercase;
-  line-height: 1rem;
-  span {
-    display: none;
-    ${media.mediumUp`
-      font-weight: normal;
-      font-size: 0.75rem;
-      display: block;
-      opacity: 0.72;
-      letter-spacing: 2px;
-    `}
-  }
-`;
-
 const PageSpecificControls = styled.div`
   display: flex;
   flex-flow: row nowrap;
@@ -97,40 +77,60 @@ const PageSpecificControls = styled.div`
   }
 `;
 
-const GlobalMenuLink = styled.a`
-  position: relative;
-  display: block;
-  width: ${multiply(themeVal('layout.space'), 2)};
-  height: ${multiply(themeVal('layout.space'), 2)};
-  line-height: ${multiply(themeVal('layout.space'), 2)};
-  text-align: center;
-  border-radius: ${themeVal('shape.rounded')};
-  transition: all 0.24s ease 0s;
-  color: ${themeVal('color.base')};
-
-  &::before {
-    ${({ useIcon }) => collecticon(useIcon)}
-    font-size: ${multiply(themeVal('type.base.size'), 1.125)};
-  }
-
+const PageTitlePrimeLink = styled.a`
+  display: grid;
+  grid-template-columns: min-content 1fr;
+  grid-gap: 0 ${glsp(0.5)};
   &,
   &:visited {
-    color: ${themeVal('color.base')};
+    color: inherit;
   }
-
+  &::before {
+    grid-row: 1 / span 2;
+    content: '';
+    height: 2.5rem;
+    width: 2.5rem;
+    background: url(${`${baseUrl}../../assets/icons/app-logo.svg`});
+    background-size: contain;
+    background-repeat: none;
+    background-position: top;
+  }
   &:hover {
     opacity: 1;
-    background: ${rgba(themeVal('color.baseLight'), 0.08)};
   }
-
-  &.active {
-    color: ${themeVal('color.base')};
-    opacity: 1;
-    background: ${rgba(themeVal('color.baseLight'), 0.16)};
+  sub {
+    grid-row: 2;
+    line-height: 1;
+    font-weight: ${themeVal('type.base.regular')};
+    text-transform: uppercase;
+    align-self: flex-start;
+    top: inherit;
+    vertical-align: inherit;
+    display: none;
+    ${media.mediumUp`
+      font-size: 0.75rem;
+      display: block;
+      opacity: 0.72;
+      letter-spacing: 2px;
+    `}
   }
-
-  span {
-    ${visuallyHidden()}
+  strong {
+    grid-row: 1 / span 2;
+    font-weight: ${themeVal('type.heading.weight')};
+    letter-spacing: 4px;
+    margin: 0;
+    text-transform: uppercase;
+    line-height: 1rem;
+    font-size: 1.25rem;
+    align-self: center;
+    ${media.mediumUp`
+      grid-row: 1;
+      align-self: flex-end;
+      font-size: 1.25rem;
+    `}
+    span {
+      ${visuallyHidden()};
+    }
   }
 `;
 
@@ -142,17 +142,18 @@ function PageHeader(props) {
           <PrimarySection>
             <GlobalMenu>
               <li>
-                <GlobalMenuLink
+                <PageTitlePrimeLink
                   as={StyledLink}
                   to='/'
-                  useIcon='house'
                   title='Visit the home page'
-                />
+                >
+                  <strong>
+                    <span>Microsoft</span>
+                    {appTitle}
+                  </strong>
+                  <sub>{appLongTitle}</sub>
+                </PageTitlePrimeLink>
               </li>
-              <AppHeading size='small'>
-                {appTitle}
-                <span>{appLongTitle}</span>
-              </AppHeading>
             </GlobalMenu>
             {props.children ? (
               <PageSpecificControls>{props.children}</PageSpecificControls>
