@@ -567,8 +567,10 @@ function PrimePanel() {
                 }}
                 id='reset-button-trigger'
                 onClick={() => {
-                  dispatchCurrentCheckpoint({type: checkpointActions.CLEAR_SAMPLES})
-                  mapRef.polygonDraw.clearLayers()
+                  dispatchCurrentCheckpoint({
+                    type: checkpointActions.CLEAR_SAMPLES,
+                  });
+                  mapRef.polygonDraw.clearLayers();
                 }}
               >
                 Reset
