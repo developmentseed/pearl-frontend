@@ -582,11 +582,14 @@ function PrimePanel() {
                     type: checkpointActions.INPUT_UNDO,
                   });
 
-                  const latest = currentCheckpoint.history[currentCheckpoint.history.length - 1]
+                  const latest =
+                    currentCheckpoint.history[
+                      currentCheckpoint.history.length - 1
+                    ];
                   mapRef.polygonDraw.setLayerPolygons({
                     ...latest.classes,
-                    ...latest.checkpointBrushes
-                  })
+                    ...latest.checkpointBrushes,
+                  });
                 }}
                 disabled={
                   !(currentCheckpoint && currentCheckpoint.history.length)
