@@ -4,6 +4,7 @@ import T from 'prop-types';
 import config from '../../config';
 
 import { Button } from '@devseed-ui/button';
+import { Heading } from '@devseed-ui/typography';
 import {
   themeVal,
   rgba,
@@ -12,10 +13,9 @@ import {
   media,
 } from '@devseed-ui/theme-provider';
 import collecticon from '@devseed-ui/collecticons';
-// import UserDropdown from '../common/user-dropdown';
 import { StyledNavLink, StyledLink } from '../../styles/links';
 
-const { appTitle } = config;
+const { appTitle, appLongTitle } = config;
 
 const PageHead = styled.header`
   background-color: ${themeVal('color.baseAlphaA')};
@@ -55,34 +55,37 @@ const GlobalMenu = styled.ul`
   align-items: center;
   margin: 0;
   list-style: none;
-  border: 1px solid ${themeVal('color.base')};
-  border-radius: 2rem;
 `;
 
 const PrimarySection = styled.div`
   display: grid;
   align-items: center;
   justify-content: space-between;
-  grid-template-columns: min-content 1fr;
+  grid-template-columns: max-content 1fr;
   grid-gap: 1.5rem;
   * {
     grid-row: 1;
   }
 `;
 
-// const SecondarySection = styled.div`
-//   border-left: 0.5px solid ${themeVal('color.baseAlphaC')};
-//   padding-left: 1.5rem;
-//   display: grid;
-//   align-items: center;
-//   justify-content: space-between;
-//   grid-template-columns: min-content min-content;
-
-//   .user-options-trigger::before {
-//     ${collecticon('house')}
-//     font-size: ${multiply(themeVal('type.base.size'), 1.125)};
-//   }
-// `;
+const AppHeading = styled(Heading)`
+  display: flex;
+  flex-flow: column nowrap;
+  letter-spacing: 4px;
+  margin: 0;
+  text-transform: uppercase;
+  line-height: 1rem;
+  span {
+    display: none;
+    ${media.mediumUp`
+      font-weight: normal;
+      font-size: 0.75rem;
+      display: block;
+      opacity: 0.72;
+      letter-spacing: 2px;
+    `}
+  }
+`;
 
 const PageSpecificControls = styled.div`
   display: flex;
@@ -144,10 +147,12 @@ function PageHeader(props) {
                   to='/'
                   useIcon='house'
                   title='Visit the home page'
-                >
-                  <span>{appTitle}</span>
-                </GlobalMenuLink>
+                />
               </li>
+              <AppHeading size='small'>
+                {appTitle}
+                <span>{appLongTitle}</span>
+              </AppHeading>
             </GlobalMenu>
             {props.children ? (
               <PageSpecificControls>{props.children}</PageSpecificControls>
