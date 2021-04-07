@@ -577,6 +577,10 @@ function PrimePanel() {
                   gridColumn: '2 / -1',
                 }}
                 id='undo-button-trigger'
+                onClick={() => {
+                  dispatchCurrentCheckpoint({type: checkpointActions.INPUT_UNDO})
+                }}
+                disabled={!(currentCheckpoint && currentCheckpoint.history.length)}
               >
                 Undo
               </Button>

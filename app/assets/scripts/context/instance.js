@@ -67,7 +67,7 @@ export class WebsocketClient extends WebSocket {
           break;
         case 'model#aoi':
           dispatchCurrentCheckpoint({
-            type: checkpointActions.RECEIVE_AOI_INFO,
+            type: checkpointActions.SET_CHECKPOINT,
             data: {
               id: data.checkpoint_id,
               name: data.name,

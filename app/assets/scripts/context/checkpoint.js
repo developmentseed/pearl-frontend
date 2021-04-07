@@ -25,11 +25,13 @@ export const actions = {
   CLEAR_POINT_SAMPLES: 'CLEAR_POINT_SAMPLES',
   RESET_CHECKPOINT: 'RESET_CHECKPOINT',
   UPDATE_POLYGONS: 'UPDATE_POLYGONS',
+  INPUT_UNDO: 'INPUT_UNDO'
 };
 
 export function checkpointReducer(state, action) {
   switch (action.type) {
     case actions.SET_CHECKPOINT:
+      // Action used to load existing or initialize a new checkpoint
       return {
         ...action.data,
         mode: action.data.mode || checkpointModes.RUN,
@@ -51,6 +53,9 @@ export function checkpointReducer(state, action) {
         // with which to run inference using arbitrary checkpoint
         // that exists under the current project
         checkpointBrushes: {},
+
+        // User action history of classes and checkpoint brushes
+        history: [],
       };
     case actions.SET_CHECKPOINT_NAME:
       return {
@@ -66,6 +71,13 @@ export function checkpointReducer(state, action) {
     case actions.ADD_CHECKPOINT_BRUSH:
       return {
         ...state,
+        history: [
+          ...state.history,
+          {
+            classes: state.classes,
+            checkpointBrushes: state.checkpointBrushes,
+          },
+        ],
         checkpointBrushes: {
           ...state.checkpointBrushes,
           [action.data.id]: {
@@ -109,6 +121,13 @@ export function checkpointReducer(state, action) {
       if (action.data.isCheckpointPolygon) {
         return {
           ...state,
+          history: [
+            ...state.history,
+            {
+              classes: state.classes,
+              checkpointBrushes: state.checkpointBrushes,
+            },
+          ],
           checkpointBrushes: {
             [action.data.name]: {
               ...state.checkpointBrushes[action.data.name],
@@ -119,6 +138,13 @@ export function checkpointReducer(state, action) {
       } else {
         return {
           ...state,
+          history: [
+            ...state.history,
+            {
+              classes: state.classes,
+              checkpointBrushes: state.checkpointBrushes,
+            },
+          ],
           classes: {
             ...state.classes,
             [action.data.name]: {
@@ -152,6 +178,13 @@ export function checkpointReducer(state, action) {
       // Return with updated class
       return {
         ...state,
+        history: [
+          ...state.history,
+          {
+            classes: state.classes,
+            checkpointBrushes: state.checkpointBrushes,
+          },
+        ],
         classes: {
           ...state.classes,
           [state.activeItem]: updatedClass,
@@ -179,6 +212,14 @@ export function checkpointReducer(state, action) {
       // Return with updated class
       return {
         ...state,
+        history: [
+          ...state.history,
+          {
+            classes: state.classes,
+            checkpointBrushes: state.checkpointBrushes,
+          },
+        ],
+
         classes: {
           ...state.classes,
           [state.activeItem]: updatedClass,
@@ -189,6 +230,14 @@ export function checkpointReducer(state, action) {
     case actions.CLEAR_POINT_SAMPLES: {
       return {
         ...state,
+        history: [
+          ...state.history,
+          {
+            classes: state.classes,
+            checkpointBrushes: state.checkpointBrushes,
+          },
+        ],
+
         classes: Object.values(state.classes).reduce((accum, c) => {
           return {
             ...accum,
@@ -203,6 +252,21 @@ export function checkpointReducer(state, action) {
           };
         }, {}),
       };
+    }
+
+    case actions.INPUT_UNDO: {
+      // Pop history and set input from element
+      const latest = state.history[state.history.length - 1]
+
+      if (!latest)
+        return state
+
+      return {
+        ...state,
+        ...latest,
+        history: state.history.slice(0, -1)
+      }
+
     }
     case actions.RESET_CHECKPOINT: {
       return;
