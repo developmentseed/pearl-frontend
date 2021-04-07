@@ -25,7 +25,7 @@ export const actions = {
   CLEAR_POINT_SAMPLES: 'CLEAR_POINT_SAMPLES',
   RESET_CHECKPOINT: 'RESET_CHECKPOINT',
   UPDATE_POLYGONS: 'UPDATE_POLYGONS',
-  INPUT_UNDO: 'INPUT_UNDO'
+  INPUT_UNDO: 'INPUT_UNDO',
 };
 
 export function checkpointReducer(state, action) {
@@ -256,17 +256,15 @@ export function checkpointReducer(state, action) {
 
     case actions.INPUT_UNDO: {
       // Pop history and set input from element
-      const latest = state.history[state.history.length - 1]
+      const latest = state.history[state.history.length - 1];
 
-      if (!latest)
-        return state
+      if (!latest) return state;
 
       return {
         ...state,
         ...latest,
-        history: state.history.slice(0, -1)
-      }
-
+        history: state.history.slice(0, -1),
+      };
     }
     case actions.RESET_CHECKPOINT: {
       return;
