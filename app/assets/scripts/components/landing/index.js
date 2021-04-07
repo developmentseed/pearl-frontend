@@ -83,7 +83,7 @@ const HomeCTA = styled.article`
   }
 `;
 
-function LandingHome() {
+function Home() {
   return (
     <App pageTitle='LandingHome'>
       <PageHeader />
@@ -118,4 +118,4 @@ function LandingHome() {
   );
 }
 
-export default LandingHome;
+export default Home;
