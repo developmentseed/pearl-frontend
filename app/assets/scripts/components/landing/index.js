@@ -83,9 +83,9 @@ const HomeCTA = styled.article`
   }
 `;
 
-function Home() {
+function LandingHome() {
   return (
-    <App pageTitle='Home'>
+    <App pageTitle='LandingHome'>
       <PageHeader />
       <HomeBody role='main'>
         <HomeIntro>
@@ -118,4 +118,4 @@ function Home() {
   );
 }
 
-export default Home;
+export default LandingHome;
