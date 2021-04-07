@@ -10,7 +10,7 @@ import { Auth0Provider, useAuth0 } from '@auth0/auth0-react';
 import config from '../config';
 import logger from '../utils/logger';
 import history from '../history';
-import RestApiClient from './rest-api-client';
+import RestApiClient from '../utils/rest-api-client';
 
 export const AuthContext = createContext({});
 
@@ -199,6 +199,6 @@ export const useRestApiClient = () => {
       apiToken,
       handleUnauthorized: () => logout(),
     });
-    return { restApiClient };
+    return { restApiClient, apiToken };
   }, [apiToken]);
 };

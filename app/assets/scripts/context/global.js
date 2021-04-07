@@ -1,23 +1,14 @@
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useReducer,
-  useState,
-} from 'react';
+import React, { createContext, useEffect, useReducer, useState } from 'react';
 import T from 'prop-types';
 import { initialApiRequestState } from './reducers/reduxeed';
 import { createQueryApiGetReducer, queryApiGet } from './reducers/api';
 import { createQueryApiPostReducer } from './reducers/api';
-import RestApiClient from './rest-api-client';
-import { AuthContext } from './auth';
+import { useRestApiClient } from './auth';
 
 const GlobalContext = createContext({});
 export function GlobalContextProvider(props) {
-  const { apiToken } = useContext(AuthContext);
+  const { apiToken } = useRestApiClient();
   const [tourStep, setTourStep] = useState(0);
-
-  const [restApiClient, setRestApiClient] = useState();
 
   /* User data Reducers */
   const [modelsList, dispatchModelsList] = useReducer(
@@ -57,10 +48,6 @@ export function GlobalContextProvider(props) {
       return;
     }
 
-    // Create API Client
-    const restApiClient = new RestApiClient({ apiToken });
-    setRestApiClient(restApiClient);
-
     queryApiGet({ token: apiToken, endpoint: 'model' })(dispatchModelsList);
   }, [apiToken]);
 
@@ -68,7 +55,6 @@ export function GlobalContextProvider(props) {
     <>
       <GlobalContext.Provider
         value={{
-          restApiClient,
           modelsList,
 
           mosaicList,

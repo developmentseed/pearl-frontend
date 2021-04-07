@@ -1,11 +1,11 @@
 import toasts from '../components/common/toasts';
 import config from '../config';
-import { fetchJSON } from './reducers/reduxeed';
+import { fetchJSON } from '../context/reducers/reduxeed';
 const { restApiEndpoint } = config;
 
 class RestApiClient {
   constructor(props) {
-    this.accessToken = `Bearer ${props.apiToken}`;
+    this.apiToken = props.apiToken;
     this.handleUnauthorized = props.handleUnauthorized;
   }
 
@@ -22,6 +22,11 @@ class RestApiClient {
         'Content-Type': 'application/json',
       },
     };
+
+    // Add token if available
+    if (this.apiToken) {
+      options.headers.Authorization = `Bearer ${this.apiToken}`;
+    }
 
     if (data) {
       options.body = JSON.stringify(data);

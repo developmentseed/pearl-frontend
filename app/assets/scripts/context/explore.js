@@ -16,7 +16,6 @@ import {
 } from '@devseed-ui/global-loading';
 import toasts from '../components/common/toasts';
 import { useHistory, useParams } from 'react-router-dom';
-import GlobalContext from './global';
 import predictionsReducer, {
   actions as predictionActions,
 } from './reducers/predictions';
@@ -45,7 +44,7 @@ export const ExploreContext = createContext({});
 export function ExploreProvider(props) {
   const history = useHistory();
   let { projectId } = useParams();
-  const { restApiClient } = useContext(GlobalContext);
+  const { restApiClient } = useRestApiClient();
 
   const [currentProject, setCurrentProject] = useState(null);
   const [checkpointList, setCheckpointList] = useState(null);
