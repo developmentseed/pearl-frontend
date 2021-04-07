@@ -1,7 +1,12 @@
 import React, { useState, useContext, useEffect } from 'react';
 import styled from 'styled-components';
+import { saveAs } from 'file-saver';
 import T from 'prop-types';
 import config from '../../config';
+import {
+  showGlobalLoadingMessage,
+  hideGlobalLoading,
+} from '@devseed-ui/global-loading';
 import {
   Dropdown,
   DropdownHeader,
@@ -16,6 +21,8 @@ import { Form, FormInput } from '@devseed-ui/form';
 import InfoButton from '../common/info-button';
 import { ExploreContext } from '../../context/explore';
 import { AuthContext, useRestApiClient } from '../../context/auth';
+// import { arrayBufferToBase64, convertBase64ToFile } from '../../utils/format';
+import toasts from '../common/toasts';
 
 const { restApiEndpoint } = config;
 
@@ -77,7 +84,7 @@ const HeadingInput = styled(FormInput)`
 
 function SessionOutputControl(props) {
   const { status, projectName, openHelp, isMediumDown } = props;
-
+  const { restApiClient } = useRestApiClient();
   const { isAuthenticated } = useContext(AuthContext);
 
   const { updateProjectName, currentProject, selectedModel, predictions, aoiName } = useContext(
@@ -99,10 +106,20 @@ function SessionOutputControl(props) {
   const downloadGeotiff = async () => {
     const projectId = currentProject.id;
     const aoiId = predictions.data.aoiId;
-    const { restApiClient } = useRestApiClient();
-    await restApiClient.bookmarkAoi(projectId, aoiId, aoiName);
-    const geotiffUrl = `${restApiEndpoint}/api/project/${projectId}/aoi/${aoiId}/download/color`;
-    window.open(geotiffUrl);
+    showGlobalLoadingMessage('Preparing GeoTIFF for Download');
+    try {
+      await restApiClient.bookmarkAOI(projectId, aoiId, aoiName);
+      const geotiffArrayBuffer = await restApiClient.downloadGeotiff(projectId, aoiId);
+      var blob = new Blob([geotiffArrayBuffer], {type: 'application/x-geotiff'});
+      const filename = `${aoiId}.tiff`;
+      saveAs(blob, filename);
+    } catch (error) {
+      console.log('error with geotiff', error);
+      toasts.error('Failed to download GeoTIFF');
+    }
+    hideGlobalLoading();
+    return;
+    // console.log('base64', base64);
   }
 
   const clearInput = () => {
