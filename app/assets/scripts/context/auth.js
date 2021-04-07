@@ -81,6 +81,10 @@ function InnerAuthProvider(props) {
     <AuthContext.Provider
       value={{
         ...authState,
+        logout: () =>
+          dispatchAuthState({
+            type: actions.LOGOUT,
+          }),
       }}
     >
       {props.children}
@@ -188,10 +192,13 @@ const useCheckContext = (fnName) => {
 // Expose current restApiClient to consumer. We should avoid using useContext()
 // directly on components.
 export const useRestApiClient = () => {
-  const { apiToken } = useCheckContext('useRestApiClient');
+  const { apiToken, logout } = useCheckContext('useRestApiClient');
 
   return useMemo(() => {
-    const restApiClient = new RestApiClient({ apiToken });
+    const restApiClient = new RestApiClient({
+      apiToken,
+      handleUnauthorized: () => logout(),
+    });
     return { restApiClient };
   }, [apiToken]);
 };
