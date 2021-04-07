@@ -573,7 +573,7 @@ function PrimePanel() {
                   mapRef.polygonDraw.clearLayers();
                 }}
               >
-                Reset
+                Clear
               </Button>
               <Button
                 variation='primary-raised-light'
