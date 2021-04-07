@@ -7,12 +7,7 @@ import React, {
 } from 'react';
 import T from 'prop-types';
 import { initialApiRequestState } from './reducers/reduxeed';
-import {
-  createRestApiHealthReducer,
-  queryRestApiHealth,
-  createQueryApiGetReducer,
-  queryApiGet,
-} from './reducers/api';
+import { createQueryApiGetReducer, queryApiGet } from './reducers/api';
 import { createQueryApiPostReducer } from './reducers/api';
 import RestApiClient from './rest-api-client';
 import { AuthContext } from './auth';
@@ -23,11 +18,6 @@ export function GlobalContextProvider(props) {
   const [tourStep, setTourStep] = useState(0);
 
   const [restApiClient, setRestApiClient] = useState();
-
-  const [restApiHealth, dispatchRestApiStatus] = useReducer(
-    createRestApiHealthReducer,
-    initialApiRequestState
-  );
 
   /* User data Reducers */
   const [modelsList, dispatchModelsList] = useReducer(
@@ -48,7 +38,6 @@ export function GlobalContextProvider(props) {
   );
 
   useEffect(() => {
-    queryRestApiHealth()(dispatchRestApiStatus);
     queryApiGet({ endpoint: 'mosaic' })(dispatchMosaicList);
     const visited = localStorage.getItem('site-tour');
     if (visited !== null) {
@@ -79,7 +68,6 @@ export function GlobalContextProvider(props) {
     <>
       <GlobalContext.Provider
         value={{
-          restApiHealth,
           restApiClient,
           modelsList,
 
