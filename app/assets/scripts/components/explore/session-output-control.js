@@ -24,6 +24,7 @@ import { ExploreContext } from '../../context/explore';
 import { AuthContext, useRestApiClient } from '../../context/auth';
 // import { arrayBufferToBase64, convertBase64ToFile } from '../../utils/format';
 import toasts from '../common/toasts';
+import logger from '../../utils/logger';
 
 const { restApiEndpoint } = config;
 
@@ -88,9 +89,13 @@ function SessionOutputControl(props) {
   const { restApiClient } = useRestApiClient();
   const { isAuthenticated } = useContext(AuthContext);
 
-  const { updateProjectName, currentProject, selectedModel, predictions, aoiName } = useContext(
-    ExploreContext
-  );
+  const {
+    updateProjectName,
+    currentProject,
+    selectedModel,
+    predictions,
+    aoiName,
+  } = useContext(ExploreContext);
   const initialName = currentProject ? currentProject.name : 'Untitled';
 
   const [localProjectName, setLocalProjectName] = useState(projectName);
@@ -110,17 +115,21 @@ function SessionOutputControl(props) {
     showGlobalLoadingMessage('Preparing GeoTIFF for Download');
     try {
       await restApiClient.bookmarkAOI(projectId, aoiId, aoiName);
-      const geotiffArrayBuffer = await restApiClient.downloadGeotiff(projectId, aoiId);
-      var blob = new Blob([geotiffArrayBuffer], {type: 'application/x-geotiff'});
+      const geotiffArrayBuffer = await restApiClient.downloadGeotiff(
+        projectId,
+        aoiId
+      );
+      var blob = new Blob([geotiffArrayBuffer], {
+        type: 'application/x-geotiff',
+      });
       const filename = `${aoiId}.tiff`;
       saveAs(blob, filename);
     } catch (error) {
-      console.log('error with geotiff', error);
+      logger('Error with geotiff download', error);
       toasts.error('Failed to download GeoTIFF');
     }
     hideGlobalLoading();
     return;
-    // console.log('base64', base64);
   };
 
   const copyTilesLink = async () => {
@@ -158,7 +167,8 @@ function SessionOutputControl(props) {
     }
   };
 
-  const exportEnabled = isAuthenticated && currentProject && predictions.data.aoiId; 
+  const exportEnabled =
+    isAuthenticated && currentProject && predictions.data.aoiId;
   return (
     <Wrapper>
       <ProjectHeading>
@@ -250,31 +260,21 @@ function SessionOutputControl(props) {
         className='global__dropdown'
       >
         <>
-          <DropdownHeader>
-            Export Options
-          </DropdownHeader>
+          <DropdownHeader>Export Options</DropdownHeader>
           <DropdownBody>
             <li>
-              <DropdownItem
-                useIcon='download-2'  
-                onClick={ downloadGeotiff }  
-              >
+              <DropdownItem useIcon='download-2' onClick={downloadGeotiff}>
                 Download .geotiff
               </DropdownItem>
             </li>
             <li>
-              <DropdownItem
-                useIcon='link'
-                onClick={ copyTilesLink }
-              >
+              <DropdownItem useIcon='link' onClick={copyTilesLink}>
                 Copy link to online map
               </DropdownItem>
             </li>
           </DropdownBody>
         </>
       </Dropdown>
-
-
     </Wrapper>
   );
 }

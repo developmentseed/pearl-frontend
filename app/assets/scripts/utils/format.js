@@ -1,5 +1,3 @@
-const base64 = require('base-64');
-
 /**
  * Rounds a number to a specified amount of decimals.
  *
@@ -119,40 +117,3 @@ export function toTitleCase(str) {
     return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
   });
 }
-
-/**
- * Converts an ArrayBuffer of binary data into a base64 string
- * From: https://gist.github.com/irbull/42f3bd7a9db767ce72a770ded9a5bdd1
- * 
- * @param {ArrayBuffer} Binary data as array buffer 
- */
-// export function arrayBufferToBase64( buffer ) {
-//   var binary = '';
-//   var bytes = new Uint8Array( buffer );
-//   var len = bytes.byteLength;
-//   for (var i = 0; i < len; i++) {
-//       binary += String.fromCharCode( bytes[ i ] );
-//   }
-//   return base64.encode( binary );
-// }
-
-/**
- * Converts a base64 string to a file object that can be downloaded in the browser
- * 
- * From: https://stackoverflow.com/a/66920290
- * 
- * @param {String} base64String 
- * @param {String} fileName 
- */
-// export function convertBase64ToFile (base64String, fileName) {
-//   let arr = base64String.split(',');
-//   let mime = arr[0].match(/:(.*?);/)[1];
-//   let bstr = atob(arr[1]);
-//   let n = bstr.length;
-//   let uint8Array = new Uint8Array(n);
-//   while (n--) {
-//      uint8Array[n] = bstr.charCodeAt(n);
-//   }
-//   let file = new File([uint8Array], fileName, { type: mime });
-//   return file;
-// }

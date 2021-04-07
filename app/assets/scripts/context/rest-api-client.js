@@ -13,7 +13,7 @@ class RestApiClient {
     return `${restApiEndpoint}/api/${subpath}`;
   }
 
-  async fetch(method, path, data, format='json') {
+  async fetch(method, path, data, format = 'json') {
     const url = this.getUrl(path);
     const options = {
       method,
@@ -41,7 +41,7 @@ class RestApiClient {
     }
   }
 
-  get(path, format='json') {
+  get(path, format = 'json') {
     return this.fetch('GET', path, null, format);
   }
 
@@ -92,12 +92,15 @@ class RestApiClient {
   bookmarkAOI(projectId, aoiId, name) {
     return this.patch(`project/${projectId}/aoi/${aoiId}`, {
       bookmarked: true,
-      name
-    })
+      name,
+    });
   }
 
   downloadGeotiff(projectId, aoiId) {
-    return this.get(`project/${projectId}/aoi/${aoiId}/download/color`, 'binary');
+    return this.get(
+      `project/${projectId}/aoi/${aoiId}/download/color`,
+      'binary'
+    );
   }
 }
 
