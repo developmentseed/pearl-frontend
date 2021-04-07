@@ -84,7 +84,6 @@ function RefineModel(props) {
                   setMapMode(mapModes.REMOVE_SAMPLE);
                 }
               }}
-
             >
               Delete
             </InfoButton>
