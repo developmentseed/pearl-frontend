@@ -26,18 +26,11 @@ import {
   DropdownFooter,
 } from '../../../styles/dropdown';
 
-import {
-  useMap,
-  useMapLayers,
-  useUserLayers,
-  useMapRef,
-  usePredictionLayer,
-} from '../../../context/map';
+import { useMapLayers, useUserLayers, useMapRef } from '../../../context/map';
 import {
   ExploreContext,
   useInstance,
   useMapState,
-  viewModes,
 } from '../../../context/explore';
 import GlobalContext from '../../../context/global';
 

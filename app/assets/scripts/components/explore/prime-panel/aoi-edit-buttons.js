@@ -164,5 +164,5 @@ AoiEditButtons.propTypes = {
   setAoiRef: T.func,
   aoiBounds: T.object,
   setAoiBounds: T.func,
-  aoiArea: T.oneOfType([T.bool, T.number])
+  aoiArea: T.oneOfType([T.bool, T.number]),
 };
