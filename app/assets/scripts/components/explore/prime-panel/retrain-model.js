@@ -2,6 +2,7 @@ import React from 'react';
 import T from 'prop-types';
 import get from 'lodash.get';
 import { Button } from '@devseed-ui/button';
+import InfoButton from '../../common/info-button';
 import styled from 'styled-components';
 import { glsp } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
@@ -38,7 +39,7 @@ function RetrainModel(props) {
         <>
           <RetrainTools>
             <Heading useAlt>Sample Selection Tools</Heading>
-            <Button
+            <InfoButton
               variation={
                 mapState.mode === mapModes.ADD_SAMPLE_POLYGON
                   ? 'primary-raised-dark'
@@ -47,12 +48,17 @@ function RetrainModel(props) {
               size='small'
               radius='ellipsoid'
               useIcon='pencil'
-              disabled={!currentCheckpoint.activeItem}
-              onClick={() => setMapMode(mapModes.ADD_SAMPLE_POLYGON)}
+              visuallyDisabled={!currentCheckpoint.activeItem}
+              info={!currentCheckpoint.activeItem && 'No active item selected'}
+              onClick={() => {
+                if (currentCheckpoint.activeItem) {
+                  setMapMode(mapModes.ADD_SAMPLE_POLYGON);
+                }
+              }}
             >
               Draw
-            </Button>
-            <Button
+            </InfoButton>
+            <InfoButton
               variation={
                 mapState.mode === mapModes.ADD_SAMPLE_POINT
                   ? 'primary-raised-dark'
@@ -61,12 +67,17 @@ function RetrainModel(props) {
               size='small'
               radius='ellipsoid'
               useIcon='crosshair'
-              disabled={!currentCheckpoint.activeItem}
-              onClick={() => setMapMode(mapModes.ADD_SAMPLE_POINT)}
+              visuallyDisabled={!currentCheckpoint.activeItem}
+              info={!currentCheckpoint.activeItem && 'No active item selected'}
+              onClick={() => {
+                if (currentCheckpoint.activeItem) {
+                  setMapMode(mapModes.ADD_SAMPLE_POINT);
+                }
+              }}
             >
               Point
-            </Button>
-            <Button
+            </InfoButton>
+            <InfoButton
               variation={
                 mapState.mode === mapModes.REMOVE_SAMPLE
                   ? 'primary-raised-dark'
@@ -75,11 +86,16 @@ function RetrainModel(props) {
               size='small'
               radius='ellipsoid'
               useIcon='xmark'
-              disabled={!currentCheckpoint.activeItem}
-              onClick={() => setMapMode(mapModes.REMOVE_SAMPLE)}
+              visuallyDisabled={!currentCheckpoint.activeItem}
+              info={!currentCheckpoint.activeItem && 'No active item selected'}
+              onClick={() => {
+                if (currentCheckpoint.activeItem) {
+                  setMapMode(mapModes.REMOVE_SAMPLE);
+                }
+              }}
             >
               Delete
-            </Button>
+            </InfoButton>
           </RetrainTools>
           <ClassList>
             <Heading useAlt>Classes</Heading>

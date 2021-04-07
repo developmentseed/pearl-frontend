@@ -13,6 +13,7 @@ import {
 } from './retrain-refine-styles';
 import { Heading } from '@devseed-ui/typography';
 import { Button } from '@devseed-ui/button';
+import InfoButton from '../../common/info-button';
 import get from 'lodash.get';
 import { glsp } from '@devseed-ui/theme-provider';
 import { useMapState, useExploreContext } from '../../../context/explore.js';
@@ -48,7 +49,7 @@ function RefineModel(props) {
         <>
           <RefineTools>
             <Heading useAlt>Refinement Tools</Heading>
-            <Button
+            <InfoButton
               variation={
                 mapState.mode === mapModes.ADD_SAMPLE_POLYGON
                   ? 'primary-raised-dark'
@@ -57,12 +58,17 @@ function RefineModel(props) {
               size='small'
               radius='ellipsoid'
               useIcon='pencil'
-              disabled={!currentCheckpoint.activeItem}
-              onClick={() => setMapMode(mapModes.ADD_SAMPLE_POLYGON)}
+              visuallyDisabled={!currentCheckpoint.activeItem}
+              info={!currentCheckpoint.activeItem && 'No active item selected'}
+              onClick={() => {
+                if (currentCheckpoint.activeItem) {
+                  setMapMode(mapModes.ADD_SAMPLE_POLYGON);
+                }
+              }}
             >
               Draw
-            </Button>
-            <Button
+            </InfoButton>
+            <InfoButton
               variation={
                 mapState.mode === mapModes.REMOVE_SAMPLE
                   ? 'primary-raised-dark'
@@ -71,11 +77,17 @@ function RefineModel(props) {
               size='small'
               radius='ellipsoid'
               useIcon='xmark'
-              disabled={!currentCheckpoint.activeItem}
-              onClick={() => setMapMode(mapModes.REMOVE_SAMPLE)}
+              visuallyDisabled={!currentCheckpoint.activeItem}
+              info={!currentCheckpoint.activeItem && 'No active item selected'}
+              onClick={() => {
+                if (currentCheckpoint.activeItem) {
+                  setMapMode(mapModes.REMOVE_SAMPLE);
+                }
+              }}
+
             >
               Delete
-            </Button>
+            </InfoButton>
           </RefineTools>
           <CheckpointSection>
             <Heading useAlt>Checkpoint List</Heading>
