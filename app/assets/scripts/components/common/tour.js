@@ -7,6 +7,7 @@ import { Subheading } from '../../styles/type/heading';
 import { Heading } from '@devseed-ui/typography';
 import Prose from '../../styles/type/prose';
 import { themeVal } from '@devseed-ui/theme-provider';
+import { useTour } from '../../context/tour';
 
 const Inner = styled.div`
   background: ${themeVal('color.baseLight')};
@@ -99,7 +100,8 @@ TourTooltip.propTypes = {
 };
 
 function Tour(props) {
-  const { tourStep, setTourStep, steps } = props;
+  const { steps } = props;
+  const { tourStep, setTourStep } = useTour();
 
   return (
     <>
@@ -131,8 +133,6 @@ function Tour(props) {
 }
 
 Tour.propTypes = {
-  tourStep: T.number,
-  setTourStep: T.func,
   steps: T.array,
 };
 

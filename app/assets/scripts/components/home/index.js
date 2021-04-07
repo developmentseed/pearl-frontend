@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import App from '../common/app';
 
@@ -13,7 +13,6 @@ import {
 import { Button } from '@devseed-ui/button';
 import { Heading } from '@devseed-ui/typography';
 import { themeVal, media, glsp } from '@devseed-ui/theme-provider';
-import GlobalContext from '../../context/global';
 import { StyledLink } from '../../styles/links';
 import config from '../../config';
 import { fetchJSON } from '../../context/reducers/reduxeed';

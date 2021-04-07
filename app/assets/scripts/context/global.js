@@ -1,4 +1,11 @@
-import React, { createContext, useEffect, useReducer, useState } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useReducer,
+  useState,
+} from 'react';
 import T from 'prop-types';
 import { initialApiRequestState } from './reducers/reduxeed';
 import { createQueryApiGetReducer, queryApiGet } from './reducers/api';
@@ -35,10 +42,6 @@ export function GlobalContextProvider(props) {
       setTourStep(Number(visited));
     }
   }, []);
-
-  useEffect(() => {
-    localStorage.setItem('site-tour', tourStep);
-  }, [tourStep]);
 
   useEffect(() => {
     /*

@@ -14,7 +14,6 @@ import SecPanel from './sec-panel';
 import Map from './map';
 
 import Tour from '../common/tour';
-import GlobalContext from '../../context/global';
 import { ExploreContext } from '../../context/explore';
 import { useCheckpoint } from '../../context/checkpoint';
 
@@ -27,7 +26,6 @@ const ExploreBody = styled(InpageBody)`
 
 const ExploreCarto = styled.section``;
 function Explore() {
-  const { tourStep, setTourStep } = useContext(GlobalContext);
   const { apiLimits } = useContext(ExploreContext);
 
   const { currentCheckpoint } = useCheckpoint();
@@ -62,9 +60,7 @@ function Explore() {
           </ExploreCarto>
           {currentCheckpoint && <SecPanel checkpoint={currentCheckpoint} />}
         </ExploreBody>
-        {steps && (
-          <Tour steps={steps} tourStep={tourStep} setTourStep={setTourStep} />
-        )}
+        {steps && <Tour steps={steps} />}
       </Inpage>
     </>
   );
