@@ -1,14 +1,23 @@
 import React, { useState, useContext, useEffect } from 'react';
 import styled from 'styled-components';
 import T from 'prop-types';
-import { DropdownTrigger } from '../../styles/dropdown';
+import config from '../../config';
+import {
+  Dropdown,
+  DropdownHeader,
+  DropdownBody,
+  DropdownItem,
+  DropdownTrigger,
+} from '../../styles/dropdown';
 import { Button } from '@devseed-ui/button';
 import { themeVal, glsp, media } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
 import { Form, FormInput } from '@devseed-ui/form';
 import InfoButton from '../common/info-button';
 import { ExploreContext } from '../../context/explore';
-import { AuthContext } from '../../context/auth';
+import { AuthContext, useRestApiClient } from '../../context/auth';
+
+const { restApiEndpoint } = config;
 
 const Wrapper = styled.div`
   flex: 1;
@@ -71,7 +80,7 @@ function SessionOutputControl(props) {
 
   const { isAuthenticated } = useContext(AuthContext);
 
-  const { updateProjectName, currentProject, selectedModel } = useContext(
+  const { updateProjectName, currentProject, selectedModel, predictions, aoiName } = useContext(
     ExploreContext
   );
   const initialName = currentProject ? currentProject.name : 'Untitled';
@@ -86,6 +95,15 @@ function SessionOutputControl(props) {
     updateProjectName(name);
     setTitleEditMode(false);
   };
+
+  const downloadGeotiff = async () => {
+    const projectId = currentProject.id;
+    const aoiId = predictions.data.aoiId;
+    const { restApiClient } = useRestApiClient();
+    await restApiClient.bookmarkAoi(projectId, aoiId, aoiName);
+    const geotiffUrl = `${restApiEndpoint}/api/project/${projectId}/aoi/${aoiId}/download/color`;
+    window.open(geotiffUrl);
+  }
 
   const clearInput = () => {
     setLocalProjectName(initialName);
@@ -103,6 +121,7 @@ function SessionOutputControl(props) {
     }
   };
 
+  const exportEnabled = isAuthenticated && currentProject && predictions.data.aoiId; 
   return (
     <Wrapper>
       <ProjectHeading>
@@ -175,18 +194,49 @@ function SessionOutputControl(props) {
       >
         Help
       </Button>
-      <DropdownTrigger
-        variation='primary-raised-light'
-        useIcon={['download', 'before']}
-        title='Export map'
-        className='user-options-trigger'
-        size='medium'
-        {...props}
-        disabled={!isAuthenticated}
-        hideText={isMediumDown}
+      <Dropdown
+        alignment='right'
+        direction='down'
+        triggerElement={(props) => (
+          <DropdownTrigger
+            variation='primary-raised-light'
+            title='Export map'
+            className='user-options-trigger'
+            size='medium'
+            {...props}
+            disabled={!exportEnabled}
+            hideText={isMediumDown}
+          >
+            Export
+          </DropdownTrigger>
+        )}
+        className='global__dropdown'
       >
-        Export
-      </DropdownTrigger>
+        <>
+          <DropdownHeader>
+            Export Options
+          </DropdownHeader>
+          <DropdownBody>
+            <li>
+              <DropdownItem
+                useIcon='download-2'  
+                onClick={ downloadGeotiff }  
+              >
+                Download .geotiff
+              </DropdownItem>
+            </li>
+            <li>
+              <DropdownItem
+                useIcon='link'
+              >
+                Copy link to online map
+              </DropdownItem>
+            </li>
+          </DropdownBody>
+        </>
+      </Dropdown>
+
+
     </Wrapper>
   );
 }

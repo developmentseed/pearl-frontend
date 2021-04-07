@@ -87,6 +87,13 @@ class RestApiClient {
   getActiveInstances(projectId) {
     return this.get(`project/${projectId}/instance/?status=active`);
   }
+
+  bookmarkAOI(projectId, aoiId, name) {
+    return this.patch(`project/${projectId}/aoi/${aoiId}`, {
+      bookmarked: true,
+      name
+    })
+  }
 }
 
 export default RestApiClient;
