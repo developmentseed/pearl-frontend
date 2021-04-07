@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { saveAs } from 'file-saver';
 import T from 'prop-types';
 import config from '../../config';
+import copy from '../../utils/copy-text-to-clipboard';
 import {
   showGlobalLoadingMessage,
   hideGlobalLoading,
@@ -120,7 +121,26 @@ function SessionOutputControl(props) {
     hideGlobalLoading();
     return;
     // console.log('base64', base64);
-  }
+  };
+
+  const copyTilesLink = async () => {
+    const projectId = currentProject.id;
+    const aoiId = predictions.data.aoiId;
+
+    try {
+      await restApiClient.bookmarkAOI(projectId, aoiId, aoiName);
+    } catch (err) {
+      logger('Error Bookmarking AOI', err);
+    }
+    //FIXME: This url will likely change
+    const url = `${restApiEndpoint}/project/${projectId}/aoi/${aoiId}/tiles`;
+    const copied = copy(url);
+    if (copied) {
+      toasts.success('URL copied to clipboard');
+    } else {
+      toasts.error('Failed to copy to clipboard');
+    }
+  };
 
   const clearInput = () => {
     setLocalProjectName(initialName);
@@ -245,6 +265,7 @@ function SessionOutputControl(props) {
             <li>
               <DropdownItem
                 useIcon='link'
+                onClick={ copyTilesLink }
               >
                 Copy link to online map
               </DropdownItem>
