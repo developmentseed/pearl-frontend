@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import App from '../common/app';
 
@@ -13,10 +13,8 @@ import {
 import { Button } from '@devseed-ui/button';
 import { Heading } from '@devseed-ui/typography';
 import { themeVal, media, glsp } from '@devseed-ui/theme-provider';
-import GlobalContext from '../../context/global';
-import { StyledLink } from '../../styles/links';
 import config from '../../config';
-const { environment, baseUrl } = config;
+const { baseUrl } = config;
 
 const HomeBody = styled(InpageBody)`
   display: flex;
@@ -85,28 +83,7 @@ const HomeCTA = styled.article`
   }
 `;
 
-const StatusSection = styled.section`
-  position: absolute;
-  bottom: 0;
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.875rem;
-  margin: ${glsp(1.5)} ${glsp()};
-  > * {
-    margin-right: ${glsp()};
-  }
-`;
-
-function renderRestApiHealth(restApiHealth) {
-  const { isReady, hasError, getData } = restApiHealth;
-  if (!isReady()) return 'Fetching...';
-  if (hasError()) return 'Unavailable.';
-  return getData().message || 'Ok';
-}
-
 function Home() {
-  const { restApiHealth } = useContext(GlobalContext);
-
   return (
     <App pageTitle='Home'>
       <PageHeader />
@@ -126,33 +103,16 @@ function Home() {
             imagery (e.g. NAIP) hosted on Microsoft Azure.
           </Lead>
           <HomeCTA>
-            {/* <Button
-              size='xlarge'
-              variation='achromic-glass'
-              to='/about'
-              as={StyledLink}
-              title='Visit About page'
-            >
-              Read More
-            </Button> */}
             <Button
-              // useIcon={['chevron-right', 'after']}
               size='xlarge'
               variation='primary-raised-dark'
-              // to='/project/new'
-              as={StyledLink}
+              // as={StyledLink}
               title='Start a new project'
             >
               Coming Soon!
             </Button>
           </HomeCTA>
         </HomeIntro>
-        {environment !== 'production' && (
-          <StatusSection>
-            <strong>Status </strong>
-            <p>API: {renderRestApiHealth(restApiHealth)}</p>
-          </StatusSection>
-        )}
       </HomeBody>
     </App>
   );
