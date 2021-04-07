@@ -30,6 +30,7 @@ import ModalMapEvent from './modal-events';
 
 import VectorLayer from '../../common/map/vector-layer';
 import { useRestApiClient } from '../../../context/auth';
+import { useApiMeta } from '../../../context/api-meta';
 
 const center = [38.83428180092151, -79.37724530696869];
 const zoom = 15;
@@ -83,9 +84,10 @@ function Map() {
     aoiInitializer,
     setAoiBounds,
     predictions,
-    apiLimits,
     currentProject,
   } = useContext(ExploreContext);
+
+  const { apiLimits } = useApiMeta();
 
   const { restApiClient } = useRestApiClient();
 

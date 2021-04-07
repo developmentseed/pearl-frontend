@@ -14,10 +14,10 @@ import SecPanel from './sec-panel';
 import Map from './map';
 
 import Tour from '../common/tour';
-import { ExploreContext } from '../../context/explore';
 import { useCheckpoint } from '../../context/checkpoint';
 
 import { tourSteps } from './tour';
+import { useApiMeta } from '../../context/api-meta';
 
 const ExploreBody = styled(InpageBody)`
   display: grid;
@@ -26,7 +26,7 @@ const ExploreBody = styled(InpageBody)`
 
 const ExploreCarto = styled.section``;
 function Explore() {
-  const { apiLimits } = useContext(ExploreContext);
+  const { apiLimits } = useApiMeta();
 
   const { currentCheckpoint } = useCheckpoint();
   const [steps, setSteps] = useState(null);
@@ -43,6 +43,7 @@ function Explore() {
       setSteps(steps);
     }
   }, [apiLimits]);
+
   return (
     <>
       <Inpage isMapCentric>
@@ -65,5 +66,7 @@ function Explore() {
     </>
   );
 }
+
+Explore.whyDidYouRender = true;
 
 export default Explore;

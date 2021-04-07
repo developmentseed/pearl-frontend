@@ -83,12 +83,8 @@ export function ExploreProvider(props) {
   );
   const [currentInstance, setCurrentInstance] = useState(null);
 
-  const [apiMeta, setApiMeta] = useState();
-
   async function loadInitialData() {
     showGlobalLoadingMessage('Loading configuration...');
-    const apiMeta = await restApiClient.getApiMeta();
-    setApiMeta(apiMeta);
 
     // Bypass loading project when new
     if (projectId === 'new') {
@@ -428,7 +424,6 @@ export function ExploreProvider(props) {
     <ExploreContext.Provider
       value={{
         predictions,
-        apiLimits: apiMeta && apiMeta.limits,
 
         mapState,
         dispatchMapState,

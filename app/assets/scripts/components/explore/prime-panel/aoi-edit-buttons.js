@@ -13,6 +13,7 @@ import {
   ModalFooter as BaseModalFooter,
 } from '@devseed-ui/modal';
 import { useMapRef } from '../../../context/map';
+import { useApiMeta } from '../../../context/api-meta';
 
 const ModalFooter = styled(BaseModalFooter)`
   padding: ${glsp(2)} 0 0 0;
@@ -28,14 +29,9 @@ export function AoiEditButtons(props) {
   const { mapState, setMapMode, mapModes } = useMapState();
   const { mapRef } = useMapRef();
 
-  const {
-    aoiRef,
-    aoiArea,
-    aoiBounds,
-    setAoiBounds,
-    apiLimits,
-    setAoiRef,
-  } = props;
+  const { apiLimits } = useApiMeta();
+
+  const { aoiRef, aoiArea, aoiBounds, setAoiBounds, setAoiRef } = props;
 
   const [activeModal, setActiveModal] = useState(false);
 
@@ -168,6 +164,5 @@ AoiEditButtons.propTypes = {
   setAoiRef: T.func,
   aoiBounds: T.object,
   setAoiBounds: T.func,
-  aoiArea: T.oneOfType([T.bool, T.number]),
-  apiLimits: T.oneOfType([T.bool, T.object]),
+  aoiArea: T.oneOfType([T.bool, T.number])
 };

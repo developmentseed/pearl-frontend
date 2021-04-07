@@ -130,7 +130,6 @@ function PrimePanel() {
     aoiName,
     loadAoi,
     aoiList,
-    apiLimits,
     predictions,
     aoiBounds,
     setAoiBounds,
@@ -322,7 +321,6 @@ function PrimePanel() {
                     aoiArea={aoiArea}
                     setAoiBounds={setAoiBounds}
                     aoiBounds={aoiBounds}
-                    apiLimits={apiLimits}
                   />
                 </HeadOptionToolbar>
               </HeadOption>
