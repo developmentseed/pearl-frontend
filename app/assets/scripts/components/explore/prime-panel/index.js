@@ -262,9 +262,9 @@ function PrimePanel() {
       // There should be no polygon or point samples on the map
       // User must submit or clear retrain samples before starting refine
       if (sampleCount > 0) {
-        return false;
-      } else {
         return true;
+      } else {
+        return false;
       }
     } else {
       return false;
@@ -464,27 +464,27 @@ function PrimePanel() {
                   placeholderMessage={retrainPlaceHolderMessage()}
                   ready={
                     currentCheckpoint &&
-                    currentCheckpoint.mode === checkpointModes.RETRAIN
+                    (!predictions.isReady() ||
+                      currentCheckpoint.mode === checkpointModes.RETRAIN)
                   }
                   onTabClick={() => {
-                    setMapMode(mapModes.BROWSE_MODE);
-                    dispatchCurrentCheckpoint({
-                      type: checkpointActions.SET_ACTIVE_CLASS,
-                      data: null,
-                    });
-                    if (
-                      currentCheckpoint &&
-                      currentCheckpoint.mode != checkpointModes.RETRAIN
-                    ) {
-                      // If current checkpoint has not been set,
-                      // mode does not need to be set
-                      if (checkpointHasSamples()) {
-                        dispatchCurrentCheckpoint({
-                          type: checkpointActions.SET_CHECKPOINT_MODE,
-                          data: {
-                            mode: checkpointModes.RETRAIN,
-                          },
-                        });
+                    if (currentCheckpoint) {
+                      setMapMode(mapModes.BROWSE_MODE);
+                      dispatchCurrentCheckpoint({
+                        type: checkpointActions.SET_ACTIVE_CLASS,
+                        data: undefined,
+                      });
+                      if (currentCheckpoint.mode != checkpointModes.RETRAIN) {
+                        // If current checkpoint has not been set,
+                        // mode does not need to be set
+                        if (!checkpointHasSamples()) {
+                          dispatchCurrentCheckpoint({
+                            type: checkpointActions.SET_CHECKPOINT_MODE,
+                            data: {
+                              mode: checkpointModes.RETRAIN,
+                            },
+                          });
+                        }
                       }
                     }
                   }}
@@ -498,25 +498,23 @@ function PrimePanel() {
                     currentCheckpoint.mode === checkpointModes.REFINE
                   }
                   onTabClick={() => {
-                    setMapMode(mapModes.BROWSE_MODE);
-                    dispatchCurrentCheckpoint({
-                      type: checkpointActions.SET_ACTIVE_CLASS,
-                      data: undefined,
-                    });
-
-                    if (
-                      currentCheckpoint &&
-                      currentCheckpoint.mode !== checkpointModes.REFINE
-                    ) {
-                      // If current checkpoint has not been set,
-                      // mode does not need to be set
-                      if (checkpointHasSamples()) {
-                        dispatchCurrentCheckpoint({
-                          type: checkpointActions.SET_CHECKPOINT_MODE,
-                          data: {
-                            mode: checkpointModes.REFINE,
-                          },
-                        });
+                    if (currentCheckpoint) {
+                      setMapMode(mapModes.BROWSE_MODE);
+                      dispatchCurrentCheckpoint({
+                        type: checkpointActions.SET_ACTIVE_CLASS,
+                        data: undefined,
+                      });
+                      if (currentCheckpoint.mode !== checkpointModes.REFINE) {
+                        // If current checkpoint has not been set,
+                        // mode does not need to be set
+                        if (!checkpointHasSamples()) {
+                          dispatchCurrentCheckpoint({
+                            type: checkpointActions.SET_CHECKPOINT_MODE,
+                            data: {
+                              mode: checkpointModes.REFINE,
+                            },
+                          });
+                        }
                       }
                     }
                   }}
