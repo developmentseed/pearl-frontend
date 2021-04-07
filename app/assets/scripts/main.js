@@ -1,3 +1,4 @@
+import './wdyr';
 import '@babel/polyfill';
 import React, { useEffect } from 'react';
 import { DevseedUiThemeProvider } from '@devseed-ui/theme-provider';

@@ -625,4 +625,6 @@ function PrimePanel() {
   );
 }
 
+PrimePanel.whyDidYouRender = true
+
 export default PrimePanel;
