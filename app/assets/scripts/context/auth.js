@@ -12,7 +12,7 @@ import logger from '../utils/logger';
 import history from '../history';
 import RestApiClient from '../utils/rest-api-client';
 
-export const AuthContext = createContext({});
+export const AuthContext = createContext(null);
 
 /**
  * Inner provider to be wrapped by Auth0 provider

@@ -1,25 +1,18 @@
-import React, {
-  useContext,
-  useMemo,
-  createContext,
-  useState,
-  useEffect,
-} from 'react';
+import React, { useContext, useMemo, createContext, useState } from 'react';
 import T from 'prop-types';
-import { useRestApiClient } from './auth';
 
-const ApiMetaContext = createContext({});
+const ApiMetaContext = createContext(null);
 
 export function ApiMetaProvider(props) {
   const [apiLimits, setApiLimits] = useState(null);
 
+  const value = {
+    apiLimits,
+    setApiLimits,
+  };
+
   return (
-    <ApiMetaContext.Provider
-      value={{
-        apiLimits,
-        setApiLimits,
-      }}
-    >
+    <ApiMetaContext.Provider value={value}>
       {props.children}
     </ApiMetaContext.Provider>
   );
@@ -44,17 +37,11 @@ const useApiMetaContext = (fnName) => {
 
 export const useApiMeta = () => {
   const { apiLimits, setApiLimits } = useApiMetaContext('useApiMeta');
-  const { restApiClient } = useRestApiClient();
-
-  useEffect(() => {
-    restApiClient.getApiMeta().then((data) => {
-      setApiLimits(data && data.limits);
-    });
-  }, []);
 
   return useMemo(
     () => ({
       apiLimits,
+      setApiLimits,
     }),
     [apiLimits]
   );

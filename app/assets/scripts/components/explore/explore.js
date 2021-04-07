@@ -14,7 +14,6 @@ import SecPanel from './sec-panel';
 import Map from './map';
 
 import Tour from '../common/tour';
-import { useCheckpoint } from '../../context/checkpoint';
 
 import { tourSteps } from './tour';
 import { useApiMeta } from '../../context/api-meta';
@@ -28,7 +27,6 @@ const ExploreCarto = styled.section``;
 function Explore() {
   const { apiLimits } = useApiMeta();
 
-  const { currentCheckpoint } = useCheckpoint();
   const [steps, setSteps] = useState(null);
 
   useEffect(() => {
@@ -59,7 +57,7 @@ function Explore() {
           <ExploreCarto>
             <Map />
           </ExploreCarto>
-          {currentCheckpoint && <SecPanel checkpoint={currentCheckpoint} />}
+          <SecPanel />
         </ExploreBody>
         {steps && <Tour steps={steps} />}
       </Inpage>
@@ -67,6 +65,8 @@ function Explore() {
   );
 }
 
-Explore.whyDidYouRender = true;
+if (process.env.NODE_ENV === 'development') {
+  Explore.whyDidYouRender = true;
+}
 
 export default Explore;

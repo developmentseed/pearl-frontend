@@ -23,11 +23,7 @@ import { mapStateReducer, mapModes, mapActionTypes } from './reducers/map';
 import tBbox from '@turf/bbox';
 import reverseGeoCode from '../utils/reverse-geocode';
 
-import {
-  actions as checkpointActions,
-  checkpointReducer,
-  useCheckpoint,
-} from './checkpoint';
+import { actions as checkpointActions, useCheckpoint } from './checkpoint';
 import get from 'lodash.get';
 import logger from '../utils/logger';
 import {
@@ -40,7 +36,8 @@ import {
 /**
  * Context & Provider
  */
-export const ExploreContext = createContext({});
+export const ExploreContext = createContext(null);
+
 export function ExploreProvider(props) {
   const history = useHistory();
   let { projectId } = useParams();
@@ -73,9 +70,7 @@ export function ExploreProvider(props) {
 
   const [selectedModel, setSelectedModel] = useState(null);
 
-  const [currentCheckpoint, dispatchCurrentCheckpoint] = useReducer(
-    checkpointReducer
-  );
+  const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
 
   const [predictions, dispatchPredictions] = useReducer(
     predictionsReducer,
