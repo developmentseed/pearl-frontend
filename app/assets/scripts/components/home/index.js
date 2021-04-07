@@ -63,8 +63,8 @@ const HomeTagline = styled(InpageTagline)`
 
 const HomeHeading = styled(Heading)`
   font-weight: ${themeVal('type.base.weight')};
-  font-size: clamp(2rem, -0.875rem + 8.333vw, 3.75rem);
-  line-height: 4rem;
+  font-size: clamp(2rem, -0.875rem + 8.333vw, 3.5rem);
+  line-height: 1.25;
   margin: 0;
 `;
 

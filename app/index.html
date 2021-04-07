@@ -23,14 +23,14 @@
     <meta property='og:title' content='{{appTitle}}' />
     <meta property='og:image' content='{{baseurl}}/assets/graphics/meta/default-meta-image.png' />
     <meta property='og:description' content='{{appDescription}}' />
-
+    
     <!-- build:css /assets/styles/vendor.css -->
+    <link rel='preload'  href='{{baseurl}}/assets/fonts/TitilliumWeb.woff2' as='font' type='font/woff2' crossorigin>
     <link rel='preconnect' href='https://fonts.gstatic.com'>
     <link rel='stylesheet' href='https://fonts.googleapis.com/css2?family=Titillium+Web:wght@300;400;700&display=swap'>
     <link rel='stylesheet' href='../node_modules/leaflet/dist/leaflet.css' />
     <link rel='stylesheet' href='../node_modules/leaflet-geosearch/assets/css/leaflet.css' />
     <link rel="stylesheet" href="../node_modules/react-input-range/lib/css/input-range/input-range.css" />
-
 
     <!-- endbuild -->
 
@@ -38,6 +38,12 @@
 
 
     <style>
+      @font-face {
+        font-family: 'Titillium Web', Titillium Web;
+        src: url({{baseurl}}/assets/fonts/TitilliumWeb.woff2) format('woff2');
+        font-weight: 400;
+        font-display: swap;
+      }
       #welcome-banner {
         display: flex;
         align-items: center;
@@ -73,9 +79,7 @@
           transitioned out. Replace the contents with something appropriate
           for the project.
         -->
-        <h1><img src="/assets/graphics/layout/ds-logo-pos.svg" alt="Development Seed logotype" width="188" height="32" /></h1>
-        <p>In the beginning the Universe was created.<p>
-        <p>This has made a lot of people very angry and been widely regarded as a bad move.</p>
+        <p>Loading Azure Land Cover Mapping...</p>
       </div>
     </div>
 

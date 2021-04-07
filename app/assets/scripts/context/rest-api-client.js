@@ -1,3 +1,4 @@
+import toasts from '../components/common/toasts';
 import config from '../config';
 import { fetchJSON } from './reducers/reduxeed';
 const { restApiEndpoint } = config;
@@ -5,6 +6,7 @@ const { restApiEndpoint } = config;
 class RestApiClient {
   constructor(props) {
     this.accessToken = `Bearer ${props.apiToken}`;
+    this.handleUnauthorized = props.handleUnauthorized;
   }
 
   getUrl(subpath) {
@@ -25,8 +27,17 @@ class RestApiClient {
       options.body = JSON.stringify(data);
     }
 
-    const res = await fetchJSON(url, options);
-    return res.body;
+    try {
+      const res = await fetchJSON(url, options);
+      return res.body;
+    } catch (error) {
+      if (error.statusCode === 401 && this.handleUnauthorized) {
+        this.handleUnauthorized();
+        toasts.error('You have been signed out.');
+      } else {
+        throw error;
+      }
+    }
   }
 
   get(path) {
