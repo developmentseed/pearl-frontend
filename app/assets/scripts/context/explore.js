@@ -44,7 +44,7 @@ export const ExploreContext = createContext({});
 export function ExploreProvider(props) {
   const history = useHistory();
   let { projectId } = useParams();
-  const { restApiClient } = useRestApiClient();
+  const { restApiClient, isLoading: authIsLoading } = useRestApiClient();
 
   const [currentProject, setCurrentProject] = useState(null);
   const [checkpointList, setCheckpointList] = useState(null);
@@ -147,10 +147,10 @@ export function ExploreProvider(props) {
 
   // Load project meta on load and api client ready
   useEffect(() => {
-    if (restApiClient) {
+    if (!authIsLoading && restApiClient) {
       loadInitialData();
     }
-  }, [restApiClient]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [authIsLoading, restApiClient]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (predictions.fetching) {
