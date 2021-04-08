@@ -10,6 +10,7 @@ import { Accordion, AccordionFold as BaseFold } from '@devseed-ui/accordion';
 import throttle from 'lodash.throttle';
 import { useMapLayers, useMapRef, useUserLayers } from '../../context/map';
 import { usePredictions } from '../../context/explore';
+import { useCheckpoint } from '../../context/checkpoint';
 
 const Wrapper = styled.div`
   display: grid;
@@ -172,6 +173,7 @@ function LayersPanel(props) {
   const { userLayers, setUserLayers } = useUserLayers();
   const { mapLayers } = useMapLayers();
   const { predictions } = usePredictions();
+  const { currentCheckpoint } = useCheckpoint();
 
   // Toggle predictions layer
   useEffect(() => {
@@ -183,6 +185,19 @@ function LayersPanel(props) {
       },
     });
   }, [predictions.fetching, predictions.fetched]);
+
+  useEffect(() => {
+    setUserLayers({
+      ...userLayers,
+      retrainingSamples: {
+        ...userLayers.retrainingSamples,
+        active:
+          currentCheckpoint &&
+          currentCheckpoint.retrain_geoms &&
+          currentCheckpoint.retrain_geoms.length > 0,
+      },
+    });
+  }, [currentCheckpoint && currentCheckpoint.id]);
 
   return (
     <div className={className}>
