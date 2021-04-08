@@ -196,12 +196,8 @@ function LayersPanel(props) {
           ({ checkExpanded, setExpanded }) => (
             <>
               <Category
-                checkExpanded={() => {
-                  return checkExpanded(0);
-                }}
-                setExpanded={() => {
-                  return setExpanded(0);
-                }}
+                checkExpanded={() => checkExpanded(0)}
+                setExpanded={(v) => setExpanded(0, v)}
                 category='User Layers'
                 layers={userLayers}
                 onSliderChange={(layer, value) => {
@@ -225,12 +221,8 @@ function LayersPanel(props) {
               />
 
               <Category
-                checkExpanded={() => {
-                  return checkExpanded(1);
-                }}
-                setExpanded={() => {
-                  return setExpanded(1);
-                }}
+                checkExpanded={() => checkExpanded(1)}
+                setExpanded={(v) => setExpanded(1, v)}
                 category='Base Satellite Imagery'
                 layers={mapLayers}
                 onSliderChange={(layer, value) => {
