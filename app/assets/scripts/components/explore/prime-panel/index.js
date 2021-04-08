@@ -1,29 +1,20 @@
 import React, { useEffect, useState, useContext } from 'react';
-import styled, { css } from 'styled-components';
-import { themeVal, glsp } from '@devseed-ui/theme-provider';
+import styled from 'styled-components';
+import { glsp } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
 import { Button } from '@devseed-ui/button';
-import collecticon from '@devseed-ui/collecticons';
 import { Form, FormInput } from '@devseed-ui/form';
 
 import Panel from '../../common/panel';
 import {
   PanelBlock,
-  PanelBlockHeader as BasePanelBlockHeader,
   PanelBlockBody,
   PanelBlockFooter,
 } from '../../common/panel-block';
-import { Subheading } from '../../../styles/type/heading';
 import SelectModal from '../../common/select-modal';
 import { Card } from '../../common/card-list';
 
-import {
-  Dropdown,
-  DropdownHeader,
-  DropdownBody,
-  DropdownItem,
-  DropdownFooter,
-} from '../../../styles/dropdown';
+import { Dropdown, DropdownBody } from '../../../styles/dropdown';
 
 import { useMapLayers, useMapRef } from '../../../context/map';
 import {
@@ -38,19 +29,13 @@ import TabbedBlock from '../../common/tabbed-block-body';
 import RetrainModel from './retrain-model';
 import RefineModel from './refine-model';
 
+import PanelHeader from './header';
+
 import LayersPanel from '../layers-panel';
-import { BOUNDS_PADDING } from '../../common/map/constants';
-import {
-  HeadOption,
-  HeadOptionHeadline,
-  HeadOptionToolbar,
-} from '../../../styles/panel';
-import { EditButton } from '../../../styles/button';
 import { LocalButton } from '../../../styles/local-button';
 
 import InfoButton from '../../common/info-button';
 
-import { formatThousands } from '../../../utils/format';
 import { AuthContext } from '../../../context/auth';
 import {
   useCheckpoint,
@@ -58,45 +43,8 @@ import {
   checkpointModes,
 } from '../../../context/checkpoint';
 
-import { AoiEditButtons } from './aoi-edit-buttons';
-
-const SelectAoiTrigger = styled.div`
-  cursor: pointer;
-`;
-
-const SubheadingStrong = styled.h3`
-  color: ${themeVal('color.base')};
-  font-size: 1.125rem;
-  line-height: 1.5rem;
-
-  ${({ useIcon }) =>
-    useIcon &&
-    css`
-      display: grid;
-      grid-template-columns: max-content max-content;
-      grid-gap: 1rem;
-      &::after {
-        ${collecticon(useIcon)}
-      }
-    `}
-  ${({ onClick }) =>
-    onClick &&
-    css`
-      transition: opacity 0.24s ease 0s;
-      &:hover {
-        cursor: pointer;
-        opacity: 0.64;
-      }
-    `}
-`;
-
 const StyledPanelBlock = styled(PanelBlock)`
   width: ${glsp(24)};
-`;
-
-const PanelBlockHeader = styled(BasePanelBlockHeader)`
-  display: grid;
-  grid-gap: ${glsp(0.75)};
 `;
 
 const PanelControls = styled(PanelBlockFooter)`
@@ -165,60 +113,6 @@ function PrimePanel() {
     ? 'Run inference for this model'
     : 'Create project and run model';
 
-  const renderAoiHeader = (triggerProps) => {
-    let header;
-    let area;
-    let disabled;
-    if (aoiArea && aoiArea > 0 && mapState.mode === mapModes.EDIT_AOI_MODE) {
-      header = `${formatThousands(aoiArea / 1e6)} km2`;
-    } else if (aoiName) {
-      header = aoiName;
-      area = `${formatThousands(aoiArea / 1e6)} km2`;
-    } else if (mapState.mode === mapModes.CREATE_AOI_MODE) {
-      header = 'Drag on map to select';
-    } else {
-      header = 'None selected - Draw area on map';
-    }
-
-    const disabledProps = {
-      onClick: () => null,
-      useIcon: null,
-    };
-
-    if (mapState.mode === mapModes.EDIT_AOI_MODE || aoiList.length === 0) {
-      disabled = true;
-    }
-
-    return (
-      <SelectAoiTrigger>
-        <SubheadingStrong
-          data-cy='aoi-selection-trigger'
-          {...triggerProps}
-          useIcon='chevron-down--small'
-          {...(disabled ? disabledProps : {})}
-        >
-          {header}
-        </SubheadingStrong>
-        {area && (
-          <Heading className='subtitle' useAlt>
-            {area}
-          </Heading>
-        )}
-      </SelectAoiTrigger>
-    );
-  };
-
-  const renderCheckpointSelectionHeader = () => {
-    if (currentCheckpoint && currentCheckpoint.id) {
-      return `${currentCheckpoint.name} (${currentCheckpoint.id})`;
-    } else if (checkpointList?.length) {
-      return `${checkpointList.length} checkpoint${
-        checkpointList.length > 1 ? 's' : ''
-      } available`;
-    } else {
-      return 'Run model to create first checkpoint';
-    }
-  };
   // Retrain Panel Tab Empty State message
   //
   const retrainPlaceHolderMessage = () => {
@@ -279,174 +173,34 @@ function PrimePanel() {
         fitContent
         bodyContent={
           <StyledPanelBlock>
-            <PanelBlockHeader>
-              <HeadOption hasSubtitle>
-                <HeadOptionHeadline>
-                  <Subheading>Selected Area </Subheading>
-                </HeadOptionHeadline>
+            <PanelHeader
+              {...{
+                aoiRef,
+                setAoiRef,
+                setAoiBounds,
+                aoiBounds,
+                aoiArea,
+                aoiName,
+                aoiList,
+                loadAoi,
+                createNewAoi,
 
-                <Dropdown
-                  alignment='left'
-                  direction='down'
-                  triggerElement={
-                    (triggerProps) => renderAoiHeader(triggerProps)
-                    /* eslint-disable-next-line */
-                  }
-                >
-                  <>
-                    <DropdownHeader unshaded>
-                      <Heading useAlt size='xsmall'>
-                        Available Areas of Interest
-                      </Heading>
-                    </DropdownHeader>
-                    <DropdownBody>
-                      {aoiList.map((a) => (
-                        <li key={a.id} data-dropdown='click.close'>
-                          <DropdownItem
-                            onClick={() => {
-                              loadAoi(currentProject, a).then((bounds) =>
-                                mapRef.fitBounds(bounds, {
-                                  padding: BOUNDS_PADDING,
-                                })
-                              );
-                            }}
-                          >
-                            {`${a.name}`}
-                          </DropdownItem>
-                        </li>
-                      ))}
-                    </DropdownBody>
-                    {(currentCheckpoint || aoiList.length > 0) && (
-                      <DropdownFooter>
-                        <DropdownItem
-                          useIcon='plus'
-                          onClick={() => {
-                            createNewAoi();
-                            mapRef.aoi.control.draw.disable();
-                            //Layer must be removed from the map
-                            mapRef.aoi.control.draw.clear();
-                          }}
-                          data-cy='add-aoi-button'
-                          data-dropdown='click.close'
-                        >
-                          Add AOI
-                        </DropdownItem>
-                      </DropdownFooter>
-                    )}
-                  </>
-                </Dropdown>
+                mapState,
+                mapModes,
+                mapRef,
 
-                <HeadOptionToolbar>
-                  <AoiEditButtons
-                    aoiRef={aoiRef}
-                    setAoiRef={setAoiRef}
-                    aoiArea={aoiArea}
-                    setAoiBounds={setAoiBounds}
-                    aoiBounds={aoiBounds}
-                  />
-                </HeadOptionToolbar>
-              </HeadOption>
+                currentCheckpoint,
+                checkpointList,
+                applyCheckpoint,
 
-              <HeadOption>
-                <HeadOptionHeadline>
-                  <Subheading>Selected Model</Subheading>
-                </HeadOptionHeadline>
-                <SubheadingStrong
-                  data-cy='select-model-label'
-                  onClick={function () {
-                    setShowSelectModelModal(true);
-                  }}
-                  title='Edit Model'
-                >
-                  {(selectedModel && selectedModel.name) ||
-                    (isAuthenticated
-                      ? models && models.length
-                        ? 'Select Model'
-                        : 'No models available'
-                      : 'Login to select model')}
-                </SubheadingStrong>
-                <HeadOptionToolbar>
-                  <EditButton
-                    data-cy='show-select-model-button'
-                    useIcon='swap-horizontal'
-                    id='select-model-trigger'
-                    onClick={function () {
-                      setShowSelectModelModal(true);
-                    }}
-                    title='Edit Model'
-                    disabled={!models?.length}
-                  >
-                    Edit Model Selection
-                  </EditButton>
-                </HeadOptionToolbar>
-              </HeadOption>
+                setShowSelectModelModal,
+                selectedModel,
+                models,
 
-              <HeadOption>
-                <HeadOptionHeadline>
-                  <Subheading>Checkpoint</Subheading>
-                </HeadOptionHeadline>
-                <Dropdown
-                  alignment='right'
-                  direction='down'
-                  triggerElement={(props) => (
-                    <>
-                      <SubheadingStrong
-                        {...props}
-                        onClick={(e) => checkpointList && props.onClick(e)} // eslint-disable-line
-                        title={
-                          checkpointList
-                            ? 'Change checkpoint'
-                            : 'Run and retrain model to create first checkpoint'
-                        }
-                      >
-                        {renderCheckpointSelectionHeader()}
-                      </SubheadingStrong>
-                      <HeadOptionToolbar>
-                        <EditButton
-                          data-cy='show-select-checkpoint-button'
-                          useIcon='swap-horizontal'
-                          title={
-                            checkpointList
-                              ? 'Change checkpoint'
-                              : 'Run model to create first checkpoint'
-                          }
-                          id='checkpoint-list-trigger'
-                          {...props}
-                          onClick={(e) => checkpointList && props.onClick(e)} // eslint-disable-line
-                        >
-                          Edit Checkpoint Selection
-                        </EditButton>
-                      </HeadOptionToolbar>
-                    </>
-                  )}
-                  className='global__dropdown'
-                >
-                  <>
-                    <DropdownHeader unshaded>
-                      <p>Checkpoints</p>
-                    </DropdownHeader>
-                    <DropdownBody selectable>
-                      {checkpointList?.length &&
-                        checkpointList.map((ckpt) => (
-                          <DropdownItem
-                            key={ckpt.id}
-                            data-dropdown='click.close'
-                            checked={
-                              ckpt.id ==
-                              (currentCheckpoint && currentCheckpoint.id)
-                            }
-                            onClick={() => {
-                              applyCheckpoint(currentProject.id, ckpt.id);
-                            }}
-                          >
-                            {ckpt.name} ({ckpt.id})
-                          </DropdownItem>
-                        ))}
-                    </DropdownBody>
-                  </>
-                </Dropdown>
-              </HeadOption>
-            </PanelBlockHeader>
+                isAuthenticated,
+                currentProject,
+              }}
+            />
             <PanelBlockBody>
               <TabbedBlock>
                 <RetrainModel
