@@ -12,32 +12,27 @@ import { useMapState } from '../../../context/explore.js';
 
 const ClassList = styled.div`
   display: grid;
-  grid-gap: ${glsp(0.5)};
 
   ${PlaceholderMessage} {
     padding: 2rem;
+  }
+
+  > ${Heading} {
+    padding: 0 1.5rem;
   }
 `;
 
 const Class = styled.div`
   display: grid;
   grid-template-columns: min-content auto min-content;
-  grid-gap: ${glsp(1)};
-  padding-bottom: ${({ placeholder }) => placeholder && glsp()};
+  grid-gap: 0 ${glsp(1)};
+  padding: ${({ placeholder }) =>
+    placeholder ? '0 1.5rem 1rem' : '0.5rem 1.5rem'};
   align-items: ${({ placeholder }) => (placeholder ? 'stretch' : 'center')};
   background: none;
   border: none;
   outline: none;
-  ${Heading} {
-    margin: 0;
-    align-self: center;
-    text-align: left;
-    background: ${({ placeholder }) =>
-      placeholder ? themeVal('color.baseAlphaD') : 'none'};
-    width: ${({ placeholder }) => (placeholder ? '10rem' : 'initial')};
-    height: ${({ placeholder }) => (placeholder ? '1rem' : 'auto')};
-    line-height: 1;
-  }
+  transition: all 0.16s ease-out 0s;
 
   ${({ muted }) =>
     muted &&
@@ -45,14 +40,16 @@ const Class = styled.div`
       color: ${themeVal('color.baseAlphaE')};
       border-color: ${themeVal('color.baseAlphaE')};
     `};
+
   &.add__class {
-    transition: all 0.16s ease-out 0s;
     margin-top: ${glsp()};
-    padding: ${glsp(0.5)} 0;
+    padding: ${glsp(0.5)} ${glsp(1.5)};
+    // Add Class Button styles. May be removed if this takes on a different onClick configuration
     span {
       display: grid;
       grid-template-columns: min-content auto min-content;
-      grid-gap: ${glsp(1)};
+      align-items: center;
+      grid-gap: 0 ${glsp(1)};
     }
     :hover {
       color: ${themeVal('color.base')};
@@ -61,14 +58,68 @@ const Class = styled.div`
   &.placeholder-class:first-child {
     margin-top: ${glsp(2)};
   }
+
+  &:hover {
+    ${({ placeholder }) =>
+      !placeholder &&
+      css`
+        background: ${themeVal('color.primaryAlphaB')};
+        cursor: pointer;
+      `}
+  }
+  ${({ selected }) =>
+    selected &&
+    css`
+      position: relative;
+      background: ${themeVal('color.primaryAlphaB')};
+      &:after {
+        position: absolute;
+        content: '';
+        width: 6px;
+        height: 100%;
+        top: 0;
+        left: 0;
+        background: ${themeVal('color.primary')};
+      }
+    `};
 `;
-const Thumbnail = styled.div`
+
+const ClassInfoWrapper = styled.div`
+  grid-row: 1 / 3;
+  grid-column: 2;
+  display: flex;
+  flex-flow: column;
+`;
+
+const ClassHeading = styled(Heading)`
+  margin: 0;
+  text-align: left;
+  background: ${({ placeholder }) =>
+    placeholder ? themeVal('color.baseAlphaD') : 'none'};
+  width: ${({ placeholder }) => (placeholder ? '10rem' : 'initial')};
+  height: ${({ placeholder }) => (placeholder ? '1rem' : 'auto')};
+  line-height: 1;
+  grid-column: ${(placeholder) => placeholder && '2'};
+  grid-row: ${(placeholder) => placeholder && '1 / 3'};
+`;
+
+const ClassSamples = styled.p`
+  grid-row: 2;
+  grid-column: 2;
+  font-size: 0.75rem;
+`;
+
+const ClassOptions = styled(Button)`
+  grid-row: 1 / 3;
+`;
+const ClassThumbnail = styled.div`
   width: ${glsp(1.5)};
   height: ${glsp(1.5)};
   background: ${({ color }) => color || themeVal('color.baseAlphaD')};
   display: grid;
   justify-content: center;
   align-content: center;
+  grid-row: 1 / 3;
   ${({ outline }) =>
     outline &&
     css`
@@ -90,6 +141,7 @@ const Wrapper = styled.div`
 `;
 
 const RetrainTools = styled.section`
+  padding: 0 1.5rem;
   ${Button} {
     margin-left: ${glsp(0.25)};
     margin-right: ${glsp()};
@@ -165,18 +217,36 @@ function RetrainModel(props) {
                 }}
                 selected={currentCheckpoint.activeClass === c.name}
               >
-                <Thumbnail color={c.color} />
-                <Heading size='xsmall'>
-                  {c.name} (
-                  {get(c, 'points.coordinates.length', 0) +
-                    get(c, 'polygons.length', 0)}{' '}
-                  samples)
-                  {currentCheckpoint.activeClass === c.name ? ' (Active)' : ''}
-                </Heading>
+                <ClassThumbnail color={c.color} />
+                <ClassInfoWrapper>
+                  <ClassHeading size='xsmall'>{c.name}</ClassHeading>
+                  <ClassSamples>
+                    {get(c, 'polygons.length') > 0 && (
+                      <strong>
+                        {get(c, 'polygons.length')}{' '}
+                        {get(c, 'polygons.length') > 1 ? 'polygons' : 'polygon'}
+                      </strong>
+                    )}
+                    {get(c, 'points.coordinates.length') > 0 &&
+                      get(c, 'polygons.length') > 0 &&
+                      ` | `}
+                    {get(c, 'points.coordinates.length') > 0 && (
+                      <strong>
+                        {get(c, 'points.coordinates.length')}{' '}
+                        {get(c, 'points.coordinates.length') > 1
+                          ? 'points'
+                          : 'point'}
+                      </strong>
+                    )}{' '}
+                    {(get(c, 'points.coordinates.length') > 0 ||
+                      get(c, 'polygons.length') > 0) &&
+                      `selected for retraining`}
+                  </ClassSamples>
+                </ClassInfoWrapper>
 
-                <Button useIcon='cog' hideText variation='base-plain'>
+                <ClassOptions useIcon='cog' hideText variation='base-plain'>
                   Options
-                </Button>
+                </ClassOptions>
               </Class>
             ))}
           </ClassList>
@@ -191,9 +261,9 @@ function RetrainModel(props) {
             // assing a + casts it to int which is logically equivalent
             // but does not cause the DOM error
             <Class key={i} placeholder={+true} className='placeholder-class'>
-              <Thumbnail />
-              <Heading size='xsmall' />
-              <Button disabled size='small' variation='base-raised-semidark' />
+              <ClassThumbnail />
+              <ClassHeading size='xsmall' placeholder={+true} />
+              <ClassThumbnail />
             </Class>
           ))}
           <PlaceholderMessage>{placeholderMessage}</PlaceholderMessage>
@@ -201,7 +271,7 @@ function RetrainModel(props) {
       )}
       {currentCheckpoint && (
         <Class className='add__class' muted as={Button}>
-          <Thumbnail useIcon='plus' outline />
+          <ClassThumbnail useIcon='plus' outline />
           <Heading size='xsmall'>Add Class</Heading>
         </Class>
       )}

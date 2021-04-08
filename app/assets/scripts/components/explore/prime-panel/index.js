@@ -422,6 +422,7 @@ function PrimePanel() {
               <TabbedBlock>
                 <RetrainModel
                   name='retrain model'
+                  className='retrain-model'
                   tabId='retrain-tab-trigger'
                   placeholderMessage={retrainPlaceHolderMessage()}
                 />
