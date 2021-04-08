@@ -4,6 +4,8 @@ import isEqual from 'lodash.isequal';
 import differenceWith from 'lodash.differencewith';
 import T from 'prop-types';
 
+import { wrapLogReducer } from './reducers/utils';
+
 const CheckpointContext = createContext(null);
 
 export const checkpointModes = {
@@ -31,7 +33,7 @@ export const actions = {
 
 export function CheckpointProvider(props) {
   const [currentCheckpoint, dispatchCurrentCheckpoint] = useReducer(
-    checkpointReducer
+    wrapLogReducer(checkpointReducer)
   );
 
   const value = {
@@ -97,13 +99,6 @@ function checkpointReducer(state, action) {
     case actions.ADD_CHECKPOINT_BRUSH:
       return {
         ...state,
-        history: [
-          ...state.history,
-          {
-            classes: state.classes,
-            checkpointBrushes: state.checkpointBrushes,
-          },
-        ],
         checkpointBrushes: {
           ...state.checkpointBrushes,
           [action.data.id]: {
