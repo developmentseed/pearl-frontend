@@ -161,7 +161,7 @@ function Projects() {
                       key={proj.id}
                       details={{
                         edited: proj.created,
-                        model: proj.model || 'No model set',
+                        model: proj.model ? proj.model.name : 'No model set',
                         checkpoint: proj.checkpoint || 'No checkpoint set',
                         aoi: proj.aoi || 'No AOI set',
                         results: (
