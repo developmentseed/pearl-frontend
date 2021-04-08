@@ -117,6 +117,7 @@
     "@turf/centroid": "^6.3.0",
     "chart.js": "^2.9.4",
     "element-resize-event": "^3.0.3",
+    "file-saver": "^2.0.5",
     "gulp-replace": "^1.0.0",
     "history": "^4.10.1",
     "leaflet": "^1.7.1",
