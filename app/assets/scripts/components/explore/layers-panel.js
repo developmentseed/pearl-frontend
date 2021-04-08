@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import T from 'prop-types';
 import styled from 'styled-components';
 import { Button } from '@devseed-ui/button';
@@ -8,6 +8,9 @@ import { themeVal, glsp } from '@devseed-ui/theme-provider';
 import InputRange from 'react-input-range';
 import { Accordion, AccordionFold as BaseFold } from '@devseed-ui/accordion';
 import throttle from 'lodash.throttle';
+import { useMapLayers, useMapRef, useUserLayers } from '../../context/map';
+import { usePredictions } from '../../context/explore';
+import { useCheckpoint } from '../../context/checkpoint';
 
 const Wrapper = styled.div`
   display: grid;
@@ -59,26 +62,26 @@ const AccordionFold = styled(BaseFold)`
   }
 `;
 
-function Layer({ layer, onSliderChange, onVisibilityToggle, info }) {
-  const [value, setValue] = useState(1);
+function Layer({ layer, onSliderChange, onVisibilityToggle, info, name }) {
+  const [value, setValue] = useState(layer.opacity || 1);
   const [visible, setVisible] = useState(true);
   return (
     <LayerWrapper>
       <IconPlaceholder />
       <SliderWrapper>
         <Heading as='h4' size='xsmall'>
-          {layer.name}
+          {name}
         </Heading>
         <InputRange
-          onChange={(v) => {
+          onChange={throttle((v) => {
             setValue(v);
-            onSliderChange(layer.name, v);
-          }}
+            onSliderChange(layer, v);
+          }, 500)}
           value={value}
           formatLabel={() => null}
           minValue={0}
           maxValue={1}
-          step={0.1}
+          step={0.05}
         />
       </SliderWrapper>
 
@@ -100,7 +103,7 @@ function Layer({ layer, onSliderChange, onVisibilityToggle, info }) {
         useIcon={visible ? 'eye' : 'eye-disabled'}
         onClick={() => {
           setVisible(!visible);
-          onVisibilityToggle(layer.name, !visible);
+          onVisibilityToggle(layer, !visible);
         }}
       >
         Info
@@ -114,6 +117,7 @@ Layer.propTypes = {
   onSliderChange: T.func,
   onVisibilityToggle: T.func,
   info: T.string,
+  name: T.string,
 };
 
 function Category({
@@ -124,6 +128,9 @@ function Category({
   onSliderChange,
   onVisibilityToggle,
 }) {
+  if (!Object.values(layers).find((f) => f.active)) {
+    return null;
+  }
   return (
     <AccordionFold
       id={`${category}-fold`}
@@ -132,15 +139,18 @@ function Category({
       setFoldExpanded={setExpanded}
       renderBody={() => (
         <Wrapper>
-          {layers.map((layer) => (
-            <Layer
-              key={`${category}-${layer.name}`}
-              layer={layer}
-              onSliderChange={onSliderChange}
-              onVisibilityToggle={onVisibilityToggle}
-              info={layer.info}
-            />
-          ))}
+          {Object.entries(layers)
+            .filter(([, layer]) => layer.active)
+            .map(([key, layer]) => (
+              <Layer
+                key={`${category}-${layer.name || key}`}
+                name={layer.name || key}
+                layer={layer}
+                onSliderChange={onSliderChange}
+                onVisibilityToggle={onVisibilityToggle}
+                info={layer.info}
+              />
+            ))}
         </Wrapper>
       )}
     />
@@ -151,83 +161,97 @@ Category.propTypes = {
   checkExpanded: T.func,
   setExpanded: T.func,
   category: T.string,
-  layers: T.array,
+  layers: T.object,
   onSliderChange: T.func,
   onVisibilityToggle: T.func,
 };
 
 function LayersPanel(props) {
-  const {
-    layers,
-    baseLayerNames,
-    className,
-    onSliderChange,
-    onVisibilityToggle,
-    onPredictionLayerVisibilityToggle,
-    setPredictionLayerOpacity,
-    predictionReady,
-  } = props;
+  const { className } = props;
 
-  const categorizedLayers = layers.reduce((cats, layer) => {
-    if (!cats[layer.category]) {
-      cats[layer.category] = [];
-    }
-    cats[layer.category].push(layer);
-    return cats;
-  }, {});
+  const { mapRef } = useMapRef();
+  const { userLayers, setUserLayers } = useUserLayers();
+  const { mapLayers } = useMapLayers();
+  const { predictions } = usePredictions();
+  const { currentCheckpoint } = useCheckpoint();
 
-  const baseLayers = baseLayerNames.map((n) => ({
-    name: n,
-  }));
+  // Toggle predictions layer
+  useEffect(() => {
+    setUserLayers({
+      ...userLayers,
+      predictions: {
+        ...userLayers.predictions,
+        active: !predictions.fetching && predictions.fetched,
+      },
+    });
+  }, [predictions.fetching, predictions.fetched]);
+
+  useEffect(() => {
+    setUserLayers({
+      ...userLayers,
+      retrainingSamples: {
+        ...userLayers.retrainingSamples,
+        active:
+          currentCheckpoint &&
+          currentCheckpoint.retrain_geoms &&
+          currentCheckpoint.retrain_geoms.reduce((count, { coordinates }) => {
+            return count + coordinates.length;
+          }, 0) > 0,
+      },
+    });
+  }, [currentCheckpoint && currentCheckpoint.id]);
 
   return (
     <div className={className}>
-      {predictionReady && (
-        <Layer
-          key='prediction-layer'
-          layer={{ name: 'LULC Inference' }}
-          onSliderChange={throttle((name, value) => {
-            setPredictionLayerOpacity(value);
-          }, 100)}
-          onVisibilityToggle={onPredictionLayerVisibilityToggle}
-        />
-      )}
       <Accordion
         className={className}
         allowMultiple
-        foldCount={Object.keys(categorizedLayers).length}
-        initialState={[
-          true,
-          ...Object.keys(categorizedLayers)
-            .slice(1)
-            .map(() => false),
-        ]}
+        foldCount={2}
+        initialState={[true, true]}
       >
         {
           ({ checkExpanded, setExpanded }) => (
             <>
-              {Object.entries(categorizedLayers).map(([cat, layers], index) => (
-                <Category
-                  key={cat}
-                  checkExpanded={() => checkExpanded(index)}
-                  setExpanded={(v) => setExpanded(index, v)}
-                  category={cat}
-                  layers={layers}
-                  onSliderChange={onSliderChange}
-                  onVisibilityToggle={onVisibilityToggle}
-                />
-              ))}
               <Category
-                checkExpanded={() => {
-                  return checkExpanded(Object.keys(categorizedLayers).length);
+                checkExpanded={() => checkExpanded(0)}
+                setExpanded={(v) => setExpanded(0, v)}
+                category='User Layers'
+                layers={userLayers}
+                onSliderChange={(layer, value) => {
+                  setUserLayers({
+                    ...userLayers,
+                    [layer.id]: {
+                      ...layer,
+                      opacity: value,
+                    },
+                  });
                 }}
-                setExpanded={(v) => {
-                  return setExpanded(Object.keys(categorizedLayers).length, v);
+                onVisibilityToggle={(layer) => {
+                  setUserLayers({
+                    ...userLayers,
+                    [layer.id]: {
+                      ...layer,
+                      visible: !layer.visible,
+                    },
+                  });
                 }}
+              />
+
+              <Category
+                checkExpanded={() => checkExpanded(1)}
+                setExpanded={(v) => setExpanded(1, v)}
                 category='Base Satellite Imagery'
-                layers={baseLayers}
-                onSliderChange={onSliderChange}
-                onVisibilityToggle={onVisibilityToggle}
+                layers={mapLayers}
+                onSliderChange={(layer, value) => {
+                  layer.layer.setOpacity(value);
+                }}
+                onVisibilityToggle={(layer, value) => {
+                  if (value) {
+                    mapRef.addLayer(layer.layer);
+                  } else {
+                    mapRef.removeLayer(layer.layer);
+                  }
+                }}
               />
             </>
           )
@@ -239,14 +263,7 @@ function LayersPanel(props) {
 }
 
 LayersPanel.propTypes = {
-  layers: T.array,
   className: T.string,
-  baseLayerNames: T.array,
-  onSliderChange: T.func,
-  onVisibilityToggle: T.func,
-  setPredictionLayerOpacity: T.func,
-  onPredictionLayerVisibilityToggle: T.func,
-  predictionReady: T.bool,
 };
 
 export default LayersPanel;

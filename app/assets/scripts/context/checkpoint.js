@@ -1,9 +1,10 @@
-import { useContext, useMemo } from 'react';
+import React, { createContext, useContext, useMemo, useReducer } from 'react';
 import uniqWith from 'lodash.uniqwith';
 import isEqual from 'lodash.isequal';
 import differenceWith from 'lodash.differencewith';
-import { useRestApiClient } from './auth';
-import { useProject, useMapState, ExploreContext } from './explore';
+import T from 'prop-types';
+
+const CheckpointContext = createContext(null);
 
 export const checkpointModes = {
   RUN: 'RUN',
@@ -28,7 +29,28 @@ export const actions = {
   INPUT_UNDO: 'INPUT_UNDO',
 };
 
-export function checkpointReducer(state, action) {
+export function CheckpointProvider(props) {
+  const [currentCheckpoint, dispatchCurrentCheckpoint] = useReducer(
+    checkpointReducer
+  );
+
+  const value = {
+    currentCheckpoint,
+    dispatchCurrentCheckpoint,
+  };
+
+  return (
+    <CheckpointContext.Provider value={value}>
+      {props.children}
+    </CheckpointContext.Provider>
+  );
+}
+
+CheckpointProvider.propTypes = {
+  children: T.node,
+};
+
+function checkpointReducer(state, action) {
   switch (action.type) {
     case actions.SET_CHECKPOINT:
       // Action used to load existing or initialize a new checkpoint
@@ -280,11 +302,11 @@ export function checkpointReducer(state, action) {
 
 // Check if consumer function is used properly
 const useCheckContext = (fnName) => {
-  const context = useContext(ExploreContext);
+  const context = useContext(CheckpointContext);
 
   if (!context) {
     throw new Error(
-      `The \`${fnName}\` hook must be used inside the <ExploreContext> component's context.`
+      `The \`${fnName}\` hook must be used inside the <CheckpointContext> component's context.`
     );
   }
 
@@ -292,10 +314,6 @@ const useCheckContext = (fnName) => {
 };
 
 export const useCheckpoint = () => {
-  const { setMapMode, mapModes } = useMapState();
-  const { restApiClient } = useRestApiClient();
-  const { currentProject, aoiRef, aoiName } = useProject();
-  // const { sendWebsocketMessage } = useWebsocketClient();
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckContext(
     'useCheckpoint'
   );
@@ -305,16 +323,6 @@ export const useCheckpoint = () => {
       currentCheckpoint,
       dispatchCurrentCheckpoint,
     }),
-    [
-      aoiName,
-      aoiRef,
-      currentProject,
-      restApiClient,
-      // sendWebsocketMessage,
-      currentCheckpoint,
-      dispatchCurrentCheckpoint,
-      setMapMode,
-      mapModes,
-    ]
+    [currentCheckpoint, dispatchCurrentCheckpoint]
   );
 };

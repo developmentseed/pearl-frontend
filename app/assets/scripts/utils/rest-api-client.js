@@ -1,26 +1,35 @@
 import toasts from '../components/common/toasts';
 import config from '../config';
-import { fetchJSON } from './reducers/reduxeed';
+import { fetchJSON } from '../context/reducers/reduxeed';
 const { restApiEndpoint } = config;
 
 class RestApiClient {
   constructor(props) {
-    this.accessToken = `Bearer ${props.apiToken}`;
+    this.apiToken = props.apiToken;
     this.handleUnauthorized = props.handleUnauthorized;
+
+    this.defaultOptions = {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    };
+
+    // Add token if available
+    if (this.apiToken) {
+      this.defaultOptions.headers.Authorization = `Bearer ${this.apiToken}`;
+    }
   }
 
   getUrl(subpath) {
     return `${restApiEndpoint}/api/${subpath}`;
   }
 
-  async fetch(method, path, data) {
+  async fetch(method, path, data, format = 'json') {
     const url = this.getUrl(path);
     const options = {
+      ...this.defaultOptions,
       method,
-      headers: {
-        Authorization: this.accessToken,
-        'Content-Type': 'application/json',
-      },
+      format,
     };
 
     if (data) {
@@ -40,8 +49,8 @@ class RestApiClient {
     }
   }
 
-  get(path) {
-    return this.fetch('GET', path);
+  get(path, format = 'json') {
+    return this.fetch('GET', path, null, format);
   }
 
   post(path, data) {
@@ -86,6 +95,20 @@ class RestApiClient {
 
   getActiveInstances(projectId) {
     return this.get(`project/${projectId}/instance/?status=active`);
+  }
+
+  bookmarkAOI(projectId, aoiId, name) {
+    return this.patch(`project/${projectId}/aoi/${aoiId}`, {
+      bookmarked: true,
+      name,
+    });
+  }
+
+  downloadGeotiff(projectId, aoiId) {
+    return this.get(
+      `project/${projectId}/aoi/${aoiId}/download/color`,
+      'binary'
+    );
   }
 }
 

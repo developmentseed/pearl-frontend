@@ -16,20 +16,17 @@ import {
 } from '@devseed-ui/global-loading';
 import toasts from '../components/common/toasts';
 import { useHistory, useParams } from 'react-router-dom';
-import GlobalContext from './global';
 import predictionsReducer, {
   actions as predictionActions,
 } from './reducers/predictions';
 import { mapStateReducer, mapModes, mapActionTypes } from './reducers/map';
 import tBbox from '@turf/bbox';
-import tBboxPolygon from '@turf/bbox-polygon';
-import tCentroid from '@turf/centroid';
+import reverseGeoCode from '../utils/reverse-geocode';
 
 import {
   actions as checkpointActions,
-  checkpointModes,
-  checkpointReducer,
   useCheckpoint,
+  checkpointModes,
 } from './checkpoint';
 import get from 'lodash.get';
 import logger from '../utils/logger';
@@ -44,11 +41,12 @@ import {
 /**
  * Context & Provider
  */
-export const ExploreContext = createContext({});
+export const ExploreContext = createContext(null);
+
 export function ExploreProvider(props) {
   const history = useHistory();
   let { projectId } = useParams();
-  const { restApiClient } = useContext(GlobalContext);
+  const { restApiClient, isLoading: authIsLoading } = useRestApiClient();
 
   const [currentProject, setCurrentProject] = useState(null);
   const [checkpointList, setCheckpointList] = useState(null);
@@ -80,9 +78,7 @@ export function ExploreProvider(props) {
 
   const [selectedModel, setSelectedModel] = useState(null);
 
-  const [currentCheckpoint, dispatchCurrentCheckpoint] = useReducer(
-    wrapLogReducer(checkpointReducer)
-  );
+  const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
 
   const [predictions, dispatchPredictions] = useReducer(
     predictionsReducer,
@@ -90,12 +86,8 @@ export function ExploreProvider(props) {
   );
   const [currentInstance, setCurrentInstance] = useState(null);
 
-  const [apiMeta, setApiMeta] = useState();
-
   async function loadInitialData() {
     showGlobalLoadingMessage('Loading configuration...');
-    const apiMeta = await restApiClient.getApiMeta();
-    setApiMeta(apiMeta);
 
     // Bypass loading project when new
     if (projectId === 'new') {
@@ -154,10 +146,10 @@ export function ExploreProvider(props) {
 
   // Load project meta on load and api client ready
   useEffect(() => {
-    if (restApiClient) {
+    if (!authIsLoading && restApiClient) {
       loadInitialData();
     }
-  }, [restApiClient]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [authIsLoading, restApiClient]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (predictions.fetching) {
@@ -372,55 +364,6 @@ export function ExploreProvider(props) {
     }
   }
 
-  /*
-   * Reverse geocode using Bing
-   *
-   * @param bbox - should be turf bbox [minx, miny, maxX, maxY] or polygon feature
-   */
-  async function reverseGeoCode(bbox) {
-    /*
-    if (!aoiBounds) {
-      console.error('defined bounds before reverse geocoding')
-    }*/
-
-    let center;
-    if (Array.isArray(bbox)) {
-      // Need to create a polygon
-      center = tCentroid(tBboxPolygon(bbox));
-    } else {
-      // Assume a polygon feature is provided
-      center = tCentroid(bbox);
-    }
-
-    const [lon, lat] = center.geometry.coordinates;
-
-    const address = await fetch(
-      `${config.bingSearchUrl}/Locations/${lat},${lon}?radius=${config.reverseGeocodeRadius}&includeEntityTypes=address&key=${config.bingApiKey}`,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        mode: 'cors',
-      }
-    )
-      .then((res) => res.json())
-      .catch(() => {
-        toasts.error('Error querying address');
-        return null;
-      });
-
-    let name;
-    if (address && address.resourceSets[0].estimatedTotal) {
-      // Use first result if there are any
-      name = address.resourceSets[0].resources[0].address.locality;
-    } else {
-      toasts.warn('AOI not geocodable, generic name used');
-      name = 'Area';
-    }
-    // else leave name undefined, should be set by user
-    return name;
-  }
-
   useEffect(() => {
     if (!aoiRef) {
       setAoiArea(null);
@@ -484,7 +427,6 @@ export function ExploreProvider(props) {
     <ExploreContext.Provider
       value={{
         predictions,
-        apiLimits: apiMeta && apiMeta.limits,
 
         mapState,
         dispatchMapState,
@@ -521,8 +463,6 @@ export function ExploreProvider(props) {
 
         updateProjectName,
         updateCheckpointName,
-
-        reverseGeoCode,
       }}
     >
       {props.children}
