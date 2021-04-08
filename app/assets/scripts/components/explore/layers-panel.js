@@ -194,7 +194,9 @@ function LayersPanel(props) {
         active:
           currentCheckpoint &&
           currentCheckpoint.retrain_geoms &&
-          currentCheckpoint.retrain_geoms.length > 0,
+          currentCheckpoint.retrain_geoms.reduce((count, { coordinates }) => {
+            return count + coordinates.length;
+          }, 0) > 0,
       },
     });
   }, [currentCheckpoint && currentCheckpoint.id]);

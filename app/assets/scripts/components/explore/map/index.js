@@ -305,18 +305,20 @@ function Map() {
             />
           ))}
 
-        {currentCheckpoint && currentCheckpoint.id && (
-          <VectorLayer
-            url={`${config.restApiEndpoint}/api/project/${currentProject.id}/checkpoint/${currentCheckpoint.id}/tiles/{z}/{x}/{y}.mvt`}
-            token={`Bearer ${restApiClient.apiToken}`}
-            pane='markerPane'
-            opacity={
-              userLayers.retrainingSamples.visible
-                ? userLayers.retrainingSamples.opacity
-                : 0
-            }
-          />
-        )}
+        {currentCheckpoint &&
+          currentCheckpoint.id &&
+          userLayers.retrainingSamples.active && (
+            <VectorLayer
+              url={`${config.restApiEndpoint}/api/project/${currentProject.id}/checkpoint/${currentCheckpoint.id}/tiles/{z}/{x}/{y}.mvt`}
+              token={`Bearer ${restApiClient.apiToken}`}
+              pane='markerPane'
+              opacity={
+                userLayers.retrainingSamples.visible
+                  ? userLayers.retrainingSamples.opacity
+                  : 0
+              }
+            />
+          )}
 
         {predictions.data.predictions &&
           predictions.data.predictions.map((p) => (
