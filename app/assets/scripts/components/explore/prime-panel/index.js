@@ -124,6 +124,7 @@ function PrimePanel() {
         },
         0
       );
+      console.log(sampleCount)
 
       // There should be no polygon or point samples on the map
       // User must submit or clear retrain samples before starting refine
@@ -189,8 +190,7 @@ function PrimePanel() {
                   placeholderMessage={retrainPlaceHolderMessage()}
                   ready={
                     currentCheckpoint &&
-                    (!predictions.isReady() ||
-                      currentCheckpoint.mode === checkpointModes.RETRAIN)
+                      (currentCheckpoint.mode === checkpointModes.RETRAIN || currentCheckpoint.mode === checkpointModes.RUN)
                   }
                   onTabClick={() => {
                     if (currentCheckpoint) {
@@ -262,6 +262,7 @@ function PrimePanel() {
                 dispatchCurrentCheckpoint,
                 currentCheckpoint,
                 checkpointActions,
+                checkpointModes,
 
                 updateCheckpointName,
                 localCheckpointName,
