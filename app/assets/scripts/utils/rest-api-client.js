@@ -24,11 +24,12 @@ class RestApiClient {
     return `${restApiEndpoint}/api/${subpath}`;
   }
 
-  async fetch(method, path, data) {
+  async fetch(method, path, data, format = 'json') {
     const url = this.getUrl(path);
     const options = {
       ...this.defaultOptions,
       method,
+      format,
     };
 
     if (data) {
@@ -48,8 +49,8 @@ class RestApiClient {
     }
   }
 
-  get(path) {
-    return this.fetch('GET', path);
+  get(path, format = 'json') {
+    return this.fetch('GET', path, null, format);
   }
 
   post(path, data) {
@@ -94,6 +95,20 @@ class RestApiClient {
 
   getActiveInstances(projectId) {
     return this.get(`project/${projectId}/instance/?status=active`);
+  }
+
+  bookmarkAOI(projectId, aoiId, name) {
+    return this.patch(`project/${projectId}/aoi/${aoiId}`, {
+      bookmarked: true,
+      name,
+    });
+  }
+
+  downloadGeotiff(projectId, aoiId) {
+    return this.get(
+      `project/${projectId}/aoi/${aoiId}/download/color`,
+      'binary'
+    );
   }
 }
 

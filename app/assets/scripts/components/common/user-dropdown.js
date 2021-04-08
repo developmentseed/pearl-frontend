@@ -105,7 +105,7 @@ function UserDropdown() {
           <>
             <DropdownHeader>
               <p>Hello</p>
-              <Heading>{user.name}</Heading>
+              <Heading size='xsmall'>{user.name}</Heading>
             </DropdownHeader>
             <DropdownBody>
               <li>
