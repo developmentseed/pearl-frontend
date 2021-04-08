@@ -22,7 +22,6 @@ import { Form, FormInput } from '@devseed-ui/form';
 import InfoButton from '../common/info-button';
 import { ExploreContext } from '../../context/explore';
 import { AuthContext, useRestApiClient } from '../../context/auth';
-// import { arrayBufferToBase64, convertBase64ToFile } from '../../utils/format';
 import toasts from '../common/toasts';
 import logger from '../../utils/logger';
 
