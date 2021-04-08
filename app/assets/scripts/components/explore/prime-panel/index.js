@@ -251,7 +251,7 @@ function PrimePanel() {
                 />
                 <LayersPanel
                   onTabClick={() => {
-                    setActiveTab('LAYERS')
+                    setActiveTab('LAYERS');
                   }}
                   name='layers'
                   tabId='layers-tab-trigger'
