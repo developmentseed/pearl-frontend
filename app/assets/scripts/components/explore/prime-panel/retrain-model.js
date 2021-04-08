@@ -28,11 +28,12 @@ const Class = styled.div`
   grid-gap: 0 ${glsp(1)};
   padding: ${({ placeholder }) =>
     placeholder ? '0 1.5rem 1rem' : '0.5rem 1.5rem'};
-  align-items: ${({ placeholder }) => (placeholder ? 'stretch' : 'center')};
+  align-items: center;
   background: none;
   border: none;
   outline: none;
   transition: all 0.16s ease-out 0s;
+  height: 3.125rem;
 
   ${({ muted }) =>
     muted &&
@@ -240,7 +241,7 @@ function RetrainModel(props) {
                     )}{' '}
                     {(get(c, 'points.coordinates.length') > 0 ||
                       get(c, 'polygons.length') > 0) &&
-                      `selected for retraining`}
+                      `selected since last retrain`}
                   </ClassSamples>
                 </ClassInfoWrapper>
 
