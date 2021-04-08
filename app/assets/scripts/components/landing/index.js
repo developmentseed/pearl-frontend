@@ -18,8 +18,9 @@ const { baseUrl } = config;
 
 const HomeBody = styled(InpageBody)`
   display: flex;
+  flex-flow: row wrap;
   height: 100%;
-  align-items: center;
+  align-items: flex-end;
   color: ${themeVal('color.surface')};
 
   background-image: linear-gradient(to top right, #040a15, rgba(4, 10, 21, 0)),
@@ -40,6 +41,7 @@ const HomeBody = styled(InpageBody)`
 const HomeIntro = styled(InpageBodyInner)`
   max-width: 50rem;
   margin: 0;
+  margin-top: 12vw;
   ${media.xlargeUp`
     margin: 0 12vw;
   `};
@@ -62,7 +64,7 @@ const HomeTagline = styled(InpageTagline)`
 const HomeHeading = styled(Heading)`
   font-weight: ${themeVal('type.base.weight')};
   font-size: clamp(2rem, -0.875rem + 8.333vw, 3.75rem);
-  line-height: 4rem;
+  line-height: 1.25;
   margin: 0;
 `;
 
@@ -78,8 +80,27 @@ const HomeCTA = styled.article`
     margin-bottom: ${glsp(2)};
     ${media.smallUp`
       min-width: 14rem;
-      /* margin-left: ${glsp(2)}; */
     `}
+  }
+`;
+
+const HomeTout = styled(InpageBodyInner)`
+  flex-basis: 100%;
+  margin: ${glsp(2)} 0;
+  ${media.xlargeUp`
+    margin: -18rem 0 18rem 12vw;
+  `};
+  ul {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-gap: ${glsp(2)};
+    ${media.largeUp`
+      grid-template-columns: repeat(3, 1fr);
+    `};
+  }
+  li {
+    padding: ${glsp(2)};
+    border-left: 4px solid ${themeVal('color.primary')};
   }
 `;
 
@@ -103,16 +124,26 @@ function Home() {
             imagery (e.g. NAIP) hosted on Microsoft Azure.
           </Lead>
           <HomeCTA>
-            <Button
-              size='xlarge'
-              variation='primary-raised-dark'
-              // as={StyledLink}
-              title='Start a new project'
-            >
-              Coming Soon!
+            <Button size='xlarge' variation='primary-raised-dark'>
+              Coming Soon
             </Button>
           </HomeCTA>
         </HomeIntro>
+        <HomeTout>
+          <ul>
+            <li>
+              <strong>Faster</strong> creation of land cover maps
+            </li>
+            <li>
+              <strong>Easier</strong> QA and editing of the LULC map. Save,
+              store, pause and return to mapping anytime.
+            </li>
+            <li>
+              <strong>Cloud based</strong>, open-sourced services provide access
+              to high quality models, imagery and processing.
+            </li>
+          </ul>
+        </HomeTout>
       </HomeBody>
     </App>
   );
