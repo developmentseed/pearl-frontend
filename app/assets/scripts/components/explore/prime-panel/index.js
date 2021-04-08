@@ -26,11 +26,12 @@ import {
   DropdownFooter,
 } from '../../../styles/dropdown';
 
-import { useMapLayers, useUserLayers, useMapRef } from '../../../context/map';
+import { useMapLayers, useMapRef } from '../../../context/map';
 import {
   ExploreContext,
   useInstance,
   useMapState,
+  usePredictions,
 } from '../../../context/explore';
 import GlobalContext from '../../../context/global';
 
@@ -123,7 +124,6 @@ function PrimePanel() {
     aoiName,
     loadAoi,
     aoiList,
-    predictions,
     aoiBounds,
     setAoiBounds,
     updateCheckpointName,
@@ -137,7 +137,7 @@ function PrimePanel() {
 
   const { mapLayers } = useMapLayers();
 
-  const { userLayers, setUserLayers } = useUserLayers();
+  const { predictions } = usePredictions();
 
   const [showSelectModelModal, setShowSelectModelModal] = useState(false);
   const [localCheckpointName, setLocalCheckpointName] = useState(
@@ -435,56 +435,6 @@ function PrimePanel() {
                   name='layers'
                   tabId='layers-tab-trigger'
                   mapLayers={mapLayers}
-                  userLayers={userLayers}
-                  /*
-                  predictionReady={predictions.isReady()}
-                  predictionLayerOpacity={predictionLayerSettings.opacity}
-                  onPredictionLayerVisibilityToggle={() => {
-                    setPredictionLayerSettings({
-                      ...predictionLayerSettings,
-                      visible: !predictionLayerSettings.visible,
-                    });
-                  }}
-                  setPredictionLayerOpacity={(v) => {
-                    setPredictionLayerSettings({
-                      ...predictionLayerSettings,
-                      opacity: v,
-                    });
-                   }}*/
-                  onSliderChange={(layer, value) => {
-                    if (layer.layer) {
-                      // Map Layer
-                      layer.layer.setOpacity(value);
-                    } else {
-                      // User layer
-                      setUserLayers({
-                        ...userLayers,
-                        [layer.id]: {
-                          ...layer,
-                          opacity: value,
-                        },
-                      });
-                    }
-                  }}
-                  onVisibilityToggle={(layer, value) => {
-                    if (layer.layer) {
-                      // Map Layer
-                      if (value) {
-                        mapRef.addLayer(layer.layer);
-                      } else {
-                        mapRef.removeLayer(layer.layer);
-                      }
-                    } else {
-                      // User layer
-                      setUserLayers({
-                        ...userLayers,
-                        [layer.id]: {
-                          ...layer,
-                          visible: !layer.visible,
-                        },
-                      });
-                    }
-                  }}
                   baseLayerNames={
                     mosaicList.isReady() && !mosaicList.hasError()
                       ? mosaicList.getData().mosaics

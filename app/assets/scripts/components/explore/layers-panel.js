@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import T from 'prop-types';
 import styled from 'styled-components';
 import { Button } from '@devseed-ui/button';
@@ -8,6 +8,8 @@ import { themeVal, glsp } from '@devseed-ui/theme-provider';
 import InputRange from 'react-input-range';
 import { Accordion, AccordionFold as BaseFold } from '@devseed-ui/accordion';
 import throttle from 'lodash.throttle';
+import { useMapLayers, useMapRef, useUserLayers } from '../../context/map';
+import { usePredictions } from '../../context/explore';
 
 const Wrapper = styled.div`
   display: grid;
@@ -164,13 +166,23 @@ Category.propTypes = {
 };
 
 function LayersPanel(props) {
-  const {
-    mapLayers,
-    userLayers,
-    className,
-    onSliderChange,
-    onVisibilityToggle,
-  } = props;
+  const { className } = props;
+
+  const { mapRef } = useMapRef();
+  const { userLayers, setUserLayers } = useUserLayers();
+  const { mapLayers } = useMapLayers();
+  const { predictions } = usePredictions();
+
+  // Toggle predictions layer
+  useEffect(() => {
+    setUserLayers({
+      ...userLayers,
+      predictions: {
+        ...userLayers.predictions,
+        active: !predictions.fetching && predictions.fetched,
+      },
+    });
+  }, [predictions.fetching, predictions.fetched]);
 
   return (
     <div className={className}>
@@ -192,8 +204,24 @@ function LayersPanel(props) {
                 }}
                 category='User Layers'
                 layers={userLayers}
-                onSliderChange={onSliderChange}
-                onVisibilityToggle={onVisibilityToggle}
+                onSliderChange={(layer, value) => {
+                  setUserLayers({
+                    ...userLayers,
+                    [layer.id]: {
+                      ...layer,
+                      opacity: value,
+                    },
+                  });
+                }}
+                onVisibilityToggle={(layer) => {
+                  setUserLayers({
+                    ...userLayers,
+                    [layer.id]: {
+                      ...layer,
+                      visible: !layer.visible,
+                    },
+                  });
+                }}
               />
 
               <Category
@@ -205,8 +233,16 @@ function LayersPanel(props) {
                 }}
                 category='Base Satellite Imagery'
                 layers={mapLayers}
-                onSliderChange={onSliderChange}
-                onVisibilityToggle={onVisibilityToggle}
+                onSliderChange={(layer, value) => {
+                  layer.layer.setOpacity(value);
+                }}
+                onVisibilityToggle={(layer, value) => {
+                  if (value) {
+                    mapRef.addLayer(layer.layer);
+                  } else {
+                    mapRef.removeLayer(layer.layer);
+                  }
+                }}
               />
             </>
           )
@@ -218,11 +254,7 @@ function LayersPanel(props) {
 }
 
 LayersPanel.propTypes = {
-  mapLayers: T.object,
-  userLayers: T.object,
   className: T.string,
-  onSliderChange: T.func,
-  onVisibilityToggle: T.func,
 };
 
 export default LayersPanel;
