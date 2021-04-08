@@ -26,10 +26,12 @@ import {
   DropdownFooter,
 } from '../../../styles/dropdown';
 
+import { useMapLayers, useMapRef } from '../../../context/map';
 import {
   ExploreContext,
   useInstance,
   useMapState,
+  usePredictions,
 } from '../../../context/explore';
 import GlobalContext from '../../../context/global';
 
@@ -48,17 +50,11 @@ import { LocalButton } from '../../../styles/local-button';
 
 import InfoButton from '../../common/info-button';
 
-import { availableLayers } from '../sample-data';
 import { formatThousands } from '../../../utils/format';
 import { AuthContext } from '../../../context/auth';
 import { useCheckpoint } from '../../../context/checkpoint';
 
 import { AoiEditButtons } from './aoi-edit-buttons';
-import {
-  useMapLayers,
-  useMapRef,
-  usePredictionLayer,
-} from '../../../context/map';
 
 const SelectAoiTrigger = styled.div`
   cursor: pointer;
@@ -128,8 +124,6 @@ function PrimePanel() {
     aoiName,
     loadAoi,
     aoiList,
-    apiLimits,
-    predictions,
     aoiBounds,
     setAoiBounds,
     updateCheckpointName,
@@ -142,10 +136,8 @@ function PrimePanel() {
   const { modelsList, mosaicList } = useContext(GlobalContext);
 
   const { mapLayers } = useMapLayers();
-  const {
-    predictionLayerSettings,
-    setPredictionLayerSettings,
-  } = usePredictionLayer();
+
+  const { predictions } = usePredictions();
 
   const [showSelectModelModal, setShowSelectModelModal] = useState(false);
   const [localCheckpointName, setLocalCheckpointName] = useState(
@@ -322,7 +314,6 @@ function PrimePanel() {
                     aoiArea={aoiArea}
                     setAoiBounds={setAoiBounds}
                     aoiBounds={aoiBounds}
-                    apiLimits={apiLimits}
                   />
                 </HeadOptionToolbar>
               </HeadOption>
@@ -443,36 +434,12 @@ function PrimePanel() {
                 <LayersPanel
                   name='layers'
                   tabId='layers-tab-trigger'
-                  layers={availableLayers}
-                  predictionReady={predictions.isReady()}
-                  predictionLayerOpacity={predictionLayerSettings.opacity}
-                  onPredictionLayerVisibilityToggle={() => {
-                    setPredictionLayerSettings({
-                      ...predictionLayerSettings,
-                      visible: !predictionLayerSettings.visible,
-                    });
-                  }}
-                  setPredictionLayerOpacity={(v) => {
-                    setPredictionLayerSettings({
-                      ...predictionLayerSettings,
-                      opacity: v,
-                    });
-                  }}
+                  mapLayers={mapLayers}
                   baseLayerNames={
                     mosaicList.isReady() && !mosaicList.hasError()
                       ? mosaicList.getData().mosaics
                       : []
                   }
-                  onSliderChange={(name, value) => {
-                    mapLayers[name].setOpacity(value);
-                  }}
-                  onVisibilityToggle={(name, value) => {
-                    if (value) {
-                      mapRef.addLayer(mapLayers[name]);
-                    } else {
-                      mapRef.removeLayer(mapLayers[name]);
-                    }
-                  }}
                 />
               </TabbedBlock>
             </PanelBlockBody>

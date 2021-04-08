@@ -1,6 +1,5 @@
 import React from 'react';
-import ClassDistribitionChart from './class-distribution-chart';
-import T from 'prop-types';
+import ClassDistributionChart from './class-distribution-chart';
 import styled from 'styled-components';
 import Panel from '../../common/panel';
 import {
@@ -14,6 +13,7 @@ import { Subheading } from '../../../styles/type/heading';
 import { PlaceholderMessage } from '../../../styles/placeholder.js';
 
 import { glsp } from '@devseed-ui/theme-provider';
+import { useCheckpoint } from '../../../context/checkpoint';
 
 const StyledBlockBody = styled(PanelBlockBody)`
   justify-content: flex-start;
@@ -31,8 +31,11 @@ const ScrollBodyWrapper = styled.div`
   height: calc(100vh - 10rem);
 `;
 
-function SecPanel(props) {
-  const { checkpoint } = props;
+function SecPanel() {
+  const { currentCheckpoint } = useCheckpoint();
+
+  if (!currentCheckpoint) return null;
+
   return (
     <Panel
       collapsible
@@ -43,14 +46,14 @@ function SecPanel(props) {
           <PanelBlockHeader>
             <Heading size='xsmall'>Analysis</Heading>
           </PanelBlockHeader>
-          {checkpoint.input_geoms && checkpoint.retrain_geoms ? (
+          {currentCheckpoint.input_geoms && currentCheckpoint.retrain_geoms ? (
             <PanelBlockScroll>
               <ScrollBodyWrapper>
                 <StyledBlockBody>
                   <PanelBlockHeader>
                     <Subheading>Class Distribution</Subheading>
                   </PanelBlockHeader>
-                  <ClassDistribitionChart checkpoint={checkpoint} />
+                  <ClassDistributionChart checkpoint={currentCheckpoint} />
                 </StyledBlockBody>
                 {/* Stubbed out second chart below:
                 <StyledBlockBody>
@@ -72,9 +75,5 @@ function SecPanel(props) {
     />
   );
 }
-
-SecPanel.propTypes = {
-  checkpoint: T.object,
-};
 
 export default SecPanel;
