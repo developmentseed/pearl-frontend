@@ -33,7 +33,7 @@ const Class = styled.div`
   border: none;
   outline: none;
   transition: all 0.16s ease-out 0s;
-  height: 3.125rem;
+  min-height: 3.125rem;
 
   ${({ muted }) =>
     muted &&
