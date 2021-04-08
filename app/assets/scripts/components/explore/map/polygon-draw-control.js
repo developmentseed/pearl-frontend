@@ -11,6 +11,8 @@ class PolygonDrawControl {
 
     this.onUpdate = events.onUpdate;
     this.addLayer = this.addLayer.bind(this);
+    this.setLayerPolygons = this.setLayerPolygons.bind(this);
+    this.manualMode = false;
   }
 
   clearLayers() {
@@ -45,13 +47,40 @@ class PolygonDrawControl {
     // Handle added polygon
     drawer.on('layeradd', (data) => {
       const polygons = this.getLayerAsGeoJSON(data.target);
-      this.onUpdate(name, polygons);
+      if (!this.manualMode) {
+        this.onUpdate(name, polygons);
+      }
     });
     drawer.on('layerremove', (data) => {
+      // should not update history when merging
       const polygons = this.getLayerAsGeoJSON(data.target);
-      this.onUpdate(name, polygons);
+
+      if (!this.manualMode && drawer.mode === 'delete') {
+        this.onUpdate(name, polygons);
+      }
     });
     this._group.addLayer(drawer);
+  }
+
+  setLayerPolygons(layerPolygons) {
+    const idMap = Object.entries(this._group._layers).reduce(
+      (accum, [id, { category }]) => ({
+        ...accum,
+        [category]: id,
+      }),
+      {}
+    );
+    Object.entries(layerPolygons).forEach(([layerName, { polygons }]) => {
+      const layer = this._group.getLayer(idMap[layerName]);
+      this.manualMode = true;
+
+      layer.clearLayers();
+      polygons.forEach((poly) => {
+        const latlngs = [poly.coordinates[0].map(([lon, lat]) => [lat, lon])];
+        layer.addPolygon(latlngs, true, true, true);
+      });
+      this.manualMode = false;
+    });
   }
 
   enableMode(mode, layerName) {

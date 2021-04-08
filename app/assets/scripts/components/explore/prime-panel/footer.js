@@ -67,6 +67,19 @@ function Footer(props) {
         style={{
           gridColumn: '2 / -1',
         }}
+        onClick={() => {
+          dispatchCurrentCheckpoint({
+            type: checkpointActions.INPUT_UNDO,
+          });
+
+          const latest =
+            currentCheckpoint.history[currentCheckpoint.history.length - 1];
+          mapRef.polygonDraw.setLayerPolygons({
+            ...latest.classes,
+            ...latest.checkpointBrushes,
+          });
+        }}
+        disabled={!(currentCheckpoint && currentCheckpoint.history.length)}
         id='undo-button-trigger'
       >
         Undo
