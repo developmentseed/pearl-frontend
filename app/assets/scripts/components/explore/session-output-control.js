@@ -141,7 +141,7 @@ function SessionOutputControl(props) {
       logger('Error Bookmarking AOI', err);
     }
     //FIXME: This url will likely change
-    const url = `${restApiEndpoint}/project/${projectId}/aoi/${aoiId}/tiles`;
+    const url = `${window.location.origin}/project/${projectId}/aoi/${aoiId}/map`;
     const copied = copy(url);
     if (copied) {
       toasts.success('URL copied to clipboard');

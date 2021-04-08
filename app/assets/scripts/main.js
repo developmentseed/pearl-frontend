@@ -14,6 +14,7 @@ import theme from './styles/theme';
 
 import Home from './components/home';
 import Explore from './components/explore';
+import AoiMap from './components/aoi-map';
 import About from './components/about';
 import UhOh from './components/uhoh';
 
@@ -58,6 +59,7 @@ function Root() {
                 <GlobalStyles />
                 <Switch>
                   <Route exact path='/' component={Home} />
+                  <Route path='/project/:projectId/aoi/:aoiId/map' component={AoiMap} />
                   <Route path='/project/:projectId' component={Explore} />
                   <ProtectedRoute exact path='/profile/maps' component={Maps} />
                   <ProtectedRoute
