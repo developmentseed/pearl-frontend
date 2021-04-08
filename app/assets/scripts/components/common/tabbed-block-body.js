@@ -104,7 +104,7 @@ function TabbedBlock(props) {
                   title='Show menu'
                   size='small'
                   visuallyDisabled={disabled}
-                  info={disabled && tabTooltip}
+                  info={disabled ? tabTooltip : null}
                   onClick={(e) => {
                     e.preventDefault();
                     if (!disabled) {

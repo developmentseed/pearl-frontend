@@ -229,7 +229,7 @@ function Map() {
 
   // Update color on area size change during draw
   useEffect(() => {
-    if (!aoiRef) {
+    if (!aoiRef || !apiLimits) {
       return;
     }
 
