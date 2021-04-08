@@ -80,7 +80,7 @@ function Layer({ layer, onSliderChange, onVisibilityToggle, info, name }) {
           formatLabel={() => null}
           minValue={0}
           maxValue={1}
-          step={0.1}
+          step={0.05}
         />
       </SliderWrapper>
 
