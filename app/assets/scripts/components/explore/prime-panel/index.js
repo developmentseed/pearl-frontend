@@ -1,20 +1,11 @@
 import React, { useEffect, useState, useContext } from 'react';
 import styled from 'styled-components';
 import { glsp } from '@devseed-ui/theme-provider';
-import { Heading } from '@devseed-ui/typography';
-import { Button } from '@devseed-ui/button';
-import { Form, FormInput } from '@devseed-ui/form';
 
 import Panel from '../../common/panel';
-import {
-  PanelBlock,
-  PanelBlockBody,
-  PanelBlockFooter,
-} from '../../common/panel-block';
+import { PanelBlock, PanelBlockBody } from '../../common/panel-block';
 import SelectModal from '../../common/select-modal';
 import { Card } from '../../common/card-list';
-
-import { Dropdown, DropdownBody } from '../../../styles/dropdown';
 
 import { useMapLayers, useMapRef } from '../../../context/map';
 import {
@@ -30,11 +21,9 @@ import RetrainModel from './retrain-model';
 import RefineModel from './refine-model';
 
 import PanelHeader from './header';
+import PanelFooter from './footer';
 
 import LayersPanel from '../layers-panel';
-import { LocalButton } from '../../../styles/local-button';
-
-import InfoButton from '../../common/info-button';
 
 import { AuthContext } from '../../../context/auth';
 import {
@@ -47,15 +36,6 @@ const StyledPanelBlock = styled(PanelBlock)`
   width: ${glsp(24)};
 `;
 
-const PanelControls = styled(PanelBlockFooter)`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-gap: ${glsp()};
-  padding-bottom: ${glsp(2)};
-`;
-const SaveCheckpoint = styled(DropdownBody)`
-  padding: ${glsp()};
-`;
 function PrimePanel() {
   const { isAuthenticated } = useContext(AuthContext);
   const { mapState, mapModes, setMapMode } = useMapState();
@@ -277,106 +257,25 @@ function PrimePanel() {
                 />
               </TabbedBlock>
             </PanelBlockBody>
+            <PanelFooter
+              {...{
+                dispatchCurrentCheckpoint,
+                currentCheckpoint,
+                checkpointActions,
 
-            <PanelControls>
-              <Button
-                variation='primary-raised-light'
-                size='medium'
-                useIcon='tick--small'
-                style={{
-                  gridColumn: '1 / 2',
-                }}
-                id='reset-button-trigger'
-                onClick={() => {
-                  dispatchCurrentCheckpoint({
-                    type: checkpointActions.CLEAR_SAMPLES,
-                  });
-                  mapRef.polygonDraw.clearLayers();
-                }}
-              >
-                Clear
-              </Button>
-              <Button
-                variation='primary-raised-light'
-                size='medium'
-                useIcon='tick--small'
-                style={{
-                  gridColumn: '2 / -1',
-                }}
-                id='undo-button-trigger'
-              >
-                Undo
-              </Button>
+                updateCheckpointName,
+                localCheckpointName,
+                setLocalCheckpointName,
 
-              <InfoButton
-                data-cy={allowInferenceRun ? 'run-model-button' : 'disabled'}
-                variation='primary-raised-dark'
-                size='medium'
-                useIcon='tick--small'
-                style={{
-                  gridColumn: '1 / -1',
-                }}
-                onClick={() => {
-                  allowInferenceRun && !currentCheckpoint
-                    ? runInference()
-                    : retrain();
-                }}
-                visuallyDisabled={!allowInferenceRun}
-                info={applyTooltip}
-                id='apply-button-trigger'
-              >
-                {!currentCheckpoint ? 'Run Model' : 'Retrain'}
-              </InfoButton>
-              <Dropdown
-                alignment='center'
-                direction='up'
-                triggerElement={(triggerProps) => (
-                  <InfoButton
-                    variation='primary-plain'
-                    size='medium'
-                    useIcon='save-disk'
-                    useLocalButton
-                    style={{
-                      gridColumn: '1 / -1',
-                    }}
-                    id='rename-button-trigger'
-                    {...triggerProps}
-                    disabled={!currentCheckpoint}
-                  >
-                    Save Checkpoint
-                  </InfoButton>
-                )}
-              >
-                <SaveCheckpoint>
-                  <Heading useAlt>Checkpoint name:</Heading>
-                  <Form
-                    onSubmit={(evt) => {
-                      evt.preventDefault();
-                      const name = evt.target.elements.checkpointName.value;
-                      updateCheckpointName(name);
-                    }}
-                  >
-                    <FormInput
-                      name='checkpointName'
-                      placeholder='Set Checkpoint Name'
-                      value={localCheckpointName}
-                      onChange={(e) => setLocalCheckpointName(e.target.value)}
-                      autoFocus
-                    />
-                    <LocalButton
-                      type='submit'
-                      // size='small'
-                      variation='primary-plain'
-                      useIcon='save-disk'
-                      title='Rename checkpoint'
-                      data-dropdown='click.close'
-                    >
-                      Save
-                    </LocalButton>
-                  </Form>
-                </SaveCheckpoint>
-              </Dropdown>
-            </PanelControls>
+                mapRef,
+
+                allowInferenceRun: allowInferenceRun && true,
+
+                applyTooltip,
+                runInference,
+                retrain,
+              }}
+            />
           </StyledPanelBlock>
         }
       />
