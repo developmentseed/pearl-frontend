@@ -14,6 +14,9 @@ const List = styled.ol`
       margin: 0;
     }
   }
+  ${Heading} {
+    letter-spacing: ${({ useAlt }) => useAlt && '0.5px'};
+  }
 `;
 
 function DetailsList(props) {

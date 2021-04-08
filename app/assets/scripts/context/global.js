@@ -1,33 +1,14 @@
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useReducer,
-  useState,
-} from 'react';
+import React, { createContext, useEffect, useReducer, useState } from 'react';
 import T from 'prop-types';
 import { initialApiRequestState } from './reducers/reduxeed';
-import {
-  createRestApiHealthReducer,
-  queryRestApiHealth,
-  createQueryApiGetReducer,
-  queryApiGet,
-} from './reducers/api';
+import { createQueryApiGetReducer, queryApiGet } from './reducers/api';
 import { createQueryApiPostReducer } from './reducers/api';
-import RestApiClient from './rest-api-client';
-import { AuthContext } from './auth';
+import { useRestApiClient } from './auth';
 
 const GlobalContext = createContext({});
 export function GlobalContextProvider(props) {
-  const { apiToken } = useContext(AuthContext);
+  const { apiToken } = useRestApiClient();
   const [tourStep, setTourStep] = useState(0);
-
-  const [restApiClient, setRestApiClient] = useState();
-
-  const [restApiHealth, dispatchRestApiStatus] = useReducer(
-    createRestApiHealthReducer,
-    initialApiRequestState
-  );
 
   /* User data Reducers */
   const [modelsList, dispatchModelsList] = useReducer(
@@ -48,17 +29,12 @@ export function GlobalContextProvider(props) {
   );
 
   useEffect(() => {
-    queryRestApiHealth()(dispatchRestApiStatus);
     queryApiGet({ endpoint: 'mosaic' })(dispatchMosaicList);
     const visited = localStorage.getItem('site-tour');
     if (visited !== null) {
       setTourStep(Number(visited));
     }
   }, []);
-
-  useEffect(() => {
-    localStorage.setItem('site-tour', tourStep);
-  }, [tourStep]);
 
   useEffect(() => {
     /*
@@ -68,10 +44,6 @@ export function GlobalContextProvider(props) {
       return;
     }
 
-    // Create API Client
-    const restApiClient = new RestApiClient({ apiToken });
-    setRestApiClient(restApiClient);
-
     queryApiGet({ token: apiToken, endpoint: 'model' })(dispatchModelsList);
   }, [apiToken]);
 
@@ -79,8 +51,6 @@ export function GlobalContextProvider(props) {
     <>
       <GlobalContext.Provider
         value={{
-          restApiHealth,
-          restApiClient,
           modelsList,
 
           mosaicList,

@@ -12,11 +12,7 @@ import {
 } from 'react-leaflet';
 import GlobalContext from '../../../context/global';
 import { ExploreContext, useMapState } from '../../../context/explore';
-import {
-  useMapRef,
-  useMapLayers,
-  usePredictionLayer,
-} from '../../../context/map';
+import { useMapRef, useMapLayers, useUserLayers } from '../../../context/map';
 
 import GeoCoder from '../../common/map/geocoder';
 import { BOUNDS_PADDING } from '../../common/map/constants';
@@ -34,6 +30,10 @@ import {
   actions as checkpointActions,
 } from '../../../context/checkpoint';
 import ModalMapEvent from './modal-events';
+
+import VectorLayer from '../../common/map/vector-layer';
+import { useRestApiClient } from '../../../context/auth';
+import { useApiMeta } from '../../../context/api-meta';
 
 const center = [38.83428180092151, -79.37724530696869];
 const zoom = 15;
@@ -86,16 +86,19 @@ function Map() {
     setAoiArea,
     aoiInitializer,
     setAoiBounds,
-
     predictions,
-    apiLimits,
+    currentProject,
   } = useContext(ExploreContext);
+
+  const { apiLimits } = useApiMeta();
+
+  const { restApiClient } = useRestApiClient();
 
   const { mapState, mapModes, setMapMode } = useMapState();
   const { mapRef, setMapRef } = useMapRef();
 
   const { mapLayers, setMapLayers } = useMapLayers();
-  const { predictionLayerSettings } = usePredictionLayer();
+  const { userLayers } = useUserLayers();
 
   const { mosaicList } = useContext(GlobalContext);
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
@@ -316,12 +319,31 @@ function Map() {
                 add: (v) => {
                   setMapLayers({
                     ...mapLayers,
-                    [layer]: v.target,
+                    [layer]: {
+                      layer: v.target,
+                      active: true,
+                      name: layer,
+                    },
                   });
                 },
               }}
             />
           ))}
+
+        {currentCheckpoint &&
+          currentCheckpoint.id &&
+          userLayers.retrainingSamples.active && (
+            <VectorLayer
+              url={`${config.restApiEndpoint}/api/project/${currentProject.id}/checkpoint/${currentCheckpoint.id}/tiles/{z}/{x}/{y}.mvt`}
+              token={`Bearer ${restApiClient.apiToken}`}
+              pane='markerPane'
+              opacity={
+                userLayers.retrainingSamples.visible
+                  ? userLayers.retrainingSamples.opacity
+                  : 0
+              }
+            />
+          )}
 
         {predictions.data.predictions &&
           predictions.data.predictions.map((p) => (
@@ -330,8 +352,8 @@ function Map() {
               url={p.image}
               bounds={p.bounds}
               opacity={
-                predictionLayerSettings.visible
-                  ? predictionLayerSettings.opacity
+                userLayers.predictions.visible
+                  ? userLayers.predictions.opacity
                   : 0
               }
             />
@@ -379,11 +401,12 @@ function Map() {
       aoiRef,
       currentCheckpoint,
       dispatchCurrentCheckpoint,
+      userLayers,
       mapLayers,
       mosaics,
-      predictionLayerSettings,
       mapState.mode,
       predictions.data.predictions,
+      restApiClient,
       setMapLayers,
       setMapRef,
     ]
