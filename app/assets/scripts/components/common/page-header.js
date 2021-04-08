@@ -17,7 +17,7 @@ import { StyledNavLink, StyledLink } from '../../styles/links';
 const { appTitle, appLongTitle, baseUrl } = config;
 
 const PageHead = styled.header`
-  background-color: ${themeVal('color.baseAlphaA')};
+  background-color: ${themeVal('color.surface')};
   color: ${themeVal('color.base')};
   position: sticky;
   z-index: 20;
@@ -160,24 +160,26 @@ function PageHeader(props) {
             ) : (
               // Default controls when no children is passed
               <PageSpecificControls>
-                <Button
-                  forwardedAs={StyledNavLink}
-                  to='/about'
-                  useIcon='circle-information'
-                  title='Visit About page'
-                >
-                  About
-                </Button>
                 {location.pathname !== '/' && (
-                  <Button
-                    forwardedAs={StyledNavLink}
-                    to='/project/new'
-                    variation='primary-raised-dark'
-                    useIcon='globe'
-                    title='Start a new project'
-                  >
-                    New project
-                  </Button>
+                  <>
+                    <Button
+                      forwardedAs={StyledNavLink}
+                      to='/about'
+                      useIcon='circle-information'
+                      title='Visit About page'
+                    >
+                      About
+                    </Button>
+                    <Button
+                      forwardedAs={StyledNavLink}
+                      to='/project/new'
+                      variation='primary-raised-dark'
+                      useIcon='globe'
+                      title='Start a new project'
+                    >
+                      New project
+                    </Button>
+                  </>
                 )}
               </PageSpecificControls>
             )}
