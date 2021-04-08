@@ -533,8 +533,14 @@ function PrimePanel() {
                   gridColumn: '1 / 2',
                 }}
                 id='reset-button-trigger'
+                onClick={() => {
+                  dispatchCurrentCheckpoint({
+                    type: checkpointActions.CLEAR_SAMPLES,
+                  });
+                  mapRef.polygonDraw.clearLayers();
+                }}
               >
-                Reset
+                Clear
               </Button>
               <Button
                 variation='primary-raised-light'

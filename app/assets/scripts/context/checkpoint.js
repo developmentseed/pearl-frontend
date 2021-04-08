@@ -23,7 +23,7 @@ export const actions = {
   SET_ACTIVE_CLASS: 'SET_ACTIVE_CLASS',
   ADD_POINT_SAMPLE: 'ADD_POINT_SAMPLE',
   REMOVE_POINT_SAMPLE: 'REMOVE_POINT_SAMPLE',
-  CLEAR_POINT_SAMPLES: 'CLEAR_POINT_SAMPLES',
+  CLEAR_SAMPLES: 'CLEAR_SAMPLES',
   RESET_CHECKPOINT: 'RESET_CHECKPOINT',
   UPDATE_POLYGONS: 'UPDATE_POLYGONS',
 };
@@ -208,7 +208,7 @@ function checkpointReducer(state, action) {
       };
     }
 
-    case actions.CLEAR_POINT_SAMPLES: {
+    case actions.CLEAR_SAMPLES: {
       return {
         ...state,
         classes: Object.values(state.classes).reduce((accum, c) => {
