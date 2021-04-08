@@ -7,6 +7,17 @@ class RestApiClient {
   constructor(props) {
     this.apiToken = props.apiToken;
     this.handleUnauthorized = props.handleUnauthorized;
+
+    this.defaultOptions = {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    };
+
+    // Add token if available
+    if (this.apiToken) {
+      this.defaultOptions.headers.Authorization = `Bearer ${this.apiToken}`;
+    }
   }
 
   getUrl(subpath) {
@@ -16,17 +27,9 @@ class RestApiClient {
   async fetch(method, path, data) {
     const url = this.getUrl(path);
     const options = {
+      ...this.defaultOptions,
       method,
-      headers: {
-        Authorization: this.accessToken,
-        'Content-Type': 'application/json',
-      },
     };
-
-    // Add token if available
-    if (this.apiToken) {
-      options.headers.Authorization = `Bearer ${this.apiToken}`;
-    }
 
     if (data) {
       options.body = JSON.stringify(data);

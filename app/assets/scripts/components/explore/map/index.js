@@ -305,10 +305,10 @@ function Map() {
             />
           ))}
 
-        {currentCheckpoint && currentCheckpoint.checkpoint_id && (
+        {currentCheckpoint && currentCheckpoint.id && (
           <VectorLayer
-            url={`${config.restApiEndpoint}/api/project/${currentProject.id}/checkpoint/${currentCheckpoint.checkpoint_id}/tiles/{z}/{x}/{y}.mvt`}
-            token={restApiClient.accessToken}
+            url={`${config.restApiEndpoint}/api/project/${currentProject.id}/checkpoint/${currentCheckpoint.id}/tiles/{z}/{x}/{y}.mvt`}
+            token={`Bearer ${restApiClient.apiToken}`}
             pane='markerPane'
             opacity={
               userLayers.retrainingSamples.visible
@@ -379,6 +379,7 @@ function Map() {
       mosaics,
       mapState.mode,
       predictions.data.predictions,
+      restApiClient,
       setMapLayers,
       setMapRef,
     ]
