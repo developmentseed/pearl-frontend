@@ -23,7 +23,11 @@ import { mapStateReducer, mapModes, mapActionTypes } from './reducers/map';
 import tBbox from '@turf/bbox';
 import reverseGeoCode from '../utils/reverse-geocode';
 
-import { actions as checkpointActions, useCheckpoint, checkpointModes } from './checkpoint';
+import {
+  actions as checkpointActions,
+  useCheckpoint,
+  checkpointModes,
+} from './checkpoint';
 import get from 'lodash.get';
 import logger from '../utils/logger';
 import { wrapLogReducer } from './reducers/utils';

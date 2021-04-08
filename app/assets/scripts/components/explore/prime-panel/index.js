@@ -73,6 +73,8 @@ function PrimePanel() {
     (currentCheckpoint && currentCheckpoint.name) || ''
   );
 
+  const [activeTab, setActiveTab] = useState(checkpointModes.RETRAIN);
+
   const { models } = modelsList.isReady() && modelsList.getData();
 
   // Check if AOI and selected model are defined, and if view mode is runnable
@@ -124,7 +126,6 @@ function PrimePanel() {
         },
         0
       );
-      console.log(sampleCount)
 
       // There should be no polygon or point samples on the map
       // User must submit or clear retrain samples before starting refine
@@ -190,9 +191,11 @@ function PrimePanel() {
                   placeholderMessage={retrainPlaceHolderMessage()}
                   ready={
                     currentCheckpoint &&
-                      (currentCheckpoint.mode === checkpointModes.RETRAIN || currentCheckpoint.mode === checkpointModes.RUN)
+                    (currentCheckpoint.mode === checkpointModes.RETRAIN ||
+                      currentCheckpoint.mode === checkpointModes.RUN)
                   }
                   onTabClick={() => {
+                    setActiveTab(checkpointModes.RETRAIN);
                     if (currentCheckpoint) {
                       setMapMode(mapModes.BROWSE_MODE);
                       dispatchCurrentCheckpoint({
@@ -224,6 +227,7 @@ function PrimePanel() {
                   }
                   tabTooltip='Refine is not available until model has been run or retrained.'
                   onTabClick={() => {
+                    setActiveTab(checkpointModes.REFINE);
                     if (currentCheckpoint) {
                       setMapMode(mapModes.BROWSE_MODE);
                       dispatchCurrentCheckpoint({
@@ -246,6 +250,9 @@ function PrimePanel() {
                   }}
                 />
                 <LayersPanel
+                  onTabClick={() => {
+                    setActiveTab('LAYERS')
+                  }}
                   name='layers'
                   tabId='layers-tab-trigger'
                   mapLayers={mapLayers}
@@ -257,26 +264,28 @@ function PrimePanel() {
                 />
               </TabbedBlock>
             </PanelBlockBody>
-            <PanelFooter
-              {...{
-                dispatchCurrentCheckpoint,
-                currentCheckpoint,
-                checkpointActions,
-                checkpointModes,
+            {(!currentCheckpoint || activeTab === currentCheckpoint.mode) && (
+              <PanelFooter
+                {...{
+                  dispatchCurrentCheckpoint,
+                  currentCheckpoint,
+                  checkpointActions,
+                  checkpointModes,
 
-                updateCheckpointName,
-                localCheckpointName,
-                setLocalCheckpointName,
+                  updateCheckpointName,
+                  localCheckpointName,
+                  setLocalCheckpointName,
 
-                mapRef,
+                  mapRef,
 
-                allowInferenceRun: allowInferenceRun && true,
+                  allowInferenceRun: allowInferenceRun && true,
 
-                applyTooltip,
-                runInference,
-                retrain,
-              }}
-            />
+                  applyTooltip,
+                  runInference,
+                  retrain,
+                }}
+              />
+            )}
           </StyledPanelBlock>
         }
       />
