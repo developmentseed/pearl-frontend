@@ -42,7 +42,7 @@ const Class = styled.div`
       border-color: ${themeVal('color.baseAlphaE')};
     `};
 
-  &.add__class 
+  &.add__class {
     padding: ${glsp(0.5)} ${glsp(1.5)};
     // Add Class Button styles. May be removed if this takes on a different onClick configuration
     span {
@@ -51,8 +51,9 @@ const Class = styled.div`
       align-items: center;
       grid-gap: 0 ${glsp(1)};
     }
-    :hover {
-      color: ${themeVal('color.base')};
+    ${Heading} {
+      margin: 0;
+      line-height: 1.5;
     }
   }
   &.placeholder-class:first-child {
