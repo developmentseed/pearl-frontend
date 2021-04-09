@@ -1,7 +1,7 @@
 import React, { useState, Children } from 'react';
 import T from 'prop-types';
 import styled, { css } from 'styled-components';
-import { Button } from '@devseed-ui/button';
+import InfoButton from '../common/info-button';
 import { listReset, themeVal, glsp } from '@devseed-ui/theme-provider';
 
 import {
@@ -10,7 +10,7 @@ import {
 } from './panel-block';
 import { headingAlt } from '@devseed-ui/typography';
 
-const Tab = styled(Button)`
+const Tab = styled(InfoButton)`
   display: inline-flex;
   user-select: none;
   position: relative;
@@ -84,7 +84,8 @@ const PanelBlockScroll = styled(ScrollableBody)`
   }
   padding: ${glsp(0.5)} 0;
   margin: 0 -1.5rem;
-  & > .scroll-area > div > :not(.retrain-model) {
+
+  & > .scroll-area > div > .padded {
     padding-left: 1.5rem;
     padding-right: 1.5rem;
   }
@@ -99,19 +100,23 @@ function TabbedBlock(props) {
       <TabbedBlockHeader as='nav' role='navigation'>
         <ul>
           {Children.map(children, (child, ind) => {
-            const { name, icon, tabId } = child.props;
+            const { name, icon, tabId, disabled, tabTooltip } = child.props;
             return (
               <li key={name}>
                 <Tab
-                  as='a'
                   id={tabId || `${name}-tab`}
                   active={ind === activeTab}
                   useIcon={icon}
                   title='Show menu'
                   size='small'
+                  visuallyDisabled={disabled}
+                  info={disabled ? tabTooltip : null}
                   onClick={(e) => {
                     e.preventDefault();
-                    setActiveTab(ind);
+                    if (!disabled) {
+                      setActiveTab(ind);
+                      child.props.onTabClick && child.props.onTabClick(e);
+                    }
                   }}
                 >
                   {name}

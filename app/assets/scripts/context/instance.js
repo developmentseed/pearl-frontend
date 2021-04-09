@@ -1,6 +1,6 @@
 import config from '../config';
 import logger from '../utils/logger';
-import { actions as checkpointActions } from './checkpoint';
+import { actions as checkpointActions, checkpointModes } from './checkpoint';
 const { actions: predictionsActions } = require('./reducers/predictions');
 
 export const messageQueueActionTypes = {
@@ -68,7 +68,7 @@ export class WebsocketClient extends WebSocket {
           break;
         case 'model#aoi':
           dispatchCurrentCheckpoint({
-            type: checkpointActions.RECEIVE_AOI_INFO,
+            type: checkpointActions.SET_CHECKPOINT,
             data: {
               id: data.checkpoint_id,
               name: data.name,
@@ -95,6 +95,13 @@ export class WebsocketClient extends WebSocket {
           dispatchPredictions({
             type: predictionsActions.COMPLETE_PREDICTION,
           });
+          dispatchCurrentCheckpoint({
+            type: checkpointActions.SET_CHECKPOINT_MODE,
+            data: {
+              mode: checkpointModes.RETRAIN,
+            },
+          });
+
           break;
         default:
           logger('Unknown websocket message:');

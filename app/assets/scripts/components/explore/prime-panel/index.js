@@ -1,30 +1,11 @@
 import React, { useEffect, useState, useContext } from 'react';
-import styled, { css } from 'styled-components';
-import { themeVal, glsp } from '@devseed-ui/theme-provider';
-import { Heading } from '@devseed-ui/typography';
-import { Button } from '@devseed-ui/button';
-import collecticon from '@devseed-ui/collecticons';
-import { Form, FormInput } from '@devseed-ui/form';
+import styled from 'styled-components';
+import { glsp } from '@devseed-ui/theme-provider';
 
 import Panel from '../../common/panel';
-import {
-  PanelBlock,
-  PanelBlockHeader as BasePanelBlockHeader,
-  PanelBlockBody,
-  PanelBlockFooter,
-} from '../../common/panel-block';
-import { Subheading } from '../../../styles/type/heading';
+import { PanelBlock, PanelBlockBody } from '../../common/panel-block';
 import SelectModal from '../../common/select-modal';
 import { Card } from '../../common/card-list';
-import { PlaceholderMessage } from '../../../styles/placeholder.js';
-
-import {
-  Dropdown,
-  DropdownHeader,
-  DropdownBody,
-  DropdownItem,
-  DropdownFooter,
-} from '../../../styles/dropdown';
 
 import { useMapLayers, useMapRef } from '../../../context/map';
 import {
@@ -37,79 +18,27 @@ import GlobalContext from '../../../context/global';
 
 import TabbedBlock from '../../common/tabbed-block-body';
 import RetrainModel from './retrain-model';
+import RefineModel from './refine-model';
+
+import PanelHeader from './header';
+import PanelFooter from './footer';
 
 import LayersPanel from '../layers-panel';
-import { BOUNDS_PADDING } from '../../common/map/constants';
-import {
-  HeadOption,
-  HeadOptionHeadline,
-  HeadOptionToolbar,
-} from '../../../styles/panel';
-import { EditButton } from '../../../styles/button';
-import { LocalButton } from '../../../styles/local-button';
 
-import InfoButton from '../../common/info-button';
-
-import { formatThousands } from '../../../utils/format';
 import { AuthContext } from '../../../context/auth';
-import { useCheckpoint } from '../../../context/checkpoint';
-
-import { AoiEditButtons } from './aoi-edit-buttons';
-
-const SelectAoiTrigger = styled.div`
-  cursor: pointer;
-`;
-const PlaceholderPanelSection = styled.div`
-  padding: ${glsp()};
-`;
-
-const SubheadingStrong = styled.h3`
-  color: ${themeVal('color.base')};
-  font-size: 1.125rem;
-  line-height: 1.5rem;
-
-  ${({ useIcon }) =>
-    useIcon &&
-    css`
-      display: grid;
-      grid-template-columns: max-content max-content;
-      grid-gap: 1rem;
-      &::after {
-        ${collecticon(useIcon)}
-      }
-    `}
-  ${({ onClick }) =>
-    onClick &&
-    css`
-      transition: opacity 0.24s ease 0s;
-      &:hover {
-        cursor: pointer;
-        opacity: 0.64;
-      }
-    `}
-`;
+import {
+  useCheckpoint,
+  actions as checkpointActions,
+  checkpointModes,
+} from '../../../context/checkpoint';
 
 const StyledPanelBlock = styled(PanelBlock)`
   width: ${glsp(24)};
 `;
 
-const PanelBlockHeader = styled(BasePanelBlockHeader)`
-  display: grid;
-  grid-gap: ${glsp(0.5)};
-`;
-
-const PanelControls = styled(PanelBlockFooter)`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-gap: ${glsp()};
-  padding-bottom: ${glsp()};
-`;
-const SaveCheckpoint = styled(DropdownBody)`
-  padding: ${glsp()};
-`;
 function PrimePanel() {
   const { isAuthenticated } = useContext(AuthContext);
-  const { mapState, mapModes } = useMapState();
+  const { mapState, mapModes, setMapMode } = useMapState();
   const { mapRef } = useMapRef();
 
   const {
@@ -131,7 +60,7 @@ function PrimePanel() {
 
   const { runInference, retrain, applyCheckpoint } = useInstance();
 
-  const { currentCheckpoint } = useCheckpoint();
+  const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
 
   const { modelsList, mosaicList } = useContext(GlobalContext);
 
@@ -143,6 +72,8 @@ function PrimePanel() {
   const [localCheckpointName, setLocalCheckpointName] = useState(
     (currentCheckpoint && currentCheckpoint.name) || ''
   );
+
+  const [activeTab, setActiveTab] = useState(checkpointModes.RETRAIN);
 
   const { models } = modelsList.isReady() && modelsList.getData();
 
@@ -164,60 +95,6 @@ function PrimePanel() {
     ? 'Run inference for this model'
     : 'Create project and run model';
 
-  const renderAoiHeader = (triggerProps) => {
-    let header;
-    let area;
-    let disabled;
-    if (aoiArea && aoiArea > 0 && mapState.mode === mapModes.EDIT_AOI_MODE) {
-      header = `${formatThousands(aoiArea / 1e6)} km2`;
-    } else if (aoiName) {
-      header = aoiName;
-      area = `${formatThousands(aoiArea / 1e6)} km2`;
-    } else if (mapState.mode === mapModes.CREATE_AOI_MODE) {
-      header = 'Drag on map to select';
-    } else {
-      header = 'None selected - Draw area on map';
-    }
-
-    const disabledProps = {
-      onClick: () => null,
-      useIcon: null,
-    };
-
-    if (mapState.mode === mapModes.EDIT_AOI_MODE || aoiList.length === 0) {
-      disabled = true;
-    }
-
-    return (
-      <SelectAoiTrigger>
-        <SubheadingStrong
-          data-cy='aoi-selection-trigger'
-          {...triggerProps}
-          useIcon='chevron-down--small'
-          {...(disabled ? disabledProps : {})}
-        >
-          {header}
-        </SubheadingStrong>
-        {area && (
-          <Heading className='subtitle' useAlt>
-            {area}
-          </Heading>
-        )}
-      </SelectAoiTrigger>
-    );
-  };
-
-  const renderCheckpointSelectionHeader = () => {
-    if (currentCheckpoint && currentCheckpoint.id) {
-      return `${currentCheckpoint.name} (${currentCheckpoint.id})`;
-    } else if (checkpointList?.length) {
-      return `${checkpointList.length} checkpoint${
-        checkpointList.length > 1 ? 's' : ''
-      } available`;
-    } else {
-      return 'Run model to create first checkpoint';
-    }
-  };
   // Retrain Panel Tab Empty State message
   //
   const retrainPlaceHolderMessage = () => {
@@ -231,6 +108,34 @@ function PrimePanel() {
       return `Select a model to use for inference`;
     } else {
       return `Define an Area of Interest to run models at your selected location`;
+    }
+  };
+
+  const checkpointHasSamples = () => {
+    if (currentCheckpoint) {
+      let sampleCount = Object.values(currentCheckpoint.classes).reduce(
+        (count, c) => {
+          return count + c.points.coordinates.length + c.polygons.length;
+        },
+        0
+      );
+
+      sampleCount += Object.values(currentCheckpoint.checkpointBrushes).reduce(
+        (count, c) => {
+          return count + c.polygons.length;
+        },
+        0
+      );
+
+      // There should be no polygon or point samples on the map
+      // User must submit or clear retrain samples before starting refine
+      if (sampleCount > 0) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
     }
   };
 
@@ -250,174 +155,34 @@ function PrimePanel() {
         fitContent
         bodyContent={
           <StyledPanelBlock>
-            <PanelBlockHeader>
-              <HeadOption hasSubtitle>
-                <HeadOptionHeadline>
-                  <Subheading>Selected Area </Subheading>
-                </HeadOptionHeadline>
+            <PanelHeader
+              {...{
+                aoiRef,
+                setAoiRef,
+                setAoiBounds,
+                aoiBounds,
+                aoiArea,
+                aoiName,
+                aoiList,
+                loadAoi,
+                createNewAoi,
 
-                <Dropdown
-                  alignment='left'
-                  direction='down'
-                  triggerElement={
-                    (triggerProps) => renderAoiHeader(triggerProps)
-                    /* eslint-disable-next-line */
-                  }
-                >
-                  <>
-                    <DropdownHeader unshaded>
-                      <Heading useAlt size='xsmall'>
-                        Available Areas of Interest
-                      </Heading>
-                    </DropdownHeader>
-                    <DropdownBody>
-                      {aoiList.map((a) => (
-                        <li key={a.id} data-dropdown='click.close'>
-                          <DropdownItem
-                            onClick={() => {
-                              loadAoi(currentProject, a).then((bounds) =>
-                                mapRef.fitBounds(bounds, {
-                                  padding: BOUNDS_PADDING,
-                                })
-                              );
-                            }}
-                          >
-                            {`${a.name}`}
-                          </DropdownItem>
-                        </li>
-                      ))}
-                    </DropdownBody>
-                    {(currentCheckpoint || aoiList.length > 0) && (
-                      <DropdownFooter>
-                        <DropdownItem
-                          useIcon='plus'
-                          onClick={() => {
-                            createNewAoi();
-                            mapRef.aoi.control.draw.disable();
-                            //Layer must be removed from the map
-                            mapRef.aoi.control.draw.clear();
-                          }}
-                          data-cy='add-aoi-button'
-                          data-dropdown='click.close'
-                        >
-                          Add AOI
-                        </DropdownItem>
-                      </DropdownFooter>
-                    )}
-                  </>
-                </Dropdown>
+                mapState,
+                mapModes,
+                mapRef,
 
-                <HeadOptionToolbar>
-                  <AoiEditButtons
-                    aoiRef={aoiRef}
-                    setAoiRef={setAoiRef}
-                    aoiArea={aoiArea}
-                    setAoiBounds={setAoiBounds}
-                    aoiBounds={aoiBounds}
-                  />
-                </HeadOptionToolbar>
-              </HeadOption>
+                currentCheckpoint,
+                checkpointList,
+                applyCheckpoint,
 
-              <HeadOption>
-                <HeadOptionHeadline>
-                  <Subheading>Selected Model</Subheading>
-                </HeadOptionHeadline>
-                <SubheadingStrong
-                  data-cy='select-model-label'
-                  onClick={function () {
-                    setShowSelectModelModal(true);
-                  }}
-                  title='Edit Model'
-                >
-                  {(selectedModel && selectedModel.name) ||
-                    (isAuthenticated
-                      ? models && models.length
-                        ? 'Select Model'
-                        : 'No models available'
-                      : 'Login to select model')}
-                </SubheadingStrong>
-                <HeadOptionToolbar>
-                  <EditButton
-                    data-cy='show-select-model-button'
-                    useIcon='swap-horizontal'
-                    id='select-model-trigger'
-                    onClick={function () {
-                      setShowSelectModelModal(true);
-                    }}
-                    title='Edit Model'
-                    disabled={!models?.length}
-                  >
-                    Edit Model Selection
-                  </EditButton>
-                </HeadOptionToolbar>
-              </HeadOption>
+                setShowSelectModelModal,
+                selectedModel,
+                models,
 
-              <HeadOption>
-                <HeadOptionHeadline>
-                  <Subheading>Checkpoint</Subheading>
-                </HeadOptionHeadline>
-                <Dropdown
-                  alignment='right'
-                  direction='down'
-                  triggerElement={(props) => (
-                    <>
-                      <SubheadingStrong
-                        {...props}
-                        onClick={(e) => checkpointList && props.onClick(e)} // eslint-disable-line
-                        title={
-                          checkpointList
-                            ? 'Change checkpoint'
-                            : 'Run and retrain model to create first checkpoint'
-                        }
-                      >
-                        {renderCheckpointSelectionHeader()}
-                      </SubheadingStrong>
-                      <HeadOptionToolbar>
-                        <EditButton
-                          data-cy='show-select-checkpoint-button'
-                          useIcon='swap-horizontal'
-                          title={
-                            checkpointList
-                              ? 'Change checkpoint'
-                              : 'Run model to create first checkpoint'
-                          }
-                          id='checkpoint-list-trigger'
-                          {...props}
-                          onClick={(e) => checkpointList && props.onClick(e)} // eslint-disable-line
-                        >
-                          Edit Checkpoint Selection
-                        </EditButton>
-                      </HeadOptionToolbar>
-                    </>
-                  )}
-                  className='global__dropdown'
-                >
-                  <>
-                    <DropdownHeader unshaded>
-                      <p>Checkpoints</p>
-                    </DropdownHeader>
-                    <DropdownBody selectable>
-                      {checkpointList?.length &&
-                        checkpointList.map((ckpt) => (
-                          <DropdownItem
-                            key={ckpt.id}
-                            data-dropdown='click.close'
-                            checked={
-                              ckpt.id ==
-                              (currentCheckpoint && currentCheckpoint.id)
-                            }
-                            onClick={() => {
-                              applyCheckpoint(currentProject.id, ckpt.id);
-                            }}
-                          >
-                            {ckpt.name} ({ckpt.id})
-                          </DropdownItem>
-                        ))}
-                    </DropdownBody>
-                  </>
-                </Dropdown>
-              </HeadOption>
-            </PanelBlockHeader>
+                isAuthenticated,
+                currentProject,
+              }}
+            />
             <PanelBlockBody>
               <TabbedBlock>
                 <RetrainModel
@@ -425,14 +190,72 @@ function PrimePanel() {
                   className='retrain-model'
                   tabId='retrain-tab-trigger'
                   placeholderMessage={retrainPlaceHolderMessage()}
+                  ready={
+                    currentCheckpoint &&
+                    (currentCheckpoint.mode === checkpointModes.RETRAIN ||
+                      currentCheckpoint.mode === checkpointModes.RUN)
+                  }
+                  onTabClick={() => {
+                    setActiveTab(checkpointModes.RETRAIN);
+                    if (currentCheckpoint) {
+                      setMapMode(mapModes.BROWSE_MODE);
+                      dispatchCurrentCheckpoint({
+                        type: checkpointActions.SET_ACTIVE_CLASS,
+                        data: undefined,
+                      });
+                      if (currentCheckpoint.mode != checkpointModes.RETRAIN) {
+                        // If current checkpoint has not been set,
+                        // mode does not need to be set
+                        if (!checkpointHasSamples()) {
+                          dispatchCurrentCheckpoint({
+                            type: checkpointActions.SET_CHECKPOINT_MODE,
+                            data: {
+                              mode: checkpointModes.RETRAIN,
+                            },
+                          });
+                        }
+                      }
+                    }
+                  }}
                 />
-                <PlaceholderPanelSection
+                <RefineModel
                   name='Refine Results'
                   tabId='refine-tab-trigger'
-                >
-                  <PlaceholderMessage>Refine results</PlaceholderMessage>
-                </PlaceholderPanelSection>
+                  className='refine-model'
+                  disabled={!currentCheckpoint}
+                  ready={
+                    currentCheckpoint &&
+                    currentCheckpoint.mode === checkpointModes.REFINE
+                  }
+                  tabTooltip='Refine is not available until model has been run or retrained.'
+                  onTabClick={() => {
+                    setActiveTab(checkpointModes.REFINE);
+                    if (currentCheckpoint) {
+                      setMapMode(mapModes.BROWSE_MODE);
+                      dispatchCurrentCheckpoint({
+                        type: checkpointActions.SET_ACTIVE_CLASS,
+                        data: undefined,
+                      });
+                      if (currentCheckpoint.mode !== checkpointModes.REFINE) {
+                        // If current checkpoint has not been set,
+                        // mode does not need to be set
+                        if (!checkpointHasSamples()) {
+                          dispatchCurrentCheckpoint({
+                            type: checkpointActions.SET_CHECKPOINT_MODE,
+                            data: {
+                              mode: checkpointModes.REFINE,
+                            },
+                          });
+                        }
+                      }
+                    }
+                  }}
+                />
                 <LayersPanel
+                  onTabClick={() => {
+                    setActiveTab('LAYERS');
+                  }}
+                  className='padded'
                   name='layers'
                   tabId='layers-tab-trigger'
                   mapLayers={mapLayers}
@@ -444,100 +267,28 @@ function PrimePanel() {
                 />
               </TabbedBlock>
             </PanelBlockBody>
+            {(!currentCheckpoint || activeTab === currentCheckpoint.mode) && (
+              <PanelFooter
+                {...{
+                  dispatchCurrentCheckpoint,
+                  currentCheckpoint,
+                  checkpointActions,
+                  checkpointModes,
 
-            <PanelControls>
-              <Button
-                variation='primary-raised-light'
-                size='medium'
-                useIcon='tick--small'
-                style={{
-                  gridColumn: '1 / 2',
-                }}
-                id='reset-button-trigger'
-              >
-                Reset
-              </Button>
-              <Button
-                variation='primary-raised-light'
-                size='medium'
-                useIcon='tick--small'
-                style={{
-                  gridColumn: '2 / -1',
-                }}
-                id='undo-button-trigger'
-              >
-                Undo
-              </Button>
+                  updateCheckpointName,
+                  localCheckpointName,
+                  setLocalCheckpointName,
 
-              <InfoButton
-                data-cy={allowInferenceRun ? 'run-model-button' : 'disabled'}
-                variation='primary-raised-dark'
-                size='medium'
-                useIcon='tick--small'
-                style={{
-                  gridColumn: '1 / -1',
+                  mapRef,
+
+                  allowInferenceRun: allowInferenceRun && true,
+
+                  applyTooltip,
+                  runInference,
+                  retrain,
                 }}
-                onClick={() => {
-                  allowInferenceRun && !currentCheckpoint
-                    ? runInference()
-                    : retrain();
-                }}
-                visuallyDisabled={!allowInferenceRun}
-                info={applyTooltip}
-                id='apply-button-trigger'
-              >
-                {!currentCheckpoint ? 'Run Model' : 'Retrain'}
-              </InfoButton>
-              <Dropdown
-                alignment='center'
-                direction='up'
-                triggerElement={(triggerProps) => (
-                  <InfoButton
-                    variation='primary-plain'
-                    size='medium'
-                    useIcon='save-disk'
-                    useLocalButton
-                    style={{
-                      gridColumn: '1 / -1',
-                    }}
-                    id='rename-button-trigger'
-                    {...triggerProps}
-                    disabled={!currentCheckpoint}
-                  >
-                    Save Checkpoint
-                  </InfoButton>
-                )}
-              >
-                <SaveCheckpoint>
-                  <Heading useAlt>Checkpoint name:</Heading>
-                  <Form
-                    onSubmit={(evt) => {
-                      evt.preventDefault();
-                      const name = evt.target.elements.checkpointName.value;
-                      updateCheckpointName(name);
-                    }}
-                  >
-                    <FormInput
-                      name='checkpointName'
-                      placeholder='Set Checkpoint Name'
-                      value={localCheckpointName}
-                      onChange={(e) => setLocalCheckpointName(e.target.value)}
-                      autoFocus
-                    />
-                    <LocalButton
-                      type='submit'
-                      // size='small'
-                      variation='primary-plain'
-                      useIcon='save-disk'
-                      title='Rename checkpoint'
-                      data-dropdown='click.close'
-                    >
-                      Save
-                    </LocalButton>
-                  </Form>
-                </SaveCheckpoint>
-              </Dropdown>
-            </PanelControls>
+              />
+            )}
           </StyledPanelBlock>
         }
       />

@@ -27,7 +27,7 @@ export function mapStateReducer(state, action) {
     case mapActionTypes.SET_ACTIVE_CLASS:
       return {
         ...state,
-        activeClass: action.data,
+        activeItem: action.data,
       };
     case mapActionTypes.SET_CLASS_EDIT_MODE:
       return {

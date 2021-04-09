@@ -25,7 +25,10 @@ import AoiEditControl from './aoi-edit-control';
 import PolygonDrawControl from './polygon-draw-control';
 import config from '../../../config';
 import { inRange } from '../../../utils/utils';
-import { useCheckpoint, actions } from '../../../context/checkpoint';
+import {
+  useCheckpoint,
+  actions as checkpointActions,
+} from '../../../context/checkpoint';
 import ModalMapEvent from './modal-events';
 
 import VectorLayer from '../../common/map/vector-layer';
@@ -136,10 +139,14 @@ function Map() {
         }
         break;
       case mapModes.ADD_SAMPLE_POLYGON:
-        mapRef.polygonDraw.enableAdd(currentCheckpoint.activeClass);
+        if (currentCheckpoint.activeItem) {
+          mapRef.polygonDraw.enableAdd(currentCheckpoint.activeItem);
+        }
         break;
       case mapModes.REMOVE_SAMPLE:
-        mapRef.polygonDraw.enableDelete(currentCheckpoint.activeClass);
+        if (currentCheckpoint.activeItem) {
+          mapRef.polygonDraw.enableDelete(currentCheckpoint.activeItem);
+        }
         break;
       default:
         mapRef.polygonDraw.disable();
@@ -148,7 +155,7 @@ function Map() {
   }, [
     mapState.mode,
     aoiRef,
-    currentCheckpoint && currentCheckpoint.activeClass,
+    currentCheckpoint && currentCheckpoint.activeItem,
   ]);
 
   // Add polygon layers to be draw when checkpoint has changed
@@ -159,7 +166,22 @@ function Map() {
     if (currentCheckpoint) {
       mapRef.polygonDraw.setLayers(currentCheckpoint.classes);
     }
-  }, [currentCheckpoint && currentCheckpoint.id]);
+  }, [mapRef, currentCheckpoint && currentCheckpoint.id]);
+
+  /*
+   * useEffect fires when mode changes.
+   * Checkpoint ID is the same so classList should be the same
+   */
+  useEffect(() => {
+    if (!mapRef || !mapRef.polygonDraw) return;
+
+    //mapRef.polygonDraw.clearLayers();
+    if (currentCheckpoint) {
+      /*dispatchCurrentCheckpoint({
+        type: checkpointActions.CLEAR_POINT_SAMPLES,
+      });*/
+    }
+  }, [mapRef, currentCheckpoint && currentCheckpoint.mode]);
 
   /**
    * Add/update AOI controls on API metadata change.
@@ -209,7 +231,7 @@ function Map() {
 
   // Update color on area size change during draw
   useEffect(() => {
-    if (!aoiRef) {
+    if (!aoiRef || !apiLimits) {
       return;
     }
 
@@ -244,14 +266,21 @@ function Map() {
         style={{ height: '100%' }}
         whenCreated={(m) => {
           const polygonDraw = new PolygonDrawControl(m, {
-            onUpdate: (className, polygons) =>
+            onUpdate: (name, polygons) => {
+              let isCheckpointPolygon;
+              if (name.includes('checkpoint')) {
+                isCheckpointPolygon = true;
+              }
+              // Assume class polygon
               dispatchCurrentCheckpoint({
-                type: actions.UPDATE_POLYGONS,
+                type: checkpointActions.UPDATE_POLYGONS,
                 data: {
-                  class: className,
+                  name,
+                  isCheckpointPolygon,
                   polygons: polygons.map((f) => f.geometry),
                 },
-              }),
+              });
+            },
           });
 
           m.polygonDraw = polygonDraw;
@@ -273,7 +302,7 @@ function Map() {
                 return;
               }
               dispatchCurrentCheckpoint({
-                type: actions.ADD_POINT_SAMPLE,
+                type: checkpointActions.ADD_POINT_SAMPLE,
                 data: e.latlng,
               });
             }}
@@ -360,7 +389,7 @@ function Map() {
                     click: () => {
                       if (mapState.mode === mapModes.REMOVE_SAMPLE) {
                         dispatchCurrentCheckpoint({
-                          type: actions.REMOVE_POINT_SAMPLE,
+                          type: checkpointActions.REMOVE_POINT_SAMPLE,
                           data: {
                             className: sampleClass.name,
                             lat,
