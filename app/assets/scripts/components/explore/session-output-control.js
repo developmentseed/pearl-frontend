@@ -25,8 +25,6 @@ import { AuthContext, useRestApiClient } from '../../context/auth';
 import toasts from '../common/toasts';
 import logger from '../../utils/logger';
 
-const { restApiEndpoint } = config;
-
 const Wrapper = styled.div`
   flex: 1;
   display: grid;
