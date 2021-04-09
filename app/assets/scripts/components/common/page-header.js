@@ -23,6 +23,9 @@ const PageHead = styled.header`
   position: sticky;
   z-index: 20;
   padding: ${multiply(themeVal('layout.space'), 0.625)} 0;
+  max-width: 100vw;
+  max-height: 3.5rem;
+  overflow: hidden;
 `;
 
 const PageHeadInner = styled.div`
@@ -159,15 +162,17 @@ function PageHeader(props) {
                 >
                   About
                 </Button>
-                <Button
-                  forwardedAs={StyledNavLink}
-                  to='/project/new'
-                  variation='primary-raised-dark'
-                  useIcon='globe'
-                  title='Start a new project'
-                >
-                  Start a new project
-                </Button>
+                {location.pathname !== '/' && (
+                  <Button
+                    forwardedAs={StyledNavLink}
+                    to='/project/new'
+                    variation='primary-raised-dark'
+                    useIcon='globe'
+                    title='Start a new project'
+                  >
+                    New project
+                  </Button>
+                )}
               </PageSpecificControls>
             )}
           </PrimarySection>

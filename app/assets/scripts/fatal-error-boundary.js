@@ -22,7 +22,7 @@ export default class ErrorBoundary extends React.Component {
   render() {
     return this.state.error ? (
       <FatalError>
-        <h1>Oh Snap :&apos;( Something went wrong</h1>
+        <h1>Oh snap :&apos;( Something went wrong</h1>
         <p>This on us, and we&apos;ll fix it as soon as possible</p>
         <p>
           Error: <span>{this.state.error.message}</span>

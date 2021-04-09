@@ -1,6 +1,5 @@
-import React from 'react';
+import React, { useContext, useEffect, useReducer } from 'react';
 import styled from 'styled-components';
-import T from 'prop-types';
 import { Button } from '@devseed-ui/button';
 import CardList, { Card } from '../../common/card-list';
 import {
@@ -18,6 +17,12 @@ import { Heading } from '@devseed-ui/typography';
 import { StyledNavLink } from '../../../styles/links';
 import toasts from '../../common/toasts';
 import { useHistory } from 'react-router';
+import { AuthContext } from '../../../context/auth';
+import {
+  createQueryApiGetReducer,
+  queryApiGet,
+} from '../../../context/reducers/api';
+import { initialApiRequestState } from '../../../context/reducers/reduxeed';
 const ProjectsBody = styled(InpageBodyInner)`
   display: grid;
   grid-template-columns: 1fr;
@@ -78,9 +83,24 @@ const NavList = styled.ol`
   `}
 `;
 
-function Projects(props) {
+function Projects() {
   const history = useHistory();
-  const { projectsList } = props;
+
+  const { apiToken } = useContext(AuthContext);
+
+  const [projectsList, dispatchProjectsList] = useReducer(
+    createQueryApiGetReducer('project'),
+    initialApiRequestState
+  );
+
+  useEffect(() => {
+    if (apiToken) {
+      queryApiGet({ token: apiToken, endpoint: 'project' })(
+        dispatchProjectsList
+      );
+    }
+  }, [apiToken]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const { projects } = projectsList.isReady() ? projectsList.getData() : {};
   return (
     <>
@@ -141,7 +161,7 @@ function Projects(props) {
                       key={proj.id}
                       details={{
                         edited: proj.created,
-                        model: proj.model || 'No model set',
+                        model: proj.model ? proj.model.name : 'No model set',
                         checkpoint: proj.checkpoint || 'No checkpoint set',
                         aoi: proj.aoi || 'No AOI set',
                         results: (
@@ -169,13 +189,9 @@ function Projects(props) {
                                         .select();
                                       document.execCommand('copy');
                                       window.getSelection().removeAllRanges();
-                                      toasts.success('File path copied!', {
-                                        autoClose: 3000,
-                                      });
+                                      toasts.success('File path copied!');
                                     } catch (err) {
-                                      toasts.error('Copy to clipboard failed', {
-                                        autoClose: 3000,
-                                      });
+                                      toasts.error('Copy to clipboard failed');
                                     }
                                   }}
                                 >
@@ -210,7 +226,4 @@ function Projects(props) {
   );
 }
 
-Projects.propTypes = {
-  projectsList: T.object,
-};
 export default Projects;

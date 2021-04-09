@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useMap } from 'react-leaflet';
 import L from 'leaflet';
+import { BOUNDS_PADDING } from './constants';
 
 function CenterMap({ aoiRef }) {
   const map = useMap();
@@ -13,7 +14,7 @@ function CenterMap({ aoiRef }) {
       button.setAttribute('href', '#');
       button.setAttribute('title', 'Center Map');
       button.onclick = () =>
-        map.fitBounds(aoiRef.getBounds(), { padding: [25, 25] });
+        map.fitBounds(aoiRef.getBounds(), { padding: BOUNDS_PADDING });
 
       return container;
     },
@@ -23,6 +24,7 @@ function CenterMap({ aoiRef }) {
   useEffect(() => {
     const center = new CenterControl({ position: 'topleft' });
     center.addTo(map);
+    return () => center.remove(map);
   }, [map]); // eslint-disable-line react-hooks/exhaustive-deps
   return null;
 }

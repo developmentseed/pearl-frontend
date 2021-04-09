@@ -1,3 +1,4 @@
+import './wdyr';
 import '@babel/polyfill';
 import React, { useEffect } from 'react';
 import { DevseedUiThemeProvider } from '@devseed-ui/theme-provider';
@@ -23,10 +24,17 @@ import { ToastContainerCustom } from './components/common/toasts';
 import Projects from './components/profile/projects';
 import Maps from './components/profile/maps';
 import { AuthProvider } from './context/auth';
+import { ApiMetaProvider } from './context/api-meta';
 
-// eslint-disable-next-line react/prop-types
-const ProtectedRoute = ({ component, ...args }) => (
-  <Route component={withAuthenticationRequired(component)} {...args} />
+const ProtectedRoute = (
+  { component, ...args } // eslint-disable-line react/prop-types
+) => (
+  <Route
+    component={
+      window.Cypress ? component : withAuthenticationRequired(component)
+    }
+    {...args}
+  />
 );
 
 // Root component.
@@ -44,23 +52,25 @@ function Root() {
         <Router history={history}>
           <DevseedUiThemeProvider theme={theme.main}>
             <GlobalLoadingProvider />
-            <GlobalContextProvider>
-              <CollecticonsGlobalStyle />
-              <GlobalStyles />
-              <Switch>
-                <Route exact path='/' component={Home} />
-                <Route path='/project/:projectId' component={Explore} />
-                <ProtectedRoute exact path='/profile/maps' component={Maps} />
-                <ProtectedRoute
-                  exact
-                  path='/profile/projects'
-                  component={Projects}
-                />
-                <Route path='/about' component={About} />
-                <Route path='*' component={UhOh} />
-              </Switch>
-              <ToastContainerCustom />
-            </GlobalContextProvider>
+            <ApiMetaProvider>
+              <GlobalContextProvider>
+                <CollecticonsGlobalStyle />
+                <GlobalStyles />
+                <Switch>
+                  <Route exact path='/' component={Home} />
+                  <Route path='/project/:projectId' component={Explore} />
+                  <ProtectedRoute exact path='/profile/maps' component={Maps} />
+                  <ProtectedRoute
+                    exact
+                    path='/profile/projects'
+                    component={Projects}
+                  />
+                  <Route path='/about' component={About} />
+                  <Route path='*' component={UhOh} />
+                </Switch>
+                <ToastContainerCustom />
+              </GlobalContextProvider>
+            </ApiMetaProvider>
           </DevseedUiThemeProvider>
         </Router>
       </ErrorBoundary>

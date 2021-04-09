@@ -8,27 +8,33 @@ import {
   TileLayer,
   FeatureGroup,
   ImageOverlay,
+  Circle,
 } from 'react-leaflet';
 import GlobalContext from '../../../context/global';
-import { ExploreContext, viewModes } from '../../../context/explore';
-import { MapContext } from '../../../context/map';
+import { ExploreContext, useMapState } from '../../../context/explore';
+import { useMapRef, useMapLayers, useUserLayers } from '../../../context/map';
 
 import GeoCoder from '../../common/map/geocoder';
+import { BOUNDS_PADDING } from '../../common/map/constants';
 import CenterMap from '../../common/map/center-map';
 
 import { themeVal, multiply } from '@devseed-ui/theme-provider';
 import theme from '../../../styles/theme';
-import FreeDraw, { ALL } from 'leaflet-freedraw';
 import AoiDrawControl from './aoi-draw-control';
 import AoiEditControl from './aoi-edit-control';
+import PolygonDrawControl from './polygon-draw-control';
 import config from '../../../config';
 import { inRange } from '../../../utils/utils';
+import { useCheckpoint, actions } from '../../../context/checkpoint';
+import ModalMapEvent from './modal-events';
+
+import VectorLayer from '../../common/map/vector-layer';
+import { useRestApiClient } from '../../../context/auth';
+import { useApiMeta } from '../../../context/api-meta';
+import { useAoi } from '../../../context/aoi';
 
 const center = [38.83428180092151, -79.37724530696869];
 const zoom = 15;
-const freeDraw = new FreeDraw({
-  mode: ALL,
-});
 
 const MAX = 3;
 const NO_LIVE = 2;
@@ -73,103 +79,133 @@ function areaFromBounds(bbox) {
 function Map() {
   const {
     aoiRef,
-    previousViewMode,
     setAoiRef,
     aoiArea,
     setAoiArea,
     aoiInitializer,
-    setViewMode,
-    viewMode,
+    setAoiBounds,
     predictions,
-    apiLimits,
+    currentProject,
   } = useContext(ExploreContext);
 
-  const { map, setMap, mapLayers, setMapLayers, setAoiBounds } = useContext(
-    MapContext
-  );
+  const { apiLimits } = useApiMeta();
+  const { currentAoi } = useAoi();
+
+  const { restApiClient } = useRestApiClient();
+
+  const { mapState, mapModes, setMapMode } = useMapState();
+  const { mapRef, setMapRef } = useMapRef();
+
+  const { mapLayers, setMapLayers } = useMapLayers();
+  const { userLayers } = useUserLayers();
 
   const { mosaicList } = useContext(GlobalContext);
+  const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
 
   const { mosaics } = mosaicList.isReady() ? mosaicList.getData() : {};
 
+  // Manage changes in map mode
   useEffect(() => {
-    if (!map) return;
-
-    if (previousViewMode === viewModes.EDIT_CLASS_MODE) {
-      map.removeLayer(freeDraw);
-    }
-
-    switch (viewMode) {
-      case viewModes.CREATE_AOI_MODE:
-        map.aoi.control.draw.enable();
+    switch (mapState.mode) {
+      case mapModes.CREATE_AOI_MODE:
+        mapRef.aoi.control.draw.enable();
+        mapRef.polygonDraw.disable();
         break;
-      case viewModes.EDIT_AOI_MODE:
-        map.aoi.control.draw.disable();
-        map.aoi.control.edit.enable(aoiRef);
+      case mapModes.EDIT_AOI_MODE:
+        mapRef.aoi.control.draw.disable();
+        mapRef.aoi.control.edit.enable(aoiRef);
+        mapRef.polygonDraw.disable();
         break;
-      case viewModes.BROWSE_MODE:
-        if (map) {
+      case mapModes.BROWSE_MODE:
+        if (mapRef) {
+          mapRef.polygonDraw.disable();
           if (aoiRef) {
             // Only disable if something has been drawn
-            map.aoi.control.draw.disable();
-            if (map.aoi.control.edit._shape) {
-              map.aoi.control.edit.disable();
+            mapRef.aoi.control.draw.disable();
+            if (mapRef.aoi.control.edit._shape) {
+              mapRef.aoi.control.edit.disable();
             }
             if (
-              previousViewMode === viewModes.CREATE_AOI_MODE ||
-              previousViewMode === viewModes.EDIT_AOI_MODE
+              mapState.previousMode === mapModes.CREATE_AOI_MODE ||
+              mapState.previousMode === mapModes.EDIT_AOI_MODE
             ) {
               // On confirm, zoom to bounds
-              map.fitBounds(aoiRef.getBounds(), { padding: [25, 25] });
+              mapRef.fitBounds(aoiRef.getBounds(), { padding: BOUNDS_PADDING });
             }
           }
         }
         break;
-      case viewModes.EDIT_CLASS_MODE:
-        map.addLayer(freeDraw);
+      case mapModes.ADD_SAMPLE_POLYGON:
+        mapRef.polygonDraw.enableAdd(currentCheckpoint.activeClass);
+        break;
+      case mapModes.REMOVE_SAMPLE:
+        mapRef.polygonDraw.enableDelete(currentCheckpoint.activeClass);
         break;
       default:
+        mapRef.polygonDraw.disable();
         break;
     }
-  }, [viewMode, aoiRef]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [
+    mapState.mode,
+    aoiRef,
+    currentCheckpoint && currentCheckpoint.activeClass,
+  ]);
+
+  // Add polygon layers to be draw when checkpoint has changed
+  useEffect(() => {
+    if (!mapRef || !mapRef.polygonDraw) return;
+
+    mapRef.polygonDraw.clearLayers();
+    if (currentCheckpoint) {
+      mapRef.polygonDraw.setLayers(currentCheckpoint.classes);
+    }
+  }, [currentCheckpoint && currentCheckpoint.id]);
 
   /**
    * Add/update AOI controls on API metadata change.
    */
   useEffect(() => {
-    if (!map) return;
+    if (!mapRef) return;
 
     // Setup AOI controllers
-    map.aoi = {
+    mapRef.aoi = {
       control: {},
     };
 
     // Draw control, for creating an AOI
-    map.aoi.control.draw = new AoiDrawControl(map, aoiInitializer, apiLimits, {
-      onInitialize: (bbox, shape) => {
-        setAoiRef(shape);
-        setAoiBounds(shape.getBounds());
-        setAoiArea(areaFromBounds(bbox));
-      },
-      onDrawStart: (shape) => {
-        setAoiRef(shape);
-      },
-      onDrawChange: (bbox) => {
-        setAoiArea(areaFromBounds(bbox));
-      },
-      onDrawEnd: (bbox, shape) => {
-        setAoiRef(shape);
-        setViewMode(viewModes.EDIT_AOI_MODE);
-      },
-    });
+    mapRef.aoi.control.draw = new AoiDrawControl(
+      mapRef,
+      aoiInitializer,
+      apiLimits,
+      {
+        onInitialize: (bbox, shape) => {
+          setAoiRef(shape);
+          setAoiBounds(shape.getBounds());
+          setAoiArea(areaFromBounds(bbox));
+
+          mapRef.fitBounds(shape.getBounds(), { padding: BOUNDS_PADDING });
+        },
+        onDrawStart: (shape) => {
+          setAoiRef(shape);
+        },
+        onDrawChange: (bbox) => {
+          setAoiArea(areaFromBounds(bbox));
+        },
+        onDrawEnd: (bbox, shape) => {
+          setAoiRef(shape);
+          setAoiBounds(shape.getBounds());
+          setMapMode(mapModes.BROWSE_MODE);
+        },
+      }
+    );
 
     // Edit AOI control
-    map.aoi.control.edit = new AoiEditControl(map, apiLimits, {
+    mapRef.aoi.control.edit = new AoiEditControl(mapRef, apiLimits, {
       onBoundsChange: (bbox) => {
         setAoiArea(areaFromBounds(bbox));
       },
     });
-  }, [map, aoiInitializer, apiLimits]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [mapRef, aoiInitializer, apiLimits]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Update color on area size change during draw
   useEffect(() => {
@@ -207,8 +243,21 @@ function Map() {
         zoom={zoom}
         style={{ height: '100%' }}
         whenCreated={(m) => {
+          const polygonDraw = new PolygonDrawControl(m, {
+            onUpdate: (className, polygons) =>
+              dispatchCurrentCheckpoint({
+                type: actions.UPDATE_POLYGONS,
+                data: {
+                  class: className,
+                  polygons: polygons.map((f) => f.geometry),
+                },
+              }),
+          });
+
+          m.polygonDraw = polygonDraw;
+
           // Add map to state
-          setMap(m);
+          setMapRef(m);
 
           if (process.env.NODE_ENV !== 'production') {
             // makes map accessible in console for debugging
@@ -216,12 +265,26 @@ function Map() {
           }
         }}
       >
+        {mapState.mode === mapModes.ADD_SAMPLE_POINT && (
+          <ModalMapEvent
+            event='click'
+            func={(e) => {
+              if (mapState.mode !== mapModes.ADD_SAMPLE_POINT) {
+                return;
+              }
+              dispatchCurrentCheckpoint({
+                type: actions.ADD_POINT_SAMPLE,
+                data: e.latlng,
+              });
+            }}
+          />
+        )}
+
         <TileLayer
           attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
           url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
           maxZoom={18}
         />
-
         {mosaics &&
           mosaics.map((layer) => (
             <TileLayer
@@ -234,26 +297,104 @@ function Map() {
                 add: (v) => {
                   setMapLayers({
                     ...mapLayers,
-                    [layer]: v.target,
+                    [layer]: {
+                      layer: v.target,
+                      active: true,
+                      name: layer,
+                    },
                   });
                 },
               }}
             />
           ))}
 
-        {predictions &&
-          predictions.data &&
-          predictions.data.predictions &&
+        {currentCheckpoint &&
+          currentCheckpoint.id &&
+          userLayers.retrainingSamples.active && (
+            <VectorLayer
+              url={`${config.restApiEndpoint}/api/project/${currentProject.id}/checkpoint/${currentCheckpoint.id}/tiles/{z}/{x}/{y}.mvt`}
+              token={`Bearer ${restApiClient.apiToken}`}
+              pane='markerPane'
+              opacity={
+                userLayers.retrainingSamples.visible
+                  ? userLayers.retrainingSamples.opacity
+                  : 0
+              }
+            />
+          )}
+
+        {predictions.data.predictions &&
           predictions.data.predictions.map((p) => (
-            <ImageOverlay key={p.key} url={p.image} bounds={p.bounds} />
+            <ImageOverlay
+              key={p.key}
+              url={p.image}
+              bounds={p.bounds}
+              opacity={
+                userLayers.predictions.visible
+                  ? userLayers.predictions.opacity
+                  : 0
+              }
+            />
           ))}
+
+        {!predictions.data.predictions && currentProject && currentAoi && (
+          <TileLayer
+            url={`${config.restApiEndpoint}/api/project/${currentProject.id}/aoi/${currentAoi.id}/tiles/{z}/{x}/{y}`}
+            maxZoom={18}
+          />
+        )}
+
+        {currentCheckpoint &&
+          currentCheckpoint.classes &&
+          Object.values(currentCheckpoint.classes).map(
+            (sampleClass) =>
+              sampleClass.points &&
+              sampleClass.points.coordinates &&
+              sampleClass.points.coordinates.map(([lat, lng]) => (
+                <Circle
+                  key={JSON.stringify([lat, lng])}
+                  pathOptions={{
+                    color: sampleClass.color,
+                  }}
+                  eventHandlers={{
+                    click: () => {
+                      if (mapState.mode === mapModes.REMOVE_SAMPLE) {
+                        dispatchCurrentCheckpoint({
+                          type: actions.REMOVE_POINT_SAMPLE,
+                          data: {
+                            className: sampleClass.name,
+                            lat,
+                            lng,
+                          },
+                        });
+                      }
+                    },
+                  }}
+                  center={[lng, lat]}
+                  radius={10}
+                />
+              ))
+          )}
         <FeatureGroup>
           <GeoCoder />
           {aoiRef && <CenterMap aoiRef={aoiRef} />}
         </FeatureGroup>
       </MapContainer>
     ),
-    [viewMode, apiLimits, mosaics, predictions] // eslint-disable-line react-hooks/exhaustive-deps
+    [
+      mapModes,
+      aoiRef,
+      currentCheckpoint,
+      dispatchCurrentCheckpoint,
+      userLayers,
+      mapLayers,
+      mosaics,
+      mapState.mode,
+      predictions.data.predictions,
+      restApiClient,
+      setMapLayers,
+      setMapRef,
+    ]
   );
 
   return (
@@ -262,8 +403,8 @@ function Map() {
       id='map'
       data-cy='leaflet-map'
       onChange={() => {
-        if (map) {
-          map.invalidateSize();
+        if (mapRef) {
+          mapRef.invalidateSize();
         }
       }}
     >

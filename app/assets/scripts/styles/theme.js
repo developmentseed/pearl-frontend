@@ -31,6 +31,7 @@ color = {
   baseAlphaD: rgba(color.base, 0.16),
   baseAlphaE: rgba(color.base, 0.32),
   primaryAlphaA: rgba(color.primary, 0.04),
+  primaryAlphaB: rgba(color.primary, 0.08),
   silkLight: `radial-gradient(farthest-side, ${color.baseLight}, ${rgba(
     color.baseLight,
     0.64
@@ -47,7 +48,7 @@ const type = {
     size: '1rem',
     line: '1.5',
     color: color.base,
-    family: '"Titillium Web", sans-serif',
+    family: '"Titillium Web", Titillium Web, sans-serif',
     style: 'normal',
     settings: 'normal',
     case: 'none',
@@ -59,7 +60,7 @@ const type = {
     antialiasing: true,
   },
   heading: {
-    family: '"Titillium Web", sans-serif',
+    family: '"Titillium Web", Titillium Web, sans-serif',
     style: 'normal',
     settings: 'normal',
     case: 'none',
@@ -71,7 +72,7 @@ const type = {
     textTransform: 'none',
   },
   button: {
-    family: '"Open Sans", sans-serif',
+    family: '"Titillium Web", Titillium Web, sans-serif',
     style: 'normal',
     settings: 'normal',
     case: 'none',

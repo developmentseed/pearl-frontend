@@ -1,11 +1,14 @@
-import React, { useState } from 'react';
+import React from 'react';
 import T from 'prop-types';
+import get from 'lodash.get';
 import { Button } from '@devseed-ui/button';
 import styled, { css } from 'styled-components';
 import { glsp, themeVal } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
 import collecticon from '@devseed-ui/collecticons';
 import { PlaceholderMessage } from '../../../styles/placeholder.js';
+import { actions, useCheckpoint } from '../../../context/checkpoint.js';
+import { useMapState } from '../../../context/explore.js';
 
 const ClassList = styled.div`
   display: grid;
@@ -44,6 +47,7 @@ const Class = styled.div`
     `};
   &.add__class {
     transition: all 0.16s ease-out 0s;
+    margin-top: ${glsp()};
     padding: ${glsp(0.5)} 0;
     span {
       display: grid;
@@ -53,6 +57,9 @@ const Class = styled.div`
     :hover {
       color: ${themeVal('color.base')};
     }
+  }
+  &.placeholder-class:first-child {
+    margin-top: ${glsp(2)};
   }
 `;
 const Thumbnail = styled.div`
@@ -79,55 +86,120 @@ const Thumbnail = styled.div`
 
 const Wrapper = styled.div`
   display: grid;
-  grid-gap: ${glsp(0.5)};
+  grid-gap: ${glsp()};
+`;
+
+const RetrainTools = styled.section`
+  ${Button} {
+    margin-left: ${glsp(0.25)};
+    margin-right: ${glsp()};
+    padding: 0.25rem 0.75rem 0.25rem 0.5rem;
+    box-shadow: none;
+    border: 2px solid ${themeVal('color.primaryAlphaB')};
+  }
 `;
 
 function RetrainModel(props) {
-  const { classList, className, placeholderMessage } = props;
-  const [selectedClass, setSelectedClass] = useState({});
+  const { className, placeholderMessage } = props;
+
+  const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
+
+  const { setMapMode, mapModes, mapState } = useMapState();
+
   return (
     <Wrapper className={className}>
-      <Heading useAlt>Classes</Heading>
-      <ClassList>
-        {classList &&
-          classList.map((c) => (
-            <Class
-              key={c.name}
-              onClick={() => {
-                setSelectedClass(c);
-              }}
-              selected={c.name === selectedClass.name}
+      {currentCheckpoint && currentCheckpoint.classes && (
+        <>
+          <RetrainTools>
+            <Heading useAlt>Sample Selection Tools</Heading>
+            <Button
+              variation={
+                mapState.mode === mapModes.ADD_SAMPLE_POLYGON
+                  ? 'primary-raised-dark'
+                  : 'primary-raised-light'
+              }
+              size='small'
+              radius='ellipsoid'
+              useIcon='pencil'
+              onClick={() => setMapMode(mapModes.ADD_SAMPLE_POLYGON)}
             >
-              <Thumbnail color={c.color} />
-              <Heading size='xsmall'>{c.name}</Heading>
+              Draw
+            </Button>
+            <Button
+              variation={
+                mapState.mode === mapModes.ADD_SAMPLE_POINT
+                  ? 'primary-raised-dark'
+                  : 'primary-raised-light'
+              }
+              size='small'
+              radius='ellipsoid'
+              useIcon='crosshair'
+              onClick={() => setMapMode(mapModes.ADD_SAMPLE_POINT)}
+            >
+              Point
+            </Button>
+            <Button
+              variation={
+                mapState.mode === mapModes.REMOVE_SAMPLE
+                  ? 'primary-raised-dark'
+                  : 'primary-raised-light'
+              }
+              size='small'
+              radius='ellipsoid'
+              useIcon='xmark'
+              onClick={() => setMapMode(mapModes.REMOVE_SAMPLE)}
+            >
+              Delete
+            </Button>
+          </RetrainTools>
+          <ClassList>
+            <Heading useAlt>Classes</Heading>
+            {Object.values(currentCheckpoint.classes).map((c) => (
+              <Class
+                key={c.name}
+                onClick={() => {
+                  dispatchCurrentCheckpoint({
+                    type: actions.SET_ACTIVE_CLASS,
+                    data: c.name,
+                  });
+                }}
+                selected={currentCheckpoint.activeClass === c.name}
+              >
+                <Thumbnail color={c.color} />
+                <Heading size='xsmall'>
+                  {c.name} (
+                  {get(c, 'points.coordinates.length', 0) +
+                    get(c, 'polygons.length', 0)}{' '}
+                  samples)
+                  {currentCheckpoint.activeClass === c.name ? ' (Active)' : ''}
+                </Heading>
 
-              <Button useIcon='cog' hideText variation='base-plain'>
-                Options
-              </Button>
-            </Class>
-          ))}
-        {!classList && placeholderMessage && (
-          <>
-            {[1, 2, 3].map((i) => (
-              // +true workaround
-              // Styled components will try to pass true to the DOM element
-              // assing a + casts it to int which is logically equivalent
-              // but does not cause the DOM error
-              <Class key={i} placeholder={+true}>
-                <Thumbnail />
-                <Heading size='xsmall' />
-                <Button
-                  disabled
-                  size='small'
-                  variation='base-raised-semidark'
-                />
+                <Button useIcon='cog' hideText variation='base-plain'>
+                  Options
+                </Button>
               </Class>
             ))}
-            <PlaceholderMessage>{placeholderMessage}</PlaceholderMessage>
-          </>
-        )}
-      </ClassList>
-      {classList && (
+          </ClassList>
+        </>
+      )}
+
+      {!currentCheckpoint && placeholderMessage && (
+        <ClassList>
+          {[1, 2, 3].map((i) => (
+            // +true workaround
+            // Styled components will try to pass true to the DOM element
+            // assing a + casts it to int which is logically equivalent
+            // but does not cause the DOM error
+            <Class key={i} placeholder={+true} className='placeholder-class'>
+              <Thumbnail />
+              <Heading size='xsmall' />
+              <Button disabled size='small' variation='base-raised-semidark' />
+            </Class>
+          ))}
+          <PlaceholderMessage>{placeholderMessage}</PlaceholderMessage>
+        </ClassList>
+      )}
+      {currentCheckpoint && (
         <Class className='add__class' muted as={Button}>
           <Thumbnail useIcon='plus' outline />
           <Heading size='xsmall'>Add Class</Heading>
@@ -138,7 +210,6 @@ function RetrainModel(props) {
 }
 
 RetrainModel.propTypes = {
-  classList: T.array,
   className: T.string,
   placeholderMessage: T.string,
 };

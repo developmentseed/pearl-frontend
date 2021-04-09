@@ -71,6 +71,11 @@ const TabbedBlockHeader = styled(PanelBlockHeader)`
     flex-flow: row nowrap;
     justify-content: space-between;
   }
+  /* PanelBlockHeader sets z-index. This causes
+   * issues for TabbedBlockHeader so
+   * unset it 
+   */
+  z-index: unset;
 `;
 
 const PanelBlockScroll = styled(ScrollableBody)`
