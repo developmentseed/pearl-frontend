@@ -207,49 +207,46 @@ function RetrainModel(props) {
           </RetrainTools>
           <ClassList>
             <Heading useAlt>Classes</Heading>
-            {Object.values(currentCheckpoint.classes).map((c) => (
-              <Class
-                key={c.name}
-                onClick={() => {
-                  dispatchCurrentCheckpoint({
-                    type: actions.SET_ACTIVE_CLASS,
-                    data: c.name,
-                  });
-                }}
-                selected={currentCheckpoint.activeClass === c.name}
-              >
-                <ClassThumbnail color={c.color} />
-                <ClassInfoWrapper>
-                  <ClassHeading size='xsmall'>{c.name}</ClassHeading>
-                  <ClassSamples>
-                    {get(c, 'polygons.length') > 0 && (
-                      <strong>
-                        {get(c, 'polygons.length')}{' '}
-                        {get(c, 'polygons.length') > 1 ? 'polygons' : 'polygon'}
-                      </strong>
-                    )}
-                    {get(c, 'points.coordinates.length') > 0 &&
-                      get(c, 'polygons.length') > 0 &&
-                      ` | `}
-                    {get(c, 'points.coordinates.length') > 0 && (
-                      <strong>
-                        {get(c, 'points.coordinates.length')}{' '}
-                        {get(c, 'points.coordinates.length') > 1
-                          ? 'points'
-                          : 'point'}
-                      </strong>
-                    )}{' '}
-                    {(get(c, 'points.coordinates.length') > 0 ||
-                      get(c, 'polygons.length') > 0) &&
-                      `selected since last retrain`}
-                  </ClassSamples>
-                </ClassInfoWrapper>
+            {Object.values(currentCheckpoint.classes).map((c) => {
+              let polygons = get(c, 'polygons.length');
+              let points = get(c, 'points.coordinates.length');
+              return (
+                <Class
+                  key={c.name}
+                  onClick={() => {
+                    dispatchCurrentCheckpoint({
+                      type: actions.SET_ACTIVE_CLASS,
+                      data: c.name,
+                    });
+                  }}
+                  selected={currentCheckpoint.activeClass === c.name}
+                >
+                  <ClassThumbnail color={c.color} />
+                  <ClassInfoWrapper>
+                    <ClassHeading size='xsmall'>{c.name}</ClassHeading>
+                    <ClassSamples>
+                      {polygons > 0 && (
+                        <strong>
+                          {polygons} {polygons > 1 ? 'polygons' : 'polygon'}
+                        </strong>
+                      )}
+                      {points > 0 && polygons > 0 && ` | `}
+                      {points > 0 && (
+                        <strong>
+                          {points} {points > 1 ? 'points' : 'point'}
+                        </strong>
+                      )}{' '}
+                      {(polygons > 0 || points > 0) &&
+                        `selected since last retrain`}
+                    </ClassSamples>
+                  </ClassInfoWrapper>
 
-                <ClassOptions useIcon='cog' hideText variation='base-plain'>
-                  Options
-                </ClassOptions>
-              </Class>
-            ))}
+                  <ClassOptions useIcon='cog' hideText variation='base-plain'>
+                    Options
+                  </ClassOptions>
+                </Class>
+              );
+            })}
           </ClassList>
         </>
       )}
