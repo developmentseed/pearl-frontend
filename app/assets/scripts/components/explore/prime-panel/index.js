@@ -95,14 +95,14 @@ const StyledPanelBlock = styled(PanelBlock)`
 
 const PanelBlockHeader = styled(BasePanelBlockHeader)`
   display: grid;
-  grid-gap: ${glsp(0.75)};
+  grid-gap: ${glsp(0.5)};
 `;
 
 const PanelControls = styled(PanelBlockFooter)`
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-gap: ${glsp()};
-  padding-bottom: ${glsp(2)};
+  padding-bottom: ${glsp()};
 `;
 const SaveCheckpoint = styled(DropdownBody)`
   padding: ${glsp()};
@@ -422,6 +422,7 @@ function PrimePanel() {
               <TabbedBlock>
                 <RetrainModel
                   name='retrain model'
+                  className='retrain-model'
                   tabId='retrain-tab-trigger'
                   placeholderMessage={retrainPlaceHolderMessage()}
                 />
