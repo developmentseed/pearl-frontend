@@ -89,8 +89,9 @@ function RefineModel(props) {
             </InfoButton>
           </RefineTools>
           <CheckpointSection>
-            <Heading useAlt>Checkpoint List</Heading>
             <ItemList>
+              <Heading useAlt>Checkpoint List</Heading>
+
               {checkpointList.map((c) => {
                 const id = `checkpoint-${c.name}-${c.id}`;
                 return (

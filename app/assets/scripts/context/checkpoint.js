@@ -3,6 +3,9 @@ import uniqWith from 'lodash.uniqwith';
 import isEqual from 'lodash.isequal';
 import differenceWith from 'lodash.differencewith';
 import T from 'prop-types';
+import { useRestApiClient } from './auth';
+import toasts from '../components/common/toasts';
+import logger from '../utils/logger';
 
 import { wrapLogReducer } from './reducers/utils';
 
@@ -36,9 +39,28 @@ export function CheckpointProvider(props) {
     wrapLogReducer(checkpointReducer)
   );
 
+  const { restApiClient } = useRestApiClient();
+
+  async function fetchCheckpoint(projectId, checkpointId) {
+    try {
+      const checkpoint = await restApiClient.getCheckpoint(
+        projectId,
+        checkpointId
+      );
+      dispatchCurrentCheckpoint({
+        type: actions.SET_CHECKPOINT,
+        data: { ...checkpoint, mode: checkpointModes.RETRAIN },
+      });
+    } catch (error) {
+      logger(error);
+      toasts.error('Could not fetch checkpoint.');
+    }
+  }
+
   const value = {
     currentCheckpoint,
     dispatchCurrentCheckpoint,
+    fetchCheckpoint,
   };
 
   return (
@@ -309,15 +331,18 @@ const useCheckContext = (fnName) => {
 };
 
 export const useCheckpoint = () => {
-  const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckContext(
-    'useCheckpoint'
-  );
+  const {
+    currentCheckpoint,
+    dispatchCurrentCheckpoint,
+    fetchCheckpoint,
+  } = useCheckContext('useCheckpoint');
 
   return useMemo(
     () => ({
       currentCheckpoint,
       dispatchCurrentCheckpoint,
+      fetchCheckpoint,
     }),
-    [currentCheckpoint, dispatchCurrentCheckpoint]
+    [currentCheckpoint, dispatchCurrentCheckpoint, fetchCheckpoint]
   );
 };

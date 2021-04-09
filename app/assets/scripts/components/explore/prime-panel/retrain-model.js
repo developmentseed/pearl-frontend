@@ -12,7 +12,11 @@ import { useMapState } from '../../../context/explore.js';
 import {
   ClassList,
   Class,
-  Thumbnail,
+  Thumbnail as ClassThumbnail,
+  ClassInfoWrapper,
+  ClassHeading,
+  ClassSamples,
+  ClassOptions,
   ToolBox as RetrainTools,
 } from './retrain-refine-styles';
 
@@ -99,33 +103,48 @@ function RetrainModel(props) {
           </RetrainTools>
           <ClassList>
             <Heading useAlt>Classes</Heading>
-            {Object.values(currentCheckpoint.classes).map((c) => (
-              <Class
-                key={c.name}
-                onClick={() => {
-                  dispatchCurrentCheckpoint({
-                    type: actions.SET_ACTIVE_CLASS,
-                    data: c.name,
-                  });
-                }}
-                selected={currentCheckpoint.activeItem === c.name}
-              >
-                <Thumbnail color={c.color} />
-                <Heading size='xsmall'>
-                  {c.name} (
-                  {get(c, 'points.coordinates.length', 0) +
-                    get(c, 'polygons.length', 0)}{' '}
-                  samples)
-                  {currentCheckpoint.activeItem === c.name ? ' (Active)' : ''}
-                </Heading>
+            {Object.values(currentCheckpoint.classes).map((c) => {
+              let polygons = get(c, 'polygons.length');
+              let points = get(c, 'points.coordinates.length');
+              return (
+                <Class
+                  key={c.name}
+                  onClick={() => {
+                    dispatchCurrentCheckpoint({
+                      type: actions.SET_ACTIVE_CLASS,
+                      data: c.name,
+                    });
+                  }}
+                  selected={currentCheckpoint.activeItem === c.name}
+                >
+                  <ClassThumbnail color={c.color} />
+                  <ClassInfoWrapper>
+                    <ClassHeading size='xsmall'>{c.name}</ClassHeading>
+                    <ClassSamples>
+                      {polygons > 0 && (
+                        <strong>
+                          {polygons} {polygons > 1 ? 'polygons' : 'polygon'}
+                        </strong>
+                      )}
+                      {points > 0 && polygons > 0 && ` | `}
+                      {points > 0 && (
+                        <strong>
+                          {points} {points > 1 ? 'points' : 'point'}
+                        </strong>
+                      )}{' '}
+                      {(polygons > 0 || points > 0) &&
+                        `selected since last retrain`}
+                    </ClassSamples>
+                  </ClassInfoWrapper>
 
-                <Button useIcon='cog' hideText variation='base-plain'>
-                  Options
-                </Button>
-              </Class>
-            ))}
+                  <ClassOptions useIcon='cog' hideText variation='base-plain'>
+                    Options
+                  </ClassOptions>
+                </Class>
+              );
+            })}
             <Class className='add__class' muted as={Button}>
-              <Thumbnail useIcon='plus' outline />
+              <ClassThumbnail useIcon='plus' outline />
               <Heading size='xsmall'>Add Class</Heading>
             </Class>
           </ClassList>
@@ -140,9 +159,9 @@ function RetrainModel(props) {
             // assing a + casts it to int which is logically equivalent
             // but does not cause the DOM error
             <Class key={i} placeholder={+true} className='placeholder-class'>
-              <Thumbnail />
-              <Heading size='xsmall' />
-              <Button disabled size='small' variation='base-raised-semidark' />
+              <ClassThumbnail />
+              <ClassHeading size='xsmall' placeholder={+true} />
+              <ClassThumbnail />
             </Class>
           ))}
           <PlaceholderMessage>{placeholderMessage}</PlaceholderMessage>

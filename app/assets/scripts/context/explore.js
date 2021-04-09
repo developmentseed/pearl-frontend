@@ -26,7 +26,6 @@ import reverseGeoCode from '../utils/reverse-geocode';
 import {
   actions as checkpointActions,
   useCheckpoint,
-  checkpointModes,
 } from './checkpoint';
 import get from 'lodash.get';
 import logger from '../utils/logger';
@@ -37,6 +36,7 @@ import {
   messageQueueActionTypes,
   WebsocketClient,
 } from './instance';
+import { useAoi } from './aoi';
 
 /**
  * Context & Provider
@@ -51,22 +51,15 @@ export function ExploreProvider(props) {
   const [currentProject, setCurrentProject] = useState(null);
   const [checkpointList, setCheckpointList] = useState(null);
 
-  // Reference to Leaflet Rectangle layer created by
-  // AOI draw control
+  const { setCurrentAoi } = useAoi();
+
+  // The following AOI properties should be refactored in the futre and moved to useAoi()
+  // to avoid re-rendering issues in this context.
   const [aoiRef, setAoiRef] = useState(null);
-
-  // Float value that records square area of aoi
   const [aoiArea, setAoiArea] = useState(null);
-
   const [aoiName, setAoiName] = useState(null);
-
-  // Aoi shape that is requested from API. used to initialize
-  // Leaflet layer in the front end
-  // eslint-disable-next-line
   const [aoiInitializer, setAoiInitializer] = useState(null);
   const [aoiList, setAoiList] = useState([]);
-
-  //L.LatLngBounds object, set when aoi is confirmed
   const [aoiBounds, setAoiBounds] = useState(null);
 
   const [mapState, dispatchMapState] = useReducer(
@@ -277,6 +270,9 @@ export function ExploreProvider(props) {
     const aoi = await restApiClient.get(
       `project/${project.id}/aoi/${aoiObject.id}`
     );
+
+    setCurrentAoi(aoi);
+
     const [lonMin, latMin, lonMax, latMax] = tBbox(aoi.bounds);
     const bounds = [
       [latMin, lonMin],
@@ -542,7 +538,11 @@ export const usePredictions = () => {
 export const useInstance = () => {
   const history = useHistory();
   const { restApiClient } = useRestApiClient();
-  const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
+  const {
+    currentCheckpoint,
+    dispatchCurrentCheckpoint,
+    fetchCheckpoint,
+  } = useCheckpoint();
   const { aoiName, aoiRef, currentProject, setCurrentProject } = useProject();
   const { dispatchPredictions } = usePredictions();
   const { selectedModel } = useExploreContext('useWebsocket');
@@ -604,6 +604,8 @@ export const useInstance = () => {
         token,
         dispatchInstance,
         dispatchCurrentCheckpoint,
+        fetchCheckpoint: (checkpointId) =>
+          fetchCheckpoint(projectId, checkpointId),
         dispatchPredictions,
       });
       newWebsocketClient.addEventListener('open', () => {
@@ -770,18 +772,7 @@ export const useInstance = () => {
             type: predictionActions.START_PREDICTION,
           });
 
-          const checkpoint = await restApiClient.getCheckpoint(
-            projectId,
-            checkpointId
-          );
-
-          dispatchCurrentCheckpoint({
-            type: checkpointActions.SET_CHECKPOINT,
-            data: {
-              ...checkpoint,
-              mode: checkpointModes.RETRAIN,
-            },
-          });
+          await fetchCheckpoint(projectId, checkpointId);
 
           dispatchMessageQueue({
             type: messageQueueActionTypes.ADD,

@@ -187,6 +187,7 @@ function PrimePanel() {
               <TabbedBlock>
                 <RetrainModel
                   name='retrain model'
+                  className='retrain-model'
                   tabId='retrain-tab-trigger'
                   placeholderMessage={retrainPlaceHolderMessage()}
                   ready={
@@ -220,6 +221,7 @@ function PrimePanel() {
                 <RefineModel
                   name='Refine Results'
                   tabId='refine-tab-trigger'
+                  className='refine-model'
                   disabled={!currentCheckpoint}
                   ready={
                     currentCheckpoint &&
@@ -253,6 +255,7 @@ function PrimePanel() {
                   onTabClick={() => {
                     setActiveTab('LAYERS');
                   }}
+                  className='padded'
                   name='layers'
                   tabId='layers-tab-trigger'
                   mapLayers={mapLayers}

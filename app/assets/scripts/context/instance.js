@@ -37,6 +37,7 @@ export class WebsocketClient extends WebSocket {
     token,
     dispatchInstance,
     dispatchCurrentCheckpoint,
+    fetchCheckpoint,
     dispatchPredictions,
   }) {
     super(config.websocketEndpoint + `?token=${token}`);
@@ -82,12 +83,8 @@ export class WebsocketClient extends WebSocket {
           break;
 
         case 'model#checkpoint':
-          dispatchCurrentCheckpoint({
-            type: checkpointActions.RECEIVE_METADATA,
-            data: data,
-          });
+          fetchCheckpoint(data.id);
           break;
-
         case 'model#prediction':
           dispatchPredictions({
             type: predictionsActions.RECEIVE_PREDICTION,

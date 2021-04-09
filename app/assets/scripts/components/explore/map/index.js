@@ -34,6 +34,7 @@ import ModalMapEvent from './modal-events';
 import VectorLayer from '../../common/map/vector-layer';
 import { useRestApiClient } from '../../../context/auth';
 import { useApiMeta } from '../../../context/api-meta';
+import { useAoi } from '../../../context/aoi';
 
 const center = [38.83428180092151, -79.37724530696869];
 const zoom = 15;
@@ -91,6 +92,7 @@ function Map() {
   } = useContext(ExploreContext);
 
   const { apiLimits } = useApiMeta();
+  const { currentAoi } = useAoi();
 
   const { restApiClient } = useRestApiClient();
 
@@ -306,6 +308,7 @@ function Map() {
             }}
           />
         )}
+
         <TileLayer
           attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
           url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
@@ -362,6 +365,13 @@ function Map() {
               }
             />
           ))}
+
+        {!predictions.data.predictions && currentProject && currentAoi && (
+          <TileLayer
+            url={`${config.restApiEndpoint}/api/project/${currentProject.id}/aoi/${currentAoi.id}/tiles/{z}/{x}/{y}`}
+            maxZoom={18}
+          />
+        )}
 
         {currentCheckpoint &&
           currentCheckpoint.classes &&

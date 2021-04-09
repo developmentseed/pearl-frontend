@@ -11,6 +11,7 @@ import theme from '../../styles/theme';
 import SessionTimeoutModal from '../common/timeout-modal';
 import SessionOutputControl from './session-output-control';
 import { CheckpointProvider } from '../../context/checkpoint';
+import { AoiProvider } from '../../context/aoi';
 
 function Explore() {
   const { setTourStep } = useTour();
@@ -23,26 +24,28 @@ function Explore() {
   return (
     <App pageTitle='Explore'>
       <CheckpointProvider>
-        <ExploreProvider>
-          <MapProvider>
-            <SizeAwareElement
-              element='header'
-              className='header'
-              onChange={resizeListener}
-            >
-              <PageHeader>
-                <SessionOutputControl
-                  openHelp={() => setTourStep(0)}
-                  isMediumDown={isMediumDown}
-                />
-              </PageHeader>
-            </SizeAwareElement>
-            <PageBody role='main'>
-              <ExploreComponent />
-            </PageBody>
-            <SessionTimeoutModal revealed={false} />
-          </MapProvider>
-        </ExploreProvider>
+        <AoiProvider>
+          <ExploreProvider>
+            <MapProvider>
+              <SizeAwareElement
+                element='header'
+                className='header'
+                onChange={resizeListener}
+              >
+                <PageHeader>
+                  <SessionOutputControl
+                    openHelp={() => setTourStep(0)}
+                    isMediumDown={isMediumDown}
+                  />
+                </PageHeader>
+              </SizeAwareElement>
+              <PageBody role='main'>
+                <ExploreComponent />
+              </PageBody>
+              <SessionTimeoutModal revealed={false} />
+            </MapProvider>
+          </ExploreProvider>
+        </AoiProvider>
       </CheckpointProvider>
     </App>
   );

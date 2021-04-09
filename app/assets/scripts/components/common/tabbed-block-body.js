@@ -83,6 +83,12 @@ const PanelBlockScroll = styled(ScrollableBody)`
     display: none;
   }
   padding: ${glsp(0.5)} 0;
+  margin: 0 -1.5rem;
+
+  & > .scroll-area > div > .padded {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
 `;
 
 function TabbedBlock(props) {

@@ -20,7 +20,7 @@ export const HeadOption = styled.div`
   grid-template-columns: 1fr min-content;
   box-shadow: 0px 1px 0px 0px ${themeVal('color.baseAlphaC')};
   gap: 0.5rem;
-  padding-bottom: ${glsp()};
+  padding-bottom: ${glsp(0.5)};
 
   ${({ hasSubtitle }) =>
     hasSubtitle &&
