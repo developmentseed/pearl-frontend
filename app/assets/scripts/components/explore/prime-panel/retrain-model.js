@@ -42,8 +42,7 @@ const Class = styled.div`
       border-color: ${themeVal('color.baseAlphaE')};
     `};
 
-  &.add__class {
-    margin-top: ${glsp()};
+  &.add__class 
     padding: ${glsp(0.5)} ${glsp(1.5)};
     // Add Class Button styles. May be removed if this takes on a different onClick configuration
     span {
