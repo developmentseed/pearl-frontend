@@ -2,7 +2,6 @@ import React, { useState, useContext, useEffect } from 'react';
 import styled from 'styled-components';
 import { saveAs } from 'file-saver';
 import T from 'prop-types';
-import config from '../../config';
 import copy from '../../utils/copy-text-to-clipboard';
 import {
   showGlobalLoadingMessage,
