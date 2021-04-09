@@ -531,7 +531,11 @@ export const usePredictions = () => {
 export const useInstance = () => {
   const history = useHistory();
   const { restApiClient } = useRestApiClient();
-  const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
+  const {
+    currentCheckpoint,
+    dispatchCurrentCheckpoint,
+    fetchCheckpoint,
+  } = useCheckpoint();
   const { aoiName, aoiRef, currentProject, setCurrentProject } = useProject();
   const { dispatchPredictions } = usePredictions();
   const { selectedModel } = useExploreContext('useWebsocket');
@@ -593,6 +597,8 @@ export const useInstance = () => {
         token,
         dispatchInstance,
         dispatchCurrentCheckpoint,
+        fetchCheckpoint: (checkpointId) =>
+          fetchCheckpoint(projectId, checkpointId),
         dispatchPredictions,
       });
       newWebsocketClient.addEventListener('open', () => {
@@ -759,15 +765,7 @@ export const useInstance = () => {
             type: predictionActions.START_PREDICTION,
           });
 
-          const checkpoint = await restApiClient.getCheckpoint(
-            projectId,
-            checkpointId
-          );
-
-          dispatchCurrentCheckpoint({
-            type: checkpointActions.SET_CHECKPOINT,
-            data: checkpoint,
-          });
+          await fetchCheckpoint(projectId, checkpointId);
 
           dispatchMessageQueue({
             type: messageQueueActionTypes.ADD,
