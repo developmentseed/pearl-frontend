@@ -49,7 +49,7 @@ export function ExploreProvider(props) {
   const [checkpointList, setCheckpointList] = useState(null);
 
   const { setCurrentAoi } = useAoi();
-  const { dispatchAoiPatch } = useAoiPatch();
+  const { aoiPatch, dispatchAoiPatch } = useAoiPatch();
 
   // The following AOI properties should be refactored in the futre and moved to useAoi()
   // to avoid re-rendering issues in this context.
@@ -179,6 +179,27 @@ export function ExploreProvider(props) {
       }
     }
   }, [predictions, restApiClient, currentProject]);
+
+  useEffect(() => {
+    if (aoiPatch.fetching) {
+      const { processed, total } = aoiPatch;
+      if (!total) {
+        showGlobalLoadingMessage(`Waiting for patch predictions...`);
+      } else {
+        showGlobalLoadingMessage(
+          `Receiving images: ${processed} of ${total}...`
+        );
+      }
+    } else if (aoiPatch.isReady()) {
+      hideGlobalLoading();
+      if (aoiPatch.fetched) {
+        //setaoipatch list
+      } else if (aoiPatch.error) {
+        toasts.error('An error ocurred while requesting aoi patch.');
+        logger(aoiPatch.error);
+      }
+    }
+  }, [aoiPatch]);
 
   async function loadMetrics() {
     await restApiClient
@@ -459,7 +480,7 @@ export function ExploreProvider(props) {
         updateProjectName,
         updateCheckpointName,
 
-        dispatchAoiPatch
+        dispatchAoiPatch,
       }}
     >
       {props.children}
@@ -548,7 +569,6 @@ export const useInstance = () => {
   const { dispatchPredictions } = usePredictions();
   const { selectedModel, dispatchAoiPatch } = useExploreContext('useWebsocket');
 
-
   const [websocketClient, setWebsocketClient] = useState(null);
 
   const [instance, dispatchInstance] = useReducer(
@@ -609,7 +629,7 @@ export const useInstance = () => {
         fetchCheckpoint: (checkpointId) =>
           fetchCheckpoint(projectId, checkpointId),
         dispatchPredictions,
-        dispatchAoiPatch
+        dispatchAoiPatch,
       });
       newWebsocketClient.addEventListener('open', () => {
         setWebsocketClient(newWebsocketClient);
@@ -763,6 +783,7 @@ export const useInstance = () => {
         });
       },
       refine: async function () {
+        showGlobalLoadingMessage('Requesting AOI patch...');
         Object.values(currentCheckpoint.checkpointBrushes).forEach((ckpt) => {
           ckpt.polygons.forEach((polygon) => {
             dispatchMessageQueue({
