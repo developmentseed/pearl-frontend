@@ -1,7 +1,6 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { useMap } from 'react-leaflet';
 import L from 'leaflet';
-//import {} from 'leaflet.vectorgrid/dist/Leaflet.VectorGrid.bundled.js';
 import {} from 'leaflet.vectorgrid';
 import usePrevious from '../../../utils/use-previous';
 
