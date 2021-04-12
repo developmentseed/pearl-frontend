@@ -4,7 +4,7 @@ import T from 'prop-types';
 export const MapContext = createContext({});
 
 export function MapProvider(props) {
-  const [map, setMap] = useState();
+  const [mapRef, setMapRef] = useState();
   const [mapLayers, setMapLayers] = useState({});
 
   const [predictionLayerSettings, setPredictionLayerSettings] = useState({
@@ -12,17 +12,41 @@ export function MapProvider(props) {
     visible: true,
   });
 
+  /*
+   * Object tracking user layers to be controlled in frontend.
+   * Add objects here to control new layers
+   */
+  const [userLayers, setUserLayers] = useState({
+    predictions: {
+      opacity: 1,
+      visible: true,
+      active: false,
+      id: 'predictions',
+      name: 'Prediction Results',
+    },
+    retrainingSamples: {
+      opacity: 1,
+      visible: true,
+      active: false,
+      id: 'retrainingSamples',
+      name: 'Retraining Samples',
+    },
+  });
+
   return (
     <MapContext.Provider
       value={{
-        map,
-        setMap,
+        mapRef,
+        setMapRef,
 
         mapLayers,
         setMapLayers,
 
         predictionLayerSettings,
         setPredictionLayerSettings,
+
+        userLayers,
+        setUserLayers,
       }}
     >
       {props.children}
@@ -47,14 +71,14 @@ const useMapContext = (fnName) => {
   return context;
 };
 
-export const useMap = () => {
-  const { map, setMap } = useMapContext('useMap');
+export const useMapRef = () => {
+  const { mapRef, setMapRef } = useMapContext('useMapRef');
   return useMemo(
     () => ({
-      map,
-      setMap,
+      mapRef,
+      setMapRef,
     }),
-    [map, setMap]
+    [mapRef, setMapRef]
   );
 };
 
@@ -66,6 +90,17 @@ export const useMapLayers = () => {
       setMapLayers,
     }),
     [mapLayers, setMapLayers]
+  );
+};
+
+export const useUserLayers = () => {
+  const { userLayers, setUserLayers } = useMapContext('useUserLayers');
+  return useMemo(
+    () => ({
+      userLayers,
+      setUserLayers,
+    }),
+    [userLayers, setUserLayers]
   );
 };
 

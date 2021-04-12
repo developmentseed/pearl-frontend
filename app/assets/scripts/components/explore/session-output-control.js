@@ -1,14 +1,28 @@
 import React, { useState, useContext, useEffect } from 'react';
 import styled from 'styled-components';
+import { saveAs } from 'file-saver';
 import T from 'prop-types';
-import { DropdownTrigger } from '../../styles/dropdown';
+import copy from '../../utils/copy-text-to-clipboard';
+import {
+  showGlobalLoadingMessage,
+  hideGlobalLoading,
+} from '@devseed-ui/global-loading';
+import {
+  Dropdown,
+  DropdownHeader,
+  DropdownBody,
+  DropdownItem,
+  DropdownTrigger,
+} from '../../styles/dropdown';
 import { Button } from '@devseed-ui/button';
 import { themeVal, glsp, media } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
 import { Form, FormInput } from '@devseed-ui/form';
 import InfoButton from '../common/info-button';
 import { ExploreContext } from '../../context/explore';
-import { AuthContext } from '../../context/auth';
+import { AuthContext, useRestApiClient } from '../../context/auth';
+import toasts from '../common/toasts';
+import logger from '../../utils/logger';
 
 const Wrapper = styled.div`
   flex: 1;
@@ -68,12 +82,16 @@ const HeadingInput = styled(FormInput)`
 
 function SessionOutputControl(props) {
   const { status, projectName, openHelp, isMediumDown } = props;
-
+  const { restApiClient } = useRestApiClient();
   const { isAuthenticated } = useContext(AuthContext);
 
-  const { updateProjectName, currentProject, selectedModel } = useContext(
-    ExploreContext
-  );
+  const {
+    updateProjectName,
+    currentProject,
+    selectedModel,
+    predictions,
+    aoiName,
+  } = useContext(ExploreContext);
   const initialName = currentProject ? currentProject.name : 'Untitled';
 
   const [localProjectName, setLocalProjectName] = useState(projectName);
@@ -85,6 +103,48 @@ function SessionOutputControl(props) {
     const name = evt.target.elements.projectName.value;
     updateProjectName(name);
     setTitleEditMode(false);
+  };
+
+  const downloadGeotiff = async () => {
+    const projectId = currentProject.id;
+    const aoiId = predictions.data.aoiId;
+    showGlobalLoadingMessage('Preparing GeoTIFF for Download');
+    try {
+      await restApiClient.bookmarkAOI(projectId, aoiId, aoiName);
+      const geotiffArrayBuffer = await restApiClient.downloadGeotiff(
+        projectId,
+        aoiId
+      );
+      var blob = new Blob([geotiffArrayBuffer], {
+        type: 'application/x-geotiff',
+      });
+      const filename = `${aoiId}.tiff`;
+      saveAs(blob, filename);
+    } catch (error) {
+      logger('Error with geotiff download', error);
+      toasts.error('Failed to download GeoTIFF');
+    }
+    hideGlobalLoading();
+    return;
+  };
+
+  const copyTilesLink = async () => {
+    const projectId = currentProject.id;
+    const aoiId = predictions.data.aoiId;
+
+    try {
+      await restApiClient.bookmarkAOI(projectId, aoiId, aoiName);
+    } catch (err) {
+      logger('Error Bookmarking AOI', err);
+    }
+    //FIXME: This url will likely change
+    const url = `${window.location.origin}/project/${projectId}/aoi/${aoiId}/map`;
+    const copied = copy(url);
+    if (copied) {
+      toasts.success('URL copied to clipboard');
+    } else {
+      toasts.error('Failed to copy to clipboard');
+    }
   };
 
   const clearInput = () => {
@@ -103,6 +163,8 @@ function SessionOutputControl(props) {
     }
   };
 
+  const exportEnabled =
+    isAuthenticated && currentProject && predictions.data.aoiId;
   return (
     <Wrapper>
       <ProjectHeading>
@@ -175,18 +237,40 @@ function SessionOutputControl(props) {
       >
         Help
       </Button>
-      <DropdownTrigger
-        variation='primary-raised-light'
-        useIcon={['download', 'before']}
-        title='Export map'
-        className='user-options-trigger'
-        size='medium'
-        {...props}
-        disabled={!isAuthenticated}
-        hideText={isMediumDown}
+      <Dropdown
+        alignment='right'
+        direction='down'
+        triggerElement={(props) => (
+          <DropdownTrigger
+            variation='primary-raised-light'
+            title='Export map'
+            className='user-options-trigger'
+            size='medium'
+            {...props}
+            disabled={!exportEnabled}
+            hideText={isMediumDown}
+          >
+            Export
+          </DropdownTrigger>
+        )}
+        className='global__dropdown'
       >
-        Export
-      </DropdownTrigger>
+        <>
+          <DropdownHeader>Export Options</DropdownHeader>
+          <DropdownBody>
+            <li>
+              <DropdownItem useIcon='download-2' onClick={downloadGeotiff}>
+                Download .geotiff
+              </DropdownItem>
+            </li>
+            <li>
+              <DropdownItem useIcon='link' onClick={copyTilesLink}>
+                Copy link to online map
+              </DropdownItem>
+            </li>
+          </DropdownBody>
+        </>
+      </Dropdown>
     </Wrapper>
   );
 }

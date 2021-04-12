@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import App from '../common/app';
 
@@ -13,10 +13,10 @@ import {
 import { Button } from '@devseed-ui/button';
 import { Heading } from '@devseed-ui/typography';
 import { themeVal, media, glsp } from '@devseed-ui/theme-provider';
-import GlobalContext from '../../context/global';
 import { StyledLink } from '../../styles/links';
 import config from '../../config';
-const { environment, baseUrl } = config;
+import { fetchJSON } from '../../context/reducers/reduxeed';
+const { environment, baseUrl, restApiEndpoint } = config;
 
 const HomeBody = styled(InpageBody)`
   display: flex;
@@ -63,8 +63,8 @@ const HomeTagline = styled(InpageTagline)`
 
 const HomeHeading = styled(Heading)`
   font-weight: ${themeVal('type.base.weight')};
-  font-size: clamp(2rem, -0.875rem + 8.333vw, 3.75rem);
-  line-height: 4rem;
+  font-size: clamp(2rem, -0.875rem + 8.333vw, 3.5rem);
+  line-height: 1.25;
   margin: 0;
 `;
 
@@ -97,15 +97,19 @@ const StatusSection = styled.section`
   }
 `;
 
-function renderRestApiHealth(restApiHealth) {
-  const { isReady, hasError, getData } = restApiHealth;
-  if (!isReady()) return 'Fetching...';
-  if (hasError()) return 'Unavailable.';
-  return getData().message || 'Ok';
-}
-
 function Home() {
-  const { restApiHealth } = useContext(GlobalContext);
+  const [apiHealth, setApiHealth] = useState('Loading...');
+
+  // Fetch API health message on mount
+  useEffect(() => {
+    fetchJSON(`${restApiEndpoint}/health`)
+      .then(({ body }) => {
+        setApiHealth(body.message || 'Ok.');
+      })
+      .catch(() => {
+        setApiHealth('Unavailable.');
+      });
+  }, []);
 
   return (
     <App pageTitle='Home'>
@@ -150,7 +154,7 @@ function Home() {
         {environment !== 'production' && (
           <StatusSection>
             <strong>Status </strong>
-            <p>API: {renderRestApiHealth(restApiHealth)}</p>
+            <p>API: {apiHealth}</p>
           </StatusSection>
         )}
       </HomeBody>

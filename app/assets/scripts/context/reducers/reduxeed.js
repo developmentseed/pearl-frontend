@@ -1,5 +1,5 @@
 import get from 'lodash.get';
-import config from '../config';
+import config from '../../config';
 const { environment } = config;
 
 /**
@@ -237,18 +237,27 @@ export function makeFetchThunk(opts) {
  */
 export async function fetchJSON(url, options) {
   let response;
+  options = options || {};
+  const format = options.format || 'json';
+  let data;
   try {
     response = await fetch(url, options);
-    const json = await response.json();
+    if (format === 'json') {
+      data = await response.json();
+    } else if (format === 'binary') {
+      data = await response.arrayBuffer();
+    } else {
+      data = await response.text();
+    }
 
     if (response.status >= 400) {
-      const err = new Error(json.message);
+      const err = new Error(data.message);
       err.statusCode = response.status;
-      err.data = json;
+      err.data = data;
       throw err;
     }
 
-    return { body: json, headers: response.headers };
+    return { body: data, headers: response.headers };
   } catch (error) {
     error.statusCode = response ? response.status || null : null;
     throw error;

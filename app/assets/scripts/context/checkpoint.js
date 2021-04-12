@@ -1,22 +1,70 @@
-import React, { createContext, useReducer } from 'react';
-import T from 'prop-types';
+import React, { createContext, useContext, useMemo, useReducer } from 'react';
 import uniqWith from 'lodash.uniqwith';
 import isEqual from 'lodash.isequal';
 import differenceWith from 'lodash.differencewith';
-export const CheckpointContext = createContext({});
+import T from 'prop-types';
+import { useRestApiClient } from './auth';
+import toasts from '../components/common/toasts';
+import logger from '../utils/logger';
+
+import { wrapLogReducer } from './reducers/utils';
+
+const CheckpointContext = createContext(null);
+
+export const checkpointModes = {
+  RUN: 'RUN',
+  RETRAIN: 'RETRAIN',
+  REFINE: 'REFINE',
+};
+
+export const actions = {
+  SET_CHECKPOINT: 'SET_CHECKPOINT',
+  SET_CHECKPOINT_NAME: 'SET_CHECKPOINT_NAME',
+  SET_CHECKPOINT_MODE: 'SET_CHECKPOINT_MODE',
+  ADD_CHECKPOINT_BRUSH: 'ADD_CHECKPOINT_BRUSH',
+  RECEIVE_METADATA: 'RECEIVE_METADATA',
+  RECEIVE_AOI_INFO: 'RECEIVE_AOI_INFO',
+  RECEIVE_ANALYTICS: 'RECEIVE_ANALYTICS',
+  SET_ACTIVE_CLASS: 'SET_ACTIVE_CLASS',
+  ADD_POINT_SAMPLE: 'ADD_POINT_SAMPLE',
+  REMOVE_POINT_SAMPLE: 'REMOVE_POINT_SAMPLE',
+  CLEAR_SAMPLES: 'CLEAR_SAMPLES',
+  RESET_CHECKPOINT: 'RESET_CHECKPOINT',
+  UPDATE_POLYGONS: 'UPDATE_POLYGONS',
+  INPUT_UNDO: 'INPUT_UNDO',
+};
 
 export function CheckpointProvider(props) {
   const [currentCheckpoint, dispatchCurrentCheckpoint] = useReducer(
-    checkpointReducer
+    wrapLogReducer(checkpointReducer)
   );
 
+  const { restApiClient } = useRestApiClient();
+
+  async function fetchCheckpoint(projectId, checkpointId) {
+    try {
+      const checkpoint = await restApiClient.getCheckpoint(
+        projectId,
+        checkpointId
+      );
+      dispatchCurrentCheckpoint({
+        type: actions.SET_CHECKPOINT,
+        data: { ...checkpoint, mode: checkpointModes.RETRAIN },
+      });
+    } catch (error) {
+      logger(error);
+      toasts.error('Could not fetch checkpoint.');
+    }
+  }
+
+  const value = {
+    currentCheckpoint,
+    dispatchCurrentCheckpoint,
+    fetchCheckpoint,
+  };
+
   return (
-    <CheckpointContext.Provider
-      value={{
-        currentCheckpoint,
-        dispatchCurrentCheckpoint,
-      }}
-    >
+    <CheckpointContext.Provider value={value}>
       {props.children}
     </CheckpointContext.Provider>
   );
@@ -26,37 +74,79 @@ CheckpointProvider.propTypes = {
   children: T.node,
 };
 
-export const actions = {
-  SET_CHECKPOINT: 'SET_CHECKPOINT',
-  RECEIVE_METADATA: 'RECEIVE_METADATA',
-  RECEIVE_AOI_INFO: 'RECEIVE_AOI_INFO',
-  RECEIVE_ANALYTICS: 'RECEIVE_ANALYTICS',
-  SET_ACTIVE_CLASS: 'SET_ACTIVE_CLASS',
-  ADD_POINT_SAMPLE: 'ADD_POINT_SAMPLE',
-  REMOVE_POINT_SAMPLE: 'REMOVE_POINT_SAMPLE',
-  RESET_CHECKPOINT: 'RESET_CHECKPOINT',
-};
-
 function checkpointReducer(state, action) {
   switch (action.type) {
     case actions.SET_CHECKPOINT:
+      // Action used to load existing or initialize a new checkpoint
       return {
-        activeClass: action.data.classes[0].name,
-        classes: action.data.classes.reduce((acc, c) => {
-          acc[c.name] = {
-            ...c,
-            geometry: {
-              type: 'MultiPoint',
-              coordinates: [],
-            },
-          };
-          return acc;
-        }, {}),
+        ...action.data,
+        mode: action.data.mode || checkpointModes.RUN,
+        retrain_geoms: action.data.retrain_geoms,
+        input_geoms: action.data.input_geoms,
+        activeItem: action.data.classes
+          ? action.data.classes[0].name
+          : undefined,
+        classes: action.data.classes
+          ? action.data.classes.reduce((acc, c) => {
+              acc[c.name] = {
+                ...c,
+                points: {
+                  type: 'MultiPoint',
+                  coordinates: [],
+                },
+                polygons: [],
+              };
+              return acc;
+            }, {})
+          : state.classes || {},
+        // Polygon brush samples. User defined regions
+        // with which to run inference using arbitrary checkpoint
+        // that exists under the current project
+        checkpointBrushes: {},
+
+        // User action history of classes and checkpoint brushes
+        history: [],
+      };
+    case actions.SET_CHECKPOINT_NAME:
+      return {
+        ...state,
+        ...action.data,
+      };
+    case actions.SET_CHECKPOINT_MODE:
+      return {
+        ...state,
+        ...action.data,
+      };
+
+    case actions.ADD_CHECKPOINT_BRUSH:
+      return {
+        ...state,
+        checkpointBrushes: {
+          ...state.checkpointBrushes,
+          [action.data.id]: {
+            checkpoint: action.data.checkpoint,
+            polygons: [],
+          },
+        },
       };
     case actions.RECEIVE_AOI_INFO:
       return {
         ...state,
         ...action.data,
+        checkpointBrushes: {},
+        classes: Object.values(state.classes).reduce((accum, c) => {
+          return {
+            ...accum,
+            [c.name]: {
+              ...c,
+              points: {
+                type: 'MultiPoint',
+                coordinates: [],
+              },
+              polygons: [],
+            },
+          };
+        }, {}),
       };
     case actions.RECEIVE_METRICS:
       return state;
@@ -70,23 +160,60 @@ function checkpointReducer(state, action) {
         ...state,
         ...action.data,
       };
+    case actions.UPDATE_POLYGONS:
+      if (action.data.isCheckpointPolygon) {
+        return {
+          ...state,
+          history: [
+            ...state.history,
+            {
+              classes: state.classes,
+              checkpointBrushes: state.checkpointBrushes,
+            },
+          ],
+          checkpointBrushes: {
+            [action.data.name]: {
+              ...state.checkpointBrushes[action.data.name],
+              polygons: action.data.polygons,
+            },
+          },
+        };
+      } else {
+        return {
+          ...state,
+          history: [
+            ...state.history,
+            {
+              classes: state.classes,
+              checkpointBrushes: state.checkpointBrushes,
+            },
+          ],
+          classes: {
+            ...state.classes,
+            [action.data.name]: {
+              ...state.classes[action.data.name],
+              polygons: action.data.polygons,
+            },
+          },
+        };
+      }
     case actions.SET_ACTIVE_CLASS:
       return {
         ...state,
-        activeClass: action.data,
+        activeItem: action.data,
       };
     case actions.ADD_POINT_SAMPLE: {
       // Get coords
       const { lat, lng } = action.data;
 
       // Merge coords into class
-      const currentClass = state.classes[state.activeClass];
+      const currentClass = state.classes[state.activeItem];
       const updatedClass = {
         ...currentClass,
-        geometry: {
-          ...currentClass.geometry,
+        points: {
+          ...currentClass.points,
           coordinates: uniqWith(
-            currentClass.geometry.coordinates.concat([[lng, lat]]),
+            currentClass.points.coordinates.concat([[lng, lat]]),
             isEqual
           ),
         },
@@ -94,9 +221,16 @@ function checkpointReducer(state, action) {
       // Return with updated class
       return {
         ...state,
+        history: [
+          ...state.history,
+          {
+            classes: state.classes,
+            checkpointBrushes: state.checkpointBrushes,
+          },
+        ],
         classes: {
           ...state.classes,
-          [state.activeClass]: updatedClass,
+          [state.activeItem]: updatedClass,
         },
       };
     }
@@ -105,13 +239,13 @@ function checkpointReducer(state, action) {
       const { lat, lng } = action.data;
 
       // Merge coords into class
-      const currentClass = state.classes[state.activeClass];
+      const currentClass = state.classes[state.activeItem];
       const updatedClass = {
         ...currentClass,
-        geometry: {
+        points: {
           ...currentClass.geometry,
           coordinates: differenceWith(
-            currentClass.geometry.coordinates,
+            currentClass.points.coordinates,
             [[lat, lng]],
             isEqual
           ),
@@ -121,10 +255,58 @@ function checkpointReducer(state, action) {
       // Return with updated class
       return {
         ...state,
+        history: [
+          ...state.history,
+          {
+            classes: state.classes,
+            checkpointBrushes: state.checkpointBrushes,
+          },
+        ],
+
         classes: {
           ...state.classes,
-          [state.activeClass]: updatedClass,
+          [state.activeItem]: updatedClass,
         },
+      };
+    }
+
+    case actions.CLEAR_SAMPLES: {
+      return {
+        ...state,
+        history: [
+          ...state.history,
+          {
+            classes: state.classes,
+            checkpointBrushes: state.checkpointBrushes,
+          },
+        ],
+
+        classes: Object.values(state.classes).reduce((accum, c) => {
+          return {
+            ...accum,
+            [c.name]: {
+              ...c,
+              points: {
+                type: 'MultiPoint',
+                coordinates: [],
+              },
+              polygons: [],
+            },
+          };
+        }, {}),
+      };
+    }
+
+    case actions.INPUT_UNDO: {
+      // Pop history and set input from element
+      const latest = state.history[state.history.length - 1];
+
+      if (!latest) return state;
+
+      return {
+        ...state,
+        ...latest,
+        history: state.history.slice(0, -1),
       };
     }
     case actions.RESET_CHECKPOINT: {
@@ -134,3 +316,33 @@ function checkpointReducer(state, action) {
       throw new Error('Unexpected error.');
   }
 }
+
+// Check if consumer function is used properly
+const useCheckContext = (fnName) => {
+  const context = useContext(CheckpointContext);
+
+  if (!context) {
+    throw new Error(
+      `The \`${fnName}\` hook must be used inside the <CheckpointContext> component's context.`
+    );
+  }
+
+  return context;
+};
+
+export const useCheckpoint = () => {
+  const {
+    currentCheckpoint,
+    dispatchCurrentCheckpoint,
+    fetchCheckpoint,
+  } = useCheckContext('useCheckpoint');
+
+  return useMemo(
+    () => ({
+      currentCheckpoint,
+      dispatchCurrentCheckpoint,
+      fetchCheckpoint,
+    }),
+    [currentCheckpoint, dispatchCurrentCheckpoint, fetchCheckpoint]
+  );
+};

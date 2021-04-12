@@ -18,8 +18,11 @@ import { StyledNavLink } from '../../../styles/links';
 import toasts from '../../common/toasts';
 import { useHistory } from 'react-router';
 import { AuthContext } from '../../../context/auth';
-import { createQueryApiGetReducer, queryApiGet } from '../../../reducers/api';
-import { initialApiRequestState } from '../../../reducers/reduxeed';
+import {
+  createQueryApiGetReducer,
+  queryApiGet,
+} from '../../../context/reducers/api';
+import { initialApiRequestState } from '../../../context/reducers/reduxeed';
 const ProjectsBody = styled(InpageBodyInner)`
   display: grid;
   grid-template-columns: 1fr;
@@ -158,7 +161,7 @@ function Projects() {
                       key={proj.id}
                       details={{
                         edited: proj.created,
-                        model: proj.model || 'No model set',
+                        model: proj.model ? proj.model.name : 'No model set',
                         checkpoint: proj.checkpoint || 'No checkpoint set',
                         aoi: proj.aoi || 'No AOI set',
                         results: (

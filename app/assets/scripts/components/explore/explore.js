@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import {
   Inpage,
@@ -14,11 +14,9 @@ import SecPanel from './sec-panel';
 import Map from './map';
 
 import Tour from '../common/tour';
-import GlobalContext from '../../context/global';
-import { ExploreContext } from '../../context/explore';
-import { CheckpointContext } from '../../context/checkpoint';
 
 import { tourSteps } from './tour';
+import { useApiMeta } from '../../context/api-meta';
 
 const ExploreBody = styled(InpageBody)`
   display: grid;
@@ -27,10 +25,8 @@ const ExploreBody = styled(InpageBody)`
 
 const ExploreCarto = styled.section``;
 function Explore() {
-  const { tourStep, setTourStep } = useContext(GlobalContext);
-  const { apiLimits } = useContext(ExploreContext);
+  const { apiLimits } = useApiMeta();
 
-  const { currentCheckpoint } = useContext(CheckpointContext);
   const [steps, setSteps] = useState(null);
 
   useEffect(() => {
@@ -45,6 +41,7 @@ function Explore() {
       setSteps(steps);
     }
   }, [apiLimits]);
+
   return (
     <>
       <Inpage isMapCentric>
@@ -60,14 +57,16 @@ function Explore() {
           <ExploreCarto>
             <Map />
           </ExploreCarto>
-          {currentCheckpoint && <SecPanel checkpoint={currentCheckpoint} />}
+          <SecPanel />
         </ExploreBody>
-        {steps && (
-          <Tour steps={steps} tourStep={tourStep} setTourStep={setTourStep} />
-        )}
+        {steps && <Tour steps={steps} />}
       </Inpage>
     </>
   );
+}
+
+if (process.env.NODE_ENV === 'development') {
+  Explore.whyDidYouRender = true;
 }
 
 export default Explore;
