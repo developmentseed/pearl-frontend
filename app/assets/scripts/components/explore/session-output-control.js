@@ -2,7 +2,6 @@ import React, { useState, useContext, useEffect } from 'react';
 import styled from 'styled-components';
 import { saveAs } from 'file-saver';
 import T from 'prop-types';
-import config from '../../config';
 import copy from '../../utils/copy-text-to-clipboard';
 import {
   showGlobalLoadingMessage,
@@ -24,8 +23,6 @@ import { ExploreContext } from '../../context/explore';
 import { AuthContext, useRestApiClient } from '../../context/auth';
 import toasts from '../common/toasts';
 import logger from '../../utils/logger';
-
-const { restApiEndpoint } = config;
 
 const Wrapper = styled.div`
   flex: 1;
@@ -141,7 +138,7 @@ function SessionOutputControl(props) {
       logger('Error Bookmarking AOI', err);
     }
     //FIXME: This url will likely change
-    const url = `${restApiEndpoint}/project/${projectId}/aoi/${aoiId}/tiles`;
+    const url = `${window.location.origin}/project/${projectId}/aoi/${aoiId}/map`;
     const copied = copy(url);
     if (copied) {
       toasts.success('URL copied to clipboard');
