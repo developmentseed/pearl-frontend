@@ -31,12 +31,14 @@ function VectorLayer(props) {
       },
     };
 
-    const layer = L.vectorGrid.protobuf(url, options);
-    layer.on('add', (v) => setLayer(v.target));
-    layer.addTo(map);
+    const l = L.vectorGrid.protobuf(url, options);
+    l.on('add', () => {
+      setLayer(l);
+    });
+    l.addTo(map);
 
     return () => {
-      layer.remove();
+      l.remove();
     };
   }, []);
 
@@ -64,9 +66,9 @@ function VectorLayer(props) {
       },
     };
 
-    const layer = L.vectorGrid.protobuf(url, options);
-    layer.on('add', (v) => setLayer(v.target));
-    layer.addTo(map);
+    const l = L.vectorGrid.protobuf(url, options);
+    l.on('add', () => setLayer(l));
+    l.addTo(map);
   }, [url, layer]);
 
   useEffect(() => {
