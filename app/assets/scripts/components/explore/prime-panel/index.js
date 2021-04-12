@@ -58,7 +58,7 @@ function PrimePanel() {
     updateCheckpointName,
   } = useContext(ExploreContext);
 
-  const { runInference, retrain, applyCheckpoint } = useInstance();
+  const { runInference, retrain, refine, applyCheckpoint } = useInstance();
 
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
 
@@ -286,6 +286,7 @@ function PrimePanel() {
                   applyTooltip,
                   runInference,
                   retrain,
+                  refine
                 }}
               />
             )}

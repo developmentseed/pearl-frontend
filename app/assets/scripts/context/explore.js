@@ -756,6 +756,23 @@ export const useInstance = () => {
           },
         });
       },
+      refine: async function () {
+        Object.values(currentCheckpoint.checkpointBrushes).forEach((ckpt) => {
+          ckpt.polygons.forEach((polygon) => {
+            dispatchMessageQueue({
+              type: messageQueueActionTypes.ADD,
+              data: {
+                action: 'model#patch',
+                data: {
+                  type: 'brush',
+                  checkpoint_id: ckpt.checkpoint.id,
+                  polygon,
+                },
+              },
+            });
+          });
+        });
+      },
       applyCheckpoint: async (projectId, checkpointId) => {
         try {
           showGlobalLoadingMessage('Applying checkpoint...');

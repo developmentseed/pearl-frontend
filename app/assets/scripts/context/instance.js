@@ -101,7 +101,9 @@ export class WebsocketClient extends WebSocket {
               mode: checkpointModes.RETRAIN,
             },
           });
-
+          break;
+        case 'model#patch':
+          console.log(data)
           break;
         default:
           logger('Unknown websocket message:');

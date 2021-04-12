@@ -40,6 +40,7 @@ function Footer(props) {
     applyTooltip,
     runInference,
     retrain,
+    refine
   } = props;
   return (
     <PanelControls>
@@ -95,7 +96,7 @@ function Footer(props) {
           style={{
             gridColumn: '1 / -1',
           }}
-          onClick={() => {}}
+          onClick={refine}
           // visuallyDisabled={!allowInferenceRun}
           // info={applyTooltip}
           id='save-refine'
