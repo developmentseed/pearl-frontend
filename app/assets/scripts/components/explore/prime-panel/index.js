@@ -10,7 +10,6 @@ import { Card } from '../../common/card-list';
 import { useMapLayers, useMapRef } from '../../../context/map';
 import {
   ExploreContext,
-  useInstance,
   useMapState,
   usePredictions,
 } from '../../../context/explore';
@@ -31,6 +30,7 @@ import {
   actions as checkpointActions,
   checkpointModes,
 } from '../../../context/checkpoint';
+import { useInstance } from '../../../context/instance';
 
 const StyledPanelBlock = styled(PanelBlock)`
   width: ${glsp(24)};
