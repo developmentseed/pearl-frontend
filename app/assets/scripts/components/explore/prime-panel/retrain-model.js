@@ -2,105 +2,36 @@ import React from 'react';
 import T from 'prop-types';
 import get from 'lodash.get';
 import { Button } from '@devseed-ui/button';
-import styled, { css } from 'styled-components';
-import { glsp, themeVal } from '@devseed-ui/theme-provider';
+import InfoButton from '../../common/info-button';
+import styled from 'styled-components';
+import { glsp } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
-import collecticon from '@devseed-ui/collecticons';
 import { PlaceholderMessage } from '../../../styles/placeholder.js';
 import { actions, useCheckpoint } from '../../../context/checkpoint.js';
 import { useMapState } from '../../../context/explore.js';
-
-const ClassList = styled.div`
-  display: grid;
-  grid-gap: ${glsp(0.5)};
-
-  ${PlaceholderMessage} {
-    padding: 2rem;
-  }
-`;
-
-const Class = styled.div`
-  display: grid;
-  grid-template-columns: min-content auto min-content;
-  grid-gap: ${glsp(1)};
-  padding-bottom: ${({ placeholder }) => placeholder && glsp()};
-  align-items: ${({ placeholder }) => (placeholder ? 'stretch' : 'center')};
-  background: none;
-  border: none;
-  outline: none;
-  ${Heading} {
-    margin: 0;
-    align-self: center;
-    text-align: left;
-    background: ${({ placeholder }) =>
-      placeholder ? themeVal('color.baseAlphaD') : 'none'};
-    width: ${({ placeholder }) => (placeholder ? '10rem' : 'initial')};
-    height: ${({ placeholder }) => (placeholder ? '1rem' : 'auto')};
-    line-height: 1;
-  }
-
-  ${({ muted }) =>
-    muted &&
-    css`
-      color: ${themeVal('color.baseAlphaE')};
-      border-color: ${themeVal('color.baseAlphaE')};
-    `};
-  &.add__class {
-    transition: all 0.16s ease-out 0s;
-    margin-top: ${glsp()};
-    padding: ${glsp(0.5)} 0;
-    span {
-      display: grid;
-      grid-template-columns: min-content auto min-content;
-      grid-gap: ${glsp(1)};
-    }
-    :hover {
-      color: ${themeVal('color.base')};
-    }
-  }
-  &.placeholder-class:first-child {
-    margin-top: ${glsp(2)};
-  }
-`;
-const Thumbnail = styled.div`
-  width: ${glsp(1.5)};
-  height: ${glsp(1.5)};
-  background: ${({ color }) => color || themeVal('color.baseAlphaD')};
-  display: grid;
-  justify-content: center;
-  align-content: center;
-  ${({ outline }) =>
-    outline &&
-    css`
-      border: 1px solid;
-    `};
-  ${({ useIcon }) =>
-    useIcon &&
-    css`
-      background: none;
-      ::before {
-        ${({ useIcon }) => useIcon && collecticon(useIcon)}
-      }
-    `};
-`;
+import {
+  ClassList,
+  Class,
+  Thumbnail as ClassThumbnail,
+  ClassInfoWrapper,
+  ClassHeading,
+  ClassSamples,
+  ClassOptions,
+  ToolBox as RetrainTools,
+} from './retrain-refine-styles';
 
 const Wrapper = styled.div`
   display: grid;
   grid-gap: ${glsp()};
 `;
 
-const RetrainTools = styled.section`
-  ${Button} {
-    margin-left: ${glsp(0.25)};
-    margin-right: ${glsp()};
-    padding: 0.25rem 0.75rem 0.25rem 0.5rem;
-    box-shadow: none;
-    border: 2px solid ${themeVal('color.primaryAlphaB')};
-  }
-`;
+/*
+ * Retrain Model
+ * @param ready - true when checkpoint exists and we are in RETRAIN mode
+ */
 
 function RetrainModel(props) {
-  const { className, placeholderMessage } = props;
+  const { ready, className, placeholderMessage } = props;
 
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
 
@@ -108,11 +39,11 @@ function RetrainModel(props) {
 
   return (
     <Wrapper className={className}>
-      {currentCheckpoint && currentCheckpoint.classes && (
+      {ready && currentCheckpoint.classes && (
         <>
           <RetrainTools>
             <Heading useAlt>Sample Selection Tools</Heading>
-            <Button
+            <InfoButton
               variation={
                 mapState.mode === mapModes.ADD_SAMPLE_POLYGON
                   ? 'primary-raised-dark'
@@ -121,11 +52,17 @@ function RetrainModel(props) {
               size='small'
               radius='ellipsoid'
               useIcon='pencil'
-              onClick={() => setMapMode(mapModes.ADD_SAMPLE_POLYGON)}
+              visuallyDisabled={!currentCheckpoint.activeItem}
+              info={!currentCheckpoint.activeItem && 'No active item selected'}
+              onClick={() => {
+                if (currentCheckpoint.activeItem) {
+                  setMapMode(mapModes.ADD_SAMPLE_POLYGON);
+                }
+              }}
             >
               Draw
-            </Button>
-            <Button
+            </InfoButton>
+            <InfoButton
               variation={
                 mapState.mode === mapModes.ADD_SAMPLE_POINT
                   ? 'primary-raised-dark'
@@ -134,11 +71,17 @@ function RetrainModel(props) {
               size='small'
               radius='ellipsoid'
               useIcon='crosshair'
-              onClick={() => setMapMode(mapModes.ADD_SAMPLE_POINT)}
+              visuallyDisabled={!currentCheckpoint.activeItem}
+              info={!currentCheckpoint.activeItem && 'No active item selected'}
+              onClick={() => {
+                if (currentCheckpoint.activeItem) {
+                  setMapMode(mapModes.ADD_SAMPLE_POINT);
+                }
+              }}
             >
               Point
-            </Button>
-            <Button
+            </InfoButton>
+            <InfoButton
               variation={
                 mapState.mode === mapModes.REMOVE_SAMPLE
                   ? 'primary-raised-dark'
@@ -147,38 +90,63 @@ function RetrainModel(props) {
               size='small'
               radius='ellipsoid'
               useIcon='xmark'
-              onClick={() => setMapMode(mapModes.REMOVE_SAMPLE)}
+              visuallyDisabled={!currentCheckpoint.activeItem}
+              info={!currentCheckpoint.activeItem && 'No active item selected'}
+              onClick={() => {
+                if (currentCheckpoint.activeItem) {
+                  setMapMode(mapModes.REMOVE_SAMPLE);
+                }
+              }}
             >
               Delete
-            </Button>
+            </InfoButton>
           </RetrainTools>
           <ClassList>
             <Heading useAlt>Classes</Heading>
-            {Object.values(currentCheckpoint.classes).map((c) => (
-              <Class
-                key={c.name}
-                onClick={() => {
-                  dispatchCurrentCheckpoint({
-                    type: actions.SET_ACTIVE_CLASS,
-                    data: c.name,
-                  });
-                }}
-                selected={currentCheckpoint.activeClass === c.name}
-              >
-                <Thumbnail color={c.color} />
-                <Heading size='xsmall'>
-                  {c.name} (
-                  {get(c, 'points.coordinates.length', 0) +
-                    get(c, 'polygons.length', 0)}{' '}
-                  samples)
-                  {currentCheckpoint.activeClass === c.name ? ' (Active)' : ''}
-                </Heading>
+            {Object.values(currentCheckpoint.classes).map((c) => {
+              let polygons = get(c, 'polygons.length');
+              let points = get(c, 'points.coordinates.length');
+              return (
+                <Class
+                  key={c.name}
+                  onClick={() => {
+                    dispatchCurrentCheckpoint({
+                      type: actions.SET_ACTIVE_CLASS,
+                      data: c.name,
+                    });
+                  }}
+                  selected={currentCheckpoint.activeItem === c.name}
+                >
+                  <ClassThumbnail color={c.color} />
+                  <ClassInfoWrapper>
+                    <ClassHeading size='xsmall'>{c.name}</ClassHeading>
+                    <ClassSamples>
+                      {polygons > 0 && (
+                        <strong>
+                          {polygons} {polygons > 1 ? 'polygons' : 'polygon'}
+                        </strong>
+                      )}
+                      {points > 0 && polygons > 0 && ` | `}
+                      {points > 0 && (
+                        <strong>
+                          {points} {points > 1 ? 'points' : 'point'}
+                        </strong>
+                      )}{' '}
+                      {(polygons > 0 || points > 0) &&
+                        `selected since last retrain`}
+                    </ClassSamples>
+                  </ClassInfoWrapper>
 
-                <Button useIcon='cog' hideText variation='base-plain'>
-                  Options
-                </Button>
-              </Class>
-            ))}
+                  <ClassOptions useIcon='cog' hideText variation='base-plain'>
+                    Options
+                  </ClassOptions>
+                </Class>
+              );
+            })}
+            <Class className='add__class' muted as={Button}>
+              <ClassThumbnail useIcon='plus' outline />
+              <Heading size='xsmall'>Add Class</Heading>
+            </Class>
           </ClassList>
         </>
       )}
@@ -191,19 +159,19 @@ function RetrainModel(props) {
             // assing a + casts it to int which is logically equivalent
             // but does not cause the DOM error
             <Class key={i} placeholder={+true} className='placeholder-class'>
-              <Thumbnail />
-              <Heading size='xsmall' />
-              <Button disabled size='small' variation='base-raised-semidark' />
+              <ClassThumbnail />
+              <ClassHeading size='xsmall' placeholder={+true} />
+              <ClassThumbnail />
             </Class>
           ))}
           <PlaceholderMessage>{placeholderMessage}</PlaceholderMessage>
         </ClassList>
       )}
-      {currentCheckpoint && (
-        <Class className='add__class' muted as={Button}>
-          <Thumbnail useIcon='plus' outline />
-          <Heading size='xsmall'>Add Class</Heading>
-        </Class>
+
+      {!ready && currentCheckpoint && (
+        <PlaceholderMessage>
+          Please submit or clear retraining samples before refining results
+        </PlaceholderMessage>
       )}
     </Wrapper>
   );
@@ -212,5 +180,6 @@ function RetrainModel(props) {
 RetrainModel.propTypes = {
   className: T.string,
   placeholderMessage: T.string,
+  ready: T.bool,
 };
 export default RetrainModel;

@@ -26,6 +26,7 @@ import reverseGeoCode from '../utils/reverse-geocode';
 import { actions as checkpointActions, useCheckpoint } from './checkpoint';
 import get from 'lodash.get';
 import logger from '../utils/logger';
+import { wrapLogReducer } from './reducers/utils';
 import {
   instanceReducer,
   instanceInitialState,
@@ -58,9 +59,12 @@ export function ExploreProvider(props) {
   const [aoiList, setAoiList] = useState([]);
   const [aoiBounds, setAoiBounds] = useState(null);
 
-  const [mapState, dispatchMapState] = useReducer(mapStateReducer, {
-    mode: mapModes.BROWSE_MODE,
-  });
+  const [mapState, dispatchMapState] = useReducer(
+    wrapLogReducer(mapStateReducer),
+    {
+      mode: mapModes.BROWSE_MODE,
+    }
+  );
 
   const [selectedModel, setSelectedModel] = useState(null);
 
@@ -464,7 +468,7 @@ ExploreProvider.propTypes = {
 };
 
 // Check if consumer function is used properly
-const useExploreContext = (fnName) => {
+export const useExploreContext = (fnName) => {
   const context = useContext(ExploreContext);
 
   if (!context) {

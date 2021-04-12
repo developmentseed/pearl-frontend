@@ -25,6 +25,7 @@ export const InfoButton = React.forwardRef((props, ref) => {
         data-tip
         data-for={id}
         className='info-button'
+        info={info || null}
         {...props}
       >
         {props.children}
@@ -40,7 +41,7 @@ export const InfoButton = React.forwardRef((props, ref) => {
 
 InfoButton.displayName = 'InfoButton';
 InfoButton.propTypes = {
-  info: T.string,
+  info: T.oneOfType([T.string, T.bool]),
   id: T.string,
   children: T.node,
   useIcon: T.oneOfType([T.string, T.array]),
