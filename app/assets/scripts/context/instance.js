@@ -74,10 +74,10 @@ export const useInstance = () => {
     (state, { type, data }) => {
       switch (type) {
         case messageQueueActionTypes.ADD: {
-          return state.concat(JSON.stringify(data));
+          return state.concat(data);
         }
         case messageQueueActionTypes.SEND: {
-          websocketClient.send(state[0]);
+          websocketClient.sendMessage(state[0]);
           return state.slice(1);
         }
         default:
@@ -397,5 +397,9 @@ export class WebsocketClient extends WebSocket {
           break;
       }
     });
+  }
+
+  sendMessage(message) {
+    this.send(JSON.stringify(message));
   }
 }
