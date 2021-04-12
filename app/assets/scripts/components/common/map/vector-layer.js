@@ -11,26 +11,26 @@ function VectorLayer(props) {
 
   const previousUrl = usePrevious(url);
 
-  useEffect(() => {
-    const options = {
-      fetchOptions: {
-        headers: {
-          Authorization: token,
-          'Content-Type': 'application/json',
-        },
+  const options = {
+    fetchOptions: {
+      headers: {
+        Authorization: token,
+        'Content-Type': 'application/json',
       },
-      pane: pane || 'mapPane',
-      vectorTileLayerStyles: {
-        data: {
-          color: '#9bc2c4',
-          fill: true,
-          fillColor: '#9bc2c4',
-          fillOpacity: 1,
-          radius: 5,
-        },
+    },
+    pane: pane || 'mapPane',
+    vectorTileLayerStyles: {
+      data: {
+        color: '#9bc2c4',
+        fill: true,
+        fillColor: '#9bc2c4',
+        fillOpacity: 1,
+        radius: 5,
       },
-    };
+    },
+  };
 
+  useEffect(() => {
     const l = L.vectorGrid.protobuf(url, options);
     l.on('add', () => {
       setLayer(l);
@@ -46,25 +46,6 @@ function VectorLayer(props) {
     if (!layer || previousUrl === url) return;
 
     layer.remove();
-
-    const options = {
-      fetchOptions: {
-        headers: {
-          Authorization: token,
-          'Content-Type': 'application/json',
-        },
-      },
-      pane: pane || 'mapPane',
-      vectorTileLayerStyles: {
-        data: {
-          color: '#9bc2c4',
-          fill: true,
-          fillColor: '#9bc2c4',
-          fillOpacity: 1,
-          radius: 5,
-        },
-      },
-    };
 
     const l = L.vectorGrid.protobuf(url, options);
     l.on('add', () => setLayer(l));
