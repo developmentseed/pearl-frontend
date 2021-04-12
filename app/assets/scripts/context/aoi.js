@@ -81,13 +81,14 @@ export const useAoi = () => {
 };
 
 export const useAoiPatch = () => {
-  const { aoiPatch, dispatchAoiPatch } = useCheckContext('useAoiPatch');
+  const { aoiPatch, dispatchAoiPatch, patchList} = useCheckContext('useAoiPatch');
 
   return useMemo(
     () => ({
       aoiPatch,
       dispatchAoiPatch,
+      patchList
     }),
-    [aoiPatch, dispatchAoiPatch]
+    [aoiPatch, dispatchAoiPatch, patchList]
   );
 };

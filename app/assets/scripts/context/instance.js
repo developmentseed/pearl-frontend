@@ -114,9 +114,17 @@ export class WebsocketClient extends WebSocket {
           });
           break;
         case 'model#patch#progress':
+          dispatchAoiPatch({
+            type: aoiPatchActions.RECEIVE_PATCH,
+            data,
+          });
           //receive image
           break;
         case 'model#patch#complete':
+          dispatchAoiPatch({
+            type: aoiPatchActions.COMPLETE_PATCH,
+          });
+          break;
         // finish waiting for patch
         default:
           logger('Unknown websocket message:');
