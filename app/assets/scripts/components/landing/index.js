@@ -18,9 +18,9 @@ const { baseUrl } = config;
 
 const HomeBody = styled(InpageBody)`
   display: flex;
-  flex-flow: row wrap;
+  flex-flow: column nowrap;
   height: 100%;
-  align-items: flex-end;
+  align-items: flex-start;
   color: ${themeVal('color.surface')};
 
   background-image: linear-gradient(to top right, #040a15, rgba(4, 10, 21, 0)),
@@ -43,7 +43,7 @@ const HomeIntro = styled(InpageBodyInner)`
   margin: 0;
   margin-top: 12vw;
   ${media.xlargeUp`
-    margin: 0 12vw;
+    margin: 12vw 12vw 0;
   `};
 `;
 
@@ -88,7 +88,7 @@ const HomeTout = styled(InpageBodyInner)`
   flex-basis: 100%;
   margin: ${glsp(2)} 0;
   ${media.xlargeUp`
-    margin: -18rem 0 18rem 12vw;
+    margin: 0 12vw;
   `};
   ul {
     display: grid;
