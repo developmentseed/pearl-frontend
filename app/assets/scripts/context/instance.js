@@ -17,21 +17,22 @@ import {
 import { useExploreContext, usePredictions, useProject } from './explore';
 import { actions as predictionsActions } from './reducers/predictions';
 
-export const messageQueueActionTypes = {
+const messageQueueActionTypes = {
   ADD: 'ADD',
   SEND: 'SEND',
 };
 
-export const instanceActionTypes = {
+const instanceActionTypes = {
   SET_TOKEN: 'SET_TOKEN',
   SET_CONNECTION_STATUS: 'SET_CONNECTION_STATUS',
 };
 
-export const instanceInitialState = {
+const instanceInitialState = {
+  status: 'initializing', // 'ready', 'processing', 'aborting'
   connected: false,
 };
 
-export function instanceReducer(state, action) {
+function instanceReducer(state, action) {
   const { type, data } = action;
 
   switch (type) {
