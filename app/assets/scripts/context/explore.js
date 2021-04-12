@@ -33,7 +33,7 @@ import {
   messageQueueActionTypes,
   WebsocketClient,
 } from './instance';
-import { useAoi } from './aoi';
+import { useAoi, useAoiPatch } from './aoi';
 
 /**
  * Context & Provider
@@ -49,6 +49,7 @@ export function ExploreProvider(props) {
   const [checkpointList, setCheckpointList] = useState(null);
 
   const { setCurrentAoi } = useAoi();
+  const { dispatchAoiPatch } = useAoiPatch();
 
   // The following AOI properties should be refactored in the futre and moved to useAoi()
   // to avoid re-rendering issues in this context.
@@ -74,6 +75,7 @@ export function ExploreProvider(props) {
     predictionsReducer,
     initialApiRequestState
   );
+
   const [currentInstance, setCurrentInstance] = useState(null);
 
   async function loadInitialData() {
@@ -456,6 +458,8 @@ export function ExploreProvider(props) {
 
         updateProjectName,
         updateCheckpointName,
+
+        dispatchAoiPatch
       }}
     >
       {props.children}
@@ -542,7 +546,8 @@ export const useInstance = () => {
   } = useCheckpoint();
   const { aoiName, aoiRef, currentProject, setCurrentProject } = useProject();
   const { dispatchPredictions } = usePredictions();
-  const { selectedModel } = useExploreContext('useWebsocket');
+  const { selectedModel, dispatchAoiPatch } = useExploreContext('useWebsocket');
+
 
   const [websocketClient, setWebsocketClient] = useState(null);
 
@@ -604,6 +609,7 @@ export const useInstance = () => {
         fetchCheckpoint: (checkpointId) =>
           fetchCheckpoint(projectId, checkpointId),
         dispatchPredictions,
+        dispatchAoiPatch
       });
       newWebsocketClient.addEventListener('open', () => {
         setWebsocketClient(newWebsocketClient);
