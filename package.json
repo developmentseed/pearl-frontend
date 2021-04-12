@@ -18,6 +18,7 @@
   "scripts": {
     "postinstall": "[ -f app/assets/scripts/config/local.js ] || echo \"'use strict';\n\nexport default {\n  environment: 'development',\n};\" > app/assets/scripts/config/local.js",
     "serve": "NODE_ENV=development gulp serve",
+    "serve:production": "NODE_ENV=production gulp serve",
     "serve:testing": "NODE_ENV=testing gulp serve",
     "build": "NODE_ENV=production gulp",
     "stage": "NODE_ENV=staging gulp",
