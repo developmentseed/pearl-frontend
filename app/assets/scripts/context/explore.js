@@ -49,7 +49,12 @@ export function ExploreProvider(props) {
   const [checkpointList, setCheckpointList] = useState(null);
 
   const { setCurrentAoi } = useAoi();
-  const { aoiPatch, dispatchAoiPatch } = useAoiPatch();
+  const {
+    aoiPatch,
+    dispatchAoiPatch,
+    aoiPatchList,
+    setAoiPatchList,
+  } = useAoiPatch();
 
   // The following AOI properties should be refactored in the futre and moved to useAoi()
   // to avoid re-rendering issues in this context.
@@ -193,7 +198,7 @@ export function ExploreProvider(props) {
     } else if (aoiPatch.isReady()) {
       hideGlobalLoading();
       if (aoiPatch.fetched) {
-        //setaoipatch list
+        setAoiPatchList([...aoiPatchList, aoiPatch.getData()]);
       } else if (aoiPatch.error) {
         toasts.error('An error ocurred while requesting aoi patch.');
         logger(aoiPatch.error);

@@ -20,7 +20,7 @@ export function AoiProvider(props) {
     initialApiRequestState
   );
 
-  const [patchList, setPatchList] = useState([]);
+  const [aoiPatchList, setAoiPatchList] = useState([]);
 
   return (
     <AoiContext.Provider
@@ -30,6 +30,8 @@ export function AoiProvider(props) {
 
         aoiPatch,
         dispatchAoiPatch,
+
+        aoiPatchList, setAoiPatchList
       }}
     >
       {props.children}
@@ -81,14 +83,14 @@ export const useAoi = () => {
 };
 
 export const useAoiPatch = () => {
-  const { aoiPatch, dispatchAoiPatch, patchList} = useCheckContext('useAoiPatch');
+  const { aoiPatch, dispatchAoiPatch,aoiPatchList, setAoiPatchList } = useCheckContext('useAoiPatch');
 
   return useMemo(
     () => ({
       aoiPatch,
       dispatchAoiPatch,
-      patchList
+     aoiPatchList, setAoiPatchList 
     }),
-    [aoiPatch, dispatchAoiPatch, patchList]
+    [aoiPatch, dispatchAoiPatch, aoiPatchList, setAoiPatchList]
   );
 };

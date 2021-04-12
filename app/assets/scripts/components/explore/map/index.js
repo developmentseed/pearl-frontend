@@ -34,7 +34,7 @@ import ModalMapEvent from './modal-events';
 import VectorLayer from '../../common/map/vector-layer';
 import { useRestApiClient } from '../../../context/auth';
 import { useApiMeta } from '../../../context/api-meta';
-import { useAoi } from '../../../context/aoi';
+import { useAoi, useAoiPatch } from '../../../context/aoi';
 
 const center = [38.83428180092151, -79.37724530696869];
 const zoom = 15;
@@ -93,7 +93,7 @@ function Map() {
 
   const { apiLimits } = useApiMeta();
   const { currentAoi } = useAoi();
-
+  const { aoiPatchList } = useAoiPatch();
   const { restApiClient } = useRestApiClient();
 
   const { mapState, mapModes, setMapMode } = useMapState();
@@ -365,6 +365,22 @@ function Map() {
               }
             />
           ))}
+
+        {aoiPatchList.map((patch) => {
+          console.log(patch)
+          return (
+            <React.Fragment key={patch.id}>
+              {patch.patches.map((p) => (
+                <ImageOverlay
+                  key={p.key}
+                  url={p.image}
+                  bounds={p.bounds}
+                  opacity={1}
+                />
+              ))}
+            </React.Fragment>
+          );
+        })}
 
         {!predictions.data.predictions && currentProject && currentAoi && (
           <TileLayer
