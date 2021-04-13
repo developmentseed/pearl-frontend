@@ -69,6 +69,10 @@ class RestApiClient {
     return this.get(`project/${id}`);
   }
 
+  getProjects(page, limit) {
+    return this.get(`project/?page=${page}&limit=${limit}`);
+  }
+
   createProject(data) {
     return this.post('project', data);
   }

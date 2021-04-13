@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { Button } from '@devseed-ui/button';
 import CardList, { Card } from '../../common/card-list';
@@ -17,12 +17,26 @@ import { Heading } from '@devseed-ui/typography';
 import { StyledNavLink } from '../../../styles/links';
 import toasts from '../../common/toasts';
 import { useHistory } from 'react-router';
-import { useAuth } from '../../../context/auth';
+import { useAuth, AuthContext, useRestApiClient } from '../../../context/auth';
 import {
-  createQueryApiGetReducer,
-  queryApiGet,
-} from '../../../context/reducers/api';
-import { initialApiRequestState } from '../../../context/reducers/reduxeed';
+  showGlobalLoadingMessage,
+  hideGlobalLoading,
+} from '@devseed-ui/global-loading';
+import Table, {TableRow, TableCell} from '../../common/table';
+import Paginator from '../../common/paginator';
+
+// Controls the size of each page
+const PROJECTS_PER_PAGE = 20;
+
+const HEADERS = [
+  'Name',
+  'Edited',
+  'Model',
+  'Latest Checkpoint',
+  'AOIs',
+  'AOI Names'
+];
+
 const ProjectsBody = styled(InpageBodyInner)`
   display: grid;
   grid-template-columns: 1fr;
@@ -83,25 +97,77 @@ const NavList = styled.ol`
   `}
 `;
 
+// Render single projects row
+function renderRow(proj) {
+  return (
+    <TableRow key={proj.id}>
+      <TableCell>
+        {proj.name}
+      </TableCell>
+      <TableCell>
+        {proj.created}
+      </TableCell>
+      <TableCell>
+        {proj.model ? proj.model.name : 'No model set'}
+      </TableCell>
+      <TableCell>
+        {proj.checkpoint || 'No checkpoint set'}
+      </TableCell>
+      <TableCell>
+        {proj.aoi || 'No AOI set'}
+      </TableCell>
+      <TableCell>
+        FIXME: AOI Names
+      </TableCell>
+    </TableRow>
+  );
+}
+
 function Projects() {
   const history = useHistory();
 
   const { apiToken } = useAuth();
 
-  const [projectsList, dispatchProjectsList] = useReducer(
-    createQueryApiGetReducer('project'),
-    initialApiRequestState
-  );
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(null);
 
-  useEffect(() => {
+  const [projects, setProjects] = useState([]);
+
+  const { restApiClient } = useRestApiClient();
+
+  useEffect(async () => {
     if (apiToken) {
-      queryApiGet({ token: apiToken, endpoint: 'project' })(
-        dispatchProjectsList
-      );
+      showGlobalLoadingMessage('Loading projects...');
+      try {
+        const data = await restApiClient.getProjects(page, PROJECTS_PER_PAGE);
+        console.log('projects data', data);
+        setTotal(data.total);
+        setProjects(data.projects);
+      } catch (err) {
+        toasts.error('Failed to fetch projects.');
+        hideGlobalLoading();
+      }
+      hideGlobalLoading();
     }
-  }, [apiToken]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [apiToken, page]);
 
-  const { projects } = projectsList.isReady() ? projectsList.getData() : {};
+  const numPages = Math.ceil(total / PROJECTS_PER_PAGE);
+
+
+  // const [projectsList, dispatchProjectsList] = useReducer(
+  //   createQueryApiGetReducer('project'),
+  //   initialApiRequestState
+  // );
+
+  // useEffect(() => {
+  //   if (apiToken) {
+  //     queryApiGet({ token: apiToken, endpoint: 'project' })(
+  //       dispatchProjectsList
+  //     );
+  //   }
+  // }, [apiToken]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // const { projects } = projectsList.isReady() ? projectsList.getData() : {};
   return (
     <>
       <Inpage>
@@ -151,74 +217,22 @@ function Projects() {
 
             {projects &&
               (projects.length ? (
-                <CardList
-                  numColumns={1}
-                  data={projects}
-                  renderCard={(proj) => (
-                    <Card
-                      id={proj.id}
-                      title={proj.name}
-                      key={proj.id}
-                      details={{
-                        edited: proj.created,
-                        model: proj.model ? proj.model.name : 'No model set',
-                        checkpoint: proj.checkpoint || 'No checkpoint set',
-                        aoi: proj.aoi || 'No AOI set',
-                        results: (
-                          <CardResults>
-                            <Form>
-                              <FormInputGroup>
-                                <FormInput
-                                  id={`${proj.id}-site_url`}
-                                  name='site-url'
-                                  className='form__control'
-                                  type='text'
-                                  readOnly
-                                  // value={val}
-                                  value='url://map.link.here'
-                                />
-                                <Button
-                                  variation='base-raised-semidark'
-                                  useIcon='clipboard'
-                                  size='small'
-                                  hideText
-                                  onClick={() => {
-                                    try {
-                                      document
-                                        .getElementById(`${proj.id}-site_url`)
-                                        .select();
-                                      document.execCommand('copy');
-                                      window.getSelection().removeAllRanges();
-                                      toasts.success('File path copied!');
-                                    } catch (err) {
-                                      toasts.error('Copy to clipboard failed');
-                                    }
-                                  }}
-                                >
-                                  <span>Copy to clipboard</span>
-                                </Button>
-                              </FormInputGroup>
-                            </Form>
-                            <Button
-                              variation='primary-plain'
-                              useIcon={['download', 'after']}
-                              size='small'
-                            >
-                              Download Map
-                            </Button>
-                          </CardResults>
-                        ),
-                      }}
-                      size='large'
-                      onClick={() => {
-                        history.push(`/project/${proj.id}`);
-                      }}
-                    />
-                  )}
-                />
+                <>
+                  <Table
+                    headers={HEADERS}
+                    data={projects}
+                    renderRow={renderRow}
+                  />
+                  <Paginator
+                    numPages={numPages}
+                    currentPage={page}
+                    gotoPage={setPage}
+                  />
+                </>
               ) : (
                 <Heading>No projects available </Heading>
-              ))}
+            ))}
+            
           </ProjectsBody>
         </InpageBody>
       </Inpage>
