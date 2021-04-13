@@ -12,19 +12,28 @@ const { restApiEndpoint, tileUrlTemplate } = config;
 function AoiMap() {
   const { projectId, aoiId } = useParams();
   const [mapRef, setMapRef] = useState(null);
+  const [tileUrl, setTileUrl] = useState(null);
   const tileLayer = `${restApiEndpoint}/api/project/${projectId}/aoi/${aoiId}/tiles/{z}/{x}/{y}`;
   const { restApiClient } = useRestApiClient();
 
   useEffect(async () => {
     if (!mapRef) return;
     const tileJSON = await restApiClient.getTileJSON(projectId, aoiId);
+    setTileUrl(`${restApiEndpoint}${tileJSON.tiles[0]}`);
     const bounds = [
       [tileJSON.bounds[3], tileJSON.bounds[0]],
       [tileJSON.bounds[1], tileJSON.bounds[2]],
     ];
     mapRef.fitBounds(bounds);
-  }, [projectId, aoiId, mapRef]);
+  }, [projectId, aoiId, mapRef, tileUrl]);
   const layer = 'naip.latest';
+
+  let leafletLayer;
+  if (tileUrl) {
+    leafletLayer = <TileLayer url={tileUrl} />
+  } else {
+    leafletLayer = null;
+  }
 
   return (
     <App pageTitle='AOI Map'>
@@ -36,8 +45,8 @@ function AoiMap() {
             setMapRef(m);
           }}
         >
-          <TileLayer url={tileUrlTemplate.replace('{LAYER_NAME}', layer)} />
-          <TileLayer attribution='Attribution placeholder' url={tileLayer} />
+          {leafletLayer}
+          <TileLayer attribution='Microsoft Planetary Computer LULC' url={tileLayer} />
         </MapContainer>
       </PageBody>
     </App>
