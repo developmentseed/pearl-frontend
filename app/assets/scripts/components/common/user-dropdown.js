@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@devseed-ui/button';
 import CardList, { Card } from './card-list';
 import { Modal as BaseModal } from '@devseed-ui/modal';

@@ -40,7 +40,7 @@ const instanceActionTypes = {
 };
 
 const instanceInitialState = {
-  status: 'unavailable', // 'initializing', 'ready', 'processing', 'aborting'
+  status: 'disconnected', // 'initializing', 'ready', 'processing', 'aborting'
   connected: false,
 };
 
@@ -57,6 +57,7 @@ function instanceReducer(state, action) {
     case instanceActionTypes.SET_STATUS: {
       return {
         ...state,
+        previousStatus: state.status,
         status: data,
       };
     }
@@ -107,6 +108,18 @@ export function InstanceProvider(props) {
     []
   );
 
+  useEffect(() => {
+    // This checks if instance status changed from 'disconnected' to 'processing'
+    // which means an job was already running. If this is the case, send an abort
+    // message to clear the instance.
+    if (
+      instance.previousStatus === 'disconnected' &&
+      instance.status === 'processing'
+    ) {
+      websocketClient.sendMessage({ action: 'model#abort' });
+    }
+  }, [websocketClient, instance.status]);
+
   // Listen to instance connection, send queue message if any
   useEffect(() => {
     if (websocketClient && instance.connected && messageQueue.length > 0) {
@@ -143,6 +156,7 @@ export function InstanceProvider(props) {
         dispatchPredictions,
       });
       newWebsocketClient.addEventListener('open', () => {
+        newWebsocketClient.addEventListener('message', () => {});
         setWebsocketClient(newWebsocketClient);
         resolve();
       });
@@ -348,8 +362,6 @@ const useCheckContext = (fnName) => {
   return context;
 };
 
-// There is no need to create a context for instance because it is used only one time, in PrimePanel.
-// If this changes we need to create a Instance context and add the provider to the tree.
 export const useInstance = () => {
   const {
     instance,
@@ -414,6 +426,11 @@ export class WebsocketClient extends WebSocket {
             type: instanceActionTypes.SET_CONNECTION_STATUS,
             data: false,
           });
+          break;
+        case 'model#aborted':
+          logger('Previous run aborted.');
+          // Request new status update after abort is confirmed
+          this.sendMessage({ action: 'model#status' });
           break;
         case 'model#aoi':
           dispatchCurrentCheckpoint({

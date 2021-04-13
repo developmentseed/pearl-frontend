@@ -12,6 +12,7 @@ import { LocalButton } from '../../../styles/local-button';
 import InfoButton from '../../common/info-button';
 import { PanelBlockFooter } from '../../common/panel-block';
 import { checkpointModes } from '../../../context/checkpoint';
+import logger from '../../../utils/logger';
 
 const PanelControls = styled(PanelBlockFooter)`
   display: grid;
@@ -24,11 +25,13 @@ const SaveCheckpoint = styled(DropdownBody)`
 `;
 
 function PrimeButton({
+  instance,
   currentCheckpoint,
   allowInferenceRun,
   runInference,
   retrain,
 }) {
+  // If in refine mode, this button save refinements
   if (currentCheckpoint && currentCheckpoint.mode === checkpointModes.REFINE) {
     return (
       <InfoButton
@@ -47,6 +50,31 @@ function PrimeButton({
     );
   }
 
+  let label = 'Loading...';
+  let enabled = false;
+  let onClick = () => {};
+
+  switch (instance.status) {
+    case 'initializing':
+      label = 'Initializing...';
+      break;
+    case 'aborting':
+      label = 'Aborting...';
+      break;
+    case 'processing':
+      label = 'Abort';
+      break;
+    case 'disconnected':
+    case 'ready':
+      label = !currentCheckpoint ? 'Run Model' : 'Retrain Model';
+      enabled = allowInferenceRun;
+      onClick = !currentCheckpoint ? runInference : retrain;
+      break;
+    default:
+      logger('Unknown instance status: ', instance.status);
+      break;
+  }
+
   return (
     <InfoButton
       data-cy={allowInferenceRun ? 'run-model-button' : 'disabled'}
@@ -56,18 +84,17 @@ function PrimeButton({
       style={{
         gridColumn: '1 / -1',
       }}
-      onClick={() => {
-        allowInferenceRun && !currentCheckpoint ? runInference() : retrain();
-      }}
-      visuallyDisabled={!allowInferenceRun}
+      onClick={() => onClick()}
+      visuallyDisabled={!enabled}
       id='apply-button-trigger'
     >
-      {!currentCheckpoint ? 'Run Model' : 'Retrain'}
+      {label}
     </InfoButton>
   );
 }
 
 PrimeButton.propTypes = {
+  instance: T.object,
   currentCheckpoint: T.object,
   allowInferenceRun: T.bool.isRequired,
   runInference: T.func.isRequired,
