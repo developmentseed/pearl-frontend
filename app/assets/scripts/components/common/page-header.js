@@ -89,7 +89,7 @@ const PageTitlePrimeLink = styled.a`
     content: '';
     height: 2.5rem;
     width: 2.5rem;
-    background: url('${baseUrl}/assets/icons/app-logo.svg');
+    background: url('${baseUrl}/assets/graphics/content/app-logo.svg');
     background-size: contain;
     background-repeat: none;
     background-position: top;
