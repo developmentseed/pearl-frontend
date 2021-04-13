@@ -18,6 +18,7 @@ import { ProjectProvider } from '../../context/project';
 import { InstanceProvider } from '../../context/instance';
 import { PredictionsProvider } from '../../context/predictions';
 import { ModelProvider } from '../../context/model';
+import Composer from '../../utils/compose-components';
 function Explore() {
   let { projectId } = useParams();
   const { setTourStep } = useTour();
@@ -35,38 +36,35 @@ function Explore() {
 
   return (
     <App pageTitle='Explore'>
-      <CheckpointProvider>
-        <AoiProvider>
-          <ModelProvider>
-            <ProjectProvider>
-              <PredictionsProvider>
-                <InstanceProvider>
-                  <ExploreProvider>
-                    <MapProvider>
-                      <SizeAwareElement
-                        element='header'
-                        className='header'
-                        onChange={resizeListener}
-                      >
-                        <PageHeader>
-                          <SessionOutputControl
-                            openHelp={() => setTourStep(0)}
-                            isMediumDown={isMediumDown}
-                          />
-                        </PageHeader>
-                      </SizeAwareElement>
-                      <PageBody role='main'>
-                        <ExploreComponent />
-                      </PageBody>
-                      <SessionTimeoutModal revealed={false} />
-                    </MapProvider>
-                  </ExploreProvider>
-                </InstanceProvider>
-              </PredictionsProvider>
-            </ProjectProvider>
-          </ModelProvider>
-        </AoiProvider>
-      </CheckpointProvider>
+      <Composer
+        components={[
+          CheckpointProvider,
+          AoiProvider,
+          ModelProvider,
+          ProjectProvider,
+          PredictionsProvider,
+          InstanceProvider,
+          ExploreProvider,
+          MapProvider,
+        ]}
+      >
+        <SizeAwareElement
+          element='header'
+          className='header'
+          onChange={resizeListener}
+        >
+          <PageHeader>
+            <SessionOutputControl
+              openHelp={() => setTourStep(0)}
+              isMediumDown={isMediumDown}
+            />
+          </PageHeader>
+        </SizeAwareElement>
+        <PageBody role='main'>
+          <ExploreComponent />
+        </PageBody>
+        <SessionTimeoutModal revealed={false} />
+      </Composer>
     </App>
   );
 }
