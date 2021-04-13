@@ -116,17 +116,16 @@ const PageTitlePrimeLink = styled.a`
   }
   strong {
     grid-row: 1 / span 2;
-    font-weight: ${themeVal('type.heading.weight')};
+    font-weight: ${themeVal('type.base.weight')};
     letter-spacing: 4px;
     margin: 0;
     text-transform: uppercase;
     line-height: 1rem;
-    font-size: 1rem;
+    font-size: 1.25rem;
     align-self: center;
     ${media.mediumUp`
-      /* grid-row: 1; */
-      /* align-self: flex-end; */
-      /* font-size: 1.25rem; */
+      grid-row: 1;
+      align-self: flex-end;
     `}
     span {
       ${visuallyHidden()};
@@ -151,7 +150,7 @@ function PageHeader(props) {
                     <span>Microsoft</span>
                     {appTitle}
                   </strong>
-                  {/* <sub>{appLongTitle}</sub> */}
+                  <sub>{appLongTitle}</sub>
                 </PageTitlePrimeLink>
               </li>
             </GlobalMenu>

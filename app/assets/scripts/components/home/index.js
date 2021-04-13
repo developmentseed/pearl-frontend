@@ -20,8 +20,9 @@ const { environment, baseUrl, restApiEndpoint } = config;
 
 const HomeBody = styled(InpageBody)`
   display: flex;
+  flex-flow: column nowrap;
   height: 100%;
-  align-items: center;
+  align-items: flex-start;
   color: ${themeVal('color.surface')};
 
   background-image: linear-gradient(to top right, #040a15, rgba(4, 10, 21, 0)),
@@ -42,8 +43,9 @@ const HomeBody = styled(InpageBody)`
 const HomeIntro = styled(InpageBodyInner)`
   max-width: 50rem;
   margin: 0;
+  margin-top: 12vw;
   ${media.xlargeUp`
-    margin: 0 12vw;
+    margin: 12vw 12vw 0;
   `};
 `;
 
@@ -85,6 +87,26 @@ const HomeCTA = styled.article`
   }
 `;
 
+const HomeTout = styled(InpageBodyInner)`
+  flex-basis: 100%;
+  margin: ${glsp(2)} 0;
+  ${media.xlargeUp`
+    margin: 0 12vw;
+  `};
+  ul {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-gap: ${glsp(2)};
+    ${media.largeUp`
+      grid-template-columns: repeat(3, 1fr);
+    `};
+  }
+  li {
+    padding: ${glsp(2)};
+    border-left: 4px solid ${themeVal('color.primary')};
+  }
+`;
+
 const StatusSection = styled.section`
   position: absolute;
   bottom: 0;
@@ -119,15 +141,15 @@ function Home() {
           <InpageHeader>
             <InpageHeadline>
               <HomeTagline>Microsoft Planetary Computer</HomeTagline>
-              <HomeHeading size='jumbo'>Azure Land Cover Mapping</HomeHeading>
+              <HomeHeading size='large'>PEARL: Land Cover Mapping</HomeHeading>
             </InpageHeadline>
           </InpageHeader>
           <Lead>
-            The Azure Land Cover Mapping plaform uses state of the art ML and AI
-            technologies to drastically reduce the time required to produce an
-            accurate land cover map. Scientists and mappers get access to
-            pre-trained, high performing starter models, and high resolution
-            imagery (e.g. NAIP) hosted on Microsoft Azure.
+            The Planetary Computer Land Cover Mapping platform uses state of the
+            art ML and AI technologies to drastically reduce the time required
+            to produce an accurate land cover map. Scientists and mappers get
+            access to pre-trained, high performing starter models, and high
+            resolution imagery (e.g. NAIP) hosted on Microsoft Azure.
           </Lead>
           <HomeCTA>
             <Button
@@ -151,6 +173,21 @@ function Home() {
             </Button>
           </HomeCTA>
         </HomeIntro>
+        <HomeTout>
+          <ul>
+            <li>
+              <strong>Faster</strong> creation of land cover maps
+            </li>
+            <li>
+              <strong>Easier</strong> QA and editing of the LULC map. Save,
+              store, pause and return to mapping anytime.
+            </li>
+            <li>
+              <strong>Cloud based</strong>, open-sourced services provide access
+              to high quality models, imagery and processing.
+            </li>
+          </ul>
+        </HomeTout>
         {environment !== 'production' && (
           <StatusSection>
             <strong>Status </strong>
