@@ -2,9 +2,10 @@
 module.exports = {
   default: {
     environment: 'production',
-    appTitle: 'PEARL',
-    appLongTitle: 'Planetary Computer Land Cover Mapping',
-    appDescription: 'Microsoft Planetary Computer Land Cover Mapping Tool',
+    appTitle: 'Planetary Computer Land Mapping',
+    appLongTitle: 'Planetary Computer Land Mapping Tool',
+    appDescription:
+      'Microsoft Planetary Computer Land Use/Land Classification Mapping tool',
     restApiEndpoint: 'https://api.lulc.ds.io',
     websocketEndpoint: 'wss://socket.lulc.ds.io',
     auth0Domain: 'dev-y5qeoqlh.us.auth0.com',

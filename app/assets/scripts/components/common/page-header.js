@@ -121,12 +121,12 @@ const PageTitlePrimeLink = styled.a`
     margin: 0;
     text-transform: uppercase;
     line-height: 1rem;
-    font-size: 1.25rem;
+    font-size: 1rem;
     align-self: center;
     ${media.mediumUp`
-      grid-row: 1;
-      align-self: flex-end;
-      font-size: 1.25rem;
+      /* grid-row: 1; */
+      /* align-self: flex-end; */
+      /* font-size: 1.25rem; */
     `}
     span {
       ${visuallyHidden()};
@@ -151,7 +151,7 @@ function PageHeader(props) {
                     <span>Microsoft</span>
                     {appTitle}
                   </strong>
-                  <sub>{appLongTitle}</sub>
+                  {/* <sub>{appLongTitle}</sub> */}
                 </PageTitlePrimeLink>
               </li>
             </GlobalMenu>

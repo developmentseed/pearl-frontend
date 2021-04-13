@@ -113,7 +113,7 @@ function Home() {
           <InpageHeader>
             <InpageHeadline>
               <HomeTagline>Microsoft Planetary Computer</HomeTagline>
-              <HomeHeading size='large'>PEARL: Land Cover Mapping</HomeHeading>
+              <HomeHeading size='large'>Land Cover Mapping</HomeHeading>
             </InpageHeadline>
           </InpageHeader>
           <Lead>
