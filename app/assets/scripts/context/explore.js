@@ -34,6 +34,7 @@ import {
   WebsocketClient,
 } from './instance';
 import { useAoi, useAoiPatch } from './aoi';
+import { actions as aoiPatchActions } from './reducers/aoi_patch';
 
 /**
  * Context & Provider
@@ -810,6 +811,12 @@ export const useInstance = () => {
         showGlobalLoadingMessage('Requesting AOI patch...');
         Object.values(currentCheckpoint.checkpointBrushes).forEach((ckpt) => {
           ckpt.polygons.forEach((polygon) => {
+            dispatchAoiPatch({
+              type: aoiPatchActions.INIT,
+              data: {
+                name: `${ckpt.checkpoint.name} (${ckpt.checkpoint.id})`,
+              },
+            });
             dispatchMessageQueue({
               type: messageQueueActionTypes.ADD,
               data: {
@@ -826,6 +833,13 @@ export const useInstance = () => {
 
         Object.values(currentCheckpoint.classes).forEach((cl, index) => {
           cl.polygons.forEach((polygon) => {
+            dispatchAoiPatch({
+              type: aoiPatchActions.INIT,
+              data: {
+                name: `${cl.name}`,
+              },
+            });
+
             dispatchMessageQueue({
               type: messageQueueActionTypes.ADD,
               data: {

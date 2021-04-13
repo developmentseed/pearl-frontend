@@ -1,11 +1,28 @@
-import React, { useContext, useMemo, createContext, useState } from 'react';
+import React, {
+  useContext,
+  useMemo,
+  createContext,
+  useState,
+  useEffect,
+} from 'react';
 import T from 'prop-types';
-
+import { useAoiPatch } from './aoi';
 export const MapContext = createContext({});
+
+const baseLayerConfig = {
+  opacity: 1,
+  visible: true,
+};
+
+const baseUserLayerConfig = {
+  ...baseLayerConfig,
+  active: false,
+};
 
 export function MapProvider(props) {
   const [mapRef, setMapRef] = useState();
   const [mapLayers, setMapLayers] = useState({});
+  const { aoiPatch } = useAoiPatch();
 
   const [predictionLayerSettings, setPredictionLayerSettings] = useState({
     opacity: 1,
@@ -32,6 +49,23 @@ export function MapProvider(props) {
       name: 'Retraining Samples',
     },
   });
+
+  useEffect(() => {
+    if (aoiPatch.isReady()) {
+      const patch = aoiPatch.getData();
+      const id = `${patch.name}-${patch.id}`;
+
+      setUserLayers({
+        ...userLayers,
+        [id]: {
+          ...baseUserLayerConfig,
+          id,
+          name: `${patch.name} Patch: ${patch.id}`,
+          active: true,
+        },
+      });
+    }
+  }, [aoiPatch]);
 
   return (
     <MapContext.Provider
