@@ -11,6 +11,7 @@ import { LocalButton } from '../../../styles/local-button';
 
 import InfoButton from '../../common/info-button';
 import { PanelBlockFooter } from '../../common/panel-block';
+import { checkpointModes } from '../../../context/checkpoint';
 
 const PanelControls = styled(PanelBlockFooter)`
   display: grid;
@@ -22,12 +23,62 @@ const SaveCheckpoint = styled(DropdownBody)`
   padding: ${glsp()};
 `;
 
+function PrimeButton({
+  currentCheckpoint,
+  allowInferenceRun,
+  runInference,
+  retrain,
+}) {
+  if (currentCheckpoint && currentCheckpoint.mode === checkpointModes.REFINE) {
+    return (
+      <InfoButton
+        data-cy='save-refine'
+        variation='primary-raised-dark'
+        size='medium'
+        useIcon='tick--small'
+        style={{
+          gridColumn: '1 / -1',
+        }}
+        onClick={() => {}}
+        id='save-refine'
+      >
+        Save Refinements
+      </InfoButton>
+    );
+  }
+
+  return (
+    <InfoButton
+      data-cy={allowInferenceRun ? 'run-model-button' : 'disabled'}
+      variation='primary-raised-dark'
+      size='medium'
+      useIcon='tick--small'
+      style={{
+        gridColumn: '1 / -1',
+      }}
+      onClick={() => {
+        allowInferenceRun && !currentCheckpoint ? runInference() : retrain();
+      }}
+      visuallyDisabled={!allowInferenceRun}
+      id='apply-button-trigger'
+    >
+      {!currentCheckpoint ? 'Run Model' : 'Retrain'}
+    </InfoButton>
+  );
+}
+
+PrimeButton.propTypes = {
+  currentCheckpoint: T.object,
+  allowInferenceRun: T.bool.isRequired,
+  runInference: T.func.isRequired,
+  retrain: T.func.isRequired,
+};
+
 function Footer(props) {
   const {
     dispatchCurrentCheckpoint,
     currentCheckpoint,
     checkpointActions,
-    checkpointModes,
 
     updateCheckpointName,
     localCheckpointName,
@@ -37,7 +88,7 @@ function Footer(props) {
 
     allowInferenceRun,
 
-    applyTooltip,
+    instance,
     runInference,
     retrain,
   } = props;
@@ -85,44 +136,14 @@ function Footer(props) {
         Undo
       </Button>
 
-      {currentCheckpoint &&
-      currentCheckpoint.mode === checkpointModes.REFINE ? (
-        <InfoButton
-          data-cy='save-refine'
-          variation='primary-raised-dark'
-          size='medium'
-          useIcon='tick--small'
-          style={{
-            gridColumn: '1 / -1',
-          }}
-          onClick={() => {}}
-          // visuallyDisabled={!allowInferenceRun}
-          // info={applyTooltip}
-          id='save-refine'
-        >
-          Save Refinements
-        </InfoButton>
-      ) : (
-        <InfoButton
-          data-cy={allowInferenceRun ? 'run-model-button' : 'disabled'}
-          variation='primary-raised-dark'
-          size='medium'
-          useIcon='tick--small'
-          style={{
-            gridColumn: '1 / -1',
-          }}
-          onClick={() => {
-            allowInferenceRun && !currentCheckpoint
-              ? runInference()
-              : retrain();
-          }}
-          visuallyDisabled={!allowInferenceRun}
-          info={applyTooltip}
-          id='apply-button-trigger'
-        >
-          {!currentCheckpoint ? 'Run Model' : 'Retrain'}
-        </InfoButton>
-      )}
+      <PrimeButton
+        currentCheckpoint={currentCheckpoint}
+        allowInferenceRun={allowInferenceRun}
+        instance={instance}
+        runInference={runInference}
+        retrain={retrain}
+      />
+
       <Dropdown
         alignment='center'
         direction='up'
@@ -181,15 +202,14 @@ Footer.propTypes = {
   currentCheckpoint: T.object,
   checkpointActions: T.object,
   checkpointModes: T.object,
-
   updateCheckpointName: T.func,
   localCheckpointName: T.string,
   setLocalCheckpointName: T.func,
 
   mapRef: T.object,
 
-  allowInferenceRun: T.bool,
-  applyTooltip: T.string,
+  instance: T.object,
+  allowInferenceRun: T.bool.isRequired,
   runInference: T.func,
   retrain: T.func,
 };

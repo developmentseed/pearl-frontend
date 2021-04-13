@@ -58,7 +58,7 @@ function PrimePanel() {
     updateCheckpointName,
   } = useContext(ExploreContext);
 
-  const { runInference, retrain, applyCheckpoint } = useInstance();
+  const { instance, runInference, retrain, applyCheckpoint } = useInstance();
 
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
 
@@ -86,14 +86,9 @@ function PrimePanel() {
       mapModes.ADD_SAMPLE_POLYGON,
       mapModes.REMOVE_SAMPLE,
     ].includes(mapState.mode) &&
-    aoiRef &&
+    typeof aoiRef !== 'undefined' &&
     aoiArea > 0 &&
-    selectedModel;
-
-  // "Run Inference" button
-  const applyTooltip = currentProject
-    ? 'Run inference for this model'
-    : 'Create project and run model';
+    typeof selectedModel !== 'undefined';
 
   // Retrain Panel Tab Empty State message
   //
@@ -281,9 +276,9 @@ function PrimePanel() {
 
                   mapRef,
 
-                  allowInferenceRun: allowInferenceRun && true,
+                  allowInferenceRun,
+                  instance,
 
-                  applyTooltip,
                   runInference,
                   retrain,
                 }}
