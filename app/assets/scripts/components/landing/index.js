@@ -63,7 +63,7 @@ const HomeTagline = styled(InpageTagline)`
 
 const HomeHeading = styled(Heading)`
   font-weight: ${themeVal('type.base.weight')};
-  font-size: clamp(2rem, -0.875rem + 8.333vw, 3.75rem);
+  font-size: clamp(2rem, -0.875rem + 8.333vw, 3.5rem);
   line-height: 1.25;
   margin: 0;
 `;
@@ -113,20 +113,20 @@ function Home() {
           <InpageHeader>
             <InpageHeadline>
               <HomeTagline>Microsoft Planetary Computer</HomeTagline>
-              <HomeHeading size='jumbo'>Azure Land Cover Mapping</HomeHeading>
+              <HomeHeading size='large'>PEARL: Land Cover Mapping</HomeHeading>
             </InpageHeadline>
           </InpageHeader>
           <Lead>
-            The Azure Land Cover Mapping plaform uses state of the art ML and AI
-            technologies to drastically reduce the time required to produce an
-            accurate land cover map. Scientists and mappers get access to
-            pre-trained, high performing starter models, and high resolution
-            imagery (e.g. NAIP) hosted on Microsoft Azure.
+            The Planetary Computer Land Cover Mapping platform uses state of the
+            art ML and AI technologies to drastically reduce the time required
+            to produce an accurate land cover map. Scientists and mappers get
+            access to pre-trained, high performing starter models, and high
+            resolution imagery (e.g. NAIP) hosted on Microsoft Azure.
           </Lead>
           <HomeCTA>
-            <Button size='xlarge' variation='primary-raised-dark'>
-              Coming Soon
-            </Button>
+            <Heading size='small' variation='baseLight'>
+              COMING SOON
+            </Heading>
           </HomeCTA>
         </HomeIntro>
         <HomeTout>

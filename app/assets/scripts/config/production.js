@@ -2,9 +2,10 @@
 module.exports = {
   default: {
     environment: 'production',
-    appTitle: 'Azure Land Cover',
-    appLongTitle: 'Planetary Computer Land Cover Tool',
-    appDescription: 'Microsoft Land Use/Land Classification project.',
+    appTitle: 'PEARL',
+    appLongTitle: 'Planetary Computer Land Mapping Tool',
+    appDescription:
+      'Microsoft Planetary Computer Land Use/Land Classification Mapping tool',
     restApiEndpoint: 'https://api.lulc.ds.io',
     websocketEndpoint: 'wss://socket.lulc.ds.io',
     auth0Domain: 'dev-y5qeoqlh.us.auth0.com',
