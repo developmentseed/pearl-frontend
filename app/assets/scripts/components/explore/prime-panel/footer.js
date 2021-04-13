@@ -40,7 +40,7 @@ function Footer(props) {
     applyTooltip,
     runInference,
     retrain,
-    refine
+    refine,
   } = props;
   return (
     <PanelControls>
@@ -96,7 +96,10 @@ function Footer(props) {
           style={{
             gridColumn: '1 / -1',
           }}
-          onClick={refine}
+          onClick={() => {
+            refine();
+            mapRef.polygonDraw.clearLayers();
+          }}
           // visuallyDisabled={!allowInferenceRun}
           // info={applyTooltip}
           id='save-refine'

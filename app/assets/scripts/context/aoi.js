@@ -1,10 +1,15 @@
-import React, { useState, createContext, useContext, useMemo, useReducer } from 'react';
+import React, {
+  useState,
+  createContext,
+  useContext,
+  useMemo,
+  useReducer,
+} from 'react';
 import { initialApiRequestState } from './reducers/reduxeed';
 import T from 'prop-types';
 import logger from '../utils/logger';
 import aoiPatchReducer from './reducers/aoi_patch';
 import { wrapLogReducer } from './reducers/utils';
-
 
 const AoiContext = createContext(null);
 
@@ -31,7 +36,8 @@ export function AoiProvider(props) {
         aoiPatch,
         dispatchAoiPatch,
 
-        aoiPatchList, setAoiPatchList
+        aoiPatchList,
+        setAoiPatchList,
       }}
     >
       {props.children}
@@ -83,13 +89,19 @@ export const useAoi = () => {
 };
 
 export const useAoiPatch = () => {
-  const { aoiPatch, dispatchAoiPatch,aoiPatchList, setAoiPatchList } = useCheckContext('useAoiPatch');
+  const {
+    aoiPatch,
+    dispatchAoiPatch,
+    aoiPatchList,
+    setAoiPatchList,
+  } = useCheckContext('useAoiPatch');
 
   return useMemo(
     () => ({
       aoiPatch,
       dispatchAoiPatch,
-     aoiPatchList, setAoiPatchList 
+      aoiPatchList,
+      setAoiPatchList,
     }),
     [aoiPatch, dispatchAoiPatch, aoiPatchList, setAoiPatchList]
   );

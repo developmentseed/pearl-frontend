@@ -286,7 +286,7 @@ function PrimePanel() {
                   applyTooltip,
                   runInference,
                   retrain,
-                  refine
+                  refine,
                 }}
               />
             )}

@@ -168,21 +168,6 @@ function Map() {
     }
   }, [mapRef, currentCheckpoint && currentCheckpoint.id]);
 
-  /*
-   * useEffect fires when mode changes.
-   * Checkpoint ID is the same so classList should be the same
-   */
-  useEffect(() => {
-    if (!mapRef || !mapRef.polygonDraw) return;
-
-    //mapRef.polygonDraw.clearLayers();
-    if (currentCheckpoint) {
-      /*dispatchCurrentCheckpoint({
-        type: checkpointActions.CLEAR_POINT_SAMPLES,
-      });*/
-    }
-  }, [mapRef, currentCheckpoint && currentCheckpoint.mode]);
-
   /**
    * Add/update AOI controls on API metadata change.
    */

@@ -197,6 +197,7 @@ export function ExploreProvider(props) {
       }
     } else if (aoiPatch.isReady()) {
       hideGlobalLoading();
+
       if (aoiPatch.fetched) {
         setAoiPatchList([...aoiPatchList, aoiPatch.getData()]);
       } else if (aoiPatch.error) {
@@ -803,6 +804,28 @@ export const useInstance = () => {
               },
             });
           });
+        });
+
+        Object.values(currentCheckpoint.classes).forEach((cl, index) => {
+          cl.polygons.forEach((polygon) => {
+            dispatchMessageQueue({
+              type: messageQueueActionTypes.ADD,
+              data: {
+                action: 'model#patch',
+                data: {
+                  type: 'class',
+                  class: index,
+                  polygon,
+                },
+              },
+            });
+          });
+        });
+
+        // Clear samples from the checkpoint object
+        // Prime panel calls mapRef.polygonDraw.clearLayers()
+        dispatchCurrentCheckpoint({
+          type: checkpointActions.CLEAR_SAMPLES,
         });
       },
       applyCheckpoint: async (projectId, checkpointId) => {

@@ -281,8 +281,7 @@ function checkpointReducer(state, action) {
             checkpointBrushes: state.checkpointBrushes,
           },
         ],
-        checkpointBrushes: {
-        },
+        checkpointBrushes: {},
         classes: Object.values(state.classes).reduce((accum, c) => {
           return {
             ...accum,
