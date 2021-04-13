@@ -12,9 +12,8 @@ import {
   glsp,
 } from '@devseed-ui/theme-provider';
 import { StyledNavLink, StyledLink } from '../../styles/links';
-// import AppLogo from '../../../icons/app-logo.svg';
 
-const { appTitle, appLongTitle, baseUrl } = config;
+const { appTitle, baseUrl } = config;
 
 const PageHead = styled.header`
   background-color: ${themeVal('color.surface')};
@@ -151,7 +150,6 @@ function PageHeader(props) {
                     <span>Microsoft</span>
                     {appTitle}
                   </strong>
-                  {/* <sub>{appLongTitle}</sub> */}
                 </PageTitlePrimeLink>
               </li>
             </GlobalMenu>
@@ -184,9 +182,6 @@ function PageHeader(props) {
               </PageSpecificControls>
             )}
           </PrimarySection>
-          {/* <SecondarySection>
-            <UserDropdown />
-          </SecondarySection> */}
         </PageNav>
       </PageHeadInner>
     </PageHead>
