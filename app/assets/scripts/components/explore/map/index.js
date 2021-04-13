@@ -143,6 +143,11 @@ function Map() {
           mapRef.polygonDraw.enableAdd(currentCheckpoint.activeItem);
         }
         break;
+      case mapModes.ERASE_SAMPLE_POLYGON:
+        if (currentCheckpoint.activeItem) {
+          mapRef.polygonDraw.enableSubtract(currentCheckpoint.activeItem);
+        }
+        break;
       case mapModes.REMOVE_SAMPLE:
         if (currentCheckpoint.activeItem) {
           mapRef.polygonDraw.enableDelete(currentCheckpoint.activeItem);

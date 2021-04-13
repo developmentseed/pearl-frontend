@@ -46,6 +46,7 @@ class PolygonDrawControl {
 
     // Handle added polygon
     drawer.on('layeradd', (data) => {
+      console.log('layeradd')
       const polygons = this.getLayerAsGeoJSON(data.target);
       if (!this.manualMode) {
         this.onUpdate(name, polygons);
@@ -59,9 +60,24 @@ class PolygonDrawControl {
         this.onUpdate(name, polygons);
       }
     });
+    drawer.on('layersubtract', (data) => {
+      // should not update history when merging
+      const polygons = this.getLayerAsGeoJSON(data.target);
+
+      if (!this.manualMode) {
+        this.onUpdate(name, polygons);
+      }
+    });
+
+
+
     this._group.addLayer(drawer);
   }
 
+  /*
+   * Function to add polygons to layers without user input
+   * used when restoring from history using UNDO
+  */
   setLayerPolygons(layerPolygons) {
     const idMap = Object.entries(this._group._layers).reduce(
       (accum, [id, { category }]) => ({
@@ -102,6 +118,10 @@ class PolygonDrawControl {
 
   enableAdd(layerName) {
     this.enableMode('add', layerName);
+  }
+
+  enableSubtract(layerName) {
+    this.enableMode('subtract', layerName);
   }
 
   enableDelete(layerName) {
