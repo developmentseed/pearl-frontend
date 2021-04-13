@@ -25,7 +25,7 @@ import { useAuth0 } from '@auth0/auth0-react';
 
 import { availableCheckpoints } from '../explore/sample-data';
 import { filterComponentProps } from '../../styles/utils/general';
-import { AuthContext } from '../../context/auth';
+import { useAuth } from '../../context/auth';
 
 const Modal = styled(BaseModal)`
   .modal__contents {
@@ -63,7 +63,7 @@ const StyledLink = filterComponentProps(Link, propsToFilter);
 function UserDropdown() {
   const location = useLocation();
   const { loginWithRedirect, logout } = useAuth0();
-  const { isAuthenticated, user } = useContext(AuthContext);
+  const { isAuthenticated, user } = useAuth();
   const logoutWithRedirect = () =>
     logout({
       returnTo: window.location.origin,

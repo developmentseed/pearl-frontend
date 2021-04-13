@@ -32,7 +32,7 @@ import {
 import ModalMapEvent from './modal-events';
 
 import VectorLayer from '../../common/map/vector-layer';
-import { useRestApiClient } from '../../../context/auth';
+import { useAuth } from '../../../context/auth';
 import { useApiMeta } from '../../../context/api-meta';
 import { useAoi } from '../../../context/aoi';
 
@@ -92,7 +92,7 @@ function Map() {
   const { apiLimits } = useApiMeta();
   const { aoiRef, setAoiRef, currentAoi } = useAoi();
 
-  const { restApiClient } = useRestApiClient();
+  const { restApiClient } = useAuth();
 
   const { mapState, mapModes, setMapMode } = useMapState();
   const { mapRef, setMapRef } = useMapRef();

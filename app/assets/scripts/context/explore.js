@@ -7,7 +7,7 @@ import React, {
   useMemo,
 } from 'react';
 import T from 'prop-types';
-import { useRestApiClient } from './auth';
+import { useAuth } from './auth';
 import {
   showGlobalLoadingMessage,
   hideGlobalLoading,
@@ -34,7 +34,7 @@ export function ExploreProvider(props) {
   const history = useHistory();
   let { projectId } = useParams();
 
-  const { restApiClient, isLoading: authIsLoading } = useRestApiClient();
+  const { restApiClient, isLoading: authIsLoading } = useAuth();
   const { currentProject, setCurrentProject } = useProject();
   const { aoiName, aoiRef, setAoiName, setAoiRef, setCurrentAoi } = useAoi();
   const { predictions, dispatchPredictions } = usePredictions();

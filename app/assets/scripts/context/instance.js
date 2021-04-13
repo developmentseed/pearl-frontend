@@ -16,7 +16,7 @@ import {
   hideGlobalLoading,
 } from '@devseed-ui/global-loading';
 import toasts from '../components/common/toasts';
-import { useRestApiClient } from './auth';
+import { useAuth } from './auth';
 import {
   actions as checkpointActions,
   checkpointModes,
@@ -70,7 +70,7 @@ const InstanceContext = createContext(null);
 
 export function InstanceProvider(props) {
   const history = useHistory();
-  const { restApiClient } = useRestApiClient();
+  const { restApiClient } = useAuth();
   const {
     currentCheckpoint,
     dispatchCurrentCheckpoint,

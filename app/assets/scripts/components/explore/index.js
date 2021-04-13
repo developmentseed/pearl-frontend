@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import App from '../common/app';
 import ExploreComponent from './explore';
 import PageHeader from '../common/page-header';
@@ -12,27 +12,18 @@ import SessionTimeoutModal from '../common/timeout-modal';
 import SessionOutputControl from './session-output-control';
 import { CheckpointProvider } from '../../context/checkpoint';
 import { AoiProvider } from '../../context/aoi';
-import { useParams } from 'react-router';
-import { showGlobalLoadingMessage } from '@devseed-ui/global-loading';
 import { ProjectProvider } from '../../context/project';
 import { InstanceProvider } from '../../context/instance';
 import { PredictionsProvider } from '../../context/predictions';
 import { ModelProvider } from '../../context/model';
 import Composer from '../../utils/compose-components';
 function Explore() {
-  let { projectId } = useParams();
   const { setTourStep } = useTour();
   const [isMediumDown, setIsMediumDown] = useState(false);
 
   const resizeListener = ({ width }) => {
     setIsMediumDown(width < theme.main.mediaRanges.large[0]);
   };
-
-  useEffect(() => {
-    if (projectId !== 'new') {
-      showGlobalLoadingMessage('Loading project... ');
-    }
-  }, []);
 
   return (
     <App pageTitle='Explore'>

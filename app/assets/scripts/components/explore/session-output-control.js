@@ -20,7 +20,7 @@ import { Heading } from '@devseed-ui/typography';
 import { Form, FormInput } from '@devseed-ui/form';
 import InfoButton from '../common/info-button';
 import { ExploreContext } from '../../context/explore';
-import { AuthContext, useRestApiClient } from '../../context/auth';
+import { useAuth } from '../../context/auth';
 import toasts from '../common/toasts';
 import logger from '../../utils/logger';
 
@@ -82,8 +82,7 @@ const HeadingInput = styled(FormInput)`
 
 function SessionOutputControl(props) {
   const { status, projectName, openHelp, isMediumDown } = props;
-  const { restApiClient } = useRestApiClient();
-  const { isAuthenticated } = useContext(AuthContext);
+  const { isAuthenticated, restApiClient } = useAuth();
 
   const {
     updateProjectName,

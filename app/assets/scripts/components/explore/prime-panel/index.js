@@ -20,7 +20,7 @@ import PanelFooter from './footer';
 
 import LayersPanel from '../layers-panel';
 
-import { AuthContext } from '../../../context/auth';
+import { useAuth } from '../../../context/auth';
 import {
   useCheckpoint,
   actions as checkpointActions,
@@ -35,7 +35,7 @@ const StyledPanelBlock = styled(PanelBlock)`
 `;
 
 function PrimePanel() {
-  const { isAuthenticated } = useContext(AuthContext);
+  const { isAuthenticated } = useAuth();
   const { mapState, mapModes, setMapMode } = useMapState();
   const { mapRef } = useMapRef();
 
