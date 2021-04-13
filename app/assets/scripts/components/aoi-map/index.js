@@ -7,13 +7,12 @@ import App from '../common/app';
 import config from '../../config';
 import { useRestApiClient } from '../../context/auth';
 
-const { restApiEndpoint, tileUrlTemplate } = config;
+const { restApiEndpoint } = config;
 
 function AoiMap() {
   const { projectId, aoiId } = useParams();
   const [mapRef, setMapRef] = useState(null);
   const [tileUrl, setTileUrl] = useState(null);
-  const tileLayer = `${restApiEndpoint}/api/project/${projectId}/aoi/${aoiId}/tiles/{z}/{x}/{y}`;
   const { restApiClient } = useRestApiClient();
 
   useEffect(async () => {
@@ -26,11 +25,10 @@ function AoiMap() {
     ];
     mapRef.fitBounds(bounds);
   }, [projectId, aoiId, mapRef, tileUrl]);
-  const layer = 'naip.latest';
 
   let leafletLayer;
   if (tileUrl) {
-    leafletLayer = <TileLayer url={tileUrl} />
+    leafletLayer = <TileLayer url={tileUrl} />;
   } else {
     leafletLayer = null;
   }
@@ -46,7 +44,6 @@ function AoiMap() {
           }}
         >
           {leafletLayer}
-          <TileLayer attribution='Microsoft Planetary Computer LULC' url={tileLayer} />
         </MapContainer>
       </PageBody>
     </App>
