@@ -583,7 +583,7 @@ export const useInstance = () => {
 
   // Create a message queue to wait for instance connection
   const [messageQueue, dispatchMessageQueue] = useReducer(
-    (state, { type, data }) => {
+    wrapLogReducer((state, { type, data }) => {
       switch (type) {
         case messageQueueActionTypes.ADD: {
           return state.concat(JSON.stringify(data));
@@ -596,7 +596,7 @@ export const useInstance = () => {
           logger('Unexpected messageQueue action type: ', type);
           throw new Error('Unexpected error.');
       }
-    },
+    }),
     []
   );
 

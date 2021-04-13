@@ -367,7 +367,6 @@ function Map() {
           ))}
 
         {aoiPatchList.map((patch) => {
-          console.log(patch)
           return (
             <React.Fragment key={patch.id}>
               {patch.patches.map((p) => (
@@ -439,6 +438,7 @@ function Map() {
       restApiClient,
       setMapLayers,
       setMapRef,
+      aoiPatchList,
     ]
   );
 
