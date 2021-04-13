@@ -7,7 +7,6 @@ import React, {
   useMemo,
 } from 'react';
 import T from 'prop-types';
-import { initialApiRequestState } from './reducers/reduxeed';
 import { useRestApiClient } from './auth';
 import {
   showGlobalLoadingMessage,
@@ -15,9 +14,7 @@ import {
 } from '@devseed-ui/global-loading';
 import toasts from '../components/common/toasts';
 import { useHistory, useParams } from 'react-router-dom';
-import predictionsReducer, {
-  actions as predictionActions,
-} from './reducers/predictions';
+import { actions as predictionActions, usePredictions } from './predictions';
 import { mapStateReducer, mapModes, mapActionTypes } from './reducers/map';
 import tBbox from '@turf/bbox';
 import reverseGeoCode from '../utils/reverse-geocode';
@@ -26,6 +23,7 @@ import { actions as checkpointActions, useCheckpoint } from './checkpoint';
 import { wrapLogReducer } from './reducers/utils';
 import { useAoi } from './aoi';
 import { useProject } from './project';
+import { useModel } from './model';
 
 /**
  * Context & Provider
@@ -35,35 +33,26 @@ export const ExploreContext = createContext(null);
 export function ExploreProvider(props) {
   const history = useHistory();
   let { projectId } = useParams();
+
   const { restApiClient, isLoading: authIsLoading } = useRestApiClient();
-
   const { currentProject, setCurrentProject } = useProject();
-  const [checkpointList, setCheckpointList] = useState(null);
-
   const { aoiName, aoiRef, setAoiName, setAoiRef, setCurrentAoi } = useAoi();
+  const { predictions, dispatchPredictions } = usePredictions();
+  const { selectedModel, setSelectedModel } = useModel();
+  const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
 
-  // The following AOI properties should be refactored in the futre and moved to useAoi()
-  // to avoid re-rendering issues in this context.
+  // The following properties should be moved to own context to avoid re-rendering.
   const [aoiArea, setAoiArea] = useState(null);
   const [aoiInitializer, setAoiInitializer] = useState(null);
   const [aoiList, setAoiList] = useState([]);
   const [aoiBounds, setAoiBounds] = useState(null);
-
   const [mapState, dispatchMapState] = useReducer(
     wrapLogReducer(mapStateReducer),
     {
       mode: mapModes.BROWSE_MODE,
     }
   );
-
-  const [selectedModel, setSelectedModel] = useState(null);
-
-  const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
-
-  const [predictions, dispatchPredictions] = useReducer(
-    predictionsReducer,
-    initialApiRequestState
-  );
+  const [checkpointList, setCheckpointList] = useState(null);
   const [currentInstance, setCurrentInstance] = useState(null);
 
   async function loadInitialData() {
@@ -486,19 +475,5 @@ export const useMapState = () => {
       mapModes,
     }),
     [mapState, mapModes]
-  );
-};
-
-export const usePredictions = () => {
-  const { predictions, dispatchPredictions } = useExploreContext(
-    'usePredictions'
-  );
-
-  return useMemo(
-    () => ({
-      predictions,
-      dispatchPredictions,
-    }),
-    [predictions, dispatchPredictions]
   );
 };

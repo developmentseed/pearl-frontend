@@ -1,5 +1,13 @@
-import { useEffect, useMemo, useReducer, useState } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useReducer,
+  useState,
+} from 'react';
 import { useHistory } from 'react-router';
+import T from 'prop-types';
 import config from '../config';
 import logger from '../utils/logger';
 import get from 'lodash.get';
@@ -14,10 +22,11 @@ import {
   checkpointModes,
   useCheckpoint,
 } from './checkpoint';
-import { useExploreContext, usePredictions } from './explore';
-import { actions as predictionsActions } from './reducers/predictions';
+
+import { actions as predictionsActions, usePredictions } from './predictions';
 import { useProject } from './project';
 import { useAoi } from './aoi';
+import { useModel } from './model';
 
 const messageQueueActionTypes = {
   ADD: 'ADD',
@@ -27,10 +36,11 @@ const messageQueueActionTypes = {
 const instanceActionTypes = {
   SET_TOKEN: 'SET_TOKEN',
   SET_CONNECTION_STATUS: 'SET_CONNECTION_STATUS',
+  SET_STATUS: 'SET_STATUS',
 };
 
 const instanceInitialState = {
-  status: 'initializing', // 'ready', 'processing', 'aborting'
+  status: 'unavailable', // 'initializing', 'ready', 'processing', 'aborting'
   connected: false,
 };
 
@@ -44,15 +54,21 @@ function instanceReducer(state, action) {
         connected: data,
       };
     }
+    case instanceActionTypes.SET_STATUS: {
+      return {
+        ...state,
+        status: data,
+      };
+    }
     default:
       logger('Unexpected instance action type: ', { action });
       throw new Error('Unexpected error.');
   }
 }
 
-// There is no need to create a context for instance because it is used only one time, in PrimePanel.
-// If this changes we need to create a Instance context and add the provider to the tree.
-export const useInstance = () => {
+const InstanceContext = createContext(null);
+
+export function InstanceProvider(props) {
   const history = useHistory();
   const { restApiClient } = useRestApiClient();
   const {
@@ -63,7 +79,7 @@ export const useInstance = () => {
   const { currentProject, setCurrentProject } = useProject();
   const { dispatchPredictions } = usePredictions();
   const { aoiName, aoiRef } = useAoi();
-  const { selectedModel } = useExploreContext('useWebsocket');
+  const { selectedModel } = useModel();
 
   const [websocketClient, setWebsocketClient] = useState(null);
 
@@ -136,190 +152,221 @@ export const useInstance = () => {
     });
   }
 
-  return useMemo(
-    () => ({
-      runInference: async () => {
-        if (restApiClient) {
-          let project = currentProject;
+  const value = {
+    instance,
+    initInstance,
+    runInference: async () => {
+      if (restApiClient) {
+        let project = currentProject;
 
-          if (!project) {
-            try {
-              showGlobalLoadingMessage('Creating project...');
-              project = await restApiClient.createProject({
-                model_id: selectedModel.id,
-                mosaic: 'naip.latest',
-                name: 'Untitled',
-              });
-              setCurrentProject(project);
-              history.push(`/project/${project.id}`);
-            } catch (error) {
-              logger(error);
-              hideGlobalLoading();
-              toasts.error('Could not create project, please try again later.');
-              return; // abort inference run
-            }
-          }
-
+        if (!project) {
           try {
-            showGlobalLoadingMessage('Fetching classes...');
-            const { classes } = await restApiClient.getModel(selectedModel.id);
-            dispatchCurrentCheckpoint({
-              type: checkpointActions.SET_CHECKPOINT,
-              data: {
-                classes,
-              },
+            showGlobalLoadingMessage('Creating project...');
+            project = await restApiClient.createProject({
+              model_id: selectedModel.id,
+              mosaic: 'naip.latest',
+              name: 'Untitled',
             });
+            setCurrentProject(project);
+            history.push(`/project/${project.id}`);
           } catch (error) {
             logger(error);
             hideGlobalLoading();
-            toasts.error('Could fetch model classes, please try again later.');
+            toasts.error('Could not create project, please try again later.');
             return; // abort inference run
-          }
-
-          if (!aoiName) {
-            hideGlobalLoading();
-            toasts.error('AOI Name must be set before running inference');
-            return; // abort inference run
-          }
-
-          try {
-            await initInstance(project.id);
-          } catch (error) {
-            logger(error);
-            hideGlobalLoading();
-            toasts.error('Could not create instance, please try again later.');
-          }
-
-          try {
-            // Get bbox polygon from AOI
-            const {
-              _southWest: { lng: minX, lat: minY },
-              _northEast: { lng: maxX, lat: maxY },
-            } = aoiRef.getBounds();
-
-            const polygon = {
-              type: 'Polygon',
-              coordinates: [
-                [
-                  [minX, minY],
-                  [maxX, minY],
-                  [maxX, maxY],
-                  [minX, maxY],
-                  [minX, minY],
-                ],
-              ],
-            };
-
-            // Reset predictions state
-            dispatchPredictions({
-              type: predictionsActions.START_PREDICTION,
-            });
-
-            // Add prediction request to queue
-            dispatchMessageQueue({
-              type: messageQueueActionTypes.ADD,
-              data: {
-                action: 'model#prediction',
-                data: {
-                  name: aoiName,
-                  polygon,
-                },
-              },
-            });
-          } catch (error) {
-            logger(error);
-            hideGlobalLoading();
-            toasts.error('Could not create instance, please try again later.');
-          }
-        }
-      },
-      retrain: async function () {
-        // Check if all classes have the minimum number of samples
-        const classes = Object.values(currentCheckpoint.classes);
-        for (let i = 0; i < classes.length; i++) {
-          const aClass = classes[i];
-          const sampleCount =
-            get(aClass, 'points.coordinates.length', 0) +
-            get(aClass, 'polygons.length', 0);
-          if (sampleCount < config.minSampleCount) {
-            toasts.error(
-              `A minimum of ${config.minSampleCount} samples is required for every class.`
-            );
-            return;
           }
         }
 
-        showGlobalLoadingMessage('Retraining...');
-
-        // Reset predictions state
-        dispatchPredictions({
-          type: predictionsActions.START_PREDICTION,
-        });
-
-        // Add prediction request to queue
-        dispatchMessageQueue({
-          type: messageQueueActionTypes.ADD,
-          data: {
-            action: 'model#retrain',
-            data: {
-              name: aoiName,
-              classes: classes.map((c) => {
-                return {
-                  name: c.name,
-                  color: c.color,
-                  geometry: {
-                    type: 'GeometryCollection',
-                    geometries: [c.points, ...c.polygons],
-                  },
-                };
-              }),
-            },
-          },
-        });
-      },
-      applyCheckpoint: async (projectId, checkpointId) => {
         try {
-          showGlobalLoadingMessage('Applying checkpoint...');
+          showGlobalLoadingMessage('Fetching classes...');
+          const { classes } = await restApiClient.getModel(selectedModel.id);
+          dispatchCurrentCheckpoint({
+            type: checkpointActions.SET_CHECKPOINT,
+            data: {
+              classes,
+            },
+          });
+        } catch (error) {
+          logger(error);
+          toasts.error('Could fetch model classes, please try again later.');
+          return; // abort inference run
+        }
 
-          if (!websocketClient) {
-            await initInstance(projectId);
-          }
+        hideGlobalLoading();
+
+        if (!aoiName) {
+          toasts.error('AOI Name must be set before running inference');
+          return; // abort inference run
+        }
+
+        try {
+          await initInstance(project.id);
+        } catch (error) {
+          logger(error);
+          toasts.error('Could not create instance, please try again later.');
+        }
+
+        try {
+          // Get bbox polygon from AOI
+          const {
+            _southWest: { lng: minX, lat: minY },
+            _northEast: { lng: maxX, lat: maxY },
+          } = aoiRef.getBounds();
+
+          const polygon = {
+            type: 'Polygon',
+            coordinates: [
+              [
+                [minX, minY],
+                [maxX, minY],
+                [maxX, maxY],
+                [minX, maxY],
+                [minX, minY],
+              ],
+            ],
+          };
 
           // Reset predictions state
           dispatchPredictions({
             type: predictionsActions.START_PREDICTION,
           });
 
-          await fetchCheckpoint(projectId, checkpointId);
-
+          // Add prediction request to queue
           dispatchMessageQueue({
             type: messageQueueActionTypes.ADD,
             data: {
-              action: 'model#checkpoint',
+              action: 'model#prediction',
               data: {
-                id: checkpointId,
+                name: aoiName,
+                polygon,
               },
             },
           });
-
-          hideGlobalLoading();
         } catch (error) {
           logger(error);
-          toasts.error('Could not load checkpoint, please try again later.');
+          toasts.error('Could not create instance, please try again later.');
         }
-      },
-    }),
-    [
-      aoiName,
-      aoiRef,
-      currentProject,
-      currentCheckpoint,
-      dispatchCurrentCheckpoint,
-      setCurrentProject,
-      restApiClient,
+      }
+    },
+    retrain: async function () {
+      // Check if all classes have the minimum number of samples
+      const classes = Object.values(currentCheckpoint.classes);
+      for (let i = 0; i < classes.length; i++) {
+        const aClass = classes[i];
+        const sampleCount =
+          get(aClass, 'points.coordinates.length', 0) +
+          get(aClass, 'polygons.length', 0);
+        if (sampleCount < config.minSampleCount) {
+          toasts.error(
+            `A minimum of ${config.minSampleCount} samples is required for every class.`
+          );
+          return;
+        }
+      }
+
+      showGlobalLoadingMessage('Retraining...');
+
+      // Reset predictions state
+      dispatchPredictions({
+        type: predictionsActions.START_PREDICTION,
+      });
+
+      // Add prediction request to queue
+      dispatchMessageQueue({
+        type: messageQueueActionTypes.ADD,
+        data: {
+          action: 'model#retrain',
+          data: {
+            name: aoiName,
+            classes: classes.map((c) => {
+              return {
+                name: c.name,
+                color: c.color,
+                geometry: {
+                  type: 'GeometryCollection',
+                  geometries: [c.points, ...c.polygons],
+                },
+              };
+            }),
+          },
+        },
+      });
+    },
+    applyCheckpoint: async (projectId, checkpointId) => {
+      try {
+        showGlobalLoadingMessage('Applying checkpoint...');
+
+        if (!websocketClient) {
+          await initInstance(projectId);
+        }
+
+        // Reset predictions state
+        dispatchPredictions({
+          type: predictionsActions.START_PREDICTION,
+        });
+
+        await fetchCheckpoint(projectId, checkpointId);
+
+        dispatchMessageQueue({
+          type: messageQueueActionTypes.ADD,
+          data: {
+            action: 'model#checkpoint',
+            data: {
+              id: checkpointId,
+            },
+          },
+        });
+
+        hideGlobalLoading();
+      } catch (error) {
+        logger(error);
+        toasts.error('Could not load checkpoint, please try again later.');
+      }
+    },
+  };
+
+  return (
+    <InstanceContext.Provider value={value}>
+      {props.children}
+    </InstanceContext.Provider>
+  );
+}
+
+InstanceProvider.propTypes = {
+  children: T.node,
+};
+
+const useCheckContext = (fnName) => {
+  const context = useContext(InstanceContext);
+
+  if (!context) {
+    throw new Error(
+      `The \`${fnName}\` hook must be used inside the <InstanceContext> component's context.`
+    );
+  }
+
+  return context;
+};
+
+// There is no need to create a context for instance because it is used only one time, in PrimePanel.
+// If this changes we need to create a Instance context and add the provider to the tree.
+export const useInstance = () => {
+  const {
+    instance,
+    initInstance,
+    runInference,
+    retrain,
+    applyCheckpoint,
+  } = useCheckContext(InstanceContext);
+  return useMemo(
+    () => ({
       instance,
-      selectedModel,
-    ]
+      initInstance,
+      runInference,
+      retrain,
+      applyCheckpoint,
+    }),
+    [instance, initInstance, runInference, retrain, applyCheckpoint]
   );
 };
 
@@ -343,12 +390,23 @@ export class WebsocketClient extends WebSocket {
 
       // On connected, request a prediction
       switch (message) {
+        case 'model#status':
+          dispatchInstance({
+            type: instanceActionTypes.SET_STATUS,
+            data: data.isAborting
+              ? 'aborting'
+              : data.processing
+              ? 'processing'
+              : 'ready',
+          });
+          break;
         case 'info#connected':
           logger('Instance connected.');
           dispatchInstance({
             type: instanceActionTypes.SET_CONNECTION_STATUS,
             data: true,
           });
+          this.sendMessage({ action: 'model#status' });
           break;
         case 'info#disconnected':
           logger('Instance disconnected.');

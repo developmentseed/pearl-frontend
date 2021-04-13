@@ -15,7 +15,9 @@ import { AoiProvider } from '../../context/aoi';
 import { useParams } from 'react-router';
 import { showGlobalLoadingMessage } from '@devseed-ui/global-loading';
 import { ProjectProvider } from '../../context/project';
-
+import { InstanceProvider } from '../../context/instance';
+import { PredictionsProvider } from '../../context/predictions';
+import { ModelProvider } from '../../context/model';
 function Explore() {
   let { projectId } = useParams();
   const { setTourStep } = useTour();
@@ -35,28 +37,34 @@ function Explore() {
     <App pageTitle='Explore'>
       <CheckpointProvider>
         <AoiProvider>
-          <ProjectProvider>
-            <ExploreProvider>
-              <MapProvider>
-                <SizeAwareElement
-                  element='header'
-                  className='header'
-                  onChange={resizeListener}
-                >
-                  <PageHeader>
-                    <SessionOutputControl
-                      openHelp={() => setTourStep(0)}
-                      isMediumDown={isMediumDown}
-                    />
-                  </PageHeader>
-                </SizeAwareElement>
-                <PageBody role='main'>
-                  <ExploreComponent />
-                </PageBody>
-                <SessionTimeoutModal revealed={false} />
-              </MapProvider>
-            </ExploreProvider>
-          </ProjectProvider>
+          <ModelProvider>
+            <ProjectProvider>
+              <PredictionsProvider>
+                <InstanceProvider>
+                  <ExploreProvider>
+                    <MapProvider>
+                      <SizeAwareElement
+                        element='header'
+                        className='header'
+                        onChange={resizeListener}
+                      >
+                        <PageHeader>
+                          <SessionOutputControl
+                            openHelp={() => setTourStep(0)}
+                            isMediumDown={isMediumDown}
+                          />
+                        </PageHeader>
+                      </SizeAwareElement>
+                      <PageBody role='main'>
+                        <ExploreComponent />
+                      </PageBody>
+                      <SessionTimeoutModal revealed={false} />
+                    </MapProvider>
+                  </ExploreProvider>
+                </InstanceProvider>
+              </PredictionsProvider>
+            </ProjectProvider>
+          </ModelProvider>
         </AoiProvider>
       </CheckpointProvider>
     </App>

@@ -8,11 +8,7 @@ import SelectModal from '../../common/select-modal';
 import { Card } from '../../common/card-list';
 
 import { useMapLayers, useMapRef } from '../../../context/map';
-import {
-  ExploreContext,
-  useMapState,
-  usePredictions,
-} from '../../../context/explore';
+import { ExploreContext, useMapState } from '../../../context/explore';
 import GlobalContext from '../../../context/global';
 
 import TabbedBlock from '../../common/tabbed-block-body';
@@ -32,6 +28,7 @@ import {
 } from '../../../context/checkpoint';
 import { useInstance } from '../../../context/instance';
 import { useAoi } from '../../../context/aoi';
+import { usePredictions } from '../../../context/predictions';
 
 const StyledPanelBlock = styled(PanelBlock)`
   width: ${glsp(24)};
@@ -88,10 +85,10 @@ function PrimePanel() {
     ].includes(mapState.mode) &&
     typeof aoiRef !== 'undefined' &&
     aoiArea > 0 &&
-    typeof selectedModel !== 'undefined';
+    typeof selectedModel !== 'undefined' &&
+    selectedModel !== null;
 
   // Retrain Panel Tab Empty State message
-  //
   const retrainPlaceHolderMessage = () => {
     if (predictions.isReady()) {
       // If predictions are ready, do not need a placeholder
@@ -262,7 +259,7 @@ function PrimePanel() {
                 />
               </TabbedBlock>
             </PanelBlockBody>
-            {(!currentCheckpoint || activeTab === currentCheckpoint.mode) && (
+            {activeTab !== 'LAYERS' && (
               <PanelFooter
                 {...{
                   dispatchCurrentCheckpoint,
