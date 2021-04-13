@@ -789,6 +789,24 @@ export const useInstance = () => {
         });
       },
       refine: async function () {
+        const classes = Object.values(currentCheckpoint.classes);
+        let sampleCount = 0;
+        for (let i = 0; i < classes.length; i++) {
+          const aClass = classes[i];
+          sampleCount += get(aClass, 'polygons.length', 0);
+        }
+        const checkpoints = Object.values(currentCheckpoint.checkpointBrushes);
+
+        for (let i = 0; i < checkpoints.length; i++) {
+          const ckpt = checkpoints[i];
+          sampleCount += get(ckpt, 'polygons.length', 0);
+        }
+
+        if (sampleCount === 0) {
+          toasts.error(`At least one sample must be provided for refinement`);
+          return;
+        }
+
         showGlobalLoadingMessage('Requesting AOI patch...');
         Object.values(currentCheckpoint.checkpointBrushes).forEach((ckpt) => {
           ckpt.polygons.forEach((polygon) => {

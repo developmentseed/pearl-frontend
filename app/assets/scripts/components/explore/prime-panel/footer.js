@@ -196,5 +196,6 @@ Footer.propTypes = {
   applyTooltip: T.string,
   runInference: T.func,
   retrain: T.func,
+  refine: T.func,
 };
 export default Footer;
