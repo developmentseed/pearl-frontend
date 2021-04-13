@@ -81,8 +81,6 @@ function areaFromBounds(bbox) {
 
 function Map() {
   const {
-    aoiRef,
-    setAoiRef,
     aoiArea,
     setAoiArea,
     aoiInitializer,
@@ -92,7 +90,7 @@ function Map() {
   } = useContext(ExploreContext);
 
   const { apiLimits } = useApiMeta();
-  const { currentAoi } = useAoi();
+  const { aoiRef, setAoiRef, currentAoi } = useAoi();
 
   const { restApiClient } = useRestApiClient();
 

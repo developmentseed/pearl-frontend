@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useMemo, useReducer } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useMemo,
+  useReducer,
+  useState,
+} from 'react';
 import T from 'prop-types';
 import logger from '../utils/logger';
 
@@ -10,10 +16,16 @@ export const actions = {
 
 export function AoiProvider(props) {
   const [currentAoi, dispatchCurrentAoi] = useReducer(aoiReducer);
+  const [aoiRef, setAoiRef] = useState(null);
+  const [aoiName, setAoiName] = useState(null);
 
   const value = {
     currentAoi,
     dispatchCurrentAoi,
+    aoiRef,
+    setAoiRef,
+    aoiName,
+    setAoiName,
   };
 
   return (
@@ -51,15 +63,26 @@ const useCheckContext = (fnName) => {
 };
 
 export const useAoi = () => {
-  const { currentAoi, dispatchCurrentAoi } = useCheckContext('useAoi');
+  const {
+    aoiRef,
+    setAoiRef,
+    aoiName,
+    setAoiName,
+    currentAoi,
+    dispatchCurrentAoi,
+  } = useCheckContext('useAoi');
 
   return useMemo(
     () => ({
+      aoiRef,
+      setAoiRef,
+      aoiName,
+      setAoiName,
       currentAoi,
       dispatchCurrentAoi,
       setCurrentAoi: (data) =>
         dispatchCurrentAoi({ type: actions.SET_AOI, data }),
     }),
-    [currentAoi, dispatchCurrentAoi]
+    [aoiRef, aoiName, currentAoi, dispatchCurrentAoi]
   );
 };

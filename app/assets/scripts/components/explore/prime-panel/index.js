@@ -31,6 +31,7 @@ import {
   checkpointModes,
 } from '../../../context/checkpoint';
 import { useInstance } from '../../../context/instance';
+import { useAoi } from '../../../context/aoi';
 
 const StyledPanelBlock = styled(PanelBlock)`
   width: ${glsp(24)};
@@ -46,17 +47,16 @@ function PrimePanel() {
     checkpointList,
     selectedModel,
     setSelectedModel,
-    aoiRef,
-    setAoiRef,
     aoiArea,
     createNewAoi,
-    aoiName,
     loadAoi,
     aoiList,
     aoiBounds,
     setAoiBounds,
     updateCheckpointName,
   } = useContext(ExploreContext);
+
+  const { aoiRef, setAoiRef, aoiName } = useAoi();
 
   const { instance, runInference, retrain, applyCheckpoint } = useInstance();
 

@@ -14,8 +14,10 @@ import {
   checkpointModes,
   useCheckpoint,
 } from './checkpoint';
-import { useExploreContext, usePredictions, useProject } from './explore';
+import { useExploreContext, usePredictions } from './explore';
 import { actions as predictionsActions } from './reducers/predictions';
+import { useProject } from './project';
+import { useAoi } from './aoi';
 
 const messageQueueActionTypes = {
   ADD: 'ADD',
@@ -58,8 +60,9 @@ export const useInstance = () => {
     dispatchCurrentCheckpoint,
     fetchCheckpoint,
   } = useCheckpoint();
-  const { aoiName, aoiRef, currentProject, setCurrentProject } = useProject();
+  const { currentProject, setCurrentProject } = useProject();
   const { dispatchPredictions } = usePredictions();
+  const { aoiName, aoiRef } = useAoi();
   const { selectedModel } = useExploreContext('useWebsocket');
 
   const [websocketClient, setWebsocketClient] = useState(null);

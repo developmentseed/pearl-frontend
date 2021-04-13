@@ -25,6 +25,7 @@ import reverseGeoCode from '../utils/reverse-geocode';
 import { actions as checkpointActions, useCheckpoint } from './checkpoint';
 import { wrapLogReducer } from './reducers/utils';
 import { useAoi } from './aoi';
+import { useProject } from './project';
 
 /**
  * Context & Provider
@@ -36,16 +37,14 @@ export function ExploreProvider(props) {
   let { projectId } = useParams();
   const { restApiClient, isLoading: authIsLoading } = useRestApiClient();
 
-  const [currentProject, setCurrentProject] = useState(null);
+  const { currentProject, setCurrentProject } = useProject();
   const [checkpointList, setCheckpointList] = useState(null);
 
-  const { setCurrentAoi } = useAoi();
+  const { aoiName, aoiRef, setAoiName, setAoiRef, setCurrentAoi } = useAoi();
 
   // The following AOI properties should be refactored in the futre and moved to useAoi()
   // to avoid re-rendering issues in this context.
-  const [aoiRef, setAoiRef] = useState(null);
   const [aoiArea, setAoiArea] = useState(null);
-  const [aoiName, setAoiName] = useState(null);
   const [aoiInitializer, setAoiInitializer] = useState(null);
   const [aoiList, setAoiList] = useState([]);
   const [aoiBounds, setAoiBounds] = useState(null);
@@ -469,25 +468,6 @@ export const useExploreContext = (fnName) => {
   }
 
   return context;
-};
-
-export const useProject = () => {
-  const {
-    aoiName,
-    aoiRef,
-    currentProject,
-    setCurrentProject,
-  } = useExploreContext('useProject');
-
-  return useMemo(
-    () => ({
-      currentProject,
-      setCurrentProject,
-      aoiName,
-      aoiRef,
-    }),
-    [currentProject, aoiName, aoiRef]
-  );
 };
 
 export const useMapState = () => {

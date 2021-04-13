@@ -14,6 +14,7 @@ import { CheckpointProvider } from '../../context/checkpoint';
 import { AoiProvider } from '../../context/aoi';
 import { useParams } from 'react-router';
 import { showGlobalLoadingMessage } from '@devseed-ui/global-loading';
+import { ProjectProvider } from '../../context/project';
 
 function Explore() {
   let { projectId } = useParams();
@@ -34,26 +35,28 @@ function Explore() {
     <App pageTitle='Explore'>
       <CheckpointProvider>
         <AoiProvider>
-          <ExploreProvider>
-            <MapProvider>
-              <SizeAwareElement
-                element='header'
-                className='header'
-                onChange={resizeListener}
-              >
-                <PageHeader>
-                  <SessionOutputControl
-                    openHelp={() => setTourStep(0)}
-                    isMediumDown={isMediumDown}
-                  />
-                </PageHeader>
-              </SizeAwareElement>
-              <PageBody role='main'>
-                <ExploreComponent />
-              </PageBody>
-              <SessionTimeoutModal revealed={false} />
-            </MapProvider>
-          </ExploreProvider>
+          <ProjectProvider>
+            <ExploreProvider>
+              <MapProvider>
+                <SizeAwareElement
+                  element='header'
+                  className='header'
+                  onChange={resizeListener}
+                >
+                  <PageHeader>
+                    <SessionOutputControl
+                      openHelp={() => setTourStep(0)}
+                      isMediumDown={isMediumDown}
+                    />
+                  </PageHeader>
+                </SizeAwareElement>
+                <PageBody role='main'>
+                  <ExploreComponent />
+                </PageBody>
+                <SessionTimeoutModal revealed={false} />
+              </MapProvider>
+            </ExploreProvider>
+          </ProjectProvider>
         </AoiProvider>
       </CheckpointProvider>
     </App>
