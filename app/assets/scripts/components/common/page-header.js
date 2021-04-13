@@ -12,7 +12,6 @@ import {
   glsp,
 } from '@devseed-ui/theme-provider';
 import { StyledNavLink, StyledLink } from '../../styles/links';
-// import AppLogo from '../../../icons/app-logo.svg';
 
 const { appTitle, appLongTitle, baseUrl } = config;
 
@@ -183,9 +182,6 @@ function PageHeader(props) {
               </PageSpecificControls>
             )}
           </PrimarySection>
-          {/* <SecondarySection>
-            <UserDropdown />
-          </SecondarySection> */}
         </PageNav>
       </PageHeadInner>
     </PageHead>
