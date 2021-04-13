@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import App from '../common/app';
 
@@ -13,10 +13,8 @@ import {
 import { Button } from '@devseed-ui/button';
 import { Heading } from '@devseed-ui/typography';
 import { themeVal, media, glsp } from '@devseed-ui/theme-provider';
-import { StyledLink } from '../../styles/links';
 import config from '../../config';
-import { fetchJSON } from '../../context/reducers/reduxeed';
-const { environment, baseUrl, restApiEndpoint } = config;
+const { baseUrl } = config;
 
 const HomeBody = styled(InpageBody)`
   display: flex;
@@ -72,7 +70,7 @@ const HomeHeading = styled(Heading)`
 
 const HomeCTA = styled.article`
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
   flex-flow: column nowrap;
   ${media.smallUp`
     flex-flow: row nowrap;
@@ -82,7 +80,6 @@ const HomeCTA = styled.article`
     margin-bottom: ${glsp(2)};
     ${media.smallUp`
       min-width: 14rem;
-      margin-left: ${glsp(2)};
     `}
   }
 `;
@@ -107,41 +104,16 @@ const HomeTout = styled(InpageBodyInner)`
   }
 `;
 
-const StatusSection = styled.section`
-  position: absolute;
-  bottom: 0;
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.875rem;
-  margin: ${glsp(1.5)} ${glsp()};
-  > * {
-    margin-right: ${glsp()};
-  }
-`;
-
 function Home() {
-  const [apiHealth, setApiHealth] = useState('Loading...');
-
-  // Fetch API health message on mount
-  useEffect(() => {
-    fetchJSON(`${restApiEndpoint}/health`)
-      .then(({ body }) => {
-        setApiHealth(body.message || 'Ok.');
-      })
-      .catch(() => {
-        setApiHealth('Unavailable.');
-      });
-  }, []);
-
   return (
-    <App pageTitle='Home'>
+    <App pageTitle='LandingHome'>
       <PageHeader />
       <HomeBody role='main'>
         <HomeIntro>
           <InpageHeader>
             <InpageHeadline>
               <HomeTagline>Microsoft Planetary Computer</HomeTagline>
-              <HomeHeading size='large'>PEARL: Land Cover Mapping</HomeHeading>
+              <HomeHeading size='large'>PEARL Land Cover Mapping</HomeHeading>
             </InpageHeadline>
           </InpageHeader>
           <Lead>
@@ -152,25 +124,9 @@ function Home() {
             resolution imagery (e.g. NAIP) hosted on Microsoft Azure.
           </Lead>
           <HomeCTA>
-            <Button
-              size='xlarge'
-              variation='achromic-glass'
-              to='/about'
-              as={StyledLink}
-              title='Visit About page'
-            >
-              Read More
-            </Button>
-            <Button
-              useIcon={['chevron-right', 'after']}
-              size='xlarge'
-              variation='primary-raised-dark'
-              to='/project/new'
-              as={StyledLink}
-              title='Start a new project'
-            >
-              Launch App
-            </Button>
+            <Heading size='small' variation='baseLight'>
+              COMING SOON
+            </Heading>
           </HomeCTA>
         </HomeIntro>
         <HomeTout>
@@ -188,12 +144,6 @@ function Home() {
             </li>
           </ul>
         </HomeTout>
-        {environment !== 'production' && (
-          <StatusSection>
-            <strong>Status </strong>
-            <p>API: {apiHealth}</p>
-          </StatusSection>
-        )}
       </HomeBody>
     </App>
   );
