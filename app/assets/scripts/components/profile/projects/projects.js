@@ -22,7 +22,7 @@ import {
   showGlobalLoadingMessage,
   hideGlobalLoading,
 } from '@devseed-ui/global-loading';
-import Table, {TableRow, TableCell} from '../../common/table';
+import Table, { TableRow, TableCell } from '../../common/table';
 import Paginator from '../../common/paginator';
 
 // Controls the size of each page
@@ -34,7 +34,7 @@ const HEADERS = [
   'Model',
   'Latest Checkpoint',
   'AOIs',
-  'AOI Names'
+  'AOI Names',
 ];
 
 const ProjectsBody = styled(InpageBodyInner)`
@@ -102,30 +102,22 @@ function renderRow(proj) {
   return (
     <TableRow key={proj.id}>
       <TableCell>
-        <StyledNavLink to={`/profile/projects/${proj.id}`}>      
+        <StyledNavLink to={`/profile/projects/${proj.id}`}>
           {proj.name}
         </StyledNavLink>
       </TableCell>
+      <TableCell>{formatDateTime(proj.created)}</TableCell>
+      <TableCell>{proj.model ? proj.model.name : 'No model set'}</TableCell>
       <TableCell>
-        {formatDateTime(proj.created)}
-      </TableCell>
-      <TableCell>
-        {proj.model ? proj.model.name : 'No model set'}
-      </TableCell>
-      <TableCell>
-        { proj.checkpoints.length
+        {proj.checkpoints.length
           ? proj.checkpoints[proj.checkpoints.length - 1].name
-          : 'No checkpoint set' }
+          : 'No checkpoint set'}
       </TableCell>
+      <TableCell>{proj.aois.length}</TableCell>
       <TableCell>
-        { proj.aois.length }
-      </TableCell>
-      <TableCell>
-        { 
-          proj.aois.length
-            ? proj.aois.map((a) => a.name).join(', ')
-            : 'No AOIs set'
-        }
+        {proj.aois.length
+          ? proj.aois.map((a) => a.name).join(', ')
+          : 'No AOIs set'}
       </TableCell>
     </TableRow>
   );
@@ -224,10 +216,9 @@ function Projects() {
                 </>
               ) : (
                 <Heading>
-                  { isLoading ? 'Loading Projects...' : 'No projects found.'}
+                  {isLoading ? 'Loading Projects...' : 'No projects found.'}
                 </Heading>
-            ))}
-            
+              ))}
           </ProjectsBody>
         </InpageBody>
       </Inpage>

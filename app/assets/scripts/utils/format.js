@@ -1,4 +1,4 @@
-import { format, parseISO } from 'date-fns'
+import { format, parseISO } from 'date-fns';
 
 /**
  * Rounds a number to a specified amount of decimals.
