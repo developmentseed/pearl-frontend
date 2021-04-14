@@ -1,4 +1,4 @@
-import React, { useMemo, useContext, useEffect } from 'react';
+import React, { useMemo, useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import tArea from '@turf/area';
 import tBboxPolygon from '@turf/bbox-polygon';
@@ -98,6 +98,7 @@ function Map() {
 
   const { mapState, mapModes, setMapMode } = useMapState();
   const { mapRef, setMapRef } = useMapRef();
+  const [tileUrl, setTileUrl] = useState(null);
 
   const { mapLayers, setMapLayers } = useMapLayers();
   const { userLayers } = useUserLayers();
@@ -258,6 +259,21 @@ function Map() {
     }
   }, [aoiArea, apiLimits, aoiRef]);
 
+  useEffect(async () => {
+    if (currentProject && currentAoi) {
+      const tileJSON = await restApiClient.getTileJSON(
+        currentProject.id,
+        currentAoi.id
+      );
+      setTileUrl(`${config.restApiEndpoint}${tileJSON.tiles[0]}`);
+      const bounds = [
+        [tileJSON.bounds[3], tileJSON.bounds[0]],
+        [tileJSON.bounds[1], tileJSON.bounds[2]],
+      ];
+      mapRef.fitBounds(bounds);
+    }
+  }, [currentAoi, currentProject, mapRef]);
+
   const displayMap = useMemo(
     () => (
       <MapContainer
@@ -366,12 +382,10 @@ function Map() {
             />
           ))}
 
-        {!predictions.data.predictions && currentProject && currentAoi && (
-          <TileLayer
-            url={`${config.restApiEndpoint}/api/project/${currentProject.id}/aoi/${currentAoi.id}/tiles/{z}/{x}/{y}`}
-            maxZoom={18}
-          />
-        )}
+        {!predictions.data.predictions &&
+          tileUrl &&
+          currentProject &&
+          currentAoi && <TileLayer url={tileUrl} maxZoom={18} />}
 
         {currentCheckpoint &&
           currentCheckpoint.classes &&
@@ -423,6 +437,7 @@ function Map() {
       restApiClient,
       setMapLayers,
       setMapRef,
+      tileUrl,
     ]
   );
 
