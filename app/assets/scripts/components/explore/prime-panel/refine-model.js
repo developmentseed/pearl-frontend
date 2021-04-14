@@ -6,6 +6,7 @@ import {
   actions as checkpointActions,
 } from '../../../context/checkpoint';
 import {
+  ToolsWrapper,
   ClassList as ItemList,
   Class as Item,
   Thumbnail,
@@ -22,11 +23,6 @@ import { glsp } from '@devseed-ui/theme-provider';
 import { useMapState, useExploreContext } from '../../../context/explore.js';
 import { useMapRef } from '../../../context/map';
 import { PlaceholderMessage } from '../../../styles/placeholder';
-
-const Wrapper = styled.div`
-  display: grid;
-  grid-gap: ${glsp()};
-`;
 
 const CheckpointSection = styled(ItemList)`
   max-height: ${glsp(7.5)};
@@ -46,7 +42,7 @@ function RefineModel(props) {
   const { checkpointList } = useExploreContext();
 
   return (
-    <Wrapper className={className}>
+    <ToolsWrapper className={className}>
       {ready ? (
         <>
           <RefineTools>
@@ -189,7 +185,7 @@ function RefineModel(props) {
           Please submit or clear retraining samples before refining results
         </PlaceholderMessage>
       )}
-    </Wrapper>
+    </ToolsWrapper>
   );
 }
 

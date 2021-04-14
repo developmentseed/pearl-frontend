@@ -5,12 +5,17 @@ import { Heading } from '@devseed-ui/typography';
 import collecticon from '@devseed-ui/collecticons';
 import { Button } from '@devseed-ui/button';
 
-export const ClassList = styled.section`
+export const ToolsWrapper = styled.div`
   display: grid;
+  grid-gap: ${glsp()};
 
   ${PlaceholderMessage} {
     padding: 2rem;
   }
+`;
+
+export const ClassList = styled.section`
+  display: grid;
 
   > ${Heading} {
     padding: 0 1.5rem;

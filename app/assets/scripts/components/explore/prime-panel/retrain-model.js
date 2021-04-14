@@ -10,6 +10,7 @@ import { PlaceholderMessage } from '../../../styles/placeholder.js';
 import { actions, useCheckpoint } from '../../../context/checkpoint.js';
 import { useMapState } from '../../../context/explore.js';
 import {
+  ToolsWrapper,
   ClassList,
   Class,
   Thumbnail as ClassThumbnail,
@@ -19,11 +20,6 @@ import {
   ClassOptions,
   ToolBox as RetrainTools,
 } from './retrain-refine-styles';
-
-const Wrapper = styled.div`
-  display: grid;
-  grid-gap: ${glsp()};
-`;
 
 /*
  * Retrain Model
@@ -38,7 +34,7 @@ function RetrainModel(props) {
   const { setMapMode, mapModes, mapState } = useMapState();
 
   return (
-    <Wrapper className={className}>
+    <ToolsWrapper className={className}>
       {ready && currentCheckpoint.classes && (
         <>
           <RetrainTools>
@@ -194,7 +190,7 @@ function RetrainModel(props) {
           Please submit or clear retraining samples before refining results
         </PlaceholderMessage>
       )}
-    </Wrapper>
+    </ToolsWrapper>
   );
 }
 
