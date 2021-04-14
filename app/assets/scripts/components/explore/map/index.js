@@ -274,7 +274,7 @@ function Map() {
         ];
         mapRef.fitBounds(bounds);
       } catch (error) {
-          toasts.error('Could not load AOI map');
+        toasts.error('Could not load AOI map');
       }
     }
   }, [currentAoi, currentProject, mapRef]);
