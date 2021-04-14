@@ -106,7 +106,7 @@ const HomeTout = styled(InpageBodyInner)`
 
 function Home() {
   return (
-    <App pageTitle='LandingHome'>
+    <App pageTitle='Home'>
       <PageHeader />
       <HomeBody role='main'>
         <HomeIntro>
