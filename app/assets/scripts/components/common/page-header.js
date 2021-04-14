@@ -124,8 +124,10 @@ const PageTitlePrimeLink = styled.a`
     font-size: 1.25rem;
     align-self: center;
     ${media.mediumUp`
-      grid-row: 1;
-      align-self: flex-end;
+      &:not(:only-child) {
+        grid-row: 1;
+        align-self: flex-end;
+      }
     `}
     span {
       ${visuallyHidden()};
@@ -159,7 +161,9 @@ function PageHeader(props) {
                     <span>Microsoft</span>
                     {appTitle}
                   </strong>
-                  <sub>{appLongTitle}</sub>
+                  {location.pathname.split('/')[1] !== 'project' && (
+                    <sub>{appLongTitle}</sub>
+                  )}
                 </PageTitlePrimeLink>
               </li>
             </GlobalMenu>
