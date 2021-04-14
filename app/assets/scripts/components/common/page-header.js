@@ -6,19 +6,17 @@ import config from '../../config';
 import { Button } from '@devseed-ui/button';
 import {
   themeVal,
-  rgba,
   visuallyHidden,
   multiply,
   media,
+  glsp,
 } from '@devseed-ui/theme-provider';
-import collecticon from '@devseed-ui/collecticons';
-import UserDropdown from '../common/user-dropdown';
 import { StyledNavLink, StyledLink } from '../../styles/links';
 
-const { appTitle } = config;
+const { appTitle, appLongTitle, baseUrl } = config;
 
 const PageHead = styled.header`
-  background-color: ${themeVal('color.baseAlphaA')};
+  background-color: ${themeVal('color.surface')};
   color: ${themeVal('color.base')};
   position: sticky;
   z-index: 20;
@@ -55,32 +53,16 @@ const GlobalMenu = styled.ul`
   align-items: center;
   margin: 0;
   list-style: none;
-  border: 1px solid ${themeVal('color.base')};
-  border-radius: 2rem;
 `;
 
 const PrimarySection = styled.div`
   display: grid;
   align-items: center;
   justify-content: space-between;
-  grid-template-columns: min-content 1fr;
+  grid-template-columns: max-content 1fr;
   grid-gap: 1.5rem;
   * {
     grid-row: 1;
-  }
-`;
-
-const SecondarySection = styled.div`
-  border-left: 0.5px solid ${themeVal('color.baseAlphaC')};
-  padding-left: 1.5rem;
-  display: grid;
-  align-items: center;
-  justify-content: space-between;
-  grid-template-columns: min-content min-content;
-
-  .user-options-trigger::before {
-    ${collecticon('house')}
-    font-size: ${multiply(themeVal('type.base.size'), 1.125)};
   }
 `;
 
@@ -94,40 +76,59 @@ const PageSpecificControls = styled.div`
   }
 `;
 
-const GlobalMenuLink = styled.a`
-  position: relative;
-  display: block;
-  width: ${multiply(themeVal('layout.space'), 2)};
-  height: ${multiply(themeVal('layout.space'), 2)};
-  line-height: ${multiply(themeVal('layout.space'), 2)};
-  text-align: center;
-  border-radius: ${themeVal('shape.rounded')};
-  transition: all 0.24s ease 0s;
-  color: ${themeVal('color.base')};
-
-  &::before {
-    ${({ useIcon }) => collecticon(useIcon)}
-    font-size: ${multiply(themeVal('type.base.size'), 1.125)};
-  }
-
+const PageTitlePrimeLink = styled.a`
+  display: grid;
+  grid-template-columns: min-content 1fr;
+  grid-gap: 0 ${glsp(0.5)};
   &,
   &:visited {
-    color: ${themeVal('color.base')};
+    color: inherit;
   }
-
+  &::before {
+    grid-row: 1 / span 2;
+    content: '';
+    height: 2.5rem;
+    width: 2.5rem;
+    background: url('${baseUrl}/assets/graphics/content/app-logo.svg');
+    background-size: contain;
+    background-repeat: none;
+    background-position: top;
+  }
   &:hover {
     opacity: 1;
-    background: ${rgba(themeVal('color.baseLight'), 0.08)};
   }
-
-  &.active {
-    color: ${themeVal('color.base')};
-    opacity: 1;
-    background: ${rgba(themeVal('color.baseLight'), 0.16)};
+  sub {
+    grid-row: 2;
+    line-height: 1;
+    font-weight: ${themeVal('type.base.regular')};
+    text-transform: uppercase;
+    align-self: flex-start;
+    top: inherit;
+    vertical-align: inherit;
+    display: none;
+    ${media.mediumUp`
+      font-size: 0.75rem;
+      display: block;
+      opacity: 0.72;
+      letter-spacing: 2px;
+    `}
   }
-
-  span {
-    ${visuallyHidden()}
+  strong {
+    grid-row: 1 / span 2;
+    font-weight: ${themeVal('type.base.weight')};
+    letter-spacing: 4px;
+    margin: 0;
+    text-transform: uppercase;
+    line-height: 1rem;
+    font-size: 1.25rem;
+    align-self: center;
+    ${media.mediumUp`
+      grid-row: 1;
+      align-self: flex-end;
+    `}
+    span {
+      ${visuallyHidden()};
+    }
   }
 `;
 
@@ -139,14 +140,17 @@ function PageHeader(props) {
           <PrimarySection>
             <GlobalMenu>
               <li>
-                <GlobalMenuLink
+                <PageTitlePrimeLink
                   as={StyledLink}
                   to='/'
-                  useIcon='house'
                   title='Visit the home page'
                 >
-                  <span>{appTitle}</span>
-                </GlobalMenuLink>
+                  <strong>
+                    <span>Microsoft</span>
+                    {appTitle}
+                  </strong>
+                  <sub>{appLongTitle}</sub>
+                </PageTitlePrimeLink>
               </li>
             </GlobalMenu>
             {props.children ? (
@@ -154,31 +158,30 @@ function PageHeader(props) {
             ) : (
               // Default controls when no children is passed
               <PageSpecificControls>
-                <Button
-                  forwardedAs={StyledNavLink}
-                  to='/about'
-                  useIcon='circle-information'
-                  title='Visit About page'
-                >
-                  About
-                </Button>
                 {location.pathname !== '/' && (
-                  <Button
-                    forwardedAs={StyledNavLink}
-                    to='/project/new'
-                    variation='primary-raised-dark'
-                    useIcon='globe'
-                    title='Start a new project'
-                  >
-                    New project
-                  </Button>
+                  <>
+                    <Button
+                      forwardedAs={StyledNavLink}
+                      to='/about'
+                      useIcon='circle-information'
+                      title='Visit About page'
+                    >
+                      About
+                    </Button>
+                    <Button
+                      forwardedAs={StyledNavLink}
+                      to='/project/new'
+                      variation='primary-raised-dark'
+                      useIcon='globe'
+                      title='Start a new project'
+                    >
+                      New project
+                    </Button>
+                  </>
                 )}
               </PageSpecificControls>
             )}
           </PrimarySection>
-          <SecondarySection>
-            <UserDropdown />
-          </SecondarySection>
         </PageNav>
       </PageHeadInner>
     </PageHead>
