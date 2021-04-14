@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import T from 'prop-types';
 import config from '../../config';
 
+import UserDropdown from '../common/user-dropdown';
 import { Button } from '@devseed-ui/button';
 import {
   themeVal,
@@ -132,6 +133,15 @@ const PageTitlePrimeLink = styled.a`
   }
 `;
 
+const SecondarySection = styled.div`
+  border-left: 0.5px solid ${themeVal('color.baseAlphaC')};
+  padding-left: 1.5rem;
+  display: grid;
+  align-items: center;
+  justify-content: space-between;
+  grid-template-columns: min-content min-content;
+`;
+
 function PageHeader(props) {
   return (
     <PageHead role='banner'>
@@ -182,6 +192,9 @@ function PageHeader(props) {
               </PageSpecificControls>
             )}
           </PrimarySection>
+          <SecondarySection>
+            <UserDropdown />
+          </SecondarySection>
         </PageNav>
       </PageHeadInner>
     </PageHead>
