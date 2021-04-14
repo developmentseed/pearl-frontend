@@ -117,6 +117,7 @@
     "@turf/centroid": "^6.3.0",
     "@welldone-software/why-did-you-render": "^6.1.1",
     "chart.js": "^2.9.4",
+    "date-fns": "^2.20.3",
     "element-resize-event": "^3.0.3",
     "file-saver": "^2.0.5",
     "fill-range": "^7.0.1",

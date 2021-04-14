@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { Button } from '@devseed-ui/button';
-import CardList, { Card } from '../../common/card-list';
 import {
   Inpage,
   InpageHeader,
@@ -18,6 +17,7 @@ import { StyledNavLink } from '../../../styles/links';
 import toasts from '../../common/toasts';
 import { useHistory } from 'react-router';
 import { useAuth, AuthContext, useRestApiClient } from '../../../context/auth';
+import { formatDateTime } from '../../../utils/format';
 import {
   showGlobalLoadingMessage,
   hideGlobalLoading,
@@ -102,22 +102,30 @@ function renderRow(proj) {
   return (
     <TableRow key={proj.id}>
       <TableCell>
-        {proj.name}
+        <StyledNavLink to={`/profile/projects/${proj.id}`}>      
+          {proj.name}
+        </StyledNavLink>
       </TableCell>
       <TableCell>
-        {proj.created}
+        {formatDateTime(proj.created)}
       </TableCell>
       <TableCell>
         {proj.model ? proj.model.name : 'No model set'}
       </TableCell>
       <TableCell>
-        {proj.checkpoint || 'No checkpoint set'}
+        { proj.checkpoints.length
+          ? proj.checkpoints[proj.checkpoints.length - 1].name
+          : 'No checkpoint set' }
       </TableCell>
       <TableCell>
-        {proj.aoi || 'No AOI set'}
+        { proj.aois.length }
       </TableCell>
       <TableCell>
-        FIXME: AOI Names
+        { 
+          proj.aois.length
+            ? proj.aois.map((a) => a.name).join(', ')
+            : 'No AOIs set'
+        }
       </TableCell>
     </TableRow>
   );
@@ -130,7 +138,7 @@ function Projects() {
 
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(null);
-
+  const [isLoading, setIsLoading] = useState(true);
   const [projects, setProjects] = useState([]);
 
   const { restApiClient } = useRestApiClient();
@@ -140,34 +148,20 @@ function Projects() {
       showGlobalLoadingMessage('Loading projects...');
       try {
         const data = await restApiClient.getProjects(page, PROJECTS_PER_PAGE);
-        console.log('projects data', data);
         setTotal(data.total);
         setProjects(data.projects);
       } catch (err) {
         toasts.error('Failed to fetch projects.');
+        setIsLoading(false);
         hideGlobalLoading();
       }
       hideGlobalLoading();
+      setLoading(false);
     }
   }, [apiToken, page]);
 
   const numPages = Math.ceil(total / PROJECTS_PER_PAGE);
 
-
-  // const [projectsList, dispatchProjectsList] = useReducer(
-  //   createQueryApiGetReducer('project'),
-  //   initialApiRequestState
-  // );
-
-  // useEffect(() => {
-  //   if (apiToken) {
-  //     queryApiGet({ token: apiToken, endpoint: 'project' })(
-  //       dispatchProjectsList
-  //     );
-  //   }
-  // }, [apiToken]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // const { projects } = projectsList.isReady() ? projectsList.getData() : {};
   return (
     <>
       <Inpage>
@@ -205,7 +199,6 @@ function Projects() {
               <NavList>
                 <li>
                   <StyledNavLink to='/profile/projects' className='active'>
-                    {' '}
                     Projects
                   </StyledNavLink>
                 </li>
@@ -230,7 +223,9 @@ function Projects() {
                   />
                 </>
               ) : (
-                <Heading>No projects available </Heading>
+                <Heading>
+                  { isLoading ? 'Loading Projects...' : 'No projects found.'}
+                </Heading>
             ))}
             
           </ProjectsBody>
