@@ -16,7 +16,6 @@ const PanelControls = styled(PanelBlockFooter)`
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-gap: ${glsp()};
-  padding-bottom: ${glsp(2)};
 `;
 const SaveCheckpoint = styled(DropdownBody)`
   padding: ${glsp()};
