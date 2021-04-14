@@ -100,7 +100,7 @@ function RefineModel(props) {
               }
               size='small'
               radius='ellipsoid'
-              useIcon='xmark'
+              useIcon='trash-bin'
               visuallyDisabled={!currentCheckpoint.activeItem}
               info={!currentCheckpoint.activeItem && 'No active item selected'}
               onClick={() => {
