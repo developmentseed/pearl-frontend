@@ -46,10 +46,11 @@ function Footer(props) {
       <Button
         variation='primary-raised-light'
         size='medium'
-        useIcon='tick--small'
+        useIcon='arrow-loop'
         style={{
           gridColumn: '1 / 2',
         }}
+        title='Clear all samples drawn since last retrain or save'
         id='reset-button-trigger'
         onClick={() => {
           dispatchCurrentCheckpoint({
@@ -63,10 +64,11 @@ function Footer(props) {
       <Button
         variation='primary-raised-light'
         size='medium'
-        useIcon='tick--small'
+        useIcon='arrow-semi-spin-ccw'
         style={{
           gridColumn: '2 / -1',
         }}
+        title='Undo last performed action'
         onClick={() => {
           dispatchCurrentCheckpoint({
             type: checkpointActions.INPUT_UNDO,
@@ -98,6 +100,7 @@ function Footer(props) {
           onClick={() => {}}
           // visuallyDisabled={!allowInferenceRun}
           // info={applyTooltip}
+          info='Apply previous checkpoints and save drawn polygons to tiff'
           id='save-refine'
         >
           Save Refinements
