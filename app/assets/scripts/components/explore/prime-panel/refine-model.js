@@ -27,9 +27,8 @@ const Wrapper = styled.div`
   display: grid;
   grid-gap: ${glsp()};
 `;
-const Section = styled.section``;
 
-const CheckpointSection = styled(Section)`
+const CheckpointSection = styled(ItemList)`
   max-height: ${glsp(7.5)};
   overflow-y: scroll;
 `;
@@ -113,81 +112,77 @@ function RefineModel(props) {
             </InfoButton>
           </RefineTools>
           <CheckpointSection>
-            <ItemList>
-              <Heading useAlt>Checkpoint List</Heading>
+            <Heading useAlt>Checkpoint List</Heading>
 
-              {checkpointList.map((c) => {
-                const id = `checkpoint-${c.name}-${c.id}`;
-                return (
-                  <Item
-                    key={c.id}
-                    onClick={() => {
-                      if (!currentCheckpoint.checkpointBrushes[id]) {
-                        dispatchCurrentCheckpoint({
-                          type: checkpointActions.ADD_CHECKPOINT_BRUSH,
-                          data: {
-                            id,
-                            checkpoint: c,
-                          },
-                        });
-
-                        mapRef.polygonDraw.addLayer({
-                          name: id,
-                          color: '#efefef',
-                        });
-                      }
-
+            {checkpointList.map((c) => {
+              const id = `checkpoint-${c.name}-${c.id}`;
+              return (
+                <Item
+                  key={c.id}
+                  onClick={() => {
+                    if (!currentCheckpoint.checkpointBrushes[id]) {
                       dispatchCurrentCheckpoint({
-                        type: checkpointActions.SET_ACTIVE_CLASS,
-                        data: id,
+                        type: checkpointActions.ADD_CHECKPOINT_BRUSH,
+                        data: {
+                          id,
+                          checkpoint: c,
+                        },
                       });
-                    }}
-                    selected={currentCheckpoint.activeItem === id}
-                  >
-                    <Thumbnail />
-                    <Heading size='xsmall'>{c.name}</Heading>
-                  </Item>
-                );
-              })}
-            </ItemList>
+
+                      mapRef.polygonDraw.addLayer({
+                        name: id,
+                        color: '#efefef',
+                      });
+                    }
+
+                    dispatchCurrentCheckpoint({
+                      type: checkpointActions.SET_ACTIVE_CLASS,
+                      data: id,
+                    });
+                  }}
+                  selected={currentCheckpoint.activeItem === id}
+                >
+                  <Thumbnail />
+                  <ClassHeading size='xsmall'>{c.name}</ClassHeading>
+                </Item>
+              );
+            })}
           </CheckpointSection>
-          <Section>
+          <ItemList>
             <Heading useAlt>Class List</Heading>
-            <ItemList>
-              {Object.values(currentCheckpoint.classes).map((c) => {
-                let polygons = get(c, 'polygons.length');
-                return (
-                  <Item
-                    key={c.name}
-                    onClick={() => {
-                      dispatchCurrentCheckpoint({
-                        type: checkpointActions.SET_ACTIVE_CLASS,
-                        data: c.name,
-                      });
-                    }}
-                    selected={currentCheckpoint.activeItem === c.name}
-                  >
-                    <Thumbnail color={c.color} />
-                    <ClassInfoWrapper>
-                      <ClassHeading size='xsmall'>{c.name}</ClassHeading>
-                      <ClassSamples>
-                        {polygons > 0 && (
-                          <strong>
-                            {polygons} {polygons > 1 ? 'polygons' : 'polygon'}
-                          </strong>
-                        )}{' '}
-                        {polygons > 0 && `selected`}
-                      </ClassSamples>
-                    </ClassInfoWrapper>
+            {Object.values(currentCheckpoint.classes).map((c) => {
+              let polygons = get(c, 'polygons.length');
+              return (
+                <Item
+                  key={c.name}
+                  onClick={() => {
+                    dispatchCurrentCheckpoint({
+                      type: checkpointActions.SET_ACTIVE_CLASS,
+                      data: c.name,
+                    });
+                  }}
+                  selected={currentCheckpoint.activeItem === c.name}
+                >
+                  <Thumbnail color={c.color} />
+                  <ClassInfoWrapper>
+                    <ClassHeading size='xsmall'>{c.name}</ClassHeading>
+                    <ClassSamples>
+                      {polygons > 0 && (
+                        <strong>
+                          {polygons} {polygons > 1 ? 'polygons' : 'polygon'}
+                        </strong>
+                      )}{' '}
+                      {polygons > 0 && `selected`}
+                    </ClassSamples>
+                  </ClassInfoWrapper>
 
-                    <Button useIcon='cog' hideText variation='base-plain'>
-                      Options
-                    </Button>
-                  </Item>
-                );
-              })}
-            </ItemList>
-          </Section>
+                  <Button useIcon='cog' hideText variation='base-plain'>
+                    Options
+                  </Button>
+                </Item>
+              );
+            })}
+          </ItemList>
         </>
       ) : (
         <PlaceholderMessage>

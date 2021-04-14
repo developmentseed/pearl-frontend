@@ -5,7 +5,7 @@ import { Heading } from '@devseed-ui/typography';
 import collecticon from '@devseed-ui/collecticons';
 import { Button } from '@devseed-ui/button';
 
-export const ClassList = styled.div`
+export const ClassList = styled.section`
   display: grid;
 
   ${PlaceholderMessage} {
