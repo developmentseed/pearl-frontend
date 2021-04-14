@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import PageHeader from '../common/page-header';
+import toasts from '../common/toasts';
 import { PageBody } from '../../styles/page';
 import { MapContainer, TileLayer } from 'react-leaflet';
 import { useParams } from 'react-router-dom';
@@ -17,13 +18,17 @@ function AoiMap() {
 
   useEffect(async () => {
     if (!mapRef) return;
-    const tileJSON = await restApiClient.getTileJSON(projectId, aoiId);
-    setTileUrl(`${restApiEndpoint}${tileJSON.tiles[0]}`);
-    const bounds = [
-      [tileJSON.bounds[3], tileJSON.bounds[0]],
-      [tileJSON.bounds[1], tileJSON.bounds[2]],
-    ];
-    mapRef.fitBounds(bounds);
+    try {
+      const tileJSON = await restApiClient.getTileJSON(projectId, aoiId);
+      setTileUrl(`${restApiEndpoint}${tileJSON.tiles[0]}`);
+      const bounds = [
+        [tileJSON.bounds[3], tileJSON.bounds[0]],
+        [tileJSON.bounds[1], tileJSON.bounds[2]],
+      ];
+      mapRef.fitBounds(bounds);
+    } catch (error) {
+      toasts.error('Could not load AOI map');
+    }
   }, [projectId, aoiId, mapRef, tileUrl]);
 
   let leafletLayer;

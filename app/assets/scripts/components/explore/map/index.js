@@ -35,6 +35,7 @@ import VectorLayer from '../../common/map/vector-layer';
 import { useRestApiClient } from '../../../context/auth';
 import { useApiMeta } from '../../../context/api-meta';
 import { useAoi } from '../../../context/aoi';
+import toasts from '../../common/toasts';
 
 const center = [38.83428180092151, -79.37724530696869];
 const zoom = 15;
@@ -261,16 +262,20 @@ function Map() {
 
   useEffect(async () => {
     if (currentProject && currentAoi) {
-      const tileJSON = await restApiClient.getTileJSON(
-        currentProject.id,
-        currentAoi.id
-      );
-      setTileUrl(`${config.restApiEndpoint}${tileJSON.tiles[0]}`);
-      const bounds = [
-        [tileJSON.bounds[3], tileJSON.bounds[0]],
-        [tileJSON.bounds[1], tileJSON.bounds[2]],
-      ];
-      mapRef.fitBounds(bounds);
+      try {
+        const tileJSON = await restApiClient.getTileJSON(
+          currentProject.id,
+          currentAoi.id
+        );
+        setTileUrl(`${config.restApiEndpoint}${tileJSON.tiles[0]}`);
+        const bounds = [
+          [tileJSON.bounds[3], tileJSON.bounds[0]],
+          [tileJSON.bounds[1], tileJSON.bounds[2]],
+        ];
+        mapRef.fitBounds(bounds);
+      } catch (error) {
+          toasts.error('Could not load AOI map');
+      }
     }
   }, [currentAoi, currentProject, mapRef]);
 
