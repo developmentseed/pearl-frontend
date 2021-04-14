@@ -10,6 +10,9 @@ import {
   Class as Item,
   Thumbnail,
   ToolBox as RefineTools,
+  ClassHeading,
+  ClassSamples,
+  ClassInfoWrapper,
 } from './retrain-refine-styles';
 import { Heading } from '@devseed-ui/typography';
 import { Button } from '@devseed-ui/button';
@@ -142,10 +145,7 @@ function RefineModel(props) {
                     selected={currentCheckpoint.activeItem === id}
                   >
                     <Thumbnail />
-                    <Heading size='xsmall'>
-                      {c.name}
-                      {currentCheckpoint.activeItem === id ? ' (Active)' : ''}
-                    </Heading>
+                    <Heading size='xsmall'>{c.name}</Heading>
                   </Item>
                 );
               })}
@@ -154,31 +154,38 @@ function RefineModel(props) {
           <Section>
             <Heading useAlt>Class List</Heading>
             <ItemList>
-              {Object.values(currentCheckpoint.classes).map((c) => (
-                <Item
-                  key={c.name}
-                  onClick={() => {
-                    dispatchCurrentCheckpoint({
-                      type: checkpointActions.SET_ACTIVE_CLASS,
-                      data: c.name,
-                    });
-                  }}
-                  selected={currentCheckpoint.activeItem === c.name}
-                >
-                  <Thumbnail color={c.color} />
-                  <Heading size='xsmall'>
-                    {c.name} (
-                    {get(c, 'points.coordinates.length', 0) +
-                      get(c, 'polygons.length', 0)}{' '}
-                    samples)
-                    {currentCheckpoint.activeItem === c.name ? ' (Active)' : ''}
-                  </Heading>
+              {Object.values(currentCheckpoint.classes).map((c) => {
+                let polygons = get(c, 'polygons.length');
+                return (
+                  <Item
+                    key={c.name}
+                    onClick={() => {
+                      dispatchCurrentCheckpoint({
+                        type: checkpointActions.SET_ACTIVE_CLASS,
+                        data: c.name,
+                      });
+                    }}
+                    selected={currentCheckpoint.activeItem === c.name}
+                  >
+                    <Thumbnail color={c.color} />
+                    <ClassInfoWrapper>
+                      <ClassHeading size='xsmall'>{c.name}</ClassHeading>
+                      <ClassSamples>
+                        {polygons > 0 && (
+                          <strong>
+                            {polygons} {polygons > 1 ? 'polygons' : 'polygon'}
+                          </strong>
+                        )}{' '}
+                        {polygons > 0 && `selected`}
+                      </ClassSamples>
+                    </ClassInfoWrapper>
 
-                  <Button useIcon='cog' hideText variation='base-plain'>
-                    Options
-                  </Button>
-                </Item>
-              ))}
+                    <Button useIcon='cog' hideText variation='base-plain'>
+                      Options
+                    </Button>
+                  </Item>
+                );
+              })}
             </ItemList>
           </Section>
         </>
