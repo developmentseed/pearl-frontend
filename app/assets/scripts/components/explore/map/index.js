@@ -47,6 +47,7 @@ const LIVE = 1;
 const Container = styled.div`
   height: 100%;
   z-index: 1;
+  user-select: none;
 
   .leaflet-draw-toolbar,
   .leaflet-draw-actions {
