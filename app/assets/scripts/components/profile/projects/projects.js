@@ -100,8 +100,6 @@ function Projects() {
     }
   }, [apiToken, page]);
 
-  const numPages = Math.ceil(total / PROJECTS_PER_PAGE);
-
   return (
     <>
       <Inpage>
@@ -144,9 +142,10 @@ function Projects() {
                     renderRow={renderRow}
                   />
                   <Paginator
-                    numPages={numPages}
                     currentPage={page}
                     gotoPage={setPage}
+                    totalItems={total}
+                    itemsPerPage={PROJECTS_PER_PAGE}
                   />
                 </>
               ) : (

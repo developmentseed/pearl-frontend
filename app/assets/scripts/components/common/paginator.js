@@ -33,14 +33,37 @@ const PageButton = styled(Button)`
   }
 `;
 
+// Print range of page items
+// From https://stackoverflow.com/questions/47698412/pagination-in-javascript-showing-amount-of-elements-per-page
+function renderPageRange(totalItems, itemsPerPage) {
+  function getPageStart(pageSize, pageNr) {
+    return pageSize * pageNr;
+  }
+
+  function getPageLabel(total, pageSize, pageNr) {
+    const start = Math.max(getPageStart(pageSize, pageNr), 0);
+    const end = Math.min(getPageStart(pageSize, pageNr + 1), total);
+
+    return `${start + 1} - ${end}`;
+  }
+
+  const size = itemsPerPage;
+  const pages = Array.from({ length: Math.ceil(totalItems / size) }, (_, i) =>
+    getPageLabel(totalItems, size, i)
+  );
+  return pages;
+}
+
 /**
  *
- * @param {Number} numPages - total number of pages
+ * @param {Number} totalItems - total number of items
+ * @param {Number} itemsPerPage - total number of pages
  * @param {Number} currentPage - current page
  * @param {Function} gotoPage - function to call to navigate to a page
  *                              (passed page number as param)
  */
-function Paginator({ numPages, currentPage, gotoPage }) {
+function Paginator({ currentPage, gotoPage, totalItems, itemsPerPage }) {
+  const numPages = Math.ceil(totalItems / itemsPerPage);
   const hasPrev = currentPage > 1;
   const hasNext = currentPage < numPages;
   return (
@@ -92,16 +115,18 @@ function Paginator({ numPages, currentPage, gotoPage }) {
         </li>
       </Pager>
       <div>
-        Showing {currentPage} of {numPages}
+        Showing {renderPageRange(totalItems, itemsPerPage)[currentPage - 1]} of{' '}
+        {totalItems}
       </div>
     </PaginatorContainer>
   );
 }
 
 Paginator.propTypes = {
-  numPages: T.number,
+  itemsPerPage: T.number,
   currentPage: T.number,
   gotoPage: T.func,
+  totalItems: T.number,
 };
 
 export default Paginator;

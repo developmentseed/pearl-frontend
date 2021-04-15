@@ -191,6 +191,8 @@ function Project() {
                     numPages={numPages}
                     currentPage={page}
                     gotoPage={setPage}
+                    totalItems={total}
+                    itemsPerPage={AOIS_PER_PAGE}
                   />
                 </>
               ) : (
