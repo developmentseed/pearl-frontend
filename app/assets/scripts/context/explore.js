@@ -33,7 +33,8 @@ import {
   messageQueueActionTypes,
   WebsocketClient,
 } from './instance';
-import { useAoi } from './aoi';
+import { useAoi, useAoiPatch } from './aoi';
+import { actions as aoiPatchActions } from './reducers/aoi_patch';
 
 /**
  * Context & Provider
@@ -49,6 +50,12 @@ export function ExploreProvider(props) {
   const [checkpointList, setCheckpointList] = useState(null);
 
   const { setCurrentAoi } = useAoi();
+  const {
+    aoiPatch,
+    dispatchAoiPatch,
+    aoiPatchList,
+    setAoiPatchList,
+  } = useAoiPatch();
 
   // The following AOI properties should be refactored in the futre and moved to useAoi()
   // to avoid re-rendering issues in this context.
@@ -74,6 +81,7 @@ export function ExploreProvider(props) {
     predictionsReducer,
     initialApiRequestState
   );
+
   const [currentInstance, setCurrentInstance] = useState(null);
 
   async function loadInitialData() {
@@ -177,6 +185,28 @@ export function ExploreProvider(props) {
       }
     }
   }, [predictions, restApiClient, currentProject]);
+
+  useEffect(() => {
+    if (aoiPatch.fetching) {
+      const { processed, total } = aoiPatch;
+      if (!total) {
+        showGlobalLoadingMessage(`Waiting for patch predictions...`);
+      } else {
+        showGlobalLoadingMessage(
+          `Receiving images: ${processed} of ${total}...`
+        );
+      }
+    } else if (aoiPatch.isReady()) {
+      hideGlobalLoading();
+
+      if (aoiPatch.fetched) {
+        setAoiPatchList([...aoiPatchList, aoiPatch.getData()]);
+      } else if (aoiPatch.error) {
+        toasts.error('An error ocurred while requesting aoi patch.');
+        logger(aoiPatch.error);
+      }
+    }
+  }, [aoiPatch]);
 
   async function loadMetrics() {
     await restApiClient
@@ -456,6 +486,8 @@ export function ExploreProvider(props) {
 
         updateProjectName,
         updateCheckpointName,
+
+        dispatchAoiPatch,
       }}
     >
       {props.children}
@@ -542,7 +574,7 @@ export const useInstance = () => {
   } = useCheckpoint();
   const { aoiName, aoiRef, currentProject, setCurrentProject } = useProject();
   const { dispatchPredictions } = usePredictions();
-  const { selectedModel } = useExploreContext('useWebsocket');
+  const { selectedModel, dispatchAoiPatch } = useExploreContext('useWebsocket');
 
   const [websocketClient, setWebsocketClient] = useState(null);
 
@@ -553,7 +585,7 @@ export const useInstance = () => {
 
   // Create a message queue to wait for instance connection
   const [messageQueue, dispatchMessageQueue] = useReducer(
-    (state, { type, data }) => {
+    wrapLogReducer((state, { type, data }) => {
       switch (type) {
         case messageQueueActionTypes.ADD: {
           return state.concat(JSON.stringify(data));
@@ -566,7 +598,7 @@ export const useInstance = () => {
           logger('Unexpected messageQueue action type: ', type);
           throw new Error('Unexpected error.');
       }
-    },
+    }),
     []
   );
 
@@ -604,6 +636,7 @@ export const useInstance = () => {
         fetchCheckpoint: (checkpointId) =>
           fetchCheckpoint(projectId, checkpointId),
         dispatchPredictions,
+        dispatchAoiPatch,
       });
       newWebsocketClient.addEventListener('open', () => {
         setWebsocketClient(newWebsocketClient);
@@ -754,6 +787,77 @@ export const useInstance = () => {
               }),
             },
           },
+        });
+      },
+      refine: async function () {
+        const classes = Object.values(currentCheckpoint.classes);
+        let sampleCount = 0;
+        for (let i = 0; i < classes.length; i++) {
+          const aClass = classes[i];
+          sampleCount += get(aClass, 'polygons.length', 0);
+        }
+        const checkpoints = Object.values(currentCheckpoint.checkpointBrushes);
+
+        for (let i = 0; i < checkpoints.length; i++) {
+          const ckpt = checkpoints[i];
+          sampleCount += get(ckpt, 'polygons.length', 0);
+        }
+
+        if (sampleCount === 0) {
+          toasts.error(`At least one sample must be provided for refinement`);
+          return;
+        }
+
+        showGlobalLoadingMessage('Requesting AOI patch...');
+        Object.values(currentCheckpoint.checkpointBrushes).forEach((ckpt) => {
+          ckpt.polygons.forEach((polygon) => {
+            dispatchAoiPatch({
+              type: aoiPatchActions.INIT,
+              data: {
+                name: `${ckpt.checkpoint.name} (${ckpt.checkpoint.id})`,
+              },
+            });
+            dispatchMessageQueue({
+              type: messageQueueActionTypes.ADD,
+              data: {
+                action: 'model#patch',
+                data: {
+                  type: 'brush',
+                  checkpoint_id: ckpt.checkpoint.id,
+                  polygon,
+                },
+              },
+            });
+          });
+        });
+
+        Object.values(currentCheckpoint.classes).forEach((cl, index) => {
+          cl.polygons.forEach((polygon) => {
+            dispatchAoiPatch({
+              type: aoiPatchActions.INIT,
+              data: {
+                name: `${cl.name}`,
+              },
+            });
+
+            dispatchMessageQueue({
+              type: messageQueueActionTypes.ADD,
+              data: {
+                action: 'model#patch',
+                data: {
+                  type: 'class',
+                  class: index,
+                  polygon,
+                },
+              },
+            });
+          });
+        });
+
+        // Clear samples from the checkpoint object
+        // Prime panel calls mapRef.polygonDraw.clearLayers()
+        dispatchCurrentCheckpoint({
+          type: checkpointActions.CLEAR_SAMPLES,
         });
       },
       applyCheckpoint: async (projectId, checkpointId) => {

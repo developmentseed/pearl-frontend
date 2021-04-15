@@ -1,6 +1,7 @@
 import config from '../config';
 import logger from '../utils/logger';
 import { actions as checkpointActions, checkpointModes } from './checkpoint';
+import { actions as aoiPatchActions } from './reducers/aoi_patch';
 const { actions: predictionsActions } = require('./reducers/predictions');
 
 export const messageQueueActionTypes = {
@@ -39,6 +40,7 @@ export class WebsocketClient extends WebSocket {
     dispatchCurrentCheckpoint,
     fetchCheckpoint,
     dispatchPredictions,
+    dispatchAoiPatch,
   }) {
     super(config.websocketEndpoint + `?token=${token}`);
 
@@ -101,8 +103,29 @@ export class WebsocketClient extends WebSocket {
               mode: checkpointModes.RETRAIN,
             },
           });
-
           break;
+        case 'model#patch':
+          //receive new patch
+          dispatchAoiPatch({
+            type: aoiPatchActions.START_PATCH,
+            data: {
+              id: data.id,
+            },
+          });
+          break;
+        case 'model#patch#progress':
+          dispatchAoiPatch({
+            type: aoiPatchActions.RECEIVE_PATCH,
+            data,
+          });
+          //receive image
+          break;
+        case 'model#patch#complete':
+          dispatchAoiPatch({
+            type: aoiPatchActions.COMPLETE_PATCH,
+          });
+          break;
+        // finish waiting for patch
         default:
           logger('Unknown websocket message:');
           logger(event);

@@ -3,8 +3,6 @@ import T from 'prop-types';
 import get from 'lodash.get';
 import { Button } from '@devseed-ui/button';
 import InfoButton from '../../common/info-button';
-import styled from 'styled-components';
-import { glsp } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
 import { PlaceholderMessage } from '../../../styles/placeholder.js';
 import { actions, useCheckpoint } from '../../../context/checkpoint.js';

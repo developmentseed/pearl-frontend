@@ -172,6 +172,7 @@ function checkpointReducer(state, action) {
             },
           ],
           checkpointBrushes: {
+            ...state.checkpointBrushes,
             [action.data.name]: {
               ...state.checkpointBrushes[action.data.name],
               polygons: action.data.polygons,

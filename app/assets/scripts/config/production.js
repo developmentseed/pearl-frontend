@@ -2,14 +2,16 @@
 module.exports = {
   default: {
     environment: 'production',
-    appTitle: 'MS LULC',
-    appDescription: 'Microsoft Land Use/Land Classification project.',
+    appTitle: 'PEARL',
+    appLongTitle: 'Planetary Computer Land Cover Mapping',
+    appDescription:
+      'Microsoft Planetary Computer Land Use/Land Classification Mapping tool',
     restApiEndpoint: 'https://api.lulc.ds.io',
     websocketEndpoint: 'wss://socket.lulc.ds.io',
     auth0Domain: 'dev-y5qeoqlh.us.auth0.com',
     clientId: 'cnTAr7SyMGYu4qDLaw5rEGy4G0sn4Htn',
     audience: 'https://api.lulc.ds.io',
-    minSampleCount: 2,
+    minSampleCount: 0,
     bingApiKey:
       'ArLmu8JG2PHK_-_zo7yS1WbvDz7PgsoVEgcqFTg8uaH-lsXLcjADCAtnyQB054uq',
     bingSearchUrl: 'https://dev.virtualearth.net/REST/v1',

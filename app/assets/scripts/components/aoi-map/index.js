@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import PageHeader from '../common/page-header';
+import toasts from '../common/toasts';
 import { PageBody } from '../../styles/page';
 import { MapContainer, TileLayer } from 'react-leaflet';
 import { useParams } from 'react-router-dom';
@@ -7,24 +8,35 @@ import App from '../common/app';
 import config from '../../config';
 import { useRestApiClient } from '../../context/auth';
 
-const { restApiEndpoint, tileUrlTemplate } = config;
+const { restApiEndpoint } = config;
 
 function AoiMap() {
   const { projectId, aoiId } = useParams();
   const [mapRef, setMapRef] = useState(null);
-  const tileLayer = `${restApiEndpoint}/api/project/${projectId}/aoi/${aoiId}/tiles/{z}/{x}/{y}`;
+  const [tileUrl, setTileUrl] = useState(null);
   const { restApiClient } = useRestApiClient();
 
   useEffect(async () => {
     if (!mapRef) return;
-    const tileJSON = await restApiClient.getTileJSON(projectId, aoiId);
-    const bounds = [
-      [tileJSON.bounds[3], tileJSON.bounds[0]],
-      [tileJSON.bounds[1], tileJSON.bounds[2]],
-    ];
-    mapRef.fitBounds(bounds);
-  }, [projectId, aoiId, mapRef]);
-  const layer = 'naip.latest';
+    try {
+      const tileJSON = await restApiClient.getTileJSON(projectId, aoiId);
+      setTileUrl(`${restApiEndpoint}${tileJSON.tiles[0]}`);
+      const bounds = [
+        [tileJSON.bounds[3], tileJSON.bounds[0]],
+        [tileJSON.bounds[1], tileJSON.bounds[2]],
+      ];
+      mapRef.fitBounds(bounds);
+    } catch (error) {
+      toasts.error('Could not load AOI map');
+    }
+  }, [projectId, aoiId, mapRef, tileUrl]);
+
+  let leafletLayer;
+  if (tileUrl) {
+    leafletLayer = <TileLayer url={tileUrl} />;
+  } else {
+    leafletLayer = null;
+  }
 
   return (
     <App pageTitle='AOI Map'>
@@ -36,8 +48,7 @@ function AoiMap() {
             setMapRef(m);
           }}
         >
-          <TileLayer url={tileUrlTemplate.replace('{LAYER_NAME}', layer)} />
-          <TileLayer attribution='Attribution placeholder' url={tileLayer} />
+          {leafletLayer}
         </MapContainer>
       </PageBody>
     </App>
