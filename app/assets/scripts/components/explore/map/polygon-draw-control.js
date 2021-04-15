@@ -45,13 +45,13 @@ class PolygonDrawControl {
     drawer.category = name;
 
     // Handle added polygon
-    drawer.on('layeradd', (data) => {
+    drawer.on('layeradd', () => {
       const polygons = this.getLayerAsGeoJSON(drawer);
       if (!this.manualMode) {
         this.onUpdate(name, polygons);
       }
     });
-    drawer.on('layerremove', (data) => {
+    drawer.on('layerremove', () => {
       // should not update history when merging
       const polygons = this.getLayerAsGeoJSON(drawer);
       if (!this.manualMode && drawer.mode === 'subtract') {
@@ -67,11 +67,11 @@ class PolygonDrawControl {
       }
     });
 
-    drawer.polygonClick = (polygon, event) => {
+    drawer.polygonClick = (polygon) => {
       if (drawer.mode === 'subtract') {
-        drawer.removeLayer(polygon)
+        drawer.removeLayer(polygon);
       }
-    }
+    };
 
     this._group.addLayer(drawer);
   }

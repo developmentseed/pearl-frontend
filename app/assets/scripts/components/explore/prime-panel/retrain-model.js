@@ -89,7 +89,6 @@ function RetrainModel(props) {
               info={!currentCheckpoint.activeItem && 'No active item selected'}
               onClick={() => {
                 if (currentCheckpoint.activeItem) {
-                  //setMapMode(mapModes.REMOVE_SAMPLE);
                   setMapMode(mapModes.DELETE_SAMPLES);
                 }
               }}

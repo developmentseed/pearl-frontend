@@ -80,14 +80,12 @@ function RefineModel(props) {
               info={!currentCheckpoint.activeItem && 'No active item selected'}
               onClick={() => {
                 if (currentCheckpoint.activeItem) {
-                  //setMapMode(mapModes.REMOVE_SAMPLE);
                   setMapMode(mapModes.DELETE_SAMPLES);
                 }
               }}
             >
               Delete
             </InfoButton>
-
           </RefineTools>
           <CheckpointSection>
             <Heading useAlt>Checkpoint List</Heading>
