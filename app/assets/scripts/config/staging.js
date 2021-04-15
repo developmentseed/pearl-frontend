@@ -2,7 +2,6 @@ export default {
   environment: 'staging',
   restApiEndpoint: 'https://api.lulc-staging.ds.io',
   audience: 'https://api.lulc-staging.ds.io',
-  minSampleCount: 0,
   websocketEndpoint: 'wss://socket.lulc-staging.ds.io',
   tileUrlTemplate:
     'https://tiles.lulc-staging.ds.io/mosaic/{LAYER_NAME}/tiles/{z}/{x}/{y}.png?bidx=1%2C2%2C3',
