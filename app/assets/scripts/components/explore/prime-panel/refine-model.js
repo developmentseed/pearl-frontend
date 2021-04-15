@@ -51,7 +51,7 @@ function RefineModel(props) {
 
   const { checkpointList: apiCheckpointList } = useExploreContext();
 
-  const initVisibleLength = 6;
+  const initVisibleLength = 4;
 
   // Brushable checkpoints shown to user
   const [checkpointList, setCheckpointList] = useState([]);
@@ -145,46 +145,50 @@ function RefineModel(props) {
                   >
                     <Thumbnail />
                     <Heading size='xsmall'>
-                      {c.name}
+                      {c.name} ({c.id})
                       {currentCheckpoint.activeItem === id ? ' (Active)' : ''}
                     </Heading>
                   </Item>
                 );
               })}
 
-              <Dropdown
-                alignment='right'
-                direction='down'
-                triggerElement={(props) => (
-                  <Item className='add__class' muted as={Button} {...props}>
-                    <Thumbnail useIcon='plus' outline />
-                    <Heading size='xsmall'>Add Class</Heading>
-                  </Item>
-                )}
-                className='global__dropdown'
-              >
-                <>
-                  <DropdownHeader unshaded>
-                    <p>Checkpoints</p>
-                  </DropdownHeader>
-                  <DropdownBody selectable>
-                    {availableCheckpointList.map((ckpt, ind) => (
-                      <DropdownItem
-                        key={ckpt.id}
-                        data-dropdown='click.close'
-                        onClick={() => {
-                          checkpointList.push(ckpt);
-                          availableCheckpointList.splice(ind, 1);
-                          setCheckpointList(checkpointList);
-                          setAvailableCheckpointList(availableCheckpointList);
-                        }}
-                      >
-                        {ckpt.name} ({ckpt.id})
-                      </DropdownItem>
-                    ))}
-                  </DropdownBody>
-                </>
-              </Dropdown>
+              {availableCheckpointList.length > 0 && (
+                <Dropdown
+                  alignment='right'
+                  direction='down'
+                  triggerElement={(props) => (
+                    <Item className='add__class' muted as={Button} {...props}>
+                      <Thumbnail useIcon='plus' outline />
+                      <Heading size='xsmall'>Add Class</Heading>
+                    </Item>
+                  )}
+                  className='global__dropdown'
+                >
+                  <>
+                    <DropdownHeader unshaded>
+                      <p>Checkpoints</p>
+                    </DropdownHeader>
+                    <DropdownBody selectable>
+                      {availableCheckpointList.map((ckpt, ind) => (
+                        <DropdownItem
+                          key={ckpt.id}
+                          data-dropdown='click.close'
+                          onClick={() => {
+                            availableCheckpointList.splice(ind, 1);
+                            setCheckpointList([...checkpointList, ckpt]);
+                            setAvailableCheckpointList([
+                              ...availableCheckpointList.slice(0, ind),
+                              ...availableCheckpointList.slice(ind + 1),
+                            ]);
+                          }}
+                        >
+                          {ckpt.name} ({ckpt.id})
+                        </DropdownItem>
+                      ))}
+                    </DropdownBody>
+                  </>
+                </Dropdown>
+              )}
             </ItemList>
           </CheckpointSection>
           <Section>
