@@ -43,58 +43,7 @@ const ProjectsBody = styled(InpageBodyInner)`
   grid-auto-rows: auto 1fr;
   grid-gap: ${glsp()};
   padding: 0 ${glsp(4)} ${glsp(4)};
-  min-height: 100%;
-  ${media.mediumUp`
-    grid-template-columns: 1fr 4fr;
-    grid-auto-rows: auto;
-  `}
-`;
-const CardResults = styled.div`
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-auto-rows: auto 1fr;
-  grid-gap: 1rem;
-  ${media.mediumUp`
-    grid-template-columns: 2fr 1fr;
-    grid-auto-rows: auto;
-  `}
-`;
-
-const FormInputGroup = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 2.125rem;
-
-  > :first-child:not(:last-child) {
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-  }
-
-  > :last-child:not(:first-child) {
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-  }
-
-  .form__control::selection {
-    background-color: unset;
-    color: unset;
-  }
-`;
-
-const NavPane = styled.div`
-  .active::before {
-    content: '-';
-  }
-`;
-const NavList = styled.ol`
-  display: flex;
-  flex-flow: row nowrap;
-  justify-content: space-around;
-  > * {
-    padding: ${glsp(0.5)};
-  }
-  ${media.mediumUp`
-    flex-flow: column;
-  `}
+  justify-items: center;
 `;
 
 // Render single projects row
@@ -174,7 +123,7 @@ function Projects() {
                 to='/project/new'
                 variation='primary-raised-light'
                 size='large'
-                useIcon={['plus', 'after']}
+                useIcon='plus'
                 title='Start a new project'
                 style={{
                   alignSelf: 'center',
@@ -187,19 +136,6 @@ function Projects() {
         </InpageHeader>
         <InpageBody>
           <ProjectsBody>
-            <NavPane>
-              <NavList>
-                <li>
-                  <StyledNavLink to='/profile/projects' className='active'>
-                    Projects
-                  </StyledNavLink>
-                </li>
-                <li>
-                  <StyledNavLink to='/profile/maps'> Maps</StyledNavLink>
-                </li>
-              </NavList>
-            </NavPane>
-
             {projects &&
               (projects.length ? (
                 <>
