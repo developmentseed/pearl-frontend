@@ -119,11 +119,7 @@ function UserDropdown() {
                 </DropdownItem>
               </li>
               <li>
-                <DropdownItem
-                  as={StyledLink}
-                  to='/profile/maps'
-                  useIcon='map'
-                >
+                <DropdownItem as={StyledLink} to='/profile/maps' useIcon='map'>
                   My Saved Maps
                 </DropdownItem>
               </li>
