@@ -25,7 +25,6 @@ import {
   DropdownHeader,
   DropdownBody,
   DropdownItem,
-  DropdownFooter,
 } from '../../../styles/dropdown';
 
 const Wrapper = styled.div`
@@ -159,7 +158,7 @@ function RefineModel(props) {
                   triggerElement={(props) => (
                     <Item className='add__class' muted as={Button} {...props}>
                       <Thumbnail useIcon='plus' outline />
-                      <Heading size='xsmall'>Add Class</Heading>
+                      <Heading size='xsmall'>Add Checkpoint</Heading>
                     </Item>
                   )}
                   className='global__dropdown'
