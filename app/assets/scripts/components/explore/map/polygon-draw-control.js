@@ -67,6 +67,12 @@ class PolygonDrawControl {
       }
     });
 
+    /*
+     * Override default functionality of freehand shapes
+     * Default functionality dictates that polygonClick only fires a remove event when in delete mode.
+     * Here it it firest the event only when in subtract mode so as to allow draw erase and click delete
+     * without changing tools
+     */
     drawer.polygonClick = (polygon) => {
       if (drawer.mode === 'subtract') {
         drawer.removeLayer(polygon);
