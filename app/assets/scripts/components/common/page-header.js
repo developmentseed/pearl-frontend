@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import T from 'prop-types';
 import config from '../../config';
 
+import UserDropdown from '../common/user-dropdown';
 import { Button } from '@devseed-ui/button';
 import {
   themeVal,
@@ -123,13 +124,24 @@ const PageTitlePrimeLink = styled.a`
     font-size: 1.25rem;
     align-self: center;
     ${media.mediumUp`
-      grid-row: 1;
-      align-self: flex-end;
+      &:not(:only-child) {
+        grid-row: 1;
+        align-self: flex-end;
+      }
     `}
     span {
       ${visuallyHidden()};
     }
   }
+`;
+
+const SecondarySection = styled.div`
+  border-left: 0.5px solid ${themeVal('color.baseAlphaC')};
+  padding-left: 1.5rem;
+  display: grid;
+  align-items: center;
+  justify-content: space-between;
+  grid-template-columns: min-content min-content;
 `;
 
 function PageHeader(props) {
@@ -149,7 +161,9 @@ function PageHeader(props) {
                     <span>Microsoft</span>
                     {appTitle}
                   </strong>
-                  <sub>{appLongTitle}</sub>
+                  {location.pathname.split('/')[1] !== 'project' && (
+                    <sub>{appLongTitle}</sub>
+                  )}
                 </PageTitlePrimeLink>
               </li>
             </GlobalMenu>
@@ -182,6 +196,9 @@ function PageHeader(props) {
               </PageSpecificControls>
             )}
           </PrimarySection>
+          <SecondarySection>
+            <UserDropdown />
+          </SecondarySection>
         </PageNav>
       </PageHeadInner>
     </PageHead>

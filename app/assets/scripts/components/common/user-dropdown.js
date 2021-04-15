@@ -64,6 +64,9 @@ function UserDropdown() {
   const location = useLocation();
   const { loginWithRedirect, logout } = useAuth0();
   const { isAuthenticated, user } = useContext(AuthContext);
+  // FIXME: remove this for launch
+  const isProduction = process.env.NODE_ENV === 'production';
+
   const logoutWithRedirect = () =>
     logout({
       returnTo: window.location.origin,
@@ -111,14 +114,18 @@ function UserDropdown() {
               <li>
                 <DropdownItem
                   as={StyledLink}
-                  to='/profile/projects'
+                  to={isProduction ? '/' : '/profile/projects'}
                   useIcon='folder'
                 >
                   My Projects
                 </DropdownItem>
               </li>
               <li>
-                <DropdownItem as={StyledLink} to='/profile/maps' useIcon='map'>
+                <DropdownItem
+                  as={StyledLink}
+                  to={isProduction ? '/' : '/profile/maps'}
+                  useIcon='map'
+                >
                   My Saved Maps
                 </DropdownItem>
               </li>
