@@ -135,14 +135,18 @@ function SessionOutputControl(props) {
   const copyTilesLink = async () => {
     const projectId = currentProject.id;
     const aoiId = predictions.data.aoiId;
+    let uuid;
 
     try {
-      await restApiClient.bookmarkAOI(projectId, aoiId, aoiName);
+      const aoi = await restApiClient.bookmarkAOI(projectId, aoiId, aoiName);
+      uuid = aoi.uuid;
+      
     } catch (err) {
       logger('Error Bookmarking AOI', err);
+      return;
     }
     //FIXME: This url will likely change
-    const url = `${window.location.origin}/project/${projectId}/aoi/${aoiId}/map`;
+    const url = `${window.location.origin}/aoi/${uuid}/map`;
     const copied = copy(url);
     if (copied) {
       toasts.success('URL copied to clipboard');
