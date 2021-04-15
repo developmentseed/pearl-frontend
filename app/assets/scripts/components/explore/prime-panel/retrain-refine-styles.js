@@ -107,6 +107,7 @@ export const ClassOptions = styled(Button)`
 `;
 
 export const Thumbnail = styled.div`
+  grid-row: 1 / 3;
   width: ${glsp(1.5)};
   height: ${glsp(1.5)};
   background: ${({ color }) => color || themeVal('color.baseAlphaD')};

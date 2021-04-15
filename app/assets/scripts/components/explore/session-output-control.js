@@ -24,6 +24,7 @@ import { useAuth } from '../../context/auth';
 import toasts from '../common/toasts';
 import logger from '../../utils/logger';
 import { useInstance } from '../../context/instance';
+import { useParams } from 'react-router';
 
 const Wrapper = styled.div`
   flex: 1;
@@ -82,6 +83,7 @@ const HeadingInput = styled(FormInput)`
 `;
 
 function SessionOutputControl(props) {
+  const { projectId } = useParams();
   const { projectName, openHelp, isMediumDown } = props;
   const { isAuthenticated, restApiClient } = useAuth();
 
@@ -228,7 +230,8 @@ function SessionOutputControl(props) {
         variation={status === 'OK' ? 'primary' : 'danger'}
         size='xxsmall'
       >
-        <span>Session Status:</span> {instance.statusText}
+        <span>Session Status:</span>{' '}
+        {projectId === 'new' ? 'Ready.' : instance.statusText}
       </StatusHeading>
       <Button
         variation='base-plain'

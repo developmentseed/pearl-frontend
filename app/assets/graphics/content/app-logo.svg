@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width='44' height='44' xmlns='http://www.w3.org/2000/svg'>
+  <g fill='#10E6C9' stroke='#10E6C9' fill-rule='evenodd'>
+    <rect
+      fill-opacity='.13'
+      x='.5'
+      y='.5'
+      width='43'
+      height='43'
+      rx='21.5'
+    />
+    <g fill-opacity='.33'>
+      <path d='M16 8l11.97.03L28 20l-11.97-.03z' />
+      <path d='M24 12l11.98.02L36 24l-11.98-.02z' />
+      <path d='M24.05 20.05L36 20l-.05 11.95L24 32z' />
+      <path d='M16 24l11.97.03L28 36l-11.97-.03z' />
+      <path d='M8 20l11.98.02L20 32l-11.98-.02z' />
+      <path d='M8.05 12.05L20 12l-.05 11.95L8 24z' />
+    </g>
+  </g>
+</svg>
