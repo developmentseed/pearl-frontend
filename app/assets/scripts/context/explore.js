@@ -24,6 +24,7 @@ import { wrapLogReducer } from './reducers/utils';
 import { useAoi } from './aoi';
 import { useProject } from './project';
 import { useModel } from './model';
+import { useInstance } from './instance';
 
 /**
  * Context & Provider
@@ -54,6 +55,7 @@ export function ExploreProvider(props) {
   );
   const [checkpointList, setCheckpointList] = useState(null);
   const [currentInstance, setCurrentInstance] = useState(null);
+  const { setInstanceStatusMessage } = useInstance();
 
   async function loadInitialData() {
     showGlobalLoadingMessage('Loading configuration...');
@@ -124,10 +126,10 @@ export function ExploreProvider(props) {
     if (predictions.fetching) {
       const { processed, total } = predictions;
       if (!total) {
-        showGlobalLoadingMessage(`Waiting for predictions...`);
+        setInstanceStatusMessage(`Waiting for predictions...`);
       } else {
-        showGlobalLoadingMessage(
-          `Receiving images: ${processed} of ${total}...`
+        setInstanceStatusMessage(
+          `Receiving images ${processed} of ${total}...`
         );
       }
     } else if (predictions.isReady()) {

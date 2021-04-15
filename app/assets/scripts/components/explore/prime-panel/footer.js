@@ -12,7 +12,8 @@ import { LocalButton } from '../../../styles/local-button';
 import InfoButton from '../../common/info-button';
 import { PanelBlockFooter } from '../../common/panel-block';
 import { checkpointModes } from '../../../context/checkpoint';
-import logger from '../../../utils/logger';
+import { usePredictions } from '../../../context/predictions';
+import { useInstance } from '../../../context/instance';
 
 const PanelControls = styled(PanelBlockFooter)`
   display: grid;
@@ -24,13 +25,10 @@ const SaveCheckpoint = styled(DropdownBody)`
   padding: ${glsp()};
 `;
 
-function PrimeButton({
-  instance,
-  currentCheckpoint,
-  allowInferenceRun,
-  runInference,
-  retrain,
-}) {
+function PrimeButton({ currentCheckpoint, allowInferenceRun }) {
+  const { predictions } = usePredictions();
+  const { instance, sendAbortMessage, runInference, retrain } = useInstance();
+
   // If in refine mode, this button save refinements
   if (currentCheckpoint && currentCheckpoint.mode === checkpointModes.REFINE) {
     return (
@@ -54,25 +52,14 @@ function PrimeButton({
   let enabled = false;
   let onClick = () => {};
 
-  switch (instance.status) {
-    case 'initializing':
-      label = 'Initializing...';
-      break;
-    case 'aborting':
-      label = 'Aborting...';
-      break;
-    case 'processing':
-      label = 'Abort';
-      break;
-    case 'disconnected':
-    case 'ready':
-      label = !currentCheckpoint ? 'Run Model' : 'Retrain Model';
-      enabled = allowInferenceRun;
-      onClick = !currentCheckpoint ? runInference : retrain;
-      break;
-    default:
-      logger('Unknown instance status: ', instance.status);
-      break;
+  if (predictions.fetching) {
+    label = 'Abort';
+    onClick = sendAbortMessage;
+    enabled = true;
+  } else if (['disconnected', 'ready'].includes(instance.status)) {
+    label = !currentCheckpoint ? 'Run Model' : 'Retrain Model';
+    enabled = allowInferenceRun;
+    onClick = !currentCheckpoint ? runInference : retrain;
   }
 
   return (
@@ -94,11 +81,8 @@ function PrimeButton({
 }
 
 PrimeButton.propTypes = {
-  instance: T.object,
   currentCheckpoint: T.object,
   allowInferenceRun: T.bool.isRequired,
-  runInference: T.func.isRequired,
-  retrain: T.func.isRequired,
 };
 
 function Footer(props) {
@@ -114,10 +98,6 @@ function Footer(props) {
     mapRef,
 
     allowInferenceRun,
-
-    instance,
-    runInference,
-    retrain,
   } = props;
   return (
     <PanelControls>
@@ -166,9 +146,6 @@ function Footer(props) {
       <PrimeButton
         currentCheckpoint={currentCheckpoint}
         allowInferenceRun={allowInferenceRun}
-        instance={instance}
-        runInference={runInference}
-        retrain={retrain}
       />
 
       <Dropdown

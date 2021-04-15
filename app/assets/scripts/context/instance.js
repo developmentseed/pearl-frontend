@@ -42,6 +42,7 @@ const instanceActionTypes = {
 const instanceInitialState = {
   status: 'disconnected', // 'initializing', 'ready', 'processing', 'aborting'
   connected: false,
+  statusText: 'Fetching...',
 };
 
 function instanceReducer(state, action) {
@@ -52,6 +53,8 @@ function instanceReducer(state, action) {
       return {
         ...state,
         connected: data,
+        status: !data ? 'disconnected' : state.status,
+        statusText: data ? 'Instance connected' : 'Instance disconnected',
       };
     }
     case instanceActionTypes.SET_STATUS: {
@@ -59,6 +62,7 @@ function instanceReducer(state, action) {
         ...state,
         previousStatus: state.status,
         status: data,
+        statusText: data,
       };
     }
     default:
@@ -168,6 +172,14 @@ export function InstanceProvider(props) {
 
   const value = {
     instance,
+    setInstanceStatusMessage: (message) =>
+      dispatchInstance({
+        type: instanceActionTypes.SET_STATUS,
+        data: message,
+      }),
+    sendAbortMessage: () =>
+      websocketClient.sendMessage({ action: 'model#abort' }),
+
     initInstance,
     runInference: async () => {
       if (restApiClient) {
@@ -365,6 +377,8 @@ const useCheckContext = (fnName) => {
 export const useInstance = () => {
   const {
     instance,
+    setInstanceStatusMessage,
+    sendAbortMessage,
     initInstance,
     runInference,
     retrain,
@@ -373,6 +387,8 @@ export const useInstance = () => {
   return useMemo(
     () => ({
       instance,
+      setInstanceStatusMessage,
+      sendAbortMessage,
       initInstance,
       runInference,
       retrain,
@@ -429,6 +445,12 @@ export class WebsocketClient extends WebSocket {
           break;
         case 'model#aborted':
           logger('Previous run aborted.');
+          dispatchPredictions({
+            type: predictionsActions.CLEAR_PREDICTION,
+          });
+          dispatchCurrentCheckpoint({
+            type: checkpointActions.RESET_CHECKPOINT,
+          });
           // Request new status update after abort is confirmed
           this.sendMessage({ action: 'model#status' });
           break;
@@ -450,6 +472,13 @@ export class WebsocketClient extends WebSocket {
 
         case 'model#checkpoint':
           fetchCheckpoint(data.id);
+          this.sendMessage({ action: 'model#status' });
+          break;
+        case 'model#checkpoint#progress':
+          this.sendMessage({ action: 'model#status' });
+          break;
+        case 'model#checkpoint#complete':
+          this.sendMessage({ action: 'model#status' });
           break;
         case 'model#prediction':
           dispatchPredictions({
@@ -467,7 +496,8 @@ export class WebsocketClient extends WebSocket {
               mode: checkpointModes.RETRAIN,
             },
           });
-
+          // Request new status update after abort is confirmed
+          this.sendMessage({ action: 'model#status' });
           break;
         default:
           logger('Unknown websocket message:');

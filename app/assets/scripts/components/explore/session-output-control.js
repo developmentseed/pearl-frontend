@@ -23,6 +23,7 @@ import { ExploreContext } from '../../context/explore';
 import { useAuth } from '../../context/auth';
 import toasts from '../common/toasts';
 import logger from '../../utils/logger';
+import { useInstance } from '../../context/instance';
 
 const Wrapper = styled.div`
   flex: 1;
@@ -81,8 +82,10 @@ const HeadingInput = styled(FormInput)`
 `;
 
 function SessionOutputControl(props) {
-  const { status, projectName, openHelp, isMediumDown } = props;
+  const { projectName, openHelp, isMediumDown } = props;
   const { isAuthenticated, restApiClient } = useAuth();
+
+  const { instance } = useInstance();
 
   const {
     updateProjectName,
@@ -225,7 +228,7 @@ function SessionOutputControl(props) {
         variation={status === 'OK' ? 'primary' : 'danger'}
         size='xxsmall'
       >
-        <span>Session Status:</span> {status || 'None Provided'}
+        <span>Session Status:</span> {instance.statusText}
       </StatusHeading>
       <Button
         variation='base-plain'
