@@ -114,7 +114,7 @@ function UserDropdown() {
               <li>
                 <DropdownItem
                   as={StyledLink}
-                  to={isProduction ? '/': '/profile/projects'}
+                  to={isProduction ? '/' : '/profile/projects'}
                   useIcon='folder'
                 >
                   My Projects
@@ -123,7 +123,7 @@ function UserDropdown() {
               <li>
                 <DropdownItem
                   as={StyledLink}
-                  to={isProduction ? '/' :'/profile/maps'}
+                  to={isProduction ? '/' : '/profile/maps'}
                   useIcon='map'
                 >
                   My Saved Maps
