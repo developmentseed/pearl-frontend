@@ -149,7 +149,7 @@ function Home() {
             art ML and AI technologies to drastically reduce the time required
             to produce an accurate land cover map. Scientists and mappers get
             access to pre-trained, high performing starter models, and high
-            resolution imagery (e.g. NAIP) hosted on Microsoft Azure.
+            resolution imagery like NAIP hosted on Microsoft Azure.
           </Lead>
           <HomeCTA>
             <Button
@@ -183,8 +183,8 @@ function Home() {
               store, pause and return to mapping anytime.
             </li>
             <li>
-              <strong>Cloud based</strong>, open-sourced services provide access
-              to high quality models, imagery and processing.
+              <strong>Scalable</strong>, cloud-based open source services
+              provide access to high quality models, imagery and processing.
             </li>
           </ul>
         </HomeTout>
