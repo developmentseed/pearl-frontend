@@ -177,10 +177,6 @@ export function ExploreProvider(props) {
       if (predictions.error) {
         toasts.error('An inference error occurred, please try again later.');
       } else {
-        dispatchMapState({
-          type: mapActionTypes.SET_MODE,
-          data: mapModes.ADD_SAMPLE_POLYGON,
-        });
         loadMetrics();
       }
     }
