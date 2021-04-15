@@ -19,7 +19,7 @@ export const TableCell = styled.td``;
  * @param {Array<Object>} data - array of data objects
  * @param {Function} renderRow - function which receives data objects and returns a <tr>
  */
-function Table({ headers, data, renderRow }) {
+function Table({ headers, data, renderRow, extraData }) {
   return (
     <StyledTable>
       <TableHeader>
@@ -29,7 +29,7 @@ function Table({ headers, data, renderRow }) {
           ))}
         </TableRow>
       </TableHeader>
-      <TableBody>{data.map(renderRow)}</TableBody>
+      <TableBody>{data.map((d) => renderRow(d, extraData))}</TableBody>
     </StyledTable>
   );
 }

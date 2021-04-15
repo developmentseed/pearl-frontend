@@ -25,7 +25,7 @@ import {
 import Table, { TableRow, TableCell } from '../../common/table';
 import Paginator from '../../common/paginator';
 import ProjectCard from './project-card';
-import { areaFromBounds } from '../../../utils/map';
+import copyTextToClipboard from '../../../utils/copy-text-to-clipboard';
 
 // Controls the size of each page
 const AOIS_PER_PAGE = 20;
@@ -44,23 +44,7 @@ const ProjectBody = styled(InpageBodyInner)`
   `}
 `;
 
-
-const NavPane = styled.div`
-  .active::before {
-    content: '-';
-  }
-`;
-const NavList = styled.ol`
-  display: flex;
-  flex-flow: row nowrap;
-  justify-content: space-around;
-  > * {
-    padding: ${glsp(0.5)};
-  }
-  ${media.mediumUp`
-    flex-flow: column;
-  `}
-`;
+const LinkInput = styled.input``;
 
 const AOI_HEADERS = [
   'AOI Name',
@@ -72,9 +56,14 @@ const AOI_HEADERS = [
   'Download'
 ];
 
+function downloadGeoTiff(projectId, aoiId) {
+
+}
+
 // Render single projects row
-function renderRow(aoi) {
+function renderRow(aoi, { project }) {
   console.log('row', aoi);
+  const aoiLink = `${window.location.origin}/aoi/${aoi.uuid}/map`;
   return (
     <TableRow key={aoi.id}>
       <TableCell>
@@ -87,10 +76,23 @@ function renderRow(aoi) {
       </TableCell>
       <TableCell>{ formatDateTime(aoi.created) }</TableCell>
       <TableCell>
-        Link
+        <LinkInput value={aoiLink} disabled={true} />
+        <Button
+          size='small'
+          useIcon=''
+          onClick={() => {
+            copyTextToClipboard(aoiLink);
+          }}
+        />
       </TableCell>
       <TableCell>
-        Download
+        <Button
+          size='small'
+          useIcon=''
+          onClick={() => {
+            downloadGeoTiff(project.id, aoi.id);
+          }}
+        />
       </TableCell>
     </TableRow>
   );
@@ -191,6 +193,9 @@ function Project() {
                     headers={AOI_HEADERS}
                     data={aois}
                     renderRow={renderRow}
+                    extraData={{
+                      project: project
+                    }}
                   />
                   <Paginator
                     numPages={numPages}

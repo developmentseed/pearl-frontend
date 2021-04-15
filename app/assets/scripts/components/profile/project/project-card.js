@@ -13,7 +13,7 @@ function getDetails(project, aois) {
   return {
     'Created': formatDateTime(project.created),
     'Model': project.model_name,
-    'Last Checkpoint': project.checkpoints.checkpoints.length > 0 ? project.checkpoints.checkpoints[0].name : 'No checkpoints',
+    'Last Checkpoint': project.checkpoints.length > 0 ? project.checkpoints[0].name : 'No checkpoints',
     'AOIS': aois.length,
     'AOI Name': aois.length > 0 ? aois[0].name : '',
   };
