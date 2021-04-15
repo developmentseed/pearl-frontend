@@ -145,6 +145,14 @@ function Map() {
           mapRef.polygonDraw.enableAdd(currentCheckpoint.activeItem);
         }
         break;
+
+      case mapModes.DELETE_SAMPLES:
+        if (currentCheckpoint.activeItem) {
+          mapRef.polygonDraw.enableSubtract(currentCheckpoint.activeItem);
+        }
+        break;
+
+        /*
       case mapModes.ERASE_SAMPLE_POLYGON:
         if (currentCheckpoint.activeItem) {
           mapRef.polygonDraw.enableSubtract(currentCheckpoint.activeItem);
@@ -154,7 +162,7 @@ function Map() {
         if (currentCheckpoint.activeItem) {
           mapRef.polygonDraw.enableDelete(currentCheckpoint.activeItem);
         }
-        break;
+        break;*/
       default:
         mapRef.polygonDraw.disable();
         break;

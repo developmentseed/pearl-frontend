@@ -14,6 +14,7 @@ export const mapModes = {
   ADD_SAMPLE_POINT: 'ADD_SAMPLE_POINT',
   ADD_SAMPLE_POLYGON: 'ADD_SAMPLE_POLYGON',
   REMOVE_SAMPLE: 'REMOVE_SAMPLE',
+  DELETE_SAMPLES: 'DELETE_SAMPLES'
 };
 
 export function mapStateReducer(state, action) {

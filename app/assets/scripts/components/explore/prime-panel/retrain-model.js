@@ -76,7 +76,7 @@ function RetrainModel(props) {
               Point
             </InfoButton>
 
-            <InfoButton
+            {/*<InfoButton
               variation={
                 mapState.mode === mapModes.ERASE_SAMPLE_POLYGON
                   ? 'primary-raised-dark'
@@ -94,11 +94,11 @@ function RetrainModel(props) {
               }}
             >
               Erase
-            </InfoButton>
+            </InfoButton>*/}
 
             <InfoButton
               variation={
-                mapState.mode === mapModes.REMOVE_SAMPLE
+                mapState.mode === mapModes.DELETE_SAMPLES
                   ? 'primary-raised-dark'
                   : 'primary-raised-light'
               }
@@ -109,7 +109,8 @@ function RetrainModel(props) {
               info={!currentCheckpoint.activeItem && 'No active item selected'}
               onClick={() => {
                 if (currentCheckpoint.activeItem) {
-                  setMapMode(mapModes.REMOVE_SAMPLE);
+                  //setMapMode(mapModes.REMOVE_SAMPLE);
+                  setMapMode(mapModes.DELETE_SAMPLES);
                 }
               }}
             >

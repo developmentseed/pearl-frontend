@@ -46,16 +46,18 @@ class PolygonDrawControl {
 
     // Handle added polygon
     drawer.on('layeradd', (data) => {
-      const polygons = this.getLayerAsGeoJSON(data.target);
+      const polygons = this.getLayerAsGeoJSON(drawer);
       if (!this.manualMode) {
         this.onUpdate(name, polygons);
       }
     });
     drawer.on('layerremove', (data) => {
       // should not update history when merging
-      const polygons = this.getLayerAsGeoJSON(data.target);
+      const polygons = this.getLayerAsGeoJSON(drawer);
+      console.log('layerremove')
+      console.log(drawer.mode)
 
-      if (!this.manualMode && drawer.mode === 'delete') {
+      if (!this.manualMode && drawer.mode === 'subtract') {
         this.onUpdate(name, polygons);
       }
     });
@@ -67,6 +69,16 @@ class PolygonDrawControl {
         this.onUpdate(name, polygons);
       }
     });
+
+    drawer.polygonClick = (polygon, event) => {
+      if (drawer.mode === 'subtract') {
+        console.log(polygon)
+        console.log(event)
+        drawer.removeLayer(polygon)
+        //drawer.fire('layerremove')
+        console.log('remove polygon')
+      }
+    }
 
     this._group.addLayer(drawer);
   }
