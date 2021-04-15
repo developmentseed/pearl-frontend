@@ -10,8 +10,7 @@ import {
   InpageBody,
   InpageBodyInner,
 } from '../../../styles/inpage';
-import { Form, FormInput } from '@devseed-ui/form';
-import { glsp, media } from '@devseed-ui/theme-provider';
+import { glsp } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
 import { StyledNavLink } from '../../../styles/links';
 import toasts from '../../common/toasts';
@@ -42,7 +41,7 @@ const ProjectsBody = styled(InpageBodyInner)`
   grid-template-columns: 1fr;
   grid-auto-rows: auto 1fr;
   grid-gap: ${glsp()};
-  padding: 0 ${glsp(4)} ${glsp(4)};
+  padding-top: 0;
   justify-items: center;
 `;
 

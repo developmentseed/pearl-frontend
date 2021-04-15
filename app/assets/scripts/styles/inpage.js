@@ -6,6 +6,7 @@ import {
   themeVal,
   glsp,
   rgba,
+  media
 } from '@devseed-ui/theme-provider';
 import { headingAlt } from '@devseed-ui/typography';
 
@@ -44,9 +45,12 @@ export const InpageHeaderInner = styled.div`
   display: flex;
   flex-flow: row nowrap;
   align-items: flex-end;
-  padding: ${glsp(4)} ${glsp(4)} ${glsp(2)};
+  padding: ${glsp(2)} ${glsp()};
   max-width: ${themeVal('layout.max')};
   margin: 0 auto;
+  ${media.mediumUp`
+    padding: ${glsp(4)} ${glsp(4)} ${glsp(2)};
+  `}
 `;
 
 export const InpageHeadline = styled.div`
@@ -94,8 +98,11 @@ export const InpageBody = styled.div`
 `;
 
 export const InpageBodyInner = styled.div`
-  padding: ${glsp(4)};
+  padding: ${glsp()};
   padding-top: 0;
   max-width: ${themeVal('layout.max')};
   margin: 0 auto;
+  ${media.mediumUp`
+    padding: ${glsp(4)};
+  `}
 `;

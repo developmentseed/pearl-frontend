@@ -1,13 +1,56 @@
 import React from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
+import T from 'prop-types';
+import { glsp, themeVal, media } from '@devseed-ui/theme-provider';
+import { Heading } from '@devseed-ui/typography';
 
-const StyledTable = styled.table``;
+const StyledTable = styled.table`
+  width: 100%;
+  max-width: 100%;
+  td,
+  th {
+    padding: ${glsp(1 / 4)};
+    vertical-align: top;
+    text-align: left;
+  }
+  thead th {
+    letter-spacing: 0.4px;
+    vertical-align: middle;
+    position: relative;
+    text-align: left;
+    a {
+      display: inline-flex;
+    }
+    a,
+    a:visited,
+    a:hover {
+      color: inherit;
+    }
+  }
+  tbody th,
+  tbody td {
+    text-align: left;
+    vertical-align: top;
+    border-bottom: ${themeVal('layout.border')} solid
+      ${themeVal('color.baseAlphaB')};
+  }
+  th:first-child,
+  td:first-child {
+    padding-left: ${glsp()};
+  }
+  th:last-child,
+  td:last-child {
+    padding-right: ${glsp()};
+  }
+`;
 
 const TableHeader = styled.thead``;
 
-const TableHeaderCell = styled.th``;
-
-const TableBody = styled.tbody``;
+const TableBody = styled.tbody`
+  & tr:hover {
+    background: ${themeVal('color.primaryAlphaA')};
+  }
+`;
 
 export const TableRow = styled.tr``;
 
@@ -25,7 +68,9 @@ function Table({ headers, data, renderRow, extraData }) {
       <TableHeader>
         <TableRow>
           {headers.map((header) => (
-            <TableHeaderCell key={header}>{header}</TableHeaderCell>
+            <Heading key={header} as='th' useAlt>
+              {header}
+            </Heading>
           ))}
         </TableRow>
       </TableHeader>
@@ -33,5 +78,12 @@ function Table({ headers, data, renderRow, extraData }) {
     </StyledTable>
   );
 }
+
+Table.propTypes = {
+  headers: T.array,
+  data: T.array,
+  renderRow: T.func,
+  extraData: T.array,
+};
 
 export default Table;
