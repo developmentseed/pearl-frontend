@@ -172,6 +172,7 @@ function checkpointReducer(state, action) {
             },
           ],
           checkpointBrushes: {
+            ...state.checkpointBrushes,
             [action.data.name]: {
               ...state.checkpointBrushes[action.data.name],
               polygons: action.data.polygons,
@@ -280,7 +281,7 @@ function checkpointReducer(state, action) {
             checkpointBrushes: state.checkpointBrushes,
           },
         ],
-
+        checkpointBrushes: {},
         classes: Object.values(state.classes).reduce((accum, c) => {
           return {
             ...accum,

@@ -34,7 +34,7 @@ import ModalMapEvent from './modal-events';
 import VectorLayer from '../../common/map/vector-layer';
 import { useRestApiClient } from '../../../context/auth';
 import { useApiMeta } from '../../../context/api-meta';
-import { useAoi } from '../../../context/aoi';
+import { useAoi, useAoiPatch } from '../../../context/aoi';
 import toasts from '../../common/toasts';
 
 const center = [38.83428180092151, -79.37724530696869];
@@ -94,7 +94,7 @@ function Map() {
 
   const { apiLimits } = useApiMeta();
   const { currentAoi } = useAoi();
-
+  const { aoiPatchList } = useAoiPatch();
   const { restApiClient } = useRestApiClient();
 
   const { mapState, mapModes, setMapMode } = useMapState();
@@ -169,21 +169,6 @@ function Map() {
       mapRef.polygonDraw.setLayers(currentCheckpoint.classes);
     }
   }, [mapRef, currentCheckpoint && currentCheckpoint.id]);
-
-  /*
-   * useEffect fires when mode changes.
-   * Checkpoint ID is the same so classList should be the same
-   */
-  useEffect(() => {
-    if (!mapRef || !mapRef.polygonDraw) return;
-
-    //mapRef.polygonDraw.clearLayers();
-    if (currentCheckpoint) {
-      /*dispatchCurrentCheckpoint({
-        type: checkpointActions.CLEAR_POINT_SAMPLES,
-      });*/
-    }
-  }, [mapRef, currentCheckpoint && currentCheckpoint.mode]);
 
   /**
    * Add/update AOI controls on API metadata change.
@@ -387,10 +372,30 @@ function Map() {
             />
           ))}
 
-        {!predictions.data.predictions &&
-          tileUrl &&
-          currentProject &&
-          currentAoi && <TileLayer url={tileUrl} maxZoom={18} />}
+        {aoiPatchList.map((patch) => {
+          // Id format set in context/map.js
+          const id = `${patch.name}-${patch.id}`;
+
+          return (
+            <React.Fragment key={patch.id}>
+              {patch.patches.map((p) => (
+                <ImageOverlay
+                  key={p.key}
+                  url={p.image}
+                  bounds={p.bounds}
+                  opacity={userLayers[id].visible ? userLayers[id].opacity : 0}
+                />
+              ))}
+            </React.Fragment>
+          );
+        })}
+
+        {!predictions.data.predictions && currentProject && currentAoi && (
+          <TileLayer
+            url={`${config.restApiEndpoint}/api/project/${currentProject.id}/aoi/${currentAoi.id}/tiles/{z}/{x}/{y}`}
+            maxZoom={18}
+          />
+        )}
 
         {currentCheckpoint &&
           currentCheckpoint.classes &&
@@ -442,6 +447,7 @@ function Map() {
       restApiClient,
       setMapLayers,
       setMapRef,
+      aoiPatchList,
       tileUrl,
     ]
   );
