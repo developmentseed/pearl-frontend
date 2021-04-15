@@ -1,4 +1,4 @@
-import React, { useMemo, useContext, useEffect } from 'react';
+import React, { useMemo, useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import tArea from '@turf/area';
 import tBboxPolygon from '@turf/bbox-polygon';
@@ -35,6 +35,7 @@ import VectorLayer from '../../common/map/vector-layer';
 import { useRestApiClient } from '../../../context/auth';
 import { useApiMeta } from '../../../context/api-meta';
 import { useAoi, useAoiPatch } from '../../../context/aoi';
+import toasts from '../../common/toasts';
 
 const center = [38.83428180092151, -79.37724530696869];
 const zoom = 15;
@@ -98,6 +99,7 @@ function Map() {
 
   const { mapState, mapModes, setMapMode } = useMapState();
   const { mapRef, setMapRef } = useMapRef();
+  const [tileUrl, setTileUrl] = useState(null);
 
   const { mapLayers, setMapLayers } = useMapLayers();
   const { userLayers } = useUserLayers();
@@ -242,6 +244,25 @@ function Map() {
       aoiRef.status = LIVE;
     }
   }, [aoiArea, apiLimits, aoiRef]);
+
+  useEffect(async () => {
+    if (currentProject && currentAoi) {
+      try {
+        const tileJSON = await restApiClient.getTileJSON(
+          currentProject.id,
+          currentAoi.id
+        );
+        setTileUrl(`${config.restApiEndpoint}${tileJSON.tiles[0]}`);
+        const bounds = [
+          [tileJSON.bounds[3], tileJSON.bounds[0]],
+          [tileJSON.bounds[1], tileJSON.bounds[2]],
+        ];
+        mapRef.fitBounds(bounds);
+      } catch (error) {
+        toasts.error('Could not load AOI map');
+      }
+    }
+  }, [currentAoi, currentProject, mapRef]);
 
   const displayMap = useMemo(
     () => (
@@ -427,6 +448,7 @@ function Map() {
       setMapLayers,
       setMapRef,
       aoiPatchList,
+      tileUrl,
     ]
   );
 
