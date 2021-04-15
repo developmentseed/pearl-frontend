@@ -34,7 +34,7 @@ function Paginator({ numPages, currentPage, gotoPage }) {
           if (hasPrev) {
             gotoPage(currentPage - 1);
           }
-        }} 
+        }}
       />
       <NextArrow
         disabled={!hasNext}
@@ -42,7 +42,7 @@ function Paginator({ numPages, currentPage, gotoPage }) {
           if (hasNext) {
             gotoPage(currentPage + 1);
           }
-        }} 
+        }}
       />
       {fill(1, numPages).map((pageNumber) => (
         <PageNumber
@@ -53,7 +53,9 @@ function Paginator({ numPages, currentPage, gotoPage }) {
           {pageNumber}
         </PageNumber>
       ))}
-      <div>Showing { currentPage } of { numPages }</div>
+      <div>
+        Showing {currentPage} of {numPages}
+      </div>
     </PaginatorContainer>
   );
 }

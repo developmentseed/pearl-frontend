@@ -140,7 +140,6 @@ function SessionOutputControl(props) {
     try {
       const aoi = await restApiClient.bookmarkAOI(projectId, aoiId, aoiName);
       uuid = aoi.uuid;
-      
     } catch (err) {
       logger('Error Bookmarking AOI', err);
       return;

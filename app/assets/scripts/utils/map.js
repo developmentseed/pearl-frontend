@@ -10,4 +10,3 @@ export function areaFromBounds(bbox) {
   const poly = tBboxPolygon(bbox);
   return tArea(poly);
 }
-

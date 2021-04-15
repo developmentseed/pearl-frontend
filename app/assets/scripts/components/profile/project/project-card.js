@@ -11,10 +11,13 @@ function getDetails(project, aois) {
     return {};
   }
   return {
-    'Created': formatDateTime(project.created),
-    'Model': project.model_name,
-    'Last Checkpoint': project.checkpoints.length > 0 ? project.checkpoints[0].name : 'No checkpoints',
-    'AOIS': aois.length,
+    Created: formatDateTime(project.created),
+    Model: project.model_name,
+    'Last Checkpoint':
+      project.checkpoints.length > 0
+        ? project.checkpoints[0].name
+        : 'No checkpoints',
+    AOIS: aois.length,
     'AOI Name': aois.length > 0 ? aois[0].name : '',
   };
 }
@@ -25,9 +28,7 @@ function ProjectCard({ project, aois }) {
   const details = getDetails(project, aois);
   return (
     <ProjectContainer>
-      { hasAoi ? 
-          ( <ProjectMap bounds={bounds} /> ) : null
-      }
+      {hasAoi ? <ProjectMap bounds={bounds} /> : null}
       <DetailsList details={details} />
     </ProjectContainer>
   );

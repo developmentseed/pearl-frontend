@@ -81,7 +81,10 @@ function Root() {
                         path='/profile/projects'
                         component={Projects}
                       />
-                      <Route path='/profile/projects/:projectId' component={Project} />
+                      <Route
+                        path='/profile/projects/:projectId'
+                        component={Project}
+                      />
                       <Route path='/about' component={About} />
                     </>
                   )}

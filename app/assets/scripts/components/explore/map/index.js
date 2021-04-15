@@ -72,7 +72,6 @@ const Container = styled.div`
   }
 `;
 
-
 function Map() {
   const {
     aoiArea,

@@ -30,7 +30,6 @@ import copyTextToClipboard from '../../../utils/copy-text-to-clipboard';
 // Controls the size of each page
 const AOIS_PER_PAGE = 20;
 
-
 const ProjectBody = styled(InpageBodyInner)`
   display: grid;
   grid-template-columns: 1fr;
@@ -53,12 +52,10 @@ const AOI_HEADERS = [
   'Classes',
   'Created',
   'Link',
-  'Download'
+  'Download',
 ];
 
-function downloadGeoTiff(projectId, aoiId) {
-
-}
+function downloadGeoTiff(projectId, aoiId) {}
 
 // Render single projects row
 function renderRow(aoi, { project }) {
@@ -66,15 +63,11 @@ function renderRow(aoi, { project }) {
   const aoiLink = `${window.location.origin}/aoi/${aoi.uuid}/map`;
   return (
     <TableRow key={aoi.id}>
-      <TableCell>
-        {aoi.name}
-      </TableCell>
-      <TableCell>{ formatThousands(tArea(aoi.bounds) / 1e6 )}</TableCell>
-      <TableCell>{ aoi.checkpoint_name }</TableCell>
-      <TableCell>
-        Number of Classes
-      </TableCell>
-      <TableCell>{ formatDateTime(aoi.created) }</TableCell>
+      <TableCell>{aoi.name}</TableCell>
+      <TableCell>{formatThousands(tArea(aoi.bounds) / 1e6)}</TableCell>
+      <TableCell>{aoi.checkpoint_name}</TableCell>
+      <TableCell>Number of Classes</TableCell>
+      <TableCell>{formatDateTime(aoi.created)}</TableCell>
       <TableCell>
         <LinkInput value={aoiLink} disabled={true} />
         <Button
@@ -99,7 +92,6 @@ function renderRow(aoi, { project }) {
 }
 
 function Project() {
-
   const { apiToken } = useContext(AuthContext);
   const { projectId } = useParams();
   const [page, setPage] = useState(1);
@@ -161,7 +153,7 @@ function Project() {
                 justifyContent: 'space-between',
               }}
             >
-              <InpageTitle>{ project ? project.name : '' }</InpageTitle>
+              <InpageTitle>{project ? project.name : ''}</InpageTitle>
               <Button
                 forwardedAs={StyledNavLink}
                 to='/project/new'
@@ -180,9 +172,7 @@ function Project() {
         </InpageHeader>
         <InpageBody>
           <ProjectBody>
-            { project ? (
-              <ProjectCard project={project} aois={aois} />
-            ) : null }
+            {project ? <ProjectCard project={project} aois={aois} /> : null}
             {aois &&
               (aois.length ? (
                 <>
@@ -194,7 +184,7 @@ function Project() {
                     data={aois}
                     renderRow={renderRow}
                     extraData={{
-                      project: project
+                      project: project,
                     }}
                   />
                   <Paginator
@@ -205,7 +195,9 @@ function Project() {
                 </>
               ) : (
                 <Heading>
-                  {isAoisLoading ? 'Loading AOIs...' : 'No Exported AOIs for this project.'}
+                  {isAoisLoading
+                    ? 'Loading AOIs...'
+                    : 'No Exported AOIs for this project.'}
                 </Heading>
               ))}
           </ProjectBody>
