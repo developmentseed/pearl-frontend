@@ -1,6 +1,8 @@
 import React, { useContext, useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { Button } from '@devseed-ui/button';
+import tArea from '@turf/area';
 import {
   Inpage,
   InpageHeader,
@@ -10,34 +12,35 @@ import {
   InpageBody,
   InpageBodyInner,
 } from '../../../styles/inpage';
-import { Form, FormInput } from '@devseed-ui/form';
 import { glsp, media } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
 import { StyledNavLink } from '../../../styles/links';
 import toasts from '../../common/toasts';
-import { useHistory } from 'react-router';
-import { useAuth, AuthContext, useRestApiClient } from '../../../context/auth';
-import { formatDateTime } from '../../../utils/format';
+import { AuthContext, useRestApiClient } from '../../../context/auth';
+import { formatDateTime, formatThousands } from '../../../utils/format';
 import {
   showGlobalLoadingMessage,
   hideGlobalLoading,
 } from '@devseed-ui/global-loading';
 import Table, { TableRow, TableCell } from '../../common/table';
 import Paginator from '../../common/paginator';
+import ProjectCard from './project-card';
+import { areaFromBounds } from '../../../utils/map';
 
 // Controls the size of each page
-const PROJECTS_PER_PAGE = 20;
+const AOIS_PER_PAGE = 20;
 
-const HEADERS = [
-  'Name',
-  'Created',
-  'Model',
-  'Latest Checkpoint',
-  'AOIs',
-  'AOI Names',
+const AOI_HEADERS = [
+  'AOI Name',
+  'AOI Size (Km2)',
+  'Checkpoint',
+  'Classes',
+  'Exported',
+  'Link',
+  'Download'
 ];
 
-const ProjectsBody = styled(InpageBodyInner)`
+const ProjectBody = styled(InpageBodyInner)`
   display: grid;
   grid-template-columns: 1fr;
   grid-auto-rows: auto 1fr;
@@ -49,36 +52,7 @@ const ProjectsBody = styled(InpageBodyInner)`
     grid-auto-rows: auto;
   `}
 `;
-const CardResults = styled.div`
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-auto-rows: auto 1fr;
-  grid-gap: 1rem;
-  ${media.mediumUp`
-    grid-template-columns: 2fr 1fr;
-    grid-auto-rows: auto;
-  `}
-`;
 
-const FormInputGroup = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 2.125rem;
-
-  > :first-child:not(:last-child) {
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-  }
-
-  > :last-child:not(:first-child) {
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-  }
-
-  .form__control::selection {
-    background-color: unset;
-    color: unset;
-  }
-`;
 
 const NavPane = styled.div`
   .active::before {
@@ -98,61 +72,77 @@ const NavList = styled.ol`
 `;
 
 // Render single projects row
-function renderRow(proj) {
+function renderRow(aoi) {
+  console.log('row', aoi);
   return (
-    <TableRow key={proj.id}>
+    <TableRow key={aoi.id}>
       <TableCell>
-        <StyledNavLink to={`/profile/projects/${proj.id}`}>
-          {proj.name}
-        </StyledNavLink>
+        {aoi.name}
       </TableCell>
-      <TableCell>{formatDateTime(proj.created)}</TableCell>
-      <TableCell>{proj.model ? proj.model.name : 'No model set'}</TableCell>
+      <TableCell>{ formatThousands(tArea(aoi.bounds) / 1e6 )}</TableCell>
+      <TableCell>{ aoi.checkpoint_name }</TableCell>
       <TableCell>
-        {proj.checkpoints.length
-          ? proj.checkpoints[proj.checkpoints.length - 1].name
-          : 'No checkpoint set'}
+        Number of Classes
       </TableCell>
-      <TableCell>{proj.aois.length}</TableCell>
+      <TableCell>{ formatDateTime(aoi.created) }</TableCell>
       <TableCell>
-        {proj.aois.length
-          ? proj.aois.map((a) => a.name).join(', ')
-          : 'No AOIs set'}
+        Link
+      </TableCell>
+      <TableCell>
+        Download
       </TableCell>
     </TableRow>
   );
 }
 
-function Projects() {
-  const history = useHistory();
+function Project() {
 
-  const { apiToken } = useAuth();
-
+  const { apiToken } = useContext(AuthContext);
+  const { projectId } = useParams();
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [projects, setProjects] = useState([]);
+  const [aois, setAois] = useState([]);
+  const [isProjectLoading, setIsProjectLoading] = useState(true);
+  const [isAoisLoading, setIsAoisLoading] = useState(true);
+  const [project, setProject] = useState(null);
 
   const { restApiClient } = useRestApiClient();
 
   useEffect(async () => {
     if (apiToken) {
-      showGlobalLoadingMessage('Loading projects...');
+      setIsProjectLoading(true);
+      showGlobalLoadingMessage('Loading project...');
       try {
-        const data = await restApiClient.getProjects(page, PROJECTS_PER_PAGE);
-        setTotal(data.total);
-        setProjects(data.projects);
+        const data = await restApiClient.getProject(projectId);
+        console.log('project', data);
+        setProject(data);
       } catch (err) {
-        toasts.error('Failed to fetch projects.');
-        setIsLoading(false);
+        toasts.error('Failed to fetch project.');
+        setIsProjectLoading(false);
         hideGlobalLoading();
       }
       hideGlobalLoading();
-      setIsLoading(false);
+      setIsProjectLoading(false);
+    }
+  }, [apiToken]);
+
+  useEffect(async () => {
+    if (apiToken) {
+      setIsAoisLoading(true);
+      try {
+        const aoisData = await restApiClient.getAOIs(projectId);
+        console.log('aois', aoisData);
+        setTotal(aoisData.total);
+        setAois(aoisData.aois);
+      } catch (err) {
+        toasts.error('Failed to fetch AOIs for Project');
+        setIsAoisLoading(false);
+      }
+      setIsAoisLoading(false);
     }
   }, [apiToken, page]);
 
-  const numPages = Math.ceil(total / PROJECTS_PER_PAGE);
+  const numPages = Math.ceil(total / AOIS_PER_PAGE);
 
   return (
     <>
@@ -168,7 +158,7 @@ function Projects() {
                 justifyContent: 'space-between',
               }}
             >
-              <InpageTitle>Projects</InpageTitle>
+              <InpageTitle>{ project ? project.name : '' }</InpageTitle>
               <Button
                 forwardedAs={StyledNavLink}
                 to='/project/new'
@@ -186,26 +176,19 @@ function Projects() {
           </InpageHeaderInner>
         </InpageHeader>
         <InpageBody>
-          <ProjectsBody>
-            <NavPane>
-              <NavList>
-                <li>
-                  <StyledNavLink to='/profile/projects' className='active'>
-                    Projects
-                  </StyledNavLink>
-                </li>
-                <li>
-                  <StyledNavLink to='/profile/maps'> Maps</StyledNavLink>
-                </li>
-              </NavList>
-            </NavPane>
-
-            {projects &&
-              (projects.length ? (
+          <ProjectBody>
+            { project ? (
+              <ProjectCard project={project} aois={aois} />
+            ) : null }
+            {aois &&
+              (aois.length ? (
                 <>
+                  <Heading>
+                    {project ? project.name : 'Loading Project...'}
+                  </Heading>
                   <Table
-                    headers={HEADERS}
-                    data={projects}
+                    headers={AOI_HEADERS}
+                    data={aois}
                     renderRow={renderRow}
                   />
                   <Paginator
@@ -216,14 +199,14 @@ function Projects() {
                 </>
               ) : (
                 <Heading>
-                  {isLoading ? 'Loading Projects...' : 'No projects found.'}
+                  {isAoisLoading ? 'Loading AOIs...' : 'No AOIs for this project.'}
                 </Heading>
               ))}
-          </ProjectsBody>
+          </ProjectBody>
         </InpageBody>
       </Inpage>
     </>
   );
 }
 
-export default Projects;
+export default Project;

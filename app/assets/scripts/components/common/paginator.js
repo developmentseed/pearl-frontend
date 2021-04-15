@@ -6,6 +6,16 @@ const PaginatorContainer = styled.div``;
 
 const PageNumber = styled.span``;
 
+const PrevArrow = styled.div`
+  content: '<';
+  cursor: pointer;
+`;
+
+const NextArrow = styled.div`
+  content: '>';
+  cursor: pointer;
+`;
+
 /**
  *
  * @param {Number} numPages - total number of pages
@@ -14,8 +24,26 @@ const PageNumber = styled.span``;
  *                              (passed page number as param)
  */
 function Paginator({ numPages, currentPage, gotoPage }) {
+  const hasPrev = currentPage > 1;
+  const hasNext = currentPage < numPages;
   return (
     <PaginatorContainer>
+      <PrevArrow
+        disabled={!hasPrev}
+        onClick={() => {
+          if (hasPrev) {
+            gotoPage(currentPage - 1);
+          }
+        }} 
+      />
+      <NextArrow
+        disabled={!hasNext}
+        onClick={() => {
+          if (hasNext) {
+            gotoPage(currentPage + 1);
+          }
+        }} 
+      />
       {fill(1, numPages).map((pageNumber) => (
         <PageNumber
           key={pageNumber}
@@ -25,6 +53,7 @@ function Paginator({ numPages, currentPage, gotoPage }) {
           {pageNumber}
         </PageNumber>
       ))}
+      <div>Showing { currentPage } of { numPages }</div>
     </PaginatorContainer>
   );
 }

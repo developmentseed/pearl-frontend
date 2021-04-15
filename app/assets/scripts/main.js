@@ -26,6 +26,9 @@ import { GlobalContextProvider } from './context/global';
 import { CollecticonsGlobalStyle } from '@devseed-ui/collecticons';
 import GlobalLoadingProvider from '@devseed-ui/global-loading';
 import { ToastContainerCustom } from './components/common/toasts';
+import Projects from './components/profile/projects';
+import Project from './components/profile/project';
+import Maps from './components/profile/maps';
 import { AuthProvider } from './context/auth';
 import { ApiMetaProvider } from './context/api-meta';
 
@@ -80,9 +83,11 @@ function Root() {
                         path='/profile/projects'
                         component={Projects}
                       />
+                      <Route path='/profile/projects/:projectId' component={Project} />
                       <Route path='/about' component={About} />
                     </>
                   )}
+
                   <Route path='*' component={UhOh} />
                 </Switch>
                 <ToastContainerCustom />

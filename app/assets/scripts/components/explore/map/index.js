@@ -25,6 +25,7 @@ import AoiEditControl from './aoi-edit-control';
 import PolygonDrawControl from './polygon-draw-control';
 import config from '../../../config';
 import { inRange } from '../../../utils/utils';
+import { areaFromBounds } from '../../../utils/map';
 import {
   useCheckpoint,
   actions as checkpointActions,
@@ -71,15 +72,6 @@ const Container = styled.div`
   }
 `;
 
-/**
- * Get area from bbox
- *
- * @param {array} bbox extent in minX, minY, maxX, maxY order
- */
-function areaFromBounds(bbox) {
-  const poly = tBboxPolygon(bbox);
-  return tArea(poly);
-}
 
 function Map() {
   const {
