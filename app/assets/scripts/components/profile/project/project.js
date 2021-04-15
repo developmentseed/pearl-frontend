@@ -30,15 +30,6 @@ import { areaFromBounds } from '../../../utils/map';
 // Controls the size of each page
 const AOIS_PER_PAGE = 20;
 
-const AOI_HEADERS = [
-  'AOI Name',
-  'AOI Size (Km2)',
-  'Checkpoint',
-  'Classes',
-  'Exported',
-  'Link',
-  'Download'
-];
 
 const ProjectBody = styled(InpageBodyInner)`
   display: grid;
@@ -70,6 +61,16 @@ const NavList = styled.ol`
     flex-flow: column;
   `}
 `;
+
+const AOI_HEADERS = [
+  'AOI Name',
+  'AOI Size (Km2)',
+  'Checkpoint',
+  'Classes',
+  'Created',
+  'Link',
+  'Download'
+];
 
 // Render single projects row
 function renderRow(aoi) {
@@ -130,7 +131,7 @@ function Project() {
     if (apiToken) {
       setIsAoisLoading(true);
       try {
-        const aoisData = await restApiClient.getAOIs(projectId);
+        const aoisData = await restApiClient.getBookmarkedAOIs(projectId);
         console.log('aois', aoisData);
         setTotal(aoisData.total);
         setAois(aoisData.aois);
@@ -199,7 +200,7 @@ function Project() {
                 </>
               ) : (
                 <Heading>
-                  {isAoisLoading ? 'Loading AOIs...' : 'No AOIs for this project.'}
+                  {isAoisLoading ? 'Loading AOIs...' : 'No Exported AOIs for this project.'}
                 </Heading>
               ))}
           </ProjectBody>

@@ -85,6 +85,10 @@ class RestApiClient {
     return this.get(`project/${projectId}/aoi`);
   }
 
+  getBookmarkedAOIs(projectId) {
+    return this.get(`project/${projectId}/aoi?bookmarked=true`);
+  }
+
   getCheckpoint(projectId, checkpointId) {
     return this.get(`project/${projectId}/checkpoint/${checkpointId}`);
   }
