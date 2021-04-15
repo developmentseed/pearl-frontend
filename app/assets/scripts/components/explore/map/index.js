@@ -424,7 +424,7 @@ function Map() {
                   }}
                   eventHandlers={{
                     click: () => {
-                      if (mapState.mode === mapModes.REMOVE_SAMPLE) {
+                      if (mapState.mode === mapModes.DELETE_SAMPLES) {
                         dispatchCurrentCheckpoint({
                           type: checkpointActions.REMOVE_POINT_SAMPLE,
                           data: {

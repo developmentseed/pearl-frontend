@@ -69,27 +69,7 @@ function RefineModel(props) {
 
             <InfoButton
               variation={
-                mapState.mode === mapModes.ERASE_SAMPLE_POLYGON
-                  ? 'primary-raised-dark'
-                  : 'primary-raised-light'
-              }
-              size='small'
-              radius='ellipsoid'
-              useIcon='xmark'
-              visuallyDisabled={!currentCheckpoint.activeItem}
-              info={!currentCheckpoint.activeItem && 'No active item selected'}
-              onClick={() => {
-                if (currentCheckpoint.activeItem) {
-                  setMapMode(mapModes.ERASE_SAMPLE_POLYGON);
-                }
-              }}
-            >
-              Erase
-            </InfoButton>
-
-            <InfoButton
-              variation={
-                mapState.mode === mapModes.REMOVE_SAMPLE
+                mapState.mode === mapModes.DELETE_SAMPLES
                   ? 'primary-raised-dark'
                   : 'primary-raised-light'
               }
@@ -100,12 +80,14 @@ function RefineModel(props) {
               info={!currentCheckpoint.activeItem && 'No active item selected'}
               onClick={() => {
                 if (currentCheckpoint.activeItem) {
-                  setMapMode(mapModes.REMOVE_SAMPLE);
+                  //setMapMode(mapModes.REMOVE_SAMPLE);
+                  setMapMode(mapModes.DELETE_SAMPLES);
                 }
               }}
             >
               Delete
             </InfoButton>
+
           </RefineTools>
           <CheckpointSection>
             <Heading useAlt>Checkpoint List</Heading>
