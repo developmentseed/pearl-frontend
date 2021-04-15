@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import T from 'prop-types';
 import config from '../../config';
 
+import UserDropdown from '../common/user-dropdown';
 import { Button } from '@devseed-ui/button';
 import {
   themeVal,
@@ -13,7 +14,7 @@ import {
 } from '@devseed-ui/theme-provider';
 import { StyledNavLink, StyledLink } from '../../styles/links';
 
-const { appTitle, appLongTitle, baseUrl } = config;
+const { appTitle, appLongTitle, baseUrl, environment } = config;
 
 const PageHead = styled.header`
   background-color: ${themeVal('color.surface')};
@@ -123,8 +124,10 @@ const PageTitlePrimeLink = styled.a`
     font-size: 1.25rem;
     align-self: center;
     ${media.mediumUp`
-      grid-row: 1;
-      align-self: flex-end;
+      &:not(:only-child) {
+        grid-row: 1;
+        align-self: flex-end;
+      }
     `}
     span {
       ${visuallyHidden()};
@@ -132,7 +135,19 @@ const PageTitlePrimeLink = styled.a`
   }
 `;
 
+const SecondarySection = styled.div`
+  border-left: 0.5px solid ${themeVal('color.baseAlphaC')};
+  padding-left: 1.5rem;
+  display: grid;
+  align-items: center;
+  justify-content: space-between;
+  grid-template-columns: min-content min-content;
+`;
+
 function PageHeader(props) {
+  // FIXME: remove this for launch
+  const isProduction = environment === 'production';
+
   return (
     <PageHead role='banner'>
       <PageHeadInner>
@@ -149,7 +164,9 @@ function PageHeader(props) {
                     <span>Microsoft</span>
                     {appTitle}
                   </strong>
-                  <sub>{appLongTitle}</sub>
+                  {location.pathname.split('/')[1] !== 'project' && (
+                    <sub>{appLongTitle}</sub>
+                  )}
                 </PageTitlePrimeLink>
               </li>
             </GlobalMenu>
@@ -182,6 +199,14 @@ function PageHeader(props) {
               </PageSpecificControls>
             )}
           </PrimarySection>
+          {
+            // FIXME: remove this for launch
+            !isProduction && (
+              <SecondarySection>
+                <UserDropdown />
+              </SecondarySection>
+            )
+          }
         </PageNav>
       </PageHeadInner>
     </PageHead>

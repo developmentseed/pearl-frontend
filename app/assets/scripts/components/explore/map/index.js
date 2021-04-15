@@ -1,4 +1,4 @@
-import React, { useMemo, useContext, useEffect } from 'react';
+import React, { useMemo, useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import tArea from '@turf/area';
 import tBboxPolygon from '@turf/bbox-polygon';
@@ -34,7 +34,8 @@ import ModalMapEvent from './modal-events';
 import VectorLayer from '../../common/map/vector-layer';
 import { useRestApiClient } from '../../../context/auth';
 import { useApiMeta } from '../../../context/api-meta';
-import { useAoi } from '../../../context/aoi';
+import { useAoi, useAoiPatch } from '../../../context/aoi';
+import toasts from '../../common/toasts';
 
 const center = [38.83428180092151, -79.37724530696869];
 const zoom = 15;
@@ -46,6 +47,7 @@ const LIVE = 1;
 const Container = styled.div`
   height: 100%;
   z-index: 1;
+  user-select: none;
 
   .leaflet-draw-toolbar,
   .leaflet-draw-actions {
@@ -93,11 +95,12 @@ function Map() {
 
   const { apiLimits } = useApiMeta();
   const { currentAoi } = useAoi();
-
+  const { aoiPatchList } = useAoiPatch();
   const { restApiClient } = useRestApiClient();
 
   const { mapState, mapModes, setMapMode } = useMapState();
   const { mapRef, setMapRef } = useMapRef();
+  const [tileUrl, setTileUrl] = useState(null);
 
   const { mapLayers, setMapLayers } = useMapLayers();
   const { userLayers } = useUserLayers();
@@ -167,21 +170,6 @@ function Map() {
       mapRef.polygonDraw.setLayers(currentCheckpoint.classes);
     }
   }, [mapRef, currentCheckpoint && currentCheckpoint.id]);
-
-  /*
-   * useEffect fires when mode changes.
-   * Checkpoint ID is the same so classList should be the same
-   */
-  useEffect(() => {
-    if (!mapRef || !mapRef.polygonDraw) return;
-
-    //mapRef.polygonDraw.clearLayers();
-    if (currentCheckpoint) {
-      /*dispatchCurrentCheckpoint({
-        type: checkpointActions.CLEAR_POINT_SAMPLES,
-      });*/
-    }
-  }, [mapRef, currentCheckpoint && currentCheckpoint.mode]);
 
   /**
    * Add/update AOI controls on API metadata change.
@@ -257,6 +245,25 @@ function Map() {
       aoiRef.status = LIVE;
     }
   }, [aoiArea, apiLimits, aoiRef]);
+
+  useEffect(async () => {
+    if (currentProject && currentAoi) {
+      try {
+        const tileJSON = await restApiClient.getTileJSON(
+          currentProject.id,
+          currentAoi.id
+        );
+        setTileUrl(`${config.restApiEndpoint}${tileJSON.tiles[0]}`);
+        const bounds = [
+          [tileJSON.bounds[3], tileJSON.bounds[0]],
+          [tileJSON.bounds[1], tileJSON.bounds[2]],
+        ];
+        mapRef.fitBounds(bounds);
+      } catch (error) {
+        toasts.error('Could not load AOI map');
+      }
+    }
+  }, [currentAoi, currentProject, mapRef]);
 
   const displayMap = useMemo(
     () => (
@@ -366,6 +373,24 @@ function Map() {
             />
           ))}
 
+        {aoiPatchList.map((patch) => {
+          // Id format set in context/map.js
+          const id = `${patch.name}-${patch.id}`;
+
+          return (
+            <React.Fragment key={patch.id}>
+              {patch.patches.map((p) => (
+                <ImageOverlay
+                  key={p.key}
+                  url={p.image}
+                  bounds={p.bounds}
+                  opacity={userLayers[id].visible ? userLayers[id].opacity : 0}
+                />
+              ))}
+            </React.Fragment>
+          );
+        })}
+
         {!predictions.data.predictions && currentProject && currentAoi && (
           <TileLayer
             url={`${config.restApiEndpoint}/api/project/${currentProject.id}/aoi/${currentAoi.id}/tiles/{z}/{x}/{y}`}
@@ -423,6 +448,8 @@ function Map() {
       restApiClient,
       setMapLayers,
       setMapRef,
+      aoiPatchList,
+      tileUrl,
     ]
   );
 

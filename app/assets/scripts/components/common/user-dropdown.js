@@ -64,6 +64,7 @@ function UserDropdown() {
   const location = useLocation();
   const { loginWithRedirect, logout } = useAuth0();
   const { isAuthenticated, user } = useContext(AuthContext);
+
   const logoutWithRedirect = () =>
     logout({
       returnTo: window.location.origin,
