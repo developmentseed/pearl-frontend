@@ -320,15 +320,13 @@ export function InstanceProvider(props) {
     },
     applyCheckpoint: async (projectId, checkpointId) => {
       try {
-        showGlobalLoadingMessage('Applying checkpoint...');
-
         if (!websocketClient) {
           await initInstance(projectId);
         }
 
         // Reset predictions state
         dispatchPredictions({
-          type: predictionsActions.START_PREDICTION,
+          type: predictionsActions.CLEAR_PREDICTION,
         });
 
         await fetchCheckpoint(projectId, checkpointId);
@@ -342,8 +340,6 @@ export function InstanceProvider(props) {
             },
           },
         });
-
-        hideGlobalLoading();
       } catch (error) {
         logger(error);
         toasts.error('Could not load checkpoint, please try again later.');
