@@ -61,12 +61,20 @@ class RestApiClient {
     return this.fetch('PATCH', path, data);
   }
 
+  delete(path) {
+    return this.fetch('DELETE', path);
+  }
+
   getApiMeta() {
     return this.get('');
   }
 
   getProject(id) {
     return this.get(`project/${id}`);
+  }
+
+  deleteProject(id) {
+    return this.delete(`project/${id}`);
   }
 
   getProjects(page, limit) {

@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import { Button } from '@devseed-ui/button';
 import tArea from '@turf/area';
@@ -131,6 +131,7 @@ function renderRow(aoi, { project, restApiClient }) {
 
 function Project() {
   const { apiToken } = useContext(AuthContext);
+  const history = useHistory();
   const { projectId } = useParams();
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(null);
@@ -193,6 +194,16 @@ function Project() {
                     variation='base-plain'
                     title='Delete Project'
                     useIcon='trash-bin'
+                    onClick={async () => {
+                      try {
+                        await restApiClient.deleteProject(projectId);
+                        toasts.success('Project successfully deleted.');
+                        history.push(`/profile/projects`);
+                      } catch (err) {
+                        logger('Failed to delete project', err);
+                        toasts.error('Failed to delete project.', err);
+                      }
+                    }}
                   >
                     Delete Project
                   </Button>
