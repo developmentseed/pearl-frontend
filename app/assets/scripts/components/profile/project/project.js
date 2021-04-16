@@ -8,13 +8,16 @@ import {
   InpageHeader,
   InpageHeaderInner,
   InpageHeadline,
-  InpageTitle,
   InpageBody,
-  InpageBodyInner,
+  InpageTagline,
+  InpageTitleWrapper,
+  InpageToolbar,
 } from '../../../styles/inpage';
-import { glsp, media } from '@devseed-ui/theme-provider';
+import { ProjectsBody as ProjectBody } from '../projects/projects';
+import { media } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
-import { StyledNavLink } from '../../../styles/links';
+import { FormInput } from '@devseed-ui/form';
+import { StyledLink } from '../../../styles/links';
 import toasts from '../../common/toasts';
 import { AuthContext, useRestApiClient } from '../../../context/auth';
 import { formatDateTime, formatThousands } from '../../../utils/format';
@@ -30,20 +33,35 @@ import copyTextToClipboard from '../../../utils/copy-text-to-clipboard';
 // Controls the size of each page
 const AOIS_PER_PAGE = 20;
 
-const ProjectBody = styled(InpageBodyInner)`
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-auto-rows: auto 1fr;
-  grid-gap: ${glsp()};
-  padding: 0 ${glsp(4)} ${glsp(4)};
-  min-height: 100%;
-  ${media.mediumUp`
-    grid-template-columns: 1fr 4fr;
-    grid-auto-rows: auto;
-  `}
+const ProjectTagline = styled(InpageTagline)`
+  color: initial;
+  opacity: 1;
 `;
 
-const LinkInput = styled.input``;
+const FormInputGroup = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 2.125rem;
+  input {
+    display: none;
+    ${media.mediumUp`
+      display: revert;
+    `};
+  }
+  > :first-child:not(:last-child) {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  > :last-child:not(:first-child) {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+
+  .form__control::selection {
+    background-color: unset;
+    color: unset;
+  }
+`;
 
 const AOI_HEADERS = [
   'AOI Name',
@@ -69,19 +87,23 @@ function renderRow(aoi, { project }) {
       <TableCell>Number of Classes</TableCell>
       <TableCell>{formatDateTime(aoi.created)}</TableCell>
       <TableCell>
-        <LinkInput value={aoiLink} disabled={true} />
-        <Button
-          size='small'
-          useIcon=''
-          onClick={() => {
-            copyTextToClipboard(aoiLink);
-          }}
-        />
+        <FormInputGroup>
+          <FormInput value={aoiLink} size='small' />
+          <Button
+            variation='primary-plain'
+            useIcon='clipboard'
+            hideText
+            onClick={() => {
+              copyTextToClipboard(aoiLink);
+            }}
+          />
+        </FormInputGroup>
       </TableCell>
       <TableCell>
         <Button
-          size='small'
-          useIcon=''
+          variation='primary-plain'
+          useIcon='download'
+          hideText
           onClick={() => {
             downloadGeoTiff(project.id, aoi.id);
           }}
@@ -136,37 +158,39 @@ function Project() {
       setIsAoisLoading(false);
     }
   }, [apiToken, page]);
-
-  const numPages = Math.ceil(total / AOIS_PER_PAGE);
-
+  console.log(project);
   return (
     <>
       <Inpage>
         <InpageHeader>
           <InpageHeaderInner>
-            <InpageHeadline
-              style={{
-                display: 'grid',
-                gridTemplateColumns: '1fr auto',
-                gridTemplateRows: '1fr',
-                width: '100%',
-                justifyContent: 'space-between',
-              }}
-            >
-              <InpageTitle>{project ? project.name : ''}</InpageTitle>
-              <Button
-                forwardedAs={StyledNavLink}
-                to='/project/new'
-                variation='primary-raised-light'
-                size='large'
-                useIcon={['plus', 'after']}
-                title='Start a new project'
-                style={{
-                  alignSelf: 'center',
-                }}
-              >
-                New Project
-              </Button>
+            <InpageHeadline>
+              <ProjectTagline>
+                <StyledLink to='/profile/projects'>Projects</StyledLink> /{' '}
+                {project ? project.name : ''}
+              </ProjectTagline>
+              <InpageTitleWrapper>
+                <Heading>{project ? project.name : ''}</Heading>
+                <InpageToolbar>
+                  {/* ToDO: Wire Up Delete Button */}
+                  <Button
+                    variation='base-plain'
+                    title='Delete Project'
+                    useIcon='trash-bin'
+                  >
+                    Delete Project
+                  </Button>
+                  <Button
+                    forwardedAs={StyledLink}
+                    to={`/project/${project && project.id}`}
+                    variation='primary-raised-light'
+                    title='Edit project'
+                    useIcon={['chevron-right--small', 'after']}
+                  >
+                    Open in Editor
+                  </Button>
+                </InpageToolbar>
+              </InpageTitleWrapper>
             </InpageHeadline>
           </InpageHeaderInner>
         </InpageHeader>
@@ -176,8 +200,8 @@ function Project() {
             {aois &&
               (aois.length ? (
                 <>
-                  <Heading>
-                    {project ? project.name : 'Loading Project...'}
+                  <Heading size='small'>
+                    {project ? 'Exported Maps' : 'Loading Project...'}
                   </Heading>
                   <Table
                     headers={AOI_HEADERS}
@@ -188,7 +212,6 @@ function Project() {
                     }}
                   />
                   <Paginator
-                    numPages={numPages}
                     currentPage={page}
                     gotoPage={setPage}
                     totalItems={total}

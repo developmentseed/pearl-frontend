@@ -56,7 +56,7 @@ export const InpageHeaderInner = styled.div`
 export const InpageHeadline = styled.div`
   display: flex;
   flex-flow: column;
-  min-width: 0;
+  min-width: 100%;
 
   > *:last-child {
     margin-bottom: 0;
@@ -67,15 +67,25 @@ export const InpageToolbar = styled.div`
   display: flex;
   flex-flow: row nowrap;
   align-items: center;
-  padding-left: ${glsp(2)};
-  margin-left: auto;
+  justify-content: space-between;
+  > * ~ * {
+    margin-left: ${glsp()};
+  }
+  ${media.mediumUp`
+    padding-left: ${glsp(2)};
+    margin-left: auto;
+  `}
 `;
 
 export const InpageTitleWrapper = styled.div`
   display: flex;
-  flex-flow: row nowrap;
   min-width: 0;
+  flex-flow: column nowrap;
   margin-bottom: ${glsp(1.5)};
+  ${media.mediumUp`
+    /* padding: ${glsp(4)}; */
+    flex-flow: row nowrap;
+  `}
 `;
 
 export const InpageTitle = styled.h1`

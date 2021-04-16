@@ -1,10 +1,22 @@
 import React from 'react';
+import styled from 'styled-components';
 import DetailsList from '../../common/details-list';
 import ProjectMap from './project-map';
-import styled from 'styled-components';
+import { media } from '@devseed-ui/theme-provider';
 import { formatDateTime } from '../../../utils/format';
 
-const ProjectContainer = styled.div``;
+const ProjectContainer = styled.div`
+  display: grid;
+  grid-gap: 2rem;
+  grid-template-columns: 1fr;
+  justify-items: center;
+  grid-auto-rows: auto 1fr;
+  ${media.smallUp`
+    grid-template-columns: auto 1fr;
+    align-items: flex-start;
+    justify-items: flex-start;
+  `}
+`;
 
 function getDetails(project, aois) {
   if (!project) {

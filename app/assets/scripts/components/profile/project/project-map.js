@@ -1,7 +1,11 @@
 import React from 'react';
 
 function ProjectMap({ bounds }) {
-  return <div>Map goes here</div>;
+  return (
+    <div>
+      <img src='https://via.placeholder.com/350' />
+    </div>
+  );
 }
 
 export default ProjectMap;

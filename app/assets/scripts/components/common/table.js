@@ -1,7 +1,7 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import T from 'prop-types';
-import { glsp, themeVal, media } from '@devseed-ui/theme-provider';
+import { glsp, themeVal } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
 
 const StyledTable = styled.table`
@@ -30,7 +30,7 @@ const StyledTable = styled.table`
   tbody th,
   tbody td {
     text-align: left;
-    vertical-align: top;
+    vertical-align: baseline;
     border-bottom: ${themeVal('layout.border')} solid
       ${themeVal('color.baseAlphaB')};
   }
@@ -42,19 +42,27 @@ const StyledTable = styled.table`
   td:last-child {
     padding-right: ${glsp()};
   }
+  tbody tr:hover {
+    background: ${({ hoverable }) =>
+      hoverable &&
+      css`
+        ${themeVal('color.primaryAlphaA')}
+      `};
+  }
 `;
 
 const TableHeader = styled.thead``;
 
-const TableBody = styled.tbody`
-  & tr:hover {
-    background: ${themeVal('color.primaryAlphaA')};
-  }
-`;
+const TableBody = styled.tbody``;
 
 export const TableRow = styled.tr``;
 
-export const TableCell = styled.td``;
+export const TableCell = styled.td`
+  > * {
+    vertical-align: inherit;
+    font-size: inherit;
+  }
+`;
 
 /**
  *
@@ -62,9 +70,9 @@ export const TableCell = styled.td``;
  * @param {Array<Object>} data - array of data objects
  * @param {Function} renderRow - function which receives data objects and returns a <tr>
  */
-function Table({ headers, data, renderRow, extraData }) {
+function Table({ headers, data, renderRow, extraData, hoverable }) {
   return (
-    <StyledTable>
+    <StyledTable hoverable={hoverable}>
       <TableHeader>
         <TableRow>
           {headers.map((header) => (
@@ -84,6 +92,7 @@ Table.propTypes = {
   data: T.array,
   renderRow: T.func,
   extraData: T.array,
+  hoverable: T.bool,
 };
 
 export default Table;

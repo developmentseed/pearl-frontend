@@ -36,13 +36,21 @@ const HEADERS = [
   'AOI Names',
 ];
 
-const ProjectsBody = styled(InpageBodyInner)`
+export const ProjectsBody = styled(InpageBodyInner)`
   display: grid;
   grid-template-columns: 1fr;
   grid-auto-rows: auto 1fr;
   grid-gap: ${glsp()};
   padding-top: 0;
-  justify-items: center;
+`;
+
+export const ProjectsHeadline = styled(InpageHeadline)`
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: 1fr;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
 `;
 
 // Render single projects row
@@ -105,15 +113,7 @@ function Projects() {
       <Inpage>
         <InpageHeader>
           <InpageHeaderInner>
-            <InpageHeadline
-              style={{
-                display: 'grid',
-                gridTemplateColumns: '1fr auto',
-                gridTemplateRows: '1fr',
-                width: '100%',
-                justifyContent: 'space-between',
-              }}
-            >
+            <ProjectsHeadline>
               <InpageTitle>Projects</InpageTitle>
               <Button
                 forwardedAs={StyledNavLink}
@@ -122,13 +122,10 @@ function Projects() {
                 size='large'
                 useIcon='plus'
                 title='Start a new project'
-                style={{
-                  alignSelf: 'center',
-                }}
               >
                 New Project
               </Button>
-            </InpageHeadline>
+            </ProjectsHeadline>
           </InpageHeaderInner>
         </InpageHeader>
         <InpageBody>
@@ -140,6 +137,7 @@ function Projects() {
                     headers={HEADERS}
                     data={projects}
                     renderRow={renderRow}
+                    hoverable
                   />
                   <Paginator
                     currentPage={page}
