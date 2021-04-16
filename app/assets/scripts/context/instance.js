@@ -32,6 +32,7 @@ import { useModel } from './model';
 const messageQueueActionTypes = {
   ADD: 'ADD',
   SEND: 'SEND',
+  CLEAR: 'CLEAR',
 };
 
 const instanceActionTypes = {
@@ -126,6 +127,9 @@ export function InstanceProvider(props) {
           websocketClient.sendMessage(state[0]);
           return state.slice(1);
         }
+        case messageQueueActionTypes.CLEAR: {
+          return [];
+        }
         default:
           logger('Unexpected messageQueue action type: ', type);
           throw new Error('Unexpected error.');
@@ -185,6 +189,7 @@ export function InstanceProvider(props) {
         fetchCheckpoint: (checkpointId) =>
           fetchCheckpoint(projectId, checkpointId),
         dispatchPredictions,
+        dispatchMessageQueue,
       });
       newWebsocketClient.addEventListener('open', () => {
         newWebsocketClient.addEventListener('message', () => {});
@@ -417,6 +422,7 @@ export class WebsocketClient extends WebSocket {
     token,
     dispatchInstance,
     dispatchCurrentCheckpoint,
+    dispatchMessageQueue,
     fetchCheckpoint,
     dispatchPredictions,
     dispatchAoiPatch,
@@ -489,12 +495,15 @@ export class WebsocketClient extends WebSocket {
           fetchCheckpoint(data.id);
           this.sendMessage({ action: 'model#status' });
           break;
+        case 'error':
+          logger(event);
+          dispatchMessageQueue({ type: messageQueueActionTypes.CLEAR });
+          dispatchPredictions({ type: predictionsActions.CLEAR_PREDICTION });
+          this.sendMessage({ action: 'model#status' });
+          toasts.error('Unexpected error, please try again later.');
+          break;
         case 'model#checkpoint#progress':
-          this.sendMessage({ action: 'model#status' });
-          break;
         case 'model#checkpoint#complete':
-          this.sendMessage({ action: 'model#status' });
-          break;
         case 'model#retrain#complete':
           this.sendMessage({ action: 'model#status' });
           break;
@@ -537,8 +546,8 @@ export class WebsocketClient extends WebSocket {
           dispatchAoiPatch({
             type: aoiPatchActions.COMPLETE_PATCH,
           });
+          // finish waiting for patch
           break;
-        // finish waiting for patch
         default:
           logger('Unknown websocket message:');
           logger(event);
