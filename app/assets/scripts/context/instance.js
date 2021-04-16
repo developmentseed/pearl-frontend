@@ -71,6 +71,27 @@ function instanceReducer(state, action) {
   }
 }
 
+function aoiBoundsToPolygon(bounds) {
+  // Get bbox polygon from AOI
+  const {
+    _southWest: { lng: minX, lat: minY },
+    _northEast: { lng: maxX, lat: maxY },
+  } = bounds();
+
+  return {
+    type: 'Polygon',
+    coordinates: [
+      [
+        [minX, minY],
+        [maxX, minY],
+        [maxX, maxY],
+        [minX, maxY],
+        [minX, minY],
+      ],
+    ],
+  };
+}
+
 const InstanceContext = createContext(null);
 
 export function InstanceProvider(props) {
@@ -126,10 +147,15 @@ export function InstanceProvider(props) {
 
   // Listen to instance connection, send queue message if any
   useEffect(() => {
-    if (websocketClient && instance.connected && messageQueue.length > 0) {
+    if (
+      websocketClient &&
+      instance.connected &&
+      instance.status === 'ready' &&
+      messageQueue.length > 0
+    ) {
       dispatchMessageQueue({ type: messageQueueActionTypes.SEND });
     }
-  }, [websocketClient, instance.connected, messageQueue]);
+  }, [websocketClient, instance.connected, instance.status, messageQueue]);
 
   async function initInstance(projectId) {
     // Close existing websocket
@@ -233,25 +259,6 @@ export function InstanceProvider(props) {
         }
 
         try {
-          // Get bbox polygon from AOI
-          const {
-            _southWest: { lng: minX, lat: minY },
-            _northEast: { lng: maxX, lat: maxY },
-          } = aoiRef.getBounds();
-
-          const polygon = {
-            type: 'Polygon',
-            coordinates: [
-              [
-                [minX, minY],
-                [maxX, minY],
-                [maxX, maxY],
-                [minX, maxY],
-                [minX, minY],
-              ],
-            ],
-          };
-
           // Reset predictions state
           dispatchPredictions({
             type: predictionsActions.START_PREDICTION,
@@ -264,7 +271,7 @@ export function InstanceProvider(props) {
               action: 'model#prediction',
               data: {
                 name: aoiName,
-                polygon,
+                polygon: aoiBoundsToPolygon(aoiRef.getBounds()),
               },
             },
           });
@@ -290,8 +297,6 @@ export function InstanceProvider(props) {
         }
       }
 
-      showGlobalLoadingMessage('Retraining...');
-
       // Reset predictions state
       dispatchPredictions({
         type: predictionsActions.START_PREDICTION,
@@ -314,6 +319,18 @@ export function InstanceProvider(props) {
                 },
               };
             }),
+          },
+        },
+      });
+
+      // Add prediction request to queue
+      dispatchMessageQueue({
+        type: messageQueueActionTypes.ADD,
+        data: {
+          action: 'model#prediction',
+          data: {
+            name: aoiName,
+            polygon: aoiBoundsToPolygon(aoiRef.getBounds()),
           },
         },
       });
@@ -474,6 +491,9 @@ export class WebsocketClient extends WebSocket {
           this.sendMessage({ action: 'model#status' });
           break;
         case 'model#checkpoint#complete':
+          this.sendMessage({ action: 'model#status' });
+          break;
+        case 'model#retrain#complete':
           this.sendMessage({ action: 'model#status' });
           break;
         case 'model#prediction':
