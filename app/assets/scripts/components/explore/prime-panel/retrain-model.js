@@ -86,11 +86,12 @@ function RetrainModel(props) {
               radius='ellipsoid'
               useLocalButton
               useIcon='eraser'
+              id='eraser-button'
               visuallyDisabled={!currentCheckpoint.activeItem}
               info={
                 !currentCheckpoint.activeItem
                   ? 'No active item selected'
-                  : 'Click to delete, draw to erase'
+                  : 'Draw to erase, click to delete'
               }
               onClick={() => {
                 if (currentCheckpoint.activeItem) {
