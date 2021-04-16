@@ -133,11 +133,13 @@ function Map() {
           mapRef.polygonDraw.enableAdd(currentCheckpoint.activeItem);
         }
         break;
-      case mapModes.REMOVE_SAMPLE:
+
+      case mapModes.DELETE_SAMPLES:
         if (currentCheckpoint.activeItem) {
-          mapRef.polygonDraw.enableDelete(currentCheckpoint.activeItem);
+          mapRef.polygonDraw.enableSubtract(currentCheckpoint.activeItem);
         }
         break;
+
       default:
         mapRef.polygonDraw.disable();
         break;
@@ -398,7 +400,7 @@ function Map() {
                   }}
                   eventHandlers={{
                     click: () => {
-                      if (mapState.mode === mapModes.REMOVE_SAMPLE) {
+                      if (mapState.mode === mapModes.DELETE_SAMPLES) {
                         dispatchCurrentCheckpoint({
                           type: checkpointActions.REMOVE_POINT_SAMPLE,
                           data: {

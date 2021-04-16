@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="17px" height="14px" viewBox="0 0 17 14" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>eraser</title>
+    <g id="Symbols" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Group" transform="translate(0.197829, 0.000000)" fill="#443F3F" fill-rule="nonzero">
+            <g id="trash-bin">
+                <path d="M11.8364146,1.48528137 C12.3089577,1.48528137 12.6920295,1.87703222 12.6920295,2.36028137 L12.6920295,11.3211564 L8.62015787,15.4852814 L4.1358798,15.4852814 C3.66333669,15.4852814 3.28026482,15.0935305 3.28026482,14.6102814 L3.28026482,2.36028137 C3.28026482,1.87703222 3.66333669,1.48528137 4.1358798,1.48528137 L11.8364146,1.48528137 Z M10.7943533,7.48528137 L5.16261776,7.48528137 L5.16261776,13.4852814 L8.43921121,13.4839151 L10.8096766,10.9584428 L10.7943533,7.48528137 Z" id="Combined-Shape" transform="translate(7.986147, 8.485281) rotate(45.000000) translate(-7.986147, -8.485281) "></path>
+            </g>
+        </g>
+    </g>
+</svg>

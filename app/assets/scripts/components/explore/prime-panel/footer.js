@@ -19,7 +19,6 @@ const PanelControls = styled(PanelBlockFooter)`
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-gap: ${glsp()};
-  padding-bottom: ${glsp(2)};
 `;
 const SaveCheckpoint = styled(DropdownBody)`
   padding: ${glsp()};
@@ -114,10 +113,11 @@ function Footer(props) {
       <Button
         variation='primary-raised-light'
         size='medium'
-        useIcon='tick--small'
+        useIcon='arrow-loop'
         style={{
           gridColumn: '1 / 2',
         }}
+        title='Clear all samples drawn since last retrain or save'
         id='reset-button-trigger'
         onClick={() => {
           dispatchCurrentCheckpoint({
@@ -131,10 +131,11 @@ function Footer(props) {
       <Button
         variation='primary-raised-light'
         size='medium'
-        useIcon='tick--small'
+        useIcon='arrow-semi-spin-ccw'
         style={{
           gridColumn: '2 / -1',
         }}
+        title='Undo last performed action'
         onClick={() => {
           dispatchCurrentCheckpoint({
             type: checkpointActions.INPUT_UNDO,

@@ -6,10 +6,14 @@ import {
   actions as checkpointActions,
 } from '../../../context/checkpoint';
 import {
+  ToolsWrapper,
   ClassList as ItemList,
   Class as Item,
   Thumbnail,
   ToolBox as RefineTools,
+  ClassHeading,
+  ClassSamples,
+  ClassInfoWrapper,
 } from './retrain-refine-styles';
 import { Heading } from '@devseed-ui/typography';
 import { Button } from '@devseed-ui/button';
@@ -19,7 +23,6 @@ import { glsp } from '@devseed-ui/theme-provider';
 import { useMapState, useExploreContext } from '../../../context/explore.js';
 import { useMapRef } from '../../../context/map';
 import { PlaceholderMessage } from '../../../styles/placeholder';
-
 import {
   Dropdown,
   DropdownHeader,
@@ -27,13 +30,7 @@ import {
   DropdownItem,
 } from '../../../styles/dropdown';
 
-const Wrapper = styled.div`
-  display: grid;
-  grid-gap: ${glsp()};
-`;
-const Section = styled.section``;
-
-const CheckpointSection = styled(Section)`
+const CheckpointSection = styled(ItemList)`
   max-height: ${glsp(7.5)};
   overflow-y: scroll;
 `;
@@ -66,7 +63,7 @@ function RefineModel(props) {
   }, [apiCheckpointList]);
 
   return (
-    <Wrapper className={className}>
+    <ToolsWrapper className={className}>
       {ready ? (
         <>
           <RefineTools>
@@ -90,24 +87,31 @@ function RefineModel(props) {
             >
               Draw
             </InfoButton>
+
             <InfoButton
               variation={
-                mapState.mode === mapModes.REMOVE_SAMPLE
+                mapState.mode === mapModes.DELETE_SAMPLES
                   ? 'primary-raised-dark'
                   : 'primary-raised-light'
               }
               size='small'
               radius='ellipsoid'
-              useIcon='xmark'
+              useLocalButton
+              useIcon='eraser'
+              id='eraser-button'
               visuallyDisabled={!currentCheckpoint.activeItem}
-              info={!currentCheckpoint.activeItem && 'No active item selected'}
+              info={
+                !currentCheckpoint.activeItem
+                  ? 'No active item selected'
+                  : 'Draw to erase, click to delete'
+              }
               onClick={() => {
                 if (currentCheckpoint.activeItem) {
-                  setMapMode(mapModes.REMOVE_SAMPLE);
+                  setMapMode(mapModes.DELETE_SAMPLES);
                 }
               }}
             >
-              Delete
+              Erase
             </InfoButton>
           </RefineTools>
           {checkpointList && (
@@ -192,10 +196,11 @@ function RefineModel(props) {
               </ItemList>
             </CheckpointSection>
           )}
-          <Section>
+          <ItemList>
             <Heading useAlt>Class List</Heading>
-            <ItemList>
-              {Object.values(currentCheckpoint.classes).map((c) => (
+            {Object.values(currentCheckpoint.classes).map((c) => {
+              let polygons = get(c, 'polygons.length');
+              return (
                 <Item
                   key={c.name}
                   onClick={() => {
@@ -207,28 +212,32 @@ function RefineModel(props) {
                   selected={currentCheckpoint.activeItem === c.name}
                 >
                   <Thumbnail color={c.color} />
-                  <Heading size='xsmall'>
-                    {c.name} (
-                    {get(c, 'points.coordinates.length', 0) +
-                      get(c, 'polygons.length', 0)}{' '}
-                    samples)
-                    {currentCheckpoint.activeItem === c.name ? ' (Active)' : ''}
-                  </Heading>
+                  <ClassInfoWrapper>
+                    <ClassHeading size='xsmall'>{c.name}</ClassHeading>
+                    <ClassSamples>
+                      {polygons > 0 && (
+                        <strong>
+                          {polygons} {polygons > 1 ? 'polygons' : 'polygon'}
+                        </strong>
+                      )}{' '}
+                      {polygons > 0 && `selected`}
+                    </ClassSamples>
+                  </ClassInfoWrapper>
 
                   <Button useIcon='cog' hideText variation='base-plain'>
                     Options
                   </Button>
                 </Item>
-              ))}
-            </ItemList>
-          </Section>
+              );
+            })}
+          </ItemList>
         </>
       ) : (
         <PlaceholderMessage>
           Please submit or clear retraining samples before refining results
         </PlaceholderMessage>
       )}
-    </Wrapper>
+    </ToolsWrapper>
   );
 }
 
