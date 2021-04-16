@@ -25,7 +25,7 @@ import {
 
 import { actions as predictionsActions, usePredictions } from './predictions';
 import { useProject } from './project';
-import { useAoi } from './aoi';
+import { useAoi, useAoiPatch } from './aoi';
 import { actions as aoiPatchActions } from './reducers/aoi_patch';
 import { useModel } from './model';
 
@@ -107,6 +107,7 @@ export function InstanceProvider(props) {
   const { currentProject, setCurrentProject } = useProject();
   const { dispatchPredictions } = usePredictions();
   const { aoiName, aoiRef } = useAoi();
+  const { dispatchAoiPatch } = useAoiPatch();
   const { selectedModel } = useModel();
 
   const [websocketClient, setWebsocketClient] = useState(null);
@@ -190,6 +191,7 @@ export function InstanceProvider(props) {
           fetchCheckpoint(projectId, checkpointId),
         dispatchPredictions,
         dispatchMessageQueue,
+        dispatchAoiPatch,
       });
       newWebsocketClient.addEventListener('open', () => {
         newWebsocketClient.addEventListener('message', () => {});
@@ -341,6 +343,77 @@ export function InstanceProvider(props) {
         },
       });
     },
+    refine: async function () {
+      const classes = Object.values(currentCheckpoint.classes);
+      let sampleCount = 0;
+      for (let i = 0; i < classes.length; i++) {
+        const aClass = classes[i];
+        sampleCount += get(aClass, 'polygons.length', 0);
+      }
+      const checkpoints = Object.values(currentCheckpoint.checkpointBrushes);
+
+      for (let i = 0; i < checkpoints.length; i++) {
+        const ckpt = checkpoints[i];
+        sampleCount += get(ckpt, 'polygons.length', 0);
+      }
+
+      if (sampleCount === 0) {
+        toasts.error(`At least one sample must be provided for refinement`);
+        return;
+      }
+
+      showGlobalLoadingMessage('Requesting AOI patch...');
+      Object.values(currentCheckpoint.checkpointBrushes).forEach((ckpt) => {
+        ckpt.polygons.forEach((polygon) => {
+          dispatchAoiPatch({
+            type: aoiPatchActions.INIT,
+            data: {
+              name: `${ckpt.checkpoint.name} (${ckpt.checkpoint.id})`,
+            },
+          });
+          dispatchMessageQueue({
+            type: messageQueueActionTypes.ADD,
+            data: {
+              action: 'model#patch',
+              data: {
+                type: 'brush',
+                checkpoint_id: ckpt.checkpoint.id,
+                polygon,
+              },
+            },
+          });
+        });
+      });
+
+      Object.values(currentCheckpoint.classes).forEach((cl, index) => {
+        cl.polygons.forEach((polygon) => {
+          dispatchAoiPatch({
+            type: aoiPatchActions.INIT,
+            data: {
+              name: `${cl.name}`,
+            },
+          });
+
+          dispatchMessageQueue({
+            type: messageQueueActionTypes.ADD,
+            data: {
+              action: 'model#patch',
+              data: {
+                type: 'class',
+                class: index,
+                polygon,
+              },
+            },
+          });
+        });
+      });
+
+      // Clear samples from the checkpoint object
+      // Prime panel calls mapRef.polygonDraw.clearLayers()
+      dispatchCurrentCheckpoint({
+        type: checkpointActions.CLEAR_SAMPLES,
+      });
+    },
     applyCheckpoint: async (projectId, checkpointId) => {
       try {
         if (!websocketClient) {
@@ -401,6 +474,7 @@ export const useInstance = () => {
     initInstance,
     runInference,
     retrain,
+    refine,
     applyCheckpoint,
   } = useCheckContext(InstanceContext);
   return useMemo(
@@ -411,6 +485,7 @@ export const useInstance = () => {
       initInstance,
       runInference,
       retrain,
+      refine,
       applyCheckpoint,
     }),
     [instance, initInstance, runInference, retrain, applyCheckpoint]

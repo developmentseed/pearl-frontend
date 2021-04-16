@@ -25,9 +25,15 @@ const SaveCheckpoint = styled(DropdownBody)`
   padding: ${glsp()};
 `;
 
-function PrimeButton({ currentCheckpoint, allowInferenceRun }) {
+function PrimeButton({ currentCheckpoint, allowInferenceRun, mapRef }) {
   const { predictions } = usePredictions();
-  const { instance, sendAbortMessage, runInference, retrain } = useInstance();
+  const {
+    instance,
+    sendAbortMessage,
+    runInference,
+    retrain,
+    refine,
+  } = useInstance();
 
   // If in refine mode, this button save refinements
   if (currentCheckpoint && currentCheckpoint.mode === checkpointModes.REFINE) {
@@ -40,7 +46,10 @@ function PrimeButton({ currentCheckpoint, allowInferenceRun }) {
         style={{
           gridColumn: '1 / -1',
         }}
-        onClick={() => {}}
+        onClick={() => {
+          refine();
+          mapRef.polygonDraw.clearLayers();
+        }}
         id='save-refine'
       >
         Save Refinements
@@ -83,6 +92,7 @@ function PrimeButton({ currentCheckpoint, allowInferenceRun }) {
 PrimeButton.propTypes = {
   currentCheckpoint: T.object,
   allowInferenceRun: T.bool.isRequired,
+  mapRef: T.object,
 };
 
 function Footer(props) {
@@ -146,6 +156,7 @@ function Footer(props) {
       <PrimeButton
         currentCheckpoint={currentCheckpoint}
         allowInferenceRun={allowInferenceRun}
+        mapRef={mapRef}
       />
 
       <Dropdown
