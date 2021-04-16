@@ -7,34 +7,25 @@ import React, {
   useMemo,
 } from 'react';
 import T from 'prop-types';
-import config from '../config';
-import { initialApiRequestState } from './reducers/reduxeed';
-import { useRestApiClient } from './auth';
+import { useAuth } from './auth';
 import {
   showGlobalLoadingMessage,
   hideGlobalLoading,
 } from '@devseed-ui/global-loading';
 import toasts from '../components/common/toasts';
 import { useHistory, useParams } from 'react-router-dom';
-import predictionsReducer, {
-  actions as predictionActions,
-} from './reducers/predictions';
+import { actions as predictionActions, usePredictions } from './predictions';
 import { mapStateReducer, mapModes, mapActionTypes } from './reducers/map';
 import tBbox from '@turf/bbox';
 import reverseGeoCode from '../utils/reverse-geocode';
 
 import { actions as checkpointActions, useCheckpoint } from './checkpoint';
-import get from 'lodash.get';
-import logger from '../utils/logger';
 import { wrapLogReducer } from './reducers/utils';
-import {
-  instanceReducer,
-  instanceInitialState,
-  messageQueueActionTypes,
-  WebsocketClient,
-} from './instance';
 import { useAoi, useAoiPatch } from './aoi';
-import { actions as aoiPatchActions } from './reducers/aoi_patch';
+import { useProject } from './project';
+import { useModel } from './model';
+import { useInstance } from './instance';
+import logger from '../utils/logger';
 
 /**
  * Context & Provider
@@ -44,12 +35,13 @@ export const ExploreContext = createContext(null);
 export function ExploreProvider(props) {
   const history = useHistory();
   let { projectId } = useParams();
-  const { restApiClient, isLoading: authIsLoading } = useRestApiClient();
 
-  const [currentProject, setCurrentProject] = useState(null);
-  const [checkpointList, setCheckpointList] = useState(null);
-
-  const { setCurrentAoi } = useAoi();
+  const { restApiClient, isLoading: authIsLoading } = useAuth();
+  const { currentProject, setCurrentProject } = useProject();
+  const { aoiName, aoiRef, setAoiName, setAoiRef, setCurrentAoi } = useAoi();
+  const { predictions, dispatchPredictions } = usePredictions();
+  const { selectedModel, setSelectedModel } = useModel();
+  const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
   const {
     aoiPatch,
     dispatchAoiPatch,
@@ -57,32 +49,20 @@ export function ExploreProvider(props) {
     setAoiPatchList,
   } = useAoiPatch();
 
-  // The following AOI properties should be refactored in the futre and moved to useAoi()
-  // to avoid re-rendering issues in this context.
-  const [aoiRef, setAoiRef] = useState(null);
+  // The following properties should be moved to own context to avoid re-rendering.
   const [aoiArea, setAoiArea] = useState(null);
-  const [aoiName, setAoiName] = useState(null);
   const [aoiInitializer, setAoiInitializer] = useState(null);
   const [aoiList, setAoiList] = useState([]);
   const [aoiBounds, setAoiBounds] = useState(null);
-
   const [mapState, dispatchMapState] = useReducer(
     wrapLogReducer(mapStateReducer),
     {
       mode: mapModes.BROWSE_MODE,
     }
   );
-
-  const [selectedModel, setSelectedModel] = useState(null);
-
-  const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
-
-  const [predictions, dispatchPredictions] = useReducer(
-    predictionsReducer,
-    initialApiRequestState
-  );
-
+  const [checkpointList, setCheckpointList] = useState(null);
   const [currentInstance, setCurrentInstance] = useState(null);
+  const { setInstanceStatusMessage } = useInstance();
 
   async function loadInitialData() {
     showGlobalLoadingMessage('Loading configuration...');
@@ -153,10 +133,10 @@ export function ExploreProvider(props) {
     if (predictions.fetching) {
       const { processed, total } = predictions;
       if (!total) {
-        showGlobalLoadingMessage(`Waiting for predictions...`);
+        setInstanceStatusMessage(`Waiting for predictions...`);
       } else {
-        showGlobalLoadingMessage(
-          `Receiving images: ${processed} of ${total}...`
+        setInstanceStatusMessage(
+          `Receiving images ${processed} of ${total}...`
         );
       }
     } else if (predictions.isReady()) {
@@ -318,7 +298,7 @@ export function ExploreProvider(props) {
       setAoiBounds(aoiRef.getBounds());
       setAoiName(aoiObject.name);
       dispatchMapState({
-        type: mapActionTypes.BROWSE_MODE,
+        type: mapActionTypes.SET_MODE,
         data: mapModes.ADD_CLASS_SAMPLES,
       });
       if (predictions.isReady) {
@@ -518,25 +498,6 @@ export const useExploreContext = (fnName) => {
   return context;
 };
 
-export const useProject = () => {
-  const {
-    aoiName,
-    aoiRef,
-    currentProject,
-    setCurrentProject,
-  } = useExploreContext('useProject');
-
-  return useMemo(
-    () => ({
-      currentProject,
-      setCurrentProject,
-      aoiName,
-      aoiRef,
-    }),
-    [currentProject, aoiName, aoiRef]
-  );
-};
-
 export const useMapState = () => {
   const { mapState, dispatchMapState } = useExploreContext('useMapState');
 
@@ -553,361 +514,5 @@ export const useMapState = () => {
       mapModes,
     }),
     [mapState, mapModes]
-  );
-};
-
-export const usePredictions = () => {
-  const { predictions, dispatchPredictions } = useExploreContext(
-    'usePredictions'
-  );
-
-  return useMemo(
-    () => ({
-      predictions,
-      dispatchPredictions,
-    }),
-    [predictions, dispatchPredictions]
-  );
-};
-
-export const useInstance = () => {
-  const history = useHistory();
-  const { restApiClient } = useRestApiClient();
-  const {
-    currentCheckpoint,
-    dispatchCurrentCheckpoint,
-    fetchCheckpoint,
-  } = useCheckpoint();
-  const { aoiName, aoiRef, currentProject, setCurrentProject } = useProject();
-  const { dispatchPredictions } = usePredictions();
-  const { selectedModel, dispatchAoiPatch } = useExploreContext('useWebsocket');
-
-  const [websocketClient, setWebsocketClient] = useState(null);
-
-  const [instance, dispatchInstance] = useReducer(
-    instanceReducer,
-    instanceInitialState
-  );
-
-  // Create a message queue to wait for instance connection
-  const [messageQueue, dispatchMessageQueue] = useReducer(
-    wrapLogReducer((state, { type, data }) => {
-      switch (type) {
-        case messageQueueActionTypes.ADD: {
-          return state.concat(JSON.stringify(data));
-        }
-        case messageQueueActionTypes.SEND: {
-          websocketClient.send(state[0]);
-          return state.slice(1);
-        }
-        default:
-          logger('Unexpected messageQueue action type: ', type);
-          throw new Error('Unexpected error.');
-      }
-    }),
-    []
-  );
-
-  // Listen to instance connection, send queue message if any
-  useEffect(() => {
-    if (websocketClient && instance.connected && messageQueue.length > 0) {
-      dispatchMessageQueue({ type: messageQueueActionTypes.SEND });
-    }
-  }, [websocketClient, instance.connected, messageQueue]);
-
-  async function initInstance(projectId) {
-    // Close existing websocket
-    if (websocketClient) {
-      websocketClient.close();
-    }
-
-    // Fetch active instances for this project
-    const activeInstances = await restApiClient.getActiveInstances(projectId);
-
-    // Get instance token
-    let token;
-    if (activeInstances.total > 0) {
-      const { id: instanceId } = activeInstances.instances[0];
-      token = (await restApiClient.getInstance(projectId, instanceId)).token;
-    } else {
-      token = (await restApiClient.createInstance(projectId)).token;
-    }
-
-    // Use a Promise to stand by for GPU connection
-    return new Promise((resolve, reject) => {
-      const newWebsocketClient = new WebsocketClient({
-        token,
-        dispatchInstance,
-        dispatchCurrentCheckpoint,
-        fetchCheckpoint: (checkpointId) =>
-          fetchCheckpoint(projectId, checkpointId),
-        dispatchPredictions,
-        dispatchAoiPatch,
-      });
-      newWebsocketClient.addEventListener('open', () => {
-        setWebsocketClient(newWebsocketClient);
-        resolve();
-      });
-      newWebsocketClient.addEventListener('error', () => {
-        reject();
-      });
-    });
-  }
-
-  return useMemo(
-    () => ({
-      runInference: async () => {
-        if (restApiClient) {
-          let project = currentProject;
-
-          if (!project) {
-            try {
-              showGlobalLoadingMessage('Creating project...');
-              project = await restApiClient.createProject({
-                model_id: selectedModel.id,
-                mosaic: 'naip.latest',
-                name: 'Untitled',
-              });
-              setCurrentProject(project);
-              history.push(`/project/${project.id}`);
-            } catch (error) {
-              logger(error);
-              hideGlobalLoading();
-              toasts.error('Could not create project, please try again later.');
-              return; // abort inference run
-            }
-          }
-
-          try {
-            showGlobalLoadingMessage('Fetching classes...');
-            const { classes } = await restApiClient.getModel(selectedModel.id);
-            dispatchCurrentCheckpoint({
-              type: checkpointActions.SET_CHECKPOINT,
-              data: {
-                classes,
-              },
-            });
-          } catch (error) {
-            logger(error);
-            hideGlobalLoading();
-            toasts.error('Could fetch model classes, please try again later.');
-            return; // abort inference run
-          }
-
-          if (!aoiName) {
-            hideGlobalLoading();
-            toasts.error('AOI Name must be set before running inference');
-            return; // abort inference run
-          }
-
-          try {
-            await initInstance(project.id);
-          } catch (error) {
-            logger(error);
-            hideGlobalLoading();
-            toasts.error('Could not create instance, please try again later.');
-          }
-
-          try {
-            // Get bbox polygon from AOI
-            const {
-              _southWest: { lng: minX, lat: minY },
-              _northEast: { lng: maxX, lat: maxY },
-            } = aoiRef.getBounds();
-
-            const polygon = {
-              type: 'Polygon',
-              coordinates: [
-                [
-                  [minX, minY],
-                  [maxX, minY],
-                  [maxX, maxY],
-                  [minX, maxY],
-                  [minX, minY],
-                ],
-              ],
-            };
-
-            // Reset predictions state
-            dispatchPredictions({
-              type: predictionActions.START_PREDICTION,
-            });
-
-            // Add prediction request to queue
-            dispatchMessageQueue({
-              type: messageQueueActionTypes.ADD,
-              data: {
-                action: 'model#prediction',
-                data: {
-                  name: aoiName,
-                  polygon,
-                },
-              },
-            });
-          } catch (error) {
-            logger(error);
-            hideGlobalLoading();
-            toasts.error('Could not create instance, please try again later.');
-          }
-        }
-      },
-      retrain: async function () {
-        // Check if all classes have the minimum number of samples
-        const classes = Object.values(currentCheckpoint.classes);
-        for (let i = 0; i < classes.length; i++) {
-          const aClass = classes[i];
-          const sampleCount =
-            get(aClass, 'points.coordinates.length', 0) +
-            get(aClass, 'polygons.length', 0);
-          if (sampleCount < config.minSampleCount) {
-            toasts.error(
-              `A minimum of ${config.minSampleCount} samples is required for every class.`
-            );
-            return;
-          }
-        }
-
-        showGlobalLoadingMessage('Retraining...');
-
-        // Reset predictions state
-        dispatchPredictions({
-          type: predictionActions.START_PREDICTION,
-        });
-
-        // Add prediction request to queue
-        dispatchMessageQueue({
-          type: messageQueueActionTypes.ADD,
-          data: {
-            action: 'model#retrain',
-            data: {
-              name: aoiName,
-              classes: classes.map((c) => {
-                return {
-                  name: c.name,
-                  color: c.color,
-                  geometry: {
-                    type: 'GeometryCollection',
-                    geometries: [c.points, ...c.polygons],
-                  },
-                };
-              }),
-            },
-          },
-        });
-      },
-      refine: async function () {
-        const classes = Object.values(currentCheckpoint.classes);
-        let sampleCount = 0;
-        for (let i = 0; i < classes.length; i++) {
-          const aClass = classes[i];
-          sampleCount += get(aClass, 'polygons.length', 0);
-        }
-        const checkpoints = Object.values(currentCheckpoint.checkpointBrushes);
-
-        for (let i = 0; i < checkpoints.length; i++) {
-          const ckpt = checkpoints[i];
-          sampleCount += get(ckpt, 'polygons.length', 0);
-        }
-
-        if (sampleCount === 0) {
-          toasts.error(`At least one sample must be provided for refinement`);
-          return;
-        }
-
-        showGlobalLoadingMessage('Requesting AOI patch...');
-        Object.values(currentCheckpoint.checkpointBrushes).forEach((ckpt) => {
-          ckpt.polygons.forEach((polygon) => {
-            dispatchAoiPatch({
-              type: aoiPatchActions.INIT,
-              data: {
-                name: `${ckpt.checkpoint.name} (${ckpt.checkpoint.id})`,
-              },
-            });
-            dispatchMessageQueue({
-              type: messageQueueActionTypes.ADD,
-              data: {
-                action: 'model#patch',
-                data: {
-                  type: 'brush',
-                  checkpoint_id: ckpt.checkpoint.id,
-                  polygon,
-                },
-              },
-            });
-          });
-        });
-
-        Object.values(currentCheckpoint.classes).forEach((cl, index) => {
-          cl.polygons.forEach((polygon) => {
-            dispatchAoiPatch({
-              type: aoiPatchActions.INIT,
-              data: {
-                name: `${cl.name}`,
-              },
-            });
-
-            dispatchMessageQueue({
-              type: messageQueueActionTypes.ADD,
-              data: {
-                action: 'model#patch',
-                data: {
-                  type: 'class',
-                  class: index,
-                  polygon,
-                },
-              },
-            });
-          });
-        });
-
-        // Clear samples from the checkpoint object
-        // Prime panel calls mapRef.polygonDraw.clearLayers()
-        dispatchCurrentCheckpoint({
-          type: checkpointActions.CLEAR_SAMPLES,
-        });
-      },
-      applyCheckpoint: async (projectId, checkpointId) => {
-        try {
-          showGlobalLoadingMessage('Applying checkpoint...');
-
-          if (!websocketClient) {
-            await initInstance(projectId);
-          }
-
-          // Reset predictions state
-          dispatchPredictions({
-            type: predictionActions.START_PREDICTION,
-          });
-
-          await fetchCheckpoint(projectId, checkpointId);
-
-          dispatchMessageQueue({
-            type: messageQueueActionTypes.ADD,
-            data: {
-              action: 'model#checkpoint',
-              data: {
-                id: checkpointId,
-              },
-            },
-          });
-
-          hideGlobalLoading();
-        } catch (error) {
-          logger(error);
-          toasts.error('Could not load checkpoint, please try again later.');
-        }
-      },
-    }),
-    [
-      aoiName,
-      aoiRef,
-      currentProject,
-      currentCheckpoint,
-      dispatchCurrentCheckpoint,
-      setCurrentProject,
-      restApiClient,
-      instance,
-      selectedModel,
-    ]
   );
 };

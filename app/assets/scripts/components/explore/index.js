@@ -12,7 +12,11 @@ import SessionTimeoutModal from '../common/timeout-modal';
 import SessionOutputControl from './session-output-control';
 import { CheckpointProvider } from '../../context/checkpoint';
 import { AoiProvider } from '../../context/aoi';
-
+import { ProjectProvider } from '../../context/project';
+import { InstanceProvider } from '../../context/instance';
+import { PredictionsProvider } from '../../context/predictions';
+import { ModelProvider } from '../../context/model';
+import Composer from '../../utils/compose-components';
 function Explore() {
   const { setTourStep } = useTour();
   const [isMediumDown, setIsMediumDown] = useState(false);
@@ -23,30 +27,35 @@ function Explore() {
 
   return (
     <App pageTitle='Explore'>
-      <CheckpointProvider>
-        <AoiProvider>
-          <ExploreProvider>
-            <MapProvider>
-              <SizeAwareElement
-                element='header'
-                className='header'
-                onChange={resizeListener}
-              >
-                <PageHeader>
-                  <SessionOutputControl
-                    openHelp={() => setTourStep(0)}
-                    isMediumDown={isMediumDown}
-                  />
-                </PageHeader>
-              </SizeAwareElement>
-              <PageBody role='main'>
-                <ExploreComponent />
-              </PageBody>
-              <SessionTimeoutModal revealed={false} />
-            </MapProvider>
-          </ExploreProvider>
-        </AoiProvider>
-      </CheckpointProvider>
+      <Composer
+        components={[
+          CheckpointProvider,
+          AoiProvider,
+          ModelProvider,
+          ProjectProvider,
+          PredictionsProvider,
+          InstanceProvider,
+          ExploreProvider,
+          MapProvider,
+        ]}
+      >
+        <SizeAwareElement
+          element='header'
+          className='header'
+          onChange={resizeListener}
+        >
+          <PageHeader>
+            <SessionOutputControl
+              openHelp={() => setTourStep(0)}
+              isMediumDown={isMediumDown}
+            />
+          </PageHeader>
+        </SizeAwareElement>
+        <PageBody role='main'>
+          <ExploreComponent />
+        </PageBody>
+        <SessionTimeoutModal revealed={false} />
+      </Composer>
     </App>
   );
 }

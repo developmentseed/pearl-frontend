@@ -9,7 +9,7 @@ import InputRange from 'react-input-range';
 import { Accordion, AccordionFold as BaseFold } from '@devseed-ui/accordion';
 import throttle from 'lodash.throttle';
 import { useMapLayers, useMapRef, useUserLayers } from '../../context/map';
-import { usePredictions } from '../../context/explore';
+import { usePredictions } from '../../context/predictions';
 import { useCheckpoint } from '../../context/checkpoint';
 
 const Wrapper = styled.div`
