@@ -5,7 +5,8 @@ import {} from 'leaflet.vectorgrid';
 import usePrevious from '../../../utils/use-previous';
 
 function VectorLayer(props) {
-  const { url, token, pane, opacity } = props;
+  const { url, token, pane, opacity, classes } = props;
+  const classArray = Object.keys(classes);
   const map = useMap();
   const [layer, setLayer] = useState(null);
 
@@ -19,13 +20,17 @@ function VectorLayer(props) {
       },
     },
     pane: pane || 'mapPane',
+    interactive: true,
     vectorTileLayerStyles: {
-      data: {
-        color: '#9bc2c4',
-        fill: true,
-        fillColor: '#9bc2c4',
-        fillOpacity: 1,
-        radius: 5,
+      data: function (properties) {
+        const klass = properties.class;
+        return {
+          color: classes[classArray[klass - 1]].color,
+          fill: true,
+          fillColor: classes[classArray[klass - 1]].color,
+          fillOpacity: 1,
+          radius: 5,
+        };
       },
     },
   };
