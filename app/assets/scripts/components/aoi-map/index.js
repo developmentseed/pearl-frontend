@@ -6,15 +6,15 @@ import { MapContainer, TileLayer } from 'react-leaflet';
 import { useParams } from 'react-router-dom';
 import App from '../common/app';
 import config from '../../config';
-import { useRestApiClient } from '../../context/auth';
+import { useAuth } from '../../context/auth';
 
 const { restApiEndpoint } = config;
 
 function AoiMap() {
   const { projectId, aoiId } = useParams();
   const [mapRef, setMapRef] = useState(null);
+  const { restApiClient } = useAuth();
   const [tileUrl, setTileUrl] = useState(null);
-  const { restApiClient } = useRestApiClient();
 
   useEffect(async () => {
     if (!mapRef) return;

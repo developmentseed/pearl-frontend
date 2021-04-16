@@ -3,11 +3,11 @@ import T from 'prop-types';
 import { initialApiRequestState } from './reducers/reduxeed';
 import { createQueryApiGetReducer, queryApiGet } from './reducers/api';
 import { createQueryApiPostReducer } from './reducers/api';
-import { useRestApiClient } from './auth';
+import { useAuth } from './auth';
 
 const GlobalContext = createContext({});
 export function GlobalContextProvider(props) {
-  const { apiToken } = useRestApiClient();
+  const { apiToken } = useAuth();
   const [tourStep, setTourStep] = useState(0);
 
   /* User data Reducers */

@@ -3,7 +3,7 @@ import uniqWith from 'lodash.uniqwith';
 import isEqual from 'lodash.isequal';
 import differenceWith from 'lodash.differencewith';
 import T from 'prop-types';
-import { useRestApiClient } from './auth';
+import { useAuth } from './auth';
 import toasts from '../components/common/toasts';
 import logger from '../utils/logger';
 
@@ -39,7 +39,7 @@ export function CheckpointProvider(props) {
     wrapLogReducer(checkpointReducer)
   );
 
-  const { restApiClient } = useRestApiClient();
+  const { restApiClient } = useAuth();
 
   async function fetchCheckpoint(projectId, checkpointId) {
     try {

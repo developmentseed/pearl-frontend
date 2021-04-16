@@ -32,7 +32,7 @@ import {
 import ModalMapEvent from './modal-events';
 
 import VectorLayer from '../../common/map/vector-layer';
-import { useRestApiClient } from '../../../context/auth';
+import { useAuth } from '../../../context/auth';
 import { useApiMeta } from '../../../context/api-meta';
 import { useAoi, useAoiPatch } from '../../../context/aoi';
 import toasts from '../../common/toasts';
@@ -83,8 +83,6 @@ function areaFromBounds(bbox) {
 
 function Map() {
   const {
-    aoiRef,
-    setAoiRef,
     aoiArea,
     setAoiArea,
     aoiInitializer,
@@ -94,9 +92,9 @@ function Map() {
   } = useContext(ExploreContext);
 
   const { apiLimits } = useApiMeta();
-  const { currentAoi } = useAoi();
+  const { aoiRef, setAoiRef, currentAoi } = useAoi();
+  const { restApiClient } = useAuth();
   const { aoiPatchList } = useAoiPatch();
-  const { restApiClient } = useRestApiClient();
 
   const { mapState, mapModes, setMapMode } = useMapState();
   const { mapRef, setMapRef } = useMapRef();

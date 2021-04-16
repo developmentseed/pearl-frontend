@@ -8,12 +8,7 @@ import SelectModal from '../../common/select-modal';
 import { Card } from '../../common/card-list';
 
 import { useMapLayers, useMapRef } from '../../../context/map';
-import {
-  ExploreContext,
-  useInstance,
-  useMapState,
-  usePredictions,
-} from '../../../context/explore';
+import { ExploreContext, useMapState } from '../../../context/explore';
 import GlobalContext from '../../../context/global';
 
 import TabbedBlock from '../../common/tabbed-block-body';
@@ -25,19 +20,22 @@ import PanelFooter from './footer';
 
 import LayersPanel from '../layers-panel';
 
-import { AuthContext } from '../../../context/auth';
+import { useAuth } from '../../../context/auth';
 import {
   useCheckpoint,
   actions as checkpointActions,
   checkpointModes,
 } from '../../../context/checkpoint';
+import { useInstance } from '../../../context/instance';
+import { useAoi } from '../../../context/aoi';
+import { usePredictions } from '../../../context/predictions';
 
 const StyledPanelBlock = styled(PanelBlock)`
   width: ${glsp(24)};
 `;
 
 function PrimePanel() {
-  const { isAuthenticated } = useContext(AuthContext);
+  const { isAuthenticated } = useAuth();
   const { mapState, mapModes, setMapMode } = useMapState();
   const { mapRef } = useMapRef();
 
@@ -46,11 +44,8 @@ function PrimePanel() {
     checkpointList,
     selectedModel,
     setSelectedModel,
-    aoiRef,
-    setAoiRef,
     aoiArea,
     createNewAoi,
-    aoiName,
     loadAoi,
     aoiList,
     aoiBounds,
@@ -58,7 +53,9 @@ function PrimePanel() {
     updateCheckpointName,
   } = useContext(ExploreContext);
 
-  const { runInference, retrain, refine, applyCheckpoint } = useInstance();
+  const { aoiRef, setAoiRef, aoiName } = useAoi();
+
+  const { applyCheckpoint } = useInstance();
 
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
 
@@ -86,17 +83,12 @@ function PrimePanel() {
       mapModes.ADD_SAMPLE_POLYGON,
       mapModes.REMOVE_SAMPLE,
     ].includes(mapState.mode) &&
-    aoiRef &&
+    typeof aoiRef !== 'undefined' &&
     aoiArea > 0 &&
-    selectedModel;
-
-  // "Run Inference" button
-  const applyTooltip = currentProject
-    ? 'Run inference for this model'
-    : 'Create project and run model';
+    typeof selectedModel !== 'undefined' &&
+    selectedModel !== null;
 
   // Retrain Panel Tab Empty State message
-  //
   const retrainPlaceHolderMessage = () => {
     if (predictions.isReady()) {
       // If predictions are ready, do not need a placeholder
@@ -267,13 +259,12 @@ function PrimePanel() {
                 />
               </TabbedBlock>
             </PanelBlockBody>
-            {(!currentCheckpoint || activeTab === currentCheckpoint.mode) && (
+            {activeTab !== 'LAYERS' && (
               <PanelFooter
                 {...{
                   dispatchCurrentCheckpoint,
                   currentCheckpoint,
                   checkpointActions,
-                  checkpointModes,
 
                   updateCheckpointName,
                   localCheckpointName,
@@ -281,12 +272,7 @@ function PrimePanel() {
 
                   mapRef,
 
-                  allowInferenceRun: allowInferenceRun && true,
-
-                  applyTooltip,
-                  runInference,
-                  retrain,
-                  refine,
+                  allowInferenceRun,
                 }}
               />
             )}
