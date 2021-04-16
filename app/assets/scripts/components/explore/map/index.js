@@ -245,7 +245,7 @@ function Map() {
   }, [aoiArea, apiLimits, aoiRef]);
 
   useEffect(() => {
-    async function updateTitleUrl() {
+    async function updateTileUrl() {
       if (mapRef && currentProject && currentAoi) {
         try {
           const tileJSON = await restApiClient.getTileJSON(
@@ -258,7 +258,7 @@ function Map() {
         }
       }
     }
-    updateTitleUrl();
+    updateTileUrl();
   }, [currentAoi, currentProject, mapRef]);
 
   const displayMap = useMemo(
