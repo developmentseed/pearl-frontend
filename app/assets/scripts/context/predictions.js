@@ -1,5 +1,58 @@
-import { initialApiRequestState } from './reduxeed';
-import logger from '../../utils/logger';
+import React, { useContext, useMemo, createContext, useReducer } from 'react';
+import T from 'prop-types';
+import { initialApiRequestState } from './reducers/reduxeed';
+import logger from '../utils/logger';
+
+const PredictionsContext = createContext(null);
+
+export function PredictionsProvider(props) {
+  const [predictions, dispatchPredictions] = useReducer(
+    predictionsReducer,
+    initialApiRequestState
+  );
+
+  const value = {
+    predictions,
+    dispatchPredictions,
+  };
+
+  return (
+    <PredictionsContext.Provider value={value}>
+      {props.children}
+    </PredictionsContext.Provider>
+  );
+}
+
+PredictionsProvider.propTypes = {
+  children: T.node,
+};
+
+// Check if consumer function is used properly
+const usePredictionsContext = (fnName) => {
+  const context = useContext(PredictionsContext);
+
+  if (!context) {
+    throw new Error(
+      `The \`${fnName}\` hook must be used inside the <PredictionsContext> component's context.`
+    );
+  }
+
+  return context;
+};
+
+export const usePredictions = () => {
+  const { predictions, dispatchPredictions } = usePredictionsContext(
+    'usePredictions'
+  );
+
+  return useMemo(
+    () => ({
+      predictions,
+      dispatchPredictions,
+    }),
+    [predictions]
+  );
+};
 
 export const actions = {
   START_PREDICTION: 'START_PREDICTION',
@@ -25,7 +78,7 @@ function wrapApiResult(stateData) {
   };
 }
 
-export default function (state, action) {
+export function predictionsReducer(state, action) {
   const { data } = action;
 
   switch (action.type) {

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useReducer } from 'react';
+import React, { useEffect, useReducer } from 'react';
 import styled from 'styled-components';
 import { Button } from '@devseed-ui/button';
 import CardList, { Card } from '../../common/card-list';
@@ -17,7 +17,7 @@ import { Heading } from '@devseed-ui/typography';
 import { StyledNavLink } from '../../../styles/links';
 import toasts from '../../common/toasts';
 import { useHistory } from 'react-router';
-import { AuthContext } from '../../../context/auth';
+import { useAuth } from '../../../context/auth';
 import {
   createQueryApiGetReducer,
   queryApiGet,
@@ -86,7 +86,7 @@ const NavList = styled.ol`
 function Projects() {
   const history = useHistory();
 
-  const { apiToken } = useContext(AuthContext);
+  const { apiToken } = useAuth();
 
   const [projectsList, dispatchProjectsList] = useReducer(
     createQueryApiGetReducer('project'),

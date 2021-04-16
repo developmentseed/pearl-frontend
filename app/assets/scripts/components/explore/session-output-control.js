@@ -20,9 +20,11 @@ import { Heading } from '@devseed-ui/typography';
 import { Form, FormInput } from '@devseed-ui/form';
 import InfoButton from '../common/info-button';
 import { ExploreContext } from '../../context/explore';
-import { AuthContext, useRestApiClient } from '../../context/auth';
+import { useAuth } from '../../context/auth';
 import toasts from '../common/toasts';
 import logger from '../../utils/logger';
+import { useInstance } from '../../context/instance';
+import { useParams } from 'react-router';
 
 const Wrapper = styled.div`
   flex: 1;
@@ -81,9 +83,11 @@ const HeadingInput = styled(FormInput)`
 `;
 
 function SessionOutputControl(props) {
-  const { status, projectName, openHelp, isMediumDown } = props;
-  const { restApiClient } = useRestApiClient();
-  const { isAuthenticated } = useContext(AuthContext);
+  const { projectId } = useParams();
+  const { projectName, openHelp, isMediumDown } = props;
+  const { isAuthenticated, restApiClient } = useAuth();
+
+  const { instance } = useInstance();
 
   const {
     updateProjectName,
@@ -226,7 +230,8 @@ function SessionOutputControl(props) {
         variation={status === 'OK' ? 'primary' : 'danger'}
         size='xxsmall'
       >
-        <span>Session Status:</span> {status || 'None Provided'}
+        <span>Session Status:</span>{' '}
+        {projectId === 'new' ? 'Ready.' : instance.statusText}
       </StatusHeading>
       <Button
         variation='base-plain'

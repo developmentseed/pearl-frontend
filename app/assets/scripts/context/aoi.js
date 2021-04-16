@@ -1,15 +1,15 @@
 import React, {
-  useState,
   createContext,
   useContext,
   useMemo,
   useReducer,
+  useState,
 } from 'react';
-import { initialApiRequestState } from './reducers/reduxeed';
 import T from 'prop-types';
 import logger from '../utils/logger';
 import aoiPatchReducer from './reducers/aoi_patch';
 import { wrapLogReducer } from './reducers/utils';
+import { initialApiRequestState } from './reducers/reduxeed';
 
 const AoiContext = createContext(null);
 
@@ -19,6 +19,8 @@ export const actions = {
 
 export function AoiProvider(props) {
   const [currentAoi, dispatchCurrentAoi] = useReducer(aoiReducer);
+  const [aoiRef, setAoiRef] = useState(null);
+  const [aoiName, setAoiName] = useState(null);
 
   const [aoiPatch, dispatchAoiPatch] = useReducer(
     wrapLogReducer(aoiPatchReducer),
@@ -27,21 +29,23 @@ export function AoiProvider(props) {
 
   const [aoiPatchList, setAoiPatchList] = useState([]);
 
+  const value = {
+    currentAoi,
+    dispatchCurrentAoi,
+    aoiRef,
+    setAoiRef,
+    aoiName,
+    setAoiName,
+
+    aoiPatch,
+    dispatchAoiPatch,
+
+    aoiPatchList,
+    setAoiPatchList,
+  };
+
   return (
-    <AoiContext.Provider
-      value={{
-        currentAoi,
-        dispatchCurrentAoi,
-
-        aoiPatch,
-        dispatchAoiPatch,
-
-        aoiPatchList,
-        setAoiPatchList,
-      }}
-    >
-      {props.children}
-    </AoiContext.Provider>
+    <AoiContext.Provider value={value}>{props.children}</AoiContext.Provider>
   );
 }
 
@@ -75,16 +79,27 @@ const useCheckContext = (fnName) => {
 };
 
 export const useAoi = () => {
-  const { currentAoi, dispatchCurrentAoi } = useCheckContext('useAoi');
+  const {
+    aoiRef,
+    setAoiRef,
+    aoiName,
+    setAoiName,
+    currentAoi,
+    dispatchCurrentAoi,
+  } = useCheckContext('useAoi');
 
   return useMemo(
     () => ({
+      aoiRef,
+      setAoiRef,
+      aoiName,
+      setAoiName,
       currentAoi,
       dispatchCurrentAoi,
       setCurrentAoi: (data) =>
         dispatchCurrentAoi({ type: actions.SET_AOI, data }),
     }),
-    [currentAoi, dispatchCurrentAoi]
+    [aoiRef, aoiName, currentAoi, dispatchCurrentAoi]
   );
 };
 

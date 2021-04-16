@@ -110,86 +110,88 @@ function RefineModel(props) {
               Delete
             </InfoButton>
           </RefineTools>
-          <CheckpointSection>
-            <ItemList>
-              <Heading useAlt>Checkpoint List</Heading>
+          {checkpointList && (
+            <CheckpointSection>
+              <ItemList>
+                <Heading useAlt>Checkpoint List</Heading>
 
-              {checkpointList.map((c) => {
-                const id = `checkpoint-${c.name}-${c.id}`;
-                return (
-                  <Item
-                    key={c.id}
-                    onClick={() => {
-                      if (!currentCheckpoint.checkpointBrushes[id]) {
+                {checkpointList.map((c) => {
+                  const id = `checkpoint-${c.name}-${c.id}`;
+                  return (
+                    <Item
+                      key={c.id}
+                      onClick={() => {
+                        if (!currentCheckpoint.checkpointBrushes[id]) {
+                          dispatchCurrentCheckpoint({
+                            type: checkpointActions.ADD_CHECKPOINT_BRUSH,
+                            data: {
+                              id,
+                              checkpoint: c,
+                            },
+                          });
+
+                          mapRef.polygonDraw.addLayer({
+                            name: id,
+                            color: '#efefef',
+                          });
+                        }
+
                         dispatchCurrentCheckpoint({
-                          type: checkpointActions.ADD_CHECKPOINT_BRUSH,
-                          data: {
-                            id,
-                            checkpoint: c,
-                          },
+                          type: checkpointActions.SET_ACTIVE_CLASS,
+                          data: id,
                         });
-
-                        mapRef.polygonDraw.addLayer({
-                          name: id,
-                          color: '#efefef',
-                        });
-                      }
-
-                      dispatchCurrentCheckpoint({
-                        type: checkpointActions.SET_ACTIVE_CLASS,
-                        data: id,
-                      });
-                    }}
-                    selected={currentCheckpoint.activeItem === id}
-                  >
-                    <Thumbnail />
-                    <Heading size='xsmall'>
-                      {c.name} ({c.id})
-                      {currentCheckpoint.activeItem === id ? ' (Active)' : ''}
-                    </Heading>
-                  </Item>
-                );
-              })}
-
-              {availableCheckpointList.length > 0 && (
-                <Dropdown
-                  alignment='right'
-                  direction='down'
-                  triggerElement={(props) => (
-                    <Item className='add__class' muted as={Button} {...props}>
-                      <Thumbnail useIcon='plus' outline />
-                      <Heading size='xsmall'>Add Checkpoint</Heading>
+                      }}
+                      selected={currentCheckpoint.activeItem === id}
+                    >
+                      <Thumbnail />
+                      <Heading size='xsmall'>
+                        {c.name} ({c.id})
+                        {currentCheckpoint.activeItem === id ? ' (Active)' : ''}
+                      </Heading>
                     </Item>
-                  )}
-                  className='global__dropdown'
-                >
-                  <>
-                    <DropdownHeader unshaded>
-                      <p>Checkpoints</p>
-                    </DropdownHeader>
-                    <DropdownBody selectable>
-                      {availableCheckpointList.map((ckpt, ind) => (
-                        <DropdownItem
-                          key={ckpt.id}
-                          data-dropdown='click.close'
-                          onClick={() => {
-                            availableCheckpointList.splice(ind, 1);
-                            setCheckpointList([...checkpointList, ckpt]);
-                            setAvailableCheckpointList([
-                              ...availableCheckpointList.slice(0, ind),
-                              ...availableCheckpointList.slice(ind + 1),
-                            ]);
-                          }}
-                        >
-                          {ckpt.name} ({ckpt.id})
-                        </DropdownItem>
-                      ))}
-                    </DropdownBody>
-                  </>
-                </Dropdown>
-              )}
-            </ItemList>
-          </CheckpointSection>
+                  );
+                })}
+
+                {availableCheckpointList.length > 0 && (
+                  <Dropdown
+                    alignment='right'
+                    direction='down'
+                    triggerElement={(props) => (
+                      <Item className='add__class' muted as={Button} {...props}>
+                        <Thumbnail useIcon='plus' outline />
+                        <Heading size='xsmall'>Add Checkpoint</Heading>
+                      </Item>
+                    )}
+                    className='global__dropdown'
+                  >
+                    <>
+                      <DropdownHeader unshaded>
+                        <p>Checkpoints</p>
+                      </DropdownHeader>
+                      <DropdownBody selectable>
+                        {availableCheckpointList.map((ckpt, ind) => (
+                          <DropdownItem
+                            key={ckpt.id}
+                            data-dropdown='click.close'
+                            onClick={() => {
+                              availableCheckpointList.splice(ind, 1);
+                              setCheckpointList([...checkpointList, ckpt]);
+                              setAvailableCheckpointList([
+                                ...availableCheckpointList.slice(0, ind),
+                                ...availableCheckpointList.slice(ind + 1),
+                              ]);
+                            }}
+                          >
+                            {ckpt.name} ({ckpt.id})
+                          </DropdownItem>
+                        ))}
+                      </DropdownBody>
+                    </>
+                  </Dropdown>
+                )}
+              </ItemList>
+            </CheckpointSection>
+          )}
           <Section>
             <Heading useAlt>Class List</Heading>
             <ItemList>
