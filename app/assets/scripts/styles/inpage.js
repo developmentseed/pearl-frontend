@@ -6,7 +6,7 @@ import {
   themeVal,
   glsp,
   rgba,
-  media
+  media,
 } from '@devseed-ui/theme-provider';
 import { headingAlt } from '@devseed-ui/typography';
 

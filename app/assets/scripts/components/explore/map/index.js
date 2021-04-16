@@ -1,7 +1,5 @@
 import React, { useMemo, useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
-import tArea from '@turf/area';
-import tBboxPolygon from '@turf/bbox-polygon';
 import SizeAwareElement from '../../common/size-aware-element';
 import {
   MapContainer,

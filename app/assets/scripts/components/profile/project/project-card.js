@@ -4,6 +4,7 @@ import DetailsList from '../../common/details-list';
 import ProjectMap from './project-map';
 import { media } from '@devseed-ui/theme-provider';
 import { formatDateTime } from '../../../utils/format';
+import T from 'prop-types';
 
 const ProjectContainer = styled.div`
   display: grid;
@@ -45,5 +46,10 @@ function ProjectCard({ project, aois }) {
     </ProjectContainer>
   );
 }
+
+ProjectCard.propTypes = {
+  project: T.object,
+  aois: T.array,
+};
 
 export default ProjectCard;

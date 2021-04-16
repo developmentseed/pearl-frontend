@@ -1,4 +1,5 @@
 import React from 'react';
+import T from 'prop-types';
 
 function ProjectMap({ bounds }) {
   return (
@@ -7,5 +8,9 @@ function ProjectMap({ bounds }) {
     </div>
   );
 }
+
+ProjectMap.propTypes = {
+  bounds: T.object,
+};
 
 export default ProjectMap;

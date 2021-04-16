@@ -80,9 +80,13 @@ function renderRow(proj) {
 }
 
 function Projects() {
+<<<<<<< HEAD
   const history = useHistory();
 
   const { apiToken } = useAuth();
+=======
+  const { apiToken } = useContext(AuthContext);
+>>>>>>> lintfixes
 
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(null);
