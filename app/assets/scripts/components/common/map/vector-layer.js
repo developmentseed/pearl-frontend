@@ -29,9 +29,9 @@ function VectorLayer(props) {
           fill: true,
           fillColor: classes[classArray[klass - 1]].color,
           fillOpacity: 1,
-          radius: 5
-        }
-      }
+          radius: 5,
+        };
+      },
     },
   };
 
