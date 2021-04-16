@@ -11,7 +11,7 @@ import { useAuth } from '../../context/auth';
 const { restApiEndpoint } = config;
 
 function AoiMap() {
-  const { projectId, aoiId } = useParams();
+  const { uuid } = useParams();
   const [mapRef, setMapRef] = useState(null);
   const { restApiClient } = useAuth();
   const [tileUrl, setTileUrl] = useState(null);
@@ -19,7 +19,7 @@ function AoiMap() {
   useEffect(async () => {
     if (!mapRef) return;
     try {
-      const tileJSON = await restApiClient.getTileJSON(projectId, aoiId);
+      const tileJSON = await restApiClient.getTileJSONFromUUID(uuid);
       setTileUrl(`${restApiEndpoint}${tileJSON.tiles[0]}`);
       const bounds = [
         [tileJSON.bounds[3], tileJSON.bounds[0]],
@@ -29,7 +29,7 @@ function AoiMap() {
     } catch (error) {
       toasts.error('Could not load AOI map');
     }
-  }, [projectId, aoiId, mapRef, tileUrl]);
+  }, [uuid, mapRef, tileUrl]);
 
   let leafletLayer;
   if (tileUrl) {

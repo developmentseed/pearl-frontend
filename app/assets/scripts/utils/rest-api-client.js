@@ -114,6 +114,10 @@ class RestApiClient {
     return this.get(`project/${projectId}/aoi/${aoiId}/tiles`);
   }
 
+  getTileJSONFromUUID(uuid) {
+    return this.get(`aoi/${uuid}/tiles`);
+  }
+
   bookmarkAOI(projectId, aoiId, name) {
     return this.patch(`project/${projectId}/aoi/${aoiId}`, {
       bookmarked: true,

@@ -29,6 +29,8 @@ import Table, { TableRow, TableCell } from '../../common/table';
 import Paginator from '../../common/paginator';
 import ProjectCard from './project-card';
 import copyTextToClipboard from '../../../utils/copy-text-to-clipboard';
+import logger from '../../../utils/logger';
+import { downloadGeotiff } from '../../../utils/map';
 
 // Controls the size of each page
 const AOIS_PER_PAGE = 20;
@@ -73,10 +75,8 @@ const AOI_HEADERS = [
   'Download',
 ];
 
-function downloadGeoTiff(projectId, aoiId) {}
-
 // Render single projects row
-function renderRow(aoi, { project }) {
+function renderRow(aoi, { project, restApiClient }) {
   console.log('row', aoi);
   const aoiLink = `${window.location.origin}/aoi/${aoi.uuid}/map`;
   return (
@@ -88,13 +88,19 @@ function renderRow(aoi, { project }) {
       <TableCell>{formatDateTime(aoi.created)}</TableCell>
       <TableCell>
         <FormInputGroup>
-          <FormInput value={aoiLink} size='small' />
+          <FormInput readOnly value={aoiLink} size='small' />
           <Button
             variation='primary-plain'
             useIcon='clipboard'
             hideText
             onClick={() => {
-              copyTextToClipboard(aoiLink);
+              try {
+                copyTextToClipboard(aoiLink);
+                toasts.success('Coped URL to Clipboard');
+              } catch (err) {
+                logger('Failed to copy', err);
+                toasts.error('Failed to copy to clipboard');
+              }
             }}
           />
         </FormInputGroup>
@@ -104,8 +110,18 @@ function renderRow(aoi, { project }) {
           variation='primary-plain'
           useIcon='download'
           hideText
-          onClick={() => {
-            downloadGeoTiff(project.id, aoi.id);
+          onClick={async () => {
+            try {
+              showGlobalLoadingMessage('Preparing GeoTIFF...');
+              const arrayBuffer = await restApiClient.downloadGeotiff(project.id, aoi.id);
+              const filename = `${aoi.id}.tiff`;
+              downloadGeotiff(arrayBuffer, filename);
+            } catch (err) {
+              logger('Failed to download geotiff', err);
+              toasts.error('Failed to download GeoTIFF');
+              hideGlobalLoading();
+            }
+            hideGlobalLoading();
           }}
         />
       </TableCell>
@@ -196,7 +212,7 @@ function Project() {
         </InpageHeader>
         <InpageBody>
           <ProjectBody>
-            {project ? <ProjectCard project={project} aois={aois} /> : null}
+            {project ? <ProjectCard restApiClient={restApiClient} project={project} aois={aois} /> : null}
             {aois &&
               (aois.length ? (
                 <>
@@ -208,7 +224,8 @@ function Project() {
                     data={aois}
                     renderRow={renderRow}
                     extraData={{
-                      project: project,
+                      project,
+                      restApiClient,
                     }}
                   />
                   <Paginator

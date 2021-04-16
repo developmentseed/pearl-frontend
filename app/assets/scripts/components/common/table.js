@@ -69,6 +69,7 @@ export const TableCell = styled.td`
  * @param {Array<String>} headers - header columns, as strings
  * @param {Array<Object>} data - array of data objects
  * @param {Function} renderRow - function which receives data objects and returns a <tr>
+ * @param {Object} extraData - arbitrary extra data that will be passed to renderRow as second argument
  */
 function Table({ headers, data, renderRow, extraData, hoverable }) {
   return (
@@ -91,7 +92,7 @@ Table.propTypes = {
   headers: T.array,
   data: T.array,
   renderRow: T.func,
-  extraData: T.array,
+  extraData: T.object,
   hoverable: T.bool,
 };
 
