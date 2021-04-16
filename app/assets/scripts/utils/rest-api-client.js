@@ -70,7 +70,8 @@ class RestApiClient {
   }
 
   getProjects(page, limit) {
-    return this.get(`project/?page=${page}&limit=${limit}`);
+    const offset = (page  - 1) * limit;
+    return this.get(`project/?page=${offset}&limit=${limit}`);
   }
 
   createProject(data) {
