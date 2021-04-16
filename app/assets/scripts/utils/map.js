@@ -12,9 +12,9 @@ export function areaFromBounds(bbox) {
   return tArea(poly);
 }
 
-export function downloadGeotiff (arrayBuffer, filename) {
+export function downloadGeotiff(arrayBuffer, filename) {
   var blob = new Blob([arrayBuffer], {
     type: 'application/x-geotiff',
   });
-  saveAs(blob, filename);  
+  saveAs(blob, filename);
 }

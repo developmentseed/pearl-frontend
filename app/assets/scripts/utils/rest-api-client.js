@@ -96,7 +96,9 @@ class RestApiClient {
 
   getBookmarkedAOIs(projectId, page, limit) {
     const offset = (page - 1) * limit;
-    return this.get(`project/${projectId}/aoi?bookmarked=true&page=${offset}&limit=${limit}`);
+    return this.get(
+      `project/${projectId}/aoi?bookmarked=true&page=${offset}&limit=${limit}`
+    );
   }
 
   getCheckpoint(projectId, checkpointId) {

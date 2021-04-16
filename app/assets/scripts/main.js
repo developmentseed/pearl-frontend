@@ -66,10 +66,7 @@ function Root() {
                   ) : (
                     <>
                       <Route exact path='/' component={Home} />
-                      <Route
-                        path='/aoi/:uuid/map'
-                        component={AoiMap}
-                      />
+                      <Route path='/aoi/:uuid/map' component={AoiMap} />
                       <Route path='/project/:projectId' component={Explore} />
                       <ProtectedRoute
                         exact

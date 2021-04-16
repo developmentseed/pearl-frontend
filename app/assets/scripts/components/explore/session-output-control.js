@@ -24,7 +24,7 @@ import toasts from '../common/toasts';
 import logger from '../../utils/logger';
 import { useInstance } from '../../context/instance';
 import { useParams } from 'react-router';
-import { downloadGeotiff } from '../../utils/map';
+import { downloadGeotiff as downloadGeotiffUtil } from '../../utils/map';
 
 const Wrapper = styled.div`
   flex: 1;
@@ -120,7 +120,7 @@ function SessionOutputControl(props) {
         aoiId
       );
       const filename = `${aoiId}.tiff`;
-      downloadGeotiff(geotiffArrayBuffer, filename);
+      downloadGeotiffUtil(geotiffArrayBuffer, filename);
     } catch (error) {
       logger('Error with geotiff download', error);
       toasts.error('Failed to download GeoTIFF');
@@ -141,7 +141,7 @@ function SessionOutputControl(props) {
       logger('Error Bookmarking AOI', err);
       return;
     }
-    
+
     const url = `${window.location.origin}/aoi/${uuid}/map`;
     const copied = copy(url);
     if (copied) {

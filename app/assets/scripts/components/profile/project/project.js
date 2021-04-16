@@ -75,9 +75,8 @@ const AOI_HEADERS = [
   'Download',
 ];
 
-// Render single projects row
+// Render single AOI row
 function renderRow(aoi, { project, restApiClient }) {
-  console.log('row', aoi);
   const aoiLink = `${window.location.origin}/aoi/${aoi.uuid}/map`;
   return (
     <TableRow key={aoi.id}>
@@ -113,7 +112,10 @@ function renderRow(aoi, { project, restApiClient }) {
           onClick={async () => {
             try {
               showGlobalLoadingMessage('Preparing GeoTIFF...');
-              const arrayBuffer = await restApiClient.downloadGeotiff(project.id, aoi.id);
+              const arrayBuffer = await restApiClient.downloadGeotiff(
+                project.id,
+                aoi.id
+              );
               const filename = `${aoi.id}.tiff`;
               downloadGeotiff(arrayBuffer, filename);
             } catch (err) {
@@ -148,7 +150,6 @@ function Project() {
       showGlobalLoadingMessage('Loading project...');
       try {
         const data = await restApiClient.getProject(projectId);
-        console.log('project', data);
         setProject(data);
       } catch (err) {
         toasts.error('Failed to fetch project.');
@@ -164,8 +165,11 @@ function Project() {
     if (apiToken) {
       setIsAoisLoading(true);
       try {
-        const aoisData = await restApiClient.getBookmarkedAOIs(projectId, page, AOIS_PER_PAGE);
-        console.log('aois', aoisData);
+        const aoisData = await restApiClient.getBookmarkedAOIs(
+          projectId,
+          page,
+          AOIS_PER_PAGE
+        );
         setTotal(aoisData.total);
         setAois(aoisData.aois);
       } catch (err) {
@@ -175,7 +179,7 @@ function Project() {
       setIsAoisLoading(false);
     }
   }, [apiToken, page]);
-  console.log(project);
+
   return (
     <>
       <Inpage>
@@ -184,12 +188,11 @@ function Project() {
             <InpageHeadline>
               <ProjectTagline>
                 <StyledLink to='/profile/projects'>Projects</StyledLink> /{' '}
-                {project ? project.name : ''}
+                {!isProjectLoading ? project.name : ''}
               </ProjectTagline>
               <InpageTitleWrapper>
-                <Heading>{project ? project.name : ''}</Heading>
+                <Heading>{!isProjectLoading ? project.name : ''}</Heading>
                 <InpageToolbar>
-                  {/* ToDO: Wire Up Delete Button */}
                   <Button
                     variation='base-plain'
                     title='Delete Project'
@@ -209,7 +212,7 @@ function Project() {
                   </Button>
                   <Button
                     forwardedAs={StyledLink}
-                    to={`/project/${project && project.id}`}
+                    to={`/project/${projectId}`}
                     variation='primary-raised-light'
                     title='Edit project'
                     useIcon={['chevron-right--small', 'after']}
@@ -223,7 +226,13 @@ function Project() {
         </InpageHeader>
         <InpageBody>
           <ProjectBody>
-            {project ? <ProjectCard restApiClient={restApiClient} project={project} aois={aois} /> : null}
+            {project ? (
+              <ProjectCard
+                restApiClient={restApiClient}
+                project={project}
+                aois={aois}
+              />
+            ) : null}
             {aois &&
               (aois.length ? (
                 <>
