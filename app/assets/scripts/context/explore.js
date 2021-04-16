@@ -180,13 +180,19 @@ export function ExploreProvider(props) {
       hideGlobalLoading();
 
       if (aoiPatch.fetched) {
-        setAoiPatchList([...aoiPatchList, aoiPatch.getData()]);
+        const updatedPatchList = [...aoiPatchList, aoiPatch.getData()];
+        setAoiPatchList(updatedPatchList);
+        restApiClient.patchAoi(
+          currentProject.id,
+          predictions.data.aoiId,
+          updatedPatchList.map((p) => p.id)
+        );
       } else if (aoiPatch.error) {
         toasts.error('An error ocurred while requesting aoi patch.');
         logger(aoiPatch.error);
       }
     }
-  }, [aoiPatch]);
+  }, [aoiPatch, predictions, restApiClient, currentProject]);
 
   async function loadMetrics() {
     await restApiClient

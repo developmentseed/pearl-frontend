@@ -142,6 +142,11 @@ class RestApiClient {
       'binary'
     );
   }
+  patchAoi(projectId, aoiId, patches) {
+    return this.patch(`project/${projectId}/aoi/${aoiId}`, {
+      patches,
+    });
+  }
 }
 
 export default RestApiClient;

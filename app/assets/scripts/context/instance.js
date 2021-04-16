@@ -612,6 +612,7 @@ export class WebsocketClient extends WebSocket {
               id: data.id,
             },
           });
+          this.sendMessage({ action: 'model#status' });
           break;
         case 'model#patch#progress':
           dispatchAoiPatch({
@@ -625,6 +626,7 @@ export class WebsocketClient extends WebSocket {
             type: aoiPatchActions.COMPLETE_PATCH,
           });
           // finish waiting for patch
+          this.sendMessage({ action: 'model#status' });
           break;
         default:
           logger('Unknown websocket message:');
