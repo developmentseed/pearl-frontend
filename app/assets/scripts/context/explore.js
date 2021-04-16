@@ -21,10 +21,11 @@ import reverseGeoCode from '../utils/reverse-geocode';
 
 import { actions as checkpointActions, useCheckpoint } from './checkpoint';
 import { wrapLogReducer } from './reducers/utils';
-import { useAoi } from './aoi';
+import { useAoi, useAoiPatch } from './aoi';
 import { useProject } from './project';
 import { useModel } from './model';
 import { useInstance } from './instance';
+import logger from '../utils/logger';
 
 /**
  * Context & Provider
@@ -41,6 +42,12 @@ export function ExploreProvider(props) {
   const { predictions, dispatchPredictions } = usePredictions();
   const { selectedModel, setSelectedModel } = useModel();
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
+  const {
+    aoiPatch,
+    dispatchAoiPatch,
+    aoiPatchList,
+    setAoiPatchList,
+  } = useAoiPatch();
 
   // The following properties should be moved to own context to avoid re-rendering.
   const [aoiArea, setAoiArea] = useState(null);
@@ -158,6 +165,28 @@ export function ExploreProvider(props) {
       }
     }
   }, [predictions, restApiClient, currentProject]);
+
+  useEffect(() => {
+    if (aoiPatch.fetching) {
+      const { processed, total } = aoiPatch;
+      if (!total) {
+        showGlobalLoadingMessage(`Waiting for patch predictions...`);
+      } else {
+        showGlobalLoadingMessage(
+          `Receiving images: ${processed} of ${total}...`
+        );
+      }
+    } else if (aoiPatch.isReady()) {
+      hideGlobalLoading();
+
+      if (aoiPatch.fetched) {
+        setAoiPatchList([...aoiPatchList, aoiPatch.getData()]);
+      } else if (aoiPatch.error) {
+        toasts.error('An error ocurred while requesting aoi patch.');
+        logger(aoiPatch.error);
+      }
+    }
+  }, [aoiPatch]);
 
   async function loadMetrics() {
     await restApiClient
@@ -437,6 +466,8 @@ export function ExploreProvider(props) {
 
         updateProjectName,
         updateCheckpointName,
+
+        dispatchAoiPatch,
       }}
     >
       {props.children}

@@ -55,7 +55,7 @@ function PrimePanel() {
 
   const { aoiRef, setAoiRef, aoiName } = useAoi();
 
-  const { instance, runInference, retrain, applyCheckpoint } = useInstance();
+  const { applyCheckpoint } = useInstance();
 
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
 
@@ -265,7 +265,6 @@ function PrimePanel() {
                   dispatchCurrentCheckpoint,
                   currentCheckpoint,
                   checkpointActions,
-                  checkpointModes,
 
                   updateCheckpointName,
                   localCheckpointName,
@@ -274,10 +273,6 @@ function PrimePanel() {
                   mapRef,
 
                   allowInferenceRun,
-                  instance,
-
-                  runInference,
-                  retrain,
                 }}
               />
             )}

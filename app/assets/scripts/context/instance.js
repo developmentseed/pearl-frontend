@@ -26,6 +26,7 @@ import {
 import { actions as predictionsActions, usePredictions } from './predictions';
 import { useProject } from './project';
 import { useAoi } from './aoi';
+import { actions as aoiPatchActions } from './reducers/aoi_patch';
 import { useModel } from './model';
 
 const messageQueueActionTypes = {
@@ -76,7 +77,7 @@ function aoiBoundsToPolygon(bounds) {
   const {
     _southWest: { lng: minX, lat: minY },
     _northEast: { lng: maxX, lat: maxY },
-  } = bounds();
+  } = bounds;
 
   return {
     type: 'Polygon',
@@ -418,6 +419,7 @@ export class WebsocketClient extends WebSocket {
     dispatchCurrentCheckpoint,
     fetchCheckpoint,
     dispatchPredictions,
+    dispatchAoiPatch,
   }) {
     super(config.websocketEndpoint + `?token=${token}`);
 
@@ -515,6 +517,28 @@ export class WebsocketClient extends WebSocket {
           // Request new status update after abort is confirmed
           this.sendMessage({ action: 'model#status' });
           break;
+        case 'model#patch':
+          //receive new patch
+          dispatchAoiPatch({
+            type: aoiPatchActions.START_PATCH,
+            data: {
+              id: data.id,
+            },
+          });
+          break;
+        case 'model#patch#progress':
+          dispatchAoiPatch({
+            type: aoiPatchActions.RECEIVE_PATCH,
+            data,
+          });
+          //receive image
+          break;
+        case 'model#patch#complete':
+          dispatchAoiPatch({
+            type: aoiPatchActions.COMPLETE_PATCH,
+          });
+          break;
+        // finish waiting for patch
         default:
           logger('Unknown websocket message:');
           logger(event);

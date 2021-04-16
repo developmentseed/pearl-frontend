@@ -216,5 +216,6 @@ Footer.propTypes = {
   allowInferenceRun: T.bool.isRequired,
   runInference: T.func,
   retrain: T.func,
+  refine: T.func,
 };
 export default Footer;
