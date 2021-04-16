@@ -14,7 +14,7 @@ import { glsp } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
 import { StyledNavLink } from '../../../styles/links';
 import toasts from '../../common/toasts';
-import { useAuth, useRestApiClient } from '../../../context/auth';
+import { useAuth } from '../../../context/auth';
 import { formatDateTime } from '../../../utils/format';
 import {
   showGlobalLoadingMessage,
@@ -86,7 +86,7 @@ function Projects() {
   const [isLoading, setIsLoading] = useState(true);
   const [projects, setProjects] = useState([]);
 
-  const { restApiClient } = useRestApiClient();
+  const { restApiClient } = useAuth();
 
   useEffect(() => {
     async function fetchProjects() {

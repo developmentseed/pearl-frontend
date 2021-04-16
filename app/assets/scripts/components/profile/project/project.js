@@ -19,7 +19,7 @@ import { Heading } from '@devseed-ui/typography';
 import { FormInput } from '@devseed-ui/form';
 import { StyledLink } from '../../../styles/links';
 import toasts from '../../common/toasts';
-import { AuthContext, useRestApiClient } from '../../../context/auth';
+import { useAuth } from '../../../context/auth';
 import { formatDateTime, formatThousands } from '../../../utils/format';
 import {
   showGlobalLoadingMessage,
@@ -132,7 +132,7 @@ function renderRow(aoi, { project, restApiClient }) {
 }
 
 function Project() {
-  const { apiToken } = useContext(AuthContext);
+  const { apiToken } = useAuth();
   const history = useHistory();
   const { projectId } = useParams();
   const [page, setPage] = useState(1);
@@ -142,7 +142,7 @@ function Project() {
   const [isAoisLoading, setIsAoisLoading] = useState(true);
   const [project, setProject] = useState(null);
 
-  const { restApiClient } = useRestApiClient();
+  const { restApiClient } = useAuth();
 
   useEffect(() => {
     async function fetchProject() {
