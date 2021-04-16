@@ -292,7 +292,7 @@ export function ExploreProvider(props) {
       setAoiBounds(aoiRef.getBounds());
       setAoiName(aoiObject.name);
       dispatchMapState({
-        type: mapActionTypes.BROWSE_MODE,
+        type: mapActionTypes.SET_MODE,
         data: mapModes.ADD_CLASS_SAMPLES,
       });
       if (predictions.isReady) {
