@@ -356,6 +356,7 @@ function Map() {
                   ? userLayers.retrainingSamples.opacity
                   : 0
               }
+              classes={currentCheckpoint.classes}
             />
           )}
 
