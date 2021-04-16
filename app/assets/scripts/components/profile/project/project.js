@@ -144,40 +144,46 @@ function Project() {
 
   const { restApiClient } = useRestApiClient();
 
-  useEffect(async () => {
-    if (apiToken) {
-      setIsProjectLoading(true);
-      showGlobalLoadingMessage('Loading project...');
-      try {
-        const data = await restApiClient.getProject(projectId);
-        setProject(data);
-      } catch (err) {
-        toasts.error('Failed to fetch project.');
-        setIsProjectLoading(false);
+  useEffect(() => {
+    async function fetchProject() {
+      if (apiToken) {
+        setIsProjectLoading(true);
+        showGlobalLoadingMessage('Loading project...');
+        try {
+          const data = await restApiClient.getProject(projectId);
+          setProject(data);
+        } catch (err) {
+          toasts.error('Failed to fetch project.');
+          setIsProjectLoading(false);
+          hideGlobalLoading();
+        }
         hideGlobalLoading();
+        setIsProjectLoading(false);
       }
-      hideGlobalLoading();
-      setIsProjectLoading(false);
     }
+    fetchProject();
   }, [apiToken]);
 
-  useEffect(async () => {
-    if (apiToken) {
-      setIsAoisLoading(true);
-      try {
-        const aoisData = await restApiClient.getBookmarkedAOIs(
-          projectId,
-          page,
-          AOIS_PER_PAGE
-        );
-        setTotal(aoisData.total);
-        setAois(aoisData.aois);
-      } catch (err) {
-        toasts.error('Failed to fetch AOIs for Project');
+  useEffect(() => {
+    async function fetchAOIs() {
+      if (apiToken) {
+        setIsAoisLoading(true);
+        try {
+          const aoisData = await restApiClient.getBookmarkedAOIs(
+            projectId,
+            page,
+            AOIS_PER_PAGE
+          );
+          setTotal(aoisData.total);
+          setAois(aoisData.aois);
+        } catch (err) {
+          toasts.error('Failed to fetch AOIs for Project');
+          setIsAoisLoading(false);
+        }
         setIsAoisLoading(false);
       }
-      setIsAoisLoading(false);
     }
+    fetchAOIs();
   }, [apiToken, page]);
 
   return (

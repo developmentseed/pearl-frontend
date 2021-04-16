@@ -16,19 +16,22 @@ function AoiMap() {
   const { restApiClient } = useAuth();
   const [tileUrl, setTileUrl] = useState(null);
 
-  useEffect(async () => {
-    if (!mapRef) return;
-    try {
-      const tileJSON = await restApiClient.getTileJSONFromUUID(uuid);
-      setTileUrl(`${restApiEndpoint}${tileJSON.tiles[0]}`);
-      const bounds = [
-        [tileJSON.bounds[3], tileJSON.bounds[0]],
-        [tileJSON.bounds[1], tileJSON.bounds[2]],
-      ];
-      mapRef.fitBounds(bounds);
-    } catch (error) {
-      toasts.error('Could not load AOI map');
+  useEffect(() => {
+    async function fetchData() {
+      if (!mapRef) return;
+      try {
+        const tileJSON = await restApiClient.getTileJSONFromUUID(uuid);
+        setTileUrl(`${restApiEndpoint}${tileJSON.tiles[0]}`);
+        const bounds = [
+          [tileJSON.bounds[3], tileJSON.bounds[0]],
+          [tileJSON.bounds[1], tileJSON.bounds[2]],
+        ];
+        mapRef.fitBounds(bounds);
+      } catch (error) {
+        toasts.error('Could not load AOI map');
+      }
     }
+    fetchData();
   }, [uuid, mapRef, tileUrl]);
 
   let leafletLayer;

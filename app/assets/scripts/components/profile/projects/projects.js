@@ -95,21 +95,24 @@ function Projects() {
 
   const { restApiClient } = useRestApiClient();
 
-  useEffect(async () => {
-    if (apiToken) {
-      showGlobalLoadingMessage('Loading projects...');
-      try {
-        const data = await restApiClient.getProjects(page, PROJECTS_PER_PAGE);
-        setTotal(data.total);
-        setProjects(data.projects);
-      } catch (err) {
-        toasts.error('Failed to fetch projects.');
-        setIsLoading(false);
+  useEffect(() => {
+    async function fetchProjects() {
+      if (apiToken) {
+        showGlobalLoadingMessage('Loading projects...');
+        try {
+          const data = await restApiClient.getProjects(page, PROJECTS_PER_PAGE);
+          setTotal(data.total);
+          setProjects(data.projects);
+        } catch (err) {
+          toasts.error('Failed to fetch projects.');
+          setIsLoading(false);
+          hideGlobalLoading();
+        }
         hideGlobalLoading();
+        setIsLoading(false);
       }
-      hideGlobalLoading();
-      setIsLoading(false);
     }
+    fetchProjects();
   }, [apiToken, page]);
 
   return (
