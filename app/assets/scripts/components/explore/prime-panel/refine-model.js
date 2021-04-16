@@ -75,16 +75,21 @@ function RefineModel(props) {
               }
               size='small'
               radius='ellipsoid'
-              useIcon='trash-bin'
+              useLocalButton
+              useIcon='eraser'
               visuallyDisabled={!currentCheckpoint.activeItem}
-              info={!currentCheckpoint.activeItem && 'No active item selected'}
+              info={
+                !currentCheckpoint.activeItem
+                  ? 'No active item selected'
+                  : 'Click to delete, draw to erase'
+              }
               onClick={() => {
                 if (currentCheckpoint.activeItem) {
                   setMapMode(mapModes.DELETE_SAMPLES);
                 }
               }}
             >
-              Delete
+              Erase
             </InfoButton>
           </RefineTools>
           {checkpointList && (
