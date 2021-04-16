@@ -163,7 +163,7 @@ function Project() {
     if (apiToken) {
       setIsAoisLoading(true);
       try {
-        const aoisData = await restApiClient.getBookmarkedAOIs(projectId);
+        const aoisData = await restApiClient.getBookmarkedAOIs(projectId, page, AOIS_PER_PAGE);
         console.log('aois', aoisData);
         setTotal(aoisData.total);
         setAois(aoisData.aois);
