@@ -7,5 +7,6 @@ describe('Projects list', () => {
     cy.visit('/profile/projects');
 
     // FIXME: Actually check if project list is populated
-    cy.get('body').should('exist')  });
+    cy.get('body').should('exist');
+  });
 });

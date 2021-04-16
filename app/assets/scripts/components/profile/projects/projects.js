@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { Button } from '@devseed-ui/button';
 import {
@@ -14,8 +14,7 @@ import { glsp } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
 import { StyledNavLink } from '../../../styles/links';
 import toasts from '../../common/toasts';
-import { useHistory } from 'react-router';
-import { useAuth, AuthContext, useRestApiClient } from '../../../context/auth';
+import { useAuth, useRestApiClient } from '../../../context/auth';
 import { formatDateTime } from '../../../utils/format';
 import {
   showGlobalLoadingMessage,
@@ -80,13 +79,7 @@ function renderRow(proj) {
 }
 
 function Projects() {
-<<<<<<< HEAD
-  const history = useHistory();
-
   const { apiToken } = useAuth();
-=======
-  const { apiToken } = useContext(AuthContext);
->>>>>>> lintfixes
 
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(null);
