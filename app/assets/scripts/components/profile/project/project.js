@@ -84,7 +84,7 @@ function renderRow(aoi, { project, restApiClient }) {
       <TableCell>{aoi.name}</TableCell>
       <TableCell>{formatThousands(tArea(aoi.bounds) / 1e6)}</TableCell>
       <TableCell>{aoi.checkpoint_name}</TableCell>
-      <TableCell>Number of Classes</TableCell>
+      <TableCell>{aoi.classes.length}</TableCell>
       <TableCell>{formatDateTime(aoi.created)}</TableCell>
       <TableCell>
         <FormInputGroup>
