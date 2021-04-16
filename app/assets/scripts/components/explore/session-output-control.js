@@ -251,6 +251,7 @@ function SessionOutputControl(props) {
             title='Export map'
             className='user-options-trigger'
             size='medium'
+            useIcon='share'
             {...props}
             disabled={!exportEnabled}
             hideText={isMediumDown}

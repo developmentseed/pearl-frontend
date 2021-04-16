@@ -3,7 +3,7 @@ import T from 'prop-types';
 import styled, { css } from 'styled-components';
 import { Heading } from '@devseed-ui/typography';
 
-import { themeVal, glsp } from '@devseed-ui/theme-provider';
+import { themeVal, glsp, truncated } from '@devseed-ui/theme-provider';
 
 import { BOUNDS_PADDING } from '../../common/map/constants';
 import {
@@ -34,6 +34,7 @@ const SubheadingStrong = styled.h3`
   color: ${themeVal('color.base')};
   font-size: 1.125rem;
   line-height: 1.5rem;
+  ${truncated}
 
   ${({ useIcon }) =>
     useIcon &&
