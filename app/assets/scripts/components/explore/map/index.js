@@ -244,23 +244,21 @@ function Map() {
     }
   }, [aoiArea, apiLimits, aoiRef]);
 
-  useEffect(async () => {
-    if (currentProject && currentAoi) {
-      try {
-        const tileJSON = await restApiClient.getTileJSON(
-          currentProject.id,
-          currentAoi.id
-        );
-        setTileUrl(`${config.restApiEndpoint}${tileJSON.tiles[0]}`);
-        const bounds = [
-          [tileJSON.bounds[3], tileJSON.bounds[0]],
-          [tileJSON.bounds[1], tileJSON.bounds[2]],
-        ];
-        mapRef.fitBounds(bounds);
-      } catch (error) {
-        toasts.error('Could not load AOI map');
+  useEffect(() => {
+    async function updateTitleUrl() {
+      if (mapRef && currentProject && currentAoi) {
+        try {
+          const tileJSON = await restApiClient.getTileJSON(
+            currentProject.id,
+            currentAoi.id
+          );
+          setTileUrl(`${config.restApiEndpoint}${tileJSON.tiles[0]}`);
+        } catch (error) {
+          toasts.error('Could not load AOI map');
+        }
       }
     }
+    updateTitleUrl();
   }, [currentAoi, currentProject, mapRef]);
 
   const displayMap = useMemo(
@@ -389,12 +387,12 @@ function Map() {
           );
         })}
 
-        {!predictions.data.predictions && currentProject && currentAoi && (
+        {/* {!predictions.data.predictions && currentProject && currentAoi && (
           <TileLayer
             url={`${config.restApiEndpoint}/api/project/${currentProject.id}/aoi/${currentAoi.id}/tiles/{z}/{x}/{y}`}
             maxZoom={18}
           />
-        )}
+        )} */}
 
         {currentCheckpoint &&
           currentCheckpoint.classes &&
