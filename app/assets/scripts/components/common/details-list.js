@@ -8,8 +8,9 @@ const List = styled.ol`
   grid-gap: 0.25rem;
   li {
     display: grid;
-    grid-gap: 0.5rem;
+    grid-gap: 1rem;
     grid-template-columns: 1fr 4fr;
+    align-items: center;
     h1 {
       margin: 0;
     }

@@ -6,6 +6,7 @@ import {
   themeVal,
   glsp,
   rgba,
+  media,
 } from '@devseed-ui/theme-provider';
 import { headingAlt } from '@devseed-ui/typography';
 
@@ -44,15 +45,18 @@ export const InpageHeaderInner = styled.div`
   display: flex;
   flex-flow: row nowrap;
   align-items: flex-end;
-  padding: ${glsp(4)} ${glsp(4)} ${glsp(2)};
+  padding: ${glsp(2)} ${glsp()};
   max-width: ${themeVal('layout.max')};
   margin: 0 auto;
+  ${media.mediumUp`
+    padding: ${glsp(4)} ${glsp(4)} ${glsp(2)};
+  `}
 `;
 
 export const InpageHeadline = styled.div`
   display: flex;
   flex-flow: column;
-  min-width: 0;
+  min-width: 100%;
 
   > *:last-child {
     margin-bottom: 0;
@@ -63,15 +67,25 @@ export const InpageToolbar = styled.div`
   display: flex;
   flex-flow: row nowrap;
   align-items: center;
-  padding-left: ${glsp(2)};
-  margin-left: auto;
+  justify-content: space-between;
+  > * ~ * {
+    margin-left: ${glsp()};
+  }
+  ${media.mediumUp`
+    padding-left: ${glsp(2)};
+    margin-left: auto;
+  `}
 `;
 
 export const InpageTitleWrapper = styled.div`
   display: flex;
-  flex-flow: row nowrap;
   min-width: 0;
+  flex-flow: column nowrap;
   margin-bottom: ${glsp(1.5)};
+  ${media.mediumUp`
+    /* padding: ${glsp(4)}; */
+    flex-flow: row nowrap;
+  `}
 `;
 
 export const InpageTitle = styled.h1`
@@ -94,8 +108,11 @@ export const InpageBody = styled.div`
 `;
 
 export const InpageBodyInner = styled.div`
-  padding: ${glsp(4)};
+  padding: ${glsp()};
   padding-top: 0;
   max-width: ${themeVal('layout.max')};
   margin: 0 auto;
+  ${media.mediumUp`
+    padding: ${glsp(4)};
+  `}
 `;
