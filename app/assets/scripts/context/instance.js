@@ -290,17 +290,20 @@ export function InstanceProvider(props) {
     retrain: async function () {
       // Check if all classes have the minimum number of samples
       const classes = Object.values(currentCheckpoint.classes);
+      let sampleCount = 0;
       for (let i = 0; i < classes.length; i++) {
         const aClass = classes[i];
-        const sampleCount =
+        sampleCount +=
           get(aClass, 'points.coordinates.length', 0) +
           get(aClass, 'polygons.length', 0);
-        if (sampleCount < config.minSampleCount) {
-          toasts.error(
-            `A minimum of ${config.minSampleCount} samples is required for every class.`
-          );
-          return;
-        }
+      }
+      if (sampleCount < config.minSampleCount) {
+        toasts.error(
+          `At least ${config.minSampleCount} sample${
+            config.minSampleCount === 1 ? '' : 's'
+          } should be provided for retraining.`
+        );
+        return;
       }
 
       // Reset predictions state
