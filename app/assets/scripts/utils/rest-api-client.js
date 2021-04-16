@@ -61,6 +61,10 @@ class RestApiClient {
     return this.fetch('PATCH', path, data);
   }
 
+  delete(path) {
+    return this.fetch('DELETE', path);
+  }
+
   getApiMeta() {
     return this.get('');
   }
@@ -69,12 +73,32 @@ class RestApiClient {
     return this.get(`project/${id}`);
   }
 
+  deleteProject(id) {
+    return this.delete(`project/${id}`);
+  }
+
+  getProjects(page, limit) {
+    const offset = (page - 1) * limit;
+    return this.get(`project/?page=${offset}&limit=${limit}`);
+  }
+
   createProject(data) {
     return this.post('project', data);
   }
 
   getModel(id) {
     return this.get(`model/${id}`);
+  }
+
+  getAOIs(projectId) {
+    return this.get(`project/${projectId}/aoi`);
+  }
+
+  getBookmarkedAOIs(projectId, page, limit) {
+    const offset = (page - 1) * limit;
+    return this.get(
+      `project/${projectId}/aoi?bookmarked=true&page=${offset}&limit=${limit}`
+    );
   }
 
   getCheckpoint(projectId, checkpointId) {
@@ -99,6 +123,10 @@ class RestApiClient {
 
   getTileJSON(projectId, aoiId) {
     return this.get(`project/${projectId}/aoi/${aoiId}/tiles`);
+  }
+
+  getTileJSONFromUUID(uuid) {
+    return this.get(`aoi/${uuid}/tiles`);
   }
 
   bookmarkAOI(projectId, aoiId, name) {
