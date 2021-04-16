@@ -87,43 +87,50 @@ function RefineModel(props) {
               Delete
             </InfoButton>
           </RefineTools>
-          <CheckpointSection>
-            <Heading useAlt>Checkpoint List</Heading>
+          {checkpointList && (
+            <CheckpointSection>
+              <ItemList>
+                <Heading useAlt>Checkpoint List</Heading>
 
-            {checkpointList.map((c) => {
-              const id = `checkpoint-${c.name}-${c.id}`;
-              return (
-                <Item
-                  key={c.id}
-                  onClick={() => {
-                    if (!currentCheckpoint.checkpointBrushes[id]) {
-                      dispatchCurrentCheckpoint({
-                        type: checkpointActions.ADD_CHECKPOINT_BRUSH,
-                        data: {
-                          id,
-                          checkpoint: c,
-                        },
-                      });
+                {checkpointList.map((c) => {
+                  const id = `checkpoint-${c.name}-${c.id}`;
+                  return (
+                    <Item
+                      key={c.id}
+                      onClick={() => {
+                        if (!currentCheckpoint.checkpointBrushes[id]) {
+                          dispatchCurrentCheckpoint({
+                            type: checkpointActions.ADD_CHECKPOINT_BRUSH,
+                            data: {
+                              id,
+                              checkpoint: c,
+                            },
+                          });
 
-                      mapRef.polygonDraw.addLayer({
-                        name: id,
-                        color: '#efefef',
-                      });
-                    }
+                          mapRef.polygonDraw.addLayer({
+                            name: id,
+                            color: '#efefef',
+                          });
+                        }
 
-                    dispatchCurrentCheckpoint({
-                      type: checkpointActions.SET_ACTIVE_CLASS,
-                      data: id,
-                    });
-                  }}
-                  selected={currentCheckpoint.activeItem === id}
-                >
-                  <Thumbnail />
-                  <ClassHeading size='xsmall'>{c.name}</ClassHeading>
-                </Item>
-              );
-            })}
-          </CheckpointSection>
+                        dispatchCurrentCheckpoint({
+                          type: checkpointActions.SET_ACTIVE_CLASS,
+                          data: id,
+                        });
+                      }}
+                      selected={currentCheckpoint.activeItem === id}
+                    >
+                      <Thumbnail />
+                      <Heading size='xsmall'>
+                        {c.name}
+                        {currentCheckpoint.activeItem === id ? ' (Active)' : ''}
+                      </Heading>
+                    </Item>
+                  );
+                })}
+              </ItemList>
+            </CheckpointSection>
+          )}
           <ItemList>
             <Heading useAlt>Class List</Heading>
             {Object.values(currentCheckpoint.classes).map((c) => {

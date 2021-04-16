@@ -12,7 +12,7 @@ import logger from '../utils/logger';
 import history from '../history';
 import RestApiClient from '../utils/rest-api-client';
 
-export const AuthContext = createContext(null);
+const AuthContext = createContext(null);
 
 /**
  * Inner provider to be wrapped by Auth0 provider
@@ -192,14 +192,20 @@ const useCheckContext = (fnName) => {
 
 // Expose current restApiClient to consumer. We should avoid using useContext()
 // directly on components.
-export const useRestApiClient = () => {
-  const { apiToken, logout, isLoading } = useCheckContext('useRestApiClient');
+export const useAuth = () => {
+  const {
+    apiToken,
+    user,
+    isAuthenticated,
+    logout,
+    isLoading,
+  } = useCheckContext('useAuth');
 
   return useMemo(() => {
     const restApiClient = new RestApiClient({
       apiToken,
       handleUnauthorized: () => logout(),
     });
-    return { restApiClient, apiToken, isLoading };
-  }, [apiToken, isLoading]);
+    return { restApiClient, apiToken, isLoading, user, isAuthenticated };
+  }, [apiToken, isLoading, user, isAuthenticated]);
 };
