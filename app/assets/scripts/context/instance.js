@@ -270,6 +270,9 @@ export function InstanceProvider(props) {
           // Reset predictions state
           dispatchPredictions({
             type: predictionsActions.START_PREDICTION,
+            data: {
+              type: checkpointModes.RUN,
+            },
           });
 
           // Add prediction request to queue
@@ -311,6 +314,9 @@ export function InstanceProvider(props) {
       // Reset predictions state
       dispatchPredictions({
         type: predictionsActions.START_PREDICTION,
+        data: {
+          type: checkpointModes.RUN,
+        },
       });
 
       // Add prediction request to queue

@@ -91,6 +91,7 @@ export function predictionsReducer(state, action) {
         data: {
           predictions: [],
           aoiId: null,
+          type: data.type,
         },
       });
 

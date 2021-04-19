@@ -19,7 +19,11 @@ import { mapStateReducer, mapModes, mapActionTypes } from './reducers/map';
 import tBbox from '@turf/bbox';
 import reverseGeoCode from '../utils/reverse-geocode';
 
-import { actions as checkpointActions, useCheckpoint } from './checkpoint';
+import {
+  actions as checkpointActions,
+  checkpointModes,
+  useCheckpoint,
+} from './checkpoint';
 import { wrapLogReducer } from './reducers/utils';
 import { useAoi, useAoiPatch } from './aoi';
 import { useProject } from './project';
@@ -173,7 +177,9 @@ export function ExploreProvider(props) {
       if (predictions.error) {
         toasts.error('An inference error occurred, please try again later.');
       } else {
-        loadMetrics();
+        if (predictions.getData().type === checkpointModes.RETRAIN) {
+          loadMetrics();
+        }
       }
     }
   }, [predictions, restApiClient, currentProject]);
