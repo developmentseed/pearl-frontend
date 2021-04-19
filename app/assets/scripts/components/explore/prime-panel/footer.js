@@ -73,9 +73,11 @@ function PrimeButton({ currentCheckpoint, allowInferenceRun, mapRef }) {
   return (
     <InfoButton
       data-cy={allowInferenceRun ? 'run-model-button' : 'disabled'}
-      variation='primary-raised-dark'
+      variation={
+        label === 'Abort' ? 'danger-raised-light' : 'primary-raised-dark'
+      }
       size='medium'
-      useIcon='tick--small'
+      useIcon={label === 'Abort' ? 'xmark--small' : 'tick--small'}
       style={{
         gridColumn: '1 / -1',
       }}
