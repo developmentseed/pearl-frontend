@@ -116,8 +116,9 @@ function ClassAnalyticsChart(props) {
             <Icon color={c.color} />
             <Prose size='small'>{c.name}</Prose>
             <Prose size='small' className='percent'>
-              {round(checkpoint.analytics[i][metric], 2)}
-              {metric === 'percent' && '%'}
+              {metric === 'percent'
+                ? `${round(checkpoint.analytics[i][metric], 2) * 100}%`
+                : round(checkpoint.analytics[i][metric], 2)}
             </Prose>
           </ClassItem>
         ))}
