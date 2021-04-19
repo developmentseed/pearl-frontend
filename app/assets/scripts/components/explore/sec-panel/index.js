@@ -1,5 +1,6 @@
 import React from 'react';
 import ClassDistributionChart from './class-distribution-chart';
+import ClassF1ScoreChart from './class-f1score-chart';
 import styled from 'styled-components';
 import Panel from '../../common/panel';
 import {
@@ -27,7 +28,7 @@ const StyledBlockBody = styled(PanelBlockBody)`
 const ScrollBodyWrapper = styled.div`
   display: flex;
   flex-flow: column nowrap;
-  justify-content: space-between;
+  justify-content: flex-start;
   height: calc(100vh - 10rem);
 `;
 
@@ -55,13 +56,12 @@ function SecPanel() {
                   </PanelBlockHeader>
                   <ClassDistributionChart checkpoint={currentCheckpoint} />
                 </StyledBlockBody>
-                {/* Stubbed out second chart below:
                 <StyledBlockBody>
                   <PanelBlockHeader>
                     <Subheading>Class F-1 Scores</Subheading>
                   </PanelBlockHeader>
-                  <ClassF1Chart checkpoint={checkpoint} />
-                </StyledBlockBody> */}
+                  <ClassF1ScoreChart checkpoint={currentCheckpoint} />
+                </StyledBlockBody>
               </ScrollBodyWrapper>
             </PanelBlockScroll>
           ) : (
