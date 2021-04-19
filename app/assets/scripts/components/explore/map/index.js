@@ -32,6 +32,7 @@ import {
 import ModalMapEvent from './modal-events';
 
 import VectorLayer from '../../common/map/vector-layer';
+import TileLayerWithHeaders from '../../common/map/tile-layer';
 import { useAuth } from '../../../context/auth';
 import { useApiMeta } from '../../../context/api-meta';
 import { useAoi, useAoiPatch } from '../../../context/aoi';
@@ -390,9 +391,15 @@ function Map() {
         })}
 
         {!predictions.data.predictions && currentProject && currentAoi && (
-          <TileLayer
+          <TileLayerWithHeaders
             url={`${config.restApiEndpoint}/api/project/${currentProject.id}/aoi/${currentAoi.id}/tiles/{z}/{x}/{y}`}
             maxZoom={18}
+            headers={[
+              {
+                header: 'authorization',
+                value: `Bearer ${restApiClient.apiToken}`,
+              },
+            ]}
           />
         )}
 
