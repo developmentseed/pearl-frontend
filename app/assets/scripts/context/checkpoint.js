@@ -81,8 +81,8 @@ function checkpointReducer(state, action) {
       return {
         ...action.data,
         mode: action.data.mode || checkpointModes.RUN,
-        retrain_geoms: action.data.retrain_geoms,
-        input_geoms: action.data.input_geoms,
+        retrain_geoms: action.data.retrain_geoms || (state && state.retrain_geoms) || null,
+        input_geoms: action.data.input_geoms || (state && state.input_geoms) || null,
         activeItem: action.data.classes
           ? action.data.classes[0].name
           : undefined,

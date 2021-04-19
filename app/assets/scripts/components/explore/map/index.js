@@ -8,6 +8,7 @@ import {
   ImageOverlay,
   Circle,
 } from 'react-leaflet';
+import L from 'leaflet';
 import GlobalContext from '../../../context/global';
 import { ExploreContext, useMapState } from '../../../context/explore';
 import { useMapRef, useMapLayers, useUserLayers } from '../../../context/map';
@@ -30,7 +31,7 @@ import {
 } from '../../../context/checkpoint';
 import ModalMapEvent from './modal-events';
 
-import VectorLayer from '../../common/map/vector-layer';
+import GeoJSONLayer from '../../common/map/geojson-layer';
 import { useAuth } from '../../../context/auth';
 import { useApiMeta } from '../../../context/api-meta';
 import { useAoi, useAoiPatch } from '../../../context/aoi';
@@ -332,20 +333,37 @@ function Map() {
           ))}
 
         {currentCheckpoint &&
-          currentCheckpoint.id &&
-          userLayers.retrainingSamples.active && (
-            <VectorLayer
-              url={`${config.restApiEndpoint}/api/project/${currentProject.id}/checkpoint/${currentCheckpoint.id}/tiles/{z}/{x}/{y}.mvt`}
-              token={`Bearer ${restApiClient.apiToken}`}
-              pane='markerPane'
-              opacity={
-                userLayers.retrainingSamples.visible
-                  ? userLayers.retrainingSamples.opacity
-                  : 0
-              }
-              classes={currentCheckpoint.classes}
-            />
-          )}
+          currentCheckpoint.retrain_geoms &&
+          userLayers.retrainingSamples.active &&
+          currentCheckpoint.retrain_geoms.map((geoms, i) => {
+            return (
+              <GeoJSONLayer
+                key={Object.keys(currentCheckpoint.classes)[i]}
+                data={{
+                  type: 'Feature',
+                  geometry: geoms,
+                  properties: {
+                    id: currentCheckpoint.id,
+                  },
+                }}
+                style={{
+                  stroke: false,
+                  fillColor: Object.values(currentCheckpoint.classes)[i].color,
+                  fillOpacity: userLayers.retrainingSamples.opacity,
+                }}
+                opacity={
+                  userLayers.retrainingSamples.visible
+                    ? userLayers.retrainingSamples.opacity
+                    : 0
+                }
+                pointToLayer={function (feature, latlng) {
+                  return L.circleMarker(latlng, {
+                    radius: 4,
+                  });
+                }}
+              />
+            );
+          })}
 
         {predictions.data.predictions &&
           predictions.data.predictions.map((p) => (
