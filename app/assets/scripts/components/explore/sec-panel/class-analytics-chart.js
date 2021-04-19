@@ -89,8 +89,8 @@ const options = {
   },
   maintainAspectRatio: false,
 };
-function ClassF1ScoreChart(props) {
-  const { checkpoint } = props;
+function ClassAnalyticsChart(props) {
+  const { checkpoint, metric } = props;
   return (
     <Wrapper>
       <ChartContainer>
@@ -99,7 +99,7 @@ function ClassF1ScoreChart(props) {
             datasets: [
               {
                 label: 'Class Distribution',
-                data: checkpoint.analytics.map((c) => c.f1score),
+                data: checkpoint.analytics.map((c) => c[metric]),
                 backgroundColor: Object.values(checkpoint.classes).map(
                   (c) => c.color
                 ),
@@ -116,7 +116,8 @@ function ClassF1ScoreChart(props) {
             <Icon color={c.color} />
             <Prose size='small'>{c.name}</Prose>
             <Prose size='small' className='percent'>
-              {round(checkpoint.analytics[i].f1score, 2)}
+              {round(checkpoint.analytics[i][metric], 2)}
+              {metric === 'percent' && '%'}
             </Prose>
           </ClassItem>
         ))}
@@ -124,8 +125,9 @@ function ClassF1ScoreChart(props) {
     </Wrapper>
   );
 }
-ClassF1ScoreChart.propTypes = {
+ClassAnalyticsChart.propTypes = {
   checkpoint: T.object,
+  metric: T.string,
 };
 
-export default ClassF1ScoreChart;
+export default ClassAnalyticsChart;

@@ -1,6 +1,5 @@
 import React from 'react';
-import ClassDistributionChart from './class-distribution-chart';
-import ClassF1ScoreChart from './class-f1score-chart';
+import ClassAnalyticsChart from './class-analytics-chart';
 import styled from 'styled-components';
 import Panel from '../../common/panel';
 import {
@@ -54,13 +53,19 @@ function SecPanel() {
                   <PanelBlockHeader>
                     <Subheading>Class Distribution</Subheading>
                   </PanelBlockHeader>
-                  <ClassDistributionChart checkpoint={currentCheckpoint} />
+                  <ClassAnalyticsChart
+                    checkpoint={currentCheckpoint}
+                    metric='percent'
+                  />
                 </StyledBlockBody>
                 <StyledBlockBody>
                   <PanelBlockHeader>
                     <Subheading>Class F-1 Scores</Subheading>
                   </PanelBlockHeader>
-                  <ClassF1ScoreChart checkpoint={currentCheckpoint} />
+                  <ClassAnalyticsChart
+                    checkpoint={currentCheckpoint}
+                    metric='f1score'
+                  />
                 </StyledBlockBody>
               </ScrollBodyWrapper>
             </PanelBlockScroll>
