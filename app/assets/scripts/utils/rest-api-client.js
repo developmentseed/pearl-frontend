@@ -109,8 +109,8 @@ class RestApiClient {
     return this.get(`project/${projectId}/checkpoint`);
   }
 
-  createInstance(projectId) {
-    return this.post(`project/${projectId}/instance`, {});
+  createInstance(projectId, params = {}) {
+    return this.post(`project/${projectId}/instance`, params);
   }
 
   getInstance(projectId, instanceId) {

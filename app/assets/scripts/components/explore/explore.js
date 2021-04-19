@@ -10,8 +10,6 @@ import {
 } from '../../styles/inpage';
 import PrimePanel from './prime-panel';
 import SecPanel from './sec-panel';
-import { useParams } from 'react-router';
-import { showGlobalLoadingMessage } from '@devseed-ui/global-loading';
 
 import Map from './map';
 
@@ -19,8 +17,6 @@ import Tour from '../common/tour';
 
 import { tourSteps } from './tour';
 import { useApiMeta } from '../../context/api-meta';
-import { useInstance } from '../../context/instance';
-import { useAuth } from '../../context/auth';
 
 const ExploreBody = styled(InpageBody)`
   display: grid;
@@ -29,21 +25,9 @@ const ExploreBody = styled(InpageBody)`
 
 const ExploreCarto = styled.section``;
 function Explore() {
-  let { projectId } = useParams();
-  const { isLoading } = useAuth();
-
   const { apiLimits } = useApiMeta();
-  const { initInstance } = useInstance();
 
   const [steps, setSteps] = useState(null);
-
-  // After page is mounted and auth is resolve, init instance
-  useEffect(() => {
-    if (!isLoading && projectId !== 'new') {
-      showGlobalLoadingMessage('Loading project...');
-      initInstance(projectId);
-    }
-  }, [isLoading]);
 
   useEffect(() => {
     if (apiLimits) {
