@@ -388,7 +388,7 @@ function Map() {
             maxZoom={18}
             headers={[
               {
-                header: 'authorization',
+                header: 'Authorization',
                 value: `Bearer ${restApiClient.apiToken}`,
               },
             ]}
