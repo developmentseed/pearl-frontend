@@ -41,7 +41,11 @@ export function ExploreProvider(props) {
   const { aoiName, aoiRef, setAoiName, setAoiRef, setCurrentAoi } = useAoi();
   const { predictions, dispatchPredictions } = usePredictions();
   const { selectedModel, setSelectedModel } = useModel();
-  const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
+  const {
+    currentCheckpoint,
+    dispatchCurrentCheckpoint,
+    fetchCheckpoint,
+  } = useCheckpoint();
   const {
     aoiPatch,
     dispatchAoiPatch,
@@ -94,7 +98,7 @@ export function ExploreProvider(props) {
       }
 
       showGlobalLoadingMessage('Fetching checkpoints...');
-      await loadCheckpointList(projectId);
+      const { checkpoints } = await loadCheckpointList(projectId);
 
       showGlobalLoadingMessage('Looking for active GPU instances...');
       let instance;
@@ -103,7 +107,19 @@ export function ExploreProvider(props) {
         const instanceItem = activeInstances.instances[0];
         instance = await restApiClient.getInstance(projectId, instanceItem.id);
       } else {
-        instance = await restApiClient.createInstance(project.id);
+        if (checkpoints && checkpoints.length > 0) {
+          // Apply first checkpoint, if available
+          instance = await restApiClient.createInstance(project.id, {
+            checkpoint_id: checkpoints.checkpoints[0].id,
+          });
+        } else {
+          instance = await restApiClient.createInstance(project.id);
+        }
+      }
+
+      // Fetch checkpoint meta and apply to state
+      if (instance.checkpoint_id) {
+        await fetchCheckpoint(projectId, instance.checkpoint_id);
       }
       setCurrentInstance(instance);
     } catch (error) {
