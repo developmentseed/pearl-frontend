@@ -163,7 +163,7 @@ export function InstanceProvider(props) {
     }
   }, [websocketClient, instance.connected, instance.status, messageQueue]);
 
-  async function initInstance(projectId) {
+  async function initInstance(projectId, checkpointId) {
     // Close existing websocket
     if (websocketClient) {
       websocketClient.close();
@@ -173,18 +173,36 @@ export function InstanceProvider(props) {
     const activeInstances = await restApiClient.getActiveInstances(projectId);
 
     // Get instance token
-    let token;
+    let instance;
     if (activeInstances.total > 0) {
       const { id: instanceId } = activeInstances.instances[0];
-      token = (await restApiClient.getInstance(projectId, instanceId)).token;
+      instance = await restApiClient.getInstance(projectId, instanceId);
+
+      // As the instance is already running, apply desired checkpoint when
+      // ready.
+      if (checkpointId) {
+        dispatchMessageQueue({
+          type: messageQueueActionTypes.ADD,
+          data: {
+            action: 'model#checkpoint',
+            data: {
+              id: checkpointId,
+            },
+          },
+        });
+      }
+    } else if (checkpointId) {
+      instance = await restApiClient.createInstance(projectId, {
+        checkpoint_id: checkpointId,
+      });
     } else {
-      token = (await restApiClient.createInstance(projectId)).token;
+      instance = await restApiClient.createInstance(projectId);
     }
 
     // Use a Promise to stand by for GPU connection
     return new Promise((resolve, reject) => {
       const newWebsocketClient = new WebsocketClient({
-        token,
+        token: instance.token,
         dispatchInstance,
         dispatchCurrentCheckpoint,
         fetchCheckpoint: (checkpointId) =>
@@ -194,9 +212,8 @@ export function InstanceProvider(props) {
         dispatchAoiPatch,
       });
       newWebsocketClient.addEventListener('open', () => {
-        newWebsocketClient.addEventListener('message', () => {});
         setWebsocketClient(newWebsocketClient);
-        resolve();
+        resolve(instance);
       });
       newWebsocketClient.addEventListener('error', () => {
         reject();
@@ -568,11 +585,6 @@ export class WebsocketClient extends WebSocket {
             },
           });
           break;
-
-        case 'model#checkpoint':
-          fetchCheckpoint(data.id);
-          this.sendMessage({ action: 'model#status' });
-          break;
         case 'error':
           logger(event);
           dispatchMessageQueue({ type: messageQueueActionTypes.CLEAR });
@@ -580,9 +592,11 @@ export class WebsocketClient extends WebSocket {
           this.sendMessage({ action: 'model#status' });
           toasts.error('Unexpected error, please try again later.');
           break;
+        case 'model#checkpoint':
         case 'model#checkpoint#progress':
         case 'model#checkpoint#complete':
         case 'model#retrain#complete':
+          fetchCheckpoint(data.id || data.checkpoint);
           this.sendMessage({ action: 'model#status' });
           break;
         case 'model#prediction':
