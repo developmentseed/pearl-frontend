@@ -110,7 +110,7 @@ export function ExploreProvider(props) {
         if (checkpoints && checkpoints.length > 0) {
           // Apply first checkpoint, if available
           instance = await restApiClient.createInstance(project.id, {
-            checkpoint_id: checkpoints.checkpoints[0].id,
+            checkpoint_id: checkpoints[0].id,
           });
         } else {
           instance = await restApiClient.createInstance(project.id);
@@ -123,6 +123,7 @@ export function ExploreProvider(props) {
       }
       setCurrentInstance(instance);
     } catch (error) {
+      logger(error);
       toasts.error('Error loading project, please try again later.');
     } finally {
       hideGlobalLoading();
