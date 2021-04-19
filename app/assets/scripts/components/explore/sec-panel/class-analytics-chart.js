@@ -90,7 +90,7 @@ const options = {
   maintainAspectRatio: false,
 };
 function ClassAnalyticsChart(props) {
-  const { checkpoint, metric } = props;
+  const { checkpoint, label, metric } = props;
   return (
     <Wrapper>
       <ChartContainer>
@@ -98,7 +98,7 @@ function ClassAnalyticsChart(props) {
           data={{
             datasets: [
               {
-                label: 'Class Distribution',
+                label: label,
                 data: checkpoint.analytics.map((c) => c[metric]),
                 backgroundColor: Object.values(checkpoint.classes).map(
                   (c) => c.color
@@ -127,6 +127,7 @@ function ClassAnalyticsChart(props) {
 }
 ClassAnalyticsChart.propTypes = {
   checkpoint: T.object,
+  label: T.string,
   metric: T.string,
 };
 

@@ -55,15 +55,17 @@ function SecPanel() {
                   </PanelBlockHeader>
                   <ClassAnalyticsChart
                     checkpoint={currentCheckpoint}
+                    label='Class Distribution'
                     metric='percent'
                   />
                 </StyledBlockBody>
                 <StyledBlockBody>
                   <PanelBlockHeader>
-                    <Subheading>Class F-1 Scores</Subheading>
+                    <Subheading>Class F1 Scores</Subheading>
                   </PanelBlockHeader>
                   <ClassAnalyticsChart
                     checkpoint={currentCheckpoint}
+                    label='Class F1 Score'
                     metric='f1score'
                   />
                 </StyledBlockBody>
