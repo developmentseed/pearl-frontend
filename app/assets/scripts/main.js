@@ -26,6 +26,7 @@ import { GlobalContextProvider } from './context/global';
 import { CollecticonsGlobalStyle } from '@devseed-ui/collecticons';
 import GlobalLoadingProvider from '@devseed-ui/global-loading';
 import { ToastContainerCustom } from './components/common/toasts';
+import Project from './components/profile/project';
 import { AuthProvider } from './context/auth';
 import { ApiMetaProvider } from './context/api-meta';
 
@@ -65,10 +66,7 @@ function Root() {
                   ) : (
                     <>
                       <Route exact path='/' component={Home} />
-                      <Route
-                        path='/project/:projectId/aoi/:aoiId/map'
-                        component={AoiMap}
-                      />
+                      <Route path='/aoi/:uuid/map' component={AoiMap} />
                       <Route path='/project/:projectId' component={Explore} />
                       <ProtectedRoute
                         exact
@@ -80,9 +78,14 @@ function Root() {
                         path='/profile/projects'
                         component={Projects}
                       />
+                      <Route
+                        path='/profile/projects/:projectId'
+                        component={Project}
+                      />
                       <Route path='/about' component={About} />
                     </>
                   )}
+
                   <Route path='*' component={UhOh} />
                 </Switch>
                 <ToastContainerCustom />

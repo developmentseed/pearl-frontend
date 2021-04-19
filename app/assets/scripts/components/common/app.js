@@ -9,7 +9,7 @@ import { Page } from '../../styles/page';
 
 import config from '../../config';
 import { useApiMeta } from '../../context/api-meta';
-import { useRestApiClient } from '../../context/auth';
+import { useAuth } from '../../context/auth';
 
 const { appTitle, appDescription } = config;
 
@@ -17,7 +17,7 @@ function App(props) {
   const { location, pageTitle, children, hideFooter } = props;
   const title = pageTitle ? `${pageTitle} — ` : '';
 
-  const { restApiClient } = useRestApiClient();
+  const { restApiClient } = useAuth();
   const { setApiLimits } = useApiMeta();
 
   // Handle cases where the page is updated without changing

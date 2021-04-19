@@ -5,12 +5,17 @@ import { Heading } from '@devseed-ui/typography';
 import collecticon from '@devseed-ui/collecticons';
 import { Button } from '@devseed-ui/button';
 
-export const ClassList = styled.div`
+export const ToolsWrapper = styled.div`
   display: grid;
+  grid-gap: ${glsp()};
 
   ${PlaceholderMessage} {
     padding: 2rem;
   }
+`;
+
+export const ClassList = styled.section`
+  display: grid;
 
   > ${Heading} {
     padding: 0 1.5rem;
@@ -131,11 +136,18 @@ export const Thumbnail = styled.div`
 
 export const ToolBox = styled.section`
   padding: 0 1.5rem;
+  display: flex;
+  flex-flow: row wrap;
+  ${Heading} {
+    flex-basis: 100%;
+  }
   ${Button} {
-    margin-left: ${glsp(0.25)};
-    margin-right: ${glsp()};
     padding: 0.25rem 0.75rem 0.25rem 0.5rem;
     box-shadow: none;
     border: 2px solid ${themeVal('color.primaryAlphaB')};
+
+    & ~ ${Button} {
+      margin-left: ${glsp()};
+    }
   }
 `;

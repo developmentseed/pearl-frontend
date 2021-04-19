@@ -1,7 +1,5 @@
 import React, { useMemo, useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
-import tArea from '@turf/area';
-import tBboxPolygon from '@turf/bbox-polygon';
 import SizeAwareElement from '../../common/size-aware-element';
 import {
   MapContainer,
@@ -25,6 +23,7 @@ import AoiEditControl from './aoi-edit-control';
 import PolygonDrawControl from './polygon-draw-control';
 import config from '../../../config';
 import { inRange } from '../../../utils/utils';
+import { areaFromBounds } from '../../../utils/map';
 import {
   useCheckpoint,
   actions as checkpointActions,
@@ -32,7 +31,7 @@ import {
 import ModalMapEvent from './modal-events';
 
 import VectorLayer from '../../common/map/vector-layer';
-import { useRestApiClient } from '../../../context/auth';
+import { useAuth } from '../../../context/auth';
 import { useApiMeta } from '../../../context/api-meta';
 import { useAoi, useAoiPatch } from '../../../context/aoi';
 import toasts from '../../common/toasts';
@@ -71,20 +70,8 @@ const Container = styled.div`
   }
 `;
 
-/**
- * Get area from bbox
- *
- * @param {array} bbox extent in minX, minY, maxX, maxY order
- */
-function areaFromBounds(bbox) {
-  const poly = tBboxPolygon(bbox);
-  return tArea(poly);
-}
-
 function Map() {
   const {
-    aoiRef,
-    setAoiRef,
     aoiArea,
     setAoiArea,
     aoiInitializer,
@@ -94,9 +81,9 @@ function Map() {
   } = useContext(ExploreContext);
 
   const { apiLimits } = useApiMeta();
-  const { currentAoi } = useAoi();
+  const { aoiRef, setAoiRef, currentAoi } = useAoi();
+  const { restApiClient } = useAuth();
   const { aoiPatchList } = useAoiPatch();
-  const { restApiClient } = useRestApiClient();
 
   const { mapState, mapModes, setMapMode } = useMapState();
   const { mapRef, setMapRef } = useMapRef();
@@ -146,11 +133,13 @@ function Map() {
           mapRef.polygonDraw.enableAdd(currentCheckpoint.activeItem);
         }
         break;
-      case mapModes.REMOVE_SAMPLE:
+
+      case mapModes.DELETE_SAMPLES:
         if (currentCheckpoint.activeItem) {
-          mapRef.polygonDraw.enableDelete(currentCheckpoint.activeItem);
+          mapRef.polygonDraw.enableSubtract(currentCheckpoint.activeItem);
         }
         break;
+
       default:
         mapRef.polygonDraw.disable();
         break;
@@ -246,23 +235,21 @@ function Map() {
     }
   }, [aoiArea, apiLimits, aoiRef]);
 
-  useEffect(async () => {
-    if (currentProject && currentAoi) {
-      try {
-        const tileJSON = await restApiClient.getTileJSON(
-          currentProject.id,
-          currentAoi.id
-        );
-        setTileUrl(`${config.restApiEndpoint}${tileJSON.tiles[0]}`);
-        const bounds = [
-          [tileJSON.bounds[3], tileJSON.bounds[0]],
-          [tileJSON.bounds[1], tileJSON.bounds[2]],
-        ];
-        mapRef.fitBounds(bounds);
-      } catch (error) {
-        toasts.error('Could not load AOI map');
+  useEffect(() => {
+    async function updateTileUrl() {
+      if (mapRef && currentProject && currentAoi) {
+        try {
+          const tileJSON = await restApiClient.getTileJSON(
+            currentProject.id,
+            currentAoi.id
+          );
+          setTileUrl(`${config.restApiEndpoint}${tileJSON.tiles[0]}`);
+        } catch (error) {
+          toasts.error('Could not load AOI map');
+        }
       }
     }
+    updateTileUrl();
   }, [currentAoi, currentProject, mapRef]);
 
   const displayMap = useMemo(
@@ -356,6 +343,7 @@ function Map() {
                   ? userLayers.retrainingSamples.opacity
                   : 0
               }
+              classes={currentCheckpoint.classes}
             />
           )}
 
@@ -391,12 +379,12 @@ function Map() {
           );
         })}
 
-        {!predictions.data.predictions && currentProject && currentAoi && (
+        {/* {!predictions.data.predictions && currentProject && currentAoi && (
           <TileLayer
             url={`${config.restApiEndpoint}/api/project/${currentProject.id}/aoi/${currentAoi.id}/tiles/{z}/{x}/{y}`}
             maxZoom={18}
           />
-        )}
+        )} */}
 
         {currentCheckpoint &&
           currentCheckpoint.classes &&
@@ -412,7 +400,7 @@ function Map() {
                   }}
                   eventHandlers={{
                     click: () => {
-                      if (mapState.mode === mapModes.REMOVE_SAMPLE) {
+                      if (mapState.mode === mapModes.DELETE_SAMPLES) {
                         dispatchCurrentCheckpoint({
                           type: checkpointActions.REMOVE_POINT_SAMPLE,
                           data: {

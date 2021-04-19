@@ -1,6 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
 import styled from 'styled-components';
-import { saveAs } from 'file-saver';
 import T from 'prop-types';
 import copy from '../../utils/copy-text-to-clipboard';
 import {
@@ -20,9 +19,12 @@ import { Heading } from '@devseed-ui/typography';
 import { Form, FormInput } from '@devseed-ui/form';
 import InfoButton from '../common/info-button';
 import { ExploreContext } from '../../context/explore';
-import { AuthContext, useRestApiClient } from '../../context/auth';
+import { useAuth } from '../../context/auth';
 import toasts from '../common/toasts';
 import logger from '../../utils/logger';
+import { useInstance } from '../../context/instance';
+import { useParams } from 'react-router';
+import { downloadGeotiff as downloadGeotiffUtil } from '../../utils/map';
 
 const Wrapper = styled.div`
   flex: 1;
@@ -81,9 +83,11 @@ const HeadingInput = styled(FormInput)`
 `;
 
 function SessionOutputControl(props) {
-  const { status, projectName, openHelp, isMediumDown } = props;
-  const { restApiClient } = useRestApiClient();
-  const { isAuthenticated } = useContext(AuthContext);
+  const { projectId } = useParams();
+  const { projectName, openHelp, isMediumDown } = props;
+  const { isAuthenticated, restApiClient } = useAuth();
+
+  const { instance } = useInstance();
 
   const {
     updateProjectName,
@@ -115,11 +119,8 @@ function SessionOutputControl(props) {
         projectId,
         aoiId
       );
-      var blob = new Blob([geotiffArrayBuffer], {
-        type: 'application/x-geotiff',
-      });
       const filename = `${aoiId}.tiff`;
-      saveAs(blob, filename);
+      downloadGeotiffUtil(geotiffArrayBuffer, filename);
     } catch (error) {
       logger('Error with geotiff download', error);
       toasts.error('Failed to download GeoTIFF');
@@ -131,14 +132,17 @@ function SessionOutputControl(props) {
   const copyTilesLink = async () => {
     const projectId = currentProject.id;
     const aoiId = predictions.data.aoiId;
+    let uuid;
 
     try {
-      await restApiClient.bookmarkAOI(projectId, aoiId, aoiName);
+      const aoi = await restApiClient.bookmarkAOI(projectId, aoiId, aoiName);
+      uuid = aoi.uuid;
     } catch (err) {
       logger('Error Bookmarking AOI', err);
+      return;
     }
-    //FIXME: This url will likely change
-    const url = `${window.location.origin}/project/${projectId}/aoi/${aoiId}/map`;
+
+    const url = `${window.location.origin}/aoi/${uuid}/map`;
     const copied = copy(url);
     if (copied) {
       toasts.success('URL copied to clipboard');
@@ -226,7 +230,8 @@ function SessionOutputControl(props) {
         variation={status === 'OK' ? 'primary' : 'danger'}
         size='xxsmall'
       >
-        <span>Session Status:</span> {status || 'None Provided'}
+        <span>Session Status:</span>{' '}
+        {projectId === 'new' ? 'Ready.' : instance.statusText}
       </StatusHeading>
       <Button
         variation='base-plain'
@@ -246,6 +251,7 @@ function SessionOutputControl(props) {
             title='Export map'
             className='user-options-trigger'
             size='medium'
+            useIcon='share'
             {...props}
             disabled={!exportEnabled}
             hideText={isMediumDown}

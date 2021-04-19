@@ -45,23 +45,47 @@ class PolygonDrawControl {
     drawer.category = name;
 
     // Handle added polygon
-    drawer.on('layeradd', (data) => {
-      const polygons = this.getLayerAsGeoJSON(data.target);
+    drawer.on('layeradd', () => {
+      const polygons = this.getLayerAsGeoJSON(drawer);
       if (!this.manualMode) {
         this.onUpdate(name, polygons);
       }
     });
-    drawer.on('layerremove', (data) => {
+    drawer.on('layerremove', () => {
       // should not update history when merging
-      const polygons = this.getLayerAsGeoJSON(data.target);
-
-      if (!this.manualMode && drawer.mode === 'delete') {
+      const polygons = this.getLayerAsGeoJSON(drawer);
+      if (!this.manualMode && drawer.mode === 'subtract') {
         this.onUpdate(name, polygons);
       }
     });
+    drawer.on('layersubtract', (data) => {
+      // should not update history when merging
+      const polygons = this.getLayerAsGeoJSON(data.target);
+
+      if (!this.manualMode) {
+        this.onUpdate(name, polygons);
+      }
+    });
+
+    /*
+     * Override default functionality of freehand shapes
+     * Default functionality dictates that polygonClick only fires a remove event when in delete mode.
+     * Here it it firest the event only when in subtract mode so as to allow draw erase and click delete
+     * without changing tools
+     */
+    drawer.polygonClick = (polygon) => {
+      if (drawer.mode === 'subtract') {
+        drawer.removeLayer(polygon);
+      }
+    };
+
     this._group.addLayer(drawer);
   }
 
+  /*
+   * Function to add polygons to layers without user input
+   * used when restoring from history using UNDO
+   */
   setLayerPolygons(layerPolygons) {
     const idMap = Object.entries(this._group._layers).reduce(
       (accum, [id, { category }]) => ({
@@ -102,6 +126,10 @@ class PolygonDrawControl {
 
   enableAdd(layerName) {
     this.enableMode('add', layerName);
+  }
+
+  enableSubtract(layerName) {
+    this.enableMode('subtract', layerName);
   }
 
   enableDelete(layerName) {

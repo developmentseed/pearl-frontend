@@ -6,30 +6,33 @@ import { MapContainer, TileLayer } from 'react-leaflet';
 import { useParams } from 'react-router-dom';
 import App from '../common/app';
 import config from '../../config';
-import { useRestApiClient } from '../../context/auth';
+import { useAuth } from '../../context/auth';
 
 const { restApiEndpoint } = config;
 
 function AoiMap() {
-  const { projectId, aoiId } = useParams();
+  const { uuid } = useParams();
   const [mapRef, setMapRef] = useState(null);
+  const { restApiClient } = useAuth();
   const [tileUrl, setTileUrl] = useState(null);
-  const { restApiClient } = useRestApiClient();
 
-  useEffect(async () => {
-    if (!mapRef) return;
-    try {
-      const tileJSON = await restApiClient.getTileJSON(projectId, aoiId);
-      setTileUrl(`${restApiEndpoint}${tileJSON.tiles[0]}`);
-      const bounds = [
-        [tileJSON.bounds[3], tileJSON.bounds[0]],
-        [tileJSON.bounds[1], tileJSON.bounds[2]],
-      ];
-      mapRef.fitBounds(bounds);
-    } catch (error) {
-      toasts.error('Could not load AOI map');
+  useEffect(() => {
+    async function fetchData() {
+      if (!mapRef) return;
+      try {
+        const tileJSON = await restApiClient.getTileJSONFromUUID(uuid);
+        setTileUrl(`${restApiEndpoint}${tileJSON.tiles[0]}`);
+        const bounds = [
+          [tileJSON.bounds[3], tileJSON.bounds[0]],
+          [tileJSON.bounds[1], tileJSON.bounds[2]],
+        ];
+        mapRef.fitBounds(bounds);
+      } catch (error) {
+        toasts.error('Could not load AOI map');
+      }
     }
-  }, [projectId, aoiId, mapRef, tileUrl]);
+    fetchData();
+  }, [uuid, mapRef, tileUrl]);
 
   let leafletLayer;
   if (tileUrl) {

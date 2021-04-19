@@ -61,12 +61,25 @@ class RestApiClient {
     return this.fetch('PATCH', path, data);
   }
 
+  delete(path) {
+    return this.fetch('DELETE', path);
+  }
+
   getApiMeta() {
     return this.get('');
   }
 
   getProject(id) {
     return this.get(`project/${id}`);
+  }
+
+  deleteProject(id) {
+    return this.delete(`project/${id}`);
+  }
+
+  getProjects(page, limit) {
+    const offset = (page - 1) * limit;
+    return this.get(`project/?page=${offset}&limit=${limit}`);
   }
 
   createProject(data) {
@@ -77,6 +90,17 @@ class RestApiClient {
     return this.get(`model/${id}`);
   }
 
+  getAOIs(projectId) {
+    return this.get(`project/${projectId}/aoi`);
+  }
+
+  getBookmarkedAOIs(projectId, page, limit) {
+    const offset = (page - 1) * limit;
+    return this.get(
+      `project/${projectId}/aoi?bookmarked=true&page=${offset}&limit=${limit}`
+    );
+  }
+
   getCheckpoint(projectId, checkpointId) {
     return this.get(`project/${projectId}/checkpoint/${checkpointId}`);
   }
@@ -85,8 +109,8 @@ class RestApiClient {
     return this.get(`project/${projectId}/checkpoint`);
   }
 
-  createInstance(projectId) {
-    return this.post(`project/${projectId}/instance`, {});
+  createInstance(projectId, params = {}) {
+    return this.post(`project/${projectId}/instance`, params);
   }
 
   getInstance(projectId, instanceId) {
@@ -101,6 +125,10 @@ class RestApiClient {
     return this.get(`project/${projectId}/aoi/${aoiId}/tiles`);
   }
 
+  getTileJSONFromUUID(uuid) {
+    return this.get(`aoi/${uuid}/tiles`);
+  }
+
   bookmarkAOI(projectId, aoiId, name) {
     return this.patch(`project/${projectId}/aoi/${aoiId}`, {
       bookmarked: true,
@@ -113,6 +141,11 @@ class RestApiClient {
       `project/${projectId}/aoi/${aoiId}/download/color`,
       'binary'
     );
+  }
+  patchAoi(projectId, aoiId, patches) {
+    return this.patch(`project/${projectId}/aoi/${aoiId}`, {
+      patches,
+    });
   }
 }
 
