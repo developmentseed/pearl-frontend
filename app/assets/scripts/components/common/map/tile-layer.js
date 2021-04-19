@@ -1,7 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useMap } from 'react-leaflet';
 import L from 'leaflet';
-
 
 async function fetchImage(url, callback, headers, abort) {
   let _headers = {};
@@ -62,12 +61,10 @@ L.tileLayer = function (url, options, headers, abort) {
   return new L.TileLayerWithHeaders(url, options, headers, abort);
 };
 
-function TileLayerWithHeaders({url, headers, options}) {
+function TileLayerWithHeaders({ url, headers, options }) {
+  const map = useMap()
   useEffect(() => {
-    const l = L.tileLayer(url, options, headers)
-    l.on('add', () => {
-      console.log('Tile layer added')
-    });
+    const l = L.tileLayer(url, options, headers);
     l.addTo(map);
 
     return () => {
@@ -79,4 +76,3 @@ function TileLayerWithHeaders({url, headers, options}) {
 }
 
 export default TileLayerWithHeaders;
-

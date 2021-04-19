@@ -41,7 +41,11 @@ export function ExploreProvider(props) {
   const { aoiName, aoiRef, setAoiName, setAoiRef, setCurrentAoi } = useAoi();
   const { predictions, dispatchPredictions } = usePredictions();
   const { selectedModel, setSelectedModel } = useModel();
-  const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
+  const {
+    currentCheckpoint,
+    dispatchCurrentCheckpoint,
+    fetchCheckpoint,
+  } = useCheckpoint();
   const {
     aoiPatch,
     dispatchAoiPatch,
@@ -94,7 +98,7 @@ export function ExploreProvider(props) {
       }
 
       showGlobalLoadingMessage('Fetching checkpoints...');
-      await loadCheckpointList(projectId);
+      const { checkpoints } = await loadCheckpointList(projectId);
 
       showGlobalLoadingMessage('Looking for active GPU instances...');
       let instance;
@@ -103,7 +107,19 @@ export function ExploreProvider(props) {
         const instanceItem = activeInstances.instances[0];
         instance = await restApiClient.getInstance(projectId, instanceItem.id);
       } else {
-        instance = await restApiClient.createInstance(project.id);
+        if (checkpoints && checkpoints.length > 0) {
+          // Apply first checkpoint, if available
+          instance = await restApiClient.createInstance(project.id, {
+            checkpoint_id: checkpoints.checkpoints[0].id,
+          });
+        } else {
+          instance = await restApiClient.createInstance(project.id);
+        }
+      }
+
+      // Fetch checkpoint meta and apply to state
+      if (instance.checkpoint_id) {
+        await fetchCheckpoint(projectId, instance.checkpoint_id);
       }
       setCurrentInstance(instance);
     } catch (error) {
@@ -157,10 +173,6 @@ export function ExploreProvider(props) {
       if (predictions.error) {
         toasts.error('An inference error occurred, please try again later.');
       } else {
-        dispatchMapState({
-          type: mapActionTypes.SET_MODE,
-          data: mapModes.ADD_SAMPLE_POLYGON,
-        });
         loadMetrics();
       }
     }
@@ -180,13 +192,19 @@ export function ExploreProvider(props) {
       hideGlobalLoading();
 
       if (aoiPatch.fetched) {
-        setAoiPatchList([...aoiPatchList, aoiPatch.getData()]);
+        const updatedPatchList = [...aoiPatchList, aoiPatch.getData()];
+        setAoiPatchList(updatedPatchList);
+        restApiClient.patchAoi(
+          currentProject.id,
+          predictions.data.aoiId,
+          updatedPatchList.map((p) => p.id)
+        );
       } else if (aoiPatch.error) {
         toasts.error('An error ocurred while requesting aoi patch.');
         logger(aoiPatch.error);
       }
     }
-  }, [aoiPatch]);
+  }, [aoiPatch, predictions, restApiClient, currentProject]);
 
   async function loadMetrics() {
     await restApiClient
@@ -292,7 +310,7 @@ export function ExploreProvider(props) {
       setAoiBounds(aoiRef.getBounds());
       setAoiName(aoiObject.name);
       dispatchMapState({
-        type: mapActionTypes.BROWSE_MODE,
+        type: mapActionTypes.SET_MODE,
         data: mapModes.ADD_CLASS_SAMPLES,
       });
       if (predictions.isReady) {

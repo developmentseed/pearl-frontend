@@ -118,11 +118,6 @@ function UserDropdown() {
                   My Projects
                 </DropdownItem>
               </li>
-              <li>
-                <DropdownItem as={StyledLink} to='/profile/maps' useIcon='map'>
-                  My Saved Maps
-                </DropdownItem>
-              </li>
               {location &&
                 location.pathname &&
                 location.pathname.startsWith('/explore') && (

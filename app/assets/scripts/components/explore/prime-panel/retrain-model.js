@@ -3,13 +3,12 @@ import T from 'prop-types';
 import get from 'lodash.get';
 import { Button } from '@devseed-ui/button';
 import InfoButton from '../../common/info-button';
-import styled from 'styled-components';
-import { glsp } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
 import { PlaceholderMessage } from '../../../styles/placeholder.js';
 import { actions, useCheckpoint } from '../../../context/checkpoint.js';
 import { useMapState } from '../../../context/explore.js';
 import {
+  ToolsWrapper,
   ClassList,
   Class,
   Thumbnail as ClassThumbnail,
@@ -19,11 +18,6 @@ import {
   ClassOptions,
   ToolBox as RetrainTools,
 } from './retrain-refine-styles';
-
-const Wrapper = styled.div`
-  display: grid;
-  grid-gap: ${glsp()};
-`;
 
 /*
  * Retrain Model
@@ -38,7 +32,7 @@ function RetrainModel(props) {
   const { setMapMode, mapModes, mapState } = useMapState();
 
   return (
-    <Wrapper className={className}>
+    <ToolsWrapper className={className}>
       {ready && currentCheckpoint.classes && (
         <>
           <RetrainTools>
@@ -81,24 +75,31 @@ function RetrainModel(props) {
             >
               Point
             </InfoButton>
+
             <InfoButton
               variation={
-                mapState.mode === mapModes.REMOVE_SAMPLE
+                mapState.mode === mapModes.DELETE_SAMPLES
                   ? 'primary-raised-dark'
                   : 'primary-raised-light'
               }
               size='small'
               radius='ellipsoid'
-              useIcon='xmark'
+              useLocalButton
+              useIcon='eraser'
+              id='eraser-button'
               visuallyDisabled={!currentCheckpoint.activeItem}
-              info={!currentCheckpoint.activeItem && 'No active item selected'}
+              info={
+                !currentCheckpoint.activeItem
+                  ? 'No active item selected'
+                  : 'Draw to erase, click to delete'
+              }
               onClick={() => {
                 if (currentCheckpoint.activeItem) {
-                  setMapMode(mapModes.REMOVE_SAMPLE);
+                  setMapMode(mapModes.DELETE_SAMPLES);
                 }
               }}
             >
-              Delete
+              Erase
             </InfoButton>
           </RetrainTools>
           <ClassList>
@@ -173,7 +174,7 @@ function RetrainModel(props) {
           Please submit or clear retraining samples before refining results
         </PlaceholderMessage>
       )}
-    </Wrapper>
+    </ToolsWrapper>
   );
 }
 

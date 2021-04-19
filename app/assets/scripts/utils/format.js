@@ -1,3 +1,5 @@
+import { format, parseISO } from 'date-fns';
+
 /**
  * Rounds a number to a specified amount of decimals.
  *
@@ -116,4 +118,14 @@ export function toTitleCase(str) {
   return str.replace(/\w\S*/g, function (txt) {
     return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
   });
+}
+
+/**
+ * Returns a formatted date-time, given an ISO date-time string
+ * @param {String} datetime - datetime string
+ * @return {String} Formatted datetime - eg. "10/03/2021 12:45:03"
+ */
+export function formatDateTime(str) {
+  const dt = parseISO(str);
+  return format(dt, 'dd/MM/yyyy kk:mm:ss');
 }

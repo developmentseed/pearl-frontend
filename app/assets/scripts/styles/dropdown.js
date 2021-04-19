@@ -14,6 +14,8 @@ export const DropdownHeader = styled.header`
   }
   h1 {
     margin: 0;
+    overflow-wrap: break-word;
+    overflow-wrap: anywhere;
   }
 `;
 
@@ -21,24 +23,34 @@ export const DropdownBody = styled.ul`
   display: grid;
   grid-gap: ${glsp(0.5)};
   padding: ${glsp(0.5)} 0;
+  overflow: scroll;
 `;
 export const DropdownItem = styled.a`
   display: grid;
-  grid-template-columns: max-content max-content;
+  grid-template-columns: 1fr;
   justify-items: start;
   padding: ${glsp(0.25)} ${glsp()};
   grid-gap: ${glsp()};
   font-weight: ${themeVal('type.heading.weight')};
   color: ${themeVal('color.base')};
   transition: all 0.16s ease-in-out;
-  ::before {
-    ${({ useIcon }) => useIcon && collecticon(useIcon)}
-  }
+  overflow-wrap: break-word;
+  overflow-wrap: anywhere;
+
+  ${({ useIcon }) =>
+    useIcon &&
+    css`
+      grid-template-columns: max-content 1fr;
+      ::before {
+        ${collecticon(useIcon)}
+      }
+    `}
 
   /* Add a tick if checked, may conflict with useIcon */
   ${({ checked }) =>
     checked &&
     css`
+      grid-template-columns: max-content 1fr;
       ::before {
         ${collecticon('tick')}
       }

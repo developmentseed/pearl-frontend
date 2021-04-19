@@ -19,15 +19,20 @@ const PanelControls = styled(PanelBlockFooter)`
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-gap: ${glsp()};
-  padding-bottom: ${glsp(2)};
 `;
 const SaveCheckpoint = styled(DropdownBody)`
   padding: ${glsp()};
 `;
 
-function PrimeButton({ currentCheckpoint, allowInferenceRun }) {
+function PrimeButton({ currentCheckpoint, allowInferenceRun, mapRef }) {
   const { predictions } = usePredictions();
-  const { instance, sendAbortMessage, runInference, retrain } = useInstance();
+  const {
+    instance,
+    sendAbortMessage,
+    runInference,
+    retrain,
+    refine,
+  } = useInstance();
 
   // If in refine mode, this button save refinements
   if (currentCheckpoint && currentCheckpoint.mode === checkpointModes.REFINE) {
@@ -40,7 +45,10 @@ function PrimeButton({ currentCheckpoint, allowInferenceRun }) {
         style={{
           gridColumn: '1 / -1',
         }}
-        onClick={() => {}}
+        onClick={() => {
+          refine();
+          mapRef.polygonDraw.clearLayers();
+        }}
         id='save-refine'
       >
         Save Refinements
@@ -83,6 +91,7 @@ function PrimeButton({ currentCheckpoint, allowInferenceRun }) {
 PrimeButton.propTypes = {
   currentCheckpoint: T.object,
   allowInferenceRun: T.bool.isRequired,
+  mapRef: T.object,
 };
 
 function Footer(props) {
@@ -104,10 +113,11 @@ function Footer(props) {
       <Button
         variation='primary-raised-light'
         size='medium'
-        useIcon='tick--small'
+        useIcon='arrow-loop'
         style={{
           gridColumn: '1 / 2',
         }}
+        title='Clear all samples drawn since last retrain or save'
         id='reset-button-trigger'
         onClick={() => {
           dispatchCurrentCheckpoint({
@@ -121,10 +131,11 @@ function Footer(props) {
       <Button
         variation='primary-raised-light'
         size='medium'
-        useIcon='tick--small'
+        useIcon='arrow-semi-spin-ccw'
         style={{
           gridColumn: '2 / -1',
         }}
+        title='Undo last performed action'
         onClick={() => {
           dispatchCurrentCheckpoint({
             type: checkpointActions.INPUT_UNDO,
@@ -146,6 +157,7 @@ function Footer(props) {
       <PrimeButton
         currentCheckpoint={currentCheckpoint}
         allowInferenceRun={allowInferenceRun}
+        mapRef={mapRef}
       />
 
       <Dropdown

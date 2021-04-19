@@ -274,13 +274,10 @@ function checkpointReducer(state, action) {
     case actions.CLEAR_SAMPLES: {
       return {
         ...state,
-        history: [
-          ...state.history,
-          {
-            classes: state.classes,
-            checkpointBrushes: state.checkpointBrushes,
-          },
-        ],
+        // Clear history when samples are cleared
+        // If we retain history we can get into a complicated situation
+        // In which brush samples might be restored while in retrain mode
+        history: [],
         checkpointBrushes: {},
         classes: Object.values(state.classes).reduce((accum, c) => {
           return {
