@@ -62,7 +62,7 @@ L.tileLayer = function (url, options, headers, abort) {
 };
 
 function TileLayerWithHeaders({ url, headers, options }) {
-  const map = useMap()
+  const map = useMap();
   useEffect(() => {
     const l = L.tileLayer(url, options, headers);
     l.addTo(map);
