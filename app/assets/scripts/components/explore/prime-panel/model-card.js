@@ -25,6 +25,16 @@ function ModelCard({ model, onClick }) {
     tooltips: {
       intersect: false,
       enabled: true,
+      callbacks: {
+          label: (tooltipItem, data) => {
+              let label = data.datasets[tooltipItem.datasetIndex].label || '';
+              if (label) {
+                  label += ': ';
+              }
+              label += Math.round(tooltipItem.yLabel * 100) / 100;
+              return label;
+          }
+      },
     },
     scales: {
       yAxes: [
