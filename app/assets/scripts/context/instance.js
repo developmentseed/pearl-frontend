@@ -120,7 +120,7 @@ export function InstanceProvider(props) {
     instanceInitialState
   );
 
-  // Helper action function
+  // Apply instance status
   const applyInstanceStatus = (status) => {
     dispatchInstance({
       type: instanceActionTypes.APPLY_STATUS,
@@ -136,6 +136,10 @@ export function InstanceProvider(props) {
           return state.concat(data);
         }
         case messageQueueActionTypes.SEND: {
+          const message = state[0];
+          if (message.action !== 'model#status') {
+            applyInstanceStatus({ gpuStatus: 'processing' });
+          }
           websocketClient.sendMessage(state[0]);
           return state.slice(1);
         }
