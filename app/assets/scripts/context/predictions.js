@@ -110,6 +110,9 @@ export function predictionsReducer(state, action) {
 
       // only process prediction if AOI ID matches current AOI ID
       if (predictionAoiId === currentAoiId) {
+        // Discard messages with no image (non-live message)
+        if (!data.bounds || !data.image) return state;
+
         const [minX, minY, maxX, maxY] = data.bounds;
 
         // Build prediction object
