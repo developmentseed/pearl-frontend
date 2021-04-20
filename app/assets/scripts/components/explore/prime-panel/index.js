@@ -43,6 +43,10 @@ const StyledPanelBlock = styled(PanelBlock)`
   width: ${glsp(24)};
 `;
 
+const ModalHeader = styled.header`
+  padding: ${glsp(2)};
+`;
+
 const Headline = styled.div`
   display: flex;
   flex-direction: row;
@@ -313,7 +317,7 @@ function PrimePanel() {
         }}
         data={models || []}
         renderHeader={() => (
-          <header style={{ padding: '2rem' }}>
+          <ModalHeader>
             <Headline>
               {' '}
               <Heading>Starter Models</Heading>
@@ -327,7 +331,7 @@ function PrimePanel() {
                 Close modal
               </Button>
             </Headline>
-            <FormGroup>
+            {/* <FormGroup>
               <FormGroupHeader>
                 <FormLabel htmlFor='model-filter'>Search Models</FormLabel>
               </FormGroupHeader>
@@ -340,8 +344,8 @@ function PrimePanel() {
                   placeholder='Filter models'
                 />
               </FormGroupBody>
-            </FormGroup>
-          </header>
+            </FormGroup> */}
+          </ModalHeader>
         )}
         filterCard={(card) => {
           return card.name.includes(modelFilterString.toLowerCase());
@@ -356,7 +360,7 @@ function PrimePanel() {
             }}
           />
         )}
-        nonscrolling
+        nonScrolling
       />
     </>
   );
