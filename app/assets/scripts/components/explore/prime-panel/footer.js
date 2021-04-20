@@ -14,6 +14,7 @@ import { PanelBlockFooter } from '../../common/panel-block';
 import { checkpointModes } from '../../../context/checkpoint';
 import { usePredictions } from '../../../context/predictions';
 import { useInstance } from '../../../context/instance';
+import { useProjectId } from '../../../context/explore';
 
 const PanelControls = styled(PanelBlockFooter)`
   display: grid;
@@ -25,6 +26,7 @@ const SaveCheckpoint = styled(DropdownBody)`
 `;
 
 function PrimeButton({ currentCheckpoint, allowInferenceRun, mapRef }) {
+  const { projectId } = useProjectId();
   const { predictions } = usePredictions();
   const {
     instance,
@@ -56,7 +58,7 @@ function PrimeButton({ currentCheckpoint, allowInferenceRun, mapRef }) {
     );
   }
 
-  let label = 'Loading...';
+  let label = projectId !== 'new' ? 'Loading...' : 'Run model';
   let enabled = false;
   let onClick = () => {};
 
@@ -64,7 +66,7 @@ function PrimeButton({ currentCheckpoint, allowInferenceRun, mapRef }) {
     label = 'Abort Process';
     onClick = sendAbortMessage;
     enabled = true;
-  } else if (['disconnected', 'ready'].includes(instance.status)) {
+  } else if (['not-started', 'ready'].includes(instance.gpuStatus)) {
     label = !currentCheckpoint ? 'Run Model' : 'Retrain Model';
     enabled = allowInferenceRun;
     onClick = !currentCheckpoint ? runInference : retrain;
