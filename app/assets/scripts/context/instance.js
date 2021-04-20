@@ -29,6 +29,8 @@ import { useAoi, useAoiPatch } from './aoi';
 import { actions as aoiPatchActions } from './reducers/aoi_patch';
 import { useModel } from './model';
 
+import { wrapLogReducer } from './reducers/utils';
+
 const messageQueueActionTypes = {
   ADD: 'ADD',
   SEND: 'SEND',
@@ -119,7 +121,7 @@ export function InstanceProvider(props) {
 
   // Create a message queue to wait for instance connection
   const [messageQueue, dispatchMessageQueue] = useReducer(
-    (state, { type, data }) => {
+    wrapLogReducer((state, { type, data }) => {
       switch (type) {
         case messageQueueActionTypes.ADD: {
           return state.concat(data);
@@ -135,7 +137,7 @@ export function InstanceProvider(props) {
           logger('Unexpected messageQueue action type: ', type);
           throw new Error('Unexpected error.');
       }
-    },
+    }),
     []
   );
 
@@ -315,7 +317,7 @@ export function InstanceProvider(props) {
       dispatchPredictions({
         type: predictionsActions.START_PREDICTION,
         data: {
-          type: checkpointModes.RUN,
+          type: checkpointModes.RETRAIN,
         },
       });
 
@@ -339,6 +341,8 @@ export function InstanceProvider(props) {
           },
         },
       });
+      /*
+
 
       // Add prediction request to queue
       dispatchMessageQueue({
@@ -350,7 +354,7 @@ export function InstanceProvider(props) {
             polygon: aoiBoundsToPolygon(aoiRef.getBounds()),
           },
         },
-      });
+      });*/
     },
     refine: async function () {
       const classes = Object.values(currentCheckpoint.classes);
@@ -434,7 +438,7 @@ export function InstanceProvider(props) {
           type: predictionsActions.CLEAR_PREDICTION,
         });
 
-        await fetchCheckpoint(projectId, checkpointId);
+        await fetchCheckpoint(projectId, checkpointId, checkpointModes.RETRAIN);
 
         dispatchMessageQueue({
           type: messageQueueActionTypes.ADD,

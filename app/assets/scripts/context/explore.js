@@ -122,8 +122,13 @@ export function ExploreProvider(props) {
       }
 
       // Fetch checkpoint meta and apply to state
+      // App will init to retrain mode
       if (instance.checkpoint_id) {
-        await fetchCheckpoint(projectId, instance.checkpoint_id);
+        await fetchCheckpoint(
+          projectId,
+          instance.checkpoint_id,
+          checkpointModes.RETRAIN
+        );
       }
       setCurrentInstance(instance);
     } catch (error) {
@@ -160,8 +165,6 @@ export function ExploreProvider(props) {
         );
       }
     } else if (predictions.isReady()) {
-      hideGlobalLoading();
-
       // Update aoi List with newest aoi
       // If predictions is ready, restApiClient must be ready
 
@@ -172,14 +175,14 @@ export function ExploreProvider(props) {
         // Refresh checkpoint list, prediction finished
         // means new checkpoint available
         loadCheckpointList(currentProject.id);
+
+        if (predictions.getData().type === checkpointModes.RETRAIN) {
+          loadMetrics();
+        }
       }
 
       if (predictions.error) {
         toasts.error('An inference error occurred, please try again later.');
-      } else {
-        if (predictions.getData().type === checkpointModes.RETRAIN) {
-          loadMetrics();
-        }
       }
     }
   }, [predictions, restApiClient, currentProject]);
