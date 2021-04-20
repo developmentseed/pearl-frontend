@@ -32,10 +32,12 @@ import {
 import ModalMapEvent from './modal-events';
 
 import GeoJSONLayer from '../../common/map/geojson-layer';
+import TileLayerWithHeaders from '../../common/map/tile-layer';
 import { useAuth } from '../../../context/auth';
 import { useApiMeta } from '../../../context/api-meta';
 import { useAoi, useAoiPatch } from '../../../context/aoi';
 import toasts from '../../common/toasts';
+import logger from '../../../utils/logger';
 
 const center = [38.83428180092151, -79.37724530696869];
 const zoom = 15;
@@ -246,6 +248,7 @@ function Map() {
           );
           setTileUrl(`${config.restApiEndpoint}${tileJSON.tiles[0]}`);
         } catch (error) {
+          logger(error);
           toasts.error('Could not load AOI map');
         }
       }
@@ -365,7 +368,9 @@ function Map() {
             );
           })}
 
-        {predictions.data.predictions &&
+        {predictions &&
+          predictions.data &&
+          predictions.data.predictions &&
           predictions.data.predictions.map((p) => (
             <ImageOverlay
               key={p.key}
@@ -397,12 +402,18 @@ function Map() {
           );
         })}
 
-        {/* {!predictions.data.predictions && currentProject && currentAoi && (
-          <TileLayer
+        {!predictions.data.predictions && currentProject && currentAoi && (
+          <TileLayerWithHeaders
             url={`${config.restApiEndpoint}/api/project/${currentProject.id}/aoi/${currentAoi.id}/tiles/{z}/{x}/{y}`}
             maxZoom={18}
+            headers={[
+              {
+                header: 'Authorization',
+                value: `Bearer ${restApiClient.apiToken}`,
+              },
+            ]}
           />
-        )} */}
+        )}
 
         {currentCheckpoint &&
           currentCheckpoint.classes &&

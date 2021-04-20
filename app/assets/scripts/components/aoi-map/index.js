@@ -7,6 +7,7 @@ import { useParams } from 'react-router-dom';
 import App from '../common/app';
 import config from '../../config';
 import { useAuth } from '../../context/auth';
+import logger from '../../utils/logger';
 
 const { restApiEndpoint } = config;
 
@@ -28,6 +29,7 @@ function AoiMap() {
         ];
         mapRef.fitBounds(bounds);
       } catch (error) {
+        logger(error);
         toasts.error('Could not load AOI map');
       }
     }
