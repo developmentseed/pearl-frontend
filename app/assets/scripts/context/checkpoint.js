@@ -93,7 +93,7 @@ function checkpointReducer(state, action) {
       // Action used to load existing or initialize a new checkpoint
       return {
         ...action.data,
-        analytics: (state && state.analytics) || null,
+        analytics: action.data.analytics || (state && state.analytics) || null,
         mode: action.data.mode || checkpointModes.RUN,
         retrain_geoms:
           action.data.retrain_geoms || (state && state.retrain_geoms) || null,

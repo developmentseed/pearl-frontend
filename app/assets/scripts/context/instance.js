@@ -227,7 +227,7 @@ export function InstanceProvider(props) {
       });
 
       // Apply checkpoint to the interface as the instance will start with it applied.
-      fetchCheckpoint(projectId, checkpointId);
+      fetchCheckpoint(projectId, checkpointId, checkpointModes.RETRAIN);
     } else {
       instance = await restApiClient.createInstance(projectId);
     }
@@ -239,8 +239,8 @@ export function InstanceProvider(props) {
         applyInstanceStatus,
         dispatchInstance,
         dispatchCurrentCheckpoint,
-        fetchCheckpoint: (checkpointId) =>
-          fetchCheckpoint(projectId, checkpointId),
+        fetchCheckpoint: (checkpointId, mode) =>
+          fetchCheckpoint(projectId, checkpointId, mode),
         dispatchPredictions,
         dispatchMessageQueue,
         dispatchAoiPatch,
@@ -628,7 +628,10 @@ export class WebsocketClient extends WebSocket {
         case 'model#checkpoint#complete':
         case 'model#retrain#complete':
           if (data && (data.id || data.checkpoint)) {
-            fetchCheckpoint(data.id || data.checkpoint);
+            fetchCheckpoint(
+              data.id || data.checkpoint,
+              checkpointModes.RETRAIN
+            );
           }
           applyInstanceStatus({
             gpuMessage: `Loading checkpoint...`,
