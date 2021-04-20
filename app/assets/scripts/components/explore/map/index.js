@@ -338,6 +338,7 @@ function Map() {
         {currentCheckpoint &&
           currentCheckpoint.retrain_geoms &&
           userLayers.retrainingSamples.active &&
+          predictions.isReady() &&
           currentCheckpoint.retrain_geoms.map((geoms, i) => {
             return (
               <GeoJSONLayer
