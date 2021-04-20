@@ -630,6 +630,9 @@ export class WebsocketClient extends WebSocket {
           if (data && (data.id || data.checkpoint)) {
             fetchCheckpoint(data.id || data.checkpoint);
           }
+          applyInstanceStatus({
+            gpuMessage: `Loading checkpoint...`,
+          });
           this.sendMessage({ action: 'model#status' });
           break;
         case 'model#prediction':
