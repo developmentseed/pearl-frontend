@@ -10,6 +10,16 @@ import { useMapLayers, useMapRef } from '../../../context/map';
 import { ExploreContext, useMapState } from '../../../context/explore';
 import GlobalContext from '../../../context/global';
 
+import { Heading } from '@devseed-ui/typography';
+import {
+  FormGroup,
+  FormGroupHeader,
+  FormGroupBody,
+  FormLabel,
+  FormInput,
+} from '@devseed-ui/form';
+import { Button } from '@devseed-ui/button';
+
 import TabbedBlock from '../../common/tabbed-block-body';
 import RetrainModel from './retrain-model';
 import RefineModel from './refine-model';
@@ -31,6 +41,22 @@ import { usePredictions } from '../../../context/predictions';
 
 const StyledPanelBlock = styled(PanelBlock)`
   width: ${glsp(24)};
+`;
+
+const Headline = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding-bottom: ${glsp(1)};
+
+  h1 {
+    margin: 0;
+  }
+
+  ${Button} {
+    height: min-content;
+    align-self: center;
+  }
 `;
 
 function PrimePanel() {
@@ -65,6 +91,7 @@ function PrimePanel() {
   const { predictions } = usePredictions();
 
   const [showSelectModelModal, setShowSelectModelModal] = useState(false);
+  const [modelFilterString, setModelFilterString] = useState('');
   const [localCheckpointName, setLocalCheckpointName] = useState(
     (currentCheckpoint && currentCheckpoint.name) || ''
   );
@@ -285,6 +312,40 @@ function PrimePanel() {
           setShowSelectModelModal(false);
         }}
         data={models || []}
+        renderHeader={() => (
+          <header style={{ padding: '2rem' }}>
+            <Headline>
+              {' '}
+              <Heading>Starter Models</Heading>
+              <Button
+                hideText
+                variation='base-plain'
+                size='small'
+                useIcon='xmark'
+                onClick={() => setShowSelectModelModal(false)}
+              >
+                Close modal
+              </Button>
+            </Headline>
+            <FormGroup>
+              <FormGroupHeader>
+                <FormLabel htmlFor='model-filter'>Search Models</FormLabel>
+              </FormGroupHeader>
+              <FormGroupBody>
+                <FormInput
+                  type='text'
+                  id='model-filter'
+                  name='model-filter'
+                  onChange={(e) => setModelFilterString(e.target.value)}
+                  placeholder='Filter models'
+                />
+              </FormGroupBody>
+            </FormGroup>
+          </header>
+        )}
+        filterCard={(card) => {
+          return card.name.includes(modelFilterString.toLowerCase());
+        }}
         renderCard={(model) => (
           <ModelCard
             key={model.name}
@@ -295,7 +356,7 @@ function PrimePanel() {
             }}
           />
         )}
-        nonScrolling
+        nonscrolling
       />
     </>
   );

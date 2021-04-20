@@ -1,16 +1,14 @@
 import React from 'react';
 import T from 'prop-types';
 import styled from 'styled-components';
-import DetailsList from '../../common/details-list';
 import { Bar } from 'react-chartjs-2';
+import { Card } from '../../common/card-list';
 
-const CardContainer = styled.div``;
-
-const ChartContainer = styled.div``;
-
-const CardTitle = styled.div``;
-
-const CardSubtitle = styled.div``;
+const ChartContainer = styled.div`
+  height: 12rem;
+  max-width: 100%;
+  position: relative;
+`;
 
 function ModelCard({ model, onClick }) {
   const details = {
@@ -20,6 +18,7 @@ function ModelCard({ model, onClick }) {
   };
 
   const barChartOptions = {
+    maintainAspectRatio: false,
     legend: {
       display: false,
     },
@@ -47,7 +46,6 @@ function ModelCard({ model, onClick }) {
           },
           scaleLabel: {
             display: false,
-            labelString: 'Class Distributiuon',
             fontSize: 12,
           },
         },
@@ -76,8 +74,13 @@ function ModelCard({ model, onClick }) {
     };
   });
   return (
-    <CardContainer>
-      <ChartContainer>
+    <Card
+      title={model.name}
+      subtitle={model.meta.description}
+      details={details}
+      expanded
+      borderlessMedia
+      cardMedia={
         <Bar
           data={{
             datasets: [
@@ -91,11 +94,10 @@ function ModelCard({ model, onClick }) {
           }}
           options={barChartOptions}
         />
-      </ChartContainer>
-      <CardTitle onClick={onClick}>{model.name}</CardTitle>
-      <CardSubtitle>{model.meta.description}</CardSubtitle>
-      <DetailsList details={details} />
-    </CardContainer>
+      }
+      onClick={onClick}
+    >
+    </Card>
   );
 }
 

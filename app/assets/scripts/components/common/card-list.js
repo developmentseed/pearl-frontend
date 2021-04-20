@@ -3,6 +3,7 @@ import styled, { css } from 'styled-components';
 import ShadowScrollbar from '../common/shadow-scrollbar';
 import { PanelBlockBody } from '../common/panel-block';
 import DetailsList from './details-list';
+import { Heading as CardSubtitle } from '@devseed-ui/typography';
 import T from 'prop-types';
 
 import { truncated, themeVal, glsp } from '@devseed-ui/theme-provider';
@@ -37,14 +38,15 @@ const CardTitle = styled.h4`
       `}
   }
 `;
+
 export const CardWrapper = styled.article`
   display: grid;
   grid-gap: ${glsp(1)};
   ${({ expanded, cardMedia }) => {
     if (expanded) {
       return css`
-        grid-template-columns: 1fr;
-        grid-template-rows: 3fr 1fr 3fr;
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: 2fr minmax(0, 1fr) 2fr;
       `;
     } else if (cardMedia) {
       return css`
@@ -107,6 +109,7 @@ export const CardWrapper = styled.article`
 export const Card = ({
   id,
   title,
+  subtitle,
   size,
   onClick,
   borderlessMedia,
@@ -127,7 +130,14 @@ export const Card = ({
       {cardMedia && (
         <CardMedia borderlessMedia={borderlessMedia}>{cardMedia}</CardMedia>
       )}
-      <CardTitle onClick={onClick}>{title}</CardTitle>
+      <div>
+        <CardTitle onClick={onClick}>{title}</CardTitle>
+        {subtitle && (
+          <CardSubtitle size='xsmall' useAlt>
+            {subtitle}
+          </CardSubtitle>
+        )}
+      </div>
       {details && <DetailsList details={details} />}
     </CardWrapper>
   );
@@ -136,6 +146,7 @@ export const Card = ({
 Card.propTypes = {
   id: T.oneOfType([T.number, T.string]),
   title: T.string,
+  subtitle: T.string,
   size: T.oneOf(['small', 'large']),
   onClick: T.func,
   borderlessMedia: T.bool,
