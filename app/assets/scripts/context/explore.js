@@ -45,11 +45,7 @@ export function ExploreProvider(props) {
   const { aoiName, aoiRef, setAoiName, setAoiRef, setCurrentAoi } = useAoi();
   const { predictions, dispatchPredictions } = usePredictions();
   const { selectedModel, setSelectedModel } = useModel();
-  const {
-    currentCheckpoint,
-    dispatchCurrentCheckpoint,
-    fetchCheckpoint,
-  } = useCheckpoint();
+  const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
   const {
     aoiPatch,
     dispatchAoiPatch,
@@ -70,7 +66,7 @@ export function ExploreProvider(props) {
   );
   const [checkpointList, setCheckpointList] = useState(null);
   const [currentInstance, setCurrentInstance] = useState(null);
-  const { setInstanceStatusMessage } = useInstance();
+  const { setInstanceStatusMessage, initInstance } = useInstance();
 
   async function loadInitialData() {
     showGlobalLoadingMessage('Loading configuration...');
@@ -103,35 +99,17 @@ export function ExploreProvider(props) {
 
       showGlobalLoadingMessage('Fetching checkpoints...');
       const { checkpoints } = await loadCheckpointList(projectId);
+      const checkpoint = checkpoints[0];
 
       showGlobalLoadingMessage('Looking for active GPU instances...');
-      let instance;
-      const activeInstances = await restApiClient.getActiveInstances(projectId);
-      if (activeInstances.total > 0) {
-        const instanceItem = activeInstances.instances[0];
-        instance = await restApiClient.getInstance(projectId, instanceItem.id);
-      } else {
-        if (checkpoints && checkpoints.length > 0) {
-          // Apply first checkpoint, if available
-          instance = await restApiClient.createInstance(project.id, {
-            checkpoint_id: checkpoints.checkpoints[0].id,
-          });
-        } else {
-          instance = await restApiClient.createInstance(project.id);
-        }
-      }
+      const instance = await initInstance(
+        project.id,
+        checkpoint && checkpoint.id
+      );
 
-      // Fetch checkpoint meta and apply to state
-      // App will init to retrain mode
-      if (instance.checkpoint_id) {
-        await fetchCheckpoint(
-          projectId,
-          instance.checkpoint_id,
-          checkpointModes.RETRAIN
-        );
-      }
       setCurrentInstance(instance);
     } catch (error) {
+      logger(error);
       toasts.error('Error loading project, please try again later.');
     } finally {
       hideGlobalLoading();
@@ -456,6 +434,7 @@ export function ExploreProvider(props) {
   return (
     <ExploreContext.Provider
       value={{
+        projectId,
         predictions,
 
         mapState,
@@ -535,5 +514,16 @@ export const useMapState = () => {
       mapModes,
     }),
     [mapState, mapModes]
+  );
+};
+
+export const useProjectId = () => {
+  const { projectId } = useExploreContext('useProjectId');
+
+  return useMemo(
+    () => ({
+      projectId,
+    }),
+    [projectId]
   );
 };
