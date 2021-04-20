@@ -402,18 +402,21 @@ function Map() {
           );
         })}
 
-        {!predictions.data.predictions && tileUrl && currentProject && currentAoi && (
-          <TileLayerWithHeaders
-            url={tileUrl}
-            maxZoom={18}
-            headers={[
-              {
-                header: 'Authorization',
-                value: `Bearer ${restApiClient.apiToken}`,
-              },
-            ]}
-          />
-        )}
+        {!predictions.data.predictions &&
+          tileUrl &&
+          currentProject &&
+          currentAoi && (
+            <TileLayerWithHeaders
+              url={tileUrl}
+              maxZoom={18}
+              headers={[
+                {
+                  header: 'Authorization',
+                  value: `Bearer ${restApiClient.apiToken}`,
+                },
+              ]}
+            />
+          )}
 
         {currentCheckpoint &&
           currentCheckpoint.classes &&
