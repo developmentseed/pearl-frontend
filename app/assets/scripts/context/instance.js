@@ -195,6 +195,9 @@ export function InstanceProvider(props) {
       instance = await restApiClient.createInstance(projectId, {
         checkpoint_id: checkpointId,
       });
+
+      // Apply checkpoint to the interface as the instance will start with it applied.
+      fetchCheckpoint(projectId, checkpointId);
     } else {
       instance = await restApiClient.createInstance(projectId);
     }
