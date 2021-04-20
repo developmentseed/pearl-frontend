@@ -46,7 +46,9 @@ function SecPanel() {
           <PanelBlockHeader>
             <Heading size='xsmall'>Analysis</Heading>
           </PanelBlockHeader>
-          {currentCheckpoint.input_geoms && currentCheckpoint.retrain_geoms && currentCheckpoint.analytics? (
+          {currentCheckpoint.input_geoms &&
+          currentCheckpoint.retrain_geoms &&
+          currentCheckpoint.analytics ? (
             <PanelBlockScroll>
               <ScrollBodyWrapper>
                 <StyledBlockBody>
