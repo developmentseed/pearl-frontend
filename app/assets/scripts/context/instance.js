@@ -371,31 +371,26 @@ export function InstanceProvider(props) {
         type: predictionsActions.START_PREDICTION,
       });
 
-      // Bypass message queue
-      websocketClient.sendMessage({
-        action: 'model#retrain',
+      dispatchMessageQueue({
+        type: messageQueueActionTypes.ADD,
         data: {
-          name: aoiName,
-          classes: classes.map((c) => {
-            return {
-              name: c.name,
-              color: c.color,
-              geometry: {
-                type: 'GeometryCollection',
-                geometries: [c.points, ...c.polygons],
-              },
-            };
-          }),
+          action: 'model#retrain',
+          data: {
+            name: aoiName,
+            classes: classes.map((c) => {
+              return {
+                name: c.name,
+                color: c.color,
+                geometry: {
+                  type: 'GeometryCollection',
+                  geometries: [c.points, ...c.polygons],
+                },
+              };
+            }),
+          },
         },
       });
 
-      // Force apply instance status to avoid sending next message before instance is ready.
-      applyInstanceStatus({
-        gpuStatus: 'processing',
-        gpuMessage: 'Retraining...',
-      });
-
-      // Add prediction request to queue
       dispatchMessageQueue({
         type: messageQueueActionTypes.ADD,
         data: {
