@@ -596,7 +596,9 @@ export class WebsocketClient extends WebSocket {
         case 'model#checkpoint#progress':
         case 'model#checkpoint#complete':
         case 'model#retrain#complete':
-          fetchCheckpoint(data.id || data.checkpoint);
+          if (data && (data.id || data.checkpoint)) {
+            fetchCheckpoint(data.id || data.checkpoint);
+          }
           this.sendMessage({ action: 'model#status' });
           break;
         case 'model#prediction':
