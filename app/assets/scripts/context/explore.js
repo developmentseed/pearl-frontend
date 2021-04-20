@@ -430,6 +430,7 @@ export function ExploreProvider(props) {
   return (
     <ExploreContext.Provider
       value={{
+        projectId,
         predictions,
 
         mapState,
@@ -509,5 +510,16 @@ export const useMapState = () => {
       mapModes,
     }),
     [mapState, mapModes]
+  );
+};
+
+export const useProjectId = () => {
+  const { projectId } = useExploreContext('useProjectId');
+
+  return useMemo(
+    () => ({
+      projectId,
+    }),
+    [projectId]
   );
 };

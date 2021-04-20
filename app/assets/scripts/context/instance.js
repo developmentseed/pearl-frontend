@@ -36,41 +36,44 @@ const messageQueueActionTypes = {
 };
 
 const instanceActionTypes = {
-  SET_TOKEN: 'SET_TOKEN',
-  SET_CONNECTION_STATUS: 'SET_CONNECTION_STATUS',
-  SET_STATUS: 'SET_STATUS',
+  APPLY_STATUS: 'APPLY_STATUS',
 };
 
 const instanceInitialState = {
-  status: 'disconnected', // 'initializing', 'ready', 'processing', 'aborting'
-  connected: false,
-  statusText: 'Fetching...',
+  gpuMessage: 'Loading...',
+  gpuStatus: 'not-started', // 'ready', 'processing', 'aborting'
+  wsConnected: false,
+  gpuConnected: false,
 };
 
 function instanceReducer(state, action) {
   const { type, data } = action;
+  let newState = state;
 
   switch (type) {
-    case instanceActionTypes.SET_CONNECTION_STATUS: {
-      return {
+    case instanceActionTypes.APPLY_STATUS: {
+      newState = {
         ...state,
-        connected: data,
-        status: !data ? 'disconnected' : state.status,
-        statusText: data ? 'Instance connected' : 'Instance disconnected',
+        ...data,
       };
-    }
-    case instanceActionTypes.SET_STATUS: {
-      return {
-        ...state,
-        previousStatus: state.status,
-        status: data,
-        statusText: data,
-      };
+      break;
     }
     default:
-      logger('Unexpected instance action type: ', { action });
+      logger('Unexpected instance action type: ', action);
       throw new Error('Unexpected error.');
   }
+
+  // Update display message for some GPU states.
+  if (data.gpuStatus === 'aborting') {
+    newState.gpuMessage = 'Aborting...';
+  } else if (data.gpuStatus === 'ready') {
+    newState.gpuMessage = 'Ready to go';
+  }
+
+  // Uncomment this to log instance state
+  // logger(newState);
+
+  return newState;
 }
 
 function aoiBoundsToPolygon(bounds) {
@@ -117,6 +120,14 @@ export function InstanceProvider(props) {
     instanceInitialState
   );
 
+  // Helper action function
+  const applyInstanceStatus = (status) => {
+    dispatchInstance({
+      type: instanceActionTypes.APPLY_STATUS,
+      data: status,
+    });
+  };
+
   // Create a message queue to wait for instance connection
   const [messageQueue, dispatchMessageQueue] = useReducer(
     (state, { type, data }) => {
@@ -155,19 +166,32 @@ export function InstanceProvider(props) {
   useEffect(() => {
     if (
       websocketClient &&
-      instance.connected &&
-      instance.status === 'ready' &&
+      instance.wsConnected &&
+      instance.gpuConnected &&
+      instance.gpuStatus === 'ready' &&
       messageQueue.length > 0
     ) {
       dispatchMessageQueue({ type: messageQueueActionTypes.SEND });
     }
-  }, [websocketClient, instance.connected, instance.status, messageQueue]);
+  }, [
+    websocketClient,
+    instance.wsConnected,
+    instance.gpuConnected,
+    instance.gpuStatus,
+    messageQueue,
+  ]);
 
   async function initInstance(projectId, checkpointId) {
     // Close existing websocket
     if (websocketClient) {
       websocketClient.close();
     }
+
+    applyInstanceStatus({
+      gpuStatus: 'initializing',
+      wsConnected: false,
+      gpuConnected: false,
+    });
 
     // Fetch active instances for this project
     const activeInstances = await restApiClient.getActiveInstances(projectId);
@@ -203,6 +227,7 @@ export function InstanceProvider(props) {
     return new Promise((resolve, reject) => {
       const newWebsocketClient = new WebsocketClient({
         token: instance.token,
+        applyInstanceStatus,
         dispatchInstance,
         dispatchCurrentCheckpoint,
         fetchCheckpoint: (checkpointId) =>
@@ -213,10 +238,20 @@ export function InstanceProvider(props) {
       });
       newWebsocketClient.addEventListener('open', () => {
         setWebsocketClient(newWebsocketClient);
+        applyInstanceStatus({
+          wsConnected: true,
+        });
         resolve(instance);
       });
       newWebsocketClient.addEventListener('error', () => {
         reject();
+      });
+      newWebsocketClient.addEventListener('close', () => {
+        applyInstanceStatus({
+          wsConnected: false,
+          gpuConnected: false,
+          gpuStatus: 'disconnected',
+        });
       });
     });
   }
@@ -224,9 +259,8 @@ export function InstanceProvider(props) {
   const value = {
     instance,
     setInstanceStatusMessage: (message) =>
-      dispatchInstance({
-        type: instanceActionTypes.SET_STATUS,
-        data: message,
+      applyInstanceStatus({
+        gpuMessage: message,
       }),
     sendAbortMessage: () =>
       websocketClient.sendMessage({ action: 'model#abort' }),
@@ -269,8 +303,6 @@ export function InstanceProvider(props) {
           return; // abort inference run
         }
 
-        hideGlobalLoading();
-
         if (!aoiName) {
           toasts.error('AOI Name must be set before running inference');
           return; // abort inference run
@@ -282,6 +314,8 @@ export function InstanceProvider(props) {
           logger(error);
           toasts.error('Could not create instance, please try again later.');
         }
+
+        hideGlobalLoading();
 
         try {
           // Reset predictions state
@@ -515,7 +549,7 @@ export const useInstance = () => {
 export class WebsocketClient extends WebSocket {
   constructor({
     token,
-    dispatchInstance,
+    applyInstanceStatus,
     dispatchCurrentCheckpoint,
     dispatchMessageQueue,
     fetchCheckpoint,
@@ -535,9 +569,8 @@ export class WebsocketClient extends WebSocket {
       // On connected, request a prediction
       switch (message) {
         case 'model#status':
-          dispatchInstance({
-            type: instanceActionTypes.SET_STATUS,
-            data: data.isAborting
+          applyInstanceStatus({
+            gpuStatus: data.isAborting
               ? 'aborting'
               : data.processing
               ? 'processing'
@@ -546,17 +579,15 @@ export class WebsocketClient extends WebSocket {
           break;
         case 'info#connected':
           logger('Instance connected.');
-          dispatchInstance({
-            type: instanceActionTypes.SET_CONNECTION_STATUS,
-            data: true,
+          applyInstanceStatus({
+            gpuConnected: true,
           });
           this.sendMessage({ action: 'model#status' });
           break;
         case 'info#disconnected':
           logger('Instance disconnected.');
-          dispatchInstance({
-            type: instanceActionTypes.SET_CONNECTION_STATUS,
-            data: false,
+          applyInstanceStatus({
+            gpuConnected: false,
           });
           break;
         case 'model#aborted':
