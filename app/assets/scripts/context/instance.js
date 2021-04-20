@@ -624,6 +624,15 @@ export class WebsocketClient extends WebSocket {
           toasts.error('Unexpected error, please try again later.');
           break;
         case 'model#checkpoint':
+          if (data && (data.id || data.checkpoint)) {
+            fetchCheckpoint(data.id || data.checkpoint);
+          }
+          applyInstanceStatus({
+            gpuMessage: `Loading checkpoint...`,
+          });
+          this.sendMessage({ action: 'model#status' });
+          break;
+
         case 'model#checkpoint#progress':
         case 'model#checkpoint#complete':
         case 'model#retrain#complete':
