@@ -61,7 +61,7 @@ function PrimeButton({ currentCheckpoint, allowInferenceRun, mapRef }) {
   let onClick = () => {};
 
   if (predictions.fetching) {
-    label = 'Abort';
+    label = 'Abort Process';
     onClick = sendAbortMessage;
     enabled = true;
   } else if (['disconnected', 'ready'].includes(instance.status)) {
@@ -74,10 +74,12 @@ function PrimeButton({ currentCheckpoint, allowInferenceRun, mapRef }) {
     <InfoButton
       data-cy={allowInferenceRun ? 'run-model-button' : 'disabled'}
       variation={
-        label === 'Abort' ? 'danger-raised-light' : 'primary-raised-dark'
+        label === 'Abort Process'
+          ? 'danger-raised-light'
+          : 'primary-raised-dark'
       }
       size='medium'
-      useIcon={label === 'Abort' ? 'xmark--small' : 'tick--small'}
+      useIcon={label === 'Abort Process' ? 'xmark--small' : 'tick--small'}
       style={{
         gridColumn: '1 / -1',
       }}
