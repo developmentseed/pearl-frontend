@@ -402,9 +402,9 @@ function Map() {
           );
         })}
 
-        {!predictions.data.predictions && currentProject && currentAoi && (
+        {!predictions.data.predictions && tileUrl && currentProject && currentAoi && (
           <TileLayerWithHeaders
-            url={`${config.restApiEndpoint}/api/project/${currentProject.id}/aoi/${currentAoi.id}/tiles/{z}/{x}/{y}`}
+            url={tileUrl}
             maxZoom={18}
             headers={[
               {
