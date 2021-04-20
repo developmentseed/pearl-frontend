@@ -3,11 +3,13 @@ import T from 'prop-types';
 import { initialApiRequestState } from './reducers/reduxeed';
 import logger from '../utils/logger';
 
+import { wrapLogReducer } from './reducers/utils';
+
 const PredictionsContext = createContext(null);
 
 export function PredictionsProvider(props) {
   const [predictions, dispatchPredictions] = useReducer(
-    predictionsReducer,
+    wrapLogReducer(predictionsReducer),
     initialApiRequestState
   );
 
@@ -91,6 +93,7 @@ export function predictionsReducer(state, action) {
         data: {
           predictions: [],
           aoiId: null,
+          type: data.type,
         },
       });
 

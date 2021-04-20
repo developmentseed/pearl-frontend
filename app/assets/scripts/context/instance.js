@@ -29,6 +29,8 @@ import { useAoi, useAoiPatch } from './aoi';
 import { actions as aoiPatchActions } from './reducers/aoi_patch';
 import { useModel } from './model';
 
+import { wrapLogReducer } from './reducers/utils';
+
 const messageQueueActionTypes = {
   ADD: 'ADD',
   SEND: 'SEND',
@@ -130,7 +132,7 @@ export function InstanceProvider(props) {
 
   // Create a message queue to wait for instance connection
   const [messageQueue, dispatchMessageQueue] = useReducer(
-    (state, { type, data }) => {
+    wrapLogReducer((state, { type, data }) => {
       switch (type) {
         case messageQueueActionTypes.ADD: {
           return state.concat(data);
@@ -150,7 +152,7 @@ export function InstanceProvider(props) {
           logger('Unexpected messageQueue action type: ', type);
           throw new Error('Unexpected error.');
       }
-    },
+    }),
     []
   );
 
@@ -225,7 +227,7 @@ export function InstanceProvider(props) {
       });
 
       // Apply checkpoint to the interface as the instance will start with it applied.
-      fetchCheckpoint(projectId, checkpointId);
+      fetchCheckpoint(projectId, checkpointId, checkpointModes.RETRAIN);
     } else {
       instance = await restApiClient.createInstance(projectId);
     }
@@ -237,8 +239,8 @@ export function InstanceProvider(props) {
         applyInstanceStatus,
         dispatchInstance,
         dispatchCurrentCheckpoint,
-        fetchCheckpoint: (checkpointId) =>
-          fetchCheckpoint(projectId, checkpointId),
+        fetchCheckpoint: (checkpointId, mode) =>
+          fetchCheckpoint(projectId, checkpointId, mode),
         dispatchPredictions,
         dispatchMessageQueue,
         dispatchAoiPatch,
@@ -328,6 +330,9 @@ export function InstanceProvider(props) {
           // Reset predictions state
           dispatchPredictions({
             type: predictionsActions.START_PREDICTION,
+            data: {
+              type: checkpointModes.RUN,
+            },
           });
 
           // Add prediction request to queue
@@ -369,6 +374,9 @@ export function InstanceProvider(props) {
       // Reset predictions state
       dispatchPredictions({
         type: predictionsActions.START_PREDICTION,
+        data: {
+          type: checkpointModes.RETRAIN,
+        },
       });
 
       dispatchMessageQueue({
@@ -387,17 +395,6 @@ export function InstanceProvider(props) {
                 },
               };
             }),
-          },
-        },
-      });
-
-      dispatchMessageQueue({
-        type: messageQueueActionTypes.ADD,
-        data: {
-          action: 'model#prediction',
-          data: {
-            name: aoiName,
-            polygon: aoiBoundsToPolygon(aoiRef.getBounds()),
           },
         },
       });
@@ -484,7 +481,7 @@ export function InstanceProvider(props) {
           type: predictionsActions.CLEAR_PREDICTION,
         });
 
-        await fetchCheckpoint(projectId, checkpointId);
+        await fetchCheckpoint(projectId, checkpointId, checkpointModes.RETRAIN);
 
         dispatchMessageQueue({
           type: messageQueueActionTypes.ADD,
@@ -583,14 +580,12 @@ export class WebsocketClient extends WebSocket {
           });
           break;
         case 'info#connected':
-          logger('Instance connected.');
           applyInstanceStatus({
             gpuConnected: true,
           });
           this.sendMessage({ action: 'model#status' });
           break;
         case 'info#disconnected':
-          logger('Instance disconnected.');
           applyInstanceStatus({
             gpuConnected: false,
           });
@@ -633,7 +628,10 @@ export class WebsocketClient extends WebSocket {
         case 'model#checkpoint#complete':
         case 'model#retrain#complete':
           if (data && (data.id || data.checkpoint)) {
-            fetchCheckpoint(data.id || data.checkpoint);
+            fetchCheckpoint(
+              data.id || data.checkpoint,
+              checkpointModes.RETRAIN
+            );
           }
           applyInstanceStatus({
             gpuMessage: `Loading checkpoint...`,

@@ -41,15 +41,28 @@ export function CheckpointProvider(props) {
 
   const { restApiClient } = useAuth();
 
-  async function fetchCheckpoint(projectId, checkpointId) {
+  async function fetchCheckpoint(projectId, checkpointId, mode) {
     try {
       const checkpoint = await restApiClient.getCheckpoint(
         projectId,
         checkpointId
       );
+      let _data = {};
+
+      if (mode) {
+        // Function is used from applyCheckpoint context
+        _data.mode =
+          mode || (currentCheckpoint && currentCheckpoint.mode) || null;
+      } else {
+        _data.analytics = null;
+      }
       dispatchCurrentCheckpoint({
         type: actions.SET_CHECKPOINT,
-        data: { ...checkpoint, mode: checkpointModes.RETRAIN },
+        data: {
+          ...checkpoint,
+          ..._data,
+          //mode: checkpointModes.RETRAIN
+        },
       });
     } catch (error) {
       logger(error);
@@ -80,6 +93,7 @@ function checkpointReducer(state, action) {
       // Action used to load existing or initialize a new checkpoint
       return {
         ...action.data,
+        analytics: action.data.analytics || (state && state.analytics) || null,
         mode: action.data.mode || checkpointModes.RUN,
         retrain_geoms:
           action.data.retrain_geoms || (state && state.retrain_geoms) || null,
