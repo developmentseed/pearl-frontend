@@ -31,6 +31,7 @@ function RetrainModel(props) {
 
   const { setMapMode, mapModes, mapState } = useMapState();
 
+  console.log('checkpoint', currentCheckpoint);
   return (
     <ToolsWrapper className={className}>
       {ready && currentCheckpoint.classes && (
@@ -146,7 +147,20 @@ function RetrainModel(props) {
             })}
             <Class className='add__class' muted as={Button}>
               <ClassThumbnail useIcon='plus' outline />
-              <Heading size='xsmall'>Add Class</Heading>
+              <Heading
+                onClick={() => {
+                  dispatchCurrentCheckpoint({
+                    type: actions.ADD_CLASS,
+                    data: {
+                      name: 'Test',
+                      color: '#ff0000'
+                    },
+                  });                  
+                }} 
+                size='xsmall'
+              >
+                Add Class
+              </Heading>
             </Class>
           </ClassList>
         </>
