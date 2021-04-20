@@ -5,8 +5,7 @@ import { glsp } from '@devseed-ui/theme-provider';
 import Panel from '../../common/panel';
 import { PanelBlock, PanelBlockBody } from '../../common/panel-block';
 import SelectModal from '../../common/select-modal';
-import { Card } from '../../common/card-list';
-
+import ModelCard from './model-card';
 import { useMapLayers, useMapRef } from '../../../context/map';
 import { ExploreContext, useMapState } from '../../../context/explore';
 import GlobalContext from '../../../context/global';
@@ -287,12 +286,9 @@ function PrimePanel() {
         }}
         data={models || []}
         renderCard={(model) => (
-          <Card
-            id={`model-${model.id}-card`}
+          <ModelCard
             key={model.name}
-            title={model.name}
-            size='large'
-            borderlessMedia
+            model={model}
             onClick={() => {
               setShowSelectModelModal(false);
               setSelectedModel(model);
