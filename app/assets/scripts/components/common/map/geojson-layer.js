@@ -11,7 +11,7 @@ function GeoJSONLayer(props) {
   useEffect(() => {
     const geolayer = L.geoJSON(data, {
       pointToLayer,
-      pane: pane || 'overlayPane'
+      pane: pane || 'overlayPane',
     });
     geolayer.on('add', () => {
       setLayer(geolayer);
@@ -31,7 +31,7 @@ function GeoJSONLayer(props) {
       layer.clearLayers();
       const geolayer = L.geoJSON(data, {
         pointToLayer,
-        pane: pane || 'overlayPane'
+        pane: pane || 'overlayPane',
       });
       geolayer.on('add', () => {
         setLayer(geolayer);
