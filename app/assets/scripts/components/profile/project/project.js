@@ -200,7 +200,8 @@ function Project() {
         {!isProjectLoading && !project ? (
           <InpageBody>
             <Message size='large'>
-              This project could not be found! Please check that it exists.
+              We're sorry, the project you requested cannot be found. 
+              The URL may be misspelled or the project you're looking for has been deleted.
             </Message>
           </InpageBody>
         ) : (
