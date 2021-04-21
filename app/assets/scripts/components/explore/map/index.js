@@ -132,13 +132,13 @@ function Map() {
         }
         break;
       case mapModes.ADD_SAMPLE_POLYGON:
-        if (currentCheckpoint.activeItem) {
+        if (currentCheckpoint && currentCheckpoint.activeItem) {
           mapRef.polygonDraw.enableAdd(currentCheckpoint.activeItem);
         }
         break;
 
       case mapModes.DELETE_SAMPLES:
-        if (currentCheckpoint.activeItem) {
+        if (currentCheckpoint && currentCheckpoint.activeItem) {
           mapRef.polygonDraw.enableSubtract(currentCheckpoint.activeItem);
         }
         break;

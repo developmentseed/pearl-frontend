@@ -440,6 +440,18 @@ export function InstanceProvider(props) {
         return;
       }
 
+      showGlobalLoadingMessage(
+        <>
+          <Button
+            onClick={() => {
+              abortJob();
+            }}
+          >
+            Running, click here to abort...
+          </Button>
+        </>
+      );
+
       // Reset predictions state
       dispatchPredictions({
         type: predictionsActions.START_PREDICTION,
@@ -702,7 +714,13 @@ export class WebsocketClient extends WebSocket {
           break;
 
         case 'model#checkpoint#progress':
+          showGlobalLoadingMessage('Loading checkpoint...');
+          break;
         case 'model#checkpoint#complete':
+          fetchCheckpoint(data.id || data.checkpoint, checkpointModes.RETRAIN);
+          hideGlobalLoading();
+          this.sendMessage({ action: 'model#status' });
+          break;
         case 'model#retrain#complete':
           if (data && (data.id || data.checkpoint)) {
             fetchCheckpoint(
@@ -733,6 +751,7 @@ export class WebsocketClient extends WebSocket {
           });
           // Request new status update after abort is confirmed
           this.sendMessage({ action: 'model#status' });
+          hideGlobalLoading();
           break;
         case 'model#patch':
           //receive new patch
@@ -755,6 +774,7 @@ export class WebsocketClient extends WebSocket {
           dispatchAoiPatch({
             type: aoiPatchActions.COMPLETE_PATCH,
           });
+          hideGlobalLoading();
           // finish waiting for patch
           this.sendMessage({ action: 'model#status' });
           break;

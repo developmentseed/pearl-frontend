@@ -111,8 +111,6 @@ export function ExploreProvider(props) {
     } catch (error) {
       logger(error);
       toasts.error('Error loading project, please try again later.');
-    } finally {
-      hideGlobalLoading();
     }
   }
 
@@ -315,7 +313,6 @@ export function ExploreProvider(props) {
       setAoiName(aoiObject.name);
     }
 
-    hideGlobalLoading();
     return bounds;
   }
 
