@@ -207,7 +207,14 @@ function RetrainModel(props) {
                   }}
                 />
               </DropdownItem>
-              <DropdownItem>
+              <DropdownItem
+                data-dropdown="click.close"
+              >
+                Cancel
+              </DropdownItem>
+              <DropdownItem
+                data-dropdown="click.close"
+              >
                 <Button
                   onClick={() => {
                     dispatchCurrentCheckpoint({
