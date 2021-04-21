@@ -85,6 +85,7 @@ function Header(props) {
     mapRef,
 
     currentCheckpoint,
+    checkpointModes,
     checkpointList,
     applyCheckpoint,
 
@@ -226,11 +227,26 @@ function Header(props) {
         </HeadOptionHeadline>
         <SubheadingStrong
           data-cy='select-model-label'
-          onClick={function () {
-            isAuthenticated && setShowSelectModelModal(true);
-          }}
-          title='Edit Model'
-          disabled={!isAuthenticated}
+          onClick={
+            isAuthenticated &&
+            models?.length &&
+            !checkpointList?.length &&
+            !currentCheckpoint?.mode === checkpointModes.RUN &&
+            function () {
+              setShowSelectModelModal(true);
+            }
+          }
+          title={
+            !checkpointList?.length
+              ? 'Select Model'
+              : 'Models can not be changed after running inference'
+          }
+          disabled={
+            !isAuthenticated ||
+            !models?.length ||
+            checkpointList?.length ||
+            currentCheckpoint?.mode === checkpointModes.RUN
+          }
         >
           {(selectedModel && selectedModel.name) ||
             (isAuthenticated
@@ -247,8 +263,13 @@ function Header(props) {
             onClick={function () {
               setShowSelectModelModal(true);
             }}
-            title='Edit Model'
-            disabled={!isAuthenticated || !models?.length}
+            title='Select Model'
+            disabled={
+              !isAuthenticated ||
+              !models?.length ||
+              checkpointList?.length ||
+              currentCheckpoint?.mode === checkpointModes.RUN
+            }
           >
             Edit Model Selection
           </EditButton>
@@ -341,6 +362,7 @@ Header.propTypes = {
   mapRef: T.object,
 
   currentCheckpoint: T.object,
+  checkpointModes: T.object,
   checkpointList: T.array,
   applyCheckpoint: T.func,
 
