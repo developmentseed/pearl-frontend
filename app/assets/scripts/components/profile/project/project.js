@@ -75,6 +75,10 @@ const AOI_HEADERS = [
   'Download',
 ];
 
+const Message = styled(Heading)`
+  padding: 10rem;
+`;
+
 // Render single AOI row
 function renderRow(aoi, { project, restApiClient }) {
   const aoiLink = `${window.location.origin}/aoi/${aoi.uuid}/map`;
@@ -151,7 +155,11 @@ function Project() {
         showGlobalLoadingMessage('Loading project...');
         try {
           const data = await restApiClient.getProject(projectId);
-          setProject(data);
+          if (data) {
+            setProject(data);
+          } else {
+            throw new Error('Project not found');
+          }
         } catch (err) {
           toasts.error('Failed to fetch project.');
           setIsProjectLoading(false);
@@ -189,87 +197,97 @@ function Project() {
   return (
     <>
       <Inpage>
-        <InpageHeader>
-          <InpageHeaderInner>
-            <InpageHeadline>
-              <ProjectTagline>
-                <StyledLink to='/profile/projects'>Projects</StyledLink> /{' '}
-                {!isProjectLoading ? project.name : ''}
-              </ProjectTagline>
-              <InpageTitleWrapper>
-                <Heading>{!isProjectLoading ? project.name : ''}</Heading>
-                <InpageToolbar>
-                  <Button
-                    variation='base-plain'
-                    title='Delete Project'
-                    useIcon='trash-bin'
-                    onClick={async () => {
-                      try {
-                        await restApiClient.deleteProject(projectId);
-                        toasts.success('Project successfully deleted.');
-                        history.push(`/profile/projects`);
-                      } catch (err) {
-                        logger('Failed to delete project', err);
-                        toasts.error('Failed to delete project.', err);
-                      }
-                    }}
-                  >
-                    Delete Project
-                  </Button>
-                  <Button
-                    forwardedAs={StyledLink}
-                    to={`/project/${projectId}`}
-                    variation='primary-raised-light'
-                    title='Edit project'
-                    useIcon={['chevron-right--small', 'after']}
-                  >
-                    Open in Editor
-                  </Button>
-                </InpageToolbar>
-              </InpageTitleWrapper>
-            </InpageHeadline>
-          </InpageHeaderInner>
-        </InpageHeader>
-        <InpageBody>
-          <ProjectBody>
-            {project ? (
-              <ProjectCard
-                restApiClient={restApiClient}
-                project={project}
-                aois={aois}
-              />
-            ) : null}
-            {aois &&
-              (aois.length ? (
-                <>
-                  <Heading size='small'>
-                    {project ? 'Exported Maps' : 'Loading Project...'}
-                  </Heading>
-                  <Table
-                    headers={AOI_HEADERS}
-                    data={aois}
-                    renderRow={renderRow}
-                    extraData={{
-                      project,
-                      restApiClient,
-                    }}
+        {!isProjectLoading && !project ? (
+          <InpageBody>
+            <Message size='large'>
+              This project could not be found! Please check that it exists.
+            </Message>
+          </InpageBody>
+        ) : (
+          <>
+            <InpageHeader>
+              <InpageHeaderInner>
+                <InpageHeadline>
+                  <ProjectTagline>
+                    <StyledLink to='/profile/projects'>Projects</StyledLink> /{' '}
+                    {!isProjectLoading ? project.name : ''}
+                  </ProjectTagline>
+                  <InpageTitleWrapper>
+                    <Heading>{!isProjectLoading ? project.name : ''}</Heading>
+                    <InpageToolbar>
+                      <Button
+                        variation='base-plain'
+                        title='Delete Project'
+                        useIcon='trash-bin'
+                        onClick={async () => {
+                          try {
+                            await restApiClient.deleteProject(projectId);
+                            toasts.success('Project successfully deleted.');
+                            history.push(`/profile/projects`);
+                          } catch (err) {
+                            logger('Failed to delete project', err);
+                            toasts.error('Failed to delete project.', err);
+                          }
+                        }}
+                      >
+                        Delete Project
+                      </Button>
+                      <Button
+                        forwardedAs={StyledLink}
+                        to={`/project/${projectId}`}
+                        variation='primary-raised-light'
+                        title='Edit project'
+                        useIcon={['chevron-right--small', 'after']}
+                      >
+                        Open in Editor
+                      </Button>
+                    </InpageToolbar>
+                  </InpageTitleWrapper>
+                </InpageHeadline>
+              </InpageHeaderInner>
+            </InpageHeader>
+            <InpageBody>
+              <ProjectBody>
+                {project ? (
+                  <ProjectCard
+                    restApiClient={restApiClient}
+                    project={project}
+                    aois={aois}
                   />
-                  <Paginator
-                    currentPage={page}
-                    gotoPage={setPage}
-                    totalItems={total}
-                    itemsPerPage={AOIS_PER_PAGE}
-                  />
-                </>
-              ) : (
-                <Heading>
-                  {isAoisLoading
-                    ? 'Loading AOIs...'
-                    : 'No Exported AOIs for this project.'}
-                </Heading>
-              ))}
-          </ProjectBody>
-        </InpageBody>
+                ) : null}
+                {aois &&
+                  (aois.length ? (
+                    <>
+                      <Heading size='small'>
+                        {project ? 'Exported Maps' : 'Loading Project...'}
+                      </Heading>
+                      <Table
+                        headers={AOI_HEADERS}
+                        data={aois}
+                        renderRow={renderRow}
+                        extraData={{
+                          project,
+                          restApiClient,
+                        }}
+                      />
+                      <Paginator
+                        currentPage={page}
+                        gotoPage={setPage}
+                        totalItems={total}
+                        itemsPerPage={AOIS_PER_PAGE}
+                      />
+                    </>
+                  ) : (
+                    <Heading>
+                      {isAoisLoading
+                        ? 'Loading AOIs...'
+                        : 'No Exported AOIs for this project.'}
+                    </Heading>
+                  ))}
+              </ProjectBody>
+            </InpageBody>
+          </>
+        )}
       </Inpage>
     </>
   );
