@@ -56,6 +56,11 @@ const SubheadingStrong = styled.h3`
         opacity: 0.64;
       }
     `}
+  ${({ disabled }) =>
+    disabled &&
+    css`
+      opacity: 0.64;
+    `}
 `;
 
 const PanelBlockHeader = styled(BasePanelBlockHeader)`
@@ -267,6 +272,7 @@ function Header(props) {
                     ? 'Change checkpoint'
                     : 'Run and retrain model to create first checkpoint'
                 }
+                disabled={!checkpointList}
               >
                 {renderCheckpointSelectionHeader()}
               </SubheadingStrong>
@@ -282,6 +288,7 @@ function Header(props) {
                   id='checkpoint-list-trigger'
                   {...props}
                   onClick={(e) => checkpointList && props.onClick(e)} // eslint-disable-line
+                  disabled={!checkpointList}
                 >
                   Edit Checkpoint Selection
                 </EditButton>
