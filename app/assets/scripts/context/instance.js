@@ -16,6 +16,7 @@ import {
   hideGlobalLoading,
 } from '@devseed-ui/global-loading';
 import { Button } from '@devseed-ui/button';
+import { GlobalLoadingMessage } from '../styles/placeholder';
 import toasts from '../components/common/toasts';
 import { useAuth } from './auth';
 import {
@@ -384,15 +385,17 @@ export function InstanceProvider(props) {
         }
 
         showGlobalLoadingMessage(
-          <>
+          <GlobalLoadingMessage>
+            <p>Running model and loading class predictions...</p>
             <Button
+              variation='danger-raised-light'
               onClick={() => {
                 abortJob();
               }}
             >
-              Running, click here to abort...
+              Abort Process
             </Button>
-          </>
+          </GlobalLoadingMessage>
         );
 
         try {
@@ -441,15 +444,17 @@ export function InstanceProvider(props) {
       }
 
       showGlobalLoadingMessage(
-        <>
+        <GlobalLoadingMessage>
+          <p>Retraining model and loading updated predictions...</p>
           <Button
+            variation='danger-raised-light'
             onClick={() => {
               abortJob();
             }}
           >
-            Running, click here to abort...
+            Abort Process
           </Button>
-        </>
+        </GlobalLoadingMessage>
       );
 
       // Reset predictions state
