@@ -44,10 +44,12 @@ export const Class = styled.div`
     padding: ${glsp(0.5)} ${glsp(1.5)};
     // Add Class Button styles. May be removed if this takes on a different onClick configuration
     span {
-      display: grid;
-      grid-template-columns: min-content auto min-content;
-      align-items: center;
-      grid-gap: 0 ${glsp(1)};
+      text-align: left;
+    }
+    &:before {
+      border: 1px solid ${themeVal('color.baseAlphaE')};
+      padding: 0 0.25rem;
+      margin-right: 0;
     }
     ${Heading} {
       margin: 0;
@@ -80,6 +82,20 @@ export const Class = styled.div`
         background: ${themeVal('color.primary')};
       }
     `};
+`;
+
+export const AddClassButton = styled(Class)`
+  color: ${themeVal('color.base')};
+  span {
+    text-align: left;
+  }
+  &:before {
+    box-shadow: inset 0 0 0 1px ${themeVal('color.base')};
+    padding: 0 0.325rem;
+    margin-right: 0;
+    color: ${themeVal('color.base')};
+    opacity: 0.8;
+  }
 `;
 
 export const ClassInfoWrapper = styled.div`

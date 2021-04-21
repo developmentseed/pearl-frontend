@@ -26,6 +26,7 @@ import {
   ClassSamples,
   ClassOptions,
   ToolBox as RetrainTools,
+  AddClassButton,
   AddClassForm,
   AddClassInput,
 } from './retrain-refine-styles';
@@ -161,83 +162,76 @@ function RetrainModel(props) {
                 </Class>
               );
             })}
-        <Dropdown
-          alignment='right'
-          direction='up'
-          triggerElement={(props) => (
-            <DropdownTrigger
-              variation='primary-raised-light'
-              useIcon={['chevron-down--small', 'after']}
-              usePreIcon='user'
-              title='Open dropdown'
-              className='user-options-trigger'
-              size='medium'
-              {...props}
-            >
-              Add Class
-            </DropdownTrigger>
-          )}
-          className='global__dropdown'
-        >
-          <>
-            <DropdownHeader>
-              <p>New Class</p>
-            </DropdownHeader>
-            <DropdownBody>
-              <DropdownItem>
-                <label for="addClassName">
-                  <input
-                    id="addClassName"
-                    value={addClassName}
-                    onChange={(e) => {
-                      setAddClassName(e.target.value);
-                    }}
-                  />
-                </label>  
-              </DropdownItem>
-              <DropdownItem>
-                <label>
-                  Label Color
-                </label>
-                <SketchPicker
-                  color={ addClassColor }
-                  onChangeComplete={(color) => {
-                    // console.log('change complete', color);
-                    setAddClassColor(color.hex);
-                  }}
-                />
-              </DropdownItem>
-              <DropdownItem
-                data-dropdown="click.close"
-              >
-                Cancel
-              </DropdownItem>
-              <DropdownItem
-                data-dropdown="click.close"
-              >
-                <Button
-                  onClick={() => {
-                    dispatchCurrentCheckpoint({
-                      type: actions.ADD_CLASS,
-                      data: {
-                        name: addClassName,
-                        color: addClassColor,
-                      },
-                    });
-                    setAddClassName(''); 
-                    setAddClassColor('#000000');                   
-                  }}
+            <Dropdown
+              alignment='center'
+              direction='up'
+              triggerElement={(props) => (
+                <AddClassButton
+                  as={DropdownTrigger}
+                  variation='primary-plain'
+                  useIcon='plus--small'
+                  title='Open dropdown'
+                  className='add__class'
+                  size='medium'
+                  {...props}
                 >
-                  Save
-                </Button>
-              </DropdownItem>  
-            </DropdownBody>
-          </>
-        </Dropdown>
-
-      </ClassList>
-    </>
-  )}
+                  Add Class
+                </AddClassButton>
+              )}
+              className='global__dropdown'
+            >
+              <>
+                <DropdownHeader>
+                  <p>New Class</p>
+                </DropdownHeader>
+                <DropdownBody>
+                  <DropdownItem>
+                    <label htmlFor='addClassName'>
+                      <input
+                        id='addClassName'
+                        value={addClassName}
+                        onChange={(e) => {
+                          setAddClassName(e.target.value);
+                        }}
+                      />
+                    </label>
+                  </DropdownItem>
+                  <DropdownItem>
+                    <label>Label Color</label>
+                    <SketchPicker
+                      color={addClassColor}
+                      onChangeComplete={(color) => {
+                        // console.log('change complete', color);
+                        setAddClassColor(color.hex);
+                      }}
+                    />
+                  </DropdownItem>
+                  <DropdownItem data-dropdown='click.close'>
+                    Cancel
+                  </DropdownItem>
+                  <DropdownItem data-dropdown='click.close'>
+                    <Button
+                      onClick={() => {
+                        dispatchCurrentCheckpoint({
+                          type: actions.ADD_CLASS,
+                          data: {
+                            name: addClassName,
+                            color: addClassColor,
+                          },
+                        });
+                        setAddClassName('');
+                        setAddClassColor('#000000');
+                      }}
+                    >
+                      Save
+                    </Button>
+                  </DropdownItem>
+                </DropdownBody>
+              </>
+            </Dropdown>
+          </ClassList>
+        </>
+      )}
 
       {!currentCheckpoint && placeholderMessage && (
         <ClassList>
