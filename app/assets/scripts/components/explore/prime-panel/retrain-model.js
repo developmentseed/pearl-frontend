@@ -1,12 +1,21 @@
-import React from 'react';
+import React, { useState } from 'react';
 import T from 'prop-types';
 import get from 'lodash.get';
 import { Button } from '@devseed-ui/button';
+import { SketchPicker } from 'react-color';
 import InfoButton from '../../common/info-button';
 import { Heading } from '@devseed-ui/typography';
 import { PlaceholderMessage } from '../../../styles/placeholder.js';
 import { actions, useCheckpoint } from '../../../context/checkpoint.js';
 import { useMapState } from '../../../context/explore.js';
+import {
+  Dropdown,
+  DropdownHeader,
+  DropdownBody,
+  DropdownItem,
+  DropdownFooter,
+  DropdownTrigger,
+} from '../../../styles/dropdown';
 import {
   ToolsWrapper,
   ClassList,
@@ -17,6 +26,8 @@ import {
   ClassSamples,
   ClassOptions,
   ToolBox as RetrainTools,
+  AddClassForm,
+  AddClassInput,
 } from './retrain-refine-styles';
 
 /*
@@ -31,7 +42,12 @@ function RetrainModel(props) {
 
   const { setMapMode, mapModes, mapState } = useMapState();
 
+  const [addClassColor, setAddClassColor] = useState('#000000');
+
+  const [addClassName, setAddClassName] = useState('');
+
   console.log('checkpoint', currentCheckpoint);
+  console.log('color', addClassColor);
   return (
     <ToolsWrapper className={className}>
       {ready && currentCheckpoint.classes && (
@@ -145,26 +161,76 @@ function RetrainModel(props) {
                 </Class>
               );
             })}
-            <Class className='add__class' muted as={Button}>
-              <ClassThumbnail useIcon='plus' outline />
-              <Heading
-                onClick={() => {
-                  dispatchCurrentCheckpoint({
-                    type: actions.ADD_CLASS,
-                    data: {
-                      name: 'Test',
-                      color: '#ff0000'
-                    },
-                  });                  
-                }} 
-                size='xsmall'
-              >
-                Add Class
-              </Heading>
-            </Class>
-          </ClassList>
-        </>
-      )}
+        <Dropdown
+          alignment='right'
+          direction='up'
+          triggerElement={(props) => (
+            <DropdownTrigger
+              variation='primary-raised-light'
+              useIcon={['chevron-down--small', 'after']}
+              usePreIcon='user'
+              title='Open dropdown'
+              className='user-options-trigger'
+              size='medium'
+              {...props}
+            >
+              Add Class
+            </DropdownTrigger>
+          )}
+          className='global__dropdown'
+        >
+          <>
+            <DropdownHeader>
+              <p>New Class</p>
+            </DropdownHeader>
+            <DropdownBody>
+              <DropdownItem>
+                <label for="addClassName">
+                  <input
+                    id="addClassName"
+                    value={addClassName}
+                    onChange={(e) => {
+                      setAddClassName(e.target.value);
+                    }}
+                  />
+                </label>  
+              </DropdownItem>
+              <DropdownItem>
+                <label>
+                  Label Color
+                </label>
+                <SketchPicker
+                  color={ addClassColor }
+                  onChangeComplete={(color) => {
+                    // console.log('change complete', color);
+                    setAddClassColor(color.hex);
+                  }}
+                />
+              </DropdownItem>
+              <DropdownItem>
+                <Button
+                  onClick={() => {
+                    dispatchCurrentCheckpoint({
+                      type: actions.ADD_CLASS,
+                      data: {
+                        name: addClassName,
+                        color: addClassColor,
+                      },
+                    });
+                    setAddClassName(''); 
+                    setAddClassColor('#000000');                   
+                  }}
+                >
+                  Save
+                </Button>
+              </DropdownItem>  
+            </DropdownBody>
+          </>
+        </Dropdown>
+
+      </ClassList>
+    </>
+  )}
 
       {!currentCheckpoint && placeholderMessage && (
         <ClassList>

@@ -151,3 +151,9 @@ export const ToolBox = styled.section`
     }
   }
 `;
+
+export const AddClassForm = styled.div`
+  clear: both;
+`;
+
+export const AddClassInput = styled.input``;
