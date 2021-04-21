@@ -9,16 +9,6 @@ import T from 'prop-types';
 import { useAoiPatch } from './aoi';
 export const MapContext = createContext({});
 
-const baseLayerConfig = {
-  opacity: 1,
-  visible: true,
-};
-
-const baseUserLayerConfig = {
-  ...baseLayerConfig,
-  active: false,
-};
-
 export function MapProvider(props) {
   const [mapRef, setMapRef] = useState();
   const [mapLayers, setMapLayers] = useState({});
@@ -48,19 +38,21 @@ export function MapProvider(props) {
       id: 'retrainingSamples',
       name: 'Retraining Samples',
     },
+    refinementsLayer: {
+      opacity: 1,
+      visible: true,
+      active: false,
+      id: 'refinementsLayer',
+      name: 'Refinements Layer',
+    },
   });
 
   useEffect(() => {
-    if (aoiPatch.isReady()) {
-      const patch = aoiPatch.getData();
-      const id = `${patch.name}-${patch.id}`;
-
+    if (aoiPatch.isReady() && !userLayers.refinementsLayer.active) {
       setUserLayers({
         ...userLayers,
-        [id]: {
-          ...baseUserLayerConfig,
-          id,
-          name: `${patch.name} Patch: ${patch.id}`,
+        refinementsLayer: {
+          ...userLayers.refinementsLayer,
           active: true,
         },
       });

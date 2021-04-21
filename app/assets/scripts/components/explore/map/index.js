@@ -386,7 +386,6 @@ function Map() {
 
         {aoiPatchList.map((patch) => {
           // Id format set in context/map.js
-          const id = `${patch.name}-${patch.id}`;
 
           return (
             <React.Fragment key={patch.id}>
@@ -395,7 +394,11 @@ function Map() {
                   key={p.key}
                   url={p.image}
                   bounds={p.bounds}
-                  opacity={userLayers[id].visible ? userLayers[id].opacity : 0}
+                  opacity={
+                    userLayers.refinementsLayer.visible
+                      ? userLayers.refinementsLayer.opacity
+                      : 0
+                  }
                 />
               ))}
             </React.Fragment>
