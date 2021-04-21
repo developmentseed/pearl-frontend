@@ -702,6 +702,7 @@ export class WebsocketClient extends WebSocket {
           dispatchMessageQueue({ type: messageQueueActionTypes.CLEAR });
           dispatchPredictions({ type: predictionsActions.CLEAR_PREDICTION });
           this.sendMessage({ action: 'model#status' });
+          hideGlobalLoading();
           break;
         case 'model#checkpoint':
           if (data && (data.id || data.checkpoint)) {
