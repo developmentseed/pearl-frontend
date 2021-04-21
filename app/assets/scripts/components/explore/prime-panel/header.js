@@ -152,6 +152,12 @@ function Header(props) {
     }
   };
 
+  const modelNotChangeable =
+    !isAuthenticated ||
+    !models?.length ||
+    checkpointList?.length ||
+    currentCheckpoint?.mode === checkpointModes.RUN;
+
   return (
     <PanelBlockHeader>
       <HeadOption hasSubtitle>
@@ -227,26 +233,15 @@ function Header(props) {
         </HeadOptionHeadline>
         <SubheadingStrong
           data-cy='select-model-label'
-          onClick={
-            isAuthenticated &&
-            models?.length &&
-            !checkpointList?.length &&
-            !currentCheckpoint?.mode === checkpointModes.RUN &&
-            function () {
-              setShowSelectModelModal(true);
-            }
-          }
+          onClick={() => {
+            !modelNotChangeable && setShowSelectModelModal(true);
+          }}
           title={
             !checkpointList?.length
               ? 'Select Model'
               : 'Models can not be changed after running inference'
           }
-          disabled={
-            !isAuthenticated ||
-            !models?.length ||
-            checkpointList?.length ||
-            currentCheckpoint?.mode === checkpointModes.RUN
-          }
+          disabled={modelNotChangeable}
         >
           {(selectedModel && selectedModel.name) ||
             (isAuthenticated
@@ -260,16 +255,11 @@ function Header(props) {
             data-cy='show-select-model-button'
             useIcon='swap-horizontal'
             id='select-model-trigger'
-            onClick={function () {
+            onClick={() => {
               setShowSelectModelModal(true);
             }}
             title='Select Model'
-            disabled={
-              !isAuthenticated ||
-              !models?.length ||
-              checkpointList?.length ||
-              currentCheckpoint?.mode === checkpointModes.RUN
-            }
+            disabled={modelNotChangeable}
           >
             Edit Model Selection
           </EditButton>
