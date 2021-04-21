@@ -24,13 +24,14 @@ export function MapProvider(props) {
    * Add objects here to control new layers
    */
   const [userLayers, setUserLayers] = useState({
-    predictions: {
+    refinementsLayer: {
       opacity: 1,
       visible: true,
       active: false,
-      id: 'predictions',
-      name: 'Prediction Results',
+      id: 'refinementsLayer',
+      name: 'Refinements Layer',
     },
+
     retrainingSamples: {
       opacity: 0.3,
       visible: true,
@@ -38,12 +39,13 @@ export function MapProvider(props) {
       id: 'retrainingSamples',
       name: 'Retraining Samples',
     },
-    refinementsLayer: {
+
+    predictions: {
       opacity: 1,
       visible: true,
       active: false,
-      id: 'refinementsLayer',
-      name: 'Refinements Layer',
+      id: 'predictions',
+      name: 'Prediction Results',
     },
   });
 
