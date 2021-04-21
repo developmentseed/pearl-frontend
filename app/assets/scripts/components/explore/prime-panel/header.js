@@ -46,8 +46,9 @@ const SubheadingStrong = styled.h3`
         ${collecticon(useIcon)}
       }
     `}
-  ${({ onClick }) =>
+  ${({ onClick, disabled }) =>
     onClick &&
+    !disabled &&
     css`
       transition: opacity 0.24s ease 0s;
       &:hover {
@@ -221,9 +222,10 @@ function Header(props) {
         <SubheadingStrong
           data-cy='select-model-label'
           onClick={function () {
-            setShowSelectModelModal(true);
+            isAuthenticated && setShowSelectModelModal(true);
           }}
           title='Edit Model'
+          disabled={!isAuthenticated}
         >
           {(selectedModel && selectedModel.name) ||
             (isAuthenticated
@@ -241,7 +243,7 @@ function Header(props) {
               setShowSelectModelModal(true);
             }}
             title='Edit Model'
-            disabled={!models?.length}
+            disabled={!isAuthenticated || !models?.length}
           >
             Edit Model Selection
           </EditButton>
