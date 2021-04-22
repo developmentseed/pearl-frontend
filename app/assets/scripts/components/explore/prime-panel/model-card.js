@@ -3,6 +3,7 @@ import T from 'prop-types';
 import styled from 'styled-components';
 import { Bar } from 'react-chartjs-2';
 import { Card } from '../../common/card-list';
+import { round } from '../../../utils/format';
 
 const ChartContainer = styled.div`
   height: 12rem;
@@ -26,14 +27,11 @@ function ModelCard({ model, onClick }) {
       intersect: false,
       enabled: true,
       callbacks: {
-          label: (tooltipItem, data) => {
-              let label = data.datasets[tooltipItem.datasetIndex].label || '';
-              if (label) {
-                  label += ': ';
-              }
-              label += Math.round(tooltipItem.yLabel * 100) / 100;
-              return label;
-          }
+        label: (tooltipItem, data) => {
+          let label = round(tooltipItem.yLabel * 100);
+          label += '%';
+          return label;
+        }
       },
     },
     scales: {
