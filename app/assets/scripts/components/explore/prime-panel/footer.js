@@ -12,9 +12,7 @@ import { LocalButton } from '../../../styles/local-button';
 import InfoButton from '../../common/info-button';
 import { PanelBlockFooter } from '../../common/panel-block';
 import { checkpointModes } from '../../../context/checkpoint';
-import { usePredictions } from '../../../context/predictions';
 import { useInstance } from '../../../context/instance';
-import { useProjectId } from '../../../context/explore';
 
 const PanelControls = styled(PanelBlockFooter)`
   display: grid;
@@ -26,15 +24,7 @@ const SaveCheckpoint = styled(DropdownBody)`
 `;
 
 function PrimeButton({ currentCheckpoint, allowInferenceRun, mapRef }) {
-  const { projectId } = useProjectId();
-  const { predictions } = usePredictions();
-  const {
-    instance,
-    sendAbortMessage,
-    runInference,
-    retrain,
-    refine,
-  } = useInstance();
+  const { runInference, retrain, refine } = useInstance();
 
   // If in refine mode, this button save refinements
   if (currentCheckpoint && currentCheckpoint.mode === checkpointModes.REFINE) {
@@ -58,38 +48,20 @@ function PrimeButton({ currentCheckpoint, allowInferenceRun, mapRef }) {
     );
   }
 
-  let label = projectId !== 'new' ? 'Loading...' : 'Run model';
-  let enabled = false;
-  let onClick = () => {};
-
-  if (predictions.fetching) {
-    label = 'Abort Process';
-    onClick = sendAbortMessage;
-    enabled = true;
-  } else if (['not-started', 'ready'].includes(instance.gpuStatus)) {
-    label = !currentCheckpoint ? 'Run Model' : 'Retrain Model';
-    enabled = allowInferenceRun;
-    onClick = !currentCheckpoint ? runInference : retrain;
-  }
-
   return (
     <InfoButton
       data-cy={allowInferenceRun ? 'run-model-button' : 'disabled'}
-      variation={
-        label === 'Abort Process'
-          ? 'danger-raised-light'
-          : 'primary-raised-dark'
-      }
+      variation='primary-raised-dark'
       size='medium'
-      useIcon={label === 'Abort Process' ? 'xmark--small' : 'tick--small'}
+      useIcon='tick--small'
       style={{
         gridColumn: '1 / -1',
       }}
-      onClick={() => onClick()}
-      visuallyDisabled={!enabled}
+      onClick={!currentCheckpoint ? runInference : retrain}
+      visuallyDisabled={!allowInferenceRun}
       id='apply-button-trigger'
     >
-      {label}
+      {!currentCheckpoint ? 'Run Model' : 'Retrain Model'}
     </InfoButton>
   );
 }
