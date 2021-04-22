@@ -156,7 +156,6 @@ function Map() {
   // Add polygon layers to be draw when checkpoint has changed
   useEffect(() => {
     if (!mapRef || !mapRef.polygonDraw) return;
-    console.log('clearing layers');
     mapRef.polygonDraw.clearLayers();
     if (currentCheckpoint) {
       mapRef.polygonDraw.setLayers(currentCheckpoint.classes);
@@ -164,7 +163,7 @@ function Map() {
   }, [
     mapRef,
     currentCheckpoint && currentCheckpoint.id,
-    currentCheckpoint && Object.keys(currentCheckpoint.classes).length
+    currentCheckpoint && Object.keys(currentCheckpoint.classes).length,
   ]);
 
   /**

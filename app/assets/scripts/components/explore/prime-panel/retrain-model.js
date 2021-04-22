@@ -47,8 +47,6 @@ function RetrainModel(props) {
 
   const [addClassName, setAddClassName] = useState('');
 
-  console.log('checkpoint', currentCheckpoint);
-  console.log('color', addClassColor);
   return (
     <ToolsWrapper className={className}>
       {ready && currentCheckpoint.classes && (
