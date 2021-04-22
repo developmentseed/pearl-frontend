@@ -392,63 +392,6 @@ export function ExploreProvider(props) {
     }
   }, [aoiRef]);
 
-  /*
-   * This useEffect GeoCodes an AOI after it is created.
-   * On the front end we assume that any AOI with the same name
-   * from the backend, will have the same geometry.
-   *
-   * To deal with this, any AOI that has the same geocoding as an existing one will be incremented.
-   *
-   * i.e. Seneca Rocks, Seneca Rocks #1, Seneca Rocks #2...etc
-   */
-
-  /*
-  useEffect(() => {
-    console.log(mapState.mode)
-    console.log(mapState.previousMode)
-    if (!aoiBounds) {
-      return;
-    } else if (
-      mapState.mode === mapModes.BROWSE_MODE &&
-      (mapState.previousMode === mapModes.EDIT_AOI_MODE ||
-        mapState.previousMode === mapModes.CREATE_AOI_MODE)
-    ) {
-
-      const bounds = [
-        aoiBounds.getWest(),
-        aoiBounds.getSouth(),
-        aoiBounds.getEast(),
-        aoiBounds.getNorth(),
-      ];
-
-      showGlobalLoadingMessage('Geocoding AOI...');
-      reverseGeoCode(bounds).then((name) => {
-        let lastInstance;
-        aoiList
-          .sort((a, b) => {
-            if (a.name < b.name) return -1;
-            else if (a.name > b.name) return 1;
-            else return 0;
-          })
-          .forEach((a) => {
-            return (lastInstance = a.name.includes(name)
-              ? a.name
-              : lastInstance);
-          });
-        if (lastInstance) {
-          if (lastInstance.includes('#')) {
-            const [n, version] = lastInstance.split('#').map((w) => w.trim());
-            name = `${n} #${Number(version) + 1}`;
-          } else {
-            name = `${name} #${1}`;
-          }
-        }
-        setAoiName(name);
-        hideGlobalLoading();
-      });
-    }
-  }, [mapState, aoiBounds, aoiList]);*/
-
   return (
     <ExploreContext.Provider
       value={{

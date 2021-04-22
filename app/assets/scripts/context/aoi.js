@@ -42,6 +42,14 @@ export function AoiProvider(props) {
    * @param _aoiBounds - optional bound object. This is passed when this function
    * is called from onDrawEnd context of AoiDrawControl. In this situation, the aoiBounds
    * state variable is may not be updated before the function is executed so we can pass the bounds explicitly.
+   *
+   * On the front end we assume that any AOI with the same name
+   * from the backend, will have the same geometry.
+   *
+   * To deal with this, any AOI that has the same geocoding as an existing one will be incremented.
+   *
+   * i.e. Seneca Rocks, Seneca Rocks #1, Seneca Rocks #2...etc
+   *
    */
   function updateAoiName(_aoiBounds) {
     const refBounds = aoiBounds || _aoiBounds;
