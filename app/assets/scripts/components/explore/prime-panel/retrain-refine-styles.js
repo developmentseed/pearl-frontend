@@ -168,6 +168,12 @@ export const PickerStyles = {
       boxShadow: 'none',
       fontFamily: 'inherit',
     },
+    body: {
+      padding: '12px 12px 6px',
+    },
+    saturation: {
+      paddingBottom: '42%',
+    },
   },
 };
 
