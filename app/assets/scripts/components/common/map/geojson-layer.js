@@ -37,7 +37,7 @@ function GeoJSONLayer(props) {
       });
       geolayer.addTo(map);
     }
-  }, [data.properties.id]);
+  }, [data]);
 
   useEffect(() => {
     if (layer) {
