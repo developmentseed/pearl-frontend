@@ -409,6 +409,7 @@ function Map() {
         {!predictions.data.predictions &&
           tileUrl &&
           currentProject &&
+          currentCheckpoint &&
           currentAoi && (
             <TileLayerWithHeaders
               url={tileUrl}
