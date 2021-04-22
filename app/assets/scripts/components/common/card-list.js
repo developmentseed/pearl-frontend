@@ -104,6 +104,10 @@ export const CardWrapper = styled.article`
               0 8px 24px -8px ${themeVal('color.baseAlphaC')};
           `}
   }
+  > header > ${CardSubtitle} {
+    margin: 0;
+    margin-top: ${glsp(0.5)};
+  }
 `;
 
 export const Card = ({
@@ -130,14 +134,14 @@ export const Card = ({
       {cardMedia && (
         <CardMedia borderlessMedia={borderlessMedia}>{cardMedia}</CardMedia>
       )}
-      <div>
+      <header>
         <CardTitle onClick={onClick}>{title}</CardTitle>
         {subtitle && (
-          <CardSubtitle size='xsmall' useAlt>
+          <CardSubtitle size='xsmall' useAlt as='p'>
             {subtitle}
           </CardSubtitle>
         )}
-      </div>
+      </header>
       {details && <DetailsList details={details} />}
     </CardWrapper>
   );
