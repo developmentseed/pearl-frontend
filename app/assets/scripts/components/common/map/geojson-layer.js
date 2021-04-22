@@ -20,9 +20,9 @@ function GeoJSONLayer(props) {
 
     geolayer.addTo(map);
     return () => {
-      if (layer) {
-        layer.clearLayers();
-      }
+      geolayer.clearLayers();
+      geolayer.remove();
+      setLayer(null);
     };
   }, []);
 
@@ -33,11 +33,17 @@ function GeoJSONLayer(props) {
         pointToLayer,
         pane: pane || 'overlayPane',
       });
+
       geolayer.on('add', () => {
         setLayer(geolayer);
         geolayer.setStyle(style);
       });
       geolayer.addTo(map);
+      return () => {
+        geolayer.clearLayers();
+        geolayer.remove();
+        setLayer(null);
+      };
     }
   }, [data]);
 
