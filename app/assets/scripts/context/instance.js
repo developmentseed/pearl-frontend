@@ -34,6 +34,7 @@ import { useModel } from './model';
 import { wrapLogReducer } from './reducers/utils';
 
 const messageQueueActionTypes = {
+  ABORT: 'ABORT',
   ADD: 'ADD',
   ADD_EXPRESS: 'ADD_EXPRESS',
   SEND: 'SEND',
@@ -144,6 +145,14 @@ export function InstanceProvider(props) {
   const [messageQueue, dispatchMessageQueue] = useReducer(
     wrapLogReducer((state, { type, data }) => {
       switch (type) {
+        case messageQueueActionTypes.ABORT: {
+          // This action allow the abort message to be followed by messages passed in the action,
+          // useful to apply a checkpoint next, for example.
+          websocketClient.sendMessage({ action: 'model#abort' });
+          return (
+            data.queueNext.map((m) => ({ express: false, message: m })) || []
+          );
+        }
         case messageQueueActionTypes.ADD: {
           return state.concat({
             express: false,
@@ -310,7 +319,7 @@ export function InstanceProvider(props) {
     });
   }
 
-  const abortJob = () => {
+  const abortJob = (queueNext) => {
     // If GPU is not connected, just clear the message queue
     if (!instance.gpuConnected) {
       dispatchMessageQueue({
@@ -321,9 +330,9 @@ export function InstanceProvider(props) {
       });
     } else {
       dispatchMessageQueue({
-        type: messageQueueActionTypes.ADD_EXPRESS,
+        type: messageQueueActionTypes.ABORT,
         data: {
-          action: 'model#abort',
+          queueNext,
         },
       });
     }
@@ -457,13 +466,22 @@ export function InstanceProvider(props) {
         return;
       }
 
+      const formerCheckpointId = currentCheckpoint.id;
+
       showGlobalLoadingMessage(
         <GlobalLoadingMessage>
           <p>Retraining model and loading updated predictions...</p>
           <Button
             variation='danger-raised-light'
             onClick={() => {
-              abortJob();
+              abortJob([
+                {
+                  action: 'model#retrain',
+                  data: {
+                    id: formerCheckpointId,
+                  },
+                },
+              ]);
             }}
           >
             Abort Process
