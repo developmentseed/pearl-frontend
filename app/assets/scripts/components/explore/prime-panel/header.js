@@ -117,7 +117,7 @@ function Header(props) {
       useIcon: null,
     };
 
-    if (mapState.mode === mapModes.EDIT_AOI_MODE || aoiList.length === 0) {
+    if (mapState.mode === mapModes.EDIT_AOI_MODE || aoiList?.length === 0) {
       disabled = true;
     }
 
@@ -196,7 +196,7 @@ function Header(props) {
                 </li>
               ))}
             </DropdownBody>
-            {(currentCheckpoint || aoiList.length > 0) && (
+            {(currentCheckpoint || aoiList?.length > 0) && (
               <DropdownFooter>
                 <DropdownItem
                   useIcon='plus'
