@@ -57,10 +57,17 @@ function instanceReducer(state, action) {
 
   switch (type) {
     case instanceActionTypes.APPLY_STATUS: {
+      // gpuStatus will change, update previousGpuStatus
+      if (data.gpuStatus && data.gpuStatus !== state.gpuStatus) {
+        newState.previousGpuStatus = state.gpuStatus;
+      }
+
+      // Apply passed data
       newState = {
-        ...state,
+        ...newState,
         ...data,
       };
+
       break;
     }
     default:
@@ -186,16 +193,18 @@ export function InstanceProvider(props) {
   );
 
   useEffect(() => {
-    // This checks if instance status changed from 'disconnected' to 'processing'
-    // which means an job was already running. If this is the case, send an abort
-    // message to clear the instance.
+    // Send abort message if GPU status changed from 'initializing' to 'processing'
+    // which means an job was already running.
     if (
-      instance.previousStatus === 'disconnected' &&
-      instance.status === 'processing'
+      instance.previousGpuStatus === 'initializing' &&
+      instance.gpuStatus === 'processing'
     ) {
-      websocketClient.sendMessage({ action: 'model#abort' });
+      dispatchMessageQueue({
+        type: messageQueueActionTypes.ADD_EXPRESS,
+        data: { action: 'model#abort' },
+      });
     }
-  }, [websocketClient, instance.status]);
+  }, [websocketClient, instance.gpuStatus]); // eslint-disable-line
 
   // Listen to instance connection, send queue message if any
   useEffect(() => {
@@ -689,6 +698,7 @@ export class WebsocketClient extends WebSocket {
           dispatchCurrentCheckpoint({
             type: checkpointActions.RESET_CHECKPOINT,
           });
+          hideGlobalLoading();
           // Request new status update after abort is confirmed
           this.sendMessage({ action: 'model#status' });
           break;
