@@ -320,7 +320,7 @@ export function ExploreProvider(props) {
       setAoiName(aoiObject.name);
     }
 
-    hideGlobalLoading()
+    hideGlobalLoading();
 
     return bounds;
   }
