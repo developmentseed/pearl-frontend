@@ -1,15 +1,8 @@
 import React from 'react';
 import T from 'prop-types';
-import styled from 'styled-components';
 import { Bar } from 'react-chartjs-2';
 import { Card } from '../../common/card-list';
 import { round } from '../../../utils/format';
-
-const ChartContainer = styled.div`
-  height: 12rem;
-  max-width: 100%;
-  position: relative;
-`;
 
 function ModelCard({ model, onClick }) {
   const details = {
@@ -27,11 +20,11 @@ function ModelCard({ model, onClick }) {
       intersect: false,
       enabled: true,
       callbacks: {
-        label: (tooltipItem, data) => {
+        label: (tooltipItem) => {
           let label = round(tooltipItem.yLabel * 100);
           label += '%';
           return label;
-        }
+        },
       },
     },
     scales: {
@@ -104,8 +97,7 @@ function ModelCard({ model, onClick }) {
         />
       }
       onClick={onClick}
-    >
-    </Card>
+    />
   );
 }
 

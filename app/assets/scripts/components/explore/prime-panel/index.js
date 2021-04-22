@@ -11,13 +11,13 @@ import { ExploreContext, useMapState } from '../../../context/explore';
 import GlobalContext from '../../../context/global';
 
 import { Heading } from '@devseed-ui/typography';
-import {
-  FormGroup,
-  FormGroupHeader,
-  FormGroupBody,
-  FormLabel,
-  FormInput,
-} from '@devseed-ui/form';
+// import {
+//   FormGroup,
+//   FormGroupHeader,
+//   FormGroupBody,
+//   FormLabel,
+//   FormInput,
+// } from '@devseed-ui/form';
 import { Button } from '@devseed-ui/button';
 
 import TabbedBlock from '../../common/tabbed-block-body';
@@ -95,7 +95,7 @@ function PrimePanel() {
   const { predictions } = usePredictions();
 
   const [showSelectModelModal, setShowSelectModelModal] = useState(false);
-  const [modelFilterString, setModelFilterString] = useState('');
+  // const [modelFilterString, setModelFilterString] = useState('');
   const [localCheckpointName, setLocalCheckpointName] = useState(
     (currentCheckpoint && currentCheckpoint.name) || ''
   );
@@ -348,7 +348,8 @@ function PrimePanel() {
           </ModalHeader>
         )}
         filterCard={(card) => {
-          return card.name.includes(modelFilterString.toLowerCase());
+          return card.name.includes('');
+          // return card.name.includes(modelFilterString.toLowerCase());
         }}
         renderCard={(model) => (
           <ModelCard
