@@ -77,12 +77,21 @@ export function ExploreProvider(props) {
       return;
     }
 
+    let project;
     try {
       // Get project metadata
       showGlobalLoadingMessage('Fetching project metadata...');
-      const project = await restApiClient.getProject(projectId);
+      project = await restApiClient.getProject(projectId);
       setCurrentProject(project);
+    } catch (error) {
+      hideGlobalLoading();
+      logger(error);
+      toasts.error('Project not found.');
+      history.push('/profile/projects');
+      return;
+    }
 
+    try {
       showGlobalLoadingMessage('Fetching model...');
       const model = await restApiClient.getModel(project.model_id);
       setSelectedModel(model);

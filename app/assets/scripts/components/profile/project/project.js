@@ -153,9 +153,11 @@ function Project() {
           const data = await restApiClient.getProject(projectId);
           setProject(data);
         } catch (err) {
-          toasts.error('Failed to fetch project.');
+          toasts.error('Project not found.');
           setIsProjectLoading(false);
           hideGlobalLoading();
+          history.push('/profile/projects');
+          return;
         }
         hideGlobalLoading();
         setIsProjectLoading(false);
@@ -183,9 +185,14 @@ function Project() {
         setIsAoisLoading(false);
       }
     }
-    fetchAOIs();
-  }, [apiToken, page]);
+    if (!isProjectLoading && project) {
+      fetchAOIs();
+    }
+  }, [apiToken, page, isProjectLoading, project]);
 
+  if (isProjectLoading || !project) {
+    return null;
+  }
   return (
     <>
       <Inpage>

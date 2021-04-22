@@ -97,6 +97,8 @@ function Footer(props) {
         }}
         title='Clear all samples drawn since last retrain or save'
         id='reset-button-trigger'
+        disabled={!currentCheckpoint}
+        visuallyDisabled={!currentCheckpoint}
         onClick={() => {
           dispatchCurrentCheckpoint({
             type: checkpointActions.CLEAR_SAMPLES,

@@ -164,6 +164,7 @@ function PrimePanel() {
                 mapRef,
 
                 currentCheckpoint,
+                checkpointModes,
                 checkpointList,
                 applyCheckpoint,
 
