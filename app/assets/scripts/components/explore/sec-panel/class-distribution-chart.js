@@ -3,7 +3,7 @@ import { Bar } from 'react-chartjs-2';
 import styled from 'styled-components';
 import T from 'prop-types';
 import Prose from '../../../styles/type/prose';
-import { glsp, themeVal } from '@devseed-ui/theme-provider';
+import { glsp, themeVal, truncated } from '@devseed-ui/theme-provider';
 import { round } from '../../../utils/format';
 
 const Wrapper = styled.div`
@@ -13,6 +13,7 @@ const Wrapper = styled.div`
 `;
 const Summary = styled.ol`
   display: grid;
+  grid-gap: 0.125rem;
 `;
 const ChartContainer = styled.div`
   background-color: ${themeVal('color.baseAlphaC')};
@@ -20,11 +21,12 @@ const ChartContainer = styled.div`
 `;
 const ClassItem = styled.li`
   display: grid;
-  grid-gap: 1rem;
-  grid-template-columns: auto max-content 1fr;
+  grid-gap: 0.75rem;
+  grid-template-columns: 0.75rem minmax(10px, 1fr) 2rem;
 
   ${Prose} {
     text-align: left;
+    ${truncated}
   }
   ${Prose}.percent {
     text-align: right;

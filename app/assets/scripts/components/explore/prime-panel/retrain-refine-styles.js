@@ -1,4 +1,4 @@
-import { glsp, themeVal } from '@devseed-ui/theme-provider';
+import { glsp, themeVal, truncated } from '@devseed-ui/theme-provider';
 import { PlaceholderMessage } from '../../../styles/placeholder.js';
 import {
   DropdownBody,
@@ -29,7 +29,7 @@ export const ClassList = styled.section`
 
 export const Class = styled.div`
   display: grid;
-  grid-template-columns: ${glsp(1.5)} auto ${glsp(2)};
+  grid-template-columns: ${glsp(1.5)} minmax(10px, 1fr) ${glsp(2)};
   grid-gap: 0 ${glsp(1)};
   padding: ${({ placeholder }) =>
     placeholder ? '0 1.5rem 1rem' : '0.5rem 1.5rem'};
@@ -94,6 +94,7 @@ export const ClassInfoWrapper = styled.div`
 `;
 
 export const ClassHeading = styled(Heading).attrs({ as: 'h4' })`
+  ${truncated}
   margin: 0;
   text-align: left;
   background: ${({ placeholder }) =>
@@ -156,12 +157,6 @@ export const ToolBox = styled.section`
   }
 `;
 
-export const AddClassForm = styled.div`
-  clear: both;
-`;
-
-export const AddClassInput = styled.input``;
-
 export const PickerStyles = {
   default: {
     picker: {
@@ -179,7 +174,6 @@ export const PickerStyles = {
 
 export const PickerDropdownBody = styled(DropdownBody)`
   font-weight: 400;
-  grid-gap: 0;
   padding: 0;
 `;
 
