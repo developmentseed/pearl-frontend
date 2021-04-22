@@ -235,6 +235,7 @@ export function InstanceProvider(props) {
 
     // Get instance token
     let instance;
+    let doHideGlobalLoading = true;
     if (activeInstances.total > 0) {
       const { id: instanceId } = activeInstances.instances[0];
       instance = await restApiClient.getInstance(projectId, instanceId);
@@ -242,6 +243,7 @@ export function InstanceProvider(props) {
       // As the instance is already running, apply desired checkpoint when
       // ready.
       if (checkpointId) {
+        doHideGlobalLoading = false; // globalLoading will be hidden once checkpoint is in
         dispatchMessageQueue({
           type: messageQueueActionTypes.ADD,
           data: {
@@ -281,6 +283,9 @@ export function InstanceProvider(props) {
         applyInstanceStatus({
           wsConnected: true,
         });
+
+        // Hide global loading on connect, if necessary
+        if (doHideGlobalLoading) hideGlobalLoading();
         resolve(instance);
       });
       newWebsocketClient.addEventListener('error', () => {
