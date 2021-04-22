@@ -17,7 +17,6 @@ import { useHistory, useParams } from 'react-router-dom';
 import { actions as predictionActions, usePredictions } from './predictions';
 import { mapStateReducer, mapModes, mapActionTypes } from './reducers/map';
 import tBbox from '@turf/bbox';
-import reverseGeoCode from '../utils/reverse-geocode';
 
 import {
   actions as checkpointActions,
@@ -42,7 +41,17 @@ export function ExploreProvider(props) {
 
   const { restApiClient, isLoading: authIsLoading } = useAuth();
   const { currentProject, setCurrentProject } = useProject();
-  const { aoiName, aoiRef, setAoiName, setAoiRef, setCurrentAoi, aoiList, setAoiList, aoiBounds, setAoiBounds } = useAoi();
+  const {
+    aoiName,
+    aoiRef,
+    setAoiName,
+    setAoiRef,
+    setCurrentAoi,
+    aoiList,
+    setAoiList,
+    aoiBounds,
+    setAoiBounds,
+  } = useAoi();
   const { predictions, dispatchPredictions } = usePredictions();
   const { selectedModel, setSelectedModel } = useModel();
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
@@ -56,8 +65,6 @@ export function ExploreProvider(props) {
   // The following properties should be moved to own context to avoid re-rendering.
   const [aoiArea, setAoiArea] = useState(null);
   const [aoiInitializer, setAoiInitializer] = useState(null);
-
-
 
   const [mapState, dispatchMapState] = useReducer(
     wrapLogReducer(mapStateReducer),

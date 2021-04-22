@@ -55,7 +55,7 @@ export function AoiEditButtons(props) {
               setActiveModal('area-too-large');
             }
 
-            updateAoiName()
+            updateAoiName();
           }}
           title='Set Area of Interest'
           useIcon='tick'

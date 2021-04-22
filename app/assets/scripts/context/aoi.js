@@ -42,10 +42,9 @@ export function AoiProvider(props) {
    * @param _aoiBounds - optional bound object. This is passed when this function
    * is called from onDrawEnd context of AoiDrawControl. In this situation, the aoiBounds
    * state variable is may not be updated before the function is executed so we can pass the bounds explicitly.
-  */
+   */
   function updateAoiName(_aoiBounds) {
-
-    const refBounds = aoiBounds || _aoiBounds
+    const refBounds = aoiBounds || _aoiBounds;
 
     const bounds = [
       refBounds.getWest(),
@@ -87,7 +86,8 @@ export function AoiProvider(props) {
     aoiName,
     setAoiName,
 
-    aoiBounds, setAoiBounds,
+    aoiBounds,
+    setAoiBounds,
 
     aoiList,
     setAoiList,
@@ -170,7 +170,9 @@ export const useAoi = () => {
 };
 
 export const useAoiName = () => {
-  const { updateAoiName, aoiName, aoiList, aoiBounds } = useCheckContext('useAoiName');
+  const { updateAoiName, aoiName, aoiList, aoiBounds } = useCheckContext(
+    'useAoiName'
+  );
   return useMemo(
     () => ({
       updateAoiName,
