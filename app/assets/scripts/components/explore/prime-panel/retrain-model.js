@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import T from 'prop-types';
 import get from 'lodash.get';
 import { Button } from '@devseed-ui/button';
-import { SketchPicker } from 'react-color';
+import { ChromePicker } from 'react-color';
 import InfoButton from '../../common/info-button';
 import { Heading } from '@devseed-ui/typography';
 import { PlaceholderMessage } from '../../../styles/placeholder.js';
@@ -11,9 +11,7 @@ import { useMapState } from '../../../context/explore.js';
 import {
   Dropdown,
   DropdownHeader,
-  DropdownBody,
   DropdownItem,
-  DropdownFooter,
   DropdownTrigger,
 } from '../../../styles/dropdown';
 import {
@@ -27,10 +25,12 @@ import {
   ClassOptions,
   ToolBox as RetrainTools,
   AddClassButton,
-  AddClassForm,
-  AddClassInput,
+  PickerStyles,
+  PickerDropdownBody,
+  PickerDropdownItem,
+  PickerDropdownFooter,
 } from './retrain-refine-styles';
-
+import { FormInput } from '@devseed-ui/form';
 /*
  * Retrain Model
  * @param ready - true when checkpoint exists and we are in RETRAIN mode
@@ -178,39 +178,44 @@ function RetrainModel(props) {
                   Add Class
                 </AddClassButton>
               )}
-              className='global__dropdown'
+              className='add-class__dropdown'
             >
               <>
                 <DropdownHeader>
                   <p>New Class</p>
                 </DropdownHeader>
-                <DropdownBody>
-                  <DropdownItem>
-                    <label htmlFor='addClassName'>
-                      <input
-                        id='addClassName'
-                        value={addClassName}
-                        onChange={(e) => {
-                          setAddClassName(e.target.value);
-                        }}
-                      />
-                    </label>
-                  </DropdownItem>
-                  <DropdownItem>
+                <PickerDropdownBody>
+                  <PickerDropdownItem nonhoverable as='div'>
+                    <label htmlFor='addClassName'>Class Name</label>
+                    <FormInput
+                      id='addClassName'
+                      value={addClassName}
+                      onChange={(e) => {
+                        setAddClassName(e.target.value);
+                      }}
+                    />
+                  </PickerDropdownItem>
+                  <PickerDropdownItem nonhoverable as='div'>
                     <label>Label Color</label>
-                    <SketchPicker
+                    <ChromePicker
+                      disableAlpha={true}
                       color={addClassColor}
+                      width='100%'
+                      styles={PickerStyles}
                       onChangeComplete={(color) => {
                         // console.log('change complete', color);
                         setAddClassColor(color.hex);
                       }}
                     />
-                  </DropdownItem>
-                  <DropdownItem data-dropdown='click.close'>
+                  </PickerDropdownItem>
+                </PickerDropdownBody>
+                <PickerDropdownFooter>
+                  <DropdownItem nonhoverable data-dropdown='click.close'>
                     Cancel
                   </DropdownItem>
-                  <DropdownItem data-dropdown='click.close'>
+                  <DropdownItem nonhoverable data-dropdown='click.close'>
                     <Button
+                      variation='primary-plain'
                       onClick={() => {
                         dispatchCurrentCheckpoint({
                           type: actions.ADD_CLASS,
@@ -220,13 +225,13 @@ function RetrainModel(props) {
                           },
                         });
                         setAddClassName('');
-                        setAddClassColor('#000000');
+                        setAddClassColor('#1CE1CE');
                       }}
                     >
                       Save
                     </Button>
                   </DropdownItem>
-                </DropdownBody>
+                </PickerDropdownFooter>
               </>
             </Dropdown>
           </ClassList>

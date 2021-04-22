@@ -1,5 +1,10 @@
 import { glsp, themeVal } from '@devseed-ui/theme-provider';
 import { PlaceholderMessage } from '../../../styles/placeholder.js';
+import {
+  DropdownBody,
+  DropdownItem,
+  DropdownFooter,
+} from '../../../styles/dropdown';
 import styled, { css } from 'styled-components';
 import { Heading } from '@devseed-ui/typography';
 import collecticon from '@devseed-ui/collecticons';
@@ -24,7 +29,7 @@ export const ClassList = styled.section`
 
 export const Class = styled.div`
   display: grid;
-  grid-template-columns: min-content auto min-content;
+  grid-template-columns: ${glsp(1.5)} auto ${glsp(2)};
   grid-gap: 0 ${glsp(1)};
   padding: ${({ placeholder }) =>
     placeholder ? '0 1.5rem 1rem' : '0.5rem 1.5rem'};
@@ -40,22 +45,6 @@ export const Class = styled.div`
       color: ${themeVal('color.baseAlphaE')};
       border-color: ${themeVal('color.baseAlphaE')};
     `};
-  &.add__class {
-    padding: ${glsp(0.5)} ${glsp(1.5)};
-    // Add Class Button styles. May be removed if this takes on a different onClick configuration
-    span {
-      text-align: left;
-    }
-    &:before {
-      border: 1px solid ${themeVal('color.baseAlphaE')};
-      padding: 0 0.25rem;
-      margin-right: 0;
-    }
-    ${Heading} {
-      margin: 0;
-      line-height: 1.5;
-    }
-  }
   &.placeholder-class:first-child {
     margin-top: ${glsp(2)};
   }
@@ -91,7 +80,6 @@ export const AddClassButton = styled(Class)`
   }
   &:before {
     box-shadow: inset 0 0 0 1px ${themeVal('color.base')};
-    padding: 0 0.325rem;
     margin-right: 0;
     color: ${themeVal('color.base')};
     opacity: 0.8;
@@ -105,7 +93,7 @@ export const ClassInfoWrapper = styled.div`
   flex-flow: column;
 `;
 
-export const ClassHeading = styled(Heading)`
+export const ClassHeading = styled(Heading).attrs({ as: 'h4' })`
   margin: 0;
   text-align: left;
   background: ${({ placeholder }) =>
@@ -173,3 +161,33 @@ export const AddClassForm = styled.div`
 `;
 
 export const AddClassInput = styled.input``;
+
+export const PickerStyles = {
+  default: {
+    picker: {
+      boxShadow: 'none',
+      fontFamily: 'inherit',
+    },
+  },
+};
+
+export const PickerDropdownBody = styled(DropdownBody)`
+  font-weight: 400;
+  grid-gap: 0;
+  padding: 0;
+`;
+
+export const PickerDropdownItem = styled(DropdownItem)`
+  font-weight: 400;
+  grid-gap: 0;
+  label {
+    font-size: 0.875rem;
+  }
+`;
+
+export const PickerDropdownFooter = styled(DropdownFooter)`
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-around;
+  align-items: center;
+`;
