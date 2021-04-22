@@ -961,7 +961,7 @@
     debug "^3.1.0"
     lodash.once "^4.1.1"
 
-"@devseed-ui/accordion@^3.0.0":
+"@devseed-ui/accordion@^3.0.2":
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/@devseed-ui/accordion/-/accordion-3.0.2.tgz#86455d34fb8931141f70f5828b9356b5abf3f450"
   integrity sha512-OVNh4tM0c1rhpu7p9F2sKzpvnyQjiQWE5BRQXtptUX7dW7iIz6DiUCuCYuCR3UFLLpaN+cRP4umI0GrJhAQj+A==
@@ -975,7 +975,7 @@
   resolved "https://registry.yarnpkg.com/@devseed-ui/animation/-/animation-3.0.0.tgz#b4e846072c61dc8b4e46d0f4ca65534c64ba9446"
   integrity sha512-ykV0jszdKJ8MFy0pVxyuE5egGKgdaum2CAmGwO3lvWrqU4DsbZmcqMwsLNz3kyHQmAd+XHJ/yyQ71gRS+9l7tA==
 
-"@devseed-ui/button@3.0.2", "@devseed-ui/button@^3.0.0":
+"@devseed-ui/button@3.0.2", "@devseed-ui/button@^3.0.2":
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/@devseed-ui/button/-/button-3.0.2.tgz#f68b72cdd8e75cd4a646685a2034a1ecaa649911"
   integrity sha512-2YMnU+g0q1X87Os3O1TLvPf9PemRXiPOt7P0QzRw5wckM/C+nQpWOsTgNtBnDvjoX9w/s3UoVS6XqtemqnTM9w==
@@ -983,17 +983,12 @@
     "@devseed-ui/collecticons" "3.0.0"
     "@devseed-ui/theme-provider" "^3.0.0"
 
-"@devseed-ui/collecticons@3.0.0":
+"@devseed-ui/collecticons@3.0.0", "@devseed-ui/collecticons@^3.0.0":
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/@devseed-ui/collecticons/-/collecticons-3.0.0.tgz#cacecb03acfe448463bcc67e86dc11c55c0251b7"
   integrity sha512-uTd2okc/sKYw6OZzFjy1CZAX/ymYOpg++WE5T2AR69boA8/C1/hGpS4YS4+6dawMwL1TA9Am1jUt1GFxV0a0IA==
 
-"@devseed-ui/collecticons@^2.0.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@devseed-ui/collecticons/-/collecticons-2.0.0.tgz#206ea7c6770a4a8bf903e361f95d0acd3c05a02a"
-  integrity sha512-irjrk8tBR4dXglFXGaFUgkSxsvkn1M6i29/DSPevcFEGxRPa1oTxQs/yC5hxyDGykGnK93oMO88efwFqDAMj3w==
-
-"@devseed-ui/dropdown@^2.0.0":
+"@devseed-ui/dropdown@^2.0.2":
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/@devseed-ui/dropdown/-/dropdown-2.0.2.tgz#87899b1391bed65d9ae07d84485ab2ae9b05e4b1"
   integrity sha512-LyBTGegT/H375Y+n7doeHa15GzIsl2IVJFUPU7e9nGoTSYsKfjl0KhD4+HugROCGts0ZkAgCDPuCLD0Ms/gdsQ==
@@ -1005,7 +1000,7 @@
     react-tether "^2.0.7"
     react-transition-group "^4.3.0"
 
-"@devseed-ui/form@^1.0.1":
+"@devseed-ui/form@^1.0.3":
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/@devseed-ui/form/-/form-1.0.3.tgz#6c9d44885fe779dd9819dc890eea423dec398e93"
   integrity sha512-oBjsp6safXQyb6J7QtbILh52HnzaSEGnSPpLKq1TheXIbN7C24mkpBrFV4FKTEJgKOvHhu/bvTOXJg88sq5qLg==
@@ -1015,7 +1010,7 @@
     "@devseed-ui/theme-provider" "^3.0.0"
     "@devseed-ui/typography" "1.0.0"
 
-"@devseed-ui/global-loading@^2.0.0":
+"@devseed-ui/global-loading@^2.0.1":
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/@devseed-ui/global-loading/-/global-loading-2.0.1.tgz#ec9c09fe6c35dade7e93733730cf763dd4cd1be0"
   integrity sha512-hAvGq4YagfTmUKN79kBOUQS4JrdrTaXJF1r1M8PeBSSgkzUVi3jPfNfmGi1g4F4c2+bplsKpbTIn6DBbuByy/Q==
@@ -1023,7 +1018,7 @@
     "@devseed-ui/collecticons" "3.0.0"
     "@devseed-ui/theme-provider" "^3.0.0"
 
-"@devseed-ui/modal@^3.0.0":
+"@devseed-ui/modal@^3.0.1":
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/@devseed-ui/modal/-/modal-3.0.1.tgz#9a2b485e3da3e4225b6da740e404c26bc717d51d"
   integrity sha512-EA7CGYBSymzDzodJt2Fi7d43JWl5vVWn5FXVZKnsbUSggqjUB/iqlQTjT9YXcPNFUYA1zb3nNus70Pt6ZBAjBA==
