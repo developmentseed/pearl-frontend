@@ -69,7 +69,7 @@ const options = {
         },
         scaleLabel: {
           display: false,
-          labelString: 'Class Distributiuon',
+          labelString: 'Class F1 Score',
           fontSize: 12,
         },
       },
@@ -91,8 +91,8 @@ const options = {
   },
   maintainAspectRatio: false,
 };
-function ClassDistribitionChart(props) {
-  const { checkpoint } = props;
+function ClassAnalyticsChart(props) {
+  const { checkpoint, label, metric } = props;
   return (
     <Wrapper>
       <ChartContainer>
@@ -100,8 +100,8 @@ function ClassDistribitionChart(props) {
           data={{
             datasets: [
               {
-                label: 'Class Distribution',
-                data: checkpoint.analytics.map((c) => c.percent),
+                label: label,
+                data: checkpoint.analytics.map((c) => c[metric]),
                 backgroundColor: Object.values(checkpoint.classes).map(
                   (c) => c.color
                 ),
@@ -118,7 +118,9 @@ function ClassDistribitionChart(props) {
             <Icon color={c.color} />
             <Prose size='small'>{c.name}</Prose>
             <Prose size='small' className='percent'>
-              {`${round(checkpoint.analytics[i].percent * 100, 2)}%`}
+              {metric === 'percent'
+                ? `${round(checkpoint.analytics[i][metric], 2) * 100}%`
+                : round(checkpoint.analytics[i][metric], 2)}
             </Prose>
           </ClassItem>
         ))}
@@ -126,8 +128,10 @@ function ClassDistribitionChart(props) {
     </Wrapper>
   );
 }
-ClassDistribitionChart.propTypes = {
+ClassAnalyticsChart.propTypes = {
   checkpoint: T.object,
+  label: T.string,
+  metric: T.string,
 };
 
-export default ClassDistribitionChart;
+export default ClassAnalyticsChart;
