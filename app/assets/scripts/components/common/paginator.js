@@ -90,7 +90,9 @@ function Paginator({ currentPage, gotoPage, totalItems, itemsPerPage }) {
             <PageButton
               key={pageNumber}
               isCurrent={pageNumber === currentPage}
-              variation={pageNumber === currentPage && 'primary-plain'}
+              variation={
+                pageNumber === currentPage ? 'primary-plain' : 'base-plain'
+              }
               onClick={() => gotoPage(pageNumber)}
             >
               {pageNumber}
