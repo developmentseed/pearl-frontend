@@ -42,7 +42,7 @@ export function ExploreProvider(props) {
 
   const { restApiClient, isLoading: authIsLoading } = useAuth();
   const { currentProject, setCurrentProject } = useProject();
-  const { aoiName, aoiRef, setAoiName, setAoiRef, setCurrentAoi } = useAoi();
+  const { aoiName, aoiRef, setAoiName, setAoiRef, setCurrentAoi, aoiList, setAoiList, aoiBounds, setAoiBounds } = useAoi();
   const { predictions, dispatchPredictions } = usePredictions();
   const { selectedModel, setSelectedModel } = useModel();
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
@@ -56,8 +56,9 @@ export function ExploreProvider(props) {
   // The following properties should be moved to own context to avoid re-rendering.
   const [aoiArea, setAoiArea] = useState(null);
   const [aoiInitializer, setAoiInitializer] = useState(null);
-  const [aoiList, setAoiList] = useState([]);
-  const [aoiBounds, setAoiBounds] = useState(null);
+
+
+
   const [mapState, dispatchMapState] = useReducer(
     wrapLogReducer(mapStateReducer),
     {
@@ -394,7 +395,10 @@ export function ExploreProvider(props) {
    * i.e. Seneca Rocks, Seneca Rocks #1, Seneca Rocks #2...etc
    */
 
+  /*
   useEffect(() => {
+    console.log(mapState.mode)
+    console.log(mapState.previousMode)
     if (!aoiBounds) {
       return;
     } else if (
@@ -402,6 +406,7 @@ export function ExploreProvider(props) {
       (mapState.previousMode === mapModes.EDIT_AOI_MODE ||
         mapState.previousMode === mapModes.CREATE_AOI_MODE)
     ) {
+
       const bounds = [
         aoiBounds.getWest(),
         aoiBounds.getSouth(),
@@ -435,7 +440,7 @@ export function ExploreProvider(props) {
         hideGlobalLoading();
       });
     }
-  }, [mapState, aoiBounds, aoiList]);
+  }, [mapState, aoiBounds, aoiList]);*/
 
   return (
     <ExploreContext.Provider

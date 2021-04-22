@@ -14,6 +14,7 @@ import {
 } from '@devseed-ui/modal';
 import { useMapRef } from '../../../context/map';
 import { useApiMeta } from '../../../context/api-meta';
+import { useAoiName } from '../../../context/aoi';
 
 const ModalFooter = styled(BaseModalFooter)`
   padding: ${glsp(2)} 0 0 0;
@@ -27,6 +28,7 @@ const ModalFooter = styled(BaseModalFooter)`
 
 export function AoiEditButtons(props) {
   const { mapState, setMapMode, mapModes } = useMapState();
+  const { updateAoiName } = useAoiName();
   const { mapRef } = useMapRef();
 
   const { apiLimits } = useApiMeta();
@@ -52,6 +54,8 @@ export function AoiEditButtons(props) {
             } else {
               setActiveModal('area-too-large');
             }
+
+            updateAoiName()
           }}
           title='Set Area of Interest'
           useIcon='tick'
