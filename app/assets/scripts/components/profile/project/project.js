@@ -153,7 +153,7 @@ function Project() {
           const data = await restApiClient.getProject(projectId);
           setProject(data);
         } catch (err) {
-          toasts.error('Failed to fetch project.');
+          toasts.error('Project not found.');
           setIsProjectLoading(false);
           hideGlobalLoading();
           history.push('/profile/projects');
