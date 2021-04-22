@@ -15,6 +15,8 @@ import {
   showGlobalLoadingMessage,
   hideGlobalLoading,
 } from '@devseed-ui/global-loading';
+import { Button } from '@devseed-ui/button';
+import { GlobalLoadingMessage } from '../styles/placeholder';
 import toasts from '../components/common/toasts';
 import { useAuth } from './auth';
 import {
@@ -29,48 +31,61 @@ import { useAoi, useAoiPatch } from './aoi';
 import { actions as aoiPatchActions } from './reducers/aoi_patch';
 import { useModel } from './model';
 
+import { wrapLogReducer } from './reducers/utils';
+
 const messageQueueActionTypes = {
   ADD: 'ADD',
+  ADD_EXPRESS: 'ADD_EXPRESS',
   SEND: 'SEND',
   CLEAR: 'CLEAR',
 };
 
 const instanceActionTypes = {
-  SET_TOKEN: 'SET_TOKEN',
-  SET_CONNECTION_STATUS: 'SET_CONNECTION_STATUS',
-  SET_STATUS: 'SET_STATUS',
+  APPLY_STATUS: 'APPLY_STATUS',
 };
 
 const instanceInitialState = {
-  status: 'disconnected', // 'initializing', 'ready', 'processing', 'aborting'
-  connected: false,
-  statusText: 'Fetching...',
+  gpuMessage: 'Loading...',
+  gpuStatus: 'not-started', // 'ready', 'processing', 'aborting'
+  wsConnected: false,
+  gpuConnected: false,
 };
 
 function instanceReducer(state, action) {
   const { type, data } = action;
+  let newState = state;
 
   switch (type) {
-    case instanceActionTypes.SET_CONNECTION_STATUS: {
-      return {
-        ...state,
-        connected: data,
-        status: !data ? 'disconnected' : state.status,
-        statusText: data ? 'Instance connected' : 'Instance disconnected',
+    case instanceActionTypes.APPLY_STATUS: {
+      // gpuStatus will change, update previousGpuStatus
+      if (data.gpuStatus && data.gpuStatus !== state.gpuStatus) {
+        newState.previousGpuStatus = state.gpuStatus;
+      }
+
+      // Apply passed data
+      newState = {
+        ...newState,
+        ...data,
       };
-    }
-    case instanceActionTypes.SET_STATUS: {
-      return {
-        ...state,
-        previousStatus: state.status,
-        status: data,
-        statusText: data,
-      };
+
+      break;
     }
     default:
-      logger('Unexpected instance action type: ', { action });
+      logger('Unexpected instance action type: ', action);
       throw new Error('Unexpected error.');
   }
+
+  // Update display message for some GPU states.
+  if (data.gpuStatus === 'aborting') {
+    newState.gpuMessage = 'Aborting...';
+  } else if (data.gpuStatus === 'ready') {
+    newState.gpuMessage = 'Ready to go';
+  }
+
+  // Uncomment this to log instance state
+  // logger(newState);
+
+  return newState;
 }
 
 function aoiBoundsToPolygon(bounds) {
@@ -117,15 +132,53 @@ export function InstanceProvider(props) {
     instanceInitialState
   );
 
+  // Apply instance status
+  const applyInstanceStatus = (status) => {
+    dispatchInstance({
+      type: instanceActionTypes.APPLY_STATUS,
+      data: status,
+    });
+  };
+
   // Create a message queue to wait for instance connection
   const [messageQueue, dispatchMessageQueue] = useReducer(
-    (state, { type, data }) => {
+    wrapLogReducer((state, { type, data }) => {
       switch (type) {
         case messageQueueActionTypes.ADD: {
-          return state.concat(data);
+          return state.concat({
+            express: false,
+            message: data,
+          });
+        }
+        case messageQueueActionTypes.ADD_EXPRESS: {
+          // Add message to the queue beginning
+          return [
+            {
+              express: true,
+              message: data,
+            },
+          ].concat(state);
         }
         case messageQueueActionTypes.SEND: {
-          websocketClient.sendMessage(state[0]);
+          const { message } = state[0];
+
+          // make instance busy to avoid sending several messages (model#status is ok)
+          if (message.action !== 'model#status') {
+            applyInstanceStatus({ gpuStatus: 'processing' });
+          }
+
+          // Send message
+          websocketClient.sendMessage(message);
+
+          // On abort
+          if (message.action === 'model#abort') {
+            // Also request a status
+            websocketClient.sendMessage({ action: 'model#status' });
+            // And clear the queue
+            return [];
+          }
+
+          // On regular messages, remove it from the queue
           return state.slice(1);
         }
         case messageQueueActionTypes.CLEAR: {
@@ -135,85 +188,164 @@ export function InstanceProvider(props) {
           logger('Unexpected messageQueue action type: ', type);
           throw new Error('Unexpected error.');
       }
-    },
+    }),
     []
   );
 
   useEffect(() => {
-    // This checks if instance status changed from 'disconnected' to 'processing'
-    // which means an job was already running. If this is the case, send an abort
-    // message to clear the instance.
+    // Send abort message if GPU status changed from 'initializing' to 'processing'
+    // which means an job was already running.
     if (
-      instance.previousStatus === 'disconnected' &&
-      instance.status === 'processing'
+      instance.previousGpuStatus === 'initializing' &&
+      instance.gpuStatus === 'processing'
     ) {
-      websocketClient.sendMessage({ action: 'model#abort' });
+      dispatchMessageQueue({
+        type: messageQueueActionTypes.ADD_EXPRESS,
+        data: { action: 'model#abort' },
+      });
     }
-  }, [websocketClient, instance.status]);
+  }, [websocketClient, instance.gpuStatus]); // eslint-disable-line
 
   // Listen to instance connection, send queue message if any
   useEffect(() => {
     if (
       websocketClient &&
-      instance.connected &&
-      instance.status === 'ready' &&
+      instance.wsConnected &&
+      instance.gpuConnected &&
       messageQueue.length > 0
     ) {
-      dispatchMessageQueue({ type: messageQueueActionTypes.SEND });
+      // Send message if instance is ready or first message is express
+      if (instance.gpuStatus === 'ready' || messageQueue[0].express) {
+        dispatchMessageQueue({ type: messageQueueActionTypes.SEND });
+      }
     }
-  }, [websocketClient, instance.connected, instance.status, messageQueue]);
+  }, [
+    websocketClient,
+    instance.wsConnected,
+    instance.gpuConnected,
+    instance.gpuStatus,
+    messageQueue,
+  ]);
 
-  async function initInstance(projectId) {
+  async function initInstance(projectId, checkpointId) {
     // Close existing websocket
     if (websocketClient) {
       websocketClient.close();
     }
 
+    applyInstanceStatus({
+      gpuStatus: 'initializing',
+      wsConnected: false,
+      gpuConnected: false,
+    });
+
     // Fetch active instances for this project
     const activeInstances = await restApiClient.getActiveInstances(projectId);
 
     // Get instance token
-    let token;
+    let instance;
+    let doHideGlobalLoading = true;
     if (activeInstances.total > 0) {
       const { id: instanceId } = activeInstances.instances[0];
-      token = (await restApiClient.getInstance(projectId, instanceId)).token;
+      instance = await restApiClient.getInstance(projectId, instanceId);
+
+      // As the instance is already running, apply desired checkpoint when
+      // ready.
+      if (checkpointId) {
+        doHideGlobalLoading = false; // globalLoading will be hidden once checkpoint is in
+        dispatchMessageQueue({
+          type: messageQueueActionTypes.ADD,
+          data: {
+            action: 'model#checkpoint',
+            data: {
+              id: checkpointId,
+            },
+          },
+        });
+      }
+    } else if (checkpointId) {
+      instance = await restApiClient.createInstance(projectId, {
+        checkpoint_id: checkpointId,
+      });
+
+      // Apply checkpoint to the interface as the instance will start with it applied.
+      fetchCheckpoint(projectId, checkpointId, checkpointModes.RETRAIN);
     } else {
-      token = (await restApiClient.createInstance(projectId)).token;
+      instance = await restApiClient.createInstance(projectId);
     }
 
     // Use a Promise to stand by for GPU connection
     return new Promise((resolve, reject) => {
       const newWebsocketClient = new WebsocketClient({
-        token,
+        token: instance.token,
+        applyInstanceStatus,
         dispatchInstance,
         dispatchCurrentCheckpoint,
-        fetchCheckpoint: (checkpointId) =>
-          fetchCheckpoint(projectId, checkpointId),
+        fetchCheckpoint: (checkpointId, mode) =>
+          fetchCheckpoint(projectId, checkpointId, mode),
         dispatchPredictions,
         dispatchMessageQueue,
         dispatchAoiPatch,
       });
       newWebsocketClient.addEventListener('open', () => {
-        newWebsocketClient.addEventListener('message', () => {});
         setWebsocketClient(newWebsocketClient);
-        resolve();
+        applyInstanceStatus({
+          wsConnected: true,
+        });
+
+        // Hide global loading on connect, if necessary
+        if (doHideGlobalLoading) hideGlobalLoading();
+        resolve(instance);
       });
       newWebsocketClient.addEventListener('error', () => {
         reject();
       });
+      newWebsocketClient.addEventListener('close', () => {
+        applyInstanceStatus({
+          wsConnected: false,
+          gpuConnected: false,
+          gpuStatus: 'disconnected',
+        });
+      });
     });
   }
+
+  const abortJob = () => {
+    // If GPU is not connected, just clear the message queue
+    if (!instance.gpuConnected) {
+      dispatchMessageQueue({
+        type: messageQueueActionTypes.CLEAR,
+        data: {
+          action: 'model#abort',
+        },
+      });
+    } else {
+      dispatchMessageQueue({
+        type: messageQueueActionTypes.ADD_EXPRESS,
+        data: {
+          action: 'model#abort',
+        },
+      });
+    }
+
+    // Clear prediction and checkpoint
+    dispatchPredictions({
+      type: predictionsActions.CLEAR_PREDICTION,
+    });
+    dispatchCurrentCheckpoint({
+      type: checkpointActions.RESET_CHECKPOINT,
+    });
+    hideGlobalLoading();
+  };
 
   const value = {
     instance,
     setInstanceStatusMessage: (message) =>
-      dispatchInstance({
-        type: instanceActionTypes.SET_STATUS,
-        data: message,
+      applyInstanceStatus({
+        gpuMessage: message,
       }),
-    sendAbortMessage: () =>
-      websocketClient.sendMessage({ action: 'model#abort' }),
 
+    abortJob,
     initInstance,
     runInference: async () => {
       if (restApiClient) {
@@ -249,13 +381,13 @@ export function InstanceProvider(props) {
         } catch (error) {
           logger(error);
           toasts.error('Could fetch model classes, please try again later.');
+          hideGlobalLoading();
           return; // abort inference run
         }
 
-        hideGlobalLoading();
-
         if (!aoiName) {
           toasts.error('AOI Name must be set before running inference');
+          hideGlobalLoading();
           return; // abort inference run
         }
 
@@ -266,10 +398,27 @@ export function InstanceProvider(props) {
           toasts.error('Could not create instance, please try again later.');
         }
 
+        showGlobalLoadingMessage(
+          <GlobalLoadingMessage>
+            <p>Running model and loading class predictions...</p>
+            <Button
+              variation='danger-raised-light'
+              onClick={() => {
+                abortJob();
+              }}
+            >
+              Abort Process
+            </Button>
+          </GlobalLoadingMessage>
+        );
+
         try {
           // Reset predictions state
           dispatchPredictions({
             type: predictionsActions.START_PREDICTION,
+            data: {
+              type: checkpointModes.RUN,
+            },
           });
 
           // Add prediction request to queue
@@ -308,12 +457,28 @@ export function InstanceProvider(props) {
         return;
       }
 
+      showGlobalLoadingMessage(
+        <GlobalLoadingMessage>
+          <p>Retraining model and loading updated predictions...</p>
+          <Button
+            variation='danger-raised-light'
+            onClick={() => {
+              abortJob();
+            }}
+          >
+            Abort Process
+          </Button>
+        </GlobalLoadingMessage>
+      );
+
       // Reset predictions state
       dispatchPredictions({
         type: predictionsActions.START_PREDICTION,
+        data: {
+          type: checkpointModes.RETRAIN,
+        },
       });
 
-      // Add prediction request to queue
       dispatchMessageQueue({
         type: messageQueueActionTypes.ADD,
         data: {
@@ -330,18 +495,6 @@ export function InstanceProvider(props) {
                 },
               };
             }),
-          },
-        },
-      });
-
-      // Add prediction request to queue
-      dispatchMessageQueue({
-        type: messageQueueActionTypes.ADD,
-        data: {
-          action: 'model#prediction',
-          data: {
-            name: aoiName,
-            polygon: aoiBoundsToPolygon(aoiRef.getBounds()),
           },
         },
       });
@@ -428,7 +581,7 @@ export function InstanceProvider(props) {
           type: predictionsActions.CLEAR_PREDICTION,
         });
 
-        await fetchCheckpoint(projectId, checkpointId);
+        await fetchCheckpoint(projectId, checkpointId, checkpointModes.RETRAIN);
 
         dispatchMessageQueue({
           type: messageQueueActionTypes.ADD,
@@ -498,7 +651,7 @@ export const useInstance = () => {
 export class WebsocketClient extends WebSocket {
   constructor({
     token,
-    dispatchInstance,
+    applyInstanceStatus,
     dispatchCurrentCheckpoint,
     dispatchMessageQueue,
     fetchCheckpoint,
@@ -518,9 +671,8 @@ export class WebsocketClient extends WebSocket {
       // On connected, request a prediction
       switch (message) {
         case 'model#status':
-          dispatchInstance({
-            type: instanceActionTypes.SET_STATUS,
-            data: data.isAborting
+          applyInstanceStatus({
+            gpuStatus: data.isAborting
               ? 'aborting'
               : data.processing
               ? 'processing'
@@ -528,18 +680,14 @@ export class WebsocketClient extends WebSocket {
           });
           break;
         case 'info#connected':
-          logger('Instance connected.');
-          dispatchInstance({
-            type: instanceActionTypes.SET_CONNECTION_STATUS,
-            data: true,
+          applyInstanceStatus({
+            gpuConnected: true,
           });
           this.sendMessage({ action: 'model#status' });
           break;
         case 'info#disconnected':
-          logger('Instance disconnected.');
-          dispatchInstance({
-            type: instanceActionTypes.SET_CONNECTION_STATUS,
-            data: false,
+          applyInstanceStatus({
+            gpuConnected: false,
           });
           break;
         case 'model#aborted':
@@ -550,6 +698,7 @@ export class WebsocketClient extends WebSocket {
           dispatchCurrentCheckpoint({
             type: checkpointActions.RESET_CHECKPOINT,
           });
+          hideGlobalLoading();
           // Request new status update after abort is confirmed
           this.sendMessage({ action: 'model#status' });
           break;
@@ -568,21 +717,41 @@ export class WebsocketClient extends WebSocket {
             },
           });
           break;
-
-        case 'model#checkpoint':
-          fetchCheckpoint(data.id);
-          this.sendMessage({ action: 'model#status' });
-          break;
         case 'error':
           logger(event);
           dispatchMessageQueue({ type: messageQueueActionTypes.CLEAR });
           dispatchPredictions({ type: predictionsActions.CLEAR_PREDICTION });
           this.sendMessage({ action: 'model#status' });
-          toasts.error('Unexpected error, please try again later.');
+          hideGlobalLoading();
           break;
+        case 'model#checkpoint':
+          if (data && (data.id || data.checkpoint)) {
+            fetchCheckpoint(data.id || data.checkpoint);
+          }
+          applyInstanceStatus({
+            gpuMessage: `Loading checkpoint...`,
+          });
+          this.sendMessage({ action: 'model#status' });
+          break;
+
         case 'model#checkpoint#progress':
+          showGlobalLoadingMessage('Loading checkpoint...');
+          break;
         case 'model#checkpoint#complete':
+          fetchCheckpoint(data.id || data.checkpoint, checkpointModes.RETRAIN);
+          hideGlobalLoading();
+          this.sendMessage({ action: 'model#status' });
+          break;
         case 'model#retrain#complete':
+          if (data && (data.id || data.checkpoint)) {
+            fetchCheckpoint(
+              data.id || data.checkpoint,
+              checkpointModes.RETRAIN
+            );
+          }
+          applyInstanceStatus({
+            gpuMessage: `Loading checkpoint...`,
+          });
           this.sendMessage({ action: 'model#status' });
           break;
         case 'model#prediction':
@@ -603,6 +772,7 @@ export class WebsocketClient extends WebSocket {
           });
           // Request new status update after abort is confirmed
           this.sendMessage({ action: 'model#status' });
+          hideGlobalLoading();
           break;
         case 'model#patch':
           //receive new patch
@@ -625,6 +795,7 @@ export class WebsocketClient extends WebSocket {
           dispatchAoiPatch({
             type: aoiPatchActions.COMPLETE_PATCH,
           });
+          hideGlobalLoading();
           // finish waiting for patch
           this.sendMessage({ action: 'model#status' });
           break;

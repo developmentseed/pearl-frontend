@@ -3,11 +3,13 @@ import T from 'prop-types';
 import { initialApiRequestState } from './reducers/reduxeed';
 import logger from '../utils/logger';
 
+import { wrapLogReducer } from './reducers/utils';
+
 const PredictionsContext = createContext(null);
 
 export function PredictionsProvider(props) {
   const [predictions, dispatchPredictions] = useReducer(
-    predictionsReducer,
+    wrapLogReducer(predictionsReducer),
     initialApiRequestState
   );
 
@@ -91,6 +93,7 @@ export function predictionsReducer(state, action) {
         data: {
           predictions: [],
           aoiId: null,
+          type: data.type,
         },
       });
 
@@ -110,17 +113,22 @@ export function predictionsReducer(state, action) {
 
       // only process prediction if AOI ID matches current AOI ID
       if (predictionAoiId === currentAoiId) {
-        const [minX, minY, maxX, maxY] = data.bounds;
+        let predictions = state.data.predictions || [];
 
-        // Build prediction object
-        const prediction = {
-          key: state.data.predictions.length + 1,
-          image: `data:image/png;base64,${data.image}`,
-          bounds: [
-            [minY, minX],
-            [maxY, maxX],
-          ],
-        };
+        // Check if message has image
+        if (data.bounds && data.image) {
+          const [minX, minY, maxX, maxY] = data.bounds;
+
+          // Build prediction object
+          predictions = predictions.concat({
+            key: state.data.predictions.length + 1,
+            image: `data:image/png;base64,${data.image}`,
+            bounds: [
+              [minY, minX],
+              [maxY, maxX],
+            ],
+          });
+        }
 
         // Add it to state
         return wrapApiResult({
@@ -130,7 +138,7 @@ export function predictionsReducer(state, action) {
           receivedAt: Date.now(),
           data: {
             ...state.data,
-            predictions: (state.data.predictions || []).concat(prediction),
+            predictions,
           },
         });
       } else {

@@ -1,5 +1,5 @@
 import React from 'react';
-import ClassDistributionChart from './class-distribution-chart';
+import ClassAnalyticsChart from './class-analytics-chart';
 import styled from 'styled-components';
 import Panel from '../../common/panel';
 import {
@@ -27,7 +27,7 @@ const StyledBlockBody = styled(PanelBlockBody)`
 const ScrollBodyWrapper = styled.div`
   display: flex;
   flex-flow: column nowrap;
-  justify-content: space-between;
+  justify-content: flex-start;
   height: calc(100vh - 10rem);
 `;
 
@@ -46,22 +46,31 @@ function SecPanel() {
           <PanelBlockHeader>
             <Heading size='xsmall'>Analysis</Heading>
           </PanelBlockHeader>
-          {currentCheckpoint.input_geoms && currentCheckpoint.retrain_geoms ? (
+          {currentCheckpoint.input_geoms &&
+          currentCheckpoint.retrain_geoms &&
+          currentCheckpoint.analytics ? (
             <PanelBlockScroll>
               <ScrollBodyWrapper>
                 <StyledBlockBody>
                   <PanelBlockHeader>
                     <Subheading>Class Distribution</Subheading>
                   </PanelBlockHeader>
-                  <ClassDistributionChart checkpoint={currentCheckpoint} />
+                  <ClassAnalyticsChart
+                    checkpoint={currentCheckpoint}
+                    label='Class Distribution'
+                    metric='percent'
+                  />
                 </StyledBlockBody>
-                {/* Stubbed out second chart below:
                 <StyledBlockBody>
                   <PanelBlockHeader>
-                    <Subheading>Class F-1 Scores</Subheading>
+                    <Subheading>Class F1 Scores</Subheading>
                   </PanelBlockHeader>
-                  <ClassF1Chart checkpoint={checkpoint} />
-                </StyledBlockBody> */}
+                  <ClassAnalyticsChart
+                    checkpoint={currentCheckpoint}
+                    label='Class F1 Score'
+                    metric='f1score'
+                  />
+                </StyledBlockBody>
               </ScrollBodyWrapper>
             </PanelBlockScroll>
           ) : (

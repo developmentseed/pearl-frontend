@@ -46,14 +46,20 @@ const SubheadingStrong = styled.h3`
         ${collecticon(useIcon)}
       }
     `}
-  ${({ onClick }) =>
+  ${({ onClick, disabled }) =>
     onClick &&
+    !disabled &&
     css`
       transition: opacity 0.24s ease 0s;
       &:hover {
         cursor: pointer;
         opacity: 0.64;
       }
+    `}
+  ${({ disabled }) =>
+    disabled &&
+    css`
+      opacity: 0.64;
     `}
 `;
 
@@ -79,6 +85,7 @@ function Header(props) {
     mapRef,
 
     currentCheckpoint,
+    checkpointModes,
     checkpointList,
     applyCheckpoint,
 
@@ -144,6 +151,12 @@ function Header(props) {
       return 'Run model to create first checkpoint';
     }
   };
+
+  const modelNotChangeable =
+    !isAuthenticated ||
+    !models?.length ||
+    checkpointList?.length ||
+    currentCheckpoint?.mode === checkpointModes.RUN;
 
   return (
     <PanelBlockHeader>
@@ -220,10 +233,15 @@ function Header(props) {
         </HeadOptionHeadline>
         <SubheadingStrong
           data-cy='select-model-label'
-          onClick={function () {
-            setShowSelectModelModal(true);
+          onClick={() => {
+            !modelNotChangeable && setShowSelectModelModal(true);
           }}
-          title='Edit Model'
+          title={
+            !checkpointList?.length
+              ? 'Select Model'
+              : 'Models can not be changed after running inference'
+          }
+          disabled={modelNotChangeable}
         >
           {(selectedModel && selectedModel.name) ||
             (isAuthenticated
@@ -237,11 +255,11 @@ function Header(props) {
             data-cy='show-select-model-button'
             useIcon='swap-horizontal'
             id='select-model-trigger'
-            onClick={function () {
+            onClick={() => {
               setShowSelectModelModal(true);
             }}
-            title='Edit Model'
-            disabled={!models?.length}
+            title='Select Model'
+            disabled={modelNotChangeable}
           >
             Edit Model Selection
           </EditButton>
@@ -265,6 +283,7 @@ function Header(props) {
                     ? 'Change checkpoint'
                     : 'Run and retrain model to create first checkpoint'
                 }
+                disabled={!checkpointList}
               >
                 {renderCheckpointSelectionHeader()}
               </SubheadingStrong>
@@ -280,6 +299,7 @@ function Header(props) {
                   id='checkpoint-list-trigger'
                   {...props}
                   onClick={(e) => checkpointList && props.onClick(e)} // eslint-disable-line
+                  disabled={!checkpointList}
                 >
                   Edit Checkpoint Selection
                 </EditButton>
@@ -332,6 +352,7 @@ Header.propTypes = {
   mapRef: T.object,
 
   currentCheckpoint: T.object,
+  checkpointModes: T.object,
   checkpointList: T.array,
   applyCheckpoint: T.func,
 

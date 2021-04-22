@@ -19,7 +19,11 @@ import { mapStateReducer, mapModes, mapActionTypes } from './reducers/map';
 import tBbox from '@turf/bbox';
 import reverseGeoCode from '../utils/reverse-geocode';
 
-import { actions as checkpointActions, useCheckpoint } from './checkpoint';
+import {
+  actions as checkpointActions,
+  checkpointModes,
+  useCheckpoint,
+} from './checkpoint';
 import { wrapLogReducer } from './reducers/utils';
 import { useAoi, useAoiPatch } from './aoi';
 import { useProject } from './project';
@@ -62,7 +66,7 @@ export function ExploreProvider(props) {
   );
   const [checkpointList, setCheckpointList] = useState(null);
   const [currentInstance, setCurrentInstance] = useState(null);
-  const { setInstanceStatusMessage } = useInstance();
+  const { setInstanceStatusMessage, initInstance } = useInstance();
 
   async function loadInitialData() {
     showGlobalLoadingMessage('Loading configuration...');
@@ -73,12 +77,21 @@ export function ExploreProvider(props) {
       return;
     }
 
+    let project;
     try {
       // Get project metadata
       showGlobalLoadingMessage('Fetching project metadata...');
-      const project = await restApiClient.getProject(projectId);
+      project = await restApiClient.getProject(projectId);
       setCurrentProject(project);
+    } catch (error) {
+      hideGlobalLoading();
+      logger(error);
+      toasts.error('Project not found.');
+      history.push('/profile/projects');
+      return;
+    }
 
+    try {
       showGlobalLoadingMessage('Fetching model...');
       const model = await restApiClient.getModel(project.model_id);
       setSelectedModel(model);
@@ -94,22 +107,19 @@ export function ExploreProvider(props) {
       }
 
       showGlobalLoadingMessage('Fetching checkpoints...');
-      await loadCheckpointList(projectId);
+      const { checkpoints } = await loadCheckpointList(projectId);
+      const checkpoint = checkpoints[0];
 
       showGlobalLoadingMessage('Looking for active GPU instances...');
-      let instance;
-      const activeInstances = await restApiClient.getActiveInstances(projectId);
-      if (activeInstances.total > 0) {
-        const instanceItem = activeInstances.instances[0];
-        instance = await restApiClient.getInstance(projectId, instanceItem.id);
-      } else {
-        instance = await restApiClient.createInstance(project.id);
-      }
+      const instance = await initInstance(
+        project.id,
+        checkpoint && checkpoint.id
+      );
+
       setCurrentInstance(instance);
     } catch (error) {
+      logger(error);
       toasts.error('Error loading project, please try again later.');
-    } finally {
-      hideGlobalLoading();
     }
   }
 
@@ -140,8 +150,6 @@ export function ExploreProvider(props) {
         );
       }
     } else if (predictions.isReady()) {
-      hideGlobalLoading();
-
       // Update aoi List with newest aoi
       // If predictions is ready, restApiClient must be ready
 
@@ -152,12 +160,14 @@ export function ExploreProvider(props) {
         // Refresh checkpoint list, prediction finished
         // means new checkpoint available
         loadCheckpointList(currentProject.id);
+
+        if (predictions.getData().type === checkpointModes.RETRAIN) {
+          loadMetrics();
+        }
       }
 
       if (predictions.error) {
         toasts.error('An inference error occurred, please try again later.');
-      } else {
-        loadMetrics();
       }
     }
   }, [predictions, restApiClient, currentProject]);
@@ -312,7 +322,6 @@ export function ExploreProvider(props) {
       setAoiName(aoiObject.name);
     }
 
-    hideGlobalLoading();
     return bounds;
   }
 
@@ -431,6 +440,7 @@ export function ExploreProvider(props) {
   return (
     <ExploreContext.Provider
       value={{
+        projectId,
         predictions,
 
         mapState,
@@ -510,5 +520,16 @@ export const useMapState = () => {
       mapModes,
     }),
     [mapState, mapModes]
+  );
+};
+
+export const useProjectId = () => {
+  const { projectId } = useExploreContext('useProjectId');
+
+  return useMemo(
+    () => ({
+      projectId,
+    }),
+    [projectId]
   );
 };
