@@ -131,8 +131,17 @@ function UserDropdown() {
                   </li>
                 )}
               <li>
+                <DropdownItem
+                  as={StyledLink}
+                  to='/about'
+                  useIcon='circle-information'
+                >
+                  User Guide
+                </DropdownItem>
+              </li>
+              <li>
                 <DropdownItem as={StyledLink} to='/' useIcon='house'>
-                  Visit Homepage
+                  Home
                 </DropdownItem>
               </li>
             </DropdownBody>
