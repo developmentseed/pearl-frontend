@@ -9,6 +9,7 @@ function ModelCard({ model, onClick }) {
     Imagery: model.meta.imagery,
     'Imagery Resolution': model.meta.imagery_resolution,
     'Global F1 Score': model.meta.f1_weighted,
+    'Label sources': model.meta.label_sources,
   };
 
   const barChartOptions = {
@@ -18,12 +19,19 @@ function ModelCard({ model, onClick }) {
     },
     tooltips: {
       intersect: false,
+      mode: 'index',
       enabled: true,
       callbacks: {
-        label: (tooltipItem) => {
-          let label = round(tooltipItem.yLabel * 100);
-          label += '%';
-          return label;
+        label: (tooltipItem, data) => {
+          let label = data.datasets[tooltipItem.datasetIndex].label;
+          if (tooltipItem.datasetIndex === 0) {
+            let value = round(tooltipItem.yLabel * 100);
+            value += '%';
+            return `${label}: ${value}`;
+          } else if (tooltipItem.datasetIndex === 1) {
+            let value = tooltipItem.yLabel;
+            return `${label}: ${value}`;
+          }
         },
       },
     },
@@ -72,6 +80,7 @@ function ModelCard({ model, onClick }) {
     return {
       ...c,
       distribution: model.meta.class_distribution[c.name],
+      f1score: model.meta.f1_score[c.name],
     };
   });
   return (
@@ -86,8 +95,13 @@ function ModelCard({ model, onClick }) {
           data={{
             datasets: [
               {
-                label: '',
+                label: 'Distribution',
                 data: classes.map((c) => c.distribution),
+                backgroundColor: classes.map((c) => c.color),
+              },
+              {
+                label: 'F1 Score',
+                data: classes.map((c) => c.f1score),
                 backgroundColor: classes.map((c) => c.color),
               },
             ],
