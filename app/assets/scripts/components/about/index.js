@@ -7,6 +7,8 @@ import {
   InpageBodyInner,
   InpageHeader,
   InpageHeaderInner,
+  InpageTitle,
+  InpageHeadline,
 } from '../../styles/inpage';
 import Prose from '../../styles/type/prose';
 import { Heading } from '@devseed-ui/typography';
@@ -31,9 +33,14 @@ class About extends React.Component {
           <AboutBody>
             <InpageHeader>
               <InpageHeaderInner>
-                <Heading size='xlarge'>
-                  PEARL Planetary Computer Land Cover Mapping
-                </Heading>
+                <InpageHeadline>
+                  <Heading useAlt size='small'>
+                    About &amp; User Guide
+                  </Heading>
+                  <InpageTitle>
+                    PEARL Planetary Computer Land Cover Mapping
+                  </InpageTitle>
+                </InpageHeadline>
               </InpageHeaderInner>
             </InpageHeader>
             <InpageBodyInner>
@@ -111,13 +118,13 @@ class About extends React.Component {
                 <img src='../assets/graphics/content/guide-aoi.png' />
                 <p>
                   First, select an area of interest (AOI) by clicking the pencil
-                  icon in the “Selected Area” section to draw a bounding box on
-                  the map. Navigate to your area of concern via the magnifying
-                  glass icon on the map to search for a specific address or
-                  region. Areas of interest are currently limited to a maximum
-                  size of 100km2 - the AOI selection box displays the area size
-                  as you draw, and the bounding box will turn red to indicate
-                  regions which are too large.
+                  icon in the <strong>Selected Area</strong> section to draw a
+                  bounding box on the map. Navigate to your area of concern via
+                  the magnifying glass icon on the map to search for a specific
+                  address or region. Areas of interest are currently limited to
+                  a maximum size of 100km2 - the AOI selection box displays the
+                  area size as you draw, and the bounding box will turn red to
+                  indicate regions which are too large.
                 </p>
                 <Heading size='medium' as='h3'>
                   Selecting a Starter Model
@@ -134,10 +141,10 @@ class About extends React.Component {
                 <img src='../assets/graphics/content/guide-predictions.png' />
                 <p>
                   Once the AOI is defined and the model selected, run inference
-                  over your area by clicking on the “Run Inference” button. The
-                  session status bar will indicate the progress of your
-                  predictions. Once predictions are ready, they will load in
-                  over the AOI as image tiles. The classes available from the
+                  over your area by clicking on the <strong>Run Model</strong>{' '}
+                  button. The session status bar will indicate the progress of
+                  your predictions. Once predictions are ready, they will load
+                  in over the AOI as image tiles. The classes available from the
                   model are visible in the side left panel, along with the
                   Retrain, Refine, and Layer tools
                 </p>
@@ -148,18 +155,19 @@ class About extends React.Component {
                 <p>
                   After receiving the initial model inference, retraining allows
                   users to modify the starter model to obtain more accurate
-                  predictions for the selected AOI. The “Draw” and “Point” tools
-                  allow users to select available classes and mark samples for
-                  sending to the model. Draw allows free-hand creation of
-                  polygons via mouse clicking and dragging, while points are
-                  placed as individual movable markers. When a user draws a
-                  polygon during retraining 100 points are randomly sampled from
-                  that polygon and used for retraining.
+                  predictions for the selected AOI. The <strong>Draw</strong>{' '}
+                  and <strong>Point</strong> tools allow users to select
+                  available classes and mark samples for sending to the model.
+                  Draw allows free-hand creation of polygons via mouse clicking
+                  and dragging, while points are placed as individual movable
+                  markers. When a user draws a polygon during retraining 100
+                  points are randomly sampled from that polygon and used for
+                  retraining.
                 </p>
                 <p>
-                  The “Erase” tool allows the deletion of points and polygons
-                  via mouse click, and subtraction from polygons while clicking
-                  and dragging.
+                  The <strong>Erase</strong> tool allows the deletion of points
+                  and polygons via mouse click, and subtraction from polygons
+                  while clicking and dragging.
                 </p>
                 <p>
                   Each starter model within the tool comes with a “seed” dataset
@@ -189,11 +197,11 @@ class About extends React.Component {
                 <img src='../assets/graphics/content/guide-checkpoint.png' />
                 <p>
                   After retraining, save the current state of your model via a
-                  checkpoint. Click “Save Checkpoint” to provide a unique name
-                  for your current checkpoint. Checkpoints are a point in the
-                  history of the model which you would like to save and reuse
-                  later. Internally, checkpoints store the unique set of model
-                  weights based on the retraining steps you took.
+                  checkpoint. Click <strong>Save Checkpoint</strong> to provide
+                  a unique name for your current checkpoint. Checkpoints are a
+                  point in the history of the model which you would like to save
+                  and reuse later. Internally, checkpoints store the unique set
+                  of model weights based on the retraining steps taken.
                 </p>
                 <Heading size='large' as='h2'>
                   Refining the map output
@@ -205,10 +213,11 @@ class About extends React.Component {
                   classes or previous checkpoints. Refinements can be used to
                   smooth areas that your model consistently misidentifies or
                   which you wish to normalize. Select either an individual class
-                  or a previous checkpoint, then select the “Draw” tool to
-                  designate areas on your map to fill with your selected type.
-                  After drawing multiple areas, click "Save Refinements" to add
-                  your changes to the map.
+                  or a previous checkpoint, then select the{' '}
+                  <strong>Draw</strong> tool to designate areas on your map to
+                  fill with your selected type. After drawing multiple areas,
+                  click <strong>Save Refinements</strong> to add your changes to
+                  the map.
                 </p>
                 <Heading size='large' as='h2'>
                   Sharing Maps
@@ -218,7 +227,8 @@ class About extends React.Component {
                   There are two ways to share your LULC maps — downloading a
                   GeoTIFF or an interactive map URL that can be embedded. Once
                   an inference is generated and you are satisfied with the
-                  output, click on the Export button on the top right corner.
+                  output, click on the <strong>Export</strong> button on the top
+                  right corner.
                 </p>
                 <Heading size='large' as='h2'>
                   Limitations
