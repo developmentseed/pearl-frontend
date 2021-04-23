@@ -46,6 +46,7 @@ export function ExploreProvider(props) {
     aoiRef,
     setAoiName,
     setAoiRef,
+    currentAoi,
     setCurrentAoi,
     aoiList,
     setAoiList,
@@ -175,6 +176,12 @@ export function ExploreProvider(props) {
         if (predictions.getData().type === checkpointModes.RETRAIN) {
           loadMetrics();
         }
+
+        restApiClient
+          .get(`project/${currentProject.id}/aoi/${predictions.getData().aoiId}`)
+          .then((aoi) => {
+            setCurrentAoi(aoi);
+          });
       }
 
       if (predictions.error) {
@@ -201,7 +208,7 @@ export function ExploreProvider(props) {
         setAoiPatchList(updatedPatchList);
         restApiClient.patchAoi(
           currentProject.id,
-          predictions.data.aoiId,
+          currentAoi.id,
           updatedPatchList.map((p) => p.id)
         );
       } else if (aoiPatch.error) {
@@ -209,7 +216,7 @@ export function ExploreProvider(props) {
         logger(aoiPatch.error);
       }
     }
-  }, [aoiPatch, predictions, restApiClient, currentProject]);
+  }, [aoiPatch, currentAoi, restApiClient, currentProject]);
 
   async function loadMetrics() {
     await restApiClient
