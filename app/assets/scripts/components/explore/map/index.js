@@ -283,7 +283,6 @@ function Map() {
               });
             },
           });
-          console.log('POLYGON DRAW CREATED')
 
           m.polygonDraw = polygonDraw;
 

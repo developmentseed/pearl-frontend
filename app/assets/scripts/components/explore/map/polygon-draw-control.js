@@ -18,23 +18,23 @@ class PolygonDrawControl {
   /* Clear geometry from layer */
   clearLayers() {
     this._group.eachLayer(function (layer) {
-      console.log(layer)
       layer.clearLayers();
     });
   }
 
   /*
    * Create free hand shapes for each layer
-   * Remove all existing layers from the map first
+   * Layers are only added if they do not currently exist in polygon draw
    */
   setLayers(layers) {
-    console.log('set layers');
+    const currentLayers = new Set();
+    this._group.eachLayer((l) => currentLayers.add(l.category));
 
-
-    console.log(this._group._layers)
-    this._group.clearLayers();
-
-    Object.values(layers).forEach(this.addLayer);
+    Object.entries(layers).forEach(([name, layer]) => {
+      if (!currentLayers.has(name)) {
+        this.addLayer(layer);
+      }
+    });
   }
 
   addLayer(layer) {
@@ -58,15 +58,12 @@ class PolygonDrawControl {
 
     // Handle added polygon
     drawer.on('layeradd', () => {
-      console.log('layeradd');
-      console.log(drawer);
       const polygons = this.getLayerAsGeoJSON(drawer);
       if (!this.manualMode) {
         this.onUpdate(name, polygons);
       }
     });
     drawer.on('layerremove', () => {
-      console.log('layerremove');
       // should not update history when merging
       const polygons = this.getLayerAsGeoJSON(drawer);
       if (!this.manualMode && drawer.mode === 'subtract') {
@@ -74,7 +71,6 @@ class PolygonDrawControl {
       }
     });
     drawer.on('layersubtract', (data) => {
-      console.log('layersubtract');
       // should not update history when merging
       const polygons = this.getLayerAsGeoJSON(data.target);
 
