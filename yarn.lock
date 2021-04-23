@@ -927,13 +927,13 @@
     debug "^3.1.0"
     lodash.once "^4.1.1"
 
-"@devseed-ui/accordion@^3.0.0":
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/@devseed-ui/accordion/-/accordion-3.0.0.tgz#d7ba05f6892c2f140cbafc6f1b4fd8f019bb84ff"
-  integrity sha512-8j1vLOYjUBaetgeBIsTFsph0tioOrmGHKT6YCnJWIweJq98EonjqO6kszdViBobSuozUdmzJALX0l6f3kTQIPQ==
+"@devseed-ui/accordion@^3.0.2":
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/@devseed-ui/accordion/-/accordion-3.0.2.tgz#86455d34fb8931141f70f5828b9356b5abf3f450"
+  integrity sha512-OVNh4tM0c1rhpu7p9F2sKzpvnyQjiQWE5BRQXtptUX7dW7iIz6DiUCuCYuCR3UFLLpaN+cRP4umI0GrJhAQj+A==
   dependencies:
-    "@devseed-ui/button" "3.0.0"
-    "@devseed-ui/collecticons" "2.0.0"
+    "@devseed-ui/button" "3.0.2"
+    "@devseed-ui/collecticons" "3.0.0"
     "@devseed-ui/theme-provider" "3.0.0"
 
 "@devseed-ui/animation@^3.0.0":
@@ -941,53 +941,53 @@
   resolved "https://registry.yarnpkg.com/@devseed-ui/animation/-/animation-3.0.0.tgz#b4e846072c61dc8b4e46d0f4ca65534c64ba9446"
   integrity sha512-ykV0jszdKJ8MFy0pVxyuE5egGKgdaum2CAmGwO3lvWrqU4DsbZmcqMwsLNz3kyHQmAd+XHJ/yyQ71gRS+9l7tA==
 
-"@devseed-ui/button@3.0.0", "@devseed-ui/button@^3.0.0":
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/@devseed-ui/button/-/button-3.0.0.tgz#98c4d744a86eb7393e099a7e50993daa9a8614e7"
-  integrity sha512-vVSIe/sIcUBPvN02b4Me9LhJCDJI1DPK+YN0aNj5zOF5mBoT30rQU63FrphPSMsJdAa1L3LO1/OXey5vVLq8+g==
+"@devseed-ui/button@3.0.2", "@devseed-ui/button@^3.0.2":
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/@devseed-ui/button/-/button-3.0.2.tgz#f68b72cdd8e75cd4a646685a2034a1ecaa649911"
+  integrity sha512-2YMnU+g0q1X87Os3O1TLvPf9PemRXiPOt7P0QzRw5wckM/C+nQpWOsTgNtBnDvjoX9w/s3UoVS6XqtemqnTM9w==
   dependencies:
-    "@devseed-ui/collecticons" "2.0.0"
+    "@devseed-ui/collecticons" "3.0.0"
     "@devseed-ui/theme-provider" "^3.0.0"
 
-"@devseed-ui/collecticons@2.0.0", "@devseed-ui/collecticons@^2.0.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@devseed-ui/collecticons/-/collecticons-2.0.0.tgz#206ea7c6770a4a8bf903e361f95d0acd3c05a02a"
-  integrity sha512-irjrk8tBR4dXglFXGaFUgkSxsvkn1M6i29/DSPevcFEGxRPa1oTxQs/yC5hxyDGykGnK93oMO88efwFqDAMj3w==
+"@devseed-ui/collecticons@3.0.0", "@devseed-ui/collecticons@^3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@devseed-ui/collecticons/-/collecticons-3.0.0.tgz#cacecb03acfe448463bcc67e86dc11c55c0251b7"
+  integrity sha512-uTd2okc/sKYw6OZzFjy1CZAX/ymYOpg++WE5T2AR69boA8/C1/hGpS4YS4+6dawMwL1TA9Am1jUt1GFxV0a0IA==
 
-"@devseed-ui/dropdown@^2.0.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@devseed-ui/dropdown/-/dropdown-2.0.0.tgz#84aeceb7178860260e81e3f9028a10292c2dba5c"
-  integrity sha512-lqA66eBFjAQwsi21T2vfGgz1xPrUmrJ5dsEQ9MI8GbyBXhtmxavoIxbUzyYs6eA5e9zWixwLfLcrWRpX5deFUw==
+"@devseed-ui/dropdown@^2.0.2":
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/@devseed-ui/dropdown/-/dropdown-2.0.2.tgz#87899b1391bed65d9ae07d84485ab2ae9b05e4b1"
+  integrity sha512-LyBTGegT/H375Y+n7doeHa15GzIsl2IVJFUPU7e9nGoTSYsKfjl0KhD4+HugROCGts0ZkAgCDPuCLD0Ms/gdsQ==
   dependencies:
-    "@devseed-ui/button" "3.0.0"
-    "@devseed-ui/collecticons" "2.0.0"
+    "@devseed-ui/button" "3.0.2"
+    "@devseed-ui/collecticons" "3.0.0"
     "@devseed-ui/theme-provider" "^3.0.0"
     "@devseed-ui/typography" "1.0.0"
     react-tether "^2.0.7"
     react-transition-group "^4.3.0"
 
-"@devseed-ui/form@^1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@devseed-ui/form/-/form-1.0.1.tgz#4f5d6742342a50f95ab8d71eca2e962f7cb19727"
-  integrity sha512-k1E+yowoGMjohI9aUdWUWMjfK1rjr7QiFBcWvPUlcWTr88SH2IjTuCAGyuM758oSMOKxFLQhivRThsR2o55m9w==
+"@devseed-ui/form@^1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@devseed-ui/form/-/form-1.0.3.tgz#6c9d44885fe779dd9819dc890eea423dec398e93"
+  integrity sha512-oBjsp6safXQyb6J7QtbILh52HnzaSEGnSPpLKq1TheXIbN7C24mkpBrFV4FKTEJgKOvHhu/bvTOXJg88sq5qLg==
   dependencies:
     "@devseed-ui/animation" "^3.0.0"
-    "@devseed-ui/button" "3.0.0"
+    "@devseed-ui/button" "3.0.2"
     "@devseed-ui/theme-provider" "^3.0.0"
     "@devseed-ui/typography" "1.0.0"
 
-"@devseed-ui/global-loading@^2.0.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@devseed-ui/global-loading/-/global-loading-2.0.0.tgz#67373dd0be24393bbc683f8e1a67e6237b25f344"
-  integrity sha512-y+7+aoVEshZh+5QMi3n6Gi5CsOm047K5EwtnU1ppOq82/OIX39EisN5x8atADZAlr9FZggwltWmvB99ws5qjvg==
+"@devseed-ui/global-loading@^2.0.1":
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/@devseed-ui/global-loading/-/global-loading-2.0.1.tgz#ec9c09fe6c35dade7e93733730cf763dd4cd1be0"
+  integrity sha512-hAvGq4YagfTmUKN79kBOUQS4JrdrTaXJF1r1M8PeBSSgkzUVi3jPfNfmGi1g4F4c2+bplsKpbTIn6DBbuByy/Q==
   dependencies:
-    "@devseed-ui/collecticons" "2.0.0"
+    "@devseed-ui/collecticons" "3.0.0"
     "@devseed-ui/theme-provider" "^3.0.0"
 
-"@devseed-ui/modal@^3.0.0":
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/@devseed-ui/modal/-/modal-3.0.0.tgz#3033dd9b6cba901d9babf106f047db0cad2f6b1b"
-  integrity sha512-SXfofVotfzGO4Qr+7l5S2940F7yKP10MrhpeYWmix30EJAe3j0v5qzVw1ep5AGsfS12ZLCRRLtG1i1S7wTdINQ==
+"@devseed-ui/modal@^3.0.1":
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/@devseed-ui/modal/-/modal-3.0.1.tgz#9a2b485e3da3e4225b6da740e404c26bc717d51d"
+  integrity sha512-EA7CGYBSymzDzodJt2Fi7d43JWl5vVWn5FXVZKnsbUSggqjUB/iqlQTjT9YXcPNFUYA1zb3nNus70Pt6ZBAjBA==
   dependencies:
     "@devseed-ui/theme-provider" "^3.0.0"
     react-transition-group "^4.3.0"
@@ -1063,6 +1063,11 @@
   dependencies:
     normalize-path "^2.0.1"
     through2 "^2.0.3"
+
+"@icons/material@^0.2.4":
+  version "0.2.4"
+  resolved "https://registry.yarnpkg.com/@icons/material/-/material-0.2.4.tgz#e90c9f71768b3736e76d7dd6783fc6c2afa88bc8"
+  integrity sha512-QPcGmICAPbGLGb6F/yNf/KzKqvFx8z5qx3D1yFqVAjoFmXK35EgyW+cJ57Te3CNsmzblwtzakLGFqHPqrfb4Tw==
 
 "@nodelib/fs.scandir@2.1.4":
   version "2.1.4"
@@ -6659,6 +6664,11 @@ locate-path@^5.0.0:
   dependencies:
     p-locate "^4.1.0"
 
+lodash-es@^4.17.15:
+  version "4.17.21"
+  resolved "https://registry.yarnpkg.com/lodash-es/-/lodash-es-4.17.21.tgz#43e626c46e6591b7750beb2b50117390c609e3ee"
+  integrity sha512-mKnC+QJ9pWVzv+C4/U3rRsHapFfHvQFoFB92e52xeyGMcX6/OlIl78je1u8vePzYZSkkogMPJ2yjxxsb89cxyw==
+
 lodash.defaultsdeep@^4.6.0, lodash.defaultsdeep@^4.6.1:
   version "4.6.1"
   resolved "https://registry.yarnpkg.com/lodash.defaultsdeep/-/lodash.defaultsdeep-4.6.1.tgz#512e9bd721d272d94e3d3a63653fa17516741ca6"
@@ -6724,7 +6734,7 @@ lodash.zipobject@^4.1.3:
   resolved "https://registry.yarnpkg.com/lodash.zipobject/-/lodash.zipobject-4.1.3.tgz#b399f5aba8ff62a746f6979bf20b214f964dbef8"
   integrity sha1-s5n1q6j/YqdG9peb8gshT5ZNvvg=
 
-lodash@^4:
+lodash@^4, lodash@^4.0.1, lodash@^4.17.15:
   version "4.17.21"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.21.tgz#679591c564c3bffaae8454cf0b3df370c3d6911c"
   integrity sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==
@@ -6889,6 +6899,11 @@ matchdep@^2.0.0:
     micromatch "^3.0.4"
     resolve "^1.4.0"
     stack-trace "0.0.10"
+
+material-colors@^1.2.1:
+  version "1.2.6"
+  resolved "https://registry.yarnpkg.com/material-colors/-/material-colors-1.2.6.tgz#6d1958871126992ceecc72f4bcc4d8f010865f46"
+  integrity sha512-6qE4B9deFBIa9YSpOc9O0Sgc43zTeVYbgDT5veRKSlB2+ZuHNoVVxA1L/ckMUayV9Ay9y7Z/SZCLcGteW9i7bg==
 
 mathml-tag-names@^2.1.3:
   version "2.1.3"
@@ -8423,6 +8438,19 @@ react-chartjs-2@^2.11.1:
     lodash "^4.17.19"
     prop-types "^15.7.2"
 
+react-color@^2.19.3:
+  version "2.19.3"
+  resolved "https://registry.yarnpkg.com/react-color/-/react-color-2.19.3.tgz#ec6c6b4568312a3c6a18420ab0472e146aa5683d"
+  integrity sha512-LEeGE/ZzNLIsFWa1TMe8y5VYqr7bibneWmvJwm1pCn/eNmrabWDh659JSPn9BuaMpEfU83WTOJfnCcjDZwNQTA==
+  dependencies:
+    "@icons/material" "^0.2.4"
+    lodash "^4.17.15"
+    lodash-es "^4.17.15"
+    material-colors "^1.2.1"
+    prop-types "^15.5.10"
+    reactcss "^1.2.0"
+    tinycolor2 "^1.4.1"
+
 react-custom-scrollbars@^4.2.1:
   version "4.2.1"
   resolved "https://registry.yarnpkg.com/react-custom-scrollbars/-/react-custom-scrollbars-4.2.1.tgz#830fd9502927e97e8a78c2086813899b2a8b66db"
@@ -8583,6 +8611,13 @@ react-transition-group@^4.3.0:
   dependencies:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"
+
+reactcss@^1.2.0:
+  version "1.2.3"
+  resolved "https://registry.yarnpkg.com/reactcss/-/reactcss-1.2.3.tgz#c00013875e557b1cf0dfd9a368a1c3dab3b548dd"
+  integrity sha512-KiwVUcFu1RErkI97ywr8nvx8dNOpT03rbnma0SSalTYjkrPYaEajR4a/MRt6DZ46K6arDRbWMNHF+xH7G7n/8A==
+  dependencies:
+    lodash "^4.0.1"
 
 read-only-stream@^2.0.0:
   version "2.0.0"
@@ -10317,6 +10352,11 @@ tiny-warning@^1.0.0, tiny-warning@^1.0.3:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/tiny-warning/-/tiny-warning-1.0.3.tgz#94a30db453df4c643d0fd566060d60a875d84754"
   integrity sha512-lBN9zLN/oAf68o3zNXYrdCt1kP8WsiGW8Oo2ka41b2IM5JL/S1CTyX1rW0mb/zSuJun0ZUrDxx4sqvYS2FWzPA==
+
+tinycolor2@^1.4.1:
+  version "1.4.2"
+  resolved "https://registry.yarnpkg.com/tinycolor2/-/tinycolor2-1.4.2.tgz#3f6a4d1071ad07676d7fa472e1fac40a719d8803"
+  integrity sha512-vJhccZPs965sV/L2sU4oRQVAos0pQXwsvTLkWYdqJ+a8Q5kPFzJTuOFwy7UniPli44NKQGAglksjvOcpo95aZA==
 
 tmp@^0.0.33:
   version "0.0.33"

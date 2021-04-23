@@ -14,6 +14,7 @@ import {
 } from '@devseed-ui/modal';
 import { useMapRef } from '../../../context/map';
 import { useApiMeta } from '../../../context/api-meta';
+import { useAoiName } from '../../../context/aoi';
 
 const ModalFooter = styled(BaseModalFooter)`
   padding: ${glsp(2)} 0 0 0;
@@ -27,6 +28,7 @@ const ModalFooter = styled(BaseModalFooter)`
 
 export function AoiEditButtons(props) {
   const { mapState, setMapMode, mapModes } = useMapState();
+  const { updateAoiName } = useAoiName();
   const { mapRef } = useMapRef();
 
   const { apiLimits } = useApiMeta();
@@ -44,9 +46,12 @@ export function AoiEditButtons(props) {
       <>
         <EditButton
           onClick={function () {
+            let bounds;
             if (!apiLimits || apiLimits.live_inference > aoiArea) {
               setMapMode(mapModes.BROWSE_MODE);
-              setAoiBounds(aoiRef.getBounds());
+              bounds = aoiRef.getBounds();
+              setAoiBounds(bounds);
+              updateAoiName(bounds);
             } else if (apiLimits.max_inference > aoiArea) {
               setActiveModal('no-live-inference');
             } else {

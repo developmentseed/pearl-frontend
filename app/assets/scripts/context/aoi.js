@@ -10,6 +10,11 @@ import logger from '../utils/logger';
 import aoiPatchReducer from './reducers/aoi_patch';
 import { wrapLogReducer } from './reducers/utils';
 import { initialApiRequestState } from './reducers/reduxeed';
+import {
+  showGlobalLoadingMessage,
+  hideGlobalLoading,
+} from '@devseed-ui/global-loading';
+import reverseGeoCode from '../utils/reverse-geocode';
 
 const AoiContext = createContext(null);
 
@@ -21,6 +26,9 @@ export function AoiProvider(props) {
   const [currentAoi, dispatchCurrentAoi] = useReducer(aoiReducer);
   const [aoiRef, setAoiRef] = useState(null);
   const [aoiName, setAoiName] = useState(null);
+  const [aoiList, setAoiList] = useState([]);
+
+  const [aoiBounds, setAoiBounds] = useState(null);
 
   const [aoiPatch, dispatchAoiPatch] = useReducer(
     wrapLogReducer(aoiPatchReducer),
@@ -28,6 +36,59 @@ export function AoiProvider(props) {
   );
 
   const [aoiPatchList, setAoiPatchList] = useState([]);
+
+  /*
+   * Wrapping function for reverse geocode
+   * @param _aoiBounds - optional bound object. This is passed when this function
+   * is called from onDrawEnd context of AoiDrawControl. In this situation, the aoiBounds
+   * state variable is may not be updated before the function is executed so we can pass the bounds explicitly.  _aoiBounds takes precedenc over aoiBounds
+   *
+   * On the front end we assume that any AOI with the same name
+   * from the backend, will have the same geometry.
+   *
+   * To deal with this, any AOI that has the same geocoding as an existing one will be incremented.
+   *
+   * i.e. Seneca Rocks, Seneca Rocks #1, Seneca Rocks #2...etc
+   *
+   */
+  function updateAoiName(_aoiBounds) {
+    const refBounds = _aoiBounds || aoiBounds;
+
+    if (!refBounds) {
+      logger(new Error('Aoi bounds not defined', aoiBounds));
+    }
+
+    const bounds = [
+      refBounds.getWest(),
+      refBounds.getSouth(),
+      refBounds.getEast(),
+      refBounds.getNorth(),
+    ];
+
+    showGlobalLoadingMessage('Geocoding AOI...');
+    reverseGeoCode(bounds).then((name) => {
+      let lastInstance;
+      aoiList
+        .sort((a, b) => {
+          if (a.name < b.name) return -1;
+          else if (a.name > b.name) return 1;
+          else return 0;
+        })
+        .forEach((a) => {
+          return (lastInstance = a.name.includes(name) ? a.name : lastInstance);
+        });
+      if (lastInstance) {
+        if (lastInstance.includes('#')) {
+          const [n, version] = lastInstance.split('#').map((w) => w.trim());
+          name = `${n} #${Number(version) + 1}`;
+        } else {
+          name = `${name} #${1}`;
+        }
+      }
+      setAoiName(name);
+      hideGlobalLoading();
+    });
+  }
 
   const value = {
     currentAoi,
@@ -37,11 +98,19 @@ export function AoiProvider(props) {
     aoiName,
     setAoiName,
 
+    aoiBounds,
+    setAoiBounds,
+
+    aoiList,
+    setAoiList,
+
     aoiPatch,
     dispatchAoiPatch,
 
     aoiPatchList,
     setAoiPatchList,
+
+    updateAoiName,
   };
 
   return (
@@ -86,6 +155,11 @@ export const useAoi = () => {
     setAoiName,
     currentAoi,
     dispatchCurrentAoi,
+
+    aoiList,
+    setAoiList,
+    aoiBounds,
+    setAoiBounds,
   } = useCheckContext('useAoi');
 
   return useMemo(
@@ -96,10 +170,26 @@ export const useAoi = () => {
       setAoiName,
       currentAoi,
       dispatchCurrentAoi,
+      aoiList,
+      setAoiList,
+      aoiBounds,
+      setAoiBounds,
       setCurrentAoi: (data) =>
         dispatchCurrentAoi({ type: actions.SET_AOI, data }),
     }),
-    [aoiRef, aoiName, currentAoi, dispatchCurrentAoi]
+    [aoiRef, aoiName, currentAoi, dispatchCurrentAoi, aoiList, aoiBounds]
+  );
+};
+
+export const useAoiName = () => {
+  const { updateAoiName, aoiName, aoiList, aoiBounds } = useCheckContext(
+    'useAoiName'
+  );
+  return useMemo(
+    () => ({
+      updateAoiName,
+    }),
+    [aoiName, aoiList, aoiBounds]
   );
 };
 

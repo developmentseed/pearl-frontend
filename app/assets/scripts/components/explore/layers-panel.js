@@ -191,15 +191,10 @@ function LayersPanel(props) {
       ...userLayers,
       retrainingSamples: {
         ...userLayers.retrainingSamples,
-        active:
-          currentCheckpoint &&
-          currentCheckpoint.retrain_geoms &&
-          currentCheckpoint.retrain_geoms.reduce((count, { coordinates }) => {
-            return count + coordinates.length;
-          }, 0) > 0,
+        active: currentCheckpoint && currentCheckpoint.retrain_geoms,
       },
     });
-  }, [currentCheckpoint && currentCheckpoint.id]);
+  }, [currentCheckpoint && currentCheckpoint.retrain_geoms]);
 
   return (
     <div className={className}>

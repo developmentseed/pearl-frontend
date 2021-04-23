@@ -18,6 +18,7 @@ export const checkpointModes = {
 };
 
 export const actions = {
+  ADD_CLASS: 'ADD_CLASS',
   SET_CHECKPOINT: 'SET_CHECKPOINT',
   SET_CHECKPOINT_NAME: 'SET_CHECKPOINT_NAME',
   SET_CHECKPOINT_MODE: 'SET_CHECKPOINT_MODE',
@@ -41,15 +42,28 @@ export function CheckpointProvider(props) {
 
   const { restApiClient } = useAuth();
 
-  async function fetchCheckpoint(projectId, checkpointId) {
+  async function fetchCheckpoint(projectId, checkpointId, mode) {
     try {
       const checkpoint = await restApiClient.getCheckpoint(
         projectId,
         checkpointId
       );
+      let _data = {};
+
+      if (mode) {
+        // Function is used from applyCheckpoint context
+        _data.mode =
+          mode || (currentCheckpoint && currentCheckpoint.mode) || null;
+      } else {
+        _data.analytics = null;
+      }
       dispatchCurrentCheckpoint({
         type: actions.SET_CHECKPOINT,
-        data: { ...checkpoint, mode: checkpointModes.RETRAIN },
+        data: {
+          ...checkpoint,
+          ..._data,
+          //mode: checkpointModes.RETRAIN
+        },
       });
     } catch (error) {
       logger(error);
@@ -80,9 +94,12 @@ function checkpointReducer(state, action) {
       // Action used to load existing or initialize a new checkpoint
       return {
         ...action.data,
+        analytics: action.data.analytics || (state && state.analytics) || null,
         mode: action.data.mode || checkpointModes.RUN,
-        retrain_geoms: action.data.retrain_geoms,
-        input_geoms: action.data.input_geoms,
+        retrain_geoms:
+          action.data.retrain_geoms || (state && state.retrain_geoms) || null,
+        input_geoms:
+          action.data.input_geoms || (state && state.input_geoms) || null,
         activeItem: action.data.classes
           ? action.data.classes[0].name
           : undefined,
@@ -117,6 +134,54 @@ function checkpointReducer(state, action) {
         ...state,
         ...action.data,
       };
+
+    // Modifies current checkpoint classes to add a custom user defined class
+    case actions.ADD_CLASS: {
+      const newClass = {
+        name: action.data.name,
+        color: action.data.color,
+        points: {
+          type: 'MultiPoint',
+          coordinates: [],
+        },
+        polygons: [],
+      };
+      return {
+        ...state,
+        classes: {
+          ...state.classes,
+          [newClass.name]: newClass,
+        },
+        analytics: state.analytics
+          ? [
+              ...state.analytics,
+              {
+                counts: 0,
+                f1score: 0,
+                percent: 0,
+              },
+            ]
+          : state.analytics,
+        input_geoms: state.input_geoms
+          ? [
+              ...state.input_geoms,
+              {
+                type: 'GeometryCollection',
+                geometries: [],
+              },
+            ]
+          : state.input_geoms,
+        retrain_geoms: state.retrain_geoms
+          ? [
+              ...state.retrain_geoms,
+              {
+                type: 'MultiPoint',
+                coordinates: [],
+              },
+            ]
+          : state.retrain_geoms,
+      };
+    }
 
     case actions.ADD_CHECKPOINT_BRUSH:
       return {

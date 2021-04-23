@@ -18,12 +18,12 @@ import { themeVal, glsp, media } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
 import { Form, FormInput } from '@devseed-ui/form';
 import InfoButton from '../common/info-button';
-import { ExploreContext } from '../../context/explore';
+import { ExploreContext, useProjectId } from '../../context/explore';
 import { useAuth } from '../../context/auth';
+import { useAoi } from '../../context/aoi';
 import toasts from '../common/toasts';
 import logger from '../../utils/logger';
 import { useInstance } from '../../context/instance';
-import { useParams } from 'react-router';
 import { downloadGeotiff as downloadGeotiffUtil } from '../../utils/map';
 
 const Wrapper = styled.div`
@@ -83,11 +83,13 @@ const HeadingInput = styled(FormInput)`
 `;
 
 function SessionOutputControl(props) {
-  const { projectId } = useParams();
+  const { projectId } = useProjectId();
   const { projectName, openHelp, isMediumDown } = props;
   const { isAuthenticated, restApiClient } = useAuth();
 
   const { instance } = useInstance();
+
+  const { currentAoi } = useAoi();
 
   const {
     updateProjectName,
@@ -111,7 +113,7 @@ function SessionOutputControl(props) {
 
   const downloadGeotiff = async () => {
     const projectId = currentProject.id;
-    const aoiId = predictions.data.aoiId;
+    const aoiId = predictions.data?.aoiId || currentAoi.id;
     showGlobalLoadingMessage('Preparing GeoTIFF for Download');
     try {
       await restApiClient.bookmarkAOI(projectId, aoiId, aoiName);
@@ -131,7 +133,7 @@ function SessionOutputControl(props) {
 
   const copyTilesLink = async () => {
     const projectId = currentProject.id;
-    const aoiId = predictions.data.aoiId;
+    const aoiId = predictions.data?.aoiId || currentAoi.id;
     let uuid;
 
     try {
@@ -168,7 +170,9 @@ function SessionOutputControl(props) {
   };
 
   const exportEnabled =
-    isAuthenticated && currentProject && predictions.data.aoiId;
+    isAuthenticated &&
+    currentProject &&
+    (predictions.data?.aoiId || currentAoi?.id);
   return (
     <Wrapper>
       <ProjectHeading>
@@ -227,11 +231,13 @@ function SessionOutputControl(props) {
       </ProjectHeading>
       <StatusHeading
         // TODO: replace status 'OK' with API active instance response
-        variation={status === 'OK' ? 'primary' : 'danger'}
+        variation={
+          projectId === 'new' || status === 'OK' ? 'primary' : 'danger'
+        }
         size='xxsmall'
       >
         <span>Session Status:</span>{' '}
-        {projectId === 'new' ? 'Ready.' : instance.statusText}
+        {projectId === 'new' ? 'Waiting for model run' : instance.gpuMessage}
       </StatusHeading>
       <Button
         variation='base-plain'

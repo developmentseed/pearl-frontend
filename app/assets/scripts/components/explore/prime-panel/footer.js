@@ -12,7 +12,6 @@ import { LocalButton } from '../../../styles/local-button';
 import InfoButton from '../../common/info-button';
 import { PanelBlockFooter } from '../../common/panel-block';
 import { checkpointModes } from '../../../context/checkpoint';
-import { usePredictions } from '../../../context/predictions';
 import { useInstance } from '../../../context/instance';
 
 const PanelControls = styled(PanelBlockFooter)`
@@ -25,14 +24,7 @@ const SaveCheckpoint = styled(DropdownBody)`
 `;
 
 function PrimeButton({ currentCheckpoint, allowInferenceRun, mapRef }) {
-  const { predictions } = usePredictions();
-  const {
-    instance,
-    sendAbortMessage,
-    runInference,
-    retrain,
-    refine,
-  } = useInstance();
+  const { runInference, retrain, refine } = useInstance();
 
   // If in refine mode, this button save refinements
   if (currentCheckpoint && currentCheckpoint.mode === checkpointModes.REFINE) {
@@ -56,20 +48,6 @@ function PrimeButton({ currentCheckpoint, allowInferenceRun, mapRef }) {
     );
   }
 
-  let label = 'Loading...';
-  let enabled = false;
-  let onClick = () => {};
-
-  if (predictions.fetching) {
-    label = 'Abort';
-    onClick = sendAbortMessage;
-    enabled = true;
-  } else if (['disconnected', 'ready'].includes(instance.status)) {
-    label = !currentCheckpoint ? 'Run Model' : 'Retrain Model';
-    enabled = allowInferenceRun;
-    onClick = !currentCheckpoint ? runInference : retrain;
-  }
-
   return (
     <InfoButton
       data-cy={allowInferenceRun ? 'run-model-button' : 'disabled'}
@@ -79,11 +57,11 @@ function PrimeButton({ currentCheckpoint, allowInferenceRun, mapRef }) {
       style={{
         gridColumn: '1 / -1',
       }}
-      onClick={() => onClick()}
-      visuallyDisabled={!enabled}
+      onClick={!currentCheckpoint ? runInference : retrain}
+      visuallyDisabled={!allowInferenceRun}
       id='apply-button-trigger'
     >
-      {label}
+      {!currentCheckpoint ? 'Run Model' : 'Retrain Model'}
     </InfoButton>
   );
 }
@@ -119,6 +97,8 @@ function Footer(props) {
         }}
         title='Clear all samples drawn since last retrain or save'
         id='reset-button-trigger'
+        disabled={!currentCheckpoint}
+        visuallyDisabled={!currentCheckpoint}
         onClick={() => {
           dispatchCurrentCheckpoint({
             type: checkpointActions.CLEAR_SAMPLES,
@@ -148,7 +128,7 @@ function Footer(props) {
             ...latest.checkpointBrushes,
           });
         }}
-        disabled={!(currentCheckpoint && currentCheckpoint.history.length)}
+        disabled={!(currentCheckpoint && currentCheckpoint.history?.length)}
         id='undo-button-trigger'
       >
         Undo

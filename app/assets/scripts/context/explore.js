@@ -17,9 +17,12 @@ import { useHistory, useParams } from 'react-router-dom';
 import { actions as predictionActions, usePredictions } from './predictions';
 import { mapStateReducer, mapModes, mapActionTypes } from './reducers/map';
 import tBbox from '@turf/bbox';
-import reverseGeoCode from '../utils/reverse-geocode';
 
-import { actions as checkpointActions, useCheckpoint } from './checkpoint';
+import {
+  actions as checkpointActions,
+  checkpointModes,
+  useCheckpoint,
+} from './checkpoint';
 import { wrapLogReducer } from './reducers/utils';
 import { useAoi, useAoiPatch } from './aoi';
 import { useProject } from './project';
@@ -38,14 +41,20 @@ export function ExploreProvider(props) {
 
   const { restApiClient, isLoading: authIsLoading } = useAuth();
   const { currentProject, setCurrentProject } = useProject();
-  const { aoiName, aoiRef, setAoiName, setAoiRef, setCurrentAoi } = useAoi();
+  const {
+    aoiName,
+    aoiRef,
+    setAoiName,
+    setAoiRef,
+    setCurrentAoi,
+    aoiList,
+    setAoiList,
+    aoiBounds,
+    setAoiBounds,
+  } = useAoi();
   const { predictions, dispatchPredictions } = usePredictions();
   const { selectedModel, setSelectedModel } = useModel();
-  const {
-    currentCheckpoint,
-    dispatchCurrentCheckpoint,
-    fetchCheckpoint,
-  } = useCheckpoint();
+  const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
   const {
     aoiPatch,
     dispatchAoiPatch,
@@ -56,8 +65,7 @@ export function ExploreProvider(props) {
   // The following properties should be moved to own context to avoid re-rendering.
   const [aoiArea, setAoiArea] = useState(null);
   const [aoiInitializer, setAoiInitializer] = useState(null);
-  const [aoiList, setAoiList] = useState([]);
-  const [aoiBounds, setAoiBounds] = useState(null);
+
   const [mapState, dispatchMapState] = useReducer(
     wrapLogReducer(mapStateReducer),
     {
@@ -66,7 +74,7 @@ export function ExploreProvider(props) {
   );
   const [checkpointList, setCheckpointList] = useState(null);
   const [currentInstance, setCurrentInstance] = useState(null);
-  const { setInstanceStatusMessage } = useInstance();
+  const { setInstanceStatusMessage, initInstance } = useInstance();
 
   async function loadInitialData() {
     showGlobalLoadingMessage('Loading configuration...');
@@ -77,12 +85,21 @@ export function ExploreProvider(props) {
       return;
     }
 
+    let project;
     try {
       // Get project metadata
       showGlobalLoadingMessage('Fetching project metadata...');
-      const project = await restApiClient.getProject(projectId);
+      project = await restApiClient.getProject(projectId);
       setCurrentProject(project);
+    } catch (error) {
+      hideGlobalLoading();
+      logger(error);
+      toasts.error('Project not found.');
+      history.push('/profile/projects');
+      return;
+    }
 
+    try {
       showGlobalLoadingMessage('Fetching model...');
       const model = await restApiClient.getModel(project.model_id);
       setSelectedModel(model);
@@ -92,40 +109,27 @@ export function ExploreProvider(props) {
 
       const filteredList = filterAoiList(aois.aois);
       setAoiList(filteredList);
+      let latestAoi;
       if (aois.total > 0) {
-        const latest = filteredList[filteredList.length - 1];
-        loadAoi(project, latest);
+        latestAoi = filteredList[filteredList.length - 1];
+        loadAoi(project, latestAoi);
       }
 
       showGlobalLoadingMessage('Fetching checkpoints...');
       const { checkpoints } = await loadCheckpointList(projectId);
+      const checkpoint = checkpoints[0];
 
       showGlobalLoadingMessage('Looking for active GPU instances...');
-      let instance;
-      const activeInstances = await restApiClient.getActiveInstances(projectId);
-      if (activeInstances.total > 0) {
-        const instanceItem = activeInstances.instances[0];
-        instance = await restApiClient.getInstance(projectId, instanceItem.id);
-      } else {
-        if (checkpoints && checkpoints.length > 0) {
-          // Apply first checkpoint, if available
-          instance = await restApiClient.createInstance(project.id, {
-            checkpoint_id: checkpoints.checkpoints[0].id,
-          });
-        } else {
-          instance = await restApiClient.createInstance(project.id);
-        }
-      }
+      const instance = await initInstance(
+        project.id,
+        checkpoint && checkpoint.id,
+        latestAoi && latestAoi.id
+      );
 
-      // Fetch checkpoint meta and apply to state
-      if (instance.checkpoint_id) {
-        await fetchCheckpoint(projectId, instance.checkpoint_id);
-      }
       setCurrentInstance(instance);
     } catch (error) {
+      logger(error);
       toasts.error('Error loading project, please try again later.');
-    } finally {
-      hideGlobalLoading();
     }
   }
 
@@ -156,24 +160,25 @@ export function ExploreProvider(props) {
         );
       }
     } else if (predictions.isReady()) {
-      hideGlobalLoading();
-
       // Update aoi List with newest aoi
       // If predictions is ready, restApiClient must be ready
 
       if (predictions.fetched) {
         restApiClient.get(`project/${currentProject.id}/aoi/`).then((aois) => {
-          setAoiList(filterAoiList(aois.aois));
+          const list = filterAoiList(aois.aois);
+          setAoiList(list);
         });
         // Refresh checkpoint list, prediction finished
         // means new checkpoint available
         loadCheckpointList(currentProject.id);
+
+        if (predictions.getData().type === checkpointModes.RETRAIN) {
+          loadMetrics();
+        }
       }
 
       if (predictions.error) {
         toasts.error('An inference error occurred, please try again later.');
-      } else {
-        loadMetrics();
       }
     }
   }, [predictions, restApiClient, currentProject]);
@@ -223,19 +228,17 @@ export function ExploreProvider(props) {
    * Clear predictions on AOI Edit
    */
   useEffect(() => {
-    if (predictions.isReady()) {
-      if (
-        mapState.mode === mapModes.BROWSE_MODE &&
-        mapState.previousMode === mapModes.EDIT_AOI_MODE
-      ) {
-        dispatchPredictions({ type: predictionActions.CLEAR_PREDICTION });
+    if (
+      mapState.mode === mapModes.BROWSE_MODE &&
+      mapState.previousMode === mapModes.EDIT_AOI_MODE
+    ) {
+      dispatchPredictions({ type: predictionActions.CLEAR_PREDICTION });
 
-        dispatchCurrentCheckpoint({
-          type: checkpointActions.RESET_CHECKPOINT,
-        });
-      }
+      dispatchCurrentCheckpoint({
+        type: checkpointActions.RESET_CHECKPOINT,
+      });
     }
-  }, [mapState, predictions]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [mapState]); // eslint-disable-line react-hooks/exhaustive-deps
 
   /*
    * Re-init aoi state variables
@@ -329,6 +332,7 @@ export function ExploreProvider(props) {
     }
 
     hideGlobalLoading();
+
     return bounds;
   }
 
@@ -391,62 +395,10 @@ export function ExploreProvider(props) {
     }
   }, [aoiRef]);
 
-  /*
-   * This useEffect GeoCodes an AOI after it is created.
-   * On the front end we assume that any AOI with the same name
-   * from the backend, will have the same geometry.
-   *
-   * To deal with this, any AOI that has the same geocoding as an existing one will be incremented.
-   *
-   * i.e. Seneca Rocks, Seneca Rocks #1, Seneca Rocks #2...etc
-   */
-
-  useEffect(() => {
-    if (!aoiBounds) {
-      return;
-    } else if (
-      mapState.mode === mapModes.BROWSE_MODE &&
-      (mapState.previousMode === mapModes.EDIT_AOI_MODE ||
-        mapState.previousMode === mapModes.CREATE_AOI_MODE)
-    ) {
-      const bounds = [
-        aoiBounds.getWest(),
-        aoiBounds.getSouth(),
-        aoiBounds.getEast(),
-        aoiBounds.getNorth(),
-      ];
-
-      showGlobalLoadingMessage('Geocoding AOI...');
-      reverseGeoCode(bounds).then((name) => {
-        let lastInstance;
-        aoiList
-          .sort((a, b) => {
-            if (a.name < b.name) return -1;
-            else if (a.name > b.name) return 1;
-            else return 0;
-          })
-          .forEach((a) => {
-            return (lastInstance = a.name.includes(name)
-              ? a.name
-              : lastInstance);
-          });
-        if (lastInstance) {
-          if (lastInstance.includes('#')) {
-            const [n, version] = lastInstance.split('#').map((w) => w.trim());
-            name = `${n} #${Number(version) + 1}`;
-          } else {
-            name = `${name} #${1}`;
-          }
-        }
-        setAoiName(name);
-        hideGlobalLoading();
-      });
-    }
-  }, [mapState, aoiBounds, aoiList]);
-
   return (
     <ExploreContext.Provider
       value={{
+        projectId,
         predictions,
 
         mapState,
@@ -526,5 +478,16 @@ export const useMapState = () => {
       mapModes,
     }),
     [mapState, mapModes]
+  );
+};
+
+export const useProjectId = () => {
+  const { projectId } = useExploreContext('useProjectId');
+
+  return useMemo(
+    () => ({
+      projectId,
+    }),
+    [projectId]
   );
 };

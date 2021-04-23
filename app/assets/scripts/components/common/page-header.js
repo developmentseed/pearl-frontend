@@ -14,7 +14,7 @@ import {
 } from '@devseed-ui/theme-provider';
 import { StyledNavLink, StyledLink } from '../../styles/links';
 
-const { appTitle, appLongTitle, baseUrl, environment } = config;
+const { appTitle, appLongTitle, baseUrl } = config;
 
 const PageHead = styled.header`
   background-color: ${themeVal('color.surface')};
@@ -145,9 +145,6 @@ const SecondarySection = styled.div`
 `;
 
 function PageHeader(props) {
-  // FIXME: remove this for launch
-  const isProduction = environment === 'production';
-
   return (
     <PageHead role='banner'>
       <PageHeadInner>
@@ -199,14 +196,9 @@ function PageHeader(props) {
               </PageSpecificControls>
             )}
           </PrimarySection>
-          {
-            // FIXME: remove this for launch
-            !isProduction && (
-              <SecondarySection>
-                <UserDropdown />
-              </SecondarySection>
-            )
-          }
+          <SecondarySection>
+            <UserDropdown />
+          </SecondarySection>
         </PageNav>
       </PageHeadInner>
     </PageHead>

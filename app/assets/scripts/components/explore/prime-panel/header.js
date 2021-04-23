@@ -46,14 +46,20 @@ const SubheadingStrong = styled.h3`
         ${collecticon(useIcon)}
       }
     `}
-  ${({ onClick }) =>
+  ${({ onClick, disabled }) =>
     onClick &&
+    !disabled &&
     css`
       transition: opacity 0.24s ease 0s;
       &:hover {
         cursor: pointer;
         opacity: 0.64;
       }
+    `}
+  ${({ disabled }) =>
+    disabled &&
+    css`
+      opacity: 0.64;
     `}
 `;
 
@@ -79,6 +85,7 @@ function Header(props) {
     mapRef,
 
     currentCheckpoint,
+    checkpointModes,
     checkpointList,
     applyCheckpoint,
 
@@ -110,7 +117,7 @@ function Header(props) {
       useIcon: null,
     };
 
-    if (mapState.mode === mapModes.EDIT_AOI_MODE || aoiList.length === 0) {
+    if (mapState.mode === mapModes.EDIT_AOI_MODE || aoiList?.length === 0) {
       disabled = true;
     }
 
@@ -144,6 +151,12 @@ function Header(props) {
       return 'Run model to create first checkpoint';
     }
   };
+
+  const modelNotChangeable =
+    !isAuthenticated ||
+    !models?.length ||
+    checkpointList?.length ||
+    currentCheckpoint?.mode === checkpointModes.RUN;
 
   return (
     <PanelBlockHeader>
@@ -183,7 +196,7 @@ function Header(props) {
                 </li>
               ))}
             </DropdownBody>
-            {(currentCheckpoint || aoiList.length > 0) && (
+            {(currentCheckpoint || aoiList?.length > 0) && (
               <DropdownFooter>
                 <DropdownItem
                   useIcon='plus'
@@ -220,10 +233,14 @@ function Header(props) {
         </HeadOptionHeadline>
         <SubheadingStrong
           data-cy='select-model-label'
-          onClick={function () {
-            setShowSelectModelModal(true);
+          onClick={() => {
+            !modelNotChangeable && setShowSelectModelModal(true);
           }}
-          title='Edit Model'
+          title={
+            !checkpointList?.length
+              ? 'Select Model'
+              : 'Models can not be changed after running inference'
+          }
         >
           {(selectedModel && selectedModel.name) ||
             (isAuthenticated
@@ -232,20 +249,21 @@ function Header(props) {
                 : 'No models available'
               : 'Login to select model')}
         </SubheadingStrong>
-        <HeadOptionToolbar>
-          <EditButton
-            data-cy='show-select-model-button'
-            useIcon='swap-horizontal'
-            id='select-model-trigger'
-            onClick={function () {
-              setShowSelectModelModal(true);
-            }}
-            title='Edit Model'
-            disabled={!models?.length}
-          >
-            Edit Model Selection
-          </EditButton>
-        </HeadOptionToolbar>
+        {!modelNotChangeable && (
+          <HeadOptionToolbar>
+            <EditButton
+              data-cy='show-select-model-button'
+              useIcon='swap-horizontal'
+              id='select-model-trigger'
+              onClick={() => {
+                setShowSelectModelModal(true);
+              }}
+              title='Select Model'
+            >
+              Edit Model Selection
+            </EditButton>
+          </HeadOptionToolbar>
+        )}
       </HeadOption>
 
       <HeadOption>
@@ -265,6 +283,7 @@ function Header(props) {
                     ? 'Change checkpoint'
                     : 'Run and retrain model to create first checkpoint'
                 }
+                disabled={!checkpointList}
               >
                 {renderCheckpointSelectionHeader()}
               </SubheadingStrong>
@@ -280,6 +299,7 @@ function Header(props) {
                   id='checkpoint-list-trigger'
                   {...props}
                   onClick={(e) => checkpointList && props.onClick(e)} // eslint-disable-line
+                  disabled={!checkpointList}
                 >
                   Edit Checkpoint Selection
                 </EditButton>
@@ -332,6 +352,7 @@ Header.propTypes = {
   mapRef: T.object,
 
   currentCheckpoint: T.object,
+  checkpointModes: T.object,
   checkpointList: T.array,
   applyCheckpoint: T.func,
 
