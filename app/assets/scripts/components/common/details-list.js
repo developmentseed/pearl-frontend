@@ -9,7 +9,7 @@ const List = styled.ol`
   li {
     display: grid;
     grid-gap: 1rem;
-    grid-template-columns: 1fr 4fr;
+    grid-template-columns: 1fr 1fr;
     align-items: center;
     h1 {
       margin: 0;
@@ -27,8 +27,10 @@ function DetailsList(props) {
       {Object.entries(details).map(([key, value]) => (
         <li key={key}>
           <>
-            <Heading useAlt>{toTitleCase(key)}</Heading>
-            {React.isValidElement(value) ? value : <p>{value}</p>}
+            <Heading as='dt' useAlt>
+              {toTitleCase(key)}
+            </Heading>
+            {React.isValidElement(value) ? value : <dd>{value}</dd>}
           </>
         </li>
       ))}

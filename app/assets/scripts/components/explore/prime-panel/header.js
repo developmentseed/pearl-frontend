@@ -117,7 +117,7 @@ function Header(props) {
       useIcon: null,
     };
 
-    if (mapState.mode === mapModes.EDIT_AOI_MODE || aoiList.length === 0) {
+    if (mapState.mode === mapModes.EDIT_AOI_MODE || aoiList?.length === 0) {
       disabled = true;
     }
 
@@ -196,7 +196,7 @@ function Header(props) {
                 </li>
               ))}
             </DropdownBody>
-            {(currentCheckpoint || aoiList.length > 0) && (
+            {(currentCheckpoint || aoiList?.length > 0) && (
               <DropdownFooter>
                 <DropdownItem
                   useIcon='plus'
@@ -241,7 +241,6 @@ function Header(props) {
               ? 'Select Model'
               : 'Models can not be changed after running inference'
           }
-          disabled={modelNotChangeable}
         >
           {(selectedModel && selectedModel.name) ||
             (isAuthenticated
@@ -250,20 +249,21 @@ function Header(props) {
                 : 'No models available'
               : 'Login to select model')}
         </SubheadingStrong>
-        <HeadOptionToolbar>
-          <EditButton
-            data-cy='show-select-model-button'
-            useIcon='swap-horizontal'
-            id='select-model-trigger'
-            onClick={() => {
-              setShowSelectModelModal(true);
-            }}
-            title='Select Model'
-            disabled={modelNotChangeable}
-          >
-            Edit Model Selection
-          </EditButton>
-        </HeadOptionToolbar>
+        {!modelNotChangeable && (
+          <HeadOptionToolbar>
+            <EditButton
+              data-cy='show-select-model-button'
+              useIcon='swap-horizontal'
+              id='select-model-trigger'
+              onClick={() => {
+                setShowSelectModelModal(true);
+              }}
+              title='Select Model'
+            >
+              Edit Model Selection
+            </EditButton>
+          </HeadOptionToolbar>
+        )}
       </HeadOption>
 
       <HeadOption>

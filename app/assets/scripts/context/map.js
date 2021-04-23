@@ -9,16 +9,6 @@ import T from 'prop-types';
 import { useAoiPatch } from './aoi';
 export const MapContext = createContext({});
 
-const baseLayerConfig = {
-  opacity: 1,
-  visible: true,
-};
-
-const baseUserLayerConfig = {
-  ...baseLayerConfig,
-  active: false,
-};
-
 export function MapProvider(props) {
   const [mapRef, setMapRef] = useState();
   const [mapLayers, setMapLayers] = useState({});
@@ -34,13 +24,14 @@ export function MapProvider(props) {
    * Add objects here to control new layers
    */
   const [userLayers, setUserLayers] = useState({
-    predictions: {
+    refinementsLayer: {
       opacity: 1,
       visible: true,
       active: false,
-      id: 'predictions',
-      name: 'Prediction Results',
+      id: 'refinementsLayer',
+      name: 'Refinements Layer',
     },
+
     retrainingSamples: {
       opacity: 0.3,
       visible: true,
@@ -48,19 +39,22 @@ export function MapProvider(props) {
       id: 'retrainingSamples',
       name: 'Retraining Samples',
     },
+
+    predictions: {
+      opacity: 1,
+      visible: true,
+      active: false,
+      id: 'predictions',
+      name: 'Prediction Results',
+    },
   });
 
   useEffect(() => {
-    if (aoiPatch.isReady()) {
-      const patch = aoiPatch.getData();
-      const id = `${patch.name}-${patch.id}`;
-
+    if (aoiPatch.isReady() && !userLayers.refinementsLayer.active) {
       setUserLayers({
         ...userLayers,
-        [id]: {
-          ...baseUserLayerConfig,
-          id,
-          name: `${patch.name} Patch: ${patch.id}`,
+        refinementsLayer: {
+          ...userLayers.refinementsLayer,
           active: true,
         },
       });

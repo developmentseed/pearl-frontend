@@ -77,12 +77,21 @@ export function ExploreProvider(props) {
       return;
     }
 
+    let project;
     try {
       // Get project metadata
       showGlobalLoadingMessage('Fetching project metadata...');
-      const project = await restApiClient.getProject(projectId);
+      project = await restApiClient.getProject(projectId);
       setCurrentProject(project);
+    } catch (error) {
+      hideGlobalLoading();
+      logger(error);
+      toasts.error('Project not found.');
+      history.push('/profile/projects');
+      return;
+    }
 
+    try {
       showGlobalLoadingMessage('Fetching model...');
       const model = await restApiClient.getModel(project.model_id);
       setSelectedModel(model);
@@ -111,8 +120,6 @@ export function ExploreProvider(props) {
     } catch (error) {
       logger(error);
       toasts.error('Error loading project, please try again later.');
-    } finally {
-      hideGlobalLoading();
     }
   }
 
@@ -210,19 +217,17 @@ export function ExploreProvider(props) {
    * Clear predictions on AOI Edit
    */
   useEffect(() => {
-    if (predictions.isReady()) {
-      if (
-        mapState.mode === mapModes.BROWSE_MODE &&
-        mapState.previousMode === mapModes.EDIT_AOI_MODE
-      ) {
-        dispatchPredictions({ type: predictionActions.CLEAR_PREDICTION });
+    if (
+      mapState.mode === mapModes.BROWSE_MODE &&
+      mapState.previousMode === mapModes.EDIT_AOI_MODE
+    ) {
+      dispatchPredictions({ type: predictionActions.CLEAR_PREDICTION });
 
-        dispatchCurrentCheckpoint({
-          type: checkpointActions.RESET_CHECKPOINT,
-        });
-      }
+      dispatchCurrentCheckpoint({
+        type: checkpointActions.RESET_CHECKPOINT,
+      });
     }
-  }, [mapState, predictions]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [mapState]); // eslint-disable-line react-hooks/exhaustive-deps
 
   /*
    * Re-init aoi state variables
@@ -316,6 +321,7 @@ export function ExploreProvider(props) {
     }
 
     hideGlobalLoading();
+
     return bounds;
   }
 

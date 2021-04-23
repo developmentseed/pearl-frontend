@@ -15,6 +15,7 @@ import {
   showGlobalLoadingMessage,
   hideGlobalLoading,
 } from '@devseed-ui/global-loading';
+import { Button } from '@devseed-ui/button';
 import toasts from '../components/common/toasts';
 import { useAuth } from './auth';
 import {
@@ -33,6 +34,7 @@ import { wrapLogReducer } from './reducers/utils';
 
 const messageQueueActionTypes = {
   ADD: 'ADD',
+  ADD_EXPRESS: 'ADD_EXPRESS',
   SEND: 'SEND',
   CLEAR: 'CLEAR',
 };
@@ -54,10 +56,17 @@ function instanceReducer(state, action) {
 
   switch (type) {
     case instanceActionTypes.APPLY_STATUS: {
+      // gpuStatus will change, update previousGpuStatus
+      if (data.gpuStatus && data.gpuStatus !== state.gpuStatus) {
+        newState.previousGpuStatus = state.gpuStatus;
+      }
+
+      // Apply passed data
       newState = {
-        ...state,
+        ...newState,
         ...data,
       };
+
       break;
     }
     default:
@@ -135,14 +144,40 @@ export function InstanceProvider(props) {
     wrapLogReducer((state, { type, data }) => {
       switch (type) {
         case messageQueueActionTypes.ADD: {
-          return state.concat(data);
+          return state.concat({
+            express: false,
+            message: data,
+          });
+        }
+        case messageQueueActionTypes.ADD_EXPRESS: {
+          // Add message to the queue beginning
+          return [
+            {
+              express: true,
+              message: data,
+            },
+          ].concat(state);
         }
         case messageQueueActionTypes.SEND: {
-          const message = state[0];
+          const { message } = state[0];
+
+          // make instance busy to avoid sending several messages (model#status is ok)
           if (message.action !== 'model#status') {
             applyInstanceStatus({ gpuStatus: 'processing' });
           }
-          websocketClient.sendMessage(state[0]);
+
+          // Send message
+          websocketClient.sendMessage(message);
+
+          // On abort
+          if (message.action === 'model#abort') {
+            // Also request a status
+            websocketClient.sendMessage({ action: 'model#status' });
+            // And clear the queue
+            return [];
+          }
+
+          // On regular messages, remove it from the queue
           return state.slice(1);
         }
         case messageQueueActionTypes.CLEAR: {
@@ -157,16 +192,18 @@ export function InstanceProvider(props) {
   );
 
   useEffect(() => {
-    // This checks if instance status changed from 'disconnected' to 'processing'
-    // which means an job was already running. If this is the case, send an abort
-    // message to clear the instance.
+    // Send abort message if GPU status changed from 'initializing' to 'processing'
+    // which means an job was already running.
     if (
-      instance.previousStatus === 'disconnected' &&
-      instance.status === 'processing'
+      instance.previousGpuStatus === 'initializing' &&
+      instance.gpuStatus === 'processing'
     ) {
-      websocketClient.sendMessage({ action: 'model#abort' });
+      dispatchMessageQueue({
+        type: messageQueueActionTypes.ADD_EXPRESS,
+        data: { action: 'model#abort' },
+      });
     }
-  }, [websocketClient, instance.status]);
+  }, [websocketClient, instance.gpuStatus]); // eslint-disable-line
 
   // Listen to instance connection, send queue message if any
   useEffect(() => {
@@ -174,10 +211,12 @@ export function InstanceProvider(props) {
       websocketClient &&
       instance.wsConnected &&
       instance.gpuConnected &&
-      instance.gpuStatus === 'ready' &&
       messageQueue.length > 0
     ) {
-      dispatchMessageQueue({ type: messageQueueActionTypes.SEND });
+      // Send message if instance is ready or first message is express
+      if (instance.gpuStatus === 'ready' || messageQueue[0].express) {
+        dispatchMessageQueue({ type: messageQueueActionTypes.SEND });
+      }
     }
   }, [
     websocketClient,
@@ -204,6 +243,7 @@ export function InstanceProvider(props) {
 
     // Get instance token
     let instance;
+    let doHideGlobalLoading = true;
     if (activeInstances.total > 0) {
       const { id: instanceId } = activeInstances.instances[0];
       instance = await restApiClient.getInstance(projectId, instanceId);
@@ -211,6 +251,7 @@ export function InstanceProvider(props) {
       // As the instance is already running, apply desired checkpoint when
       // ready.
       if (checkpointId) {
+        doHideGlobalLoading = false; // globalLoading will be hidden once checkpoint is in
         dispatchMessageQueue({
           type: messageQueueActionTypes.ADD,
           data: {
@@ -250,6 +291,9 @@ export function InstanceProvider(props) {
         applyInstanceStatus({
           wsConnected: true,
         });
+
+        // Hide global loading on connect, if necessary
+        if (doHideGlobalLoading) hideGlobalLoading();
         resolve(instance);
       });
       newWebsocketClient.addEventListener('error', () => {
@@ -265,15 +309,42 @@ export function InstanceProvider(props) {
     });
   }
 
+  const abortJob = () => {
+    // If GPU is not connected, just clear the message queue
+    if (!instance.gpuConnected) {
+      dispatchMessageQueue({
+        type: messageQueueActionTypes.CLEAR,
+        data: {
+          action: 'model#abort',
+        },
+      });
+    } else {
+      dispatchMessageQueue({
+        type: messageQueueActionTypes.ADD_EXPRESS,
+        data: {
+          action: 'model#abort',
+        },
+      });
+    }
+
+    // Clear prediction and checkpoint
+    dispatchPredictions({
+      type: predictionsActions.CLEAR_PREDICTION,
+    });
+    dispatchCurrentCheckpoint({
+      type: checkpointActions.RESET_CHECKPOINT,
+    });
+    hideGlobalLoading();
+  };
+
   const value = {
     instance,
     setInstanceStatusMessage: (message) =>
       applyInstanceStatus({
         gpuMessage: message,
       }),
-    sendAbortMessage: () =>
-      websocketClient.sendMessage({ action: 'model#abort' }),
 
+    abortJob,
     initInstance,
     runInference: async () => {
       if (restApiClient) {
@@ -309,11 +380,13 @@ export function InstanceProvider(props) {
         } catch (error) {
           logger(error);
           toasts.error('Could fetch model classes, please try again later.');
+          hideGlobalLoading();
           return; // abort inference run
         }
 
         if (!aoiName) {
           toasts.error('AOI Name must be set before running inference');
+          hideGlobalLoading();
           return; // abort inference run
         }
 
@@ -324,7 +397,20 @@ export function InstanceProvider(props) {
           toasts.error('Could not create instance, please try again later.');
         }
 
-        hideGlobalLoading();
+        showGlobalLoadingMessage(
+          <>
+            Running model and loading class predictions...
+            <Button
+              style={{ display: 'block', margin: '1rem auto 0' }}
+              variation='danger-raised-light'
+              onClick={() => {
+                abortJob();
+              }}
+            >
+              Abort Process
+            </Button>
+          </>
+        );
 
         try {
           // Reset predictions state
@@ -370,6 +456,21 @@ export function InstanceProvider(props) {
         );
         return;
       }
+
+      showGlobalLoadingMessage(
+        <>
+          Retraining model and loading updated predictions...
+          <Button
+            style={{ display: 'block', margin: '1rem auto 0' }}
+            variation='danger-raised-light'
+            onClick={() => {
+              abortJob();
+            }}
+          >
+            Abort Process
+          </Button>
+        </>
+      );
 
       // Reset predictions state
       dispatchPredictions({
@@ -598,6 +699,7 @@ export class WebsocketClient extends WebSocket {
           dispatchCurrentCheckpoint({
             type: checkpointActions.RESET_CHECKPOINT,
           });
+          hideGlobalLoading();
           // Request new status update after abort is confirmed
           this.sendMessage({ action: 'model#status' });
           break;
@@ -621,7 +723,7 @@ export class WebsocketClient extends WebSocket {
           dispatchMessageQueue({ type: messageQueueActionTypes.CLEAR });
           dispatchPredictions({ type: predictionsActions.CLEAR_PREDICTION });
           this.sendMessage({ action: 'model#status' });
-          toasts.error('Unexpected error, please try again later.');
+          hideGlobalLoading();
           break;
         case 'model#checkpoint':
           if (data && (data.id || data.checkpoint)) {
@@ -634,7 +736,13 @@ export class WebsocketClient extends WebSocket {
           break;
 
         case 'model#checkpoint#progress':
+          showGlobalLoadingMessage('Loading checkpoint...');
+          break;
         case 'model#checkpoint#complete':
+          fetchCheckpoint(data.id || data.checkpoint, checkpointModes.RETRAIN);
+          hideGlobalLoading();
+          this.sendMessage({ action: 'model#status' });
+          break;
         case 'model#retrain#complete':
           if (data && (data.id || data.checkpoint)) {
             fetchCheckpoint(
@@ -665,6 +773,7 @@ export class WebsocketClient extends WebSocket {
           });
           // Request new status update after abort is confirmed
           this.sendMessage({ action: 'model#status' });
+          hideGlobalLoading();
           break;
         case 'model#patch':
           //receive new patch
@@ -687,6 +796,7 @@ export class WebsocketClient extends WebSocket {
           dispatchAoiPatch({
             type: aoiPatchActions.COMPLETE_PATCH,
           });
+          hideGlobalLoading();
           // finish waiting for patch
           this.sendMessage({ action: 'model#status' });
           break;

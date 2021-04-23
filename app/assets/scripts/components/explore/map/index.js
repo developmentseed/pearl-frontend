@@ -132,13 +132,13 @@ function Map() {
         }
         break;
       case mapModes.ADD_SAMPLE_POLYGON:
-        if (currentCheckpoint.activeItem) {
+        if (currentCheckpoint && currentCheckpoint.activeItem) {
           mapRef.polygonDraw.enableAdd(currentCheckpoint.activeItem);
         }
         break;
 
       case mapModes.DELETE_SAMPLES:
-        if (currentCheckpoint.activeItem) {
+        if (currentCheckpoint && currentCheckpoint.activeItem) {
           mapRef.polygonDraw.enableSubtract(currentCheckpoint.activeItem);
         }
         break;
@@ -338,6 +338,44 @@ function Map() {
             />
           ))}
 
+        {predictions &&
+          predictions.data &&
+          predictions.data.predictions &&
+          predictions.data.predictions.map((p) => (
+            <ImageOverlay
+              key={p.key}
+              url={p.image}
+              bounds={p.bounds}
+              opacity={
+                userLayers.predictions.visible
+                  ? userLayers.predictions.opacity
+                  : 0
+              }
+            />
+          ))}
+
+        {aoiPatchList.map((patch) => {
+          // Id format set in context/map.js
+
+          return (
+            <React.Fragment key={patch.id}>
+              {patch.patches.map((p) => (
+                <ImageOverlay
+                  key={p.key}
+                  url={p.image}
+                  bounds={p.bounds}
+                  pane='markerPane'
+                  opacity={
+                    userLayers.refinementsLayer.visible
+                      ? userLayers.refinementsLayer.opacity
+                      : 0
+                  }
+                />
+              ))}
+            </React.Fragment>
+          );
+        })}
+
         {currentCheckpoint &&
           currentCheckpoint.retrain_geoms &&
           userLayers.retrainingSamples.active &&
@@ -371,43 +409,10 @@ function Map() {
             );
           })}
 
-        {predictions &&
-          predictions.data &&
-          predictions.data.predictions &&
-          predictions.data.predictions.map((p) => (
-            <ImageOverlay
-              key={p.key}
-              url={p.image}
-              bounds={p.bounds}
-              opacity={
-                userLayers.predictions.visible
-                  ? userLayers.predictions.opacity
-                  : 0
-              }
-            />
-          ))}
-
-        {aoiPatchList.map((patch) => {
-          // Id format set in context/map.js
-          const id = `${patch.name}-${patch.id}`;
-
-          return (
-            <React.Fragment key={patch.id}>
-              {patch.patches.map((p) => (
-                <ImageOverlay
-                  key={p.key}
-                  url={p.image}
-                  bounds={p.bounds}
-                  opacity={userLayers[id].visible ? userLayers[id].opacity : 0}
-                />
-              ))}
-            </React.Fragment>
-          );
-        })}
-
         {!predictions.data.predictions &&
           tileUrl &&
           currentProject &&
+          currentCheckpoint &&
           currentAoi && (
             <TileLayerWithHeaders
               url={tileUrl}

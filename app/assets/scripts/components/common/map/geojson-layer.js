@@ -4,13 +4,14 @@ import L from 'leaflet';
 import {} from 'leaflet.vectorgrid';
 
 function GeoJSONLayer(props) {
-  const { data, style, opacity, pointToLayer } = props;
+  const { data, style, opacity, pointToLayer, pane } = props;
   const map = useMap();
   const [layer, setLayer] = useState(null);
 
   useEffect(() => {
     const geolayer = L.geoJSON(data, {
       pointToLayer,
+      pane: pane || 'overlayPane',
     });
     geolayer.on('add', () => {
       setLayer(geolayer);
@@ -19,9 +20,9 @@ function GeoJSONLayer(props) {
 
     geolayer.addTo(map);
     return () => {
-      if (layer) {
-        layer.clearLayers();
-      }
+      geolayer.clearLayers();
+      geolayer.remove();
+      setLayer(null);
     };
   }, []);
 
@@ -30,14 +31,21 @@ function GeoJSONLayer(props) {
       layer.clearLayers();
       const geolayer = L.geoJSON(data, {
         pointToLayer,
+        pane: pane || 'overlayPane',
       });
+
       geolayer.on('add', () => {
         setLayer(geolayer);
         geolayer.setStyle(style);
       });
       geolayer.addTo(map);
+      return () => {
+        geolayer.clearLayers();
+        geolayer.remove();
+        setLayer(null);
+      };
     }
-  }, [data.properties.id]);
+  }, [data]);
 
   useEffect(() => {
     if (layer) {

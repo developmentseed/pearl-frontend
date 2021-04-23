@@ -4,10 +4,6 @@ import styled from 'styled-components';
 import { Modal } from '@devseed-ui/modal';
 import CardList from './card-list';
 
-const BodyOuter = styled.div`
-  height: 45vh;
-`;
-
 const HeaderWrapper = styled(Modal)`
   display: grid;
   grid-template-columns: 1fr;
@@ -56,14 +52,12 @@ function SelectModal(props) {
       renderHeader={renderHeader}
       filterCard={filterCard}
       content={
-        <BodyOuter>
-          <CardList
-            data={data}
-            renderCard={renderCard}
-            filterCard={filterCard}
-            nonScrolling={nonScrolling}
-          />
-        </BodyOuter>
+        <CardList
+          data={data}
+          renderCard={renderCard}
+          filterCard={filterCard}
+          nonScrolling={nonScrolling}
+        />
       }
     />
   );
