@@ -11,6 +11,7 @@ export const DropdownHeader = styled.header`
   padding: ${glsp()};
   p {
     text-transform: uppercase;
+    font-size: 0.875rem;
   }
   h1 {
     margin: 0;
@@ -60,10 +61,16 @@ export const DropdownItem = styled.a`
     color: ${themeVal('color.base')};
   }
   :hover {
-    color: ${themeVal('color.primary')};
     opacity: 1;
-    background: ${themeVal('color.primaryAlphaA')};
   }
+  ${({ nonhoverable }) =>
+    !nonhoverable &&
+    css`
+      :hover {
+        color: ${themeVal('color.primary')};
+        background: ${themeVal('color.primaryAlphaA')};
+      }
+    `}
 
   ${({ muted }) =>
     muted &&
@@ -78,6 +85,7 @@ export const DropdownFooter = styled.footer`
 
 export const Dropdown = styled(BaseDropdown)`
   padding: 0;
+  max-width: 18rem;
 `;
 export const DropdownTrigger = styled(InfoButton)`
   &::before {

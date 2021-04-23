@@ -1,5 +1,10 @@
-import { glsp, themeVal } from '@devseed-ui/theme-provider';
+import { glsp, themeVal, truncated } from '@devseed-ui/theme-provider';
 import { PlaceholderMessage } from '../../../styles/placeholder.js';
+import {
+  DropdownBody,
+  DropdownItem,
+  DropdownFooter,
+} from '../../../styles/dropdown';
 import styled, { css } from 'styled-components';
 import { Heading } from '@devseed-ui/typography';
 import collecticon from '@devseed-ui/collecticons';
@@ -24,7 +29,7 @@ export const ClassList = styled.section`
 
 export const Class = styled.div`
   display: grid;
-  grid-template-columns: min-content auto min-content;
+  grid-template-columns: ${glsp(1.5)} minmax(10px, 1fr) ${glsp(2)};
   grid-gap: 0 ${glsp(1)};
   padding: ${({ placeholder }) =>
     placeholder ? '0 1.5rem 1rem' : '0.5rem 1.5rem'};
@@ -40,20 +45,6 @@ export const Class = styled.div`
       color: ${themeVal('color.baseAlphaE')};
       border-color: ${themeVal('color.baseAlphaE')};
     `};
-  &.add__class {
-    padding: ${glsp(0.5)} ${glsp(1.5)};
-    // Add Class Button styles. May be removed if this takes on a different onClick configuration
-    span {
-      display: grid;
-      grid-template-columns: min-content auto min-content;
-      align-items: center;
-      grid-gap: 0 ${glsp(1)};
-    }
-    ${Heading} {
-      margin: 0;
-      line-height: 1.5;
-    }
-  }
   &.placeholder-class:first-child {
     margin-top: ${glsp(2)};
   }
@@ -82,6 +73,19 @@ export const Class = styled.div`
     `};
 `;
 
+export const AddClassButton = styled(Class)`
+  color: ${themeVal('color.base')};
+  span {
+    text-align: left;
+  }
+  &:before {
+    box-shadow: inset 0 0 0 1px ${themeVal('color.base')};
+    margin-right: 0;
+    color: ${themeVal('color.base')};
+    opacity: 0.8;
+  }
+`;
+
 export const ClassInfoWrapper = styled.div`
   grid-row: 1 / 3;
   grid-column: 2;
@@ -89,7 +93,8 @@ export const ClassInfoWrapper = styled.div`
   flex-flow: column;
 `;
 
-export const ClassHeading = styled(Heading)`
+export const ClassHeading = styled(Heading).attrs({ as: 'h4' })`
+  ${truncated}
   margin: 0;
   text-align: left;
   background: ${({ placeholder }) =>
@@ -150,4 +155,39 @@ export const ToolBox = styled.section`
       margin-left: ${glsp()};
     }
   }
+`;
+
+export const PickerStyles = {
+  default: {
+    picker: {
+      boxShadow: 'none',
+      fontFamily: 'inherit',
+    },
+    body: {
+      padding: '12px 12px 6px',
+    },
+    saturation: {
+      paddingBottom: '42%',
+    },
+  },
+};
+
+export const PickerDropdownBody = styled(DropdownBody)`
+  font-weight: 400;
+  padding: 0;
+`;
+
+export const PickerDropdownItem = styled(DropdownItem)`
+  font-weight: 400;
+  grid-gap: 0;
+  label {
+    font-size: 0.875rem;
+  }
+`;
+
+export const PickerDropdownFooter = styled(DropdownFooter)`
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-around;
+  align-items: center;
 `;

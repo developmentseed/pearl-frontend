@@ -18,6 +18,7 @@ export const checkpointModes = {
 };
 
 export const actions = {
+  ADD_CLASS: 'ADD_CLASS',
   SET_CHECKPOINT: 'SET_CHECKPOINT',
   SET_CHECKPOINT_NAME: 'SET_CHECKPOINT_NAME',
   SET_CHECKPOINT_MODE: 'SET_CHECKPOINT_MODE',
@@ -133,6 +134,54 @@ function checkpointReducer(state, action) {
         ...state,
         ...action.data,
       };
+
+    // Modifies current checkpoint classes to add a custom user defined class
+    case actions.ADD_CLASS: {
+      const newClass = {
+        name: action.data.name,
+        color: action.data.color,
+        points: {
+          type: 'MultiPoint',
+          coordinates: [],
+        },
+        polygons: [],
+      };
+      return {
+        ...state,
+        classes: {
+          ...state.classes,
+          [newClass.name]: newClass,
+        },
+        analytics: state.analytics
+          ? [
+              ...state.analytics,
+              {
+                counts: 0,
+                f1score: 0,
+                percent: 0,
+              },
+            ]
+          : state.analytics,
+        input_geoms: state.input_geoms
+          ? [
+              ...state.input_geoms,
+              {
+                type: 'GeometryCollection',
+                geometries: [],
+              },
+            ]
+          : state.input_geoms,
+        retrain_geoms: state.retrain_geoms
+          ? [
+              ...state.retrain_geoms,
+              {
+                type: 'MultiPoint',
+                coordinates: [],
+              },
+            ]
+          : state.retrain_geoms,
+      };
+    }
 
     case actions.ADD_CHECKPOINT_BRUSH:
       return {
