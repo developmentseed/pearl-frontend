@@ -343,7 +343,6 @@ export function InstanceProvider(props) {
     dispatchCurrentCheckpoint({
       type: checkpointActions.RESET_CHECKPOINT,
     });
-    hideGlobalLoading();
   };
 
   const value = {
@@ -483,6 +482,7 @@ export function InstanceProvider(props) {
                   },
                 },
               ]);
+              showGlobalLoadingMessage('Aborting...');
             }}
           >
             Abort Process
