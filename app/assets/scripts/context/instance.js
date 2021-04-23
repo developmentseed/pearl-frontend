@@ -477,7 +477,7 @@ export function InstanceProvider(props) {
             onClick={() => {
               abortJob([
                 {
-                  action: 'model#retrain',
+                  action: 'model#checkpoint',
                   data: {
                     id: formerCheckpointId,
                   },
