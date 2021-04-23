@@ -101,9 +101,10 @@ export function ExploreProvider(props) {
 
       const filteredList = filterAoiList(aois.aois);
       setAoiList(filteredList);
+      let latestAoi;
       if (aois.total > 0) {
-        const latest = filteredList[filteredList.length - 1];
-        loadAoi(project, latest);
+        latestAoi = filteredList[filteredList.length - 1];
+        loadAoi(project, latestAoi);
       }
 
       showGlobalLoadingMessage('Fetching checkpoints...');
@@ -113,7 +114,8 @@ export function ExploreProvider(props) {
       showGlobalLoadingMessage('Looking for active GPU instances...');
       const instance = await initInstance(
         project.id,
-        checkpoint && checkpoint.id
+        checkpoint && checkpoint.id,
+        latestAoi && latestAoi.id,
       );
 
       setCurrentInstance(instance);
