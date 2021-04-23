@@ -35,7 +35,7 @@ import GeoJSONLayer from '../../common/map/geojson-layer';
 import TileLayerWithHeaders from '../../common/map/tile-layer';
 import { useAuth } from '../../../context/auth';
 import { useApiMeta } from '../../../context/api-meta';
-import { useAoi, useAoiPatch } from '../../../context/aoi';
+import { useAoi, useAoiPatch, useAoiName } from '../../../context/aoi';
 import toasts from '../../common/toasts';
 import logger from '../../../utils/logger';
 
@@ -85,6 +85,8 @@ function Map() {
 
   const { apiLimits } = useApiMeta();
   const { aoiRef, setAoiRef, currentAoi } = useAoi();
+  const { updateAoiName } = useAoiName();
+
   const { restApiClient } = useAuth();
   const { aoiPatchList } = useAoiPatch();
 
@@ -198,8 +200,11 @@ function Map() {
         },
         onDrawEnd: (bbox, shape) => {
           setAoiRef(shape);
-          setAoiBounds(shape.getBounds());
+
+          const bounds = shape.getBounds();
+          setAoiBounds(bounds);
           setMapMode(mapModes.BROWSE_MODE);
+          updateAoiName(bounds);
         },
       }
     );

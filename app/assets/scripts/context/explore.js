@@ -17,7 +17,6 @@ import { useHistory, useParams } from 'react-router-dom';
 import { actions as predictionActions, usePredictions } from './predictions';
 import { mapStateReducer, mapModes, mapActionTypes } from './reducers/map';
 import tBbox from '@turf/bbox';
-import reverseGeoCode from '../utils/reverse-geocode';
 
 import {
   actions as checkpointActions,
@@ -42,7 +41,17 @@ export function ExploreProvider(props) {
 
   const { restApiClient, isLoading: authIsLoading } = useAuth();
   const { currentProject, setCurrentProject } = useProject();
-  const { aoiName, aoiRef, setAoiName, setAoiRef, setCurrentAoi } = useAoi();
+  const {
+    aoiName,
+    aoiRef,
+    setAoiName,
+    setAoiRef,
+    setCurrentAoi,
+    aoiList,
+    setAoiList,
+    aoiBounds,
+    setAoiBounds,
+  } = useAoi();
   const { predictions, dispatchPredictions } = usePredictions();
   const { selectedModel, setSelectedModel } = useModel();
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
@@ -56,8 +65,7 @@ export function ExploreProvider(props) {
   // The following properties should be moved to own context to avoid re-rendering.
   const [aoiArea, setAoiArea] = useState(null);
   const [aoiInitializer, setAoiInitializer] = useState(null);
-  const [aoiList, setAoiList] = useState([]);
-  const [aoiBounds, setAoiBounds] = useState(null);
+
   const [mapState, dispatchMapState] = useReducer(
     wrapLogReducer(mapStateReducer),
     {
@@ -157,7 +165,8 @@ export function ExploreProvider(props) {
 
       if (predictions.fetched) {
         restApiClient.get(`project/${currentProject.id}/aoi/`).then((aois) => {
-          setAoiList(filterAoiList(aois.aois));
+          const list = filterAoiList(aois.aois);
+          setAoiList(list);
         });
         // Refresh checkpoint list, prediction finished
         // means new checkpoint available
@@ -385,59 +394,6 @@ export function ExploreProvider(props) {
       setAoiArea(null);
     }
   }, [aoiRef]);
-
-  /*
-   * This useEffect GeoCodes an AOI after it is created.
-   * On the front end we assume that any AOI with the same name
-   * from the backend, will have the same geometry.
-   *
-   * To deal with this, any AOI that has the same geocoding as an existing one will be incremented.
-   *
-   * i.e. Seneca Rocks, Seneca Rocks #1, Seneca Rocks #2...etc
-   */
-
-  useEffect(() => {
-    if (!aoiBounds) {
-      return;
-    } else if (
-      mapState.mode === mapModes.BROWSE_MODE &&
-      (mapState.previousMode === mapModes.EDIT_AOI_MODE ||
-        mapState.previousMode === mapModes.CREATE_AOI_MODE)
-    ) {
-      const bounds = [
-        aoiBounds.getWest(),
-        aoiBounds.getSouth(),
-        aoiBounds.getEast(),
-        aoiBounds.getNorth(),
-      ];
-
-      showGlobalLoadingMessage('Geocoding AOI...');
-      reverseGeoCode(bounds).then((name) => {
-        let lastInstance;
-        aoiList
-          .sort((a, b) => {
-            if (a.name < b.name) return -1;
-            else if (a.name > b.name) return 1;
-            else return 0;
-          })
-          .forEach((a) => {
-            return (lastInstance = a.name.includes(name)
-              ? a.name
-              : lastInstance);
-          });
-        if (lastInstance) {
-          if (lastInstance.includes('#')) {
-            const [n, version] = lastInstance.split('#').map((w) => w.trim());
-            name = `${n} #${Number(version) + 1}`;
-          } else {
-            name = `${name} #${1}`;
-          }
-        }
-        setAoiName(name);
-        hideGlobalLoading();
-      });
-    }
-  }, [mapState, aoiBounds, aoiList]);
 
   return (
     <ExploreContext.Provider
