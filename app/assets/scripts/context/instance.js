@@ -260,16 +260,20 @@ export function InstanceProvider(props) {
       // As the instance is already running, apply desired checkpoint when
       // ready.
       if (checkpointId) {
-        doHideGlobalLoading = false; // globalLoading will be hidden once checkpoint is in
-        dispatchMessageQueue({
-          type: messageQueueActionTypes.ADD,
-          data: {
-            action: 'model#checkpoint',
+        if (checkpointId !== instance.checkpoint_id) {
+          doHideGlobalLoading = false; // globalLoading will be hidden once checkpoint is in
+          dispatchMessageQueue({
+            type: messageQueueActionTypes.ADD,
             data: {
-              id: checkpointId,
+              action: 'model#checkpoint',
+              data: {
+                id: checkpointId,
+              },
             },
-          },
-        });
+          });
+        } else {
+          fetchCheckpoint(projectId, checkpointId, checkpointModes.RETRAIN);
+        }
       }
     } else if (checkpointId) {
       instance = await restApiClient.createInstance(projectId, {
