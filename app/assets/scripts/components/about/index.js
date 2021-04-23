@@ -12,6 +12,7 @@ import {
 } from '../../styles/inpage';
 import Prose from '../../styles/type/prose';
 import { Heading } from '@devseed-ui/typography';
+import { glsp, media } from '@devseed-ui/theme-provider';
 
 import App from '../common/app';
 
@@ -24,6 +25,31 @@ const AboutBody = styled(InpageBody)`
   }
 `;
 
+const AboutBodyInner = styled(InpageBodyInner)`
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr auto;
+  grid-gap: 1rem;
+  ${media.mediumUp`
+    grid-template-columns: 4fr 1fr;
+    grid-template-rows: auto;
+  `}
+`;
+
+const InpageNav = styled.nav`
+  order: -1;
+  ${media.mediumUp`
+    order: 1;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    padding-top: ${glsp(8)};
+    margin: ${glsp(-8)} 0;
+  `}
+  li {
+    line-height: 2;
+  }
+`;
 class About extends React.Component {
   render() {
     return (
@@ -43,9 +69,9 @@ class About extends React.Component {
                 </InpageHeadline>
               </InpageHeaderInner>
             </InpageHeader>
-            <InpageBodyInner>
+            <AboutBodyInner>
               <Prose>
-                <Heading size='large' as='h2'>
+                <Heading size='large' as='h2' id='introduction'>
                   Introduction
                 </Heading>
                 <p>
@@ -90,7 +116,7 @@ class About extends React.Component {
                     Detailed class descriptions are available here.
                   </a>
                 </p>
-                <Heading size='large' as='h2'>
+                <Heading size='large' as='h2' id='guide-home'>
                   Getting around PEARL
                 </Heading>
                 <img src='../assets/graphics/content/guide-home.png' />
@@ -112,7 +138,7 @@ class About extends React.Component {
                   Users can create and refine AI-assisted land cover maps from
                   the main application page.
                 </p>
-                <Heading size='medium' as='h3'>
+                <Heading size='medium' as='h3' id='guide-aoi'>
                   Selecting an Area of Interest
                 </Heading>
                 <img src='../assets/graphics/content/guide-aoi.png' />
@@ -126,7 +152,7 @@ class About extends React.Component {
                   area size as you draw, and the bounding box will turn red to
                   indicate regions which are too large.
                 </p>
-                <Heading size='medium' as='h3'>
+                <Heading size='medium' as='h3' id='guide-models'>
                   Selecting a Starter Model
                 </Heading>
                 <img src='../assets/graphics/content/guide-models.png' />
@@ -135,7 +161,7 @@ class About extends React.Component {
                   starter model seed data, class distribution and F1 scores,
                   training area, and label sources.
                 </p>
-                <Heading size='large' as='h2'>
+                <Heading size='large' as='h2' id='guide-run'>
                   Running inference and improving the model through retraining
                 </Heading>
                 <img src='../assets/graphics/content/guide-predictions.png' />
@@ -148,7 +174,7 @@ class About extends React.Component {
                   model are visible in the side left panel, along with the
                   Retrain, Refine, and Layer tools
                 </p>
-                <Heading size='medium' as='h3'>
+                <Heading size='medium' as='h3' id='guide-retrain'>
                   Retraining
                 </Heading>
                 <img src='../assets/graphics/content/guide-retrain.png' />
@@ -179,7 +205,7 @@ class About extends React.Component {
                   model can be fine tuned. This dataset has class distribution
                   as the original training data set.
                 </p>
-                <Heading size='medium' as='h3'>
+                <Heading size='medium' as='h3' id='guide-analysis'>
                   Prediction Analysis
                 </Heading>
                 <img src='../assets/graphics/content/guide-analysis.png' />
@@ -191,7 +217,7 @@ class About extends React.Component {
                   returned results. Class F1 scores can help you compare the
                   accuracy of classes to{' '}
                 </p>
-                <Heading size='large' as='h2'>
+                <Heading size='large' as='h2' id='guide-checkpoint'>
                   Saving your work using checkpoints
                 </Heading>
                 <img src='../assets/graphics/content/guide-checkpoint.png' />
@@ -203,7 +229,7 @@ class About extends React.Component {
                   and reuse later. Internally, checkpoints store the unique set
                   of model weights based on the retraining steps taken.
                 </p>
-                <Heading size='large' as='h2'>
+                <Heading size='large' as='h2' id='guide-refine'>
                   Refining the map output
                 </Heading>
                 <img src='../assets/graphics/content/guide-refine.png' />
@@ -219,7 +245,7 @@ class About extends React.Component {
                   click <strong>Save Refinements</strong> to add your changes to
                   the map.
                 </p>
-                <Heading size='large' as='h2'>
+                <Heading size='large' as='h2' id='guide-export'>
                   Sharing Maps
                 </Heading>
                 <img src='../assets/graphics/content/guide-export.png' />
@@ -230,7 +256,7 @@ class About extends React.Component {
                   output, click on the <strong>Export</strong> button on the top
                   right corner.
                 </p>
-                <Heading size='large' as='h2'>
+                <Heading size='large' as='h2' id='guide-limitations'>
                   Limitations
                 </Heading>
                 <ul>
@@ -261,7 +287,47 @@ class About extends React.Component {
                   </li>
                 </ul>
               </Prose>
-            </InpageBodyInner>
+              <InpageNav>
+                <ul>
+                  <li>
+                    <strong>User Guide</strong>
+                  </li>
+                  <li>
+                    <a href='#introduction'>Introduction</a>
+                  </li>
+                  <li>
+                    <a href='#guide-home'>Getting around PEARL</a>
+                  </li>
+                  <li>
+                    <a href='#guide-aoi'>Selecting an AOI</a>
+                  </li>
+                  <li>
+                    <a href='#guide-models'>Selecting Starter Models</a>
+                  </li>
+                  <li>
+                    <a href='#guide-run'>Running inference</a>
+                  </li>
+                  <li>
+                    <a href='#guide-retrain'>Retraining</a>
+                  </li>
+                  <li>
+                    <a href='#guide-analysis'>Prediction Analysis</a>
+                  </li>
+                  <li>
+                    <a href='#guide-checkpoint'>Saving Checkpoints</a>
+                  </li>
+                  <li>
+                    <a href='#guide-refine'>Refining output</a>
+                  </li>
+                  <li>
+                    <a href='#guide-export'>Sharing maps</a>
+                  </li>
+                  <li>
+                    <a href='#guide-limitations'>Limitations</a>
+                  </li>
+                </ul>
+              </InpageNav>
+            </AboutBodyInner>
           </AboutBody>
         </PageBody>
       </App>
