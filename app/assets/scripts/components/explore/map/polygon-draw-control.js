@@ -15,14 +15,26 @@ class PolygonDrawControl {
     this.manualMode = false;
   }
 
+  /* Clear geometry from layer */
   clearLayers() {
     this._group.eachLayer(function (layer) {
       layer.clearLayers();
     });
   }
 
+  /*
+   * Create free hand shapes for each layer
+   * Layers are only added if they do not currently exist in polygon draw
+   */
   setLayers(layers) {
-    Object.values(layers).forEach(this.addLayer);
+    const currentLayers = new Set();
+    this._group.eachLayer((l) => currentLayers.add(l.category));
+
+    Object.entries(layers).forEach(([name, layer]) => {
+      if (!currentLayers.has(name)) {
+        this.addLayer(layer);
+      }
+    });
   }
 
   addLayer(layer) {

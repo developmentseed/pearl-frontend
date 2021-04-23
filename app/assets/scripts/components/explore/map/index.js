@@ -153,7 +153,7 @@ function Map() {
     currentCheckpoint && currentCheckpoint.activeItem,
   ]);
 
-  // Add polygon layers to be draw when checkpoint has changed
+  // Add polygon layers to be drawn when checkpoint has changed
   useEffect(() => {
     if (!mapRef || !mapRef.polygonDraw) return;
     mapRef.polygonDraw.clearLayers();
