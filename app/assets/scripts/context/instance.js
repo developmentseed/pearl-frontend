@@ -149,7 +149,9 @@ export function InstanceProvider(props) {
           // useful to apply a checkpoint next, for example.
           websocketClient.sendMessage({ action: 'model#abort' });
           return (
-            data.queueNext.map((m) => ({ express: false, message: m })) || []
+            (data.queueNext &&
+              data.queueNext.map((m) => ({ express: false, message: m }))) ||
+            []
           );
         }
         case messageQueueActionTypes.ADD: {
@@ -478,15 +480,9 @@ export function InstanceProvider(props) {
             style={{ display: 'block', margin: '1rem auto 0' }}
             variation='danger-raised-light'
             onClick={() => {
-              abortJob([
-                {
-                  action: 'model#checkpoint',
-                  data: {
-                    id: formerCheckpointId,
-                  },
-                },
-              ]);
+              abortJob();
               showGlobalLoadingMessage('Aborting...');
+              fetchCheckpoint(currentProject.id, formerCheckpointId);
             }}
           >
             Abort Process
