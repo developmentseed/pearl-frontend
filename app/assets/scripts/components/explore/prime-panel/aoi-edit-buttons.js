@@ -46,16 +46,17 @@ export function AoiEditButtons(props) {
       <>
         <EditButton
           onClick={function () {
+            let bounds;
             if (!apiLimits || apiLimits.live_inference > aoiArea) {
               setMapMode(mapModes.BROWSE_MODE);
-              setAoiBounds(aoiRef.getBounds());
+              bounds = aoiRef.getBounds();
+              setAoiBounds(bounds);
+              updateAoiName(bounds);
             } else if (apiLimits.max_inference > aoiArea) {
               setActiveModal('no-live-inference');
             } else {
               setActiveModal('area-too-large');
             }
-
-            updateAoiName();
           }}
           title='Set Area of Interest'
           useIcon='tick'

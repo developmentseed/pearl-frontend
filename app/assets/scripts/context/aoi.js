@@ -41,7 +41,7 @@ export function AoiProvider(props) {
    * Wrapping function for reverse geocode
    * @param _aoiBounds - optional bound object. This is passed when this function
    * is called from onDrawEnd context of AoiDrawControl. In this situation, the aoiBounds
-   * state variable is may not be updated before the function is executed so we can pass the bounds explicitly.
+   * state variable is may not be updated before the function is executed so we can pass the bounds explicitly.  _aoiBounds takes precedenc over aoiBounds
    *
    * On the front end we assume that any AOI with the same name
    * from the backend, will have the same geometry.
@@ -52,7 +52,11 @@ export function AoiProvider(props) {
    *
    */
   function updateAoiName(_aoiBounds) {
-    const refBounds = aoiBounds || _aoiBounds;
+    const refBounds = _aoiBounds || aoiBounds;
+
+    if (!refBounds) {
+      logger(new Error('Aoi bounds not defined', aoiBounds));
+    }
 
     const bounds = [
       refBounds.getWest(),
