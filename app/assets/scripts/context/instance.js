@@ -33,6 +33,7 @@ import { useModel } from './model';
 import { wrapLogReducer } from './reducers/utils';
 
 const messageQueueActionTypes = {
+  ABORT: 'ABORT',
   ADD: 'ADD',
   ADD_EXPRESS: 'ADD_EXPRESS',
   SEND: 'SEND',
@@ -143,6 +144,16 @@ export function InstanceProvider(props) {
   const [messageQueue, dispatchMessageQueue] = useReducer(
     wrapLogReducer((state, { type, data }) => {
       switch (type) {
+        case messageQueueActionTypes.ABORT: {
+          // This action allow the abort message to be followed by messages passed in the action,
+          // useful to apply a checkpoint next, for example.
+          websocketClient.sendMessage({ action: 'model#abort' });
+          return (
+            (data.queueNext &&
+              data.queueNext.map((m) => ({ express: false, message: m }))) ||
+            []
+          );
+        }
         case messageQueueActionTypes.ADD: {
           return state.concat({
             express: false,
@@ -251,16 +262,20 @@ export function InstanceProvider(props) {
       // As the instance is already running, apply desired checkpoint when
       // ready.
       if (checkpointId) {
-        doHideGlobalLoading = false; // globalLoading will be hidden once checkpoint is in
-        dispatchMessageQueue({
-          type: messageQueueActionTypes.ADD,
-          data: {
-            action: 'model#checkpoint',
+        if (checkpointId !== instance.checkpoint_id) {
+          doHideGlobalLoading = false; // globalLoading will be hidden once checkpoint is in
+          dispatchMessageQueue({
+            type: messageQueueActionTypes.ADD,
             data: {
-              id: checkpointId,
+              action: 'model#checkpoint',
+              data: {
+                id: checkpointId,
+              },
             },
-          },
-        });
+          });
+        } else {
+          fetchCheckpoint(projectId, checkpointId, checkpointModes.RETRAIN);
+        }
       }
     } else if (checkpointId) {
       instance = await restApiClient.createInstance(projectId, {
@@ -309,7 +324,7 @@ export function InstanceProvider(props) {
     });
   }
 
-  const abortJob = () => {
+  const abortJob = (queueNext) => {
     // If GPU is not connected, just clear the message queue
     if (!instance.gpuConnected) {
       dispatchMessageQueue({
@@ -320,9 +335,9 @@ export function InstanceProvider(props) {
       });
     } else {
       dispatchMessageQueue({
-        type: messageQueueActionTypes.ADD_EXPRESS,
+        type: messageQueueActionTypes.ABORT,
         data: {
-          action: 'model#abort',
+          queueNext,
         },
       });
     }
@@ -334,7 +349,6 @@ export function InstanceProvider(props) {
     dispatchCurrentCheckpoint({
       type: checkpointActions.RESET_CHECKPOINT,
     });
-    hideGlobalLoading();
   };
 
   const value = {
@@ -457,6 +471,8 @@ export function InstanceProvider(props) {
         return;
       }
 
+      const formerCheckpointId = currentCheckpoint.id;
+
       showGlobalLoadingMessage(
         <>
           Retraining model and loading updated predictions...
@@ -465,6 +481,8 @@ export function InstanceProvider(props) {
             variation='danger-raised-light'
             onClick={() => {
               abortJob();
+              showGlobalLoadingMessage('Aborting...');
+              fetchCheckpoint(currentProject.id, formerCheckpointId);
             }}
           >
             Abort Process

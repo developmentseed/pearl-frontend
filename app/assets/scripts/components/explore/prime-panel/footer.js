@@ -128,7 +128,7 @@ function Footer(props) {
             ...latest.checkpointBrushes,
           });
         }}
-        disabled={!(currentCheckpoint && currentCheckpoint.history.length)}
+        disabled={!(currentCheckpoint && currentCheckpoint.history?.length)}
         id='undo-button-trigger'
       >
         Undo
