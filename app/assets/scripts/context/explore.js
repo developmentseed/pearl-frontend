@@ -115,7 +115,7 @@ export function ExploreProvider(props) {
       const instance = await initInstance(
         project.id,
         checkpoint && checkpoint.id,
-        latestAoi && latestAoi.id,
+        latestAoi && latestAoi.id
       );
 
       setCurrentInstance(instance);
