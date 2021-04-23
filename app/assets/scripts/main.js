@@ -1,7 +1,6 @@
 import './wdyr';
 import '@babel/polyfill';
 import React, { useEffect } from 'react';
-import config from './config';
 import { DevseedUiThemeProvider } from '@devseed-ui/theme-provider';
 
 import { render } from 'react-dom';
@@ -13,7 +12,6 @@ import history from './history';
 
 import theme from './styles/theme';
 
-import Landing from './components/landing';
 import Home from './components/home';
 import Explore from './components/explore';
 import AoiMap from './components/aoi-map';
@@ -61,31 +59,26 @@ function Root() {
                 <CollecticonsGlobalStyle />
                 <GlobalStyles />
                 <Switch>
-                  {config.environment === 'production' ? (
-                    <Route exact path='/' component={Landing} />
-                  ) : (
-                    <>
-                      <Route exact path='/' component={Home} />
-                      <Route path='/aoi/:uuid/map' component={AoiMap} />
-                      <Route path='/project/:projectId' component={Explore} />
-                      <ProtectedRoute
-                        exact
-                        path='/profile/maps'
-                        component={Maps}
-                      />
-                      <ProtectedRoute
-                        exact
-                        path='/profile/projects'
-                        component={Projects}
-                      />
-                      <Route
-                        path='/profile/projects/:projectId'
-                        component={Project}
-                      />
-                      <Route path='/about' component={About} />
-                    </>
-                  )}
-
+                  <>
+                    <Route exact path='/' component={Home} />
+                    <Route path='/aoi/:uuid/map' component={AoiMap} />
+                    <Route path='/project/:projectId' component={Explore} />
+                    <ProtectedRoute
+                      exact
+                      path='/profile/maps'
+                      component={Maps}
+                    />
+                    <ProtectedRoute
+                      exact
+                      path='/profile/projects'
+                      component={Projects}
+                    />
+                    <Route
+                      path='/profile/projects/:projectId'
+                      component={Project}
+                    />
+                    <Route path='/about' component={About} />
+                  </>
                   <Route path='*' component={UhOh} />
                 </Switch>
                 <ToastContainerCustom />
