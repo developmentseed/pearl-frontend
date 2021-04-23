@@ -156,12 +156,15 @@ function Map() {
   // Add polygon layers to be draw when checkpoint has changed
   useEffect(() => {
     if (!mapRef || !mapRef.polygonDraw) return;
-
     mapRef.polygonDraw.clearLayers();
     if (currentCheckpoint) {
       mapRef.polygonDraw.setLayers(currentCheckpoint.classes);
     }
-  }, [mapRef, currentCheckpoint && currentCheckpoint.id]);
+  }, [
+    mapRef,
+    currentCheckpoint && currentCheckpoint.id,
+    currentCheckpoint && Object.keys(currentCheckpoint.classes).length,
+  ]);
 
   /**
    * Add/update AOI controls on API metadata change.

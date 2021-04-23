@@ -1,12 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import T from 'prop-types';
 import get from 'lodash.get';
 import { Button } from '@devseed-ui/button';
+import { ChromePicker } from 'react-color';
 import InfoButton from '../../common/info-button';
 import { Heading } from '@devseed-ui/typography';
 import { PlaceholderMessage } from '../../../styles/placeholder.js';
 import { actions, useCheckpoint } from '../../../context/checkpoint.js';
 import { useMapState } from '../../../context/explore.js';
+import {
+  Dropdown,
+  DropdownHeader,
+  DropdownItem,
+  DropdownTrigger,
+} from '../../../styles/dropdown';
 import {
   ToolsWrapper,
   ClassList,
@@ -17,8 +24,13 @@ import {
   ClassSamples,
   ClassOptions,
   ToolBox as RetrainTools,
+  AddClassButton,
+  PickerStyles,
+  PickerDropdownBody,
+  PickerDropdownItem,
+  PickerDropdownFooter,
 } from './retrain-refine-styles';
-
+import { FormInput } from '@devseed-ui/form';
 /*
  * Retrain Model
  * @param ready - true when checkpoint exists and we are in RETRAIN mode
@@ -30,6 +42,10 @@ function RetrainModel(props) {
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
 
   const { setMapMode, mapModes, mapState } = useMapState();
+
+  const [addClassColor, setAddClassColor] = useState('#000000');
+
+  const [addClassName, setAddClassName] = useState('');
 
   return (
     <ToolsWrapper className={className}>
@@ -144,10 +160,78 @@ function RetrainModel(props) {
                 </Class>
               );
             })}
-            <Class className='add__class' muted as={Button}>
-              <ClassThumbnail useIcon='plus' outline />
-              <Heading size='xsmall'>Add Class</Heading>
-            </Class>
+            <Dropdown
+              alignment='center'
+              direction='up'
+              triggerElement={(props) => (
+                <AddClassButton
+                  as={DropdownTrigger}
+                  variation='primary-plain'
+                  useIcon='plus--small'
+                  title='Open dropdown'
+                  className='add__class'
+                  size='medium'
+                  {...props}
+                >
+                  Add Class
+                </AddClassButton>
+              )}
+              className='add-class__dropdown'
+            >
+              <>
+                <DropdownHeader>
+                  <p>New Class</p>
+                </DropdownHeader>
+                <PickerDropdownBody>
+                  <PickerDropdownItem nonhoverable as='div'>
+                    <label htmlFor='addClassName'>Class Name</label>
+                    <FormInput
+                      id='addClassName'
+                      value={addClassName}
+                      onChange={(e) => {
+                        setAddClassName(e.target.value);
+                      }}
+                    />
+                  </PickerDropdownItem>
+                  <PickerDropdownItem nonhoverable as='div'>
+                    <label>Label Color</label>
+                    <ChromePicker
+                      disableAlpha={true}
+                      color={addClassColor}
+                      width='100%'
+                      styles={PickerStyles}
+                      onChangeComplete={(color) => {
+                        // console.log('change complete', color);
+                        setAddClassColor(color.hex);
+                      }}
+                    />
+                  </PickerDropdownItem>
+                </PickerDropdownBody>
+                <PickerDropdownFooter>
+                  <DropdownItem nonhoverable data-dropdown='click.close'>
+                    Cancel
+                  </DropdownItem>
+                  <DropdownItem nonhoverable data-dropdown='click.close'>
+                    <Button
+                      variation='primary-plain'
+                      onClick={() => {
+                        dispatchCurrentCheckpoint({
+                          type: actions.ADD_CLASS,
+                          data: {
+                            name: addClassName,
+                            color: addClassColor,
+                          },
+                        });
+                        setAddClassName('');
+                        setAddClassColor('#1CE1CE');
+                      }}
+                    >
+                      Save
+                    </Button>
+                  </DropdownItem>
+                </PickerDropdownFooter>
+              </>
+            </Dropdown>
           </ClassList>
         </>
       )}
