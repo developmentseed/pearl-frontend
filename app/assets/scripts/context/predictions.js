@@ -115,8 +115,8 @@ export function predictionsReducer(state, action) {
       if (predictionAoiId === currentAoiId) {
         let predictions = state.data.predictions || [];
 
-        // Check if message has image
-        if (data.bounds && data.image) {
+        // Extract geo-located image from message
+        try {
           const [minX, minY, maxX, maxY] = data.bounds;
 
           // Build prediction object
@@ -128,6 +128,9 @@ export function predictionsReducer(state, action) {
               [maxY, maxX],
             ],
           });
+        } catch (error) {
+          logger('Could not parse message: ', { message: data });
+          logger(error);
         }
 
         // Add it to state
