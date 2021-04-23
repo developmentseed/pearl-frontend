@@ -91,6 +91,7 @@ export default function (state, action) {
         error: true,
       });
     default:
+      console.log(action);
       throw new Error('Unexpected error.');
   }
 }

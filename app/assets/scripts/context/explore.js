@@ -25,6 +25,7 @@ import {
 } from './checkpoint';
 import { wrapLogReducer } from './reducers/utils';
 import { useAoi, useAoiPatch } from './aoi';
+import { actions as aoiPatchActions } from './reducers/aoi_patch';
 import { useProject } from './project';
 import { useModel } from './model';
 import { useInstance } from './instance';
@@ -178,7 +179,9 @@ export function ExploreProvider(props) {
         }
 
         restApiClient
-          .get(`project/${currentProject.id}/aoi/${predictions.getData().aoiId}`)
+          .get(
+            `project/${currentProject.id}/aoi/${predictions.getData().aoiId}`
+          )
           .then((aoi) => {
             setCurrentAoi(aoi);
           });
@@ -211,6 +214,7 @@ export function ExploreProvider(props) {
           currentAoi.id,
           updatedPatchList.map((p) => p.id)
         );
+        dispatchAoiPatch({ type: aoiPatchActions.CLEAR_PATCH });
       } else if (aoiPatch.error) {
         toasts.error('An error ocurred while requesting aoi patch.');
         logger(aoiPatch.error);
