@@ -173,7 +173,7 @@ export const useAoi = () => {
       setCurrentAoi: (data) =>
         dispatchCurrentAoi({ type: actions.SET_AOI, data }),
     }),
-    [aoiRef, aoiName, currentAoi, dispatchCurrentAoi]
+    [aoiRef, aoiName, currentAoi, dispatchCurrentAoi, aoiList, aoiBounds]
   );
 };
 
