@@ -30,13 +30,9 @@ class PolygonDrawControl {
   setLayers(layers) {
     console.log('set layers');
 
-    console.log(this._group)
 
-    //this._group.clearLayers()
-    this._group.eachLayer(function (layer) {
-      console.log(layer)
-      layer.clearLayers();
-    })
+    console.log(this._group._layers)
+    this._group.clearLayers();
 
     Object.values(layers).forEach(this.addLayer);
   }
