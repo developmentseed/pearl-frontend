@@ -172,7 +172,7 @@ class About extends React.Component {
                   your predictions. Once predictions are ready, they will load
                   in over the AOI as image tiles. The classes available from the
                   model are visible in the side left panel, along with the
-                  Retrain, Refine, and Layer tools
+                  Retrain, Refine, and Layer tools.
                 </p>
                 <Heading size='medium' as='h3' id='guide-retrain'>
                   Retraining
@@ -212,10 +212,26 @@ class About extends React.Component {
                 <p>
                   After submitting retraining samples, the analysis panel will
                   populate with metrics on class distribution and class f1
-                  scores. Use the analysis to compare your expected
-                  understanding of an area’s land cover classes with the
-                  returned results. Class F1 scores can help you compare the
-                  accuracy of classes to{' '}
+                  scores. This is possible because a subset of the retraining
+                  samples are held out (ie unseen during retraining), so the
+                  retrained model can be evaluated against those samples. Use
+                  the analysis to compare your expected understanding of an
+                  area’s land cover classes with the returned results. Per class
+                  F1 scores help you understand how each class of the model is
+                  performing.
+                </p>
+                <p>
+                  The F1 score is the harmonic mean of precision, and recall.
+                  Precision is the percentage of “guesses” that a model makes
+                  that are correct. Recall is the percentage of true positives
+                  that a model captures. At a pixel level we’re comparing if the
+                  predicted land cover class matches the ground truth land cover
+                  class. The global F1 score in the model meta-data card is
+                  “weighted” F1 score, so classes that occur more often will
+                  have a greater weight in that value, interpreting this global
+                  score within the context of the F1 score performance for each
+                  individual class will give a more complete picture of model
+                  performance.
                 </p>
                 <Heading size='large' as='h2' id='guide-checkpoint'>
                   Saving your work using checkpoints
