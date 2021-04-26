@@ -53,11 +53,11 @@ function SecPanel() {
               <ScrollBodyWrapper>
                 <StyledBlockBody>
                   <PanelBlockHeader>
-                    <Subheading>Class Distribution</Subheading>
+                    <Subheading>Retraining Sample Distribution</Subheading>
                   </PanelBlockHeader>
                   <ClassAnalyticsChart
                     checkpoint={currentCheckpoint}
-                    label='Class Distribution'
+                    label='Retraining Sample Distribution'
                     metric='percent'
                   />
                 </StyledBlockBody>
