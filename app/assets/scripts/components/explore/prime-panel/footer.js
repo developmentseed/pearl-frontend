@@ -57,11 +57,17 @@ function PrimeButton({ currentCheckpoint, allowInferenceRun, mapRef }) {
       style={{
         gridColumn: '1 / -1',
       }}
-      onClick={!currentCheckpoint ? runInference : retrain}
+      onClick={
+        !currentCheckpoint || currentCheckpoint.mode === checkpointModes.RUN
+          ? runInference
+          : retrain
+      }
       visuallyDisabled={!allowInferenceRun}
       id='apply-button-trigger'
     >
-      {!currentCheckpoint ? 'Run Model' : 'Retrain Model'}
+      {!currentCheckpoint || currentCheckpoint.mode === checkpointModes.RUN
+        ? 'Run Model'
+        : 'Retrain Model'}
     </InfoButton>
   );
 }

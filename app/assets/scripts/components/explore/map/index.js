@@ -344,7 +344,8 @@ function Map() {
             />
           ))}
 
-        {predictions &&
+        {false &&
+          predictions &&
           predictions.data &&
           predictions.data.predictions &&
           predictions.data.predictions.map((p) => (
@@ -415,25 +416,23 @@ function Map() {
             );
           })}
 
-        {!predictions.data.predictions &&
-          tileUrl &&
-          currentProject &&
-          currentCheckpoint &&
-          currentAoi && (
-            <TileLayerWithHeaders
-              url={tileUrl}
-              maxZoom={18}
-              headers={[
-                {
-                  header: 'Authorization',
-                  value: `Bearer ${restApiClient.apiToken}`,
-                },
-              ]}
-              options={{
-                pane: 'overlayPane',
-              }}
-              eventHandlers={{
-                add: (v) => {
+        {tileUrl && currentProject && currentCheckpoint && currentAoi && (
+          <TileLayerWithHeaders
+            url={tileUrl}
+            maxZoom={18}
+            headers={[
+              {
+                header: 'Authorization',
+                value: `Bearer ${restApiClient.apiToken}`,
+              },
+            ]}
+            options={{
+              pane: 'overlayPane',
+            }}
+            eventHandlers={{
+              add: (v) => {
+
+                if (predictions.isReady() || !predictions.data.predictions) {
                   setMapLayers({
                     ...mapLayers,
                     ['aoi_tiles']: {
@@ -442,19 +441,20 @@ function Map() {
                       name: 'Aoi Tiles',
                     },
                   });
-                },
-                remove: () => {
-                  setMapLayers({
-                    ...mapLayers,
-                    ['aoi_tiles']: {
-                      ...mapLayers.aoi_tiles,
-                      active: false,
-                    },
-                  });
-                },
-              }}
-            />
-          )}
+                }
+              },
+              remove: () => {
+                setMapLayers({
+                  ...mapLayers,
+                  ['aoi_tiles']: {
+                    ...mapLayers.aoi_tiles,
+                    active: false,
+                  },
+                });
+              },
+            }}
+          />
+        )}
 
         {currentCheckpoint &&
           currentCheckpoint.classes &&

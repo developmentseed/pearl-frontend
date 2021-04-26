@@ -103,7 +103,7 @@ function Layer({ layer, onSliderChange, onVisibilityToggle, info, name }) {
         useIcon={visible ? 'eye' : 'eye-disabled'}
         onClick={() => {
           setVisible(!visible);
-          onVisibilityToggle(layer, !visible);
+          onVisibilityToggle(layer, !visible, value);
         }}
       >
         Info
@@ -240,11 +240,11 @@ function LayersPanel(props) {
                 onSliderChange={(layer, value) => {
                   layer.layer.setOpacity(value);
                 }}
-                onVisibilityToggle={(layer, value) => {
+                onVisibilityToggle={(layer, value, sliderValue ) => {
                   if (value) {
-                    mapRef.addLayer(layer.layer);
+                    layer.layer.setOpacity(sliderValue)
                   } else {
-                    mapRef.removeLayer(layer.layer);
+                    layer.layer.setOpacity(0)
                   }
                 }}
               />
