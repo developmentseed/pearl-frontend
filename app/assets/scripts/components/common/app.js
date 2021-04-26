@@ -10,6 +10,7 @@ import { Page } from '../../styles/page';
 import config from '../../config';
 import { useApiMeta } from '../../context/api-meta';
 import { useAuth } from '../../context/auth';
+import checkApiHealth from '../../utils/api-health';
 
 const { appTitle, appDescription } = config;
 
@@ -25,8 +26,9 @@ function App(props) {
     window.scrollTo(0, 0);
   }, [location]);
 
-  // Fetch API meta on page mount
+  // Check API health and fetch API meta on page mount
   useEffect(() => {
+    checkApiHealth();
     restApiClient.getApiMeta().then((data) => {
       setApiLimits(data && data.limits);
     });
