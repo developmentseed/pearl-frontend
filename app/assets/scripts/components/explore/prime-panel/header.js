@@ -325,7 +325,9 @@ function Header(props) {
                       applyCheckpoint(currentProject.id, ckpt.id);
                     }}
                   >
-                    {ckpt.parent ? `${ckpt.name} (${ckpt.id})` : 'Base Model'}
+                    {ckpt.parent
+                      ? `${ckpt.name} (${ckpt.id})`
+                      : `${selectedModel.name} (Base Model)`}
                   </DropdownItem>
                 ))}
             </DropdownBody>
