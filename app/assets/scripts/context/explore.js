@@ -145,6 +145,9 @@ export function ExploreProvider(props) {
       );
 
       setCheckpointList(list);
+      return {
+        checkpoints: list
+      }
     }
     return checkpointsMeta;
   }

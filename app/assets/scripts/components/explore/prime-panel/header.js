@@ -142,7 +142,10 @@ function Header(props) {
 
   const renderCheckpointSelectionHeader = () => {
     if (currentCheckpoint && currentCheckpoint.id) {
-      return `${currentCheckpoint.name} (${currentCheckpoint.id})`;
+      let realname = `${currentCheckpoint.name} (${currentCheckpoint.id})`;
+      return currentCheckpoint.parent
+        ? realname
+        : `${selectedModel.name} (Base Model)`;
     } else if (checkpointList?.length) {
       return `${checkpointList.length} checkpoint${
         checkpointList.length > 1 ? 's' : ''
@@ -325,7 +328,9 @@ function Header(props) {
                       applyCheckpoint(currentProject.id, ckpt.id);
                     }}
                   >
-                    {ckpt.name} ({ckpt.id})
+                    {ckpt.parent
+                      ? `${ckpt.name} (${ckpt.id})`
+                      : `${selectedModel.name} (Base Model)`}
                   </DropdownItem>
                 ))}
             </DropdownBody>
