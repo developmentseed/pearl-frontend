@@ -264,8 +264,8 @@ function Map() {
     updateTileUrl();
   }, [currentAoi, currentProject, mapRef]);
 
-  const displayMap = useMemo(
-    () => (
+  const displayMap = useMemo(() => {
+    return (
       <MapContainer
         center={center}
         zoom={zoom}
@@ -328,6 +328,7 @@ function Map() {
               url={config.tileUrlTemplate.replace('{LAYER_NAME}', layer)}
               minZoom={12}
               maxZoom={18}
+              pane='tilePane'
               eventHandlers={{
                 add: (v) => {
                   setMapLayers({
@@ -428,6 +429,30 @@ function Map() {
                   value: `Bearer ${restApiClient.apiToken}`,
                 },
               ]}
+              options={{
+                pane: 'overlayPane',
+              }}
+              eventHandlers={{
+                add: (v) => {
+                  setMapLayers({
+                    ...mapLayers,
+                    ['aoi_tiles']: {
+                      layer: v.target,
+                      active: true,
+                      name: 'Aoi Tiles',
+                    },
+                  });
+                },
+                remove: () => {
+                  setMapLayers({
+                    ...mapLayers,
+                    ['aoi_tiles']: {
+                      ...mapLayers.aoi_tiles,
+                      active: false,
+                    },
+                  });
+                },
+              }}
             />
           )}
 
@@ -467,24 +492,23 @@ function Map() {
           {aoiRef && <CenterMap aoiRef={aoiRef} />}
         </FeatureGroup>
       </MapContainer>
-    ),
-    [
-      mapModes,
-      aoiRef,
-      currentCheckpoint,
-      dispatchCurrentCheckpoint,
-      userLayers,
-      mapLayers,
-      mosaics,
-      mapState.mode,
-      predictions.data.predictions,
-      restApiClient,
-      setMapLayers,
-      setMapRef,
-      aoiPatchList,
-      tileUrl,
-    ]
-  );
+    );
+  }, [
+    mapModes,
+    aoiRef,
+    currentCheckpoint,
+    dispatchCurrentCheckpoint,
+    userLayers,
+    mapLayers,
+    mosaics,
+    mapState.mode,
+    predictions.data.predictions,
+    restApiClient,
+    setMapLayers,
+    setMapRef,
+    aoiPatchList,
+    tileUrl,
+  ]);
 
   return (
     <SizeAwareElement

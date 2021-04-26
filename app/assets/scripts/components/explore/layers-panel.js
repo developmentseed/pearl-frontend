@@ -235,7 +235,7 @@ function LayersPanel(props) {
               <Category
                 checkExpanded={() => checkExpanded(1)}
                 setExpanded={(v) => setExpanded(1, v)}
-                category='Base Satellite Imagery'
+                category='Map Layers'
                 layers={mapLayers}
                 onSliderChange={(layer, value) => {
                   layer.layer.setOpacity(value);

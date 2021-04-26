@@ -79,8 +79,10 @@ function ModelCard({ model, onClick }) {
   const classes = model.classes.map((c) => {
     return {
       ...c,
-      distribution: model.meta.class_distribution[c.name],
-      f1score: model.meta.f1_score[c.name],
+      distribution: model.meta.class_distribution
+        ? model.meta.class_distribution.class_distribution[c.name]
+        : 'Unknown',
+      f1score: model.meta.f1_score ? model.meta.f1_score[c.name] : 'Unknown',
     };
   });
   return (
