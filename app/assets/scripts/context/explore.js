@@ -260,7 +260,6 @@ export function ExploreProvider(props) {
     setAoiArea(null);
     setAoiName(null);
 
-
     //clear inference tiles
     dispatchPredictions({
       type: predictionActions.CLEAR_PREDICTION,
@@ -323,7 +322,6 @@ export function ExploreProvider(props) {
       if (predictions.isReady) {
         dispatchPredictions({ type: predictionActions.CLEAR_PREDICTION });
       }
-
     } else {
       // initializing map with first aoi
       setAoiInitializer(bounds);

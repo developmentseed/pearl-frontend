@@ -264,9 +264,8 @@ function Map() {
     updateTileUrl();
   }, [currentAoi, currentProject, mapRef]);
 
-  const displayMap = useMemo(
-    () => {
-      return (
+  const displayMap = useMemo(() => {
+    return (
       <MapContainer
         center={center}
         zoom={zoom}
@@ -468,25 +467,23 @@ function Map() {
           {aoiRef && <CenterMap aoiRef={aoiRef} />}
         </FeatureGroup>
       </MapContainer>
-    )
-    },
-    [
-      mapModes,
-      aoiRef,
-      currentCheckpoint,
-      dispatchCurrentCheckpoint,
-      userLayers,
-      mapLayers,
-      mosaics,
-      mapState.mode,
-      predictions.data.predictions,
-      restApiClient,
-      setMapLayers,
-      setMapRef,
-      aoiPatchList,
-      tileUrl,
-    ]
-  );
+    );
+  }, [
+    mapModes,
+    aoiRef,
+    currentCheckpoint,
+    dispatchCurrentCheckpoint,
+    userLayers,
+    mapLayers,
+    mosaics,
+    mapState.mode,
+    predictions.data.predictions,
+    restApiClient,
+    setMapLayers,
+    setMapRef,
+    aoiPatchList,
+    tileUrl,
+  ]);
 
   return (
     <SizeAwareElement
