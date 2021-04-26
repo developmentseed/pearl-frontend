@@ -443,7 +443,7 @@ function Map() {
                     },
                   });
                 },
-                remove: (v) => {
+                remove: () => {
                   setMapLayers({
                     ...mapLayers,
                     ['aoi_tiles']: {
