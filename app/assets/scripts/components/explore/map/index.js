@@ -328,6 +328,7 @@ function Map() {
               url={config.tileUrlTemplate.replace('{LAYER_NAME}', layer)}
               minZoom={12}
               maxZoom={18}
+              pane='tilePane'
               eventHandlers={{
                 add: (v) => {
                   setMapLayers({
@@ -428,6 +429,21 @@ function Map() {
                   value: `Bearer ${restApiClient.apiToken}`,
                 },
               ]}
+              options={{
+                pane: 'overlayPane',
+              }}
+              eventHandlers={{
+                add: (v) => {
+                  setMapLayers({
+                    ...mapLayers,
+                    ['AOI Tiles']: {
+                      layer: v.target,
+                      active: true,
+                      name: 'Aoi Tiles',
+                    },
+                  });
+                },
+              }}
             />
           )}
 
