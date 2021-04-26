@@ -265,7 +265,8 @@ function Map() {
   }, [currentAoi, currentProject, mapRef]);
 
   const displayMap = useMemo(
-    () => (
+    () => {
+      return (
       <MapContainer
         center={center}
         zoom={zoom}
@@ -467,7 +468,8 @@ function Map() {
           {aoiRef && <CenterMap aoiRef={aoiRef} />}
         </FeatureGroup>
       </MapContainer>
-    ),
+    )
+    },
     [
       mapModes,
       aoiRef,
