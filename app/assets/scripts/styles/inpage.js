@@ -89,7 +89,7 @@ export const InpageTitleWrapper = styled.div`
 `;
 
 export const InpageTitle = styled.h1`
-  ${truncated()}
+  /* ${truncated()} */
   font-size: 2rem;
   line-height: 2.5rem;
   margin: 0;
