@@ -25,6 +25,7 @@ import {
 } from './checkpoint';
 import { wrapLogReducer } from './reducers/utils';
 import { useAoi, useAoiPatch } from './aoi';
+import { actions as aoiPatchActions } from './reducers/aoi_patch';
 import { useProject } from './project';
 import { useModel } from './model';
 import { useInstance } from './instance';
@@ -46,6 +47,7 @@ export function ExploreProvider(props) {
     aoiRef,
     setAoiName,
     setAoiRef,
+    currentAoi,
     setCurrentAoi,
     aoiList,
     setAoiList,
@@ -175,6 +177,14 @@ export function ExploreProvider(props) {
         if (predictions.getData().type === checkpointModes.RETRAIN) {
           loadMetrics();
         }
+
+        restApiClient
+          .get(
+            `project/${currentProject.id}/aoi/${predictions.getData().aoiId}`
+          )
+          .then((aoi) => {
+            setCurrentAoi(aoi);
+          });
       }
 
       if (predictions.error) {
@@ -201,15 +211,16 @@ export function ExploreProvider(props) {
         setAoiPatchList(updatedPatchList);
         restApiClient.patchAoi(
           currentProject.id,
-          predictions.data.aoiId,
+          currentAoi.id,
           updatedPatchList.map((p) => p.id)
         );
+        dispatchAoiPatch({ type: aoiPatchActions.CLEAR_PATCH });
       } else if (aoiPatch.error) {
         toasts.error('An error ocurred while requesting aoi patch.');
         logger(aoiPatch.error);
       }
     }
-  }, [aoiPatch, predictions, restApiClient, currentProject]);
+  }, [aoiPatch, currentAoi, restApiClient, currentProject]);
 
   async function loadMetrics() {
     await restApiClient
