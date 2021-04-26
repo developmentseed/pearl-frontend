@@ -73,7 +73,7 @@ function TileLayerWithHeaders({ url, headers, options, eventHandlers }) {
 
     Object.entries(eventHandlers).forEach(([event, func]) => {
       l.on(event, func);
-    })
+    });
 
     l.on('add', () => {
       setLayer(l);
