@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useMap } from 'react-leaflet';
 import L from 'leaflet';
 
@@ -63,14 +63,22 @@ L.tileLayer = function (url, options, headers, abort) {
 
 function TileLayerWithHeaders({ url, headers, options }) {
   const map = useMap();
+
+  const [layer, setLayer] = useState(null);
   useEffect(() => {
+    if (layer) {
+      layer.remove();
+    }
     const l = L.tileLayer(url, options, headers);
+    l.on('add', () => {
+      setLayer(l);
+    });
     l.addTo(map);
 
     return () => {
       l.remove();
     };
-  }, []);
+  }, [url]);
 
   return null;
 }
