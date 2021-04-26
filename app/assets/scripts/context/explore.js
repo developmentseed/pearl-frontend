@@ -76,7 +76,11 @@ export function ExploreProvider(props) {
   );
   const [checkpointList, setCheckpointList] = useState(null);
   const [currentInstance, setCurrentInstance] = useState(null);
-  const { setInstanceStatusMessage, initInstance, loadAoiOnInstance } = useInstance();
+  const {
+    setInstanceStatusMessage,
+    initInstance,
+    loadAoiOnInstance,
+  } = useInstance();
 
   async function loadInitialData() {
     showGlobalLoadingMessage('Loading configuration...');
@@ -304,9 +308,8 @@ export function ExploreProvider(props) {
     setCurrentAoi(aoi);
 
     if (currentInstance) {
-      loadAoiOnInstance(aoi.id)
+      loadAoiOnInstance(aoi.id);
     }
-
 
     const [lonMin, latMin, lonMax, latMax] = tBbox(aoi.bounds);
     const bounds = [
@@ -332,7 +335,6 @@ export function ExploreProvider(props) {
       setAoiInitializer(bounds);
       setAoiName(aoiObject.name);
     }
-
 
     return bounds;
   }

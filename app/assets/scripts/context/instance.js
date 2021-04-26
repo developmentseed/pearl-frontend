@@ -361,9 +361,10 @@ export function InstanceProvider(props) {
     abortJob,
     initInstance,
     loadAoiOnInstance: (id) => {
-      showGlobalLoadingMessage('Loading AOI on Instance...')
+      showGlobalLoadingMessage('Loading AOI on Instance...');
+      //return
       dispatchMessageQueue({
-        type: messageQueueActionTypes.ADD,
+        type: messageQueueActionTypes.ADD_EXPRESS,
         data: {
           action: 'model#aoi',
           data: {
@@ -751,8 +752,9 @@ export class WebsocketClient extends WebSocket {
           });
           break;
         case 'model#aoi#complete':
-          hideGlobalLoading()
-          break
+          hideGlobalLoading();
+          this.sendMessage({ action: 'model#status' });
+          break;
         case 'error':
           logger(event);
           dispatchMessageQueue({ type: messageQueueActionTypes.CLEAR });
