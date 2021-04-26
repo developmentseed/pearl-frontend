@@ -705,10 +705,15 @@ export class WebsocketClient extends WebSocket {
         } else {
           // Pong didn't happened, close websocket and execute callback
           self.close();
-          clearInterval(self.pingPong);
           if (onPingPongFail) onPingPongFail();
         }
       }, config.websocketPingPongInterval);
+    });
+
+    this.addEventListener('close', () => {
+      if (typeof self.pingPong !== 'undefined') {
+        clearInterval(self.pingPong);
+      }
     });
 
     this.addEventListener('message', (event) => {
