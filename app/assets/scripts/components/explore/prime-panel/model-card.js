@@ -80,7 +80,7 @@ function ModelCard({ model, onClick }) {
     return {
       ...c,
       distribution: model.meta.class_distribution
-        ? model.meta.class_distribution.class_distribution[c.name]
+        ? model.meta.class_distribution[c.name]
         : 'Unknown',
       f1score: model.meta.f1_score ? model.meta.f1_score[c.name] : 'Unknown',
     };
