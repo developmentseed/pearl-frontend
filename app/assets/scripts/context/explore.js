@@ -244,10 +244,6 @@ export function ExploreProvider(props) {
       mapState.previousMode === mapModes.EDIT_AOI_MODE
     ) {
       dispatchPredictions({ type: predictionActions.CLEAR_PREDICTION });
-
-      dispatchCurrentCheckpoint({
-        type: checkpointActions.RESET_CHECKPOINT,
-      });
     }
   }, [mapState]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -263,11 +259,6 @@ export function ExploreProvider(props) {
     setAoiBounds(null);
     setAoiArea(null);
     setAoiName(null);
-
-    //clear inference tiles
-    dispatchCurrentCheckpoint({
-      type: checkpointActions.RESET_CHECKPOINT,
-    });
 
     //clear inference tiles
     dispatchPredictions({
@@ -327,14 +318,9 @@ export function ExploreProvider(props) {
         type: mapActionTypes.SET_MODE,
         data: mapModes.ADD_CLASS_SAMPLES,
       });
+
       if (predictions.isReady) {
         dispatchPredictions({ type: predictionActions.CLEAR_PREDICTION });
-      }
-
-      if (currentCheckpoint) {
-        dispatchCurrentCheckpoint({
-          type: checkpointActions.RESET_CHECKPOINT,
-        });
       }
     } else {
       // initializing map with first aoi
