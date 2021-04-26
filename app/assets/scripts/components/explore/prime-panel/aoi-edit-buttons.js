@@ -15,7 +15,11 @@ import {
 import { useMapRef } from '../../../context/map';
 import { useApiMeta } from '../../../context/api-meta';
 import { useAoiName } from '../../../context/aoi';
-import { useCheckpoint, actions as checkpointActions, checkpointModes } from '../../../context/checkpoint';
+import {
+  useCheckpoint,
+  actions as checkpointActions,
+  checkpointModes,
+} from '../../../context/checkpoint';
 
 const ModalFooter = styled(BaseModalFooter)`
   padding: ${glsp(2)} 0 0 0;

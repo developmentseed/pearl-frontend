@@ -431,7 +431,6 @@ function Map() {
             }}
             eventHandlers={{
               add: (v) => {
-
                 if (predictions.isReady() || !predictions.data.predictions) {
                   setMapLayers({
                     ...mapLayers,
