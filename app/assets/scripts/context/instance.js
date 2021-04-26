@@ -360,6 +360,18 @@ export function InstanceProvider(props) {
 
     abortJob,
     initInstance,
+    loadAoiOnInstance: (id) => {
+      showGlobalLoadingMessage('Loading AOI on Instance...')
+      dispatchMessageQueue({
+        type: messageQueueActionTypes.ADD,
+        data: {
+          action: 'model#aoi',
+          data: {
+            id,
+          },
+        },
+      });
+    },
     runInference: async () => {
       if (restApiClient) {
         let project = currentProject;
@@ -651,10 +663,12 @@ export const useInstance = () => {
     retrain,
     refine,
     applyCheckpoint,
+    loadAoiOnInstance,
   } = useCheckContext(InstanceContext);
   return useMemo(
     () => ({
       instance,
+      loadAoiOnInstance,
       setInstanceStatusMessage,
       sendAbortMessage,
       initInstance,
@@ -736,6 +750,9 @@ export class WebsocketClient extends WebSocket {
             },
           });
           break;
+        case 'model#aoi#complete':
+          hideGlobalLoading()
+          break
         case 'error':
           logger(event);
           dispatchMessageQueue({ type: messageQueueActionTypes.CLEAR });
