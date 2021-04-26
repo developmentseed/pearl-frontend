@@ -436,10 +436,19 @@ function Map() {
                 add: (v) => {
                   setMapLayers({
                     ...mapLayers,
-                    ['AOI Tiles']: {
+                    ['aoi_tiles']: {
                       layer: v.target,
                       active: true,
                       name: 'Aoi Tiles',
+                    },
+                  });
+                },
+                remove: (v) => {
+                  setMapLayers({
+                    ...mapLayers,
+                    ['aoi_tiles']: {
+                      ...mapLayers.aoi_tiles,
+                      active: false,
                     },
                   });
                 },
