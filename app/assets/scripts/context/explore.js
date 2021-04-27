@@ -264,6 +264,8 @@ export function ExploreProvider(props) {
     setAoiArea(null);
     setAoiName(null);
 
+    setCurrentAoi(null);
+
     //clear inference tiles
     dispatchPredictions({
       type: predictionActions.CLEAR_PREDICTION,

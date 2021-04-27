@@ -125,9 +125,7 @@ AoiProvider.propTypes = {
 function aoiReducer(state, action) {
   switch (action.type) {
     case actions.SET_AOI:
-      return {
-        ...action.data,
-      };
+      return action.data;
     default:
       logger('Undefined AOI action.');
       throw new Error('Unexpected error.');
