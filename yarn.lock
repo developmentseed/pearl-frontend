@@ -1069,6 +1069,47 @@
   resolved "https://registry.yarnpkg.com/@icons/material/-/material-0.2.4.tgz#e90c9f71768b3736e76d7dd6783fc6c2afa88bc8"
   integrity sha512-QPcGmICAPbGLGb6F/yNf/KzKqvFx8z5qx3D1yFqVAjoFmXK35EgyW+cJ57Te3CNsmzblwtzakLGFqHPqrfb4Tw==
 
+"@microsoft/applicationinsights-common@^2.6.2":
+  version "2.6.2"
+  resolved "https://registry.yarnpkg.com/@microsoft/applicationinsights-common/-/applicationinsights-common-2.6.2.tgz#d61a9f45c643a7bea40684c0cb242417f7e4f77b"
+  integrity sha512-BiLUGig0XCwZlafhxQ0SS+5nstFxE4t4HnNQGFiTnIOlPFHQCmLP04vLEg/MHNldNlz3Y00ivcGZ/ZN75dcdeA==
+  dependencies:
+    "@microsoft/applicationinsights-core-js" "2.6.2"
+    "@microsoft/applicationinsights-shims" "2.0.0"
+    "@microsoft/dynamicproto-js" "^1.1.2"
+
+"@microsoft/applicationinsights-core-js@2.6.2", "@microsoft/applicationinsights-core-js@^2.6.2":
+  version "2.6.2"
+  resolved "https://registry.yarnpkg.com/@microsoft/applicationinsights-core-js/-/applicationinsights-core-js-2.6.2.tgz#31504212520879ef8b749fce196dbef8b1c66b85"
+  integrity sha512-CwVIMqtPc7QDf3pgwIWRzUhByTE3ViZqC/bQawI6/czqFe3RHqMk11EH07a1RrlvSkb2uAjdlEv4HFe5DadgjA==
+  dependencies:
+    "@microsoft/applicationinsights-shims" "2.0.0"
+    "@microsoft/dynamicproto-js" "^1.1.2"
+
+"@microsoft/applicationinsights-react-js@^3.1.1":
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/@microsoft/applicationinsights-react-js/-/applicationinsights-react-js-3.1.1.tgz#a45fb3c43bf5f212e6b289e87491f88fc4280419"
+  integrity sha512-UznMqWzsSUXJ84eRZ38T7tXgrdYqJIFrZT0/Gw71n78sbL2BsaMkas1yI5LX+Dz2+EDCqp3TAoKCVXMou8M0JA==
+  dependencies:
+    "@microsoft/applicationinsights-common" "^2.6.2"
+    "@microsoft/applicationinsights-core-js" "^2.6.2"
+    "@microsoft/applicationinsights-shims" "^2.0.0"
+    history "^4.10.1"
+
+"@microsoft/applicationinsights-shims@2.0.0", "@microsoft/applicationinsights-shims@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@microsoft/applicationinsights-shims/-/applicationinsights-shims-2.0.0.tgz#ee622588f14e58ae3c055b12431da8ed55d71991"
+  integrity sha512-OaKew7f7acuNFgKYjMSPrRTRQi93xUyONWeeCeBlJSx7oRNJaL0TqbTvW6j5GHnSr3mhinPtAQ+rCQWASBnOrg==
+
+"@microsoft/dynamicproto-js@^1.1.2":
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/@microsoft/dynamicproto-js/-/dynamicproto-js-1.1.2.tgz#a6c8f27c01d53e613c6f02d0d20dacca7eb3a3b7"
+  integrity sha512-lKhE+Jc8l4shvYF4C++WAMXpufxpQzBA/OoAAUq7kEPu5e+X+Cj2H8gGRobgz5eyrw3fGfpwUf2+4mfgmYMSLA==
+  dependencies:
+    findup-sync "^4.0.0"
+    nopt "^5.0.0"
+    pify "^2.3.0"
+
 "@nodelib/fs.scandir@2.1.4":
   version "2.1.4"
   resolved "https://registry.yarnpkg.com/@nodelib/fs.scandir/-/fs.scandir-2.1.4.tgz#d4b3549a5db5de2683e0c1071ab4f140904bbf69"
@@ -7347,6 +7388,13 @@ node-zip@^1.1.1:
   version "3.0.6"
   resolved "https://registry.yarnpkg.com/nopt/-/nopt-3.0.6.tgz#c6465dbf08abcd4db359317f79ac68a646b28ff9"
   integrity sha1-xkZdvwirzU2zWTF/eaxopkayj/k=
+  dependencies:
+    abbrev "1"
+
+nopt@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/nopt/-/nopt-5.0.0.tgz#530942bb58a512fccafe53fe210f13a25355dc88"
+  integrity sha512-Tbj67rffqceeLpcRXrT7vKAN8CwfPeIBgM7E6iBkmKLV7bEMwpGgYLGv0jACUsECaa/vuxP0IjEont6umdMgtQ==
   dependencies:
     abbrev "1"
 

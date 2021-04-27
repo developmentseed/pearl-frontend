@@ -110,6 +110,7 @@
     "@devseed-ui/modal": "^3.0.1",
     "@devseed-ui/theme-provider": "^3.0.0",
     "@devseed-ui/typography": "^1.0.0",
+    "@microsoft/applicationinsights-react-js": "^3.1.1",
     "@react-leaflet/core": "^1.0.2",
     "@turf/area": "^6.3.0",
     "@turf/bbox": "^6.3.0",

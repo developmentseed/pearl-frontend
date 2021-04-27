@@ -11,6 +11,8 @@ import config from '../../config';
 import { useApiMeta } from '../../context/api-meta';
 import { useAuth } from '../../context/auth';
 import checkApiHealth from '../../utils/api-health';
+import { withAITracking } from '@microsoft/applicationinsights-react-js';
+import { reactPlugin } from '../../utils/azure-app-insights';
 
 const { appTitle, appDescription } = config;
 
@@ -49,4 +51,10 @@ App.propTypes = {
   pageTitle: T.string,
 };
 
-export default withRouter(App);
+
+if (environment === 'local') {
+  export default withRouter(App);
+} else {
+  // staging and production uses Azure App Insights
+  export default withRouter(withAITracking(reactPlugin, App));
+}
