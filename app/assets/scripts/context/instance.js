@@ -237,7 +237,7 @@ export function InstanceProvider(props) {
     messageQueue,
   ]);
 
-  async function initInstance(projectId, checkpointId) {
+  async function initInstance(projectId, checkpointId, aoiId) {
     // Close existing websocket
     if (websocketClient) {
       websocketClient.close();
@@ -277,9 +277,23 @@ export function InstanceProvider(props) {
           fetchCheckpoint(projectId, checkpointId, checkpointModes.RETRAIN);
         }
       }
+
+      if (aoiId && aoiId !== instance.aoi_id) {
+        doHideGlobalLoading = false; // globalLoading will be hidden once checkpoint is in
+        dispatchMessageQueue({
+          type: messageQueueActionTypes.ADD,
+          data: {
+            action: 'model#aoi',
+            data: {
+              id: aoiId,
+            },
+          },
+        });
+      }
     } else if (checkpointId) {
       instance = await restApiClient.createInstance(projectId, {
         checkpoint_id: checkpointId,
+        aoi_id: aoiId,
       });
 
       // Apply checkpoint to the interface as the instance will start with it applied.
@@ -366,6 +380,19 @@ export function InstanceProvider(props) {
 
     abortJob,
     initInstance,
+    loadAoiOnInstance: (id) => {
+      showGlobalLoadingMessage('Loading AOI on Instance...');
+      //return
+      dispatchMessageQueue({
+        type: messageQueueActionTypes.ADD_EXPRESS,
+        data: {
+          action: 'model#aoi',
+          data: {
+            id,
+          },
+        },
+      });
+    },
     runInference: async () => {
       if (restApiClient) {
         let project = currentProject;
@@ -657,10 +684,12 @@ export const useInstance = () => {
     retrain,
     refine,
     applyCheckpoint,
+    loadAoiOnInstance,
   } = useCheckContext(InstanceContext);
   return useMemo(
     () => ({
       instance,
+      loadAoiOnInstance,
       setInstanceStatusMessage,
       sendAbortMessage,
       initInstance,
@@ -779,6 +808,13 @@ export class WebsocketClient extends WebSocket {
                 id: data.id,
               },
             });
+            break;
+          case 'model#aoi#progress':
+            showGlobalLoadingMessage('Loading AOI...');
+            break;
+          case 'model#aoi#complete':
+            hideGlobalLoading();
+            this.sendMessage({ action: 'model#status' });
             break;
           case 'error':
             logger(event);

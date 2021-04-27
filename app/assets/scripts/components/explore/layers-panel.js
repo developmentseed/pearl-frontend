@@ -8,8 +8,7 @@ import { themeVal, glsp } from '@devseed-ui/theme-provider';
 import InputRange from 'react-input-range';
 import { Accordion, AccordionFold as BaseFold } from '@devseed-ui/accordion';
 import throttle from 'lodash.throttle';
-import { useMapLayers, useMapRef, useUserLayers } from '../../context/map';
-import { usePredictions } from '../../context/predictions';
+import { useMapLayers, useUserLayers } from '../../context/map';
 import { useCheckpoint } from '../../context/checkpoint';
 
 const Wrapper = styled.div`
@@ -103,7 +102,7 @@ function Layer({ layer, onSliderChange, onVisibilityToggle, info, name }) {
         useIcon={visible ? 'eye' : 'eye-disabled'}
         onClick={() => {
           setVisible(!visible);
-          onVisibilityToggle(layer, !visible);
+          onVisibilityToggle(layer, !visible, value);
         }}
       >
         Info
@@ -169,22 +168,9 @@ Category.propTypes = {
 function LayersPanel(props) {
   const { className } = props;
 
-  const { mapRef } = useMapRef();
   const { userLayers, setUserLayers } = useUserLayers();
   const { mapLayers } = useMapLayers();
-  const { predictions } = usePredictions();
   const { currentCheckpoint } = useCheckpoint();
-
-  // Toggle predictions layer
-  useEffect(() => {
-    setUserLayers({
-      ...userLayers,
-      predictions: {
-        ...userLayers.predictions,
-        active: !predictions.fetching && predictions.fetched,
-      },
-    });
-  }, [predictions.fetching, predictions.fetched]);
 
   useEffect(() => {
     setUserLayers({
@@ -240,11 +226,11 @@ function LayersPanel(props) {
                 onSliderChange={(layer, value) => {
                   layer.layer.setOpacity(value);
                 }}
-                onVisibilityToggle={(layer, value) => {
+                onVisibilityToggle={(layer, value, sliderValue) => {
                   if (value) {
-                    mapRef.addLayer(layer.layer);
+                    layer.layer.setOpacity(sliderValue);
                   } else {
-                    mapRef.removeLayer(layer.layer);
+                    layer.layer.setOpacity(0);
                   }
                 }}
               />

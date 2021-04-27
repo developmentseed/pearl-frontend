@@ -14,7 +14,12 @@ import {
 } from '@devseed-ui/modal';
 import { useMapRef } from '../../../context/map';
 import { useApiMeta } from '../../../context/api-meta';
-import { useAoiName } from '../../../context/aoi';
+import { useAoi, useAoiName } from '../../../context/aoi';
+import {
+  useCheckpoint,
+  actions as checkpointActions,
+  checkpointModes,
+} from '../../../context/checkpoint';
 
 const ModalFooter = styled(BaseModalFooter)`
   padding: ${glsp(2)} 0 0 0;
@@ -29,7 +34,10 @@ const ModalFooter = styled(BaseModalFooter)`
 export function AoiEditButtons(props) {
   const { mapState, setMapMode, mapModes } = useMapState();
   const { updateAoiName } = useAoiName();
+  const { setCurrentAoi } = useAoi();
   const { mapRef } = useMapRef();
+
+  const { dispatchCurrentCheckpoint } = useCheckpoint();
 
   const { apiLimits } = useApiMeta();
 
@@ -52,6 +60,17 @@ export function AoiEditButtons(props) {
               bounds = aoiRef.getBounds();
               setAoiBounds(bounds);
               updateAoiName(bounds);
+
+              // When AOI is edited -> we go to run mode
+              dispatchCurrentCheckpoint({
+                type: checkpointActions.SET_CHECKPOINT_MODE,
+                data: {
+                  mode: checkpointModes.RUN,
+                },
+              });
+
+              //Current aoi should only be set after aoi has been sent to the api
+              setCurrentAoi(null);
             } else if (apiLimits.max_inference > aoiArea) {
               setActiveModal('no-live-inference');
             } else {

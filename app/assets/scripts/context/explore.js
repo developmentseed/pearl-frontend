@@ -76,7 +76,11 @@ export function ExploreProvider(props) {
   );
   const [checkpointList, setCheckpointList] = useState(null);
   const [currentInstance, setCurrentInstance] = useState(null);
-  const { setInstanceStatusMessage, initInstance } = useInstance();
+  const {
+    setInstanceStatusMessage,
+    initInstance,
+    loadAoiOnInstance,
+  } = useInstance();
 
   async function loadInitialData() {
     showGlobalLoadingMessage('Loading configuration...');
@@ -260,9 +264,18 @@ export function ExploreProvider(props) {
     setAoiArea(null);
     setAoiName(null);
 
+    setCurrentAoi(null);
+
     //clear inference tiles
     dispatchPredictions({
       type: predictionActions.CLEAR_PREDICTION,
+    });
+
+    dispatchCurrentCheckpoint({
+      type: checkpointActions.SET_CHECKPOINT_MODE,
+      data: {
+        mode: checkpointModes.RUN,
+      },
     });
   }
 
@@ -303,6 +316,10 @@ export function ExploreProvider(props) {
 
     setCurrentAoi(aoi);
 
+    if (currentInstance) {
+      loadAoiOnInstance(aoi.id);
+    }
+
     const [lonMin, latMin, lonMax, latMax] = tBbox(aoi.bounds);
     const bounds = [
       [latMin, lonMin],
@@ -327,8 +344,6 @@ export function ExploreProvider(props) {
       setAoiInitializer(bounds);
       setAoiName(aoiObject.name);
     }
-
-    hideGlobalLoading();
 
     return bounds;
   }

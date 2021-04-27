@@ -36,6 +36,10 @@ import TileLayerWithHeaders from '../../common/map/tile-layer';
 import { useAuth } from '../../../context/auth';
 import { useApiMeta } from '../../../context/api-meta';
 import { useAoi, useAoiPatch, useAoiName } from '../../../context/aoi';
+import {
+  actions as predictionActions,
+  usePredictions,
+} from '../../../context/predictions';
 import toasts from '../../common/toasts';
 import logger from '../../../utils/logger';
 
@@ -93,6 +97,7 @@ function Map() {
   const { mapState, mapModes, setMapMode } = useMapState();
   const { mapRef, setMapRef } = useMapRef();
   const [tileUrl, setTileUrl] = useState(null);
+  const { dispatchPredictions } = usePredictions();
 
   const { mapLayers, setMapLayers } = useMapLayers();
   const { userLayers } = useUserLayers();
@@ -415,11 +420,11 @@ function Map() {
             );
           })}
 
-        {!predictions.data.predictions &&
-          tileUrl &&
+        {tileUrl &&
           currentProject &&
           currentCheckpoint &&
-          currentAoi && (
+          currentAoi &&
+          !predictions.fetching && (
             <TileLayerWithHeaders
               url={tileUrl}
               maxZoom={18}
@@ -434,14 +439,25 @@ function Map() {
               }}
               eventHandlers={{
                 add: (v) => {
-                  setMapLayers({
-                    ...mapLayers,
-                    ['aoi_tiles']: {
-                      layer: v.target,
-                      active: true,
-                      name: 'Aoi Tiles',
-                    },
-                  });
+                  if (predictions.isReady() || !predictions.data.predictions) {
+                    setMapLayers({
+                      ...mapLayers,
+                      ['aoi_tiles']: {
+                        layer: v.target,
+                        active: true,
+                        name: 'Aoi Tiles',
+                      },
+                    });
+                  }
+                },
+                load: () => {
+                  if (predictions.isReady() || !predictions.data.predictions) {
+                    setTimeout(() => {
+                      dispatchPredictions({
+                        type: predictionActions.CLEAR_PREDICTION,
+                      });
+                    }, 1000);
+                  }
                 },
                 remove: () => {
                   setMapLayers({
