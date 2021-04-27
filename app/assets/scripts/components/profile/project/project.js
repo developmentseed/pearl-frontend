@@ -95,10 +95,10 @@ function renderRow(aoi, { project, restApiClient }) {
             onClick={() => {
               try {
                 copyTextToClipboard(aoiLink);
-                toasts.success('Coped URL to Clipboard');
+                toasts.success('URL copied to clipboard');
               } catch (err) {
                 logger('Failed to copy', err);
-                toasts.error('Failed to copy to clipboard');
+                toasts.error('Failed to copy URL to clipboard');
               }
             }}
           />
