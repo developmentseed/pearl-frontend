@@ -48,30 +48,12 @@ const ClassLegend = styled(ClassList)`
   }
 `;
 
-const classStub = [
-  {
-    color: '#4afe90',
-    name: 'Trees',
-  },
-  {
-    color: '#0090f0',
-    name: 'Water',
-  },
-  {
-    color: '#ff0000',
-    name: 'Structure',
-  },
-  {
-    color: '#fea800',
-    name: 'Impervious Road',
-  },
-];
-
 function AoiMap() {
   const { uuid } = useParams();
   const [mapRef, setMapRef] = useState(null);
   const { restApiClient } = useAuth();
   const [tileUrl, setTileUrl] = useState(null);
+  const [classes, setClasses] = useState([]);
 
   useEffect(() => {
     async function fetchData() {
@@ -84,6 +66,8 @@ function AoiMap() {
           [tileJSON.bounds[1], tileJSON.bounds[2]],
         ];
         mapRef.fitBounds(bounds);
+        const aoiData = await restApiClient.getAOIFromUUID(uuid);
+        setClasses(aoiData.classes);
       } catch (error) {
         logger(error);
         toasts.error('Could not load AOI map');
@@ -113,7 +97,7 @@ function AoiMap() {
         </MapContainer>
         <ClassLegend>
           <Heading useAlt>LULC Classes</Heading>
-          {classStub.map((c) => (
+          {classes.map((c) => (
             <Class key={c.name} noHover>
               <ClassThumbnail color={c.color} />
               <ClassHeading size='xsmall'>{c.name}</ClassHeading>
