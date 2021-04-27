@@ -8,6 +8,7 @@ module.exports = {
       'Microsoft Planetary Computer Land Use/Land Classification Mapping tool',
     restApiEndpoint: 'https://api.lulc.ds.io',
     websocketEndpoint: 'wss://socket.lulc.ds.io',
+    websocketPingPongInterval: 3000,
     auth0Domain: 'dev-y5qeoqlh.us.auth0.com',
     clientId: 'cnTAr7SyMGYu4qDLaw5rEGy4G0sn4Htn',
     audience: 'https://api.lulc.ds.io',
