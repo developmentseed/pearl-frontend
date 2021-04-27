@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import styled from 'styled-components';
 import PageHeader from '../common/page-header';
 import toasts from '../common/toasts';
 import { PageBody } from '../../styles/page';
@@ -8,8 +9,63 @@ import App from '../common/app';
 import config from '../../config';
 import { useAuth } from '../../context/auth';
 import logger from '../../utils/logger';
+import { panelSkin } from '../../styles/skins';
+import {
+  ClassList,
+  Class,
+  Thumbnail as ClassThumbnail,
+  ClassHeading,
+} from '../explore/prime-panel/retrain-refine-styles';
+import { themeVal, glsp } from '@devseed-ui/theme-provider';
+import { Heading } from '@devseed-ui/typography';
 
 const { restApiEndpoint } = config;
+
+const ClassLegend = styled(ClassList)`
+  ${panelSkin};
+  position: absolute;
+  bottom: ${glsp(4)};
+  right: ${glsp(4)};
+  padding: ${glsp(2)} ${glsp(2.5)} ${glsp(2)} ${glsp(1.5)};
+  grid-gap: ${glsp()};
+  z-index: 99997;
+  max-width: 16rem;
+  overflow: hidden;
+
+  > ${Heading} {
+    padding: 0;
+    margin: 0;
+  }
+  ${Class} {
+    grid-template-columns: 1rem minmax(10px, 1fr);
+    padding: 0;
+    min-height: 0;
+  }
+  ${ClassThumbnail} {
+    width: ${glsp()};
+    height: ${glsp()};
+    border: 1px solid ${themeVal('color.baseAlphaD')};
+  }
+`;
+
+const classStub = [
+  {
+    color: '#4afe90',
+    name: 'Trees',
+  },
+  {
+    color: '#0090f0',
+    name: 'Water',
+  },
+  {
+    color: '#ff0000',
+    name: 'Structure',
+  },
+  {
+    color: '#fea800',
+    name: 'Impervious Road',
+  },
+];
 
 function AoiMap() {
   const { uuid } = useParams();
@@ -55,6 +111,15 @@ function AoiMap() {
         >
           {leafletLayer}
         </MapContainer>
+        <ClassLegend>
+          <Heading useAlt>LULC Classes</Heading>
+          {classStub.map((c) => (
+            <Class key={c.name} noHover>
+              <ClassThumbnail color={c.color} />
+              <ClassHeading size='xsmall'>{c.name}</ClassHeading>
+            </Class>
+          ))}
+        </ClassLegend>
       </PageBody>
     </App>
   );
