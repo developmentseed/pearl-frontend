@@ -300,6 +300,12 @@ export function InstanceProvider(props) {
         dispatchPredictions,
         dispatchMessageQueue,
         dispatchAoiPatch,
+        onPingPongFail: () => {
+          history.push(`/profile/projects/${projectId}`);
+          toasts.error(
+            'Communication with GPU failed, please try again later.'
+          );
+        },
       });
       newWebsocketClient.addEventListener('open', () => {
         setWebsocketClient(newWebsocketClient);
@@ -676,152 +682,197 @@ export class WebsocketClient extends WebSocket {
     fetchCheckpoint,
     dispatchPredictions,
     dispatchAoiPatch,
+    onPingPongFail,
   }) {
     super(config.websocketEndpoint + `?token=${token}`);
 
-    this.addEventListener('message', (event) => {
-      if (!event.data) {
-        logger('Websocket message with no data', event);
-        return;
+    const self = this;
+    this.pingCount = 0;
+
+    this.addEventListener('open', () => {
+      // Send first ping
+      self.send(`ping#${this.pingCount}`);
+
+      // Check for pong messages every interval
+      self.pingPong = setInterval(() => {
+        if (
+          typeof self.lastPong !== 'undefined' &&
+          self.lastPong === self.pingCount
+        ) {
+          // Ping pong went ok, send next
+          self.pingCount = self.pingCount + 1;
+          self.send(`ping#${self.pingCount}`);
+        } else {
+          // Pong didn't happened, close websocket and execute callback
+          self.close();
+          if (onPingPongFail) onPingPongFail();
+        }
+      }, config.websocketPingPongInterval);
+    });
+
+    this.addEventListener('close', () => {
+      if (typeof self.pingPong !== 'undefined') {
+        clearInterval(self.pingPong);
       }
+    });
 
-      const { message, data } = JSON.parse(event.data);
+    this.addEventListener('message', (event) => {
+      try {
+        if (!event.data) {
+          logger('Websocket message with no data', event);
+          return;
+        }
 
-      // On connected, request a prediction
-      switch (message) {
-        case 'model#status':
-          applyInstanceStatus({
-            gpuStatus: data.isAborting
-              ? 'aborting'
-              : data.processing
-              ? 'processing'
-              : 'ready',
-          });
-          break;
-        case 'info#connected':
-          applyInstanceStatus({
-            gpuConnected: true,
-          });
-          this.sendMessage({ action: 'model#status' });
-          break;
-        case 'info#disconnected':
-          applyInstanceStatus({
-            gpuConnected: false,
-          });
-          break;
-        case 'model#aborted':
-          logger('Previous run aborted.');
-          dispatchPredictions({
-            type: predictionsActions.CLEAR_PREDICTION,
-          });
-          dispatchCurrentCheckpoint({
-            type: checkpointActions.RESET_CHECKPOINT,
-          });
-          hideGlobalLoading();
-          // Request new status update after abort is confirmed
-          this.sendMessage({ action: 'model#status' });
-          break;
-        case 'model#aoi':
-          dispatchCurrentCheckpoint({
-            type: checkpointActions.SET_CHECKPOINT,
-            data: {
-              id: data.checkpoint_id,
-              name: data.name,
-            },
-          });
-          dispatchPredictions({
-            type: predictionsActions.RECEIVE_AOI_META,
-            data: {
-              id: data.id,
-            },
-          });
-          break;
-        case 'error':
-          logger(event);
-          dispatchMessageQueue({ type: messageQueueActionTypes.CLEAR });
-          dispatchPredictions({ type: predictionsActions.CLEAR_PREDICTION });
-          this.sendMessage({ action: 'model#status' });
-          hideGlobalLoading();
-          break;
-        case 'model#checkpoint':
-          if (data && (data.id || data.checkpoint)) {
-            fetchCheckpoint(data.id || data.checkpoint);
-          }
-          applyInstanceStatus({
-            gpuMessage: `Loading checkpoint...`,
-          });
-          this.sendMessage({ action: 'model#status' });
-          break;
+        // Handle pong first as it changes dynamically
+        if (event.data && event.data.startsWith('pong')) {
+          this.lastPong = parseInt(event.data.split('#')[1]);
+          return;
+        }
 
-        case 'model#checkpoint#progress':
-          showGlobalLoadingMessage('Loading checkpoint...');
-          break;
-        case 'model#checkpoint#complete':
-          fetchCheckpoint(data.id || data.checkpoint, checkpointModes.RETRAIN);
-          hideGlobalLoading();
-          this.sendMessage({ action: 'model#status' });
-          break;
-        case 'model#retrain#complete':
-          if (data && (data.id || data.checkpoint)) {
+        const { message, data } = JSON.parse(event.data);
+
+        // Parse message
+        switch (message) {
+          case 'model#status':
+            applyInstanceStatus({
+              gpuStatus: data.isAborting
+                ? 'aborting'
+                : data.processing
+                ? 'processing'
+                : 'ready',
+            });
+            break;
+          case 'info#connected':
+            applyInstanceStatus({
+              gpuConnected: true,
+            });
+            this.sendMessage({ action: 'model#status' });
+            break;
+          case 'info#disconnected':
+            applyInstanceStatus({
+              gpuConnected: false,
+            });
+            break;
+          case 'model#aborted':
+            logger('Previous run aborted.');
+            dispatchPredictions({
+              type: predictionsActions.CLEAR_PREDICTION,
+            });
+            dispatchCurrentCheckpoint({
+              type: checkpointActions.RESET_CHECKPOINT,
+            });
+            hideGlobalLoading();
+            // Request new status update after abort is confirmed
+            this.sendMessage({ action: 'model#status' });
+            break;
+          case 'model#aoi':
+            dispatchCurrentCheckpoint({
+              type: checkpointActions.SET_CHECKPOINT,
+              data: {
+                id: data.checkpoint_id,
+                name: data.name,
+              },
+            });
+            dispatchPredictions({
+              type: predictionsActions.RECEIVE_AOI_META,
+              data: {
+                id: data.id,
+              },
+            });
+            break;
+          case 'error':
+            logger(event);
+            dispatchMessageQueue({ type: messageQueueActionTypes.CLEAR });
+            dispatchPredictions({ type: predictionsActions.CLEAR_PREDICTION });
+            this.sendMessage({ action: 'model#status' });
+            hideGlobalLoading();
+            break;
+          case 'model#checkpoint':
+            if (data && (data.id || data.checkpoint)) {
+              fetchCheckpoint(data.id || data.checkpoint);
+            }
+            applyInstanceStatus({
+              gpuMessage: `Loading checkpoint...`,
+            });
+            this.sendMessage({ action: 'model#status' });
+            break;
+
+          case 'model#checkpoint#progress':
+            showGlobalLoadingMessage('Loading checkpoint...');
+            break;
+          case 'model#checkpoint#complete':
             fetchCheckpoint(
               data.id || data.checkpoint,
               checkpointModes.RETRAIN
             );
-          }
-          applyInstanceStatus({
-            gpuMessage: `Loading checkpoint...`,
-          });
-          this.sendMessage({ action: 'model#status' });
-          break;
-        case 'model#prediction':
-          dispatchPredictions({
-            type: predictionsActions.RECEIVE_PREDICTION,
-            data: data,
-          });
-          break;
-        case 'model#prediction#complete':
-          dispatchPredictions({
-            type: predictionsActions.COMPLETE_PREDICTION,
-          });
-          dispatchCurrentCheckpoint({
-            type: checkpointActions.SET_CHECKPOINT_MODE,
-            data: {
-              mode: checkpointModes.RETRAIN,
-            },
-          });
-          // Request new status update after abort is confirmed
-          this.sendMessage({ action: 'model#status' });
-          hideGlobalLoading();
-          break;
-        case 'model#patch':
-          //receive new patch
-          dispatchAoiPatch({
-            type: aoiPatchActions.START_PATCH,
-            data: {
-              id: data.id,
-            },
-          });
-          this.sendMessage({ action: 'model#status' });
-          break;
-        case 'model#patch#progress':
-          dispatchAoiPatch({
-            type: aoiPatchActions.RECEIVE_PATCH,
-            data,
-          });
-          //receive image
-          break;
-        case 'model#patch#complete':
-          dispatchAoiPatch({
-            type: aoiPatchActions.COMPLETE_PATCH,
-          });
-          hideGlobalLoading();
-          // finish waiting for patch
-          this.sendMessage({ action: 'model#status' });
-          break;
-        default:
-          logger('Unknown websocket message:');
-          logger(event);
-          break;
+            hideGlobalLoading();
+            this.sendMessage({ action: 'model#status' });
+            break;
+          case 'model#retrain#complete':
+            if (data && (data.id || data.checkpoint)) {
+              fetchCheckpoint(
+                data.id || data.checkpoint,
+                checkpointModes.RETRAIN
+              );
+            }
+            applyInstanceStatus({
+              gpuMessage: `Loading checkpoint...`,
+            });
+            this.sendMessage({ action: 'model#status' });
+            break;
+          case 'model#prediction':
+            dispatchPredictions({
+              type: predictionsActions.RECEIVE_PREDICTION,
+              data: data,
+            });
+            break;
+          case 'model#prediction#complete':
+            dispatchPredictions({
+              type: predictionsActions.COMPLETE_PREDICTION,
+            });
+            dispatchCurrentCheckpoint({
+              type: checkpointActions.SET_CHECKPOINT_MODE,
+              data: {
+                mode: checkpointModes.RETRAIN,
+              },
+            });
+            // Request new status update after abort is confirmed
+            this.sendMessage({ action: 'model#status' });
+            hideGlobalLoading();
+            break;
+          case 'model#patch':
+            //receive new patch
+            dispatchAoiPatch({
+              type: aoiPatchActions.START_PATCH,
+              data: {
+                id: data.id,
+              },
+            });
+            this.sendMessage({ action: 'model#status' });
+            break;
+          case 'model#patch#progress':
+            dispatchAoiPatch({
+              type: aoiPatchActions.RECEIVE_PATCH,
+              data,
+            });
+            //receive image
+            break;
+          case 'model#patch#complete':
+            dispatchAoiPatch({
+              type: aoiPatchActions.COMPLETE_PATCH,
+            });
+            hideGlobalLoading();
+            // finish waiting for patch
+            this.sendMessage({ action: 'model#status' });
+            break;
+          default:
+            logger('Unknown websocket message:');
+            logger(event);
+            break;
+        }
+      } catch (error) {
+        logger('Error handling websocket event', { event });
+        return;
       }
     });
   }
