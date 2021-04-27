@@ -451,10 +451,8 @@ function Map() {
                   }
                 },
                 load: () => {
-                  console.log('load')
                   if (predictions.isReady() || !predictions.data.predictions) {
                     setTimeout(() => {
-                      console.log('clear')
                       dispatchPredictions({
                         type: predictionActions.CLEAR_PREDICTION,
                       });
