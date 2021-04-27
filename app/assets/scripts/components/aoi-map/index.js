@@ -43,6 +43,9 @@ const ClassLegend = styled(ClassList)`
     padding: 0;
     min-height: 0;
   }
+  ${ClassHeading} {
+    white-space: normal;
+  }
   ${ClassThumbnail} {
     width: ${glsp()};
     height: ${glsp()};
