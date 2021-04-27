@@ -384,6 +384,7 @@ export function ExploreProvider(props) {
         type: checkpointActions.SET_CHECKPOINT_NAME,
         data: {
           name,
+          bookmarked: true,
         },
       });
 

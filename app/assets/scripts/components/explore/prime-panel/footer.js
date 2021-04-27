@@ -86,6 +86,7 @@ function Footer(props) {
 
     allowInferenceRun,
   } = props;
+
   return (
     <PanelControls>
       <Button

@@ -97,7 +97,10 @@ function PrimePanel() {
   const [showSelectModelModal, setShowSelectModelModal] = useState(false);
   // const [modelFilterString, setModelFilterString] = useState('');
   const [localCheckpointName, setLocalCheckpointName] = useState(
-    (currentCheckpoint && currentCheckpoint.name) || ''
+    (currentCheckpoint &&
+      currentCheckpoint.bookmarked &&
+      currentCheckpoint.name) ||
+      ''
   );
 
   const [activeTab, setActiveTab] = useState(checkpointModes.RETRAIN);
@@ -163,7 +166,11 @@ function PrimePanel() {
 
   useEffect(() => {
     if (currentCheckpoint && currentCheckpoint.name) {
-      setLocalCheckpointName(currentCheckpoint.name);
+      if (currentCheckpoint.bookmarked) {
+        setLocalCheckpointName(currentCheckpoint.name);
+      } else {
+        setLocalCheckpointName('');
+      }
     }
   }, [currentCheckpoint]);
 
