@@ -100,7 +100,7 @@ function Map() {
   const { dispatchPredictions } = usePredictions();
 
   const { mapLayers, setMapLayers } = useMapLayers();
-  const { userLayers } = useUserLayers();
+  const { userLayers, setUserLayers } = useUserLayers();
 
   const { mosaicList } = useContext(GlobalContext);
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
@@ -437,15 +437,19 @@ function Map() {
               options={{
                 pane: 'overlayPane',
               }}
+              opacity={
+                userLayers.predictions.visible
+                  ? userLayers.predictions.opacity
+                  : 0
+              }
               eventHandlers={{
-                add: (v) => {
+                add: () => {
                   if (predictions.isReady() || !predictions.data.predictions) {
-                    setMapLayers({
-                      ...mapLayers,
-                      ['aoi_tiles']: {
-                        layer: v.target,
+                    setUserLayers({
+                      ...userLayers,
+                      predictions: {
+                        ...userLayers.predictions,
                         active: true,
-                        name: 'Aoi Tiles',
                       },
                     });
                   }
@@ -460,10 +464,10 @@ function Map() {
                   }
                 },
                 remove: () => {
-                  setMapLayers({
-                    ...mapLayers,
-                    ['aoi_tiles']: {
-                      ...mapLayers.aoi_tiles,
+                  setUserLayers({
+                    ...userLayers,
+                    predictions: {
+                      ...userLayers.predictions,
                       active: false,
                     },
                   });
