@@ -268,6 +268,13 @@ export function ExploreProvider(props) {
     dispatchPredictions({
       type: predictionActions.CLEAR_PREDICTION,
     });
+
+    dispatchCurrentCheckpoint({
+      type: checkpointActions.SET_CHECKPOINT_MODE,
+      data: {
+        mode: checkpointModes.RUN,
+      },
+    });
   }
 
   /*
