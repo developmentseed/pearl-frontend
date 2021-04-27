@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import styled from 'styled-components';
 import PageHeader from '../common/page-header';
 import toasts from '../common/toasts';
 import { PageBody } from '../../styles/page';
 import { MapContainer, TileLayer } from 'react-leaflet';
+import GlobalContext from '../../context/global';
+
 import { useParams } from 'react-router-dom';
 import App from '../common/app';
 import config from '../../config';
@@ -19,7 +21,7 @@ import {
 import { themeVal, glsp } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
 
-const { restApiEndpoint } = config;
+const { restApiEndpoint, tileUrlTemplate } = config;
 
 const ClassLegend = styled(ClassList)`
   ${panelSkin};
@@ -54,6 +56,9 @@ function AoiMap() {
   const { restApiClient } = useAuth();
   const [tileUrl, setTileUrl] = useState(null);
   const [classes, setClasses] = useState([]);
+  const { mosaicList } = useContext(GlobalContext);
+  const mosaics = mosaicList.isReady() ? mosaicList.getData().mosaics : null;
+  const mosaic = mosaics && mosaics.length > 0 ? mosaics[0] : null;
 
   useEffect(() => {
     async function fetchData() {
@@ -83,6 +88,15 @@ function AoiMap() {
     leafletLayer = null;
   }
 
+  let mosaicLayer;
+  if (mosaic) {
+    mosaicLayer = (
+      <TileLayer url={tileUrlTemplate.replace('{LAYER_NAME}', mosaic)} />
+    );
+  } else {
+    mosaicLayer = null;
+  }
+
   return (
     <App pageTitle='AOI Map'>
       <PageHeader />
@@ -93,6 +107,7 @@ function AoiMap() {
             setMapRef(m);
           }}
         >
+          {mosaicLayer}
           {leafletLayer}
         </MapContainer>
         <ClassLegend>
