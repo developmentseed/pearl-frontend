@@ -31,7 +31,7 @@ const ClassLegend = styled(ClassList)`
   padding: ${glsp(2)} ${glsp(2.5)} ${glsp(2)} ${glsp(1.5)};
   grid-gap: ${glsp()};
   z-index: 99997;
-  max-width: 16rem;
+  width: 16rem;
   overflow: hidden;
 
   > ${Heading} {
@@ -115,12 +115,23 @@ function AoiMap() {
         </MapContainer>
         <ClassLegend>
           <Heading useAlt>LULC Classes</Heading>
-          {classes.map((c) => (
-            <Class key={c.name} noHover>
-              <ClassThumbnail color={c.color} />
-              <ClassHeading size='xsmall'>{c.name}</ClassHeading>
-            </Class>
-          ))}
+          {classes.length > 1
+            ? classes.map((c) => (
+                <Class key={c.name} noHover>
+                  <ClassThumbnail color={c.color} />
+                  <ClassHeading size='xsmall'>{c.name}</ClassHeading>
+                </Class>
+              ))
+            : [1, 2, 3].map((i) => (
+                <Class
+                  key={i}
+                  placeholder={+true}
+                  className='placeholder-class'
+                >
+                  <ClassThumbnail />
+                  <ClassHeading size='xsmall' placeholder={+true} />
+                </Class>
+              ))}
         </ClassLegend>
       </PageBody>
     </App>
