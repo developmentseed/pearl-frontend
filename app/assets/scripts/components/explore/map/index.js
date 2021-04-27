@@ -36,6 +36,10 @@ import TileLayerWithHeaders from '../../common/map/tile-layer';
 import { useAuth } from '../../../context/auth';
 import { useApiMeta } from '../../../context/api-meta';
 import { useAoi, useAoiPatch, useAoiName } from '../../../context/aoi';
+import {
+  actions as predictionActions,
+  usePredictions,
+} from '../../../context/predictions';
 import toasts from '../../common/toasts';
 import logger from '../../../utils/logger';
 
@@ -93,6 +97,7 @@ function Map() {
   const { mapState, mapModes, setMapMode } = useMapState();
   const { mapRef, setMapRef } = useMapRef();
   const [tileUrl, setTileUrl] = useState(null);
+  const { dispatchPredictions } = usePredictions();
 
   const { mapLayers, setMapLayers } = useMapLayers();
   const { userLayers } = useUserLayers();
@@ -344,8 +349,7 @@ function Map() {
             />
           ))}
 
-        {false &&
-          predictions &&
+        {predictions &&
           predictions.data &&
           predictions.data.predictions &&
           predictions.data.predictions.map((p) => (
@@ -416,44 +420,59 @@ function Map() {
             );
           })}
 
-        {tileUrl && currentProject && currentCheckpoint && currentAoi && (
-          <TileLayerWithHeaders
-            url={tileUrl}
-            maxZoom={18}
-            headers={[
-              {
-                header: 'Authorization',
-                value: `Bearer ${restApiClient.apiToken}`,
-              },
-            ]}
-            options={{
-              pane: 'overlayPane',
-            }}
-            eventHandlers={{
-              add: (v) => {
-                if (predictions.isReady() || !predictions.data.predictions) {
+        {tileUrl &&
+          currentProject &&
+          currentCheckpoint &&
+          currentAoi &&
+          !predictions.fetching && (
+            <TileLayerWithHeaders
+              url={tileUrl}
+              maxZoom={18}
+              headers={[
+                {
+                  header: 'Authorization',
+                  value: `Bearer ${restApiClient.apiToken}`,
+                },
+              ]}
+              options={{
+                pane: 'overlayPane',
+              }}
+              eventHandlers={{
+                add: (v) => {
+                  if (predictions.isReady() || !predictions.data.predictions) {
+                    setMapLayers({
+                      ...mapLayers,
+                      ['aoi_tiles']: {
+                        layer: v.target,
+                        active: true,
+                        name: 'Aoi Tiles',
+                      },
+                    });
+                  }
+                },
+                load: () => {
+                  console.log('load')
+                  if (predictions.isReady() || !predictions.data.predictions) {
+                    setTimeout(() => {
+                      console.log('clear')
+                      dispatchPredictions({
+                        type: predictionActions.CLEAR_PREDICTION,
+                      });
+                    }, 1000);
+                  }
+                },
+                remove: () => {
                   setMapLayers({
                     ...mapLayers,
                     ['aoi_tiles']: {
-                      layer: v.target,
-                      active: true,
-                      name: 'Aoi Tiles',
+                      ...mapLayers.aoi_tiles,
+                      active: false,
                     },
                   });
-                }
-              },
-              remove: () => {
-                setMapLayers({
-                  ...mapLayers,
-                  ['aoi_tiles']: {
-                    ...mapLayers.aoi_tiles,
-                    active: false,
-                  },
-                });
-              },
-            }}
-          />
-        )}
+                },
+              }}
+            />
+          )}
 
         {currentCheckpoint &&
           currentCheckpoint.classes &&

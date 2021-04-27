@@ -43,7 +43,7 @@ export function MapProvider(props) {
     predictions: {
       opacity: 1,
       visible: true,
-      active: false,
+      active: true,
       id: 'predictions',
       name: 'Prediction Results',
     },

@@ -9,7 +9,6 @@ import InputRange from 'react-input-range';
 import { Accordion, AccordionFold as BaseFold } from '@devseed-ui/accordion';
 import throttle from 'lodash.throttle';
 import { useMapLayers, useUserLayers } from '../../context/map';
-import { usePredictions } from '../../context/predictions';
 import { useCheckpoint } from '../../context/checkpoint';
 
 const Wrapper = styled.div`
@@ -171,19 +170,7 @@ function LayersPanel(props) {
 
   const { userLayers, setUserLayers } = useUserLayers();
   const { mapLayers } = useMapLayers();
-  const { predictions } = usePredictions();
   const { currentCheckpoint } = useCheckpoint();
-
-  // Toggle predictions layer
-  useEffect(() => {
-    setUserLayers({
-      ...userLayers,
-      predictions: {
-        ...userLayers.predictions,
-        active: !predictions.fetching && predictions.fetched,
-      },
-    });
-  }, [predictions.fetching, predictions.fetched]);
 
   useEffect(() => {
     setUserLayers({
