@@ -285,6 +285,9 @@ export function ExploreProvider(props) {
         mode: checkpointModes.RUN,
       },
     });
+    dispatchCurrentCheckpoint({
+      type: checkpointActions.CLEAR_SAMPLES,
+    });
   }
 
   /*
@@ -327,6 +330,13 @@ export function ExploreProvider(props) {
     if (currentInstance) {
       loadAoiOnInstance(aoi.id);
     }
+
+    dispatchCurrentCheckpoint({
+      type: checkpointActions.SET_CHECKPOINT_MODE,
+      data: {
+        mode: checkpointModes.RETRAIN,
+      },
+    });
 
     const [lonMin, latMin, lonMax, latMax] = tBbox(aoi.bounds);
     const bounds = [

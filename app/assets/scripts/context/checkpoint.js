@@ -7,6 +7,8 @@ import { useAuth } from './auth';
 import toasts from '../components/common/toasts';
 import logger from '../utils/logger';
 
+import { useAoi } from './aoi';
+
 import { wrapLogReducer } from './reducers/utils';
 
 const CheckpointContext = createContext(null);
@@ -41,6 +43,7 @@ export function CheckpointProvider(props) {
   );
 
   const { restApiClient } = useAuth();
+
 
   async function fetchCheckpoint(projectId, checkpointId, mode) {
     try {
@@ -99,7 +102,7 @@ function checkpointReducer(state, action) {
             ? action.data.bookmarked
             : (state && state.bookmarked) || false,
         analytics: action.data.analytics || (state && state.analytics) || null,
-        mode: action.data.mode || checkpointModes.RUN,
+        mode: action.data.mode || (state && state.mode) || checkpointModes.RUN,
         retrain_geoms:
           action.data.retrain_geoms || (state && state.retrain_geoms) || null,
         input_geoms:
