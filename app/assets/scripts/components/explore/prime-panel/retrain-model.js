@@ -22,7 +22,6 @@ import {
   ClassInfoWrapper,
   ClassHeading,
   ClassSamples,
-  ClassOptions,
   ToolBox as RetrainTools,
   AddClassButton,
   PickerStyles,
