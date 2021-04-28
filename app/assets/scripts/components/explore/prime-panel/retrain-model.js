@@ -154,9 +154,9 @@ function RetrainModel(props) {
                     </ClassSamples>
                   </ClassInfoWrapper>
 
-                  <ClassOptions useIcon='cog' hideText variation='base-plain'>
+                  {/* <ClassOptions useIcon='cog' hideText variation='base-plain'>
                     Options
-                  </ClassOptions>
+                  </ClassOptions> */}
                 </Class>
               );
             })}
@@ -246,7 +246,7 @@ function RetrainModel(props) {
             <Class key={i} placeholder={+true} className='placeholder-class'>
               <ClassThumbnail />
               <ClassHeading size='xsmall' placeholder={+true} />
-              <ClassThumbnail />
+              {/* <ClassThumbnail /> */}
             </Class>
           ))}
           <PlaceholderMessage>{placeholderMessage}</PlaceholderMessage>
