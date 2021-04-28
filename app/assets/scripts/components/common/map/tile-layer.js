@@ -61,7 +61,13 @@ L.tileLayer = function (url, options, headers, abort) {
   return new L.TileLayerWithHeaders(url, options, headers, abort);
 };
 
-function TileLayerWithHeaders({ url, headers, options, eventHandlers }) {
+function TileLayerWithHeaders({
+  url,
+  headers,
+  options,
+  eventHandlers,
+  opacity,
+}) {
   const map = useMap();
 
   const [layer, setLayer] = useState(null);
@@ -85,6 +91,12 @@ function TileLayerWithHeaders({ url, headers, options, eventHandlers }) {
       l.remove();
     };
   }, [url]);
+
+  useEffect(() => {
+    if (layer) {
+      layer.setOpacity(opacity);
+    }
+  }, [opacity, layer]);
 
   return null;
 }
