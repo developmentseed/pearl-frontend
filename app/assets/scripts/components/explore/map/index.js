@@ -162,18 +162,21 @@ function Map() {
 
   const classLength =
     currentCheckpoint && currentCheckpoint.classes
-      ? Object.keys(currentCheckpoint.classes)
+      ? Object.keys(currentCheckpoint.classes).length
       : 0;
+  const id = currentCheckpoint ? currentCheckpoint.id : null;
 
   // Add polygon layers to be drawn when checkpoint has changed
   useEffect(() => {
     if (!mapRef || !mapRef.polygonDraw) return;
+
     mapRef.polygonDraw.clearLayers();
+
     if (currentCheckpoint) {
       mapRef.polygonDraw.setLayers(currentCheckpoint.classes);
       mapRef.polygonDraw.setLayerPolygons(currentCheckpoint.classes);
     }
-  }, [mapRef, currentCheckpoint && currentCheckpoint.id, classLength]);
+  }, [mapRef, id, classLength]);
 
   /**
    * Add/update AOI controls on API metadata change.
