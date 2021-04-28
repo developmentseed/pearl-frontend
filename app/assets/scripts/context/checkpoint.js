@@ -7,8 +7,6 @@ import { useAuth } from './auth';
 import toasts from '../components/common/toasts';
 import logger from '../utils/logger';
 
-import { useAoi } from './aoi';
-
 import { wrapLogReducer } from './reducers/utils';
 
 const CheckpointContext = createContext(null);
@@ -43,7 +41,6 @@ export function CheckpointProvider(props) {
   );
 
   const { restApiClient } = useAuth();
-
 
   async function fetchCheckpoint(projectId, checkpointId, mode) {
     try {

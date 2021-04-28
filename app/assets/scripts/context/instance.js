@@ -643,9 +643,9 @@ export function InstanceProvider(props) {
         dispatchCurrentCheckpoint({
           type: checkpointActions.SET_CHECKPOINT_MODE,
           data: {
-            mode: currentAoi ? checkpointModes.RETRAIN : checkpointModes.RUN
-          }
-        })
+            mode: currentAoi ? checkpointModes.RETRAIN : checkpointModes.RUN,
+          },
+        });
 
         dispatchMessageQueue({
           type: messageQueueActionTypes.ADD,
@@ -848,7 +848,7 @@ export class WebsocketClient extends ReconnectingWebsocket {
             break;
           case 'model#checkpoint#complete':
             fetchCheckpoint(
-              data.id || data.checkpoint,
+              data.id || data.checkpoint
               //checkpointModes.RETRAIN
             );
             hideGlobalLoading();

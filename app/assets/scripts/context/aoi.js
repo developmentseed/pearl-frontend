@@ -23,7 +23,9 @@ export const actions = {
 };
 
 export function AoiProvider(props) {
-  const [currentAoi, dispatchCurrentAoi] = useReducer(wrapLogReducer(aoiReducer));
+  const [currentAoi, dispatchCurrentAoi] = useReducer(
+    wrapLogReducer(aoiReducer)
+  );
   const [aoiRef, setAoiRef] = useState(null);
   const [aoiName, setAoiName] = useState(null);
   const [aoiList, setAoiList] = useState([]);

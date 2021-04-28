@@ -337,6 +337,11 @@ export function ExploreProvider(props) {
         mode: checkpointModes.RETRAIN,
       },
     });
+    if (currentCheckpoint) {
+      dispatchCurrentCheckpoint({
+        type: checkpointActions.CLEAR_SAMPLES,
+      });
+    }
 
     const [lonMin, latMin, lonMax, latMax] = tBbox(aoi.bounds);
     const bounds = [
