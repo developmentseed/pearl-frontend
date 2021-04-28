@@ -94,6 +94,10 @@ function checkpointReducer(state, action) {
       // Action used to load existing or initialize a new checkpoint
       return {
         ...action.data,
+        bookmarked:
+          action.data.bookmarked !== undefined
+            ? action.data.bookmarked
+            : (state && state.bookmarked) || false,
         analytics: action.data.analytics || (state && state.analytics) || null,
         mode: action.data.mode || checkpointModes.RUN,
         retrain_geoms:

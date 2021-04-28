@@ -96,6 +96,7 @@ function Footer(props) {
 
     allowInferenceRun,
   } = props;
+
   return (
     <PanelControls>
       <Button
@@ -149,56 +150,57 @@ function Footer(props) {
         allowInferenceRun={allowInferenceRun}
         mapRef={mapRef}
       />
-
-      <Dropdown
-        alignment='center'
-        direction='up'
-        triggerElement={(triggerProps) => (
-          <InfoButton
-            variation='primary-plain'
-            size='medium'
-            useIcon='save-disk'
-            useLocalButton
-            style={{
-              gridColumn: '1 / -1',
-            }}
-            id='rename-button-trigger'
-            {...triggerProps}
-            disabled={!currentCheckpoint}
-          >
-            Save Checkpoint
-          </InfoButton>
-        )}
-      >
-        <SaveCheckpoint>
-          <Heading useAlt>Checkpoint name:</Heading>
-          <Form
-            onSubmit={(evt) => {
-              evt.preventDefault();
-              const name = evt.target.elements.checkpointName.value;
-              updateCheckpointName(name);
-            }}
-          >
-            <FormInput
-              name='checkpointName'
-              placeholder='Set Checkpoint Name'
-              value={localCheckpointName}
-              onChange={(e) => setLocalCheckpointName(e.target.value)}
-              autoFocus
-            />
-            <LocalButton
-              type='submit'
-              // size='small'
+      {currentCheckpoint && currentCheckpoint.parent && (
+        <Dropdown
+          alignment='center'
+          direction='up'
+          triggerElement={(triggerProps) => (
+            <InfoButton
               variation='primary-plain'
+              size='medium'
               useIcon='save-disk'
-              title='Rename checkpoint'
-              data-dropdown='click.close'
+              useLocalButton
+              style={{
+                gridColumn: '1 / -1',
+              }}
+              id='rename-button-trigger'
+              {...triggerProps}
+              disabled={!currentCheckpoint}
             >
-              Save
-            </LocalButton>
-          </Form>
-        </SaveCheckpoint>
-      </Dropdown>
+              Save Checkpoint
+            </InfoButton>
+          )}
+        >
+          <SaveCheckpoint>
+            <Heading useAlt>Checkpoint name:</Heading>
+            <Form
+              onSubmit={(evt) => {
+                evt.preventDefault();
+                const name = evt.target.elements.checkpointName.value;
+                updateCheckpointName(name);
+              }}
+            >
+              <FormInput
+                name='checkpointName'
+                placeholder='Set Checkpoint Name'
+                value={localCheckpointName}
+                onChange={(e) => setLocalCheckpointName(e.target.value)}
+                autoFocus
+              />
+              <LocalButton
+                type='submit'
+                // size='small'
+                variation='primary-plain'
+                useIcon='save-disk'
+                title='Rename checkpoint'
+                data-dropdown='click.close'
+              >
+                Save
+              </LocalButton>
+            </Form>
+          </SaveCheckpoint>
+        </Dropdown>
+      )}
     </PanelControls>
   );
 }

@@ -143,7 +143,15 @@ export function ExploreProvider(props) {
     const checkpointsMeta = await restApiClient.getCheckpoints(projectId);
     if (checkpointsMeta.total > 0) {
       // Save checkpoints if any exist, else leave as null
-      setCheckpointList(checkpointsMeta.checkpoints);
+      // Only keep book marked and root checkpoints
+      const list = checkpointsMeta.checkpoints.filter(
+        (ckpt) => !ckpt.parent || ckpt.bookmarked
+      );
+
+      setCheckpointList(list);
+      return {
+        checkpoints: list,
+      };
     }
     return checkpointsMeta;
   }
@@ -391,6 +399,7 @@ export function ExploreProvider(props) {
         type: checkpointActions.SET_CHECKPOINT_NAME,
         data: {
           name,
+          bookmarked: true,
         },
       });
 

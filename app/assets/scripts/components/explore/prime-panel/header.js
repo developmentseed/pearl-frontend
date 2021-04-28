@@ -142,7 +142,14 @@ function Header(props) {
 
   const renderCheckpointSelectionHeader = () => {
     if (currentCheckpoint && currentCheckpoint.id) {
-      return `${currentCheckpoint.name} (${currentCheckpoint.id})`;
+      let realname = `${currentCheckpoint.name} (${currentCheckpoint.id})`;
+      if (currentCheckpoint.bookmarked) {
+        return realname;
+      } else {
+        return currentCheckpoint.parent
+          ? 'Current checkpoint (Unsaved)'
+          : `${selectedModel.name} (Base Model)`;
+      }
     } else if (checkpointList?.length) {
       return `${checkpointList.length} checkpoint${
         checkpointList.length > 1 ? 's' : ''
