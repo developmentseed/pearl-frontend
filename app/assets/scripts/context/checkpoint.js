@@ -148,10 +148,12 @@ function checkpointReducer(state, action) {
       };
       return {
         ...state,
+        //history: [],
         classes: {
           ...state.classes,
           [newClass.name]: newClass,
         },
+        /*
         analytics: state.analytics
           ? [
               ...state.analytics,
@@ -180,6 +182,7 @@ function checkpointReducer(state, action) {
               },
             ]
           : state.retrain_geoms,
+          */
       };
     }
 

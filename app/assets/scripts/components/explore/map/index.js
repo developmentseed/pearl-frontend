@@ -166,6 +166,7 @@ function Map() {
     mapRef.polygonDraw.clearLayers();
     if (currentCheckpoint) {
       mapRef.polygonDraw.setLayers(currentCheckpoint.classes);
+      mapRef.polygonDraw.setLayerPolygons(currentCheckpoint.classes);
     }
   }, [
     mapRef,
