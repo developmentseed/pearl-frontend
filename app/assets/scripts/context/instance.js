@@ -324,12 +324,6 @@ export function InstanceProvider(props) {
         dispatchPredictions,
         dispatchMessageQueue,
         dispatchAoiPatch,
-        onPingPongFail: () => {
-          history.push(`/profile/projects/${projectId}`);
-          toasts.error(
-            'Communication with GPU failed, please try again later.'
-          );
-        },
       });
       newWebsocketClient.addEventListener('open', () => {
         setWebsocketClient(newWebsocketClient);
@@ -721,7 +715,6 @@ export class WebsocketClient extends ReconnectingWebsocket {
     fetchCheckpoint,
     dispatchPredictions,
     dispatchAoiPatch,
-    onPingPongFail,
   }) {
     super(config.websocketEndpoint + `?token=${token}`);
 
@@ -742,9 +735,8 @@ export class WebsocketClient extends ReconnectingWebsocket {
           self.pingCount = self.pingCount + 1;
           self.send(`ping#${self.pingCount}`);
         } else {
-          // Pong didn't happened, close websocket and execute callback
-          self.close();
-          if (onPingPongFail) onPingPongFail();
+          // Pong didn't happened, reconnect
+          self.reconnect();
         }
       }, config.websocketPingPongInterval);
     });
