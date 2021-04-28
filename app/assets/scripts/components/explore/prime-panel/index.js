@@ -8,7 +8,7 @@ import SelectModal from '../../common/select-modal';
 import ModelCard from './model-card';
 import { useMapLayers, useMapRef } from '../../../context/map';
 import { ExploreContext, useMapState } from '../../../context/explore';
-import GlobalContext from '../../../context/global';
+import GlobalContext, { useModels } from '../../../context/global';
 
 import { Heading } from '@devseed-ui/typography';
 // import {
@@ -88,7 +88,8 @@ function PrimePanel() {
 
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
 
-  const { modelsList, mosaicList } = useContext(GlobalContext);
+  const { mosaicList } = useContext(GlobalContext);
+  const { models } = useModels();
 
   const { mapLayers } = useMapLayers();
 
@@ -104,8 +105,6 @@ function PrimePanel() {
   );
 
   const [activeTab, setActiveTab] = useState(checkpointModes.RETRAIN);
-
-  const { models } = modelsList.isReady() && modelsList.getData();
 
   // Check if AOI and selected model are defined, and if view mode is runnable
   const allowInferenceRun =
@@ -207,7 +206,6 @@ function PrimePanel() {
 
                 setShowSelectModelModal,
                 selectedModel,
-                models,
 
                 isAuthenticated,
                 currentProject,
@@ -323,7 +321,7 @@ function PrimePanel() {
         onOverlayClick={() => {
           setShowSelectModelModal(false);
         }}
-        data={models || []}
+        data={models.status === 'success' ? models.value : []}
         renderHeader={() => (
           <ModalHeader>
             <Headline>

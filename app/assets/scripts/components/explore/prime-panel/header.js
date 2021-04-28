@@ -25,6 +25,7 @@ import {
   DropdownFooter,
 } from '../../../styles/dropdown';
 import { AoiEditButtons } from './aoi-edit-buttons';
+import { useModels } from '../../../context/global';
 
 const SelectAoiTrigger = styled.div`
   cursor: pointer;
@@ -90,11 +91,12 @@ function Header(props) {
 
     setShowSelectModelModal,
     selectedModel,
-    models,
 
     isAuthenticated,
     currentProject,
   } = props;
+
+  const { models } = useModels();
 
   const renderAoiHeader = (triggerProps) => {
     let header;
@@ -159,7 +161,27 @@ function Header(props) {
   };
 
   const modelNotChangeable =
-    !isAuthenticated || !models?.length || checkpointList?.length;
+    !isAuthenticated || models.status !== 'success' || checkpointList?.length;
+
+  const renderModelLabel = () => {
+    if (!isAuthenticated) {
+      return 'Login to select model';
+    }
+
+    if (['pending', 'idle'].includes(models.status)) {
+      return 'Loading...';
+    }
+
+    if (
+      models.status === 'success' &&
+      models.value &&
+      models.value.length > 0
+    ) {
+      return 'Select Model';
+    }
+
+    return 'No models available';
+  };
 
   return (
     <PanelBlockHeader>
@@ -246,12 +268,7 @@ function Header(props) {
               : 'Models can not be changed after running inference'
           }
         >
-          {(selectedModel && selectedModel.name) ||
-            (isAuthenticated
-              ? models && models.length
-                ? 'Select Model'
-                : 'No models available'
-              : 'Login to select model')}
+          {(selectedModel && selectedModel.name) || renderModelLabel()}
         </SubheadingStrong>
         {!modelNotChangeable && (
           <HeadOptionToolbar>

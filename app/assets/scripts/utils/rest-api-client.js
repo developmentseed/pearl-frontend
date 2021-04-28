@@ -90,6 +90,10 @@ class RestApiClient {
     return this.get(`model/${id}`);
   }
 
+  getModels() {
+    return this.get(`model`).then((body) => (body ? body.models : []));
+  }
+
   getAOIs(projectId) {
     return this.get(`project/${projectId}/aoi`);
   }
