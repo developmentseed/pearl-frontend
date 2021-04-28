@@ -205,6 +205,8 @@ function PrimePanel() {
                 checkpointList,
                 applyCheckpoint,
 
+                checkpointHasSamples: checkpointHasSamples(),
+
                 setShowSelectModelModal,
                 selectedModel,
                 models,
