@@ -237,6 +237,15 @@ export function InstanceProvider(props) {
     messageQueue,
   ]);
 
+  // Disconnect websocket on unmount
+  useEffect(() => {
+    return () => {
+      if (websocketClient) {
+        websocketClient.close();
+      }
+    };
+  }, [websocketClient]);
+
   async function initInstance(projectId, checkpointId, aoiId) {
     // Close existing websocket
     if (websocketClient) {
