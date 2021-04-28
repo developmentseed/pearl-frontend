@@ -1,4 +1,3 @@
-import toasts from '../components/common/toasts';
 import config from '../config';
 import { fetchJSON } from '../context/reducers/reduxeed';
 const { restApiEndpoint } = config;
