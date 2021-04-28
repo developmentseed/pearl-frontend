@@ -85,7 +85,6 @@ function Header(props) {
     mapRef,
 
     currentCheckpoint,
-    checkpointModes,
     checkpointList,
     applyCheckpoint,
 
@@ -160,10 +159,7 @@ function Header(props) {
   };
 
   const modelNotChangeable =
-    !isAuthenticated ||
-    !models?.length ||
-    checkpointList?.length ||
-    currentCheckpoint?.mode === checkpointModes.RUN;
+    !isAuthenticated || !models?.length || checkpointList?.length;
 
   return (
     <PanelBlockHeader>
@@ -362,7 +358,6 @@ Header.propTypes = {
   mapRef: T.object,
 
   currentCheckpoint: T.object,
-  checkpointModes: T.object,
   checkpointList: T.array,
   applyCheckpoint: T.func,
 
