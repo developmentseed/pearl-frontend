@@ -30,7 +30,7 @@ const HEADERS = [
   'Name',
   'Created',
   'Model',
-  'Latest Checkpoint',
+  'Last Checkpoint',
   'AOIs',
   'AOI Names',
 ];
@@ -65,7 +65,7 @@ function renderRow(proj) {
       <TableCell>{proj.model ? proj.model.name : 'No model set'}</TableCell>
       <TableCell>
         {proj.checkpoints.length
-          ? proj.checkpoints[proj.checkpoints.length - 1].name
+          ? proj.checkpoints[0].name
           : 'No checkpoint set'}
       </TableCell>
       <TableCell>{proj.aois.length}</TableCell>
