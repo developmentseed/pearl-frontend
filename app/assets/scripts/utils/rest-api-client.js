@@ -142,6 +142,11 @@ class RestApiClient {
       'binary'
     );
   }
+
+  getAOIFromUUID(uuid) {
+    return this.get(`aoi/${uuid}`);
+  }
+
   patchAoi(projectId, aoiId, patches) {
     return this.patch(`project/${projectId}/aoi/${aoiId}`, {
       patches,
