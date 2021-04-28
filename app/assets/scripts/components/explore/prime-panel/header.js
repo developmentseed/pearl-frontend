@@ -87,6 +87,7 @@ function Header(props) {
     currentCheckpoint,
     checkpointList,
     applyCheckpoint,
+    checkpointHasSamples,
 
     setShowSelectModelModal,
     selectedModel,
@@ -277,39 +278,49 @@ function Header(props) {
         <Dropdown
           alignment='right'
           direction='down'
-          triggerElement={(props) => (
-            <>
-              <SubheadingStrong
-                {...props}
-                onClick={(e) => checkpointList && props.onClick(e)} // eslint-disable-line
-                title={
-                  checkpointList
-                    ? 'Change checkpoint'
-                    : 'Run and retrain model to create first checkpoint'
-                }
-                disabled={!checkpointList}
-              >
-                {renderCheckpointSelectionHeader()}
-              </SubheadingStrong>
-              <HeadOptionToolbar>
-                <EditButton
-                  data-cy='show-select-checkpoint-button'
-                  useIcon='swap-horizontal'
+          triggerElement={(props) => {
+            const disabled = checkpointHasSamples || !checkpointList;
+            return (
+              <>
+                <SubheadingStrong
+                  {...props}
+                onClick={(e) => !disabled && props.onClick(e)} // eslint-disable-line
                   title={
                     checkpointList
                       ? 'Change checkpoint'
-                      : 'Run model to create first checkpoint'
+                      : 'Run and retrain model to create first checkpoint'
                   }
-                  id='checkpoint-list-trigger'
-                  {...props}
-                  onClick={(e) => checkpointList && props.onClick(e)} // eslint-disable-line
-                  disabled={!checkpointList}
+                  disabled={disabled}
                 >
-                  Edit Checkpoint Selection
-                </EditButton>
-              </HeadOptionToolbar>
-            </>
-          )}
+                  {renderCheckpointSelectionHeader()}
+                </SubheadingStrong>
+                <HeadOptionToolbar>
+                  <EditButton
+                    data-cy='show-select-checkpoint-button'
+                    useIcon='swap-horizontal'
+                    title={
+                      checkpointList
+                        ? 'Change checkpoint'
+                        : 'Run model to create first checkpoint'
+                    }
+                    id='checkpoint-list-trigger'
+                    info={
+                      checkpointHasSamples
+                        ? 'Submit or clear samples to change checkpoint'
+                        : !checkpointList
+                        ? 'No checkpoints available'
+                        : null
+                    }
+                    {...props}
+                  onClick={(e) => !disabled && props.onClick(e)} // eslint-disable-line
+                    visuallyDisabled={disabled}
+                  >
+                    Edit Checkpoint Selection
+                  </EditButton>
+                </HeadOptionToolbar>
+              </>
+            );
+          }}
           className='global__dropdown'
         >
           <>
@@ -360,6 +371,8 @@ Header.propTypes = {
   currentCheckpoint: T.object,
   checkpointList: T.array,
   applyCheckpoint: T.func,
+
+  checkpointHasSamples: T.bool,
 
   setShowSelectModelModal: T.func,
   selectedModel: T.object,
