@@ -36,17 +36,9 @@ class RestApiClient {
       options.body = JSON.stringify(data);
     }
 
-    try {
-      const res = await fetchJSON(url, options);
-      return res.body;
-    } catch (error) {
-      if (error.statusCode === 401 && this.handleUnauthorized) {
-        this.handleUnauthorized();
-        toasts.error('You have been signed out.');
-      } else {
-        throw error;
-      }
-    }
+    // Fetch data and let errors to be handle by the caller
+    const res = await fetchJSON(url, options);
+    return res.body;
   }
 
   get(path, format = 'json') {
