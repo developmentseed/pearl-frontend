@@ -306,7 +306,7 @@ function Header(props) {
                     id='checkpoint-list-trigger'
                     info={
                       checkpointHasSamples
-                        ? 'Clear samples to change checkpoint'
+                        ? 'Submit or clear samples to change checkpoint'
                         : !checkpointList
                         ? 'No checkpoints available'
                         : null
