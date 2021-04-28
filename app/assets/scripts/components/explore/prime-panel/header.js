@@ -183,6 +183,7 @@ function Header(props) {
               {aoiList.map((a) => (
                 <li key={a.id} data-dropdown='click.close'>
                   <DropdownItem
+                    checked={a.name == aoiName}
                     onClick={() => {
                       loadAoi(currentProject, a).then((bounds) =>
                         mapRef.fitBounds(bounds, {
