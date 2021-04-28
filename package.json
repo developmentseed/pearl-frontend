@@ -149,6 +149,7 @@
     "react-router-dom": "^5.2.0",
     "react-toastify": "^7.0.3",
     "react-tooltip": "^4.2.15",
+    "reconnecting-websocket": "^4.4.0",
     "request-promise": "^4.2.6",
     "styled-components": "^5.2.1"
   }

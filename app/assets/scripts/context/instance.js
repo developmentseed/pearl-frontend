@@ -11,6 +11,7 @@ import T from 'prop-types';
 import config from '../config';
 import logger from '../utils/logger';
 import get from 'lodash.get';
+import ReconnectingWebsocket from 'reconnecting-websocket';
 import {
   showGlobalLoadingMessage,
   hideGlobalLoading,
@@ -711,7 +712,7 @@ export const useInstance = () => {
   );
 };
 
-export class WebsocketClient extends WebSocket {
+export class WebsocketClient extends ReconnectingWebsocket {
   constructor({
     token,
     applyInstanceStatus,
