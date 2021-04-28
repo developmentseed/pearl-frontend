@@ -138,19 +138,18 @@ function PrimePanel() {
 
   const checkpointHasSamples = () => {
     if (currentCheckpoint) {
-      let sampleCount = Object.values(currentCheckpoint.classes).reduce(
+      let sampleCount = Object.values(currentCheckpoint.classes || {}).reduce(
         (count, c) => {
           return count + c.points.coordinates.length + c.polygons.length;
         },
         0
       );
 
-      sampleCount += Object.values(currentCheckpoint.checkpointBrushes).reduce(
-        (count, c) => {
-          return count + c.polygons.length;
-        },
-        0
-      );
+      sampleCount += Object.values(
+        currentCheckpoint.checkpointBrushes || {}
+      ).reduce((count, c) => {
+        return count + c.polygons.length;
+      }, 0);
 
       // There should be no polygon or point samples on the map
       // User must submit or clear retrain samples before starting refine
