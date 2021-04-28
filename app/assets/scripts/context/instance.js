@@ -11,6 +11,7 @@ import T from 'prop-types';
 import config from '../config';
 import logger from '../utils/logger';
 import get from 'lodash.get';
+import ReconnectingWebsocket from 'reconnecting-websocket';
 import {
   showGlobalLoadingMessage,
   hideGlobalLoading,
@@ -237,6 +238,15 @@ export function InstanceProvider(props) {
     messageQueue,
   ]);
 
+  // Disconnect websocket on unmount
+  useEffect(() => {
+    return () => {
+      if (websocketClient) {
+        websocketClient.close();
+      }
+    };
+  }, [websocketClient]);
+
   async function initInstance(projectId, checkpointId, aoiId) {
     // Close existing websocket
     if (websocketClient) {
@@ -314,12 +324,6 @@ export function InstanceProvider(props) {
         dispatchPredictions,
         dispatchMessageQueue,
         dispatchAoiPatch,
-        onPingPongFail: () => {
-          history.push(`/profile/projects/${projectId}`);
-          toasts.error(
-            'Communication with GPU failed, please try again later.'
-          );
-        },
       });
       newWebsocketClient.addEventListener('open', () => {
         setWebsocketClient(newWebsocketClient);
@@ -702,7 +706,7 @@ export const useInstance = () => {
   );
 };
 
-export class WebsocketClient extends WebSocket {
+export class WebsocketClient extends ReconnectingWebsocket {
   constructor({
     token,
     applyInstanceStatus,
@@ -711,7 +715,6 @@ export class WebsocketClient extends WebSocket {
     fetchCheckpoint,
     dispatchPredictions,
     dispatchAoiPatch,
-    onPingPongFail,
   }) {
     super(config.websocketEndpoint + `?token=${token}`);
 
@@ -732,9 +735,8 @@ export class WebsocketClient extends WebSocket {
           self.pingCount = self.pingCount + 1;
           self.send(`ping#${self.pingCount}`);
         } else {
-          // Pong didn't happened, close websocket and execute callback
-          self.close();
-          if (onPingPongFail) onPingPongFail();
+          // Pong didn't happened, reconnect
+          self.reconnect();
         }
       }, config.websocketPingPongInterval);
     });
