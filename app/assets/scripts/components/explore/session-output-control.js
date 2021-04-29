@@ -135,7 +135,7 @@ function SessionOutputControl(props) {
     const projectId = currentProject.id;
     const aoiId = predictions.data?.aoiId || currentAoi.id;
     let share;
-    showGlobalLoadingMessage('Creating shareable map.')
+    showGlobalLoadingMessage('Creating shareable map.');
     try {
       //FIXME: ideally, these two requests should happen in parallel
       await restApiClient.bookmarkAOI(projectId, aoiId, aoiName);
@@ -143,10 +143,10 @@ function SessionOutputControl(props) {
     } catch (err) {
       logger('Error creating share', err);
       hideGlobalLoading();
-      toasts.error('Failed to create share.')
+      toasts.error('Failed to create share.');
       return;
     }
-    
+
     hideGlobalLoading();
     const url = `${window.location.origin}/share/${share.uuid}/map`;
     const copied = copy(url);
