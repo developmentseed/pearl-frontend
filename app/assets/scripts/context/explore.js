@@ -31,7 +31,6 @@ import { useModel } from './model';
 import { useInstance } from './instance';
 import logger from '../utils/logger';
 
-
 /**
  * Context & Provider
  */
@@ -336,6 +335,27 @@ export function ExploreProvider(props) {
       `project/${project.id}/aoi/${aoiObject.id}`
     );
 
+    const [lonMin, latMin, lonMax, latMax] = tBbox(aoi.bounds);
+    const bounds = [
+      [latMin, lonMin],
+      [latMax, lonMax],
+    ];
+
+    if (aoiRef) {
+      // Load existing aoi that was returned by the api
+      aoiRef.setBounds(bounds);
+      setAoiBounds(aoiRef.getBounds());
+      setAoiName(aoiObject.name);
+
+      if (predictions.isReady) {
+        dispatchPredictions({ type: predictionActions.CLEAR_PREDICTION });
+      }
+    } else {
+      // initializing map with first aoi
+      setAoiInitializer(bounds);
+      setAoiName(aoiObject.name);
+    }
+
     if (!aoiMatchesCheckpoint) {
       toasts.error(
         'Tiles do not exist for this aoi and this checkpoint. Treating as geometry only'
@@ -376,27 +396,6 @@ export function ExploreProvider(props) {
           data: mapModes.ADD_CLASS_SAMPLES,
         });
       }
-    }
-
-    const [lonMin, latMin, lonMax, latMax] = tBbox(aoi.bounds);
-    const bounds = [
-      [latMin, lonMin],
-      [latMax, lonMax],
-    ];
-
-    if (aoiRef) {
-      // Load existing aoi that was returned by the api
-      aoiRef.setBounds(bounds);
-      setAoiBounds(aoiRef.getBounds());
-      setAoiName(aoiObject.name);
-
-      if (predictions.isReady) {
-        dispatchPredictions({ type: predictionActions.CLEAR_PREDICTION });
-      }
-    } else {
-      // initializing map with first aoi
-      setAoiInitializer(bounds);
-      setAoiName(aoiObject.name);
     }
 
     dispatchCurrentCheckpoint({
