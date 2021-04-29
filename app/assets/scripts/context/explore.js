@@ -23,7 +23,7 @@ import {
   checkpointModes,
   useCheckpoint,
 } from './checkpoint';
-import { wrapLogReducer } from './reducers/utils';
+import { wrapLogReducer } from './reducers/reduxeed';
 import { useAoi, useAoiPatch } from './aoi';
 import { actions as aoiPatchActions } from './reducers/aoi_patch';
 import { useProject } from './project';

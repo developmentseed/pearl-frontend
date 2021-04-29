@@ -1,7 +1,8 @@
 import React from 'react';
 import logger from './utils/logger';
+import config from './config';
 
-if (process.env.NODE_ENV === 'development') {
+if (config.environment === 'development' && config.wdyrLogs) {
   logger(
     '"Why did you render" module was loaded, which might slow down React in development mode.'
   );

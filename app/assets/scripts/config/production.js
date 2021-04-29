@@ -2,6 +2,8 @@
 module.exports = {
   default: {
     environment: 'production',
+    wdyrLogs: false,
+    reduxeedLogs: false,
     appTitle: 'PEARL',
     appLongTitle: 'Planetary Computer Land Cover Mapping',
     appDescription:

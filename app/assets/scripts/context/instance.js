@@ -31,7 +31,7 @@ import { useAoi, useAoiPatch } from './aoi';
 import { actions as aoiPatchActions } from './reducers/aoi_patch';
 import { useModel } from './model';
 
-import { wrapLogReducer } from './reducers/utils';
+import { wrapLogReducer } from './reducers/reduxeed';
 
 const messageQueueActionTypes = {
   ABORT: 'ABORT',

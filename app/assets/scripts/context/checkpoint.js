@@ -7,7 +7,7 @@ import { useAuth } from './auth';
 import toasts from '../components/common/toasts';
 import logger from '../utils/logger';
 
-import { wrapLogReducer } from './reducers/utils';
+import { wrapLogReducer } from './reducers/reduxeed';
 
 const CheckpointContext = createContext(null);
 
