@@ -31,7 +31,6 @@ import { useModel } from './model';
 import { useInstance } from './instance';
 import logger from '../utils/logger';
 
-import { BOUNDS_PADDING } from '../components/common/map/constants';
 
 /**
  * Context & Provider
@@ -55,8 +54,6 @@ export function ExploreProvider(props) {
     setAoiList,
     aoiBounds,
     setAoiBounds,
-    aoiNeedsUpdating,
-    setAoiNeedsUpdating,
   } = useAoi();
   const { predictions, dispatchPredictions } = usePredictions();
   const { selectedModel, setSelectedModel } = useModel();
@@ -396,13 +393,11 @@ export function ExploreProvider(props) {
       if (predictions.isReady) {
         dispatchPredictions({ type: predictionActions.CLEAR_PREDICTION });
       }
-
     } else {
       // initializing map with first aoi
       setAoiInitializer(bounds);
       setAoiName(aoiObject.name);
     }
-
 
     dispatchCurrentCheckpoint({
       type: checkpointActions.SET_AOI_CHECKED,

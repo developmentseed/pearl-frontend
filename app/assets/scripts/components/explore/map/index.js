@@ -256,8 +256,6 @@ function Map() {
     }
   }, [aoiArea, apiLimits, aoiRef]);
 
-  
-
   useEffect(() => {
     async function updateTileUrl() {
       if (mapRef && currentProject && currentAoi) {

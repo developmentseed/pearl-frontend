@@ -284,7 +284,12 @@ export function InstanceProvider(props) {
             },
           });
         } else {
-          fetchCheckpoint(projectId, checkpointId, checkpointModes.RETRAIN, true);
+          fetchCheckpoint(
+            projectId,
+            checkpointId,
+            checkpointModes.RETRAIN,
+            true
+          );
         }
       }
 
