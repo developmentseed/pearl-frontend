@@ -11,13 +11,13 @@ const { appInsightsKey } = config;
 const browserHistory = createBrowserHistory({ basename: '' });
 const reactPlugin = new ReactPlugin();
 const appInsights = new ApplicationInsights({
-    config: {
-        instrumentationKey: appInsightsKey,
-        extensions: [reactPlugin],
-        extensionConfig: {
-          [reactPlugin.identifier]: { history: browserHistory }
-        }
-    }
+  config: {
+    instrumentationKey: appInsightsKey,
+    extensions: [reactPlugin],
+    extensionConfig: {
+      [reactPlugin.identifier]: { history: browserHistory },
+    },
+  },
 });
 appInsights.loadAppInsights();
 export { reactPlugin, appInsights };

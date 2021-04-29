@@ -51,7 +51,6 @@ App.propTypes = {
   pageTitle: T.string,
 };
 
-
 let thisApp;
 if (environment === 'production' || environment === 'staging') {
   // staging and production uses Azure App Insights
