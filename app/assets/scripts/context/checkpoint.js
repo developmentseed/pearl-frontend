@@ -33,6 +33,8 @@ export const actions = {
   RESET_CHECKPOINT: 'RESET_CHECKPOINT',
   UPDATE_POLYGONS: 'UPDATE_POLYGONS',
   INPUT_UNDO: 'INPUT_UNDO',
+
+  SET_AOI_CHECKED: 'SET_AOI_CHECKED',
 };
 
 export function CheckpointProvider(props) {
@@ -42,7 +44,7 @@ export function CheckpointProvider(props) {
 
   const { restApiClient } = useAuth();
 
-  async function fetchCheckpoint(projectId, checkpointId, mode) {
+  async function fetchCheckpoint(projectId, checkpointId, mode, created) {
     try {
       const checkpoint = await restApiClient.getCheckpoint(
         projectId,
@@ -57,6 +59,8 @@ export function CheckpointProvider(props) {
       } else {
         _data.analytics = null;
       }
+
+      _data.checkAoi = created ? false : true;
       dispatchCurrentCheckpoint({
         type: actions.SET_CHECKPOINT,
         data: {
@@ -92,11 +96,9 @@ function checkpointReducer(state, action) {
   switch (action.type) {
     case actions.SET_CHECKPOINT:
       // Action used to load existing or initialize a new checkpoint
-      if (state && state.onSetCallback) {
-        state.onSetCallback()
-      }
       return {
         ...action.data,
+        checkAoi: action.data.checkAoi || false,
         bookmarked:
           action.data.bookmarked !== undefined
             ? action.data.bookmarked
@@ -131,6 +133,12 @@ function checkpointReducer(state, action) {
         // User action history of classes and checkpoint brushes
         history: [],
       };
+
+    case actions.SET_AOI_CHECKED:
+      return {
+        ...state,
+        checkAoi: action.data.checkAoi,
+      };
     case actions.SET_CHECKPOINT_NAME:
       return {
         ...state,
@@ -140,7 +148,6 @@ function checkpointReducer(state, action) {
       return {
         ...state,
         ...action.data,
-        onSetCallback: action.onSetCallback || null
       };
 
     // Modifies current checkpoint classes to add a custom user defined class

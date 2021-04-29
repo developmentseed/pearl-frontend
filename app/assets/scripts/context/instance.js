@@ -284,7 +284,7 @@ export function InstanceProvider(props) {
             },
           });
         } else {
-          fetchCheckpoint(projectId, checkpointId, checkpointModes.RETRAIN);
+          fetchCheckpoint(projectId, checkpointId, checkpointModes.RETRAIN, true);
         }
       }
 
@@ -319,8 +319,8 @@ export function InstanceProvider(props) {
         applyInstanceStatus,
         dispatchInstance,
         dispatchCurrentCheckpoint,
-        fetchCheckpoint: (checkpointId, mode) =>
-          fetchCheckpoint(projectId, checkpointId, mode),
+        fetchCheckpoint: (checkpointId, mode, created) =>
+          fetchCheckpoint(projectId, checkpointId, mode, created),
         dispatchPredictions,
         dispatchMessageQueue,
         dispatchAoiPatch,
@@ -626,7 +626,7 @@ export function InstanceProvider(props) {
         type: checkpointActions.CLEAR_SAMPLES,
       });
     },
-    applyCheckpoint: async (projectId, checkpointId, onSetCallback) => {
+    applyCheckpoint: async (projectId, checkpointId) => {
       try {
         if (!websocketClient) {
           await initInstance(projectId);
@@ -645,7 +645,13 @@ export function InstanceProvider(props) {
           data: {
             mode: currentAoi ? checkpointModes.RETRAIN : checkpointModes.RUN,
           },
-          onSetCallback
+        });
+
+        dispatchCurrentCheckpoint({
+          type: checkpointActions.SET_AOI_CHECKED,
+          data: {
+            checkAoi: true,
+          },
         });
 
         dispatchMessageQueue({
@@ -824,7 +830,7 @@ export class WebsocketClient extends ReconnectingWebsocket {
             showGlobalLoadingMessage('Loading AOI...');
             break;
           case 'model#aoi#complete':
-            hideGlobalLoading()
+            hideGlobalLoading();
             this.sendMessage({ action: 'model#status' });
             break;
           case 'error':
@@ -836,7 +842,7 @@ export class WebsocketClient extends ReconnectingWebsocket {
             break;
           case 'model#checkpoint':
             if (data && (data.id || data.checkpoint)) {
-              fetchCheckpoint(data.id || data.checkpoint);
+              fetchCheckpoint(data.id || data.checkpoint, null, true);
             }
             applyInstanceStatus({
               gpuMessage: `Loading checkpoint...`,

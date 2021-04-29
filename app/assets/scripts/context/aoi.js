@@ -174,6 +174,7 @@ export const useAoi = () => {
       setAoiList,
       aoiBounds,
       setAoiBounds,
+
       setCurrentAoi: (data) =>
         dispatchCurrentAoi({ type: actions.SET_AOI, data }),
     }),

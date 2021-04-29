@@ -31,6 +31,8 @@ import { useModel } from './model';
 import { useInstance } from './instance';
 import logger from '../utils/logger';
 
+import { BOUNDS_PADDING } from '../components/common/map/constants';
+
 /**
  * Context & Provider
  */
@@ -53,6 +55,8 @@ export function ExploreProvider(props) {
     setAoiList,
     aoiBounds,
     setAoiBounds,
+    aoiNeedsUpdating,
+    setAoiNeedsUpdating,
   } = useAoi();
   const { predictions, dispatchPredictions } = usePredictions();
   const { selectedModel, setSelectedModel } = useModel();
@@ -179,7 +183,7 @@ export function ExploreProvider(props) {
       // Update aoi List with newest aoi
       // If predictions is ready, restApiClient must be ready
 
-      if (predictions.fetched) {
+      if (predictions.fetched && predictions.data.predictions?.length > 0) {
         restApiClient.get(`project/${currentProject.id}/aoi/`).then((aois) => {
           //const list = filterAoiList(aois.aois);
           setAoiList(aois.aois);
@@ -295,9 +299,14 @@ export function ExploreProvider(props) {
   /*
    * When a checkpoint is changed
    */
-  /*
+
+  const checkId = currentCheckpoint ? currentCheckpoint.id : null;
   useEffect(() => {
-    if (currentProject && currentCheckpoint && currentCheckpoint.id) {
+    if (
+      currentCheckpoint &&
+      currentCheckpoint.id &&
+      currentCheckpoint.checkAoi
+    ) {
       const aoi = aoiList.find(
         (aoi) => Number(aoi.checkpoint_id) === Number(currentCheckpoint.id)
       );
@@ -305,7 +314,7 @@ export function ExploreProvider(props) {
         loadAoi(currentProject, aoi, true);
       }
     }
-  }, [aoiList, currentProject, currentCheckpoint && currentCheckpoint.id]);*/
+  }, [aoiList, checkId]);
 
   /*
    * Utility function to load AOI
@@ -316,8 +325,12 @@ export function ExploreProvider(props) {
    *                  aoi listing endpoint
    */
 
-  async function loadAoi(project, aoiObject, aoiMatchesCheckpoint, noLoadOnInst) {
-    console.log(project, aoiObject)
+  async function loadAoi(
+    project,
+    aoiObject,
+    aoiMatchesCheckpoint,
+    noLoadOnInst
+  ) {
     if (!aoiObject) {
       return;
     }
@@ -344,10 +357,9 @@ export function ExploreProvider(props) {
       setCurrentAoi(aoi);
 
       if (currentInstance && !noLoadOnInst) {
-        console.log('LOADING ON INSTANCE');
         loadAoiOnInstance(aoi.id);
       } else {
-        hideGlobalLoading()
+        hideGlobalLoading();
       }
 
       if (currentCheckpoint) {
@@ -384,11 +396,20 @@ export function ExploreProvider(props) {
       if (predictions.isReady) {
         dispatchPredictions({ type: predictionActions.CLEAR_PREDICTION });
       }
+
     } else {
       // initializing map with first aoi
       setAoiInitializer(bounds);
       setAoiName(aoiObject.name);
     }
+
+
+    dispatchCurrentCheckpoint({
+      type: checkpointActions.SET_AOI_CHECKED,
+      data: {
+        checkAoi: false,
+      },
+    });
 
     return bounds;
   }

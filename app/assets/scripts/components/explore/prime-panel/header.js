@@ -367,15 +367,7 @@ function Header(props) {
                       ckpt.id == (currentCheckpoint && currentCheckpoint.id)
                     }
                     onClick={async () => {
-                      await applyCheckpoint(currentProject.id, ckpt.id, () => {
-                        const aoi = aoiList.find(
-                          (aoi) => Number(aoi.checkpoint_id) === Number(ckpt.id)
-                        );
-                        if (aoi) {
-                          console.log(aoi);
-                          loadAoi(currentProject, aoi, true);
-                        }
-                      });
+                      await applyCheckpoint(currentProject.id, ckpt.id);
                     }}
                   >
                     {ckpt.parent
