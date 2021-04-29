@@ -63,7 +63,7 @@ const StyledLink = filterComponentProps(Link, propsToFilter);
 function UserDropdown() {
   const location = useLocation();
   const { loginWithRedirect, logout } = useAuth0();
-  const { isAuthenticated, user, isLoading } = useAuth();
+  const { isAuthenticated, user, authStateIsLoading } = useAuth();
 
   const logoutWithRedirect = () =>
     logout({
@@ -73,7 +73,7 @@ function UserDropdown() {
   const [showCheckpoints, setShowCheckpoints] = useState(false);
   const [checkpointFilterString, setCheckpointFilterString] = useState('');
 
-  if (isLoading) {
+  if (authStateIsLoading) {
     return (
       <Button
         variation='primary-raised-light'

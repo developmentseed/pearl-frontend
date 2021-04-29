@@ -83,6 +83,7 @@ function InnerAuthProvider(props) {
   const value = {
     ...authState,
     isLoading,
+    authStateIsLoading: authState.isLoading,
     refreshAuth: fetchToken,
     logout: () =>
       dispatchAuthState({
@@ -201,6 +202,7 @@ export const useAuth = () => {
     isAuthenticated,
     logout,
     isLoading,
+    authStateIsLoading,
     refreshAuth,
   } = useCheckContext('useAuth');
 
@@ -213,9 +215,10 @@ export const useAuth = () => {
       restApiClient,
       apiToken,
       isLoading,
+      authStateIsLoading,
       user,
       isAuthenticated,
       refreshAuth,
     };
-  }, [apiToken, isLoading, user, isAuthenticated]);
+  }, [apiToken, isLoading, authStateIsLoading, user, isAuthenticated]);
 };
