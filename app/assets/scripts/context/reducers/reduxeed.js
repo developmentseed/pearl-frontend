@@ -1,6 +1,6 @@
 import get from 'lodash.get';
 import config from '../../config';
-const { environment } = config;
+const { environment, reduxeedLogs } = config;
 
 /**
  * Creates invalidate, request and receive actions.
@@ -420,7 +420,7 @@ export function wrapLogReducer(reducer) {
   return (state, action) => {
     const nextState = wrapApiResult(reducer(state, action));
 
-    if (environment !== 'production') {
+    if (environment !== 'production' && reduxeedLogs) {
       console.groupCollapsed(action.type);
       console.log(
         '%c%s',
