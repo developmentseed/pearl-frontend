@@ -1,20 +1,24 @@
-import React, { createContext, useEffect, useReducer, useState } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useReducer,
+  useState,
+} from 'react';
 import T from 'prop-types';
 import { initialApiRequestState } from './reducers/reduxeed';
 import { createQueryApiGetReducer, queryApiGet } from './reducers/api';
 import { createQueryApiPostReducer } from './reducers/api';
 import { useAuth } from './auth';
+import useAsync from '../utils/use-async';
 
 const GlobalContext = createContext({});
 export function GlobalContextProvider(props) {
-  const { apiToken } = useAuth();
+  const { apiToken, restApiClient } = useAuth();
   const [tourStep, setTourStep] = useState(0);
 
-  /* User data Reducers */
-  const [modelsList, dispatchModelsList] = useReducer(
-    createQueryApiGetReducer('model'),
-    initialApiRequestState
-  );
+  const models = useAsync(() => restApiClient.getModels(), false);
 
   const [mosaicList, dispatchMosaicList] = useReducer(
     createQueryApiGetReducer('mosaic'),
@@ -44,14 +48,15 @@ export function GlobalContextProvider(props) {
       return;
     }
 
-    queryApiGet({ token: apiToken, endpoint: 'model' })(dispatchModelsList);
+    // fetch models when apiToken is available
+    models.execute();
   }, [apiToken]);
 
   return (
     <>
       <GlobalContext.Provider
         value={{
-          modelsList,
+          models,
 
           mosaicList,
 
@@ -73,6 +78,30 @@ export function GlobalContextProvider(props) {
 
 GlobalContextProvider.propTypes = {
   children: T.node,
+};
+
+// Check if consumer function is used properly
+export const useGlobalContext = (fnName) => {
+  const context = useContext(GlobalContext);
+
+  if (!context) {
+    throw new Error(
+      `The \`${fnName}\` hook must be used inside the <GlobalContext> component's context.`
+    );
+  }
+
+  return context;
+};
+
+export const useModels = () => {
+  const { models } = useGlobalContext('useModels');
+
+  return useMemo(
+    () => ({
+      models,
+    }),
+    [models]
+  );
 };
 
 export default GlobalContext;
