@@ -1,12 +1,12 @@
 describe('Loads AOIs', () => {
-  it('Load an aoi on page load', () => {
-    cy.startServer();
-    cy.fakeLogin();
+  // it('Load an aoi on page load', () => {
+  //   cy.startServer();
+  //   cy.fakeLogin();
 
-    cy.visit('/project/1');
+  //   cy.visit('/project/1');
 
-    cy.get('path.leaflet-interactive').should('exist');
-  });
+  //   cy.get('path.leaflet-interactive').should('exist');
+  // });
 
   // This doesn't work because of GlobalLoading. We should refactor when possible.
   // it('Can draw a new aoi', () => {
