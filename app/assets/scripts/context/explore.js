@@ -291,26 +291,20 @@ export function ExploreProvider(props) {
   }
 
   /*
-   * Filter the aoi list to have unique names
-   * Back end doesn't care if aoi's are submitted with duplicate names.
-   * On frontend, assume that equivalent name -> equivalent geometry
-   * Only update the name if the geometry has been edited
-   *
-   */
-  function filterAoiList(aoiList) {
-    const aois = new Map();
-    aoiList.forEach((a) => {
-      if (aois.has(a.name)) {
-        if (aois.get(a.name).created > a.created) {
-          aois.set(a.name, a);
-        }
-      } else {
-        aois.set(a.name, a);
+   * When a checkpoint is changed 
+  */
+  useEffect(() => {
+    if (currentProject && currentCheckpoint && currentCheckpoint.id) {
+      console.log(aoiList);
+      console.log(currentCheckpoint);
+      const aoi = aoiList.find(
+        (aoi) => Number(aoi.checkpoint_id) === Number(currentCheckpoint.id)
+      );
+      if (aoi) {
+        loadAoi(currentProject, aoi);
       }
-    });
-    return Array.from(aois.values());
-  }
-
+    }
+  }, [aoiList, currentProject, currentCheckpoint && currentCheckpoint.id]);
   /*
    * Utility function to load AOI
    * @param project - current project object
