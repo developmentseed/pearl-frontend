@@ -34,7 +34,7 @@ const ModalFooter = styled(BaseModalFooter)`
 export function AoiEditButtons(props) {
   const { mapState, setMapMode, mapModes } = useMapState();
   const { updateAoiName } = useAoiName();
-  const { setCurrentAoi } = useAoi();
+  const { setCurrentAoi, activeModal, setActiveModal} = useAoi();
   const { mapRef } = useMapRef();
 
   const { dispatchCurrentCheckpoint } = useCheckpoint();
@@ -43,7 +43,6 @@ export function AoiEditButtons(props) {
 
   const { aoiRef, aoiArea, aoiBounds, setAoiBounds, setAoiRef } = props;
 
-  const [activeModal, setActiveModal] = useState(false);
 
   // Display confirm/cancel buttons when AOI edition is active
   if (
@@ -157,7 +156,11 @@ export function AoiEditButtons(props) {
                 <Button
                   size='xlarge'
                   variation='primary-plain'
-                  onClick={() => setActiveModal(false)}
+                  onClick={() => {
+                    setActiveModal(false)
+                    setMapMode(mapModes.EDIT_AOI_MODE);
+                  }
+                  }
                 >
                   Keep editing
                 </Button>
