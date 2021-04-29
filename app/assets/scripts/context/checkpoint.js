@@ -99,7 +99,7 @@ function checkpointReducer(state, action) {
             ? action.data.bookmarked
             : (state && state.bookmarked) || false,
         analytics: action.data.analytics || (state && state.analytics) || null,
-        mode: action.data.mode || checkpointModes.RUN,
+        mode: action.data.mode || (state && state.mode) || checkpointModes.RUN,
         retrain_geoms:
           action.data.retrain_geoms || (state && state.retrain_geoms) || null,
         input_geoms:

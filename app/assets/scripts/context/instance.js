@@ -122,7 +122,7 @@ export function InstanceProvider(props) {
   } = useCheckpoint();
   const { currentProject, setCurrentProject } = useProject();
   const { dispatchPredictions } = usePredictions();
-  const { aoiName, aoiRef } = useAoi();
+  const { currentAoi, aoiName, aoiRef } = useAoi();
   const { dispatchAoiPatch } = useAoiPatch();
   const { selectedModel } = useModel();
 
@@ -637,7 +637,15 @@ export function InstanceProvider(props) {
           type: predictionsActions.CLEAR_PREDICTION,
         });
 
-        await fetchCheckpoint(projectId, checkpointId, checkpointModes.RETRAIN);
+        //console.log(currentAoi)
+        //await fetchCheckpoint(projectId, checkpointId, !currentAoi ? checkpointModes.RUN : checkpointModes.RETRAIN);
+        //
+        dispatchCurrentCheckpoint({
+          type: checkpointActions.SET_CHECKPOINT_MODE,
+          data: {
+            mode: currentAoi ? checkpointModes.RETRAIN : checkpointModes.RUN,
+          },
+        });
 
         dispatchMessageQueue({
           type: messageQueueActionTypes.ADD,
@@ -840,8 +848,8 @@ export class WebsocketClient extends ReconnectingWebsocket {
             break;
           case 'model#checkpoint#complete':
             fetchCheckpoint(
-              data.id || data.checkpoint,
-              checkpointModes.RETRAIN
+              data.id || data.checkpoint
+              //checkpointModes.RETRAIN
             );
             hideGlobalLoading();
             this.sendMessage({ action: 'model#status' });
