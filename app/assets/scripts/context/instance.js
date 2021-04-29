@@ -626,7 +626,7 @@ export function InstanceProvider(props) {
         type: checkpointActions.CLEAR_SAMPLES,
       });
     },
-    applyCheckpoint: async (projectId, checkpointId) => {
+    applyCheckpoint: async (projectId, checkpointId, onSetCallback) => {
       try {
         if (!websocketClient) {
           await initInstance(projectId);
@@ -645,6 +645,7 @@ export function InstanceProvider(props) {
           data: {
             mode: currentAoi ? checkpointModes.RETRAIN : checkpointModes.RUN,
           },
+          onSetCallback
         });
 
         dispatchMessageQueue({
@@ -823,6 +824,7 @@ export class WebsocketClient extends ReconnectingWebsocket {
             showGlobalLoadingMessage('Loading AOI...');
             break;
           case 'model#aoi#complete':
+            hideGlobalLoading()
             this.sendMessage({ action: 'model#status' });
             break;
           case 'error':

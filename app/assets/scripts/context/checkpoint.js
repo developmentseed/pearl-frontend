@@ -92,6 +92,9 @@ function checkpointReducer(state, action) {
   switch (action.type) {
     case actions.SET_CHECKPOINT:
       // Action used to load existing or initialize a new checkpoint
+      if (state && state.onSetCallback) {
+        state.onSetCallback()
+      }
       return {
         ...action.data,
         bookmarked:
@@ -137,6 +140,7 @@ function checkpointReducer(state, action) {
       return {
         ...state,
         ...action.data,
+        onSetCallback: action.onSetCallback || null
       };
 
     // Modifies current checkpoint classes to add a custom user defined class
