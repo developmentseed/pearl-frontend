@@ -111,19 +111,19 @@ export function ExploreProvider(props) {
       setSelectedModel(model);
 
       showGlobalLoadingMessage('Fetching areas of interest...');
-      const aois = await restApiClient.get(`project/${project.id}/aoi`);
+      const aoiReq = await restApiClient.get(`project/${project.id}/aoi`);
+      const aois = aoiReq.aois;
 
       //const filteredList = filterAoiList(aois.aois);
-      setAoiList(aois.aois);
-      let latestAoi;
-      if (aois.total > 0) {
-        latestAoi = aois.aois[aois.aois.length - 1];
-        loadAoi(project, latestAoi);
-      }
+      setAoiList(aois);
 
       showGlobalLoadingMessage('Fetching checkpoints...');
       const { checkpoints } = await loadCheckpointList(projectId);
       const checkpoint = checkpoints[0];
+      let latestAoi;
+      if (aoiReq.total > 0) {
+        latestAoi = aois.find((a) => Number(a.checkpoint_id) === checkpoint.id);
+      }
 
       showGlobalLoadingMessage('Looking for active GPU instances...');
       const instance = await initInstance(
@@ -131,6 +131,8 @@ export function ExploreProvider(props) {
         checkpoint && checkpoint.id,
         latestAoi && latestAoi.id
       );
+
+      loadAoi(project, latestAoi, true, true);
 
       setCurrentInstance(instance);
     } catch (error) {
@@ -291,50 +293,80 @@ export function ExploreProvider(props) {
   }
 
   /*
-   * When a checkpoint is changed 
-  */
+   * When a checkpoint is changed
+   */
+  /*
   useEffect(() => {
     if (currentProject && currentCheckpoint && currentCheckpoint.id) {
-      console.log(aoiList);
-      console.log(currentCheckpoint);
       const aoi = aoiList.find(
         (aoi) => Number(aoi.checkpoint_id) === Number(currentCheckpoint.id)
       );
       if (aoi) {
-        loadAoi(currentProject, aoi);
+        loadAoi(currentProject, aoi, true);
       }
     }
-  }, [aoiList, currentProject, currentCheckpoint && currentCheckpoint.id]);
+  }, [aoiList, currentProject, currentCheckpoint && currentCheckpoint.id]);*/
+
   /*
    * Utility function to load AOI
    * @param project - current project object
    * @param aoiObject - object containing aoi id and name
    *                  Objects of this format are returned by
+   * @param aoiMatchesCheckpoint - bool
    *                  aoi listing endpoint
    */
 
-  async function loadAoi(project, aoiObject) {
+  async function loadAoi(project, aoiObject, aoiMatchesCheckpoint, noLoadOnInst) {
+    console.log(project, aoiObject)
+    if (!aoiObject) {
+      return;
+    }
     showGlobalLoadingMessage('Loading AOI');
     const aoi = await restApiClient.get(
       `project/${project.id}/aoi/${aoiObject.id}`
     );
 
-    setCurrentAoi(aoi);
+    if (!aoiMatchesCheckpoint) {
+      toasts.error(
+        'Tiles do not exist for this aoi and this checkpoint. Treating as geometry only'
+      );
+      if (currentCheckpoint) {
+        dispatchCurrentCheckpoint({
+          type: checkpointActions.SET_CHECKPOINT_MODE,
+          data: {
+            mode: checkpointModes.RUN,
+          },
+        });
+      }
+      setCurrentAoi(null);
+      hideGlobalLoading();
+    } else {
+      setCurrentAoi(aoi);
 
-    if (currentInstance) {
-      loadAoiOnInstance(aoi.id);
-    }
+      if (currentInstance && !noLoadOnInst) {
+        console.log('LOADING ON INSTANCE');
+        loadAoiOnInstance(aoi.id);
+      } else {
+        hideGlobalLoading()
+      }
 
-    dispatchCurrentCheckpoint({
-      type: checkpointActions.SET_CHECKPOINT_MODE,
-      data: {
-        mode: checkpointModes.RETRAIN,
-      },
-    });
-    if (currentCheckpoint) {
-      dispatchCurrentCheckpoint({
-        type: checkpointActions.CLEAR_SAMPLES,
-      });
+      if (currentCheckpoint) {
+        dispatchCurrentCheckpoint({
+          type: checkpointActions.SET_CHECKPOINT_MODE,
+          data: {
+            mode: checkpointModes.RETRAIN,
+          },
+        });
+
+        dispatchCurrentCheckpoint({
+          type: checkpointActions.CLEAR_SAMPLES,
+        });
+
+        dispatchMapState({
+          type: mapActionTypes.SET_MODE,
+          data: mapModes.ADD_CLASS_SAMPLES,
+        });
+      }
     }
 
     const [lonMin, latMin, lonMax, latMax] = tBbox(aoi.bounds);
@@ -348,10 +380,6 @@ export function ExploreProvider(props) {
       aoiRef.setBounds(bounds);
       setAoiBounds(aoiRef.getBounds());
       setAoiName(aoiObject.name);
-      dispatchMapState({
-        type: mapActionTypes.SET_MODE,
-        data: mapModes.ADD_CLASS_SAMPLES,
-      });
 
       if (predictions.isReady) {
         dispatchPredictions({ type: predictionActions.CLEAR_PREDICTION });

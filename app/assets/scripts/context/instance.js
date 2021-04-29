@@ -823,7 +823,6 @@ export class WebsocketClient extends ReconnectingWebsocket {
             showGlobalLoadingMessage('Loading AOI...');
             break;
           case 'model#aoi#complete':
-            hideGlobalLoading();
             this.sendMessage({ action: 'model#status' });
             break;
           case 'error':

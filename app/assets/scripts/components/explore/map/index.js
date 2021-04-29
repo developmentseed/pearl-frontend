@@ -521,6 +521,7 @@ function Map() {
   }, [
     mapModes,
     aoiRef,
+    currentAoi,
     currentCheckpoint,
     dispatchCurrentCheckpoint,
     userLayers,

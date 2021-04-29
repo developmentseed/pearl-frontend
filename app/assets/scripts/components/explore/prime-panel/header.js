@@ -77,6 +77,12 @@ function filterAoiList(aoiList) {
   return Array.from(aois.values());
 }
 
+function findCompatibleAoi(aoi, aoiList, ckpt) {
+  const foundAoi = aoiList
+    .filter((a) => a.name === aoi.name)
+    .find((a) => Number(a.checkpoint_id) === ckpt.id);
+  return foundAoi;
+}
 
 const PanelBlockHeader = styled(BasePanelBlockHeader)`
   display: grid;
@@ -204,7 +210,16 @@ function Header(props) {
                   <DropdownItem
                     checked={a.name == aoiName}
                     onClick={() => {
-                      loadAoi(currentProject, a).then((bounds) =>
+                      const relevantAoi = findCompatibleAoi(
+                        a,
+                        aoiList,
+                        currentCheckpoint
+                      );
+                      loadAoi(
+                        currentProject,
+                        relevantAoi || a,
+                        relevantAoi || false
+                      ).then((bounds) =>
                         mapRef.fitBounds(bounds, {
                           padding: BOUNDS_PADDING,
                         })
@@ -351,8 +366,17 @@ function Header(props) {
                     checked={
                       ckpt.id == (currentCheckpoint && currentCheckpoint.id)
                     }
-                    onClick={() => {
-                      applyCheckpoint(currentProject.id, ckpt.id);
+                    onClick={async () => {
+                      await applyCheckpoint(currentProject.id, ckpt.id);
+                      const aoi = aoiList.find(
+                        (aoi) =>
+                          Number(aoi.checkpoint_id) ===
+                          Number(ckpt.id)
+                      );
+                      if (aoi) {
+                        console.log(aoi)
+                        loadAoi(currentProject, aoi, true);
+                      }
                     }}
                   >
                     {ckpt.parent
