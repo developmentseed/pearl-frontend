@@ -4,6 +4,8 @@
 import { ApplicationInsights } from '@microsoft/applicationinsights-web';
 import { ReactPlugin } from '@microsoft/applicationinsights-react-js';
 import { createBrowserHistory } from 'history';
+import config from '../config';
+
 const { appInsightsKey } = config;
 
 const browserHistory = createBrowserHistory({ basename: '' });

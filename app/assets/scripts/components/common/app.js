@@ -14,7 +14,7 @@ import checkApiHealth from '../../utils/api-health';
 import { withAITracking } from '@microsoft/applicationinsights-react-js';
 import { reactPlugin } from '../../utils/azure-app-insights';
 
-const { appTitle, appDescription } = config;
+const { appTitle, appDescription, environment } = config;
 
 function App(props) {
   const { location, pageTitle, children, hideFooter } = props;
@@ -52,9 +52,12 @@ App.propTypes = {
 };
 
 
-if (environment === 'local') {
-  export default withRouter(App);
-} else {
+let thisApp;
+if (environment === 'production' || environment === 'staging') {
   // staging and production uses Azure App Insights
-  export default withRouter(withAITracking(reactPlugin, App));
+  thisApp = withRouter(withAITracking(reactPlugin, App));
+} else {
+  thisApp = withRouter(App);
 }
+
+export default thisApp;
