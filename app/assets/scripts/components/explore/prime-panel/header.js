@@ -63,6 +63,21 @@ const SubheadingStrong = styled.h3`
     `}
 `;
 
+function filterAoiList(aoiList) {
+  const aois = new Map();
+  aoiList.forEach((a) => {
+    if (aois.has(a.name)) {
+      if (aois.get(a.name).created > a.created) {
+        aois.set(a.name, a);
+      }
+    } else {
+      aois.set(a.name, a);
+    }
+  });
+  return Array.from(aois.values());
+}
+
+
 const PanelBlockHeader = styled(BasePanelBlockHeader)`
   display: grid;
   grid-gap: ${glsp(0.75)};
@@ -184,7 +199,7 @@ function Header(props) {
               </Heading>
             </DropdownHeader>
             <DropdownBody>
-              {aoiList.map((a) => (
+              {filterAoiList(aoiList).map((a) => (
                 <li key={a.id} data-dropdown='click.close'>
                   <DropdownItem
                     checked={a.name == aoiName}

@@ -113,11 +113,11 @@ export function ExploreProvider(props) {
       showGlobalLoadingMessage('Fetching areas of interest...');
       const aois = await restApiClient.get(`project/${project.id}/aoi`);
 
-      const filteredList = filterAoiList(aois.aois);
-      setAoiList(filteredList);
+      //const filteredList = filterAoiList(aois.aois);
+      setAoiList(aois.aois);
       let latestAoi;
       if (aois.total > 0) {
-        latestAoi = filteredList[filteredList.length - 1];
+        latestAoi = aois.aois[aois.aois.length - 1];
         loadAoi(project, latestAoi);
       }
 
@@ -179,8 +179,8 @@ export function ExploreProvider(props) {
 
       if (predictions.fetched) {
         restApiClient.get(`project/${currentProject.id}/aoi/`).then((aois) => {
-          const list = filterAoiList(aois.aois);
-          setAoiList(list);
+          //const list = filterAoiList(aois.aois);
+          setAoiList(aois.aois);
         });
         // Refresh checkpoint list, prediction finished
         // means new checkpoint available
