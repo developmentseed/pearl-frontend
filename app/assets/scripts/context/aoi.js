@@ -116,8 +116,8 @@ export function AoiProvider(props) {
 
     updateAoiName,
 
-
-    activeModal,setActiveModal
+    activeModal,
+    setActiveModal,
   };
 
   return (

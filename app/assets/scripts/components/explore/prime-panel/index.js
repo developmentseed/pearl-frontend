@@ -224,7 +224,8 @@ function PrimePanel() {
                   ready={
                     currentCheckpoint &&
                     (currentCheckpoint.mode === checkpointModes.RETRAIN ||
-                      currentCheckpoint.mode === checkpointModes.RUN)
+                      currentCheckpoint.mode === checkpointModes.RUN) &&
+                    currentCheckpoint.classes !== undefined
                   }
                   onTabClick={() => {
                     setActiveTab(checkpointModes.RETRAIN);
