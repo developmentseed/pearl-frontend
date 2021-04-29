@@ -53,7 +53,7 @@ const ClassLegend = styled(ClassList)`
   }
 `;
 
-function AoiMap() {
+function ShareMap() {
   const { uuid } = useParams();
   const [mapRef, setMapRef] = useState(null);
   const { restApiClient } = useAuth();
@@ -138,4 +138,4 @@ function AoiMap() {
   );
 }
 
-export default AoiMap;
+export default ShareMap;
