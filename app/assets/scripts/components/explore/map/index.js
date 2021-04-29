@@ -172,7 +172,7 @@ function Map() {
 
     mapRef.polygonDraw.clearLayers();
 
-    if (currentCheckpoint) {
+    if (currentCheckpoint && currentCheckpoint.classes) {
       mapRef.polygonDraw.setLayers(currentCheckpoint.classes);
       mapRef.polygonDraw.setLayerPolygons(currentCheckpoint.classes);
     }
