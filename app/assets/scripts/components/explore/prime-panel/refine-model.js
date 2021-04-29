@@ -126,17 +126,17 @@ function RefineModel(props) {
                       key={c.id}
                       onClick={() => {
                         if (!currentCheckpoint.checkpointBrushes[id]) {
+                          mapRef.polygonDraw.addLayer({
+                            name: id,
+                            color: '#efefef',
+                          });
+
                           dispatchCurrentCheckpoint({
                             type: checkpointActions.ADD_CHECKPOINT_BRUSH,
                             data: {
                               id,
                               checkpoint: c,
                             },
-                          });
-
-                          mapRef.polygonDraw.addLayer({
-                            name: id,
-                            color: '#efefef',
                           });
                         }
 
