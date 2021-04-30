@@ -76,8 +76,12 @@ const AOI_HEADERS = [
 ];
 
 // Render single AOI row
-function renderRow(aoi, { project, restApiClient }) {
-  const aoiLink = `${window.location.origin}/aoi/${aoi.uuid}/map`;
+function renderRow(aoi, { project, restApiClient, aois, setAois }) {
+  const shareUUID = aoi.shares.length > 0 ? aoi.shares[0].uuid : null;
+  const shareLink = shareUUID
+    ? `${window.location.origin}/share/${shareUUID}/map`
+    : null;
+
   return (
     <TableRow key={aoi.id}>
       <TableCell>{aoi.name}</TableCell>
@@ -86,23 +90,61 @@ function renderRow(aoi, { project, restApiClient }) {
       <TableCell>{aoi.classes.length}</TableCell>
       <TableCell>{formatDateTime(aoi.created)}</TableCell>
       <TableCell>
-        <FormInputGroup>
-          <FormInput readOnly value={aoiLink} size='small' />
+        {shareUUID ? (
+          <FormInputGroup>
+            <FormInput readOnly value={shareLink} size='small' />
+            <Button
+              variation='primary-plain'
+              useIcon='clipboard'
+              hideText
+              onClick={() => {
+                try {
+                  copyTextToClipboard(shareLink);
+                  toasts.success('URL copied to clipboard');
+                } catch (err) {
+                  logger('Failed to copy', err);
+                  toasts.error('Failed to copy URL to clipboard');
+                }
+              }}
+            />
+          </FormInputGroup>
+        ) : (
           <Button
-            variation='primary-plain'
-            useIcon='clipboard'
-            hideText
-            onClick={() => {
+            onClick={async () => {
+              let share;
+              showGlobalLoadingMessage('Creating Shareable Link...');
               try {
-                copyTextToClipboard(aoiLink);
-                toasts.success('URL copied to clipboard');
+                share = await restApiClient.createShare(project.id, aoi.id);
               } catch (err) {
-                logger('Failed to copy', err);
-                toasts.error('Failed to copy URL to clipboard');
+                logger('Failed to create share', err);
+                hideGlobalLoading();
+                toasts.error('Failed to create Share URL.');
+                return;
               }
+              hideGlobalLoading();
+              const updatedAois = aois.map((a) => {
+                let shares;
+                if (a.id === aoi.id) {
+                  shares = [
+                    {
+                      uuid: share.uuid,
+                    },
+                  ];
+                }
+                const ret = {
+                  ...a,
+                };
+                if (shares) {
+                  ret.shares = shares;
+                }
+                return ret;
+              });
+              setAois(updatedAois);
             }}
-          />
-        </FormInputGroup>
+          >
+            Create share
+          </Button>
+        )}
       </TableCell>
       <TableCell>
         <Button
@@ -242,6 +284,8 @@ function Project() {
                     extraData={{
                       project,
                       restApiClient,
+                      aois,
+                      setAois,
                     }}
                   />
                   <Paginator

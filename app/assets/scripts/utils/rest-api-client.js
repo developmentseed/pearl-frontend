@@ -121,7 +121,7 @@ class RestApiClient {
   }
 
   getTileJSONFromUUID(uuid) {
-    return this.get(`aoi/${uuid}/tiles`);
+    return this.get(`share/${uuid}/tiles`);
   }
 
   bookmarkAOI(projectId, aoiId, name) {
@@ -129,6 +129,10 @@ class RestApiClient {
       bookmarked: true,
       name,
     });
+  }
+
+  createShare(projectId, aoiId) {
+    return this.post(`project/${projectId}/aoi/${aoiId}/share`);
   }
 
   downloadGeotiff(projectId, aoiId) {
@@ -139,7 +143,7 @@ class RestApiClient {
   }
 
   getAOIFromUUID(uuid) {
-    return this.get(`aoi/${uuid}`);
+    return this.get(`share/${uuid}`);
   }
 
   patchAoi(projectId, aoiId, patches) {
