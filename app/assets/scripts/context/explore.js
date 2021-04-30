@@ -63,6 +63,9 @@ export function ExploreProvider(props) {
     setAoiList,
     aoiBounds,
     setAoiBounds,
+
+    aoiArea,
+    setAoiArea,
   } = useAoi();
   const { predictions, dispatchPredictions } = usePredictions();
   const { selectedModel, setSelectedModel } = useModel();
@@ -75,7 +78,6 @@ export function ExploreProvider(props) {
   } = useAoiPatch();
 
   // The following properties should be moved to own context to avoid re-rendering.
-  const [aoiArea, setAoiArea] = useState(null);
   const [aoiInitializer, setAoiInitializer] = useState(null);
 
   const [mapState, dispatchMapState] = useReducer(

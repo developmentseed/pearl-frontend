@@ -88,7 +88,13 @@ function Map() {
   } = useContext(ExploreContext);
 
   const { apiLimits } = useApiMeta();
-  const { aoiRef, setAoiRef, currentAoi } = useAoi();
+  const {
+    aoiRef,
+    setAoiRef,
+    currentAoi,
+    setActiveModal,
+    setCurrentAoi,
+  } = useAoi();
   const { updateAoiName } = useAoiName();
 
   const { restApiClient } = useAuth();
@@ -209,12 +215,31 @@ function Map() {
           setAoiArea(areaFromBounds(bbox));
         },
         onDrawEnd: (bbox, shape) => {
+          /*
           setAoiRef(shape);
 
           const bounds = shape.getBounds();
           setAoiBounds(bounds);
           setMapMode(mapModes.BROWSE_MODE);
           updateAoiName(bounds);
+          */
+
+          const area = areaFromBounds(bbox);
+
+          if (!apiLimits || apiLimits.live_inference > area) {
+            const bounds = shape.getBounds();
+            setMapMode(mapModes.BROWSE_MODE);
+            setAoiBounds(bounds);
+            updateAoiName(bounds);
+
+            setAoiRef(shape);
+            //Current aoi should only be set after aoi has been sent to the api
+            setCurrentAoi(null);
+          } else if (apiLimits.max_inference > area) {
+            setActiveModal('no-live-inference');
+          } else {
+            setActiveModal('area-too-large');
+          }
         },
       }
     );

@@ -39,6 +39,9 @@ export function AoiProvider(props) {
 
   const [aoiPatchList, setAoiPatchList] = useState([]);
 
+  const [activeModal, setActiveModal] = useState(false);
+  const [aoiArea, setAoiArea] = useState(null);
+
   /*
    * Wrapping function for reverse geocode
    * @param _aoiBounds - optional bound object. This is passed when this function
@@ -100,6 +103,9 @@ export function AoiProvider(props) {
     aoiName,
     setAoiName,
 
+    aoiArea,
+    setAoiArea,
+
     aoiBounds,
     setAoiBounds,
 
@@ -113,6 +119,9 @@ export function AoiProvider(props) {
     setAoiPatchList,
 
     updateAoiName,
+
+    activeModal,
+    setActiveModal,
   };
 
   return (
@@ -160,6 +169,12 @@ export const useAoi = () => {
     setAoiList,
     aoiBounds,
     setAoiBounds,
+
+    aoiArea,
+    setAoiArea,
+
+    activeModal,
+    setActiveModal,
   } = useCheckContext('useAoi');
 
   return useMemo(
@@ -175,10 +190,23 @@ export const useAoi = () => {
       aoiBounds,
       setAoiBounds,
 
+      aoiArea,
+      setAoiArea,
+      activeModal,
+      setActiveModal,
       setCurrentAoi: (data) =>
         dispatchCurrentAoi({ type: actions.SET_AOI, data }),
     }),
-    [aoiRef, aoiName, currentAoi, dispatchCurrentAoi, aoiList, aoiBounds]
+    [
+      aoiRef,
+      aoiName,
+      currentAoi,
+      dispatchCurrentAoi,
+      aoiList,
+      aoiBounds,
+      aoiArea,
+      activeModal,
+    ]
   );
 };
 
