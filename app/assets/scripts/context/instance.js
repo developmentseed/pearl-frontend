@@ -513,23 +513,8 @@ export function InstanceProvider(props) {
         return;
       }
 
-      const formerCheckpointId = currentCheckpoint.id;
-
       showGlobalLoadingMessage(
-        <>
-          Retraining model and loading updated predictions...
-          <Button
-            style={{ display: 'block', margin: '1rem auto 0' }}
-            variation='danger-raised-light'
-            onClick={() => {
-              abortJob();
-              showGlobalLoadingMessage('Aborting...');
-              fetchCheckpoint(currentProject.id, formerCheckpointId);
-            }}
-          >
-            Abort Process
-          </Button>
-        </>
+        <>Retraining model and loading predictions...</>
       );
 
       // Reset predictions state
