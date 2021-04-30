@@ -49,8 +49,9 @@ export const Class = styled.div`
     margin-top: ${glsp(2)};
   }
   &:hover {
-    ${({ placeholder }) =>
+    ${({ placeholder, noHover }) =>
       !placeholder &&
+      !noHover &&
       css`
         background: ${themeVal('color.primaryAlphaB')};
         cursor: pointer;

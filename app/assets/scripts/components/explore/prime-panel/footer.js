@@ -1,7 +1,7 @@
 import React from 'react';
 import T from 'prop-types';
-import styled from 'styled-components';
-import { glsp } from '@devseed-ui/theme-provider';
+import styled, { css } from 'styled-components';
+import { glsp, disabled as disabledStyles } from '@devseed-ui/theme-provider';
 
 import { Heading } from '@devseed-ui/typography';
 import { Button } from '@devseed-ui/button';
@@ -18,6 +18,12 @@ const PanelControls = styled(PanelBlockFooter)`
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-gap: ${glsp()};
+
+  ${({ disabled }) =>
+    disabled &&
+    css`
+      ${disabledStyles()}
+    `}
 `;
 const SaveCheckpoint = styled(DropdownBody)`
   padding: ${glsp()};
@@ -48,6 +54,10 @@ function PrimeButton({ currentCheckpoint, allowInferenceRun, mapRef }) {
     );
   }
 
+  const runText =
+    !currentCheckpoint || !currentCheckpoint.parent
+      ? 'Run model'
+      : 'Run checkpoint';
   return (
     <InfoButton
       data-cy={allowInferenceRun ? 'run-model-button' : 'disabled'}
@@ -57,11 +67,17 @@ function PrimeButton({ currentCheckpoint, allowInferenceRun, mapRef }) {
       style={{
         gridColumn: '1 / -1',
       }}
-      onClick={!currentCheckpoint ? runInference : retrain}
+      onClick={
+        !currentCheckpoint || currentCheckpoint.mode === checkpointModes.RUN
+          ? runInference
+          : () => retrain() && mapRef.polygonDraw.clearLayers()
+      }
       visuallyDisabled={!allowInferenceRun}
       id='apply-button-trigger'
     >
-      {!currentCheckpoint ? 'Run Model' : 'Retrain Model'}
+      {!currentCheckpoint || currentCheckpoint.mode === checkpointModes.RUN
+        ? runText
+        : 'Retrain Model'}
     </InfoButton>
   );
 }
@@ -85,9 +101,12 @@ function Footer(props) {
     mapRef,
 
     allowInferenceRun,
+
+    disabled,
   } = props;
+
   return (
-    <PanelControls>
+    <PanelControls disabled={disabled}>
       <Button
         variation='primary-raised-light'
         size='medium'
@@ -139,56 +158,57 @@ function Footer(props) {
         allowInferenceRun={allowInferenceRun}
         mapRef={mapRef}
       />
-
-      <Dropdown
-        alignment='center'
-        direction='up'
-        triggerElement={(triggerProps) => (
-          <InfoButton
-            variation='primary-plain'
-            size='medium'
-            useIcon='save-disk'
-            useLocalButton
-            style={{
-              gridColumn: '1 / -1',
-            }}
-            id='rename-button-trigger'
-            {...triggerProps}
-            disabled={!currentCheckpoint}
-          >
-            Save Checkpoint
-          </InfoButton>
-        )}
-      >
-        <SaveCheckpoint>
-          <Heading useAlt>Checkpoint name:</Heading>
-          <Form
-            onSubmit={(evt) => {
-              evt.preventDefault();
-              const name = evt.target.elements.checkpointName.value;
-              updateCheckpointName(name);
-            }}
-          >
-            <FormInput
-              name='checkpointName'
-              placeholder='Set Checkpoint Name'
-              value={localCheckpointName}
-              onChange={(e) => setLocalCheckpointName(e.target.value)}
-              autoFocus
-            />
-            <LocalButton
-              type='submit'
-              // size='small'
+      {currentCheckpoint && currentCheckpoint.parent && (
+        <Dropdown
+          alignment='center'
+          direction='up'
+          triggerElement={(triggerProps) => (
+            <InfoButton
               variation='primary-plain'
+              size='medium'
               useIcon='save-disk'
-              title='Rename checkpoint'
-              data-dropdown='click.close'
+              useLocalButton
+              style={{
+                gridColumn: '1 / -1',
+              }}
+              id='rename-button-trigger'
+              {...triggerProps}
+              disabled={!currentCheckpoint}
             >
-              Save
-            </LocalButton>
-          </Form>
-        </SaveCheckpoint>
-      </Dropdown>
+              Save Checkpoint
+            </InfoButton>
+          )}
+        >
+          <SaveCheckpoint>
+            <Heading useAlt>Checkpoint name:</Heading>
+            <Form
+              onSubmit={(evt) => {
+                evt.preventDefault();
+                const name = evt.target.elements.checkpointName.value;
+                updateCheckpointName(name);
+              }}
+            >
+              <FormInput
+                name='checkpointName'
+                placeholder='Set Checkpoint Name'
+                value={localCheckpointName}
+                onChange={(e) => setLocalCheckpointName(e.target.value)}
+                autoFocus
+              />
+              <LocalButton
+                type='submit'
+                // size='small'
+                variation='primary-plain'
+                useIcon='save-disk'
+                title='Rename checkpoint'
+                data-dropdown='click.close'
+              >
+                Save
+              </LocalButton>
+            </Form>
+          </SaveCheckpoint>
+        </Dropdown>
+      )}
     </PanelControls>
   );
 }
@@ -209,5 +229,7 @@ Footer.propTypes = {
   runInference: T.func,
   retrain: T.func,
   refine: T.func,
+
+  disabled: T.bool,
 };
 export default Footer;

@@ -1,4 +1,3 @@
-import toasts from '../components/common/toasts';
 import config from '../config';
 import { fetchJSON } from '../context/reducers/reduxeed';
 const { restApiEndpoint } = config;
@@ -36,17 +35,9 @@ class RestApiClient {
       options.body = JSON.stringify(data);
     }
 
-    try {
-      const res = await fetchJSON(url, options);
-      return res.body;
-    } catch (error) {
-      if (error.statusCode === 401 && this.handleUnauthorized) {
-        this.handleUnauthorized();
-        toasts.error('You have been signed out.');
-      } else {
-        throw error;
-      }
-    }
+    // Fetch data and let errors to be handle by the caller
+    const res = await fetchJSON(url, options);
+    return res.body;
   }
 
   get(path, format = 'json') {
@@ -90,6 +81,10 @@ class RestApiClient {
     return this.get(`model/${id}`);
   }
 
+  getModels() {
+    return this.get(`model`).then((body) => (body ? body.models : []));
+  }
+
   getAOIs(projectId) {
     return this.get(`project/${projectId}/aoi`);
   }
@@ -126,7 +121,7 @@ class RestApiClient {
   }
 
   getTileJSONFromUUID(uuid) {
-    return this.get(`aoi/${uuid}/tiles`);
+    return this.get(`share/${uuid}/tiles`);
   }
 
   bookmarkAOI(projectId, aoiId, name) {
@@ -136,12 +131,21 @@ class RestApiClient {
     });
   }
 
+  createShare(projectId, aoiId) {
+    return this.post(`project/${projectId}/aoi/${aoiId}/share`);
+  }
+
   downloadGeotiff(projectId, aoiId) {
     return this.get(
       `project/${projectId}/aoi/${aoiId}/download/color`,
       'binary'
     );
   }
+
+  getAOIFromUUID(uuid) {
+    return this.get(`share/${uuid}`);
+  }
+
   patchAoi(projectId, aoiId, patches) {
     return this.patch(`project/${projectId}/aoi/${aoiId}`, {
       patches,

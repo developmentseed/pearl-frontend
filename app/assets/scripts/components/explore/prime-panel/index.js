@@ -8,7 +8,7 @@ import SelectModal from '../../common/select-modal';
 import ModelCard from './model-card';
 import { useMapLayers, useMapRef } from '../../../context/map';
 import { ExploreContext, useMapState } from '../../../context/explore';
-import GlobalContext from '../../../context/global';
+import GlobalContext, { useModels } from '../../../context/global';
 
 import { Heading } from '@devseed-ui/typography';
 // import {
@@ -82,13 +82,14 @@ function PrimePanel() {
     updateCheckpointName,
   } = useContext(ExploreContext);
 
-  const { aoiRef, setAoiRef, aoiName } = useAoi();
+  const { aoiRef, setAoiRef, aoiName, currentAoi } = useAoi();
 
   const { applyCheckpoint } = useInstance();
 
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
 
-  const { modelsList, mosaicList } = useContext(GlobalContext);
+  const { mosaicList } = useContext(GlobalContext);
+  const { models } = useModels();
 
   const { mapLayers } = useMapLayers();
 
@@ -97,12 +98,13 @@ function PrimePanel() {
   const [showSelectModelModal, setShowSelectModelModal] = useState(false);
   // const [modelFilterString, setModelFilterString] = useState('');
   const [localCheckpointName, setLocalCheckpointName] = useState(
-    (currentCheckpoint && currentCheckpoint.name) || ''
+    (currentCheckpoint &&
+      currentCheckpoint.bookmarked &&
+      currentCheckpoint.name) ||
+      ''
   );
 
   const [activeTab, setActiveTab] = useState(checkpointModes.RETRAIN);
-
-  const { models } = modelsList.isReady() && modelsList.getData();
 
   // Check if AOI and selected model are defined, and if view mode is runnable
   const allowInferenceRun =
@@ -124,7 +126,7 @@ function PrimePanel() {
       // If predictions are ready, do not need a placeholder
       return null;
     }
-    if (aoiRef && selectedModel) {
+    if ((aoiRef && selectedModel) || !currentAoi) {
       return `Click the "Run Model" button to generate the class LULC map for your AOI`;
     } else if (aoiRef && !selectedModel) {
       return `Select a model to use for inference`;
@@ -135,19 +137,18 @@ function PrimePanel() {
 
   const checkpointHasSamples = () => {
     if (currentCheckpoint) {
-      let sampleCount = Object.values(currentCheckpoint.classes).reduce(
+      let sampleCount = Object.values(currentCheckpoint.classes || {}).reduce(
         (count, c) => {
           return count + c.points.coordinates.length + c.polygons.length;
         },
         0
       );
 
-      sampleCount += Object.values(currentCheckpoint.checkpointBrushes).reduce(
-        (count, c) => {
-          return count + c.polygons.length;
-        },
-        0
-      );
+      sampleCount += Object.values(
+        currentCheckpoint.checkpointBrushes || {}
+      ).reduce((count, c) => {
+        return count + c.polygons.length;
+      }, 0);
 
       // There should be no polygon or point samples on the map
       // User must submit or clear retrain samples before starting refine
@@ -163,7 +164,11 @@ function PrimePanel() {
 
   useEffect(() => {
     if (currentCheckpoint && currentCheckpoint.name) {
-      setLocalCheckpointName(currentCheckpoint.name);
+      if (currentCheckpoint.bookmarked) {
+        setLocalCheckpointName(currentCheckpoint.name);
+      } else {
+        setLocalCheckpointName('');
+      }
     }
   }, [currentCheckpoint]);
 
@@ -198,9 +203,10 @@ function PrimePanel() {
                 checkpointList,
                 applyCheckpoint,
 
+                checkpointHasSamples: checkpointHasSamples(),
+
                 setShowSelectModelModal,
                 selectedModel,
-                models,
 
                 isAuthenticated,
                 currentProject,
@@ -216,11 +222,17 @@ function PrimePanel() {
                   ready={
                     currentCheckpoint &&
                     (currentCheckpoint.mode === checkpointModes.RETRAIN ||
-                      currentCheckpoint.mode === checkpointModes.RUN)
+                      currentCheckpoint.mode === checkpointModes.RUN) &&
+                    currentCheckpoint.classes !== undefined &&
+                    currentAoi
+                  }
+                  disabled={
+                    !currentCheckpoint ||
+                    mapState.mode === mapModes.EDIT_AOI_MODE
                   }
                   onTabClick={() => {
                     setActiveTab(checkpointModes.RETRAIN);
-                    if (currentCheckpoint) {
+                    if (currentCheckpoint && currentAoi) {
                       setMapMode(mapModes.BROWSE_MODE);
                       dispatchCurrentCheckpoint({
                         type: checkpointActions.SET_ACTIVE_CLASS,
@@ -245,7 +257,11 @@ function PrimePanel() {
                   name='Refine Results'
                   tabId='refine-tab-trigger'
                   className='refine-model'
-                  disabled={!currentCheckpoint}
+                  disabled={
+                    !currentCheckpoint ||
+                    !currentAoi ||
+                    mapState.mode === mapModes.EDIT_AOI_MODE
+                  }
                   ready={
                     currentCheckpoint &&
                     currentCheckpoint.mode === checkpointModes.REFINE
@@ -278,6 +294,7 @@ function PrimePanel() {
                   onTabClick={() => {
                     setActiveTab('LAYERS');
                   }}
+                  disabled={mapState.mode === mapModes.EDIT_AOI_MODE}
                   className='padded'
                   name='layers'
                   tabId='layers-tab-trigger'
@@ -303,6 +320,8 @@ function PrimePanel() {
 
                   mapRef,
 
+                  disabled: mapState.mode === mapModes.EDIT_AOI_MODE,
+
                   allowInferenceRun,
                 }}
               />
@@ -316,7 +335,7 @@ function PrimePanel() {
         onOverlayClick={() => {
           setShowSelectModelModal(false);
         }}
-        data={models || []}
+        data={models.status === 'success' ? models.value : []}
         renderHeader={() => (
           <ModalHeader>
             <Headline>

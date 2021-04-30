@@ -113,17 +113,20 @@ function ClassAnalyticsChart(props) {
         />
       </ChartContainer>
       <Summary>
-        {Object.values(checkpoint.classes).map((c, i) => (
-          <ClassItem key={c.name}>
-            <Icon color={c.color} />
-            <Prose size='small'>{c.name}</Prose>
-            <Prose size='small' className='percent'>
-              {metric === 'percent'
-                ? `${round(checkpoint.analytics[i][metric], 2) * 100}%`
-                : round(checkpoint.analytics[i][metric], 2)}
-            </Prose>
-          </ClassItem>
-        ))}
+        {Object.values(checkpoint.classes).map(
+          (c, i) =>
+            checkpoint.analytics[i] && (
+              <ClassItem key={c.name}>
+                <Icon color={c.color} />
+                <Prose size='small'>{c.name}</Prose>
+                <Prose size='small' className='percent'>
+                  {metric === 'percent'
+                    ? `${round(checkpoint.analytics[i][metric], 2) * 100}%`
+                    : round(checkpoint.analytics[i][metric], 2)}
+                </Prose>
+              </ClassItem>
+            )
+        )}
       </Summary>
     </Wrapper>
   );

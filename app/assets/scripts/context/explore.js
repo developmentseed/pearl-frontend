@@ -25,6 +25,7 @@ import {
 } from './checkpoint';
 import { wrapLogReducer } from './reducers/utils';
 import { useAoi, useAoiPatch } from './aoi';
+import { actions as aoiPatchActions } from './reducers/aoi_patch';
 import { useProject } from './project';
 import { useModel } from './model';
 import { useInstance } from './instance';
@@ -39,6 +40,16 @@ export function ExploreProvider(props) {
   const history = useHistory();
   let { projectId } = useParams();
 
+  const [tourStep, setTourStep] = useState(
+    localStorage.getItem('site-tour')
+      ? Number(localStorage.getItem('site-tour'))
+      : null
+  );
+
+  useEffect(() => {
+    localStorage.setItem('site-tour', tourStep);
+  }, [tourStep]);
+
   const { restApiClient, isLoading: authIsLoading } = useAuth();
   const { currentProject, setCurrentProject } = useProject();
   const {
@@ -46,11 +57,15 @@ export function ExploreProvider(props) {
     aoiRef,
     setAoiName,
     setAoiRef,
+    currentAoi,
     setCurrentAoi,
     aoiList,
     setAoiList,
     aoiBounds,
     setAoiBounds,
+
+    aoiArea,
+    setAoiArea,
   } = useAoi();
   const { predictions, dispatchPredictions } = usePredictions();
   const { selectedModel, setSelectedModel } = useModel();
@@ -63,7 +78,6 @@ export function ExploreProvider(props) {
   } = useAoiPatch();
 
   // The following properties should be moved to own context to avoid re-rendering.
-  const [aoiArea, setAoiArea] = useState(null);
   const [aoiInitializer, setAoiInitializer] = useState(null);
 
   const [mapState, dispatchMapState] = useReducer(
@@ -74,7 +88,11 @@ export function ExploreProvider(props) {
   );
   const [checkpointList, setCheckpointList] = useState(null);
   const [currentInstance, setCurrentInstance] = useState(null);
-  const { setInstanceStatusMessage, initInstance } = useInstance();
+  const {
+    setInstanceStatusMessage,
+    initInstance,
+    loadAoiOnInstance,
+  } = useInstance();
 
   async function loadInitialData() {
     showGlobalLoadingMessage('Loading configuration...');
@@ -105,19 +123,19 @@ export function ExploreProvider(props) {
       setSelectedModel(model);
 
       showGlobalLoadingMessage('Fetching areas of interest...');
-      const aois = await restApiClient.get(`project/${project.id}/aoi`);
+      const aoiReq = await restApiClient.get(`project/${project.id}/aoi`);
+      const aois = aoiReq.aois;
 
-      const filteredList = filterAoiList(aois.aois);
-      setAoiList(filteredList);
-      let latestAoi;
-      if (aois.total > 0) {
-        latestAoi = filteredList[filteredList.length - 1];
-        loadAoi(project, latestAoi);
-      }
+      //const filteredList = filterAoiList(aois.aois);
+      setAoiList(aois);
 
       showGlobalLoadingMessage('Fetching checkpoints...');
       const { checkpoints } = await loadCheckpointList(projectId);
       const checkpoint = checkpoints[0];
+      let latestAoi;
+      if (aoiReq.total > 0) {
+        latestAoi = aois.find((a) => Number(a.checkpoint_id) === checkpoint.id);
+      }
 
       showGlobalLoadingMessage('Looking for active GPU instances...');
       const instance = await initInstance(
@@ -125,6 +143,8 @@ export function ExploreProvider(props) {
         checkpoint && checkpoint.id,
         latestAoi && latestAoi.id
       );
+
+      loadAoi(project, latestAoi, true, true);
 
       setCurrentInstance(instance);
     } catch (error) {
@@ -137,7 +157,15 @@ export function ExploreProvider(props) {
     const checkpointsMeta = await restApiClient.getCheckpoints(projectId);
     if (checkpointsMeta.total > 0) {
       // Save checkpoints if any exist, else leave as null
-      setCheckpointList(checkpointsMeta.checkpoints);
+      // Only keep book marked and root checkpoints
+      const list = checkpointsMeta.checkpoints.filter(
+        (ckpt) => !ckpt.parent || ckpt.bookmarked
+      );
+
+      setCheckpointList(list);
+      return {
+        checkpoints: list,
+      };
     }
     return checkpointsMeta;
   }
@@ -163,10 +191,10 @@ export function ExploreProvider(props) {
       // Update aoi List with newest aoi
       // If predictions is ready, restApiClient must be ready
 
-      if (predictions.fetched) {
+      if (predictions.fetched && predictions.data.predictions?.length > 0) {
         restApiClient.get(`project/${currentProject.id}/aoi/`).then((aois) => {
-          const list = filterAoiList(aois.aois);
-          setAoiList(list);
+          //const list = filterAoiList(aois.aois);
+          setAoiList(aois.aois);
         });
         // Refresh checkpoint list, prediction finished
         // means new checkpoint available
@@ -175,6 +203,14 @@ export function ExploreProvider(props) {
         if (predictions.getData().type === checkpointModes.RETRAIN) {
           loadMetrics();
         }
+
+        restApiClient
+          .get(
+            `project/${currentProject.id}/aoi/${predictions.getData().aoiId}`
+          )
+          .then((aoi) => {
+            setCurrentAoi(aoi);
+          });
       }
 
       if (predictions.error) {
@@ -201,15 +237,16 @@ export function ExploreProvider(props) {
         setAoiPatchList(updatedPatchList);
         restApiClient.patchAoi(
           currentProject.id,
-          predictions.data.aoiId,
+          currentAoi.id,
           updatedPatchList.map((p) => p.id)
         );
+        dispatchAoiPatch({ type: aoiPatchActions.CLEAR_PATCH });
       } else if (aoiPatch.error) {
         toasts.error('An error ocurred while requesting aoi patch.');
         logger(aoiPatch.error);
       }
     }
-  }, [aoiPatch, predictions, restApiClient, currentProject]);
+  }, [aoiPatch, currentAoi, restApiClient, currentProject]);
 
   async function loadMetrics() {
     await restApiClient
@@ -233,10 +270,6 @@ export function ExploreProvider(props) {
       mapState.previousMode === mapModes.EDIT_AOI_MODE
     ) {
       dispatchPredictions({ type: predictionActions.CLEAR_PREDICTION });
-
-      dispatchCurrentCheckpoint({
-        type: checkpointActions.RESET_CHECKPOINT,
-      });
     }
   }, [mapState]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -253,53 +286,66 @@ export function ExploreProvider(props) {
     setAoiArea(null);
     setAoiName(null);
 
-    //clear inference tiles
-    dispatchCurrentCheckpoint({
-      type: checkpointActions.RESET_CHECKPOINT,
-    });
+    setCurrentAoi(null);
 
     //clear inference tiles
     dispatchPredictions({
       type: predictionActions.CLEAR_PREDICTION,
     });
+
+    dispatchCurrentCheckpoint({
+      type: checkpointActions.SET_CHECKPOINT_MODE,
+      data: {
+        mode: checkpointModes.RUN,
+      },
+    });
+    dispatchCurrentCheckpoint({
+      type: checkpointActions.CLEAR_SAMPLES,
+    });
   }
 
   /*
-   * Filter the aoi list to have unique names
-   * Back end doesn't care if aoi's are submitted with duplicate names.
-   * On frontend, assume that equivalent name -> equivalent geometry
-   * Only update the name if the geometry has been edited
-   *
+   * When a checkpoint is changed
    */
-  function filterAoiList(aoiList) {
-    const aois = new Map();
-    aoiList.forEach((a) => {
-      if (aois.has(a.name)) {
-        if (aois.get(a.name).created > a.created) {
-          aois.set(a.name, a);
-        }
-      } else {
-        aois.set(a.name, a);
+
+  const checkId = currentCheckpoint ? currentCheckpoint.id : null;
+  useEffect(() => {
+    if (
+      currentCheckpoint &&
+      currentCheckpoint.id &&
+      currentCheckpoint.checkAoi
+    ) {
+      const aoi = aoiList.find(
+        (aoi) => Number(aoi.checkpoint_id) === Number(currentCheckpoint.id)
+      );
+      if (aoi) {
+        loadAoi(currentProject, aoi, true);
       }
-    });
-    return Array.from(aois.values());
-  }
+    }
+  }, [aoiList, checkId]);
 
   /*
    * Utility function to load AOI
    * @param project - current project object
    * @param aoiObject - object containing aoi id and name
    *                  Objects of this format are returned by
+   * @param aoiMatchesCheckpoint - bool
    *                  aoi listing endpoint
    */
 
-  async function loadAoi(project, aoiObject) {
+  async function loadAoi(
+    project,
+    aoiObject,
+    aoiMatchesCheckpoint,
+    noLoadOnInst
+  ) {
+    if (!aoiObject) {
+      return;
+    }
     showGlobalLoadingMessage('Loading AOI');
     const aoi = await restApiClient.get(
       `project/${project.id}/aoi/${aoiObject.id}`
     );
-
-    setCurrentAoi(aoi);
 
     const [lonMin, latMin, lonMax, latMax] = tBbox(aoi.bounds);
     const bounds = [
@@ -312,18 +358,9 @@ export function ExploreProvider(props) {
       aoiRef.setBounds(bounds);
       setAoiBounds(aoiRef.getBounds());
       setAoiName(aoiObject.name);
-      dispatchMapState({
-        type: mapActionTypes.SET_MODE,
-        data: mapModes.ADD_CLASS_SAMPLES,
-      });
+
       if (predictions.isReady) {
         dispatchPredictions({ type: predictionActions.CLEAR_PREDICTION });
-      }
-
-      if (currentCheckpoint) {
-        dispatchCurrentCheckpoint({
-          type: checkpointActions.RESET_CHECKPOINT,
-        });
       }
     } else {
       // initializing map with first aoi
@@ -331,7 +368,54 @@ export function ExploreProvider(props) {
       setAoiName(aoiObject.name);
     }
 
-    hideGlobalLoading();
+    if (!aoiMatchesCheckpoint) {
+      toasts.error(
+        'Tiles do not exist for this aoi and this checkpoint. Treating as geometry only'
+      );
+      if (currentCheckpoint) {
+        dispatchCurrentCheckpoint({
+          type: checkpointActions.SET_CHECKPOINT_MODE,
+          data: {
+            mode: checkpointModes.RUN,
+          },
+        });
+      }
+      setCurrentAoi(null);
+      hideGlobalLoading();
+    } else {
+      setCurrentAoi(aoi);
+
+      if (currentInstance && !noLoadOnInst) {
+        loadAoiOnInstance(aoi.id);
+      } else {
+        hideGlobalLoading();
+      }
+
+      if (currentCheckpoint) {
+        dispatchCurrentCheckpoint({
+          type: checkpointActions.SET_CHECKPOINT_MODE,
+          data: {
+            mode: checkpointModes.RETRAIN,
+          },
+        });
+
+        dispatchCurrentCheckpoint({
+          type: checkpointActions.CLEAR_SAMPLES,
+        });
+
+        dispatchMapState({
+          type: mapActionTypes.SET_MODE,
+          data: mapModes.ADD_CLASS_SAMPLES,
+        });
+      }
+    }
+
+    dispatchCurrentCheckpoint({
+      type: checkpointActions.SET_AOI_CHECKED,
+      data: {
+        checkAoi: false,
+      },
+    });
 
     return bounds;
   }
@@ -379,6 +463,7 @@ export function ExploreProvider(props) {
         type: checkpointActions.SET_CHECKPOINT_NAME,
         data: {
           name,
+          bookmarked: true,
         },
       });
 
@@ -398,6 +483,9 @@ export function ExploreProvider(props) {
   return (
     <ExploreContext.Provider
       value={{
+        tourStep,
+        setTourStep,
+
         projectId,
         predictions,
 
@@ -489,5 +577,17 @@ export const useProjectId = () => {
       projectId,
     }),
     [projectId]
+  );
+};
+
+export const useTour = () => {
+  const { tourStep, setTourStep } = useExploreContext('useTour');
+
+  return useMemo(
+    () => ({
+      setTourStep,
+      tourStep,
+    }),
+    [setTourStep, tourStep]
   );
 };

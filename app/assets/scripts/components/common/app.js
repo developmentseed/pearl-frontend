@@ -10,8 +10,11 @@ import { Page } from '../../styles/page';
 import config from '../../config';
 import { useApiMeta } from '../../context/api-meta';
 import { useAuth } from '../../context/auth';
+import checkApiHealth from '../../utils/api-health';
+import { withAITracking } from '@microsoft/applicationinsights-react-js';
+import { reactPlugin } from '../../utils/azure-app-insights';
 
-const { appTitle, appDescription } = config;
+const { appTitle, appDescription, environment } = config;
 
 function App(props) {
   const { location, pageTitle, children, hideFooter } = props;
@@ -25,8 +28,9 @@ function App(props) {
     window.scrollTo(0, 0);
   }, [location]);
 
-  // Fetch API meta on page mount
+  // Check API health and fetch API meta on page mount
   useEffect(() => {
+    checkApiHealth();
     restApiClient.getApiMeta().then((data) => {
       setApiLimits(data && data.limits);
     });
@@ -47,4 +51,12 @@ App.propTypes = {
   pageTitle: T.string,
 };
 
-export default withRouter(App);
+let thisApp;
+if (environment === 'production' || environment === 'staging') {
+  // staging and production uses Azure App Insights
+  thisApp = withRouter(withAITracking(reactPlugin, App));
+} else {
+  thisApp = withRouter(App);
+}
+
+export default thisApp;

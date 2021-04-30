@@ -25,6 +25,7 @@ import {
   DropdownFooter,
 } from '../../../styles/dropdown';
 import { AoiEditButtons } from './aoi-edit-buttons';
+import { useModels } from '../../../context/global';
 
 const SelectAoiTrigger = styled.div`
   cursor: pointer;
@@ -63,6 +64,27 @@ const SubheadingStrong = styled.h3`
     `}
 `;
 
+function filterAoiList(aoiList) {
+  const aois = new Map();
+  aoiList.forEach((a) => {
+    if (aois.has(a.name)) {
+      if (aois.get(a.name).created > a.created) {
+        aois.set(a.name, a);
+      }
+    } else {
+      aois.set(a.name, a);
+    }
+  });
+  return Array.from(aois.values());
+}
+
+function findCompatibleAoi(aoi, aoiList, ckpt) {
+  const foundAoi = aoiList
+    .filter((a) => a.name === aoi.name)
+    .find((a) => Number(a.checkpoint_id) === ckpt.id);
+  return foundAoi;
+}
+
 const PanelBlockHeader = styled(BasePanelBlockHeader)`
   display: grid;
   grid-gap: ${glsp(0.75)};
@@ -85,17 +107,18 @@ function Header(props) {
     mapRef,
 
     currentCheckpoint,
-    checkpointModes,
     checkpointList,
     applyCheckpoint,
+    checkpointHasSamples,
 
     setShowSelectModelModal,
     selectedModel,
-    models,
 
     isAuthenticated,
     currentProject,
   } = props;
+
+  const { models } = useModels();
 
   const renderAoiHeader = (triggerProps) => {
     let header;
@@ -142,7 +165,14 @@ function Header(props) {
 
   const renderCheckpointSelectionHeader = () => {
     if (currentCheckpoint && currentCheckpoint.id) {
-      return `${currentCheckpoint.name} (${currentCheckpoint.id})`;
+      let realname = `${currentCheckpoint.name} (${currentCheckpoint.id})`;
+      if (currentCheckpoint.bookmarked) {
+        return realname;
+      } else {
+        return currentCheckpoint.parent
+          ? 'Current checkpoint (Unsaved)'
+          : `${selectedModel.name} (Base Model)`;
+      }
     } else if (checkpointList?.length) {
       return `${checkpointList.length} checkpoint${
         checkpointList.length > 1 ? 's' : ''
@@ -153,10 +183,27 @@ function Header(props) {
   };
 
   const modelNotChangeable =
-    !isAuthenticated ||
-    !models?.length ||
-    checkpointList?.length ||
-    currentCheckpoint?.mode === checkpointModes.RUN;
+    !isAuthenticated || models.status !== 'success' || checkpointList?.length;
+
+  const renderModelLabel = () => {
+    if (!isAuthenticated) {
+      return 'Login to select model';
+    }
+
+    if (['pending', 'idle'].includes(models.status)) {
+      return 'Loading...';
+    }
+
+    if (
+      models.status === 'success' &&
+      models.value &&
+      models.value.length > 0
+    ) {
+      return 'Select Model';
+    }
+
+    return 'No models available';
+  };
 
   return (
     <PanelBlockHeader>
@@ -180,11 +227,21 @@ function Header(props) {
               </Heading>
             </DropdownHeader>
             <DropdownBody>
-              {aoiList.map((a) => (
+              {filterAoiList(aoiList).map((a) => (
                 <li key={a.id} data-dropdown='click.close'>
                   <DropdownItem
+                    checked={a.name == aoiName}
                     onClick={() => {
-                      loadAoi(currentProject, a).then((bounds) =>
+                      const relevantAoi = findCompatibleAoi(
+                        a,
+                        aoiList,
+                        currentCheckpoint
+                      );
+                      loadAoi(
+                        currentProject,
+                        relevantAoi || a,
+                        relevantAoi || false
+                      ).then((bounds) =>
                         mapRef.fitBounds(bounds, {
                           padding: BOUNDS_PADDING,
                         })
@@ -242,12 +299,7 @@ function Header(props) {
               : 'Models can not be changed after running inference'
           }
         >
-          {(selectedModel && selectedModel.name) ||
-            (isAuthenticated
-              ? models && models.length
-                ? 'Select Model'
-                : 'No models available'
-              : 'Login to select model')}
+          {(selectedModel && selectedModel.name) || renderModelLabel()}
         </SubheadingStrong>
         {!modelNotChangeable && (
           <HeadOptionToolbar>
@@ -273,39 +325,52 @@ function Header(props) {
         <Dropdown
           alignment='right'
           direction='down'
-          triggerElement={(props) => (
-            <>
-              <SubheadingStrong
-                {...props}
-                onClick={(e) => checkpointList && props.onClick(e)} // eslint-disable-line
-                title={
-                  checkpointList
-                    ? 'Change checkpoint'
-                    : 'Run and retrain model to create first checkpoint'
-                }
-                disabled={!checkpointList}
-              >
-                {renderCheckpointSelectionHeader()}
-              </SubheadingStrong>
-              <HeadOptionToolbar>
-                <EditButton
-                  data-cy='show-select-checkpoint-button'
-                  useIcon='swap-horizontal'
+          triggerElement={(props) => {
+            const disabled =
+              checkpointHasSamples ||
+              !checkpointList ||
+              mapState.mode === mapModes.EDIT_AOI_MODE;
+            return (
+              <>
+                <SubheadingStrong
+                  {...props}
+                onClick={(e) => !disabled && props.onClick(e)} // eslint-disable-line
                   title={
                     checkpointList
                       ? 'Change checkpoint'
-                      : 'Run model to create first checkpoint'
+                      : 'Run and retrain model to create first checkpoint'
                   }
-                  id='checkpoint-list-trigger'
-                  {...props}
-                  onClick={(e) => checkpointList && props.onClick(e)} // eslint-disable-line
-                  disabled={!checkpointList}
+                  disabled={disabled}
                 >
-                  Edit Checkpoint Selection
-                </EditButton>
-              </HeadOptionToolbar>
-            </>
-          )}
+                  {renderCheckpointSelectionHeader()}
+                </SubheadingStrong>
+                <HeadOptionToolbar>
+                  <EditButton
+                    data-cy='show-select-checkpoint-button'
+                    useIcon='swap-horizontal'
+                    title={
+                      checkpointList
+                        ? 'Change checkpoint'
+                        : 'Run model to create first checkpoint'
+                    }
+                    id='checkpoint-list-trigger'
+                    info={
+                      checkpointHasSamples
+                        ? 'Submit or clear samples to change checkpoint'
+                        : !checkpointList
+                        ? 'No checkpoints available'
+                        : null
+                    }
+                    {...props}
+                  onClick={(e) => !disabled && props.onClick(e)} // eslint-disable-line
+                    visuallyDisabled={disabled}
+                  >
+                    Edit Checkpoint Selection
+                  </EditButton>
+                </HeadOptionToolbar>
+              </>
+            );
+          }}
           className='global__dropdown'
         >
           <>
@@ -321,11 +386,13 @@ function Header(props) {
                     checked={
                       ckpt.id == (currentCheckpoint && currentCheckpoint.id)
                     }
-                    onClick={() => {
-                      applyCheckpoint(currentProject.id, ckpt.id);
+                    onClick={async () => {
+                      await applyCheckpoint(currentProject.id, ckpt.id);
                     }}
                   >
-                    {ckpt.name} ({ckpt.id})
+                    {ckpt.parent
+                      ? `${ckpt.name} (${ckpt.id})`
+                      : `${selectedModel.name} (Base Model)`}
                   </DropdownItem>
                 ))}
             </DropdownBody>
@@ -352,9 +419,10 @@ Header.propTypes = {
   mapRef: T.object,
 
   currentCheckpoint: T.object,
-  checkpointModes: T.object,
   checkpointList: T.array,
   applyCheckpoint: T.func,
+
+  checkpointHasSamples: T.bool,
 
   setShowSelectModelModal: T.func,
   selectedModel: T.object,

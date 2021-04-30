@@ -1,13 +1,13 @@
 import config from '../../config';
 
-const { environment } = config;
+const { environment, reduxeedLogs } = config;
 
 export function wrapLogReducer(reducer) {
   /* eslint-disable no-console */
   return (state, action) => {
     const nextState = reducer(state, action);
 
-    if (environment !== 'production') {
+    if (environment !== 'production' && reduxeedLogs) {
       console.groupCollapsed(action.type);
       console.log(
         '%c%s',

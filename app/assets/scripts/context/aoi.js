@@ -23,7 +23,9 @@ export const actions = {
 };
 
 export function AoiProvider(props) {
-  const [currentAoi, dispatchCurrentAoi] = useReducer(aoiReducer);
+  const [currentAoi, dispatchCurrentAoi] = useReducer(
+    wrapLogReducer(aoiReducer)
+  );
   const [aoiRef, setAoiRef] = useState(null);
   const [aoiName, setAoiName] = useState(null);
   const [aoiList, setAoiList] = useState([]);
@@ -36,6 +38,9 @@ export function AoiProvider(props) {
   );
 
   const [aoiPatchList, setAoiPatchList] = useState([]);
+
+  const [activeModal, setActiveModal] = useState(false);
+  const [aoiArea, setAoiArea] = useState(null);
 
   /*
    * Wrapping function for reverse geocode
@@ -51,7 +56,7 @@ export function AoiProvider(props) {
    * i.e. Seneca Rocks, Seneca Rocks #1, Seneca Rocks #2...etc
    *
    */
-  function updateAoiName(_aoiBounds) {
+  function updateAoiName(_aoiBounds, aoiList) {
     const refBounds = _aoiBounds || aoiBounds;
 
     if (!refBounds) {
@@ -98,6 +103,9 @@ export function AoiProvider(props) {
     aoiName,
     setAoiName,
 
+    aoiArea,
+    setAoiArea,
+
     aoiBounds,
     setAoiBounds,
 
@@ -111,6 +119,9 @@ export function AoiProvider(props) {
     setAoiPatchList,
 
     updateAoiName,
+
+    activeModal,
+    setActiveModal,
   };
 
   return (
@@ -125,9 +136,7 @@ AoiProvider.propTypes = {
 function aoiReducer(state, action) {
   switch (action.type) {
     case actions.SET_AOI:
-      return {
-        ...action.data,
-      };
+      return action.data;
     default:
       logger('Undefined AOI action.');
       throw new Error('Unexpected error.');
@@ -160,6 +169,12 @@ export const useAoi = () => {
     setAoiList,
     aoiBounds,
     setAoiBounds,
+
+    aoiArea,
+    setAoiArea,
+
+    activeModal,
+    setActiveModal,
   } = useCheckContext('useAoi');
 
   return useMemo(
@@ -174,10 +189,24 @@ export const useAoi = () => {
       setAoiList,
       aoiBounds,
       setAoiBounds,
+
+      aoiArea,
+      setAoiArea,
+      activeModal,
+      setActiveModal,
       setCurrentAoi: (data) =>
         dispatchCurrentAoi({ type: actions.SET_AOI, data }),
     }),
-    [aoiRef, aoiName, currentAoi, dispatchCurrentAoi, aoiList, aoiBounds]
+    [
+      aoiRef,
+      aoiName,
+      currentAoi,
+      dispatchCurrentAoi,
+      aoiList,
+      aoiBounds,
+      aoiArea,
+      activeModal,
+    ]
   );
 };
 
@@ -187,7 +216,7 @@ export const useAoiName = () => {
   );
   return useMemo(
     () => ({
-      updateAoiName,
+      updateAoiName: (bounds) => updateAoiName(bounds, aoiList),
     }),
     [aoiName, aoiList, aoiBounds]
   );

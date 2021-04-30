@@ -37,6 +37,26 @@ function InnerAuthProvider(props) {
     }
   }, []);
 
+  const fetchToken = async () => {
+    try {
+      const token = await getAccessTokenSilently({
+        audience: config.audience,
+      });
+      dispatchAuthState({
+        type: actions.RECEIVE_LOGIN,
+        data: {
+          user,
+          apiToken: token,
+        },
+      });
+    } catch (error) {
+      logger(error);
+      dispatchAuthState({
+        type: actions.LOGOUT,
+      });
+    }
+  };
+
   /**
    * Disable Auth0 hooks when testing.
    */
@@ -45,29 +65,12 @@ function InnerAuthProvider(props) {
     useEffect(() => {
       if (isLoading) return;
 
-      async function getApiToken() {
-        try {
-          const token = await getAccessTokenSilently({
-            audience: config.audience,
-          });
-          dispatchAuthState({
-            type: actions.RECEIVE_LOGIN,
-            data: {
-              user,
-              apiToken: token,
-            },
-          });
-        } catch (error) {
-          logger(error);
-        }
-      }
-
       if (isAuthenticated !== authState.isAuthenticated) {
         if (isAuthenticated) {
           dispatchAuthState({
             type: actions.REQUEST_LOGIN,
           });
-          getApiToken();
+          fetchToken();
         } else {
           dispatchAuthState({
             type: actions.LOGOUT,
@@ -77,19 +80,19 @@ function InnerAuthProvider(props) {
     }, [isLoading, isAuthenticated, auth0Error]); // eslint-disable-line react-hooks/exhaustive-deps
   }
 
+  const value = {
+    ...authState,
+    isLoading,
+    authStateIsLoading: authState.isLoading,
+    refreshAuth: fetchToken,
+    logout: () =>
+      dispatchAuthState({
+        type: actions.LOGOUT,
+      }),
+  };
+
   return (
-    <AuthContext.Provider
-      value={{
-        ...authState,
-        isLoading,
-        logout: () =>
-          dispatchAuthState({
-            type: actions.LOGOUT,
-          }),
-      }}
-    >
-      {props.children}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={value}>{props.children}</AuthContext.Provider>
   );
 }
 
@@ -199,6 +202,8 @@ export const useAuth = () => {
     isAuthenticated,
     logout,
     isLoading,
+    authStateIsLoading,
+    refreshAuth,
   } = useCheckContext('useAuth');
 
   return useMemo(() => {
@@ -206,6 +211,14 @@ export const useAuth = () => {
       apiToken,
       handleUnauthorized: () => logout(),
     });
-    return { restApiClient, apiToken, isLoading, user, isAuthenticated };
-  }, [apiToken, isLoading, user, isAuthenticated]);
+    return {
+      restApiClient,
+      apiToken,
+      isLoading,
+      authStateIsLoading,
+      user,
+      isAuthenticated,
+      refreshAuth,
+    };
+  }, [apiToken, isLoading, authStateIsLoading, user, isAuthenticated]);
 };

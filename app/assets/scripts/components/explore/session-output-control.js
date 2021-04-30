@@ -25,6 +25,7 @@ import toasts from '../common/toasts';
 import logger from '../../utils/logger';
 import { useInstance } from '../../context/instance';
 import { downloadGeotiff as downloadGeotiffUtil } from '../../utils/map';
+import { useTour } from '../../context/explore';
 
 const Wrapper = styled.div`
   flex: 1;
@@ -84,8 +85,9 @@ const HeadingInput = styled(FormInput)`
 
 function SessionOutputControl(props) {
   const { projectId } = useProjectId();
-  const { projectName, openHelp, isMediumDown } = props;
+  const { projectName, isMediumDown } = props;
   const { isAuthenticated, restApiClient } = useAuth();
+  const { setTourStep } = useTour();
 
   const { instance } = useInstance();
 
@@ -134,17 +136,21 @@ function SessionOutputControl(props) {
   const copyTilesLink = async () => {
     const projectId = currentProject.id;
     const aoiId = predictions.data?.aoiId || currentAoi.id;
-    let uuid;
-
+    let share;
+    showGlobalLoadingMessage('Creating shareable map.');
     try {
-      const aoi = await restApiClient.bookmarkAOI(projectId, aoiId, aoiName);
-      uuid = aoi.uuid;
+      //FIXME: ideally, these two requests should happen in parallel
+      await restApiClient.bookmarkAOI(projectId, aoiId, aoiName);
+      share = await restApiClient.createShare(projectId, aoiId);
     } catch (err) {
-      logger('Error Bookmarking AOI', err);
+      logger('Error creating share', err);
+      hideGlobalLoading();
+      toasts.error('Failed to create share.');
       return;
     }
 
-    const url = `${window.location.origin}/aoi/${uuid}/map`;
+    hideGlobalLoading();
+    const url = `${window.location.origin}/share/${share.uuid}/map`;
     const copied = copy(url);
     if (copied) {
       toasts.success('URL copied to clipboard');
@@ -243,7 +249,7 @@ function SessionOutputControl(props) {
         variation='base-plain'
         size='small'
         useIcon='circle-question'
-        onClick={openHelp}
+        onClick={() => setTourStep(0)}
         hideText={isMediumDown}
       >
         Help

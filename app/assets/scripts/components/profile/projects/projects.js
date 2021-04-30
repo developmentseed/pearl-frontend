@@ -22,6 +22,7 @@ import {
 } from '@devseed-ui/global-loading';
 import Table, { TableRow, TableCell } from '../../common/table';
 import Paginator from '../../common/paginator';
+import { useHistory } from 'react-router';
 
 // Controls the size of each page
 const PROJECTS_PER_PAGE = 20;
@@ -30,7 +31,7 @@ const HEADERS = [
   'Name',
   'Created',
   'Model',
-  'Latest Checkpoint',
+  'Last Checkpoint',
   'AOIs',
   'AOI Names',
 ];
@@ -65,7 +66,7 @@ function renderRow(proj) {
       <TableCell>{proj.model ? proj.model.name : 'No model set'}</TableCell>
       <TableCell>
         {proj.checkpoints.length
-          ? proj.checkpoints[proj.checkpoints.length - 1].name
+          ? proj.checkpoints[0].name
           : 'No checkpoint set'}
       </TableCell>
       <TableCell>{proj.aois.length}</TableCell>
@@ -79,7 +80,8 @@ function renderRow(proj) {
 }
 
 function Projects() {
-  const { apiToken } = useAuth();
+  const history = useHistory();
+  const { apiToken, refreshAuth } = useAuth();
 
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(null);
@@ -97,9 +99,15 @@ function Projects() {
           setTotal(data.total);
           setProjects(data.projects);
         } catch (err) {
-          toasts.error('Failed to fetch projects.');
+          if (err.statusCode === 401) {
+            toasts.error('Authentication failed, please try again later.');
+            refreshAuth();
+          } else {
+            toasts.error('Unexpected error.');
+          }
           setIsLoading(false);
           hideGlobalLoading();
+          history.push('/');
         }
         hideGlobalLoading();
         setIsLoading(false);

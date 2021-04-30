@@ -33,6 +33,8 @@ export const actions = {
   RESET_CHECKPOINT: 'RESET_CHECKPOINT',
   UPDATE_POLYGONS: 'UPDATE_POLYGONS',
   INPUT_UNDO: 'INPUT_UNDO',
+
+  SET_AOI_CHECKED: 'SET_AOI_CHECKED',
 };
 
 export function CheckpointProvider(props) {
@@ -42,7 +44,7 @@ export function CheckpointProvider(props) {
 
   const { restApiClient } = useAuth();
 
-  async function fetchCheckpoint(projectId, checkpointId, mode) {
+  async function fetchCheckpoint(projectId, checkpointId, mode, created) {
     try {
       const checkpoint = await restApiClient.getCheckpoint(
         projectId,
@@ -57,6 +59,8 @@ export function CheckpointProvider(props) {
       } else {
         _data.analytics = null;
       }
+
+      _data.checkAoi = created ? false : true;
       dispatchCurrentCheckpoint({
         type: actions.SET_CHECKPOINT,
         data: {
@@ -94,8 +98,17 @@ function checkpointReducer(state, action) {
       // Action used to load existing or initialize a new checkpoint
       return {
         ...action.data,
+        name:
+          state && state.mode === checkpointModes.RUN
+            ? state.name
+            : action.data.name,
+        checkAoi: action.data.checkAoi || false,
+        bookmarked:
+          action.data.bookmarked !== undefined
+            ? action.data.bookmarked
+            : (state && state.bookmarked) || false,
         analytics: action.data.analytics || (state && state.analytics) || null,
-        mode: action.data.mode || checkpointModes.RUN,
+        mode: action.data.mode || (state && state.mode) || checkpointModes.RUN,
         retrain_geoms:
           action.data.retrain_geoms || (state && state.retrain_geoms) || null,
         input_geoms:
@@ -123,6 +136,12 @@ function checkpointReducer(state, action) {
 
         // User action history of classes and checkpoint brushes
         history: [],
+      };
+
+    case actions.SET_AOI_CHECKED:
+      return {
+        ...state,
+        checkAoi: action.data.checkAoi,
       };
     case actions.SET_CHECKPOINT_NAME:
       return {
@@ -152,34 +171,6 @@ function checkpointReducer(state, action) {
           ...state.classes,
           [newClass.name]: newClass,
         },
-        analytics: state.analytics
-          ? [
-              ...state.analytics,
-              {
-                counts: 0,
-                f1score: 0,
-                percent: 0,
-              },
-            ]
-          : state.analytics,
-        input_geoms: state.input_geoms
-          ? [
-              ...state.input_geoms,
-              {
-                type: 'GeometryCollection',
-                geometries: [],
-              },
-            ]
-          : state.input_geoms,
-        retrain_geoms: state.retrain_geoms
-          ? [
-              ...state.retrain_geoms,
-              {
-                type: 'MultiPoint',
-                coordinates: [],
-              },
-            ]
-          : state.retrain_geoms,
       };
     }
 

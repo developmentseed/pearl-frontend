@@ -36,6 +36,10 @@ import TileLayerWithHeaders from '../../common/map/tile-layer';
 import { useAuth } from '../../../context/auth';
 import { useApiMeta } from '../../../context/api-meta';
 import { useAoi, useAoiPatch, useAoiName } from '../../../context/aoi';
+import {
+  actions as predictionActions,
+  usePredictions,
+} from '../../../context/predictions';
 import toasts from '../../common/toasts';
 import logger from '../../../utils/logger';
 
@@ -84,7 +88,13 @@ function Map() {
   } = useContext(ExploreContext);
 
   const { apiLimits } = useApiMeta();
-  const { aoiRef, setAoiRef, currentAoi } = useAoi();
+  const {
+    aoiRef,
+    setAoiRef,
+    currentAoi,
+    setActiveModal,
+    setCurrentAoi,
+  } = useAoi();
   const { updateAoiName } = useAoiName();
 
   const { restApiClient } = useAuth();
@@ -93,9 +103,10 @@ function Map() {
   const { mapState, mapModes, setMapMode } = useMapState();
   const { mapRef, setMapRef } = useMapRef();
   const [tileUrl, setTileUrl] = useState(null);
+  const { dispatchPredictions } = usePredictions();
 
   const { mapLayers, setMapLayers } = useMapLayers();
-  const { userLayers } = useUserLayers();
+  const { userLayers, setUserLayers } = useUserLayers();
 
   const { mosaicList } = useContext(GlobalContext);
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
@@ -155,18 +166,23 @@ function Map() {
     currentCheckpoint && currentCheckpoint.activeItem,
   ]);
 
+  const classLength =
+    currentCheckpoint && currentCheckpoint.classes
+      ? Object.keys(currentCheckpoint.classes).length
+      : 0;
+  const id = currentCheckpoint ? currentCheckpoint.id : null;
+
   // Add polygon layers to be drawn when checkpoint has changed
   useEffect(() => {
     if (!mapRef || !mapRef.polygonDraw) return;
+
     mapRef.polygonDraw.clearLayers();
-    if (currentCheckpoint) {
+
+    if (currentCheckpoint && currentCheckpoint.classes) {
       mapRef.polygonDraw.setLayers(currentCheckpoint.classes);
+      mapRef.polygonDraw.setLayerPolygons(currentCheckpoint.classes);
     }
-  }, [
-    mapRef,
-    currentCheckpoint && currentCheckpoint.id,
-    currentCheckpoint && Object.keys(currentCheckpoint.classes).length,
-  ]);
+  }, [mapRef, id, classLength]);
 
   /**
    * Add/update AOI controls on API metadata change.
@@ -199,12 +215,31 @@ function Map() {
           setAoiArea(areaFromBounds(bbox));
         },
         onDrawEnd: (bbox, shape) => {
+          /*
           setAoiRef(shape);
 
           const bounds = shape.getBounds();
           setAoiBounds(bounds);
           setMapMode(mapModes.BROWSE_MODE);
           updateAoiName(bounds);
+          */
+
+          const area = areaFromBounds(bbox);
+
+          if (!apiLimits || apiLimits.live_inference > area) {
+            const bounds = shape.getBounds();
+            setMapMode(mapModes.BROWSE_MODE);
+            setAoiBounds(bounds);
+            updateAoiName(bounds);
+
+            setAoiRef(shape);
+            //Current aoi should only be set after aoi has been sent to the api
+            setCurrentAoi(null);
+          } else if (apiLimits.max_inference > area) {
+            setActiveModal('no-live-inference');
+          } else {
+            setActiveModal('area-too-large');
+          }
         },
       }
     );
@@ -248,7 +283,8 @@ function Map() {
 
   useEffect(() => {
     async function updateTileUrl() {
-      if (mapRef && currentProject && currentAoi) {
+      if (mapRef && currentProject && currentAoi && aoiRef) {
+        mapRef.fitBounds(aoiRef.getBounds(), { padding: BOUNDS_PADDING });
         try {
           const tileJSON = await restApiClient.getTileJSON(
             currentProject.id,
@@ -262,10 +298,10 @@ function Map() {
       }
     }
     updateTileUrl();
-  }, [currentAoi, currentProject, mapRef]);
+  }, [currentAoi, currentProject, mapRef, aoiRef]);
 
-  const displayMap = useMemo(
-    () => (
+  const displayMap = useMemo(() => {
+    return (
       <MapContainer
         center={center}
         zoom={zoom}
@@ -328,6 +364,7 @@ function Map() {
               url={config.tileUrlTemplate.replace('{LAYER_NAME}', layer)}
               minZoom={12}
               maxZoom={18}
+              pane='tilePane'
               eventHandlers={{
                 add: (v) => {
                   setMapLayers({
@@ -414,11 +451,11 @@ function Map() {
             );
           })}
 
-        {!predictions.data.predictions &&
-          tileUrl &&
+        {tileUrl &&
           currentProject &&
           currentCheckpoint &&
-          currentAoi && (
+          currentAoi &&
+          !predictions.fetching && (
             <TileLayerWithHeaders
               url={tileUrl}
               maxZoom={18}
@@ -428,6 +465,45 @@ function Map() {
                   value: `Bearer ${restApiClient.apiToken}`,
                 },
               ]}
+              options={{
+                pane: 'overlayPane',
+              }}
+              opacity={
+                userLayers.predictions.visible
+                  ? userLayers.predictions.opacity
+                  : 0
+              }
+              eventHandlers={{
+                add: () => {
+                  if (predictions.isReady() || !predictions.data.predictions) {
+                    setUserLayers({
+                      ...userLayers,
+                      predictions: {
+                        ...userLayers.predictions,
+                        active: true,
+                      },
+                    });
+                  }
+                },
+                load: () => {
+                  if (predictions.isReady() || !predictions.data.predictions) {
+                    setTimeout(() => {
+                      dispatchPredictions({
+                        type: predictionActions.CLEAR_PREDICTION,
+                      });
+                    }, 1000);
+                  }
+                },
+                remove: () => {
+                  setUserLayers({
+                    ...userLayers,
+                    predictions: {
+                      ...userLayers.predictions,
+                      active: false,
+                    },
+                  });
+                },
+              }}
             />
           )}
 
@@ -467,24 +543,24 @@ function Map() {
           {aoiRef && <CenterMap aoiRef={aoiRef} />}
         </FeatureGroup>
       </MapContainer>
-    ),
-    [
-      mapModes,
-      aoiRef,
-      currentCheckpoint,
-      dispatchCurrentCheckpoint,
-      userLayers,
-      mapLayers,
-      mosaics,
-      mapState.mode,
-      predictions.data.predictions,
-      restApiClient,
-      setMapLayers,
-      setMapRef,
-      aoiPatchList,
-      tileUrl,
-    ]
-  );
+    );
+  }, [
+    mapModes,
+    aoiRef,
+    currentAoi,
+    currentCheckpoint,
+    dispatchCurrentCheckpoint,
+    userLayers,
+    mapLayers,
+    mosaics,
+    mapState.mode,
+    predictions.data.predictions,
+    restApiClient,
+    setMapLayers,
+    setMapRef,
+    aoiPatchList,
+    tileUrl,
+  ]);
 
   return (
     <SizeAwareElement

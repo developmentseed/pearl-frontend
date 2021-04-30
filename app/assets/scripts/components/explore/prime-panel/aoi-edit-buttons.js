@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { Button } from '@devseed-ui/button';
 import { glsp } from '@devseed-ui/theme-provider';
@@ -14,7 +14,13 @@ import {
 } from '@devseed-ui/modal';
 import { useMapRef } from '../../../context/map';
 import { useApiMeta } from '../../../context/api-meta';
-import { useAoiName } from '../../../context/aoi';
+import { useAoi, useAoiName } from '../../../context/aoi';
+import {
+  useCheckpoint,
+  actions as checkpointActions,
+  checkpointModes,
+} from '../../../context/checkpoint';
+import { areaFromBounds } from '../../../utils/map';
 
 const ModalFooter = styled(BaseModalFooter)`
   padding: ${glsp(2)} 0 0 0;
@@ -29,13 +35,14 @@ const ModalFooter = styled(BaseModalFooter)`
 export function AoiEditButtons(props) {
   const { mapState, setMapMode, mapModes } = useMapState();
   const { updateAoiName } = useAoiName();
+  const { setCurrentAoi, activeModal, setActiveModal, setAoiArea } = useAoi();
   const { mapRef } = useMapRef();
+
+  const { dispatchCurrentCheckpoint } = useCheckpoint();
 
   const { apiLimits } = useApiMeta();
 
   const { aoiRef, aoiArea, aoiBounds, setAoiBounds, setAoiRef } = props;
-
-  const [activeModal, setActiveModal] = useState(false);
 
   // Display confirm/cancel buttons when AOI edition is active
   if (
@@ -52,6 +59,17 @@ export function AoiEditButtons(props) {
               bounds = aoiRef.getBounds();
               setAoiBounds(bounds);
               updateAoiName(bounds);
+
+              // When AOI is edited -> we go to run mode
+              dispatchCurrentCheckpoint({
+                type: checkpointActions.SET_CHECKPOINT_MODE,
+                data: {
+                  mode: checkpointModes.RUN,
+                },
+              });
+
+              //Current aoi should only be set after aoi has been sent to the api
+              setCurrentAoi(null);
             } else if (apiLimits.max_inference > aoiArea) {
               setActiveModal('no-live-inference');
             } else {
@@ -69,6 +87,14 @@ export function AoiEditButtons(props) {
             if (aoiBounds) {
               // editing is canceled
               aoiRef.setBounds(aoiBounds);
+              const bbox = [
+                aoiBounds.getWest(),
+                aoiBounds.getSouth(),
+                aoiBounds.getEast(),
+                aoiBounds.getNorth(),
+              ];
+
+              setAoiArea(areaFromBounds(bbox));
             } else {
               // Drawing canceled
               mapRef.aoi.control.draw.disable();
@@ -138,7 +164,10 @@ export function AoiEditButtons(props) {
                 <Button
                   size='xlarge'
                   variation='primary-plain'
-                  onClick={() => setActiveModal(false)}
+                  onClick={() => {
+                    setActiveModal(false);
+                    setMapMode(mapModes.EDIT_AOI_MODE);
+                  }}
                 >
                   Keep editing
                 </Button>
