@@ -152,41 +152,10 @@ function checkpointReducer(state, action) {
       };
       return {
         ...state,
-        //history: [],
         classes: {
           ...state.classes,
           [newClass.name]: newClass,
         },
-        /*
-        analytics: state.analytics
-          ? [
-              ...state.analytics,
-              {
-                counts: 0,
-                f1score: 0,
-                percent: 0,
-              },
-            ]
-          : state.analytics,
-        input_geoms: state.input_geoms
-          ? [
-              ...state.input_geoms,
-              {
-                type: 'GeometryCollection',
-                geometries: [],
-              },
-            ]
-          : state.input_geoms,
-        retrain_geoms: state.retrain_geoms
-          ? [
-              ...state.retrain_geoms,
-              {
-                type: 'MultiPoint',
-                coordinates: [],
-              },
-            ]
-          : state.retrain_geoms,
-          */
       };
     }
 
