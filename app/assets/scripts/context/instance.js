@@ -554,6 +554,9 @@ export function InstanceProvider(props) {
           },
         },
       });
+      dispatchCurrentCheckpoint({
+        type: checkpointActions.CLEAR_SAMPLES,
+      });
     },
     refine: async function () {
       const classes = Object.values(currentCheckpoint.classes);
