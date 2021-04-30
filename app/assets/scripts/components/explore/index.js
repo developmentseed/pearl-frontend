@@ -5,7 +5,6 @@ import PageHeader from '../common/page-header';
 import { PageBody } from '../../styles/page';
 import { ExploreProvider } from '../../context/explore';
 import { MapProvider } from '../../context/map';
-import { useTour } from '../../context/tour';
 import SizeAwareElement from '../common/size-aware-element';
 import theme from '../../styles/theme';
 import SessionTimeoutModal from '../common/timeout-modal';
@@ -18,7 +17,6 @@ import { PredictionsProvider } from '../../context/predictions';
 import { ModelProvider } from '../../context/model';
 import Composer from '../../utils/compose-components';
 function Explore() {
-  const { setTourStep } = useTour();
   const [isMediumDown, setIsMediumDown] = useState(false);
 
   const resizeListener = ({ width }) => {
@@ -45,10 +43,7 @@ function Explore() {
           onChange={resizeListener}
         >
           <PageHeader>
-            <SessionOutputControl
-              openHelp={() => setTourStep(0)}
-              isMediumDown={isMediumDown}
-            />
+            <SessionOutputControl isMediumDown={isMediumDown} />
           </PageHeader>
         </SizeAwareElement>
         <PageBody role='main'>

@@ -40,6 +40,16 @@ export function ExploreProvider(props) {
   const history = useHistory();
   let { projectId } = useParams();
 
+  const [tourStep, setTourStep] = useState(
+    localStorage.getItem('site-tour')
+      ? Number(localStorage.getItem('site-tour'))
+      : null
+  );
+
+  useEffect(() => {
+    localStorage.setItem('site-tour', tourStep);
+  }, [tourStep]);
+
   const { restApiClient, isLoading: authIsLoading } = useAuth();
   const { currentProject, setCurrentProject } = useProject();
   const {
@@ -434,6 +444,9 @@ export function ExploreProvider(props) {
   return (
     <ExploreContext.Provider
       value={{
+        tourStep,
+        setTourStep,
+
         projectId,
         predictions,
 
@@ -525,5 +538,17 @@ export const useProjectId = () => {
       projectId,
     }),
     [projectId]
+  );
+};
+
+export const useTour = () => {
+  const { tourStep, setTourStep } = useExploreContext('useTour');
+
+  return useMemo(
+    () => ({
+      setTourStep,
+      tourStep,
+    }),
+    [setTourStep, tourStep]
   );
 };

@@ -25,6 +25,7 @@ import toasts from '../common/toasts';
 import logger from '../../utils/logger';
 import { useInstance } from '../../context/instance';
 import { downloadGeotiff as downloadGeotiffUtil } from '../../utils/map';
+import { useTour } from '../../context/explore';
 
 const Wrapper = styled.div`
   flex: 1;
@@ -84,8 +85,9 @@ const HeadingInput = styled(FormInput)`
 
 function SessionOutputControl(props) {
   const { projectId } = useProjectId();
-  const { projectName, openHelp, isMediumDown } = props;
+  const { projectName, isMediumDown } = props;
   const { isAuthenticated, restApiClient } = useAuth();
+  const { setTourStep } = useTour();
 
   const { instance } = useInstance();
 
@@ -247,7 +249,7 @@ function SessionOutputControl(props) {
         variation='base-plain'
         size='small'
         useIcon='circle-question'
-        onClick={openHelp}
+        onClick={() => setTourStep(0)}
         hideText={isMediumDown}
       >
         Help
