@@ -821,7 +821,6 @@ export class WebsocketClient extends ReconnectingWebsocket {
               type: checkpointActions.SET_CHECKPOINT,
               data: {
                 id: data.checkpoint_id,
-                name: data.name,
               },
             });
             dispatchPredictions({

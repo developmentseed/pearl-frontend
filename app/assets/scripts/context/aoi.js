@@ -53,7 +53,7 @@ export function AoiProvider(props) {
    * i.e. Seneca Rocks, Seneca Rocks #1, Seneca Rocks #2...etc
    *
    */
-  function updateAoiName(_aoiBounds) {
+  function updateAoiName(_aoiBounds, aoiList) {
     const refBounds = _aoiBounds || aoiBounds;
 
     if (!refBounds) {
@@ -188,7 +188,7 @@ export const useAoiName = () => {
   );
   return useMemo(
     () => ({
-      updateAoiName,
+      updateAoiName: (bounds) => updateAoiName(bounds, aoiList),
     }),
     [aoiName, aoiList, aoiBounds]
   );

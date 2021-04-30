@@ -98,6 +98,10 @@ function checkpointReducer(state, action) {
       // Action used to load existing or initialize a new checkpoint
       return {
         ...action.data,
+        name:
+          state && state.mode === checkpointModes.RUN
+            ? state.name
+            : action.data.name,
         checkAoi: action.data.checkAoi || false,
         bookmarked:
           action.data.bookmarked !== undefined
