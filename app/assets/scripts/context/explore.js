@@ -197,7 +197,6 @@ export function ExploreProvider(props) {
           .then((aoi) => {
             setCurrentAoi(aoi);
           });
-
       }
 
       if (predictions.error) {
