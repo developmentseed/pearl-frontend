@@ -112,13 +112,16 @@ function renderRow(aoi, { project, restApiClient, aois, setAois }) {
           <Button
             onClick={async () => {
               let share;
+              showGlobalLoadingMessage('Creating Shareable Link...');
               try {
                 share = await restApiClient.createShare(project.id, aoi.id);
               } catch (err) {
                 logger('Failed to create share', err);
+                hideGlobalLoading();
                 toasts.error('Failed to create Share URL.');
                 return;
               }
+              hideGlobalLoading();
               const updatedAois = aois.map((a) => {
                 let shares;
                 if (a.id === aoi.id) {
