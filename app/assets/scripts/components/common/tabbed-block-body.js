@@ -2,7 +2,12 @@ import React, { useState, Children } from 'react';
 import T from 'prop-types';
 import styled, { css } from 'styled-components';
 import InfoButton from '../common/info-button';
-import { listReset, themeVal, glsp, disabled } from '@devseed-ui/theme-provider';
+import {
+  listReset,
+  themeVal,
+  glsp,
+  disabled,
+} from '@devseed-ui/theme-provider';
 
 import {
   PanelBlockScroll as ScrollableBody,
@@ -83,7 +88,7 @@ const PanelBlockScroll = styled(ScrollableBody)`
     display: none;
   }
   .disabled {
-   ${disabled()} 
+    ${disabled()}
   }
   padding: ${glsp(0.5)} 0;
   margin: 0 -1.5rem;
@@ -135,7 +140,7 @@ function TabbedBlock(props) {
           let className = child.props.className || '';
 
           if (child.props.disabled) {
-            className += ' disabled'
+            className += ' disabled';
           }
 
           return (
