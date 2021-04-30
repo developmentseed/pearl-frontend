@@ -20,6 +20,7 @@ import {
   actions as checkpointActions,
   checkpointModes,
 } from '../../../context/checkpoint';
+import { areaFromBounds } from '../../../utils/map';
 
 const ModalFooter = styled(BaseModalFooter)`
   padding: ${glsp(2)} 0 0 0;
@@ -34,7 +35,7 @@ const ModalFooter = styled(BaseModalFooter)`
 export function AoiEditButtons(props) {
   const { mapState, setMapMode, mapModes } = useMapState();
   const { updateAoiName } = useAoiName();
-  const { setCurrentAoi, activeModal, setActiveModal } = useAoi();
+  const { setCurrentAoi, activeModal, setActiveModal, setAoiArea } = useAoi();
   const { mapRef } = useMapRef();
 
   const { dispatchCurrentCheckpoint } = useCheckpoint();
@@ -86,6 +87,14 @@ export function AoiEditButtons(props) {
             if (aoiBounds) {
               // editing is canceled
               aoiRef.setBounds(aoiBounds);
+              const bbox = [
+                aoiBounds.getWest(),
+                aoiBounds.getSouth(),
+                aoiBounds.getEast(),
+                aoiBounds.getNorth(),
+              ];
+
+              setAoiArea(areaFromBounds(bbox));
             } else {
               // Drawing canceled
               mapRef.aoi.control.draw.disable();

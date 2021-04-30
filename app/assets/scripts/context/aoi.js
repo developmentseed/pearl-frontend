@@ -40,6 +40,7 @@ export function AoiProvider(props) {
   const [aoiPatchList, setAoiPatchList] = useState([]);
 
   const [activeModal, setActiveModal] = useState(false);
+  const [aoiArea, setAoiArea] = useState(null);
 
   /*
    * Wrapping function for reverse geocode
@@ -101,6 +102,9 @@ export function AoiProvider(props) {
     setAoiRef,
     aoiName,
     setAoiName,
+
+    aoiArea,
+    setAoiArea,
 
     aoiBounds,
     setAoiBounds,
@@ -166,6 +170,9 @@ export const useAoi = () => {
     aoiBounds,
     setAoiBounds,
 
+    aoiArea,
+    setAoiArea,
+
     activeModal,
     setActiveModal,
   } = useCheckContext('useAoi');
@@ -183,6 +190,8 @@ export const useAoi = () => {
       aoiBounds,
       setAoiBounds,
 
+      aoiArea,
+      setAoiArea,
       activeModal,
       setActiveModal,
 
@@ -196,6 +205,7 @@ export const useAoi = () => {
       dispatchCurrentAoi,
       aoiList,
       aoiBounds,
+      aoiArea,
       activeModal,
     ]
   );
