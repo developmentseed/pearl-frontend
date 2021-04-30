@@ -172,6 +172,8 @@ function PrimePanel() {
     }
   }, [currentCheckpoint]);
 
+
+
   return (
     <>
       <Panel
@@ -225,7 +227,7 @@ function PrimePanel() {
                       currentCheckpoint.mode === checkpointModes.RUN) &&
                     currentAoi
                   }
-                  disabled={!currentCheckpoint}
+                  disabled={!currentCheckpoint || mapState.mode === mapModes.EDIT_AOI_MODE}
                   onTabClick={() => {
                     setActiveTab(checkpointModes.RETRAIN);
                     if (currentCheckpoint && currentAoi) {
@@ -253,7 +255,7 @@ function PrimePanel() {
                   name='Refine Results'
                   tabId='refine-tab-trigger'
                   className='refine-model'
-                  disabled={!currentCheckpoint || !currentAoi}
+                  disabled={!currentCheckpoint || !currentAoi || mapState.mode === mapModes.EDIT_AOI_MODE}
                   ready={
                     currentCheckpoint &&
                     currentCheckpoint.mode === checkpointModes.REFINE
@@ -286,6 +288,7 @@ function PrimePanel() {
                   onTabClick={() => {
                     setActiveTab('LAYERS');
                   }}
+                  disabled ={mapState.mode === mapModes.EDIT_AOI_MODE}
                   className='padded'
                   name='layers'
                   tabId='layers-tab-trigger'
@@ -310,6 +313,8 @@ function PrimePanel() {
                   setLocalCheckpointName,
 
                   mapRef,
+
+                  disabled: mapState.mode === mapModes.EDIT_AOI_MODE,
 
                   allowInferenceRun,
                 }}

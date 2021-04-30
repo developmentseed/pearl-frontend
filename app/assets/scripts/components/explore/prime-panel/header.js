@@ -205,6 +205,8 @@ function Header(props) {
     return 'No models available';
   };
 
+
+
   return (
     <PanelBlockHeader>
       <HeadOption hasSubtitle>
@@ -326,7 +328,7 @@ function Header(props) {
           alignment='right'
           direction='down'
           triggerElement={(props) => {
-            const disabled = checkpointHasSamples || !checkpointList;
+            const disabled = checkpointHasSamples || !checkpointList || mapState.mode === mapModes.EDIT_AOI_MODE;
             return (
               <>
                 <SubheadingStrong

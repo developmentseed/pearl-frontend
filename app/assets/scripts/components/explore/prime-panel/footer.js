@@ -1,7 +1,7 @@
 import React from 'react';
 import T from 'prop-types';
-import styled from 'styled-components';
-import { glsp } from '@devseed-ui/theme-provider';
+import styled, { css } from 'styled-components';
+import { glsp, disabled as disabledStyles} from '@devseed-ui/theme-provider';
 
 import { Heading } from '@devseed-ui/typography';
 import { Button } from '@devseed-ui/button';
@@ -18,6 +18,10 @@ const PanelControls = styled(PanelBlockFooter)`
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-gap: ${glsp()};
+
+  ${({disabled}) => disabled && css`
+    ${disabledStyles()}
+  `}
 `;
 const SaveCheckpoint = styled(DropdownBody)`
   padding: ${glsp()};
@@ -95,10 +99,14 @@ function Footer(props) {
     mapRef,
 
     allowInferenceRun,
+
+    disabled
   } = props;
 
   return (
-    <PanelControls>
+    <PanelControls
+      disabled={disabled}
+    >
       <Button
         variation='primary-raised-light'
         size='medium'
