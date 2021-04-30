@@ -8,7 +8,7 @@ import SelectModal from '../../common/select-modal';
 import ModelCard from './model-card';
 import { useMapLayers, useMapRef } from '../../../context/map';
 import { ExploreContext, useMapState } from '../../../context/explore';
-import GlobalContext from '../../../context/global';
+import GlobalContext, { useModels } from '../../../context/global';
 
 import { Heading } from '@devseed-ui/typography';
 // import {
@@ -82,13 +82,14 @@ function PrimePanel() {
     updateCheckpointName,
   } = useContext(ExploreContext);
 
-  const { aoiRef, setAoiRef, aoiName } = useAoi();
+  const { aoiRef, setAoiRef, aoiName, currentAoi } = useAoi();
 
   const { applyCheckpoint } = useInstance();
 
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
 
-  const { modelsList, mosaicList } = useContext(GlobalContext);
+  const { mosaicList } = useContext(GlobalContext);
+  const { models } = useModels();
 
   const { mapLayers } = useMapLayers();
 
@@ -104,8 +105,6 @@ function PrimePanel() {
   );
 
   const [activeTab, setActiveTab] = useState(checkpointModes.RETRAIN);
-
-  const { models } = modelsList.isReady() && modelsList.getData();
 
   // Check if AOI and selected model are defined, and if view mode is runnable
   const allowInferenceRun =
@@ -127,7 +126,7 @@ function PrimePanel() {
       // If predictions are ready, do not need a placeholder
       return null;
     }
-    if (aoiRef && selectedModel) {
+    if ((aoiRef && selectedModel) || !currentAoi) {
       return `Click the "Run Model" button to generate the class LULC map for your AOI`;
     } else if (aoiRef && !selectedModel) {
       return `Select a model to use for inference`;
@@ -208,7 +207,6 @@ function PrimePanel() {
 
                 setShowSelectModelModal,
                 selectedModel,
-                models,
 
                 isAuthenticated,
                 currentProject,
@@ -225,11 +223,13 @@ function PrimePanel() {
                     currentCheckpoint &&
                     (currentCheckpoint.mode === checkpointModes.RETRAIN ||
                       currentCheckpoint.mode === checkpointModes.RUN) &&
-                    currentCheckpoint.classes !== undefined
+                    currentCheckpoint.classes !== undefined && 
+                    currentAoi
                   }
+                  disabled={!currentCheckpoint}
                   onTabClick={() => {
                     setActiveTab(checkpointModes.RETRAIN);
-                    if (currentCheckpoint) {
+                    if (currentCheckpoint && currentAoi) {
                       setMapMode(mapModes.BROWSE_MODE);
                       dispatchCurrentCheckpoint({
                         type: checkpointActions.SET_ACTIVE_CLASS,
@@ -254,7 +254,7 @@ function PrimePanel() {
                   name='Refine Results'
                   tabId='refine-tab-trigger'
                   className='refine-model'
-                  disabled={!currentCheckpoint}
+                  disabled={!currentCheckpoint || !currentAoi}
                   ready={
                     currentCheckpoint &&
                     currentCheckpoint.mode === checkpointModes.REFINE
@@ -325,7 +325,7 @@ function PrimePanel() {
         onOverlayClick={() => {
           setShowSelectModelModal(false);
         }}
-        data={models || []}
+        data={models.status === 'success' ? models.value : []}
         renderHeader={() => (
           <ModalHeader>
             <Headline>

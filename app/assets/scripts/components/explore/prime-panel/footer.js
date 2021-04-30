@@ -64,7 +64,7 @@ function PrimeButton({ currentCheckpoint, allowInferenceRun, mapRef }) {
       onClick={
         !currentCheckpoint || currentCheckpoint.mode === checkpointModes.RUN
           ? runInference
-          : retrain
+          : () => retrain() && mapRef.polygonDraw.clearLayers()
       }
       visuallyDisabled={!allowInferenceRun}
       id='apply-button-trigger'

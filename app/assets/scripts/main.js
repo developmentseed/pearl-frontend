@@ -14,7 +14,7 @@ import theme from './styles/theme';
 
 import Home from './components/home';
 import Explore from './components/explore';
-import AoiMap from './components/aoi-map';
+import ShareMap from './components/share-map';
 import About from './components/about';
 import UhOh from './components/uhoh';
 import Projects from './components/profile/projects';
@@ -61,7 +61,7 @@ function Root() {
                 <Switch>
                   <>
                     <Route exact path='/' component={Home} />
-                    <Route path='/aoi/:uuid/map' component={AoiMap} />
+                    <Route path='/share/:uuid/map' component={ShareMap} />
                     <Route path='/project/:projectId' component={Explore} />
                     <ProtectedRoute
                       exact

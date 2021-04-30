@@ -25,6 +25,7 @@ import {
   DropdownFooter,
 } from '../../../styles/dropdown';
 import { AoiEditButtons } from './aoi-edit-buttons';
+import { useModels } from '../../../context/global';
 
 const SelectAoiTrigger = styled.div`
   cursor: pointer;
@@ -63,6 +64,27 @@ const SubheadingStrong = styled.h3`
     `}
 `;
 
+function filterAoiList(aoiList) {
+  const aois = new Map();
+  aoiList.forEach((a) => {
+    if (aois.has(a.name)) {
+      if (aois.get(a.name).created > a.created) {
+        aois.set(a.name, a);
+      }
+    } else {
+      aois.set(a.name, a);
+    }
+  });
+  return Array.from(aois.values());
+}
+
+function findCompatibleAoi(aoi, aoiList, ckpt) {
+  const foundAoi = aoiList
+    .filter((a) => a.name === aoi.name)
+    .find((a) => Number(a.checkpoint_id) === ckpt.id);
+  return foundAoi;
+}
+
 const PanelBlockHeader = styled(BasePanelBlockHeader)`
   display: grid;
   grid-gap: ${glsp(0.75)};
@@ -91,11 +113,12 @@ function Header(props) {
 
     setShowSelectModelModal,
     selectedModel,
-    models,
 
     isAuthenticated,
     currentProject,
   } = props;
+
+  const { models } = useModels();
 
   const renderAoiHeader = (triggerProps) => {
     let header;
@@ -160,7 +183,27 @@ function Header(props) {
   };
 
   const modelNotChangeable =
-    !isAuthenticated || !models?.length || checkpointList?.length;
+    !isAuthenticated || models.status !== 'success' || checkpointList?.length;
+
+  const renderModelLabel = () => {
+    if (!isAuthenticated) {
+      return 'Login to select model';
+    }
+
+    if (['pending', 'idle'].includes(models.status)) {
+      return 'Loading...';
+    }
+
+    if (
+      models.status === 'success' &&
+      models.value &&
+      models.value.length > 0
+    ) {
+      return 'Select Model';
+    }
+
+    return 'No models available';
+  };
 
   return (
     <PanelBlockHeader>
@@ -184,12 +227,21 @@ function Header(props) {
               </Heading>
             </DropdownHeader>
             <DropdownBody>
-              {aoiList.map((a) => (
+              {filterAoiList(aoiList).map((a) => (
                 <li key={a.id} data-dropdown='click.close'>
                   <DropdownItem
                     checked={a.name == aoiName}
                     onClick={() => {
-                      loadAoi(currentProject, a).then((bounds) =>
+                      const relevantAoi = findCompatibleAoi(
+                        a,
+                        aoiList,
+                        currentCheckpoint
+                      );
+                      loadAoi(
+                        currentProject,
+                        relevantAoi || a,
+                        relevantAoi || false
+                      ).then((bounds) =>
                         mapRef.fitBounds(bounds, {
                           padding: BOUNDS_PADDING,
                         })
@@ -247,12 +299,7 @@ function Header(props) {
               : 'Models can not be changed after running inference'
           }
         >
-          {(selectedModel && selectedModel.name) ||
-            (isAuthenticated
-              ? models && models.length
-                ? 'Select Model'
-                : 'No models available'
-              : 'Login to select model')}
+          {(selectedModel && selectedModel.name) || renderModelLabel()}
         </SubheadingStrong>
         {!modelNotChangeable && (
           <HeadOptionToolbar>
@@ -336,8 +383,8 @@ function Header(props) {
                     checked={
                       ckpt.id == (currentCheckpoint && currentCheckpoint.id)
                     }
-                    onClick={() => {
-                      applyCheckpoint(currentProject.id, ckpt.id);
+                    onClick={async () => {
+                      await applyCheckpoint(currentProject.id, ckpt.id);
                     }}
                   >
                     {ckpt.parent

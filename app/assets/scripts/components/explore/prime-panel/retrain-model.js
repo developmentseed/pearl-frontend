@@ -200,7 +200,6 @@ function RetrainModel(props) {
                       width='100%'
                       styles={PickerStyles}
                       onChangeComplete={(color) => {
-                        // console.log('change complete', color);
                         setAddClassColor(color.hex);
                       }}
                     />
@@ -253,9 +252,7 @@ function RetrainModel(props) {
       )}
 
       {!ready && currentCheckpoint && (
-        <PlaceholderMessage>
-          Please submit or clear retraining samples before refining results
-        </PlaceholderMessage>
+        <PlaceholderMessage>{placeholderMessage}</PlaceholderMessage>
       )}
     </ToolsWrapper>
   );
@@ -264,6 +261,6 @@ function RetrainModel(props) {
 RetrainModel.propTypes = {
   className: T.string,
   placeholderMessage: T.string,
-  ready: T.bool,
+  ready: T.oneOfType([T.bool, T.object]),
 };
 export default RetrainModel;

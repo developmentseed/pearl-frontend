@@ -283,7 +283,8 @@ function Map() {
 
   useEffect(() => {
     async function updateTileUrl() {
-      if (mapRef && currentProject && currentAoi) {
+      if (mapRef && currentProject && currentAoi && aoiRef) {
+        mapRef.fitBounds(aoiRef.getBounds(), { padding: BOUNDS_PADDING });
         try {
           const tileJSON = await restApiClient.getTileJSON(
             currentProject.id,
@@ -297,7 +298,7 @@ function Map() {
       }
     }
     updateTileUrl();
-  }, [currentAoi, currentProject, mapRef]);
+  }, [currentAoi, currentProject, mapRef, aoiRef]);
 
   const displayMap = useMemo(() => {
     return (
@@ -546,6 +547,7 @@ function Map() {
   }, [
     mapModes,
     aoiRef,
+    currentAoi,
     currentCheckpoint,
     dispatchCurrentCheckpoint,
     userLayers,
