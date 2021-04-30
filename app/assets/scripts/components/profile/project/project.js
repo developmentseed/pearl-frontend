@@ -78,7 +78,9 @@ const AOI_HEADERS = [
 // Render single AOI row
 function renderRow(aoi, { project, restApiClient, aois, setAois }) {
   const shareUUID = aoi.shares.length > 0 ? aoi.shares[0].uuid : null;
-  const shareLink = shareUUID ? `${window.location.origin}/share/${shareUUID}/map` : null;
+  const shareLink = shareUUID
+    ? `${window.location.origin}/share/${shareUUID}/map`
+    : null;
 
   return (
     <TableRow key={aoi.id}>
@@ -88,24 +90,24 @@ function renderRow(aoi, { project, restApiClient, aois, setAois }) {
       <TableCell>{aoi.classes.length}</TableCell>
       <TableCell>{formatDateTime(aoi.created)}</TableCell>
       <TableCell>
-        { shareUUID ? (
-        <FormInputGroup>
-          <FormInput readOnly value={shareLink} size='small' />
-          <Button
-            variation='primary-plain'
-            useIcon='clipboard'
-            hideText
-            onClick={() => {
-              try {
-                copyTextToClipboard(shareLink);
-                toasts.success('URL copied to clipboard');
-              } catch (err) {
-                logger('Failed to copy', err);
-                toasts.error('Failed to copy URL to clipboard');
-              }
-            }}
-          />
-        </FormInputGroup>
+        {shareUUID ? (
+          <FormInputGroup>
+            <FormInput readOnly value={shareLink} size='small' />
+            <Button
+              variation='primary-plain'
+              useIcon='clipboard'
+              hideText
+              onClick={() => {
+                try {
+                  copyTextToClipboard(shareLink);
+                  toasts.success('URL copied to clipboard');
+                } catch (err) {
+                  logger('Failed to copy', err);
+                  toasts.error('Failed to copy URL to clipboard');
+                }
+              }}
+            />
+          </FormInputGroup>
         ) : (
           <Button
             onClick={async () => {
@@ -117,18 +119,18 @@ function renderRow(aoi, { project, restApiClient, aois, setAois }) {
                 toasts.error('Failed to create Share URL.');
                 return;
               }
-              const updatedAois = aois.map(a => {
+              const updatedAois = aois.map((a) => {
                 let shares;
                 if (a.id === aoi.id) {
                   shares = [
                     {
                       uuid: share.uuid,
-                    }
-                  ]
+                    },
+                  ];
                 }
                 const ret = {
-                  ...a
-                }
+                  ...a,
+                };
                 if (shares) {
                   ret.shares = shares;
                 }
@@ -297,7 +299,7 @@ function Project() {
                       project,
                       restApiClient,
                       aois,
-                      setAois
+                      setAois,
                     }}
                   />
                   <Paginator
