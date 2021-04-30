@@ -515,12 +515,9 @@ export function InstanceProvider(props) {
 
       showGlobalLoadingMessage(
         <>
-          <p>Retraining model and loading predictions...</p>
-          <p>
-            At the moment it is not possible to abort, please select the
-            previous checkpoint to revert back to the state before this
-            retraining.
-          </p>
+          Retraining model and loading predictions. At the moment it is not
+          possible to abort, please select the previous checkpoint to revert
+          back to the state before this retraining.
         </>
       );
 
