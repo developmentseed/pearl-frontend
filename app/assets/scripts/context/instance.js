@@ -640,9 +640,6 @@ export function InstanceProvider(props) {
           type: predictionsActions.CLEAR_PREDICTION,
         });
 
-        //console.log(currentAoi)
-        //await fetchCheckpoint(projectId, checkpointId, !currentAoi ? checkpointModes.RUN : checkpointModes.RETRAIN);
-        //
         dispatchCurrentCheckpoint({
           type: checkpointActions.SET_CHECKPOINT_MODE,
           data: {

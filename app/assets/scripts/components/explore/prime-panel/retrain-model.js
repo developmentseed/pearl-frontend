@@ -200,7 +200,6 @@ function RetrainModel(props) {
                       width='100%'
                       styles={PickerStyles}
                       onChangeComplete={(color) => {
-                        // console.log('change complete', color);
                         setAddClassColor(color.hex);
                       }}
                     />

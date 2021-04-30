@@ -7,7 +7,7 @@ import { Subheading } from '../../styles/type/heading';
 import { Heading } from '@devseed-ui/typography';
 import Prose from '../../styles/type/prose';
 import { themeVal } from '@devseed-ui/theme-provider';
-import { useTour } from '../../context/tour';
+import { useTour } from '../../context/explore';
 
 const Inner = styled.div`
   background: ${themeVal('color.baseLight')};
