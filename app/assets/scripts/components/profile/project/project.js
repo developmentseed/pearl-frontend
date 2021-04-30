@@ -207,23 +207,6 @@ function Project() {
                 <Heading>{!isProjectLoading ? project.name : ''}</Heading>
                 <InpageToolbar>
                   <Button
-                    variation='base-plain'
-                    title='Delete Project'
-                    useIcon='trash-bin'
-                    onClick={async () => {
-                      try {
-                        await restApiClient.deleteProject(projectId);
-                        toasts.success('Project successfully deleted.');
-                        history.push(`/profile/projects`);
-                      } catch (err) {
-                        logger('Failed to delete project', err);
-                        toasts.error('Failed to delete project.', err);
-                      }
-                    }}
-                  >
-                    Delete Project
-                  </Button>
-                  <Button
                     forwardedAs={StyledLink}
                     to={`/project/${projectId}`}
                     variation='primary-raised-light'
