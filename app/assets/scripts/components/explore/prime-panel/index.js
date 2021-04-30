@@ -223,7 +223,7 @@ function PrimePanel() {
                     currentCheckpoint &&
                     (currentCheckpoint.mode === checkpointModes.RETRAIN ||
                       currentCheckpoint.mode === checkpointModes.RUN) &&
-                    currentCheckpoint.classes !== undefined && 
+                    currentCheckpoint.classes !== undefined &&
                     currentAoi
                   }
                   disabled={!currentCheckpoint}
