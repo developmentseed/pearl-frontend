@@ -284,7 +284,12 @@ export function InstanceProvider(props) {
             },
           });
         } else {
-          fetchCheckpoint(projectId, checkpointId, checkpointModes.RETRAIN);
+          fetchCheckpoint(
+            projectId,
+            checkpointId,
+            checkpointModes.RETRAIN,
+            true
+          );
         }
       }
 
@@ -319,8 +324,8 @@ export function InstanceProvider(props) {
         applyInstanceStatus,
         dispatchInstance,
         dispatchCurrentCheckpoint,
-        fetchCheckpoint: (checkpointId, mode) =>
-          fetchCheckpoint(projectId, checkpointId, mode),
+        fetchCheckpoint: (checkpointId, mode, created) =>
+          fetchCheckpoint(projectId, checkpointId, mode, created),
         dispatchPredictions,
         dispatchMessageQueue,
         dispatchAoiPatch,
@@ -647,6 +652,13 @@ export function InstanceProvider(props) {
           },
         });
 
+        dispatchCurrentCheckpoint({
+          type: checkpointActions.SET_AOI_CHECKED,
+          data: {
+            checkAoi: true,
+          },
+        });
+
         dispatchMessageQueue({
           type: messageQueueActionTypes.ADD,
           data: {
@@ -809,7 +821,6 @@ export class WebsocketClient extends ReconnectingWebsocket {
               type: checkpointActions.SET_CHECKPOINT,
               data: {
                 id: data.checkpoint_id,
-                name: data.name,
               },
             });
             dispatchPredictions({
@@ -835,7 +846,7 @@ export class WebsocketClient extends ReconnectingWebsocket {
             break;
           case 'model#checkpoint':
             if (data && (data.id || data.checkpoint)) {
-              fetchCheckpoint(data.id || data.checkpoint);
+              fetchCheckpoint(data.id || data.checkpoint, null, true);
             }
             applyInstanceStatus({
               gpuMessage: `Loading checkpoint...`,

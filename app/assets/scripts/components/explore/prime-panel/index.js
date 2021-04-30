@@ -82,7 +82,7 @@ function PrimePanel() {
     updateCheckpointName,
   } = useContext(ExploreContext);
 
-  const { aoiRef, setAoiRef, aoiName } = useAoi();
+  const { aoiRef, setAoiRef, aoiName, currentAoi } = useAoi();
 
   const { applyCheckpoint } = useInstance();
 
@@ -126,7 +126,7 @@ function PrimePanel() {
       // If predictions are ready, do not need a placeholder
       return null;
     }
-    if (aoiRef && selectedModel) {
+    if ((aoiRef && selectedModel) || !currentAoi) {
       return `Click the "Run Model" button to generate the class LULC map for your AOI`;
     } else if (aoiRef && !selectedModel) {
       return `Select a model to use for inference`;
@@ -222,11 +222,13 @@ function PrimePanel() {
                   ready={
                     currentCheckpoint &&
                     (currentCheckpoint.mode === checkpointModes.RETRAIN ||
-                      currentCheckpoint.mode === checkpointModes.RUN)
+                      currentCheckpoint.mode === checkpointModes.RUN) &&
+                    currentAoi
                   }
+                  disabled={!currentCheckpoint}
                   onTabClick={() => {
                     setActiveTab(checkpointModes.RETRAIN);
-                    if (currentCheckpoint) {
+                    if (currentCheckpoint && currentAoi) {
                       setMapMode(mapModes.BROWSE_MODE);
                       dispatchCurrentCheckpoint({
                         type: checkpointActions.SET_ACTIVE_CLASS,
@@ -251,7 +253,7 @@ function PrimePanel() {
                   name='Refine Results'
                   tabId='refine-tab-trigger'
                   className='refine-model'
-                  disabled={!currentCheckpoint}
+                  disabled={!currentCheckpoint || !currentAoi}
                   ready={
                     currentCheckpoint &&
                     currentCheckpoint.mode === checkpointModes.REFINE

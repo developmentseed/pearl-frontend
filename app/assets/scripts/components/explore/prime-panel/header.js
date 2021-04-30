@@ -64,6 +64,27 @@ const SubheadingStrong = styled.h3`
     `}
 `;
 
+function filterAoiList(aoiList) {
+  const aois = new Map();
+  aoiList.forEach((a) => {
+    if (aois.has(a.name)) {
+      if (aois.get(a.name).created > a.created) {
+        aois.set(a.name, a);
+      }
+    } else {
+      aois.set(a.name, a);
+    }
+  });
+  return Array.from(aois.values());
+}
+
+function findCompatibleAoi(aoi, aoiList, ckpt) {
+  const foundAoi = aoiList
+    .filter((a) => a.name === aoi.name)
+    .find((a) => Number(a.checkpoint_id) === ckpt.id);
+  return foundAoi;
+}
+
 const PanelBlockHeader = styled(BasePanelBlockHeader)`
   display: grid;
   grid-gap: ${glsp(0.75)};
@@ -206,12 +227,21 @@ function Header(props) {
               </Heading>
             </DropdownHeader>
             <DropdownBody>
-              {aoiList.map((a) => (
+              {filterAoiList(aoiList).map((a) => (
                 <li key={a.id} data-dropdown='click.close'>
                   <DropdownItem
                     checked={a.name == aoiName}
                     onClick={() => {
-                      loadAoi(currentProject, a).then((bounds) =>
+                      const relevantAoi = findCompatibleAoi(
+                        a,
+                        aoiList,
+                        currentCheckpoint
+                      );
+                      loadAoi(
+                        currentProject,
+                        relevantAoi || a,
+                        relevantAoi || false
+                      ).then((bounds) =>
                         mapRef.fitBounds(bounds, {
                           padding: BOUNDS_PADDING,
                         })
@@ -353,8 +383,8 @@ function Header(props) {
                     checked={
                       ckpt.id == (currentCheckpoint && currentCheckpoint.id)
                     }
-                    onClick={() => {
-                      applyCheckpoint(currentProject.id, ckpt.id);
+                    onClick={async () => {
+                      await applyCheckpoint(currentProject.id, ckpt.id);
                     }}
                   >
                     {ckpt.parent
