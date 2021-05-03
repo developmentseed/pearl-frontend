@@ -20,7 +20,7 @@ module.exports = {
     bingSearchUrl: 'https://dev.virtualearth.net/REST/v1',
     reverseGeocodeRadius: 1,
     tileUrlTemplate:
-      'https://tiles.lulc.ds.io/mosaic/{LAYER_NAME}/tiles/{z}/{x}/{y}.png?bidx=1%2C2%2C3',
+      'https://tiles.lulc.ds.io/mosaic/{LAYER_NAME}/tiles/{z}/{x}/{y}?bidx=1%2C2%2C3',
     appInsightsKey: '0291f153-9634-463e-8aa0-34700141d37c',
   },
 };
