@@ -269,6 +269,8 @@ export function InstanceProvider(props) {
       const { id: instanceId } = activeInstances.instances[0];
       instance = await restApiClient.getInstance(projectId, instanceId);
 
+      console.log('loading active insance');
+
       // As the instance is already running, apply desired checkpoint when
       // ready.
       if (checkpointId) {
@@ -306,6 +308,7 @@ export function InstanceProvider(props) {
         });
       }
     } else if (checkpointId) {
+      console.log('create instance with checkpoint');
       instance = await restApiClient.createInstance(projectId, {
         checkpoint_id: checkpointId,
         aoi_id: aoiId,
@@ -314,6 +317,7 @@ export function InstanceProvider(props) {
       // Apply checkpoint to the interface as the instance will start with it applied.
       fetchCheckpoint(projectId, checkpointId, checkpointModes.RETRAIN);
     } else {
+      console.log('create instance with no checkpoint');
       instance = await restApiClient.createInstance(projectId);
     }
 
@@ -329,6 +333,14 @@ export function InstanceProvider(props) {
         dispatchPredictions,
         dispatchMessageQueue,
         dispatchAoiPatch,
+        onError: () => {
+          if (websocketClient) {
+            websocketClient.close();
+            setWebsocketClient(null);
+          }
+          // Fetch checkpoint that existed at time of execution
+          fetchCheckpoint(currentCheckpoint.project_id, currentCheckpoint.id, null, true)
+        },
       });
       newWebsocketClient.addEventListener('open', () => {
         setWebsocketClient(newWebsocketClient);
@@ -344,6 +356,7 @@ export function InstanceProvider(props) {
         reject();
       });
       newWebsocketClient.addEventListener('close', () => {
+        console.log('closing')
         applyInstanceStatus({
           wsConnected: false,
           gpuConnected: false,
@@ -447,7 +460,11 @@ export function InstanceProvider(props) {
         }
 
         try {
-          await initInstance(project.id);
+          await initInstance(
+            project.id,
+            currentCheckpoint && currentCheckpoint.id,
+            currentAoi && currentAoi.id
+          );
         } catch (error) {
           logger(error);
           toasts.error('Could not create instance, please try again later.');
@@ -511,6 +528,17 @@ export function InstanceProvider(props) {
           } should be provided for retraining.`
         );
         return;
+      }
+
+      try {
+        await initInstance(
+          currentCheckpoint.project_id,
+          currentCheckpoint.id,
+          currentAoi.id
+        );
+      } catch (error) {
+        logger(error);
+        toasts.error('Could not create instance, please try again later.');
       }
 
       showGlobalLoadingMessage(
@@ -720,6 +748,7 @@ export class WebsocketClient extends ReconnectingWebsocket {
     fetchCheckpoint,
     dispatchPredictions,
     dispatchAoiPatch,
+    onError,
   }) {
     super(config.websocketEndpoint + `?token=${token}`);
 
@@ -822,10 +851,22 @@ export class WebsocketClient extends ReconnectingWebsocket {
             hideGlobalLoading();
             this.sendMessage({ action: 'model#status' });
             break;
+
           case 'error':
             logger(event);
+
             dispatchMessageQueue({ type: messageQueueActionTypes.CLEAR });
             dispatchPredictions({ type: predictionsActions.CLEAR_PREDICTION });
+
+            if (data.error.includes('Processing') || data.error.includes('Retrain')) {
+              this.sendMessage({ action: 'instance#terminate' });
+
+              toasts.error('Processing error, instance terminated')
+              onError()
+              hideGlobalLoading();
+              break;
+            }
+
             this.sendMessage({ action: 'model#status' });
             hideGlobalLoading();
             break;
