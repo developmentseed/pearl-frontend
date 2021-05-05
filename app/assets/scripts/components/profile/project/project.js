@@ -98,13 +98,14 @@ function renderRow(aoi, { project, restApiClient, aois, setAois }) {
               useIcon='clipboard'
               hideText
               onClick={() => {
-                try {
-                  copyTextToClipboard(shareLink);
-                  toasts.success('URL copied to clipboard');
-                } catch (err) {
-                  logger('Failed to copy', err);
-                  toasts.error('Failed to copy URL to clipboard');
-                }
+                copyTextToClipboard(shareLink).then((result) => {
+                  if (result) {
+                    toasts.success('URL copied to clipboard');
+                  } else {
+                    logger('Failed to copy', result);
+                    toasts.error('Failed to copy URL to clipboard');
+                  }
+                });
               }}
             />
           </FormInputGroup>

@@ -3,11 +3,21 @@
 // FIXME: ideally this should be part of package.json and fetched as a module
 
 import logger from './logger';
+export default async function updateClipboard(newClip) {
+  const success = await navigator.clipboard.writeText(newClip).then(
+    function () {
+      /* clipboard successfully set */
+      return true;
+    },
+    function () {
+      /* clipboard write failed */
+      return false;
+    }
+  );
+  return success;
+}
 
-export default function copyTextToClipboard(
-  input,
-  { target = document.body } = {}
-) {
+export function copyTextToClipboard(input, { target = document.body } = {}) {
   const element = document.createElement('textarea');
   const previouslyFocusedElement = document.activeElement;
 
@@ -40,6 +50,8 @@ export default function copyTextToClipboard(
   } catch (err) {
     logger('Copy to clipboard error', err);
   }
+
+  console.log(isSuccess);
 
   element.remove();
 

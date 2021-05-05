@@ -151,7 +151,7 @@ function SessionOutputControl(props) {
 
     hideGlobalLoading();
     const url = `${window.location.origin}/share/${share.uuid}/map`;
-    const copied = copy(url);
+    const copied = await copy(url);
     if (copied) {
       toasts.success('URL copied to clipboard');
     } else {
