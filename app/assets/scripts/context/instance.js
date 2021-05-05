@@ -269,8 +269,6 @@ export function InstanceProvider(props) {
       const { id: instanceId } = activeInstances.instances[0];
       instance = await restApiClient.getInstance(projectId, instanceId);
 
-      console.log('loading active insance');
-
       // As the instance is already running, apply desired checkpoint when
       // ready.
       if (checkpointId) {
@@ -308,7 +306,6 @@ export function InstanceProvider(props) {
         });
       }
     } else if (checkpointId) {
-      console.log('create instance with checkpoint');
       instance = await restApiClient.createInstance(projectId, {
         checkpoint_id: checkpointId,
         aoi_id: aoiId,
@@ -317,7 +314,6 @@ export function InstanceProvider(props) {
       // Apply checkpoint to the interface as the instance will start with it applied.
       fetchCheckpoint(projectId, checkpointId, checkpointModes.RETRAIN);
     } else {
-      console.log('create instance with no checkpoint');
       instance = await restApiClient.createInstance(projectId);
     }
 
@@ -339,7 +335,12 @@ export function InstanceProvider(props) {
             setWebsocketClient(null);
           }
           // Fetch checkpoint that existed at time of execution
-          fetchCheckpoint(currentCheckpoint.project_id, currentCheckpoint.id, null, true)
+          fetchCheckpoint(
+            currentCheckpoint.project_id,
+            currentCheckpoint.id,
+            null,
+            true
+          );
         },
       });
       newWebsocketClient.addEventListener('open', () => {
@@ -356,7 +357,6 @@ export function InstanceProvider(props) {
         reject();
       });
       newWebsocketClient.addEventListener('close', () => {
-        console.log('closing')
         applyInstanceStatus({
           wsConnected: false,
           gpuConnected: false,
@@ -858,11 +858,14 @@ export class WebsocketClient extends ReconnectingWebsocket {
             dispatchMessageQueue({ type: messageQueueActionTypes.CLEAR });
             dispatchPredictions({ type: predictionsActions.CLEAR_PREDICTION });
 
-            if (data.error.includes('Processing') || data.error.includes('Retrain')) {
+            if (
+              data.error.includes('Processing') ||
+              data.error.includes('Retrain')
+            ) {
               this.sendMessage({ action: 'instance#terminate' });
 
-              toasts.error('Processing error, instance terminated')
-              onError()
+              toasts.error('Processing error, instance terminated');
+              onError();
               hideGlobalLoading();
               break;
             }
