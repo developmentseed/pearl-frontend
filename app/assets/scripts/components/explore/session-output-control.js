@@ -133,7 +133,7 @@ function SessionOutputControl(props) {
     return;
   };
 
-  const copyTilesLink = async () => {
+  const copyTilesLink = async (e) => {
     const projectId = currentProject.id;
     const aoiId = predictions.data?.aoiId || currentAoi.id;
     let share;
