@@ -24,7 +24,7 @@ export const DropdownBody = styled.ul`
   display: grid;
   grid-gap: ${glsp(0.5)};
   padding: ${glsp(0.5)} 0;
-  overflow: scroll;
+  overflow: auto;
 `;
 export const DropdownItem = styled.a`
   display: grid;
