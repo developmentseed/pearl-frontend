@@ -40,6 +40,8 @@ const Wrapper = styled.div`
 
 const StatusHeading = styled(Heading)`
   font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
   span {
     font-weight: ${themeVal('type.base.weight')};
     color: ${themeVal('color.base')};
@@ -236,9 +238,12 @@ function SessionOutputControl(props) {
         )}
       </ProjectHeading>
       <StatusHeading
-        // TODO: replace status 'OK' with API active instance response
         variation={
-          projectId === 'new' || status === 'OK' ? 'primary' : 'danger'
+          projectId === 'new' ||
+          instance.gpuStatus === 'ready' ||
+          instance.gpuStatus === 'processing'
+            ? 'primary'
+            : 'danger'
         }
         size='xxsmall'
       >
