@@ -16,7 +16,7 @@ const Summary = styled.ol`
   grid-gap: 0.125rem;
 `;
 const ChartContainer = styled.div`
-  background-color: ${themeVal('color.baseAlphaC')};
+  background-color: ${themeVal('color.background')};
   max-width: 100%;
 `;
 const ClassItem = styled.li`
