@@ -1,4 +1,4 @@
-import { rgba, lighten } from 'polished';
+import { rgba, lighten, darken } from 'polished';
 
 let color = {
   baseLight: '#FFFFFF',
@@ -49,7 +49,7 @@ let colorDark = {
 colorDark = {
   ...colorDark,
   base: colorDark.baseLight,
-  background: color.baseDark,
+  background: colorDark.baseDark,
   surface: lighten(0.0625, colorDark.baseDark),
 };
 colorDark = {
@@ -59,6 +59,11 @@ colorDark = {
   baseAlphaC: rgba(colorDark.base, 0.08),
   baseAlphaD: rgba(colorDark.base, 0.16),
   baseAlphaE: rgba(colorDark.base, 0.32),
+  baseDarkAlphaA: rgba(darken(0.05, colorDark.baseDark), 0.02),
+  baseDarkAlphaB: rgba(darken(0.05, colorDark.baseDark), 0.04),
+  baseDarkAlphaC: rgba(darken(0.05, colorDark.baseDark), 0.08),
+  baseDarkAlphaD: rgba(darken(0.05, colorDark.baseDark), 0.16),
+  baseDarkAlphaE: rgba(darken(0.05, colorDark.baseDark), 0.32),
 };
 
 const type = {

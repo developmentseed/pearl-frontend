@@ -86,8 +86,8 @@ export const CardWrapper = styled.article`
   border: 1px solid ${themeVal('color.baseAlphaC')};
   border-radius: ${themeVal('shape.rounded')};
 
-  box-shadow: 0 0 16px 2px ${themeVal('color.baseAlphaA')},
-    0 8px 24px -16px ${themeVal('color.baseAlphaB')};
+  box-shadow: 0 0 16px 2px ${themeVal('color.baseDarkAlphaA')},
+    0 8px 24px -16px ${themeVal('color.baseDarkAlphaB')};
 
   cursor: pointer;
   transition: all 0.16s ease 0s;
@@ -96,12 +96,12 @@ export const CardWrapper = styled.article`
       hoverTransform
         ? css`
             transform: translate(0, -0.125rem);
-            box-shadow: 0 0 16px 4px ${themeVal('color.baseAlphaA')},
-              0 8px 24px -8px ${themeVal('color.baseAlphaB')};
+            box-shadow: 0 0 16px 4px ${themeVal('color.baseDarkAlphaA')},
+              0 8px 24px -8px ${themeVal('color.baseDarkAlphaB')};
           `
         : css`
-            box-shadow: 0 0 16px 4px ${themeVal('color.baseAlphaB')},
-              0 8px 24px -8px ${themeVal('color.baseAlphaC')};
+            box-shadow: 0 0 16px 4px ${themeVal('color.baseDarkAlphaB')},
+              0 8px 24px -8px ${themeVal('color.baseDarkAlphaC')};
           `}
   }
   > header > ${CardSubtitle} {
