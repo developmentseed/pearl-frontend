@@ -214,7 +214,7 @@ class Panel extends React.Component {
           {collapsible && (
             <PanelOffsetActions>
               <Button
-                variation='base-raised-dark'
+                variation='base-plain'
                 useIcon={icon}
                 title='Show/hide prime panel'
                 hideText
