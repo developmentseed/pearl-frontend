@@ -23,7 +23,7 @@ const HomeBody = styled(InpageBody)`
   flex-flow: column nowrap;
   height: 100%;
   align-items: flex-start;
-  color: ${themeVal('color.surface')};
+  color: #ffffff;
 
   background-image: linear-gradient(to top right, #040a15, rgba(4, 10, 21, 0)),
     url('${baseUrl}/assets/graphics/content/home-bg--largeUp.jpg'),

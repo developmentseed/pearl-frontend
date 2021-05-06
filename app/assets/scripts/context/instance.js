@@ -458,7 +458,7 @@ export function InstanceProvider(props) {
             Running model and loading class predictions...
             <Button
               style={{ display: 'block', margin: '1rem auto 0' }}
-              variation='danger-raised-light'
+              variation='danger-raised-dark'
               onClick={() => {
                 abortJob();
               }}

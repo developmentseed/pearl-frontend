@@ -43,6 +43,8 @@ const StatusHeading = styled(Heading)`
   span {
     font-weight: ${themeVal('type.base.weight')};
     color: ${themeVal('color.base')};
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
   }
   ${media.mediumDown`
     display: none;
@@ -54,6 +56,9 @@ const ProjectHeading = styled.div`
   align-items: center;
   line-height: 1.5;
   p {
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
     ${media.mediumDown`
       display: none;
     `}
@@ -236,9 +241,12 @@ function SessionOutputControl(props) {
         )}
       </ProjectHeading>
       <StatusHeading
-        // TODO: replace status 'OK' with API active instance response
         variation={
-          projectId === 'new' || status === 'OK' ? 'primary' : 'danger'
+          projectId === 'new' ||
+          instance.gpuStatus === 'ready' ||
+          instance.gpuStatus === 'processing'
+            ? 'primary'
+            : 'danger'
         }
         size='xxsmall'
       >
@@ -246,8 +254,7 @@ function SessionOutputControl(props) {
         {projectId === 'new' ? 'Waiting for model run' : instance.gpuMessage}
       </StatusHeading>
       <Button
-        variation='base-plain'
-        size='small'
+        variation='primary-plain'
         useIcon='circle-question'
         onClick={() => setTourStep(0)}
         hideText={isMediumDown}
@@ -259,7 +266,7 @@ function SessionOutputControl(props) {
         direction='down'
         triggerElement={(props) => (
           <DropdownTrigger
-            variation='primary-raised-light'
+            variation='primary-raised-dark'
             title='Export map'
             className='user-options-trigger'
             size='medium'

@@ -33,16 +33,16 @@ const ScrollShadow = styled.div`
         return css`
           background: linear-gradient(
             to bottom,
-            ${rgba('#FFF', 1)} 0%,
-            ${rgba('#FFF', 0)} 100%
+            ${rgba(themeVal('color.baseLight'), 1)} 0%,
+            ${rgba(themeVal('color.baseLight'), 0)} 100%
           );
         `;
       case 'dark':
         return css`
           background: linear-gradient(
             to bottom,
-            ${rgba(themeVal('color.primary'), 1)} 0%,
-            ${rgba(themeVal('color.primary'), 0)} 100%
+            ${rgba(themeVal('color.baseDark'), 1)} 0%,
+            ${rgba(themeVal('color.baseDark'), 0)} 100%
           );
         `;
     }
@@ -149,8 +149,8 @@ ShadowScrollbar.propTypes = {
 };
 
 ShadowScrollbar.defaultProps = {
-  topShadowVariation: 'light',
-  bottomShadowVariation: 'light',
+  topShadowVariation: 'dark',
+  bottomShadowVariation: 'dark',
   scrollbarsProps: {},
 };
 

@@ -64,6 +64,7 @@ function clean() {
 function serve() {
   bs.init({
     port: 9000,
+    notify: false,
     server: {
       baseDir: ['.tmp', 'app'],
       routes: {

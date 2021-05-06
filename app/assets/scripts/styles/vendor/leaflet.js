@@ -1,5 +1,6 @@
 import { css } from 'styled-components';
 import collecticon from '@devseed-ui/collecticons';
+import { themeVal } from '@devseed-ui/theme-provider';
 
 export default () => css`
   .leaflet-geosearch-button.active .leaflet-bar-part.leaflet-bar-part-single {
@@ -14,8 +15,12 @@ export default () => css`
 
   .leaflet-bar a,
   .leaflet-bar a:hover {
-    color: #121826;
+    color: ${themeVal('color.base')};
+    background: ${themeVal('color.surface')};
     opacity: 1;
+    &.leaflet-disabled {
+      background: #5d5c66;
+    }
   }
 
   .leaflet-control-geosearch a.leaflet-bar-part::before {

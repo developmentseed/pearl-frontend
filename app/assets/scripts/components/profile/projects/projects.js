@@ -126,7 +126,7 @@ function Projects() {
               <Button
                 forwardedAs={StyledNavLink}
                 to='/project/new'
-                variation='primary-raised-light'
+                variation='primary-plain'
                 size='large'
                 useIcon='plus'
                 title='Start a new project'

@@ -20,7 +20,7 @@ function Explore() {
   const [isMediumDown, setIsMediumDown] = useState(false);
 
   const resizeListener = ({ width }) => {
-    setIsMediumDown(width < theme.main.mediaRanges.large[0]);
+    setIsMediumDown(width < theme.dark.mediaRanges.large[0]);
   };
 
   return (

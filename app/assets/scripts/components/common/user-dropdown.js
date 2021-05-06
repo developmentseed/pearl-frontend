@@ -76,7 +76,7 @@ function UserDropdown() {
   if (authStateIsLoading) {
     return (
       <Button
-        variation='primary-raised-light'
+        variation='primary-plain'
         className='button-class'
         title='Fetching login status'
       >
@@ -89,7 +89,7 @@ function UserDropdown() {
     <>
       {!isAuthenticated ? (
         <Button
-          variation='primary-raised-light'
+          variation='primary-plain'
           className='button-class'
           title='sample button'
           onClick={() => loginWithRedirect()}
@@ -102,7 +102,7 @@ function UserDropdown() {
           direction='down'
           triggerElement={(props) => (
             <DropdownTrigger
-              variation='primary-raised-light'
+              variation='primary-plain'
               useIcon={['chevron-down--small', 'after']}
               usePreIcon='user'
               title='Open dropdown'

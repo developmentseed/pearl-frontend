@@ -1,11 +1,11 @@
 import styled from 'styled-components';
-import { tint } from 'polished';
+import { rgba } from 'polished';
 
 import { themeVal, stylizeFunction, glsp } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
 import ShadowScrollbar from '../common/shadow-scrollbar';
 
-const _tint = stylizeFunction(tint);
+const _rgba = stylizeFunction(rgba);
 
 export const PanelBlock = styled.section`
   /* Grid style assumes header, body, footer layout */
@@ -22,20 +22,24 @@ export const PanelBlock = styled.section`
 `;
 
 export const PanelBlockHeader = styled.header`
-  background: ${_tint(0.02, themeVal('color.surface'))};
+  margin: ${glsp(-1)} ${glsp(-1.5)};
+  padding: ${glsp(1)} ${glsp(1.5)};
+  background: ${_rgba(themeVal('color.surface'), 0.64)};
   position: relative;
   z-index: 10;
 `;
 
 export const PanelBlockFooter = styled.footer`
+  margin: 0 ${glsp(-1.5)};
+  padding: 0 ${glsp(1.5)} ${glsp(0.5)};
   box-shadow: 0px -1px 1px -1px ${themeVal('color.baseAlphaD')};
-  background: ${_tint(0.02, themeVal('color.surface'))};
   position: relative;
   z-index: 10;
 `;
 
 export const PanelBlockTitle = styled(Heading).attrs({ size: 'medium' })`
   margin: 0;
+  color: ${themeVal('color.base')};
 `;
 
 export const PanelBlockBody = styled.div`
@@ -48,4 +52,5 @@ export const PanelBlockBody = styled.div`
 export const PanelBlockScroll = styled(ShadowScrollbar)`
   flex: 1;
   z-index: 1;
+  background: ${_rgba(themeVal('color.surface'), 0.64)};
 `;

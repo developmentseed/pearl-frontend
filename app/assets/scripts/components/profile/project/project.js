@@ -251,7 +251,7 @@ function Project() {
                   <Button
                     forwardedAs={StyledLink}
                     to={`/project/${projectId}`}
-                    variation='primary-raised-light'
+                    variation='primary-raised-dark'
                     title='Edit project'
                     useIcon={['chevron-right--small', 'after']}
                   >

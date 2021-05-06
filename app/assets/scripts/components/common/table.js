@@ -1,15 +1,18 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
+import { rgba } from 'polished';
 import T from 'prop-types';
-import { glsp, themeVal } from '@devseed-ui/theme-provider';
+import { glsp, themeVal, stylizeFunction } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
+
+const _rgba = stylizeFunction(rgba);
 
 const StyledTable = styled.table`
   width: 100%;
   max-width: 100%;
   td,
   th {
-    padding: ${glsp(1 / 4)};
+    padding: ${glsp(1 / 2)};
     vertical-align: top;
     text-align: left;
   }
@@ -32,7 +35,10 @@ const StyledTable = styled.table`
     text-align: left;
     vertical-align: baseline;
     border-bottom: ${themeVal('layout.border')} solid
-      ${themeVal('color.baseAlphaB')};
+      ${themeVal('color.baseAlphaD')};
+  }
+  tbody td {
+    background: ${_rgba(themeVal('color.surface'), 0.32)};
   }
   th:first-child,
   td:first-child {
@@ -46,7 +52,7 @@ const StyledTable = styled.table`
     background: ${({ hoverable }) =>
       hoverable &&
       css`
-        ${themeVal('color.primaryAlphaA')}
+        ${themeVal('color.primaryAlphaB')}
       `};
   }
 `;

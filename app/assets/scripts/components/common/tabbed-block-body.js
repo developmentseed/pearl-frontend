@@ -2,13 +2,16 @@ import React, { useState, Children } from 'react';
 import T from 'prop-types';
 import styled, { css } from 'styled-components';
 import InfoButton from '../common/info-button';
+import { rgba } from 'polished';
 import {
   listReset,
   themeVal,
   glsp,
   disabled,
+  stylizeFunction,
 } from '@devseed-ui/theme-provider';
 
+const _rgba = stylizeFunction(rgba);
 import {
   PanelBlockScroll as ScrollableBody,
   PanelBlockHeader,
@@ -69,7 +72,9 @@ const Tab = styled(InfoButton)`
 `;
 
 const TabbedBlockHeader = styled(PanelBlockHeader)`
-  /*padding: 0 1.5rem;*/
+  margin: 0.5rem -1.5rem 0;
+  padding: 0.5rem 1.5rem;
+  background: ${_rgba(themeVal('color.surface'), 0.64)};
   ul {
     ${listReset}
     display: flex;
@@ -90,7 +95,7 @@ const PanelBlockScroll = styled(ScrollableBody)`
   .disabled {
     ${disabled()}
   }
-  padding: ${glsp(0.5)} 0;
+  padding-bottom: ${glsp(0.5)};
   margin: 0 -1.5rem;
 
   & > .scroll-area > div > .padded {

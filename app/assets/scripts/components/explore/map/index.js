@@ -262,7 +262,7 @@ function Map() {
 
     if (inRange(aoiArea, max_inference, Infinity) && aoiRef.status !== MAX) {
       aoiRef.setStyle({
-        color: theme.main.color.danger,
+        color: theme.dark.color.danger,
       });
       aoiRef.status = MAX;
     } else if (
@@ -270,12 +270,12 @@ function Map() {
       aoiRef.status !== NO_LIVE
     ) {
       aoiRef.setStyle({
-        color: theme.main.color.warning,
+        color: theme.dark.color.warning,
       });
       aoiRef.status = NO_LIVE;
     } else if (inRange(aoiArea, 0, live_inference) && aoiRef.status !== LIVE) {
       aoiRef.setStyle({
-        color: theme.main.color.info,
+        color: theme.dark.color.info,
       });
       aoiRef.status = LIVE;
     }

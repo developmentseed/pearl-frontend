@@ -16,7 +16,7 @@ const Summary = styled.ol`
   grid-gap: 0.125rem;
 `;
 const ChartContainer = styled.div`
-  background-color: ${themeVal('color.baseAlphaC')};
+  background-color: ${themeVal('color.background')};
   max-width: 100%;
 `;
 const ClassItem = styled.li`
@@ -41,7 +41,8 @@ const Icon = styled.div`
 `;
 
 const options = {
-  defaultFontFamily: "'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif",
+  defaultFontFamily:
+    "'Titillium Web', 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif",
   legend: {
     display: false,
   },
