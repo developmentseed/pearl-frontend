@@ -13,7 +13,7 @@ export const cardSkin = () => css`
 `;
 
 export const panelSkin = () => css`
-  background-color: ${themeVal('color.surface')};
+  background-color: ${themeVal('color.background')};
   box-shadow: 0 0 16px 2px ${themeVal('color.baseAlphaB')};
 `;
 

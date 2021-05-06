@@ -10,6 +10,6 @@ export const EditButton = styled(InfoButton).attrs({
   size: 'small',
   hideText: true,
 })`
-  opacity: 50%;
+  opacity: 80%;
   width: min-content;
 `;

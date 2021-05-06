@@ -17,7 +17,7 @@ import { StyledNavLink, StyledLink } from '../../styles/links';
 const { appTitle, appLongTitle, baseUrl } = config;
 
 const PageHead = styled.header`
-  background-color: ${themeVal('color.surface')};
+  background-color: ${themeVal('color.background')};
   color: ${themeVal('color.base')};
   position: sticky;
   z-index: 20;
@@ -110,7 +110,7 @@ const PageTitlePrimeLink = styled.a`
     ${media.mediumUp`
       font-size: 0.75rem;
       display: block;
-      opacity: 0.72;
+      opacity: 0.84;
       letter-spacing: 2px;
     `}
   }
@@ -177,6 +177,7 @@ function PageHeader(props) {
                     <Button
                       forwardedAs={StyledNavLink}
                       to='/about'
+                      variation='primary-plain'
                       useIcon='circle-information'
                       title='Visit About page'
                     >

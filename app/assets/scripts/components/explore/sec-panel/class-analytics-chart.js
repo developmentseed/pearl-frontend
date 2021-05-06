@@ -41,7 +41,8 @@ const Icon = styled.div`
 `;
 
 const options = {
-  defaultFontFamily: "'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif",
+  defaultFontFamily:
+    "'Titillium Web', 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif",
   legend: {
     display: false,
   },

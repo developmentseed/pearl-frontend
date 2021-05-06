@@ -85,6 +85,8 @@ export const DropdownFooter = styled.footer`
 
 export const Dropdown = styled(BaseDropdown)`
   padding: 0;
+  background: ${themeVal('color.background')};
+  color: ${themeVal('color.base')};
   max-width: 18rem;
 `;
 export const DropdownTrigger = styled(InfoButton)`

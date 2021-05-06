@@ -246,8 +246,7 @@ function SessionOutputControl(props) {
         {projectId === 'new' ? 'Waiting for model run' : instance.gpuMessage}
       </StatusHeading>
       <Button
-        variation='base-plain'
-        size='small'
+        variation='primary-plain'
         useIcon='circle-question'
         onClick={() => setTourStep(0)}
         hideText={isMediumDown}
@@ -259,7 +258,7 @@ function SessionOutputControl(props) {
         direction='down'
         triggerElement={(props) => (
           <DropdownTrigger
-            variation='primary-raised-light'
+            variation='primary-raised-dark'
             title='Export map'
             className='user-options-trigger'
             size='medium'

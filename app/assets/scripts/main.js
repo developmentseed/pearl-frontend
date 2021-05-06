@@ -52,7 +52,7 @@ function Root() {
     <AuthProvider>
       <ErrorBoundary>
         <Router history={history}>
-          <DevseedUiThemeProvider theme={theme.main}>
+          <DevseedUiThemeProvider theme={theme.dark}>
             <GlobalLoadingProvider />
             <ApiMetaProvider>
               <GlobalContextProvider>

@@ -1,11 +1,9 @@
-import { rgba } from 'polished';
+import { rgba, lighten } from 'polished';
 
 let color = {
   baseLight: '#FFFFFF',
   baseDark: '#121826',
   primary: '#07A68C',
-  baseLightDark: '#F0F4FF',
-  primaryDark: '#09CEAD',
   secondary: '#F7C948',
   tertiary: '#42A6D1',
   quaternary: '#EE4E44',
@@ -40,6 +38,27 @@ color = {
     color.baseDark,
     0.64
   )})`,
+};
+
+let colorDark = {
+  ...color,
+  baseLight: '#F0F4FF',
+  baseDark: '#121826',
+  primary: '#09CEAD',
+};
+colorDark = {
+  ...colorDark,
+  base: colorDark.baseLight,
+  background: color.baseDark,
+  surface: lighten(0.0625, colorDark.baseDark),
+};
+colorDark = {
+  ...colorDark,
+  baseAlphaA: rgba(colorDark.base, 0.02),
+  baseAlphaB: rgba(colorDark.base, 0.04),
+  baseAlphaC: rgba(colorDark.base, 0.08),
+  baseAlphaD: rgba(colorDark.base, 0.16),
+  baseAlphaE: rgba(colorDark.base, 0.32),
 };
 
 const type = {
@@ -80,6 +99,14 @@ const type = {
   },
 };
 
+const typeDark = {
+  ...type,
+  base: {
+    ...type.base,
+    color: colorDark.base,
+  },
+};
+
 const shape = {
   rounded: '0.25rem',
   ellipsoid: '320rem',
@@ -110,10 +137,18 @@ const mediaRanges = {
 };
 
 export default {
-  main: {
+  light: {
     layout,
     color,
     type,
+    shape,
+    boxShadow,
+    mediaRanges,
+  },
+  dark: {
+    layout,
+    color: colorDark,
+    type: typeDark,
     shape,
     boxShadow,
     mediaRanges,
