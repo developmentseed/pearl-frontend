@@ -18,6 +18,9 @@ export default () => css`
     color: ${themeVal('color.base')};
     background: ${themeVal('color.surface')};
     opacity: 1;
+    &.leaflet-disabled {
+      background: #5d5c66;
+    }
   }
 
   .leaflet-control-geosearch a.leaflet-bar-part::before {
