@@ -40,11 +40,11 @@ const Wrapper = styled.div`
 
 const StatusHeading = styled(Heading)`
   font-size: 0.875rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
   span {
     font-weight: ${themeVal('type.base.weight')};
     color: ${themeVal('color.base')};
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
   }
   ${media.mediumDown`
     display: none;
@@ -56,6 +56,9 @@ const ProjectHeading = styled.div`
   align-items: center;
   line-height: 1.5;
   p {
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
     ${media.mediumDown`
       display: none;
     `}
