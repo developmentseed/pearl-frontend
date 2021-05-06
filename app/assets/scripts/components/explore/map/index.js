@@ -43,8 +43,8 @@ import {
 import toasts from '../../common/toasts';
 import logger from '../../../utils/logger';
 
-const center = [38.83428180092151, -79.37724530696869];
-const zoom = 15;
+const center = [38.889805, -77.009056];
+const zoom = 12;
 
 const MAX = 3;
 const NO_LIVE = 2;
