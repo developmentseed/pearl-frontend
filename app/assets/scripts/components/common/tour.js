@@ -10,7 +10,8 @@ import { themeVal } from '@devseed-ui/theme-provider';
 import { useTour } from '../../context/explore';
 
 const Inner = styled.div`
-  background: ${themeVal('color.baseLight')};
+  background: ${themeVal('color.surface')};
+  color: ${themeVal('color.base')};
   width: 20rem;
   padding: 1rem;
   display: grid;

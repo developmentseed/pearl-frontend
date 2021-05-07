@@ -73,7 +73,7 @@ function Paginator({ currentPage, gotoPage, totalItems, itemsPerPage }) {
           <Button
             disabled={!hasPrev}
             size='small'
-            variation='base-raised-semidark'
+            variation='primary-raised-dark'
             useIcon='chevron-left--small'
             hideText
             onClick={() => {
@@ -103,7 +103,7 @@ function Paginator({ currentPage, gotoPage, totalItems, itemsPerPage }) {
           <Button
             disabled={!hasNext}
             size='small'
-            variation='base-raised-semidark'
+            variation='primary-raised-dark'
             useIcon='chevron-right--small'
             hideText
             onClick={() => {

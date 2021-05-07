@@ -24,7 +24,7 @@ export const DropdownBody = styled.ul`
   display: grid;
   grid-gap: ${glsp(0.5)};
   padding: ${glsp(0.5)} 0;
-  overflow: scroll;
+  overflow: auto;
 `;
 export const DropdownItem = styled.a`
   display: grid;
@@ -85,7 +85,12 @@ export const DropdownFooter = styled.footer`
 
 export const Dropdown = styled(BaseDropdown)`
   padding: 0;
+  background: ${themeVal('color.background')};
+  color: ${themeVal('color.base')};
   max-width: 18rem;
+  box-shadow: 0 0 0 1px ${themeVal('color.baseAlphaB')},
+    0 0 32px 2px ${themeVal('color.baseDarkAlphaD')},
+    0 16px 48px -16px ${themeVal('color.baseDarkAlphaE')};
 `;
 export const DropdownTrigger = styled(InfoButton)`
   &::before {

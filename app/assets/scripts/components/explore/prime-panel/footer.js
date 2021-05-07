@@ -108,7 +108,7 @@ function Footer(props) {
   return (
     <PanelControls disabled={disabled}>
       <Button
-        variation='primary-raised-light'
+        variation='base-plain'
         size='medium'
         useIcon='arrow-loop'
         style={{
@@ -128,7 +128,7 @@ function Footer(props) {
         Clear
       </Button>
       <Button
-        variation='primary-raised-light'
+        variation='base-plain'
         size='medium'
         useIcon='arrow-semi-spin-ccw'
         style={{

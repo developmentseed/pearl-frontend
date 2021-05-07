@@ -21,6 +21,7 @@ const StyledBlockBody = styled(PanelBlockBody)`
   margin-top: auto;
   ${PanelBlockHeader} {
     margin-bottom: ${glsp(0.5)};
+    background: none;
   }
 `;
 
@@ -29,6 +30,11 @@ const ScrollBodyWrapper = styled.div`
   flex-flow: column nowrap;
   justify-content: flex-start;
   height: calc(100vh - 10rem);
+`;
+
+const PanelBlockScrollPadded = styled(PanelBlockScroll)`
+  padding: 0 1.5rem;
+  margin: 0 -1.5rem;
 `;
 
 function SecPanel() {
@@ -49,7 +55,7 @@ function SecPanel() {
           {currentCheckpoint.input_geoms &&
           currentCheckpoint.retrain_geoms &&
           currentCheckpoint.analytics ? (
-            <PanelBlockScroll>
+            <PanelBlockScrollPadded>
               <ScrollBodyWrapper>
                 <StyledBlockBody>
                   <PanelBlockHeader>
@@ -72,7 +78,7 @@ function SecPanel() {
                   />
                 </StyledBlockBody>
               </ScrollBodyWrapper>
-            </PanelBlockScroll>
+            </PanelBlockScrollPadded>
           ) : (
             <PanelBlockBody>
               <PlaceholderMessage>Retrain to see metrics.</PlaceholderMessage>

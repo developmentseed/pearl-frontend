@@ -56,7 +56,7 @@ function RetrainModel(props) {
               variation={
                 mapState.mode === mapModes.ADD_SAMPLE_POLYGON
                   ? 'primary-raised-dark'
-                  : 'primary-raised-light'
+                  : 'primary-plain'
               }
               size='small'
               radius='ellipsoid'
@@ -75,7 +75,7 @@ function RetrainModel(props) {
               variation={
                 mapState.mode === mapModes.ADD_SAMPLE_POINT
                   ? 'primary-raised-dark'
-                  : 'primary-raised-light'
+                  : 'primary-plain'
               }
               size='small'
               radius='ellipsoid'
@@ -95,7 +95,7 @@ function RetrainModel(props) {
               variation={
                 mapState.mode === mapModes.DELETE_SAMPLES
                   ? 'primary-raised-dark'
-                  : 'primary-raised-light'
+                  : 'primary-plain'
               }
               size='small'
               radius='ellipsoid'

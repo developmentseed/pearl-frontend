@@ -329,6 +329,19 @@ export function InstanceProvider(props) {
         dispatchPredictions,
         dispatchMessageQueue,
         dispatchAoiPatch,
+        onError: () => {
+          if (websocketClient) {
+            websocketClient.close();
+            setWebsocketClient(null);
+          }
+          // Fetch checkpoint that existed at time of execution
+          fetchCheckpoint(
+            currentCheckpoint.project_id,
+            currentCheckpoint.id,
+            null,
+            true
+          );
+        },
       });
       newWebsocketClient.addEventListener('open', () => {
         setWebsocketClient(newWebsocketClient);
@@ -447,7 +460,11 @@ export function InstanceProvider(props) {
         }
 
         try {
-          await initInstance(project.id);
+          await initInstance(
+            project.id,
+            currentCheckpoint && currentCheckpoint.id,
+            currentAoi && currentAoi.id
+          );
         } catch (error) {
           logger(error);
           toasts.error('Could not create instance, please try again later.');
@@ -458,7 +475,7 @@ export function InstanceProvider(props) {
             Running model and loading class predictions...
             <Button
               style={{ display: 'block', margin: '1rem auto 0' }}
-              variation='danger-raised-light'
+              variation='danger-raised-dark'
               onClick={() => {
                 abortJob();
               }}
@@ -511,6 +528,17 @@ export function InstanceProvider(props) {
           } should be provided for retraining.`
         );
         return;
+      }
+
+      try {
+        await initInstance(
+          currentCheckpoint.project_id,
+          currentCheckpoint.id,
+          currentAoi.id
+        );
+      } catch (error) {
+        logger(error);
+        toasts.error('Could not create instance, please try again later.');
       }
 
       showGlobalLoadingMessage(
@@ -720,6 +748,7 @@ export class WebsocketClient extends ReconnectingWebsocket {
     fetchCheckpoint,
     dispatchPredictions,
     dispatchAoiPatch,
+    onError,
   }) {
     super(config.websocketEndpoint + `?token=${token}`);
 
@@ -822,10 +851,25 @@ export class WebsocketClient extends ReconnectingWebsocket {
             hideGlobalLoading();
             this.sendMessage({ action: 'model#status' });
             break;
+
           case 'error':
             logger(event);
+
             dispatchMessageQueue({ type: messageQueueActionTypes.CLEAR });
             dispatchPredictions({ type: predictionsActions.CLEAR_PREDICTION });
+
+            if (
+              data.error.includes('Processing') ||
+              data.error.includes('Retrain')
+            ) {
+              this.sendMessage({ action: 'instance#terminate' });
+
+              toasts.error('Processing error, instance terminated');
+              onError();
+              hideGlobalLoading();
+              break;
+            }
+
             this.sendMessage({ action: 'model#status' });
             hideGlobalLoading();
             break;

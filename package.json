@@ -1,6 +1,6 @@
 {
   "name": "lulc-frontend",
-  "version": "0.3.0",
+  "version": "1.0.2",
   "description": "Web application of Microsoft Land Use and Land Classification (LULC) project.",
   "repository": {
     "type": "git",

@@ -72,7 +72,7 @@ function RefineModel(props) {
               variation={
                 mapState.mode === mapModes.ADD_SAMPLE_POLYGON
                   ? 'primary-raised-dark'
-                  : 'primary-raised-light'
+                  : 'primary-plain'
               }
               size='small'
               radius='ellipsoid'
@@ -92,7 +92,7 @@ function RefineModel(props) {
               variation={
                 mapState.mode === mapModes.DELETE_SAMPLES
                   ? 'primary-raised-dark'
-                  : 'primary-raised-light'
+                  : 'primary-plain'
               }
               size='small'
               radius='ellipsoid'

@@ -32,7 +32,7 @@ const LayerWrapper = styled.div`
 const IconPlaceholder = styled.div`
   width: 3rem;
   height: 3rem;
-  background: ${themeVal('color.base')};
+  background: ${themeVal('color.baseAlphaD')};
 `;
 
 const SliderWrapper = styled.div`

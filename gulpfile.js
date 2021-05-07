@@ -64,6 +64,7 @@ function clean() {
 function serve() {
   bs.init({
     port: 9000,
+    notify: false,
     server: {
       baseDir: ['.tmp', 'app'],
       routes: {
@@ -218,7 +219,7 @@ function collecticons() {
 
 function copyFiles() {
   return gulp
-    .src(['app/**/*', '!app/assets/**', '!app/index.html'])
+    .src(['app/**/*', '!app/assets/**', '!app/index.html', '!app/manifest.json'])
     .pipe(gulp.dest('dist'));
 }
 

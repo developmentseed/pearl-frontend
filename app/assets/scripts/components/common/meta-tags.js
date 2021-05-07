@@ -14,7 +14,7 @@ const MetaTags = ({ title, description, children }) => {
       {description ? <meta name='description' content={description} /> : null}
 
       {/* Theme color */}
-      <meta name='theme-color' content={theme.main.color.primary} />
+      <meta name='theme-color' content={theme.dark.color.primary} />
 
       {/* Twitter */}
       <meta name='twitter:card' content='summary' />

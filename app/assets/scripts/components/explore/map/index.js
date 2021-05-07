@@ -43,8 +43,8 @@ import {
 import toasts from '../../common/toasts';
 import logger from '../../../utils/logger';
 
-const center = [38.83428180092151, -79.37724530696869];
-const zoom = 15;
+const center = [38.889805, -77.009056];
+const zoom = 12;
 
 const MAX = 3;
 const NO_LIVE = 2;
@@ -262,7 +262,7 @@ function Map() {
 
     if (inRange(aoiArea, max_inference, Infinity) && aoiRef.status !== MAX) {
       aoiRef.setStyle({
-        color: theme.main.color.danger,
+        color: theme.dark.color.danger,
       });
       aoiRef.status = MAX;
     } else if (
@@ -270,12 +270,12 @@ function Map() {
       aoiRef.status !== NO_LIVE
     ) {
       aoiRef.setStyle({
-        color: theme.main.color.warning,
+        color: theme.dark.color.warning,
       });
       aoiRef.status = NO_LIVE;
     } else if (inRange(aoiArea, 0, live_inference) && aoiRef.status !== LIVE) {
       aoiRef.setStyle({
-        color: theme.main.color.info,
+        color: theme.dark.color.info,
       });
       aoiRef.status = LIVE;
     }

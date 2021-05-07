@@ -163,6 +163,7 @@ export const PickerStyles = {
     picker: {
       boxShadow: 'none',
       fontFamily: 'inherit',
+      background: themeVal('color.surface'),
     },
     body: {
       padding: '12px 12px 6px',

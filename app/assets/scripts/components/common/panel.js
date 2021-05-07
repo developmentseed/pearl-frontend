@@ -3,7 +3,7 @@ import T from 'prop-types';
 import styled, { css } from 'styled-components';
 import { Button } from '@devseed-ui/button';
 
-import { tint } from 'polished';
+import { rgba } from 'polished';
 import { headingAlt } from '@devseed-ui/typography';
 import { panelSkin } from '../../styles/skins';
 import {
@@ -14,7 +14,7 @@ import {
   media,
 } from '@devseed-ui/theme-provider';
 
-const _tint = stylizeFunction(tint);
+const _rgba = stylizeFunction(rgba);
 
 export const PanelSelf = styled.section`
   position: relative;
@@ -46,7 +46,7 @@ export const PanelSelf = styled.section`
 
 const PanelHeader = styled.header`
   box-shadow: 0 1px 0 0 ${themeVal('color.baseAlphaB')};
-  background: ${_tint(0.02, themeVal('color.surface'))};
+  background: ${_rgba(themeVal('color.surface'), 0.64)};
   position: relative;
   z-index: 100;
   display: flex;
@@ -214,7 +214,7 @@ class Panel extends React.Component {
           {collapsible && (
             <PanelOffsetActions>
               <Button
-                variation='base-raised-light'
+                variation='base-plain'
                 useIcon={icon}
                 title='Show/hide prime panel'
                 hideText
