@@ -22,7 +22,7 @@ import Maps from './components/profile/maps';
 
 import { GlobalContextProvider } from './context/global';
 import { CollecticonsGlobalStyle } from '@devseed-ui/collecticons';
-import GlobalLoadingProvider from '@devseed-ui/global-loading';
+import GlobalLoadingProvider from './components/common/global-loading';
 import { ToastContainerCustom } from './components/common/toasts';
 import Project from './components/profile/project';
 import { AuthProvider } from './context/auth';

@@ -106,7 +106,6 @@
     "@devseed-ui/collecticons": "^3.0.0",
     "@devseed-ui/dropdown": "^2.0.2",
     "@devseed-ui/form": "^1.0.3",
-    "@devseed-ui/global-loading": "^2.0.1",
     "@devseed-ui/modal": "^3.0.1",
     "@devseed-ui/theme-provider": "^3.0.0",
     "@devseed-ui/typography": "^1.0.0",
@@ -151,6 +150,7 @@
     "react-router-dom": "^5.2.0",
     "react-toastify": "^7.0.3",
     "react-tooltip": "^4.2.15",
+    "react-transition-group": "^4.3.0",
     "reconnecting-websocket": "^4.4.0",
     "request-promise": "^4.2.6",
     "styled-components": "^5.2.1"

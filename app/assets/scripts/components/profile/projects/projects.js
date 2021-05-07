@@ -19,7 +19,7 @@ import { formatDateTime } from '../../../utils/format';
 import {
   showGlobalLoadingMessage,
   hideGlobalLoading,
-} from '@devseed-ui/global-loading';
+} from '../../common/global-loading';
 import Table, { TableRow, TableCell } from '../../common/table';
 import Paginator from '../../common/paginator';
 import { useHistory } from 'react-router';

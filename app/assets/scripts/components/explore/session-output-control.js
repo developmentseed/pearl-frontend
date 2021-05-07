@@ -5,7 +5,7 @@ import copy from '../../utils/copy-text-to-clipboard';
 import {
   showGlobalLoadingMessage,
   hideGlobalLoading,
-} from '@devseed-ui/global-loading';
+} from '../common/global-loading';
 import {
   Dropdown,
   DropdownHeader,
