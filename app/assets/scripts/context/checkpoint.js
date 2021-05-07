@@ -44,7 +44,10 @@ export function CheckpointProvider(props) {
 
   const { restApiClient } = useAuth();
 
-  async function fetchCheckpoint(projectId, checkpointId, mode, created) {
+  /*
+   * @param created - if new checkpoint was just created,don't to verify that aoi matches
+   */
+  async function fetchCheckpoint(projectId, checkpointId, mode, noCheck) {
     try {
       const checkpoint = await restApiClient.getCheckpoint(
         projectId,
@@ -60,7 +63,7 @@ export function CheckpointProvider(props) {
         _data.analytics = null;
       }
 
-      _data.checkAoi = created ? false : true;
+      _data.checkAoi = noCheck ? false : true;
       dispatchCurrentCheckpoint({
         type: actions.SET_CHECKPOINT,
         data: {
