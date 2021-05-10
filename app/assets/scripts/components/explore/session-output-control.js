@@ -316,33 +316,32 @@ function SessionOutputControl(props) {
               </DropdownItem>
             </li>
             <li>
-              { exportShareURL ? (
-              <DropdownItem>
-                <FormInputGroup>
-                  <FormInput readOnly value={exportShareURL} size='small' />
-                  <Button
-                    variation='primary-plain'
-                    useIcon='clipboard'
-                    hideText
-                    onClick={() => {
-                      copyTextToClipboard(exportShareURL).then((result) => {
-                        if (result) {
-                          toasts.success('URL copied to clipboard');
-                        } else {
-                          logger('Failed to copy', result);
-                          toasts.error('Failed to copy URL to clipboard');
-                        }
-                      });
-                    }}
-                  />
-                </FormInputGroup>
-              </DropdownItem>  
+              {exportShareURL ? (
+                <DropdownItem>
+                  <FormInputGroup>
+                    <FormInput readOnly value={exportShareURL} size='small' />
+                    <Button
+                      variation='primary-plain'
+                      useIcon='clipboard'
+                      hideText
+                      onClick={() => {
+                        copyTextToClipboard(exportShareURL).then((result) => {
+                          if (result) {
+                            toasts.success('URL copied to clipboard');
+                          } else {
+                            logger('Failed to copy', result);
+                            toasts.error('Failed to copy URL to clipboard');
+                          }
+                        });
+                      }}
+                    />
+                  </FormInputGroup>
+                </DropdownItem>
               ) : (
-              <DropdownItem useIcon='link' onClick={createTilesLink}>
-                Create Share URL
-              </DropdownItem>
-              )
-              }
+                <DropdownItem useIcon='link' onClick={createTilesLink}>
+                  Create Share URL
+                </DropdownItem>
+              )}
             </li>
           </DropdownBody>
         </>
