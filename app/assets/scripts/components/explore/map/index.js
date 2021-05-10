@@ -467,7 +467,7 @@ function Map() {
               ]}
               options={{
                 pane: 'overlayPane',
-                bounds: currentAoi.bounds
+                bounds: currentAoi.bounds,
               }}
               opacity={
                 userLayers.predictions.visible
