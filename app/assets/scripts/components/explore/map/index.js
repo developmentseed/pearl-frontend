@@ -477,12 +477,6 @@ function Map() {
               eventHandlers={{
                 add: () => {
                   if (predictions.isReady() || !predictions.data.predictions) {
-                    setTimeout(() => {
-                      dispatchPredictions({
-                        type: predictionActions.CLEAR_PREDICTION,
-                      });
-                    }, 1000);
-
                     setUserLayers({
                       ...userLayers,
                       predictions: {
@@ -490,6 +484,15 @@ function Map() {
                         active: true,
                       },
                     });
+                  }
+                },
+                load: () => {
+                  if (predictions.isReady() || !predictions.data.predictions) {
+                    setTimeout(() => {
+                      dispatchPredictions({
+                        type: predictionActions.CLEAR_PREDICTION,
+                      });
+                    }, 1000);
                   }
                 },
                 remove: () => {
