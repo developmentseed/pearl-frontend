@@ -184,7 +184,16 @@ function SessionOutputControl(props) {
     const url = `${window.location.origin}/share/${share.uuid}/map`;
     setExportShareURL(url);
   };
-
+  const copyTilesLink = () => {
+    copyTextToClipboard(exportShareURL).then((result) => {
+      if (result) {
+        toasts.success('URL copied to clipboard');
+      } else {
+        logger('Failed to copy', result);
+        toasts.error('Failed to copy URL to clipboard');
+      }
+    });
+  };
   const clearInput = () => {
     setLocalProjectName(initialName);
     setTitleEditMode(false);
@@ -308,7 +317,9 @@ function SessionOutputControl(props) {
         className='global__dropdown'
       >
         <>
-          <DropdownHeader>Export Options</DropdownHeader>
+          <DropdownHeader>
+            <p>Export Options</p>
+          </DropdownHeader>
           <DropdownBody>
             <li>
               <DropdownItem useIcon='download-2' onClick={downloadGeotiff}>
@@ -316,30 +327,30 @@ function SessionOutputControl(props) {
               </DropdownItem>
             </li>
             <li>
-              {exportShareURL ? (
-                <DropdownItem>
+              <DropdownItem
+                useIcon='link'
+                onClick={!exportShareURL ? createTilesLink : copyTilesLink}
+              >
+                {exportShareURL ? 'Copy Share URL' : 'Create Share URL'}
+              </DropdownItem>
+              {exportShareURL && (
+                <DropdownItem nonhoverable={!exportShareURL}>
                   <FormInputGroup>
-                    <FormInput readOnly value={exportShareURL} size='small' />
+                    <FormInput
+                      readOnly
+                      value={exportShareURL}
+                      disabled={!exportShareURL}
+                      size='small'
+                    />
                     <Button
                       variation='primary-plain'
                       useIcon='clipboard'
                       hideText
-                      onClick={() => {
-                        copyTextToClipboard(exportShareURL).then((result) => {
-                          if (result) {
-                            toasts.success('URL copied to clipboard');
-                          } else {
-                            logger('Failed to copy', result);
-                            toasts.error('Failed to copy URL to clipboard');
-                          }
-                        });
-                      }}
+                      disabled={!exportShareURL}
+                      title='Copy link to clipboard'
+                      onClick={exportShareURL && copyTilesLink}
                     />
                   </FormInputGroup>
-                </DropdownItem>
-              ) : (
-                <DropdownItem useIcon='link' onClick={createTilesLink}>
-                  Create Share URL
                 </DropdownItem>
               )}
             </li>
