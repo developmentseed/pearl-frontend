@@ -111,6 +111,8 @@ function renderRow(aoi, { project, restApiClient, aois, setAois }) {
           </FormInputGroup>
         ) : (
           <Button
+            variation='primary-plain'
+            useIcon='link'
             onClick={async () => {
               let share;
               showGlobalLoadingMessage('Creating Shareable Link...');
@@ -143,7 +145,7 @@ function renderRow(aoi, { project, restApiClient, aois, setAois }) {
               setAois(updatedAois);
             }}
           >
-            Create share
+            Create share URL
           </Button>
         )}
       </TableCell>
