@@ -24,7 +24,7 @@ import { formatDateTime, formatThousands } from '../../../utils/format';
 import {
   showGlobalLoadingMessage,
   hideGlobalLoading,
-} from '@devseed-ui/global-loading';
+} from '../../common/global-loading';
 import Table, { TableRow, TableCell } from '../../common/table';
 import Paginator from '../../common/paginator';
 import ProjectCard from './project-card';

@@ -15,7 +15,7 @@ import ReconnectingWebsocket from 'reconnecting-websocket';
 import {
   showGlobalLoadingMessage,
   hideGlobalLoading,
-} from '@devseed-ui/global-loading';
+} from '../components/common/global-loading';
 import { Button } from '@devseed-ui/button';
 import toasts from '../components/common/toasts';
 import { useAuth } from './auth';
