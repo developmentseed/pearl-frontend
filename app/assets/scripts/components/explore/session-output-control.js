@@ -30,7 +30,7 @@ import { useTour } from '../../context/explore';
 const Wrapper = styled.div`
   flex: 1;
   display: grid;
-  grid-template-columns: 1fr 1fr auto;
+  grid-template-columns: auto 1fr auto;
   grid-gap: ${glsp()};
   align-items: center;
   ${media.mediumDown`
@@ -40,6 +40,7 @@ const Wrapper = styled.div`
 
 const StatusHeading = styled(Heading)`
   font-size: 0.875rem;
+  text-align: center;
   span {
     font-weight: ${themeVal('type.base.weight')};
     color: ${themeVal('color.base')};
@@ -55,6 +56,7 @@ const ProjectHeading = styled.div`
   flex-flow: row nowrap;
   align-items: center;
   line-height: 1.5;
+  max-width: 14rem;
   p {
     font-size: 0.875rem;
     text-transform: uppercase;
