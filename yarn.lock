@@ -976,14 +976,6 @@
     "@devseed-ui/theme-provider" "^3.0.0"
     "@devseed-ui/typography" "1.0.0"
 
-"@devseed-ui/global-loading@^2.0.1":
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/@devseed-ui/global-loading/-/global-loading-2.0.1.tgz#ec9c09fe6c35dade7e93733730cf763dd4cd1be0"
-  integrity sha512-hAvGq4YagfTmUKN79kBOUQS4JrdrTaXJF1r1M8PeBSSgkzUVi3jPfNfmGi1g4F4c2+bplsKpbTIn6DBbuByy/Q==
-  dependencies:
-    "@devseed-ui/collecticons" "3.0.0"
-    "@devseed-ui/theme-provider" "^3.0.0"
-
 "@devseed-ui/modal@^3.0.1":
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/@devseed-ui/modal/-/modal-3.0.1.tgz#9a2b485e3da3e4225b6da740e404c26bc717d51d"

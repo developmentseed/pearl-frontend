@@ -11,7 +11,7 @@ import { useAuth } from './auth';
 import {
   showGlobalLoadingMessage,
   hideGlobalLoading,
-} from '@devseed-ui/global-loading';
+} from '../components/common/global-loading';
 import toasts from '../components/common/toasts';
 import { useHistory, useParams } from 'react-router-dom';
 import { actions as predictionActions, usePredictions } from './predictions';

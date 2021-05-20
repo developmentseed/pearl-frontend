@@ -14,9 +14,6 @@ const darkStyles = () => css`
     box-shadow: 0 0 32px 2px ${themeVal('color.baseDarkAlphaB')},
       0 16px 48px -16px ${themeVal('color.baseDarkAlphaD')} !important;
   }
-  [data-testid='global-loading'] {
-    background: ${themeVal('color.silkDark')} !important;
-  }
 `;
 
 export default createGlobalStyle`

@@ -1,11 +1,11 @@
 import React, { useState, useContext, useEffect } from 'react';
 import styled from 'styled-components';
 import T from 'prop-types';
-import copy from '../../utils/copy-text-to-clipboard';
+import copyTextToClipboard from '../../utils/copy-text-to-clipboard';
 import {
   showGlobalLoadingMessage,
   hideGlobalLoading,
-} from '@devseed-ui/global-loading';
+} from '../common/global-loading';
 import {
   Dropdown,
   DropdownHeader,
@@ -30,7 +30,7 @@ import { useTour } from '../../context/explore';
 const Wrapper = styled.div`
   flex: 1;
   display: grid;
-  grid-template-columns: 1fr 1fr auto;
+  grid-template-columns: auto 1fr auto;
   grid-gap: ${glsp()};
   align-items: center;
   ${media.mediumDown`
@@ -40,6 +40,7 @@ const Wrapper = styled.div`
 
 const StatusHeading = styled(Heading)`
   font-size: 0.875rem;
+  text-align: center;
   span {
     font-weight: ${themeVal('type.base.weight')};
     color: ${themeVal('color.base')};
@@ -55,6 +56,7 @@ const ProjectHeading = styled.div`
   flex-flow: row nowrap;
   align-items: center;
   line-height: 1.5;
+  max-width: 14rem;
   p {
     font-size: 0.875rem;
     text-transform: uppercase;
@@ -88,6 +90,31 @@ const HeadingInput = styled(FormInput)`
   font-weight: ${themeVal('type.heading.weight')};
 `;
 
+const FormInputGroup = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 2.125rem;
+  input {
+    display: none;
+    ${media.mediumUp`
+      display: revert;
+    `};
+  }
+  > :first-child:not(:last-child) {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  > :last-child:not(:first-child) {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+
+  .form__control::selection {
+    background-color: unset;
+    color: unset;
+  }
+`;
+
 function SessionOutputControl(props) {
   const { projectId } = useProjectId();
   const { projectName, isMediumDown } = props;
@@ -109,6 +136,7 @@ function SessionOutputControl(props) {
 
   const [localProjectName, setLocalProjectName] = useState(projectName);
   const [titleEditMode, setTitleEditMode] = useState(false);
+  const [exportShareURL, setExportShareURL] = useState(null);
   useEffect(() => setLocalProjectName(initialName), [initialName]);
 
   const handleSubmit = (evt) => {
@@ -138,7 +166,7 @@ function SessionOutputControl(props) {
     return;
   };
 
-  const copyTilesLink = async () => {
+  const createTilesLink = async () => {
     const projectId = currentProject.id;
     const aoiId = predictions.data?.aoiId || currentAoi.id;
     let share;
@@ -156,14 +184,18 @@ function SessionOutputControl(props) {
 
     hideGlobalLoading();
     const url = `${window.location.origin}/share/${share.uuid}/map`;
-    const copied = await copy(url);
-    if (copied) {
-      toasts.success('URL copied to clipboard');
-    } else {
-      toasts.error('Failed to copy to clipboard');
-    }
+    setExportShareURL(url);
   };
-
+  const copyTilesLink = () => {
+    copyTextToClipboard(exportShareURL).then((result) => {
+      if (result) {
+        toasts.success('URL copied to clipboard');
+      } else {
+        logger('Failed to copy', result);
+        toasts.error('Failed to copy URL to clipboard');
+      }
+    });
+  };
   const clearInput = () => {
     setLocalProjectName(initialName);
     setTitleEditMode(false);
@@ -264,6 +296,12 @@ function SessionOutputControl(props) {
       <Dropdown
         alignment='right'
         direction='down'
+        onChange={(isOpen) => {
+          // when dropdown closes, clear share URL value
+          if (!isOpen) {
+            setExportShareURL(null);
+          }
+        }}
         triggerElement={(props) => (
           <DropdownTrigger
             variation='primary-raised-dark'
@@ -281,7 +319,9 @@ function SessionOutputControl(props) {
         className='global__dropdown'
       >
         <>
-          <DropdownHeader>Export Options</DropdownHeader>
+          <DropdownHeader>
+            <p>Export Options</p>
+          </DropdownHeader>
           <DropdownBody>
             <li>
               <DropdownItem useIcon='download-2' onClick={downloadGeotiff}>
@@ -289,9 +329,32 @@ function SessionOutputControl(props) {
               </DropdownItem>
             </li>
             <li>
-              <DropdownItem useIcon='link' onClick={copyTilesLink}>
-                Copy link to online map
+              <DropdownItem
+                useIcon='link'
+                onClick={!exportShareURL ? createTilesLink : copyTilesLink}
+              >
+                {exportShareURL ? 'Copy Share URL' : 'Create Share URL'}
               </DropdownItem>
+              {exportShareURL && (
+                <DropdownItem nonhoverable={!exportShareURL}>
+                  <FormInputGroup>
+                    <FormInput
+                      readOnly
+                      value={exportShareURL}
+                      disabled={!exportShareURL}
+                      size='small'
+                    />
+                    <Button
+                      variation='primary-plain'
+                      useIcon='clipboard'
+                      hideText
+                      disabled={!exportShareURL}
+                      title='Copy link to clipboard'
+                      onClick={exportShareURL && copyTilesLink}
+                    />
+                  </FormInputGroup>
+                </DropdownItem>
+              )}
             </li>
           </DropdownBody>
         </>

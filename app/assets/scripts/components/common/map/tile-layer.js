@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useMap } from 'react-leaflet';
 import L from 'leaflet';
+import tBbox from '@turf/bbox';
 
 async function fetchImage(url, callback, headers, abort) {
   let _headers = {};
@@ -74,6 +75,14 @@ function TileLayerWithHeaders({
   useEffect(() => {
     if (layer) {
       layer.remove();
+    }
+
+    if (options.bounds) {
+      const [minX, minY, maxX, maxY] = tBbox(options.bounds);
+      options.bounds = [
+        [minY, minX],
+        [maxY, maxX],
+      ];
     }
     const l = L.tileLayer(url, options, headers);
 

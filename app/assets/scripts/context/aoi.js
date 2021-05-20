@@ -13,7 +13,7 @@ import { initialApiRequestState } from './reducers/reduxeed';
 import {
   showGlobalLoadingMessage,
   hideGlobalLoading,
-} from '@devseed-ui/global-loading';
+} from '../components/common/global-loading';
 import reverseGeoCode from '../utils/reverse-geocode';
 
 const AoiContext = createContext(null);
