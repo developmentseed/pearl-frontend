@@ -29,7 +29,6 @@ describe('Regular Polygon Draw', () => {
 
     cy.visit('/project/1');
 
-    // cy.get('[data-cy=session-status]').should('have.text', 'Loading...');
     cy.get('[data-cy=global-loading]').should('be.visible');
     cy.get('[data-cy=session-status]').should(
       'have.text',

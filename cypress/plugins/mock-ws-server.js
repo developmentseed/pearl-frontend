@@ -45,7 +45,7 @@ const wss = new WebSocket.Server({ port: 1999 });
 let queueStep = 0;
 let queue = [];
 
-console.log('server configured');
+console.log('WS mock server started');
 
 wss.on('connection', function connection(ws) {
   ws.on('message', function incoming(messageString) {
