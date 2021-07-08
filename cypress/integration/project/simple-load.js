@@ -1,4 +1,4 @@
-describe('Regular Polygon Draw', () => {
+describe('Simple Project Load', () => {
   beforeEach(() => {
     cy.startServer();
   });
