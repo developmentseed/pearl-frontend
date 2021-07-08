@@ -273,6 +273,7 @@ function SessionOutputControl(props) {
         )}
       </ProjectHeading>
       <StatusHeading
+        data-cy='session-status'
         variation={
           projectId === 'new' ||
           instance.gpuStatus === 'ready' ||

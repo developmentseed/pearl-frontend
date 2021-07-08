@@ -16,39 +16,5 @@
  * @type {Cypress.PluginConfig}
  */
 module.exports = () => {
-  const WebSocket = require('ws');
-
-  const wss = new WebSocket.Server({ port: 1999 });
-
-  let queueStep = 0;
-  let queue = [];
-
-  wss.on('connection', function connection(ws) {
-    ws.on('message', function incoming(messageString) {
-      // Handle ping/pong
-      if (messageString.indexOf('ping#') === 0) {
-        ws.send(`pong#${parseInt(messageString.split('#')[1])}`);
-      } else {
-        try {
-          const message = JSON.parse(messageString);
-          if (message.type === 'cy:set_queue') {
-            queue = message.messageQueue;
-            queueStep = 0;
-          } else if (queue[queueStep]) {
-            queue[queueStep].forEach((message) => {
-              ws.send(JSON.stringify(message));
-            });
-            queueStep += 1;
-          }
-        } catch (err) {
-          console.log(err);
-        }
-      }
-
-      console.log('WS received: %s', messageString);
-    });
-
-    // Send info#connect right away
-    ws.send(JSON.stringify({ message: 'info#connected' }));
-  });
+  require('./mock-ws-server');
 };

@@ -6,7 +6,7 @@ describe('Regular Polygon Draw', () => {
   it('successfully loads', () => {
     cy.fakeLogin();
     cy.mockRegularProject();
-    cy.mockWebsocket([
+    cy.setWsSequence([
       [
         {
           message: 'model#status',
@@ -28,5 +28,13 @@ describe('Regular Polygon Draw', () => {
     ]);
 
     cy.visit('/project/1');
+
+    // cy.get('[data-cy=session-status]').should('have.text', 'Loading...');
+    cy.get('[data-cy=global-loading]').should('be.visible');
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Ready to go'
+    );
+    cy.get('[data-cy=global-loading]').should('not.exist');
   });
 });
