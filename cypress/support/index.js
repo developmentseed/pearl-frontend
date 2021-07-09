@@ -15,5 +15,5 @@
 
 require('./commands/start-server');
 require('./commands/fake-login');
-require('./commands/regular-project');
+require('./commands/mock-regular-project');
 require('./commands/set-ws-sequence');
