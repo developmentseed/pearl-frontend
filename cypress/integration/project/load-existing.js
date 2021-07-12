@@ -30,7 +30,7 @@ describe('Load existing project', () => {
     cy.visit('/project/1');
     cy.get('[data-cy=session-status]').should(
       'have.text',
-      'Session Status: Ready to go'
+      'Session Status: Loading...'
     );
     cy.get('[data-cy=session-status]').should(
       'have.text',
