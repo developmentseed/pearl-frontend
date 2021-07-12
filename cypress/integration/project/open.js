@@ -1,4 +1,4 @@
-describe('Load existing project', () => {
+describe('Open existing project', () => {
   beforeEach(() => {
     cy.startServer();
   });
@@ -28,10 +28,6 @@ describe('Load existing project', () => {
     ]);
 
     cy.visit('/project/1');
-    cy.get('[data-cy=session-status]').should(
-      'have.text',
-      'Session Status: Loading...'
-    );
     cy.get('[data-cy=session-status]').should(
       'have.text',
       'Session Status: Ready to go'
