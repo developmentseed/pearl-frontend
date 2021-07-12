@@ -84,14 +84,74 @@ Cypress.Commands.add('mockRegularProject', () => {
     },
     {
       body: {
-        total: 1,
+        total: 2,
         project_id: 1,
         aois: [
           {
             id: 1,
-            name: 'A name',
-            created: '2021-03-18T18:42:42.224Z',
+            name: 'Seneca Rocks',
+            bookmarked: false,
+            bounds: {
+              type: 'Polygon',
+              coordinates: [
+                [
+                  [-79.389824867, 38.828040665],
+                  [-79.372229576, 38.828040665],
+                  [-79.372229576, 38.846058444],
+                  [-79.389824867, 38.846058444],
+                  [-79.389824867, 38.828040665],
+                ],
+              ],
+            },
+            created: '2021-04-30T18:11:51.705Z',
+            storage: false,
+            checkpoint_id: '1',
+            checkpoint_name: 'Seneca Rocks',
+            classes: [
+              { name: 'Water / Wetland', color: '#486DA2' },
+              { name: 'Emergent Wetlands', color: '#00A884' },
+              { name: 'Tree', color: '#6CA966' },
+              { name: 'Shrubland', color: '#ABC964' },
+              { name: 'Low Vegetation', color: '#D0F3AB' },
+              { name: 'Barren', color: '#D2AD74' },
+              { name: 'Structure', color: '#F10100' },
+              { name: 'Impervious Surface', color: '#BFB5B5' },
+              { name: 'Impervious Road', color: '#320000' },
+            ],
+            shares: [],
+          },
+          {
+            id: 2,
+            name: 'Seneca Rocks',
+            bookmarked: false,
+            bounds: {
+              type: 'Polygon',
+              coordinates: [
+                [
+                  [-79.389824867, 38.828040665],
+                  [-79.372229576, 38.828040665],
+                  [-79.372229576, 38.846058444],
+                  [-79.389824867, 38.846058444],
+                  [-79.389824867, 38.828040665],
+                ],
+              ],
+            },
+            created: '2021-04-30T18:05:26.309Z',
             storage: true,
+            checkpoint_id: '2',
+            checkpoint_name: 'Seneca Rocks',
+            classes: [
+              { name: 'Water / Wetland', color: '#486DA2' },
+              { name: 'Emergent Wetlands', color: '#00A884' },
+              { name: 'Tree', color: '#6CA966' },
+              { name: 'Shrubland', color: '#ABC964' },
+              { name: 'Low Vegetation', color: '#D0F3AB' },
+              { name: 'Barren', color: '#D2AD74' },
+              { name: 'Structure', color: '#F10100' },
+              { name: 'Impervious Surface', color: '#BFB5B5' },
+              { name: 'Impervious Road', color: '#320000' },
+            ],
+            shares: [],
           },
         ],
       },
@@ -104,16 +164,24 @@ Cypress.Commands.add('mockRegularProject', () => {
       path: '/api/project/1/checkpoint',
     },
     {
-      total: 1,
-      instance_id: 1,
+      total: 2,
+      project_id: 1,
       checkpoints: [
         {
-          id: 1,
+          id: 2,
           parent: 1,
-          name: 'Checkpoint Name',
+          name: 'Seneca Rocks',
+          created: '2021-04-30T18:11:51.509Z',
           storage: true,
-          created: '2021-03-18T18:42:42.224Z',
-          bookmarked: true,
+          bookmarked: false,
+        },
+        {
+          id: 1,
+          parent: null,
+          name: 'Seneca Rocks',
+          created: '2021-04-30T18:05:26.176Z',
+          storage: true,
+          bookmarked: false,
         },
       ],
     }
@@ -147,10 +215,14 @@ Cypress.Commands.add('mockRegularProject', () => {
     },
     {
       id: 1,
-      uid: 123,
+      project_id: 1,
+      aoi_id: 1,
+      checkpoint_id: 1,
+      last_update: '2021-07-12T09:59:04.442Z',
+      created: '2021-07-12T09:58:57.459Z',
       active: true,
-      created: '2021-03-18T18:42:42.224Z',
-      token: 'fake_token',
+      status: {},
+      token: 'a token',
     }
   );
 
@@ -211,6 +283,47 @@ Cypress.Commands.add('mockRegularProject', () => {
         { type: 'GeometryCollection', geometries: [] },
         { type: 'GeometryCollection', geometries: [] },
       ],
+    }
+  );
+
+  cy.intercept(
+    {
+      host: restApiEndpoint,
+      path: '/api/project/1/aoi/1',
+    },
+    {
+      id: 1,
+      name: 'Seneca Rocks',
+      created: '2021-04-30T18:05:26.309Z',
+      storage: true,
+      bookmarked: false,
+      project_id: 1,
+      checkpoint_id: 1,
+      patches: [],
+      classes: [
+        { name: 'Water / Wetland', color: '#486DA2' },
+        { name: 'Emergent Wetlands', color: '#00A884' },
+        { name: 'Tree', color: '#6CA966' },
+        { name: 'Shrubland', color: '#ABC964' },
+        { name: 'Low Vegetation', color: '#D0F3AB' },
+        { name: 'Barren', color: '#D2AD74' },
+        { name: 'Structure', color: '#F10100' },
+        { name: 'Impervious Surface', color: '#BFB5B5' },
+        { name: 'Impervious Road', color: '#320000' },
+      ],
+      bounds: {
+        type: 'Polygon',
+        coordinates: [
+          [
+            [-79.389824867, 38.828040665],
+            [-79.372229576, 38.828040665],
+            [-79.372229576, 38.846058444],
+            [-79.389824867, 38.846058444],
+            [-79.389824867, 38.828040665],
+          ],
+        ],
+      },
+      shares: [],
     }
   );
 });
