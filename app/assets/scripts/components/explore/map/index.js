@@ -144,7 +144,7 @@ function Map() {
           }
         }
         break;
-      case mapModes.ADD_SAMPLE_FREE_HAND:
+      case mapModes.ADD_SAMPLE_FREEHAND:
         if (currentCheckpoint && currentCheckpoint.activeItem) {
           mapRef.freehandDraw.enableAdd(currentCheckpoint.activeItem);
         }

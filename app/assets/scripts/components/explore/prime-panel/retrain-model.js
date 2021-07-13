@@ -54,7 +54,7 @@ function RetrainModel(props) {
             <Heading useAlt>Sample Selection Tools</Heading>
             <InfoButton
               variation={
-                mapState.mode === mapModes.ADD_SAMPLE_FREE_HAND
+                mapState.mode === mapModes.ADD_SAMPLE_POLYGON
                   ? 'primary-raised-dark'
                   : 'primary-plain'
               }
