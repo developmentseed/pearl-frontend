@@ -1,75 +1,92 @@
 /* eslint no-console: 0 */
+const isEqual = require('lodash.isequal');
 
 //
-// This a helper to mock WebSocket exchange between the client and API.
-// Unless it is a ping/pong message, the server doesn't analyse what was
-// send by the client, it will just respond by sending one or more messages
-// of the current batch in the message sequece defined by cy.setWsSequence(messageSequence).
+// This a plugin to mock WebSocket exchange between the client and API.
 //
-// An example:
+// It will setup a message workflow on the  websocket server that will
+// respond to the client using messages defined in a fixtures file.
 //
-// const batch1 = [
-//   {
-//     message: 'model#status',
-//     data: {
-//       is_aborting: false,
-//       processing: false,
-//       aoi: 631,
-//       checkpoint: 292,
-//     },
-//   },
-// ];
+// The following command will load file fixtures/websocket-workflow/retrain.json:
 //
-// const batch2 = [
-//   {
-//     message: 'model#checkpoint#progress',
-//     data: { checkpoint: 292, processed: 0, total: 1 },
-//   },
-//   { message: 'model#checkpoint#complete', data: { checkpoint: 292 } },
-// ];
+//   cy.setWebsocketWorkflow('retrain');
 //
-// const messageSequence = [batch1, batch2];
+// Please note the fixture file has to be defined manually in 'workflows' objects bellow.
 //
-// cy.setWsSequence(messageSequence)
+// After setting up the workflow, the server will:
 //
-// After every client message receibed, the mock server will send the current batch
-// messages in sequence, and wait move the pointer to the next batch.
-//
-// Ping/pong messages are not affected by this workflow.
+// - Respond to ping/pong messages
+// - Validate if client message follow expect order in fixture file and
+// log errors to console
+// - Send expected messages in sequence
 //
 
+// Load workflow fixtures
+const workflows = {
+  retrain: require('../fixtures/websocket-workflow/retrain.json'),
+};
+
+// Start websocket server
 const WebSocket = require('ws');
-
 const wss = new WebSocket.Server({ port: 1999 });
+console.log('WS mock server started');
 
-let queueStep = 0;
+// Init websocket messages queue
+let step = 0;
 let queue = [];
 
-console.log('WS mock server started');
+// Helper function to print queue
+function logQueue() {
+  console.log(`queue step: `, step);
+  console.log(queue);
+}
 
 wss.on('connection', function connection(ws) {
   ws.on('message', function incoming(messageString) {
-    // Handle ping/pong
+    console.log('WS received: %s', messageString);
+
+    // Keep ping/pong flow
     if (messageString.indexOf('ping#') === 0) {
       ws.send(`pong#${parseInt(messageString.split('#')[1])}`);
-    } else {
-      try {
-        const message = JSON.parse(messageString);
-        if (message.type === 'cy:set_message_sequence') {
-          queue = message.messageSequence;
-          queueStep = 0;
-        } else if (queue[queueStep]) {
-          queue[queueStep].forEach((message) => {
-            ws.send(JSON.stringify(message));
-          });
-          queueStep += 1;
-        }
-      } catch (err) {
-        console.log(err);
-      }
+      return;
     }
 
-    console.log('WS received: %s', messageString);
+    // Handle message and response
+    try {
+      // If not ping/pong, parse JSON
+      const message = JSON.parse(messageString);
+
+      // Sets expected WS messages sequence
+      if (message.type === 'cy:set_workflow') {
+        queue = workflows[message.data];
+        step = 0;
+        return;
+      }
+
+      // Validate received message and return expected messages to the client
+      if (!queue[step] || queue[step].type !== 'send') {
+        console.log('Unexpected websocket message type: ', messageString);
+        logQueue();
+      }
+
+      if (!isEqual(queue[step].data, message.data)) {
+        console.log('Unexpected websocket message data: ', messageString);
+        logQueue();
+      }
+
+      // Update counter
+      step += 1;
+
+      // Send next if type is 'send'
+      while (queue[step] && queue[step].type === 'receive') {
+        ws.send(JSON.stringify(queue[step].data));
+        step += 1;
+      }
+    } catch (err) {
+      // Check errors
+      console.log(err); // eslint-disable
+      expect(err).to.not.exist();
+    }
   });
 
   // Send info#connect right away

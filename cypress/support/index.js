@@ -16,4 +16,4 @@
 require('./commands/start-server');
 require('./commands/fake-login');
 require('./commands/mock-regular-project');
-require('./commands/set-ws-sequence');
+require('./commands/set-websocket-workflow');
