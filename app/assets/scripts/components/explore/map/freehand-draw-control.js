@@ -1,7 +1,7 @@
 import L from 'leaflet';
 import 'leaflet-freehandshapes';
 
-class PolygonDrawControl {
+class FreehandDrawControl {
   constructor(map, events) {
     this._map = map;
 
@@ -132,7 +132,7 @@ class PolygonDrawControl {
       }
     });
     if (!present) {
-      throw new Error(`${layerName} not present in PolygonDraw Group.`);
+      throw new Error(`${layerName} not present in FreehandDraw Group.`);
     }
   }
 
@@ -160,4 +160,4 @@ class PolygonDrawControl {
   }
 }
 
-export default PolygonDrawControl;
+export default FreehandDrawControl;

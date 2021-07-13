@@ -126,7 +126,7 @@ function RefineModel(props) {
                       key={c.id}
                       onClick={() => {
                         if (!currentCheckpoint.checkpointBrushes[id]) {
-                          mapRef.polygonDraw.addLayer({
+                          mapRef.freehandDraw.addLayer({
                             name: id,
                             color: '#efefef',
                           });

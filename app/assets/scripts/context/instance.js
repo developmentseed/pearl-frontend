@@ -642,7 +642,7 @@ export function InstanceProvider(props) {
       });
 
       // Clear samples from the checkpoint object
-      // Prime panel calls mapRef.polygonDraw.clearLayers()
+      // Prime panel calls mapRef.freehandDraw.clearLayers()
       dispatchCurrentCheckpoint({
         type: checkpointActions.CLEAR_SAMPLES,
       });

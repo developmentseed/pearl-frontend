@@ -45,7 +45,7 @@ function PrimeButton({ currentCheckpoint, allowInferenceRun, mapRef }) {
         }}
         onClick={() => {
           refine();
-          mapRef.polygonDraw.clearLayers();
+          mapRef.freehandDraw.clearLayers();
         }}
         id='save-refine'
       >
@@ -70,7 +70,7 @@ function PrimeButton({ currentCheckpoint, allowInferenceRun, mapRef }) {
       onClick={
         !currentCheckpoint || currentCheckpoint.mode === checkpointModes.RUN
           ? runInference
-          : () => retrain() && mapRef.polygonDraw.clearLayers()
+          : () => retrain() && mapRef.freehandDraw.clearLayers()
       }
       visuallyDisabled={!allowInferenceRun}
       id='apply-button-trigger'
@@ -122,7 +122,7 @@ function Footer(props) {
           dispatchCurrentCheckpoint({
             type: checkpointActions.CLEAR_SAMPLES,
           });
-          mapRef.polygonDraw.clearLayers();
+          mapRef.freehandDraw.clearLayers();
         }}
       >
         Clear
@@ -142,7 +142,7 @@ function Footer(props) {
 
           const latest =
             currentCheckpoint.history[currentCheckpoint.history.length - 1];
-          mapRef.polygonDraw.setLayerPolygons({
+          mapRef.freehandDraw.setLayerPolygons({
             ...latest.classes,
             ...latest.checkpointBrushes,
           });
