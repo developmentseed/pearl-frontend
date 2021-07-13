@@ -334,7 +334,7 @@ function Map() {
             // makes map accessible in console for debugging
             window.map = m;
             if (window.Cypress) {
-              window.Cypress.map = m
+              window.Cypress.map = m;
             }
           }
         }}
