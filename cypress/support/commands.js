@@ -1,6 +1,7 @@
 const {
   restApiEndpoint,
 } = require('../../app/assets/scripts/config/testing').default;
+const bingApi = 'https://dev.virtualearth.net/';
 
 const FAKE_API_TOKEN = 'FAKE_API_TOKEN';
 
@@ -31,6 +32,21 @@ Cypress.Commands.add('fakeLogin', () => {
  * Stub network requests
  */
 Cypress.Commands.add('startServer', () => {
+  cy.intercept(
+    {
+      url:
+        'https://dev.virtualearth.net/REST/v1/Locations/38.89497406962095,-77.01622009277345?*',
+    },
+    { fixture: 'geocoder/dc.json' }
+  );
+  cy.intercept(
+    {
+      url:
+        'https://dev.virtualearth.net/REST/v1/Locations/-77.78531879383951,40.350980758667?*',
+    },
+    { fixture: 'geocoder/rurual.json' }
+  );
+
   // GET /health
   cy.intercept(
     {

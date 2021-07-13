@@ -78,6 +78,7 @@ export function AoiEditButtons(props) {
           }}
           title='Set Area of Interest'
           useIcon='tick'
+          data-cy='aoi-edit-confirm-button'
         >
           Select AOI
         </EditButton>
@@ -112,6 +113,7 @@ export function AoiEditButtons(props) {
             }
           }}
           useIcon='xmark'
+          data-cy='aoi-edit-cancel-button'
         >
           Select AOI
         </EditButton>
@@ -187,6 +189,7 @@ export function AoiEditButtons(props) {
       title='Draw Area of Interest'
       id='edit-aoi-trigger'
       useIcon='pencil'
+      data-cy='aoi-edit-button'
     >
       Select AOI
     </EditButton>
