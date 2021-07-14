@@ -84,8 +84,7 @@ wss.on('connection', function connection(ws) {
       }
     } catch (err) {
       // Check errors
-      console.log(err); // eslint-disable
-      expect(err).to.not.exist();
+      console.log(err);
     }
   });
 

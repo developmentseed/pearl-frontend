@@ -42,6 +42,7 @@ import {
 } from '../../../context/predictions';
 import toasts from '../../common/toasts';
 import logger from '../../../utils/logger';
+import PolygonDrawControl from './polygon-draw-control';
 
 const center = [38.889805, -77.009056];
 const zoom = 12;
@@ -142,6 +143,12 @@ function Map() {
               mapRef.fitBounds(aoiRef.getBounds(), { padding: BOUNDS_PADDING });
             }
           }
+        }
+        break;
+      case mapModes.ADD_SAMPLE_POLYGON:
+        if (currentCheckpoint && currentCheckpoint.activeItem) {
+          mapRef.freehandDraw.disable();
+          mapRef.polygonDraw.enable(currentCheckpoint.activeItem);
         }
         break;
       case mapModes.ADD_SAMPLE_FREEHAND:
@@ -326,6 +333,8 @@ function Map() {
           });
 
           m.freehandDraw = freehandDraw;
+
+          m.polygonDraw = new PolygonDrawControl(m);
 
           // Add map to state
           setMapRef(m);
