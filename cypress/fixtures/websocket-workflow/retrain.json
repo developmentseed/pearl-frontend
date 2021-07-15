@@ -1,11 +1,11 @@
 [
   {
     "type": "send",
-    "data": { "action": "model#status" }
+    "payload": { "action": "model#status" }
   },
   {
     "type": "receive",
-    "data": {
+    "payload": {
       "message": "model#status",
       "data": {
         "is_aborting": false,
@@ -17,7 +17,7 @@
   },
   {
     "type": "send",
-    "data": {
+    "payload": {
       "action": "model#prediction",
       "data": {
         "name": "Downtown Washington DC",
@@ -38,19 +38,19 @@
   },
   {
     "type": "receive",
-    "data": {
+    "payload": {
       "message": "model#checkpoint",
       "data": { "name": "Downtown Washington DC", "id": 2015 }
     }
   },
   {
     "type": "send",
-    "data": { "action": "model#status" }
+    "payload": { "action": "model#status" }
   },
 
   {
     "type": "receive",
-    "data": {
+    "payload": {
       "message": "model#aoi",
       "data": {
         "id": 2859,
@@ -69,7 +69,7 @@
   },
   {
     "type": "receive",
-    "data": {
+    "payload": {
       "message": "model#status",
       "data": {
         "is_aborting": false,
@@ -82,7 +82,7 @@
 
   {
     "type": "receive",
-    "data": {
+    "payload": {
       "message": "model#prediction",
       "data": {
         "aoi": 2859,
@@ -103,7 +103,7 @@
   },
   {
     "type": "receive",
-    "data": {
+    "payload": {
       "message": "model#prediction",
       "data": {
         "aoi": 2859,
@@ -125,7 +125,7 @@
 
   {
     "type": "receive",
-    "data": {
+    "payload": {
       "message": "model#prediction",
       "data": {
         "aoi": 2859,
@@ -147,7 +147,7 @@
 
   {
     "type": "receive",
-    "data": {
+    "payload": {
       "message": "model#prediction",
       "data": {
         "aoi": 2859,
@@ -168,7 +168,7 @@
   },
   {
     "type": "receive",
-    "data": {
+    "payload": {
       "message": "model#prediction",
       "data": {
         "aoi": 2859,
@@ -189,7 +189,7 @@
   },
   {
     "type": "receive",
-    "data": {
+    "payload": {
       "message": "model#prediction",
       "data": {
         "aoi": 2859,
@@ -210,18 +210,18 @@
   },
   {
     "type": "receive",
-    "data": {
+    "payload": {
       "message": "model#prediction#complete",
       "data": { "aoi": 2859 }
     }
   },
   {
     "type": "send",
-    "data": { "action": "model#status" }
+    "payload": { "action": "model#status" }
   },
   {
     "type": "receive",
-    "data": {
+    "payload": {
       "message": "model#status",
       "data": {
         "is_aborting": false,

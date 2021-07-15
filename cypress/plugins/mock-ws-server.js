@@ -26,65 +26,61 @@ const workflows = {
   retrain: require('../fixtures/websocket-workflow/retrain.json'),
 };
 
-// Start websocket server
-const WebSocket = require('ws');
-const wss = new WebSocket.Server({ port: 1999 });
-console.log('WS mock server started');
-
 // Init websocket messages queue
 let step = 0;
 let queue = [];
 
-// Helper function to print queue
-function logQueue() {
-  console.log(`queue step: `, step);
-  console.log(queue);
-}
+// Start websocket server
+const WebSocket = require('ws');
+const wss = new WebSocket.Server({ port: 1999 });
+console.log('Cypress websocket: server started.');
 
+// Setup listeners
 wss.on('connection', function connection(ws) {
+  console.log('Cypress websocket: client connected.');
   ws.on('message', function incoming(messageString) {
-    console.log('WS received: %s', messageString);
-
     // Keep ping/pong flow
     if (messageString.indexOf('ping#') === 0) {
       ws.send(`pong#${parseInt(messageString.split('#')[1])}`);
       return;
     }
 
-    // Handle message and response
-    try {
-      // If not ping/pong, parse JSON
-      const message = JSON.parse(messageString);
+    // Print message
+    console.log(`Workflow step ${step + 1}/${queue.length}`);
 
-      // Sets expected WS messages sequence
-      if (message.type === 'cy:set_workflow') {
-        queue = workflows[message.data];
-        step = 0;
-        return;
-      }
+    // Parse message payload
+    const message = JSON.parse(messageString);
 
-      // Validate received message and return expected messages to the client
-      if (!queue[step] || queue[step].type !== 'send') {
-        console.log('Unexpected websocket message type: ', messageString);
-        logQueue();
-      }
+    // Internal cypress message to set the workflow
+    if (message.type === 'cy:set_workflow') {
+      queue = workflows[message.data];
+      step = 0;
+      return;
+    }
 
-      if (!isEqual(queue[step].data, message.data)) {
-        console.log('Unexpected websocket message data: ', messageString);
-        logQueue();
-      }
+    // Check if workflow ended
+    if (!queue[step]) {
+      console.log(
+        '  Message sent by client after workflow ended: ',
+        messageString
+      );
+      return;
+    }
 
-      // Update counter
+    // Check if payload is expected
+    if (!isEqual(queue[step].payload, message)) {
+      console.log('Unexpected websocket message data:');
+      console.log('  Expected: ', JSON.stringify(queue[step].payload));
+      console.log('  Received: ', JSON.stringify(message));
+    }
+
+    // Update step counter
+    step = step + 1;
+
+    // Send next if type is 'send'
+    while (queue[step] && queue[step].type === 'receive') {
+      ws.send(JSON.stringify(queue[step].payload));
       step += 1;
-
-      // Send next if type is 'send'
-      while (queue[step] && queue[step].type === 'receive') {
-        ws.send(JSON.stringify(queue[step].data));
-        step += 1;
-      }
-    } catch (err) {
-      // Check errors
-      console.log(err);
     }
   });
 
