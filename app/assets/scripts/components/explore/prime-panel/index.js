@@ -112,7 +112,7 @@ function PrimePanel() {
       mapModes.BROWSE_MODE,
       mapModes.ADD_CLASS_SAMPLES,
       mapModes.ADD_SAMPLE_POINT,
-      mapModes.ADD_SAMPLE_POLYGON,
+      mapModes.ADD_SAMPLE_FREE_HAND,
       mapModes.REMOVE_SAMPLE,
     ].includes(mapState.mode) &&
     typeof aoiRef !== 'undefined' &&

@@ -54,7 +54,7 @@ function RetrainModel(props) {
             <Heading useAlt>Sample Selection Tools</Heading>
             <InfoButton
               variation={
-                mapState.mode === mapModes.ADD_SAMPLE_POLYGON
+                mapState.mode === mapModes.ADD_SAMPLE_FREE_HAND
                   ? 'primary-raised-dark'
                   : 'primary-plain'
               }
@@ -65,7 +65,7 @@ function RetrainModel(props) {
               info={!currentCheckpoint.activeItem && 'No active item selected'}
               onClick={() => {
                 if (currentCheckpoint.activeItem) {
-                  setMapMode(mapModes.ADD_SAMPLE_POLYGON);
+                  setMapMode(mapModes.ADD_SAMPLE_FREE_HAND);
                 }
               }}
             >

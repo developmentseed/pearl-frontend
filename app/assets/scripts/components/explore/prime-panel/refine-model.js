@@ -70,7 +70,7 @@ function RefineModel(props) {
             <Heading useAlt>Refinement Tools</Heading>
             <InfoButton
               variation={
-                mapState.mode === mapModes.ADD_SAMPLE_POLYGON
+                mapState.mode === mapModes.ADD_SAMPLE_FREE_HAND
                   ? 'primary-raised-dark'
                   : 'primary-plain'
               }
@@ -81,7 +81,7 @@ function RefineModel(props) {
               info={!currentCheckpoint.activeItem && 'No active item selected'}
               onClick={() => {
                 if (currentCheckpoint.activeItem) {
-                  setMapMode(mapModes.ADD_SAMPLE_POLYGON);
+                  setMapMode(mapModes.ADD_SAMPLE_FREE_HAND);
                 }
               }}
             >
