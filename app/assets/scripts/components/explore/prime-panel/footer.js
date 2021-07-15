@@ -58,9 +58,10 @@ function PrimeButton({ currentCheckpoint, allowInferenceRun, mapRef }) {
     !currentCheckpoint || !currentCheckpoint.parent
       ? 'Run model'
       : 'Run checkpoint';
+
   return (
     <InfoButton
-      data-cy={allowInferenceRun ? 'run-model-button' : 'disabled'}
+      data-cy='run-button'
       variation='primary-raised-dark'
       size='medium'
       useIcon='tick--small'
