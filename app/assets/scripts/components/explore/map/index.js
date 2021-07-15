@@ -144,7 +144,7 @@ function Map() {
           }
         }
         break;
-      case mapModes.ADD_SAMPLE_POLYGON:
+      case mapModes.ADD_SAMPLE_FREE_HAND:
         if (currentCheckpoint && currentCheckpoint.activeItem) {
           mapRef.polygonDraw.enableAdd(currentCheckpoint.activeItem);
         }

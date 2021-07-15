@@ -96,7 +96,8 @@
     "through2": "^4.0.2",
     "vinyl-buffer": "^1.0.1",
     "vinyl-source-stream": "^2.0.0",
-    "watchify": "^3.11.1"
+    "watchify": "^3.11.1",
+    "ws": "^7.5.2"
   },
   "dependencies": {
     "@auth0/auth0-react": "^1.2.0",

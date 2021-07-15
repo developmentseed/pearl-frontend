@@ -114,3 +114,4 @@ tmp
 dist
 cypress/**/*.mp4
 cypress.env.json
+cypress/fixtures/example.json
