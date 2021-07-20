@@ -1,22 +1,95 @@
 [
   {
-    "type": "send",
+    "type": "server",
+    "payload": { "message": "info#connected" }
+  },
+  {
+    "type": "client",
     "payload": { "action": "model#status" }
   },
   {
-    "type": "receive",
+    "type": "server",
     "payload": {
       "message": "model#status",
       "data": {
         "is_aborting": false,
         "processing": false,
-        "aoi": false,
-        "checkpoint": false
+        "aoi": 1,
+        "checkpoint": 1
       }
     }
   },
   {
-    "type": "send",
+    "type": "client",
+    "payload": {
+      "action": "model#retrain",
+      "data": {
+        "name": "Area #1",
+        "classes": [
+          {
+            "name": "Water / Wetland",
+            "color": "#486DA2",
+            "geometry": {
+              "type": "GeometryCollection",
+              "geometries": [
+                { "type": "MultiPoint", "coordinates": [] },
+                {
+                  "type": "Polygon",
+                  "coordinates": [
+                    [
+                      [-79.387658, 38.843585],
+                      [-79.388022, 38.843652],
+                      [-79.388258, 38.843786],
+                      [-79.388344, 38.843886],
+                      [-79.388344, 38.844237],
+                      [-79.388258, 38.844939],
+                      [-79.388173, 38.845457],
+                      [-79.387336, 38.846643],
+                      [-79.387057, 38.846643],
+                      [-79.385684, 38.846426],
+                      [-79.385147, 38.846159],
+                      [-79.384933, 38.845858],
+                      [-79.384933, 38.845574],
+                      [-79.385469, 38.844588],
+                      [-79.386199, 38.844003],
+                      [-79.387057, 38.843702],
+                      [-79.387658, 38.843585]
+                    ]
+                  ]
+                }
+              ]
+            }
+          },
+          {
+            "name": "Tree",
+            "color": "#6CA966",
+            "geometry": {
+              "type": "GeometryCollection",
+              "geometries": [{ "type": "MultiPoint", "coordinates": [] }]
+            }
+          },
+          {
+            "name": "Low Vegetation / Barren",
+            "color": "#D0F3AB",
+            "geometry": {
+              "type": "GeometryCollection",
+              "geometries": [{ "type": "MultiPoint", "coordinates": [] }]
+            }
+          },
+          {
+            "name": "Built Environment",
+            "color": "#BFB5B5",
+            "geometry": {
+              "type": "GeometryCollection",
+              "geometries": [{ "type": "MultiPoint", "coordinates": [] }]
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "client",
     "payload": {
       "action": "model#prediction",
       "data": {
@@ -37,26 +110,26 @@
     }
   },
   {
-    "type": "receive",
+    "type": "server",
     "payload": {
       "message": "model#checkpoint",
-      "data": { "name": "Downtown Washington DC", "id": 2015 }
+      "data": { "name": "Downtown Washington DC", "id": 2 }
     }
   },
   {
-    "type": "send",
+    "type": "client",
     "payload": { "action": "model#status" }
   },
 
   {
-    "type": "receive",
+    "type": "server",
     "payload": {
       "message": "model#aoi",
       "data": {
-        "id": 2859,
+        "id": 1,
         "live": true,
         "name": "Downtown Washington DC",
-        "checkpoint_id": 2015,
+        "checkpoint_id": 2,
         "bounds": [
           -77.047119140625,
           38.89958342598271,
@@ -68,24 +141,24 @@
     }
   },
   {
-    "type": "receive",
+    "type": "server",
     "payload": {
       "message": "model#status",
       "data": {
         "is_aborting": false,
         "processing": true,
-        "aoi": 2859,
-        "checkpoint": 2015
+        "aoi": 1,
+        "checkpoint": 2
       }
     }
   },
 
   {
-    "type": "receive",
+    "type": "server",
     "payload": {
       "message": "model#prediction",
       "data": {
-        "aoi": 2859,
+        "aoi": 1,
         "bounds": [
           -77.047119140625,
           38.901720914997945,
@@ -102,11 +175,11 @@
     }
   },
   {
-    "type": "receive",
+    "type": "server",
     "payload": {
       "message": "model#prediction",
       "data": {
-        "aoi": 2859,
+        "aoi": 1,
         "bounds": [
           -77.047119140625,
           38.89958342598271,
@@ -124,11 +197,11 @@
   },
 
   {
-    "type": "receive",
+    "type": "server",
     "payload": {
       "message": "model#prediction",
       "data": {
-        "aoi": 2859,
+        "aoi": 1,
         "bounds": [
           -77.04437255859375,
           38.901720914997945,
@@ -146,11 +219,11 @@
   },
 
   {
-    "type": "receive",
+    "type": "server",
     "payload": {
       "message": "model#prediction",
       "data": {
-        "aoi": 2859,
+        "aoi": 1,
         "bounds": [
           -77.04437255859375,
           38.89958342598271,
@@ -167,11 +240,11 @@
     }
   },
   {
-    "type": "receive",
+    "type": "server",
     "payload": {
       "message": "model#prediction",
       "data": {
-        "aoi": 2859,
+        "aoi": 1,
         "bounds": [
           -77.0416259765625,
           38.901720914997945,
@@ -188,11 +261,11 @@
     }
   },
   {
-    "type": "receive",
+    "type": "server",
     "payload": {
       "message": "model#prediction",
       "data": {
-        "aoi": 2859,
+        "aoi": 1,
         "bounds": [
           -77.0416259765625,
           38.89958342598271,
@@ -209,25 +282,25 @@
     }
   },
   {
-    "type": "receive",
+    "type": "server",
     "payload": {
       "message": "model#prediction#complete",
-      "data": { "aoi": 2859 }
+      "data": { "aoi": 1 }
     }
   },
   {
-    "type": "send",
+    "type": "client",
     "payload": { "action": "model#status" }
   },
   {
-    "type": "receive",
+    "type": "server",
     "payload": {
       "message": "model#status",
       "data": {
         "is_aborting": false,
         "processing": false,
-        "aoi": 2859,
-        "checkpoint": 2015
+        "aoi": 1,
+        "checkpoint": 2
       }
     }
   }

@@ -3,7 +3,7 @@ const {
 } = require('../../../app/assets/scripts/config/testing').default;
 
 /**
- * Mock a regular project
+ * Mock a project scenario: an instance is running with checkpoint 2 and AOI 2 applied.
  */
 Cypress.Commands.add('mockRegularProject', () => {
   cy.intercept(
@@ -86,7 +86,7 @@ Cypress.Commands.add('mockRegularProject', () => {
           {
             id: 1,
             name: 'Seneca Rocks',
-            bookmarked: false,
+            bookmarked: true,
             bounds: {
               type: 'Polygon',
               coordinates: [
@@ -119,7 +119,7 @@ Cypress.Commands.add('mockRegularProject', () => {
           {
             id: 2,
             name: 'Seneca Rocks',
-            bookmarked: false,
+            bookmarked: true,
             bounds: {
               type: 'Polygon',
               coordinates: [
@@ -168,7 +168,7 @@ Cypress.Commands.add('mockRegularProject', () => {
           name: 'Seneca Rocks',
           created: '2021-04-30T18:11:51.509Z',
           storage: true,
-          bookmarked: false,
+          bookmarked: true,
         },
         {
           id: 1,
@@ -176,7 +176,7 @@ Cypress.Commands.add('mockRegularProject', () => {
           name: 'Seneca Rocks',
           created: '2021-04-30T18:05:26.176Z',
           storage: true,
-          bookmarked: false,
+          bookmarked: true,
         },
       ],
     }
@@ -195,7 +195,7 @@ Cypress.Commands.add('mockRegularProject', () => {
           uid: 123,
           active: true,
           created: '2021-03-18T18:42:42.224Z',
-          token: '<instance token>',
+          token: 'app_client',
         },
       ],
     }
@@ -209,13 +209,13 @@ Cypress.Commands.add('mockRegularProject', () => {
     {
       id: 1,
       project_id: 1,
-      aoi_id: 1,
-      checkpoint_id: 1,
+      aoi_id: 2,
+      checkpoint_id: 2,
       last_update: '2021-07-12T09:59:04.442Z',
       created: '2021-07-12T09:58:57.459Z',
       active: true,
       status: {},
-      token: 'a token',
+      token: 'app_client',
     }
   );
 
@@ -280,6 +280,65 @@ Cypress.Commands.add('mockRegularProject', () => {
 
   cy.intercept(
     {
+      url: restApiEndpoint + '/api/project/1/checkpoint/2',
+    },
+    {
+      id: 2,
+      project_id: 1,
+      parent: 1,
+      name: 'Seneca Rocks',
+      bookmarked: true,
+      classes: [
+        { name: 'Water / Wetland', color: '#486DA2' },
+        { name: 'Emergent Wetlands', color: '#00A884' },
+        { name: 'Tree', color: '#6CA966' },
+        { name: 'Shrubland', color: '#ABC964' },
+        { name: 'Low Vegetation', color: '#D0F3AB' },
+        { name: 'Barren', color: '#D2AD74' },
+        { name: 'Structure', color: '#F10100' },
+        { name: 'Impervious Surface', color: '#BFB5B5' },
+        { name: 'Impervious Road', color: '#320000' },
+      ],
+      created: '2021-04-30T18:05:26.176Z',
+      storage: true,
+      analytics: [
+        { counts: 50, f1score: 1, percent: 0 },
+        { counts: 0, f1score: 0, percent: 0 },
+        { counts: 0, f1score: 0, percent: 0 },
+        { counts: 0, f1score: 0, percent: 0 },
+        { counts: 0, f1score: 0, percent: 0 },
+        { counts: 0, f1score: 0, percent: 0 },
+        { counts: 0, f1score: 0, percent: 0 },
+        { counts: 0, f1score: 0, percent: 0 },
+        { counts: 0, f1score: 0, percent: 0 },
+      ],
+      retrain_geoms: [
+        { type: 'MultiPoint', coordinates: [] },
+        { type: 'MultiPoint', coordinates: [] },
+        { type: 'MultiPoint', coordinates: [] },
+        { type: 'MultiPoint', coordinates: [] },
+        { type: 'MultiPoint', coordinates: [] },
+        { type: 'MultiPoint', coordinates: [] },
+        { type: 'MultiPoint', coordinates: [] },
+        { type: 'MultiPoint', coordinates: [] },
+        { type: 'MultiPoint', coordinates: [] },
+      ],
+      input_geoms: [
+        { type: 'GeometryCollection', geometries: [] },
+        { type: 'GeometryCollection', geometries: [] },
+        { type: 'GeometryCollection', geometries: [] },
+        { type: 'GeometryCollection', geometries: [] },
+        { type: 'GeometryCollection', geometries: [] },
+        { type: 'GeometryCollection', geometries: [] },
+        { type: 'GeometryCollection', geometries: [] },
+        { type: 'GeometryCollection', geometries: [] },
+        { type: 'GeometryCollection', geometries: [] },
+      ],
+    }
+  );
+
+  cy.intercept(
+    {
       url: restApiEndpoint + '/api/project/1/aoi/1',
     },
     {
@@ -289,7 +348,7 @@ Cypress.Commands.add('mockRegularProject', () => {
       storage: true,
       bookmarked: false,
       project_id: 1,
-      checkpoint_id: 1,
+      checkpoint_id: '1',
       patches: [],
       classes: [
         { name: 'Water / Wetland', color: '#486DA2' },
@@ -316,5 +375,76 @@ Cypress.Commands.add('mockRegularProject', () => {
       },
       shares: [],
     }
+  );
+
+  cy.intercept(
+    {
+      url: restApiEndpoint + '/api/project/1/aoi/2',
+    },
+    {
+      id: 1,
+      name: 'Seneca Rocks',
+      created: '2021-04-30T18:05:26.309Z',
+      storage: true,
+      bookmarked: true,
+      project_id: 1,
+      checkpoint_id: '1',
+      patches: [],
+      classes: [
+        { name: 'Water / Wetland', color: '#486DA2' },
+        { name: 'Emergent Wetlands', color: '#00A884' },
+        { name: 'Tree', color: '#6CA966' },
+        { name: 'Shrubland', color: '#ABC964' },
+        { name: 'Low Vegetation', color: '#D0F3AB' },
+        { name: 'Barren', color: '#D2AD74' },
+        { name: 'Structure', color: '#F10100' },
+        { name: 'Impervious Surface', color: '#BFB5B5' },
+        { name: 'Impervious Road', color: '#320000' },
+      ],
+      bounds: {
+        type: 'Polygon',
+        coordinates: [
+          [
+            [-79.389824867, 38.828040665],
+            [-79.372229576, 38.828040665],
+            [-79.372229576, 38.846058444],
+            [-79.389824867, 38.846058444],
+            [-79.389824867, 38.828040665],
+          ],
+        ],
+      },
+      shares: [],
+    }
+  );
+
+  cy.intercept(
+    {
+      url: restApiEndpoint + '/api/project/1/aoi/1/tiles',
+    },
+    {
+      tilejson: '2.2.0',
+      name: 'aoi-1',
+      version: '1.0.0',
+      schema: 'xyz',
+      tiles: [
+        '/api/project/1/aoi/1/tiles/{z}/{x}/{y}?colormap=%7B%220%22%3A%22%23486DA2%22%2C%221%22%3A%22%236CA966%22%2C%222%22%3A%22%23D0F3AB%22%2C%223%22%3A%22%23BFB5B5%22%7D',
+      ],
+      minzoom: 15,
+      maxzoom: 17,
+      bounds: [
+        -77.04711914062497,
+        38.89744587262309,
+        -77.03613281249997,
+        38.90385833966774,
+      ],
+      center: [-77.04162597656247, 38.900652106145415, 15],
+    }
+  );
+
+  cy.intercept(
+    {
+      url: restApiEndpoint + '/api/project/1/aoi/1/tiles/**',
+    },
+    { fixture: 'tiles/png-tile.png' }
   );
 });
