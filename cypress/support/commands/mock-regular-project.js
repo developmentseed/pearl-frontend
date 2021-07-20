@@ -8,8 +8,7 @@ const {
 Cypress.Commands.add('mockRegularProject', () => {
   cy.intercept(
     {
-      host: restApiEndpoint,
-      path: '/api/model',
+      url: restApiEndpoint + '/api/model',
     },
     {
       body: {
@@ -29,8 +28,7 @@ Cypress.Commands.add('mockRegularProject', () => {
 
   cy.intercept(
     {
-      host: restApiEndpoint,
-      path: '/api/project/1',
+      url: restApiEndpoint + '/api/project/1',
     },
     {
       body: {
@@ -45,8 +43,7 @@ Cypress.Commands.add('mockRegularProject', () => {
 
   cy.intercept(
     {
-      host: restApiEndpoint,
-      path: '/api/model/1',
+      url: restApiEndpoint + '/api/model/1',
     },
     {
       body: {
@@ -79,8 +76,7 @@ Cypress.Commands.add('mockRegularProject', () => {
 
   cy.intercept(
     {
-      host: restApiEndpoint,
-      path: '/api/project/1/aoi',
+      url: restApiEndpoint + '/api/project/1/aoi',
     },
     {
       body: {
@@ -160,8 +156,7 @@ Cypress.Commands.add('mockRegularProject', () => {
 
   cy.intercept(
     {
-      host: restApiEndpoint,
-      path: '/api/project/1/checkpoint',
+      url: restApiEndpoint + '/api/project/1/checkpoint',
     },
     {
       total: 2,
@@ -190,8 +185,7 @@ Cypress.Commands.add('mockRegularProject', () => {
   // An instance is running
   cy.intercept(
     {
-      host: restApiEndpoint,
-      path: '/api/project/1/instance/?status=active',
+      url: restApiEndpoint + '/api/project/1/instance/?status=active',
     },
     {
       total: 1,
@@ -210,8 +204,7 @@ Cypress.Commands.add('mockRegularProject', () => {
   // Get instance details
   cy.intercept(
     {
-      host: restApiEndpoint,
-      path: '/api/project/1/instance/1',
+      url: restApiEndpoint + '/api/project/1/instance/1',
     },
     {
       id: 1,
@@ -228,8 +221,7 @@ Cypress.Commands.add('mockRegularProject', () => {
 
   cy.intercept(
     {
-      host: restApiEndpoint,
-      path: '/api/project/1/checkpoint/1',
+      url: restApiEndpoint + '/api/project/1/checkpoint/1',
     },
     {
       id: 1,
@@ -288,8 +280,7 @@ Cypress.Commands.add('mockRegularProject', () => {
 
   cy.intercept(
     {
-      host: restApiEndpoint,
-      path: '/api/project/1/aoi/1',
+      url: restApiEndpoint + '/api/project/1/aoi/1',
     },
     {
       id: 1,
