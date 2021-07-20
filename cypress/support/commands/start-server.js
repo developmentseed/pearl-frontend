@@ -33,4 +33,19 @@ Cypress.Commands.add('startServer', () => {
     },
     { mosaics: ['naip.latest'] }
   );
+
+  cy.intercept(
+    {
+      url:
+        'https://dev.virtualearth.net/REST/v1/Locations/38.89497406962095,-77.01622009277345?*',
+    },
+    { fixture: 'geocoder/dc.json' }
+  ).as('reverseGeocodeCity');
+  cy.intercept(
+    {
+      url:
+        'https://dev.virtualearth.net/REST/v1/Locations/40.36315736436661,-77.7938461303711?*',
+    },
+    { fixture: 'geocoder/rural.json' }
+  ).as('reverseGeocodeRural');
 });

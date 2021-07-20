@@ -26,7 +26,7 @@ export default async function reverseGeoCode(bbox) {
   const [lon, lat] = center.geometry.coordinates;
 
   const address = await fetch(
-    `${config.bingSearchUrl}/Locations/${lat},${lon}?radius=${config.reverseGeocodeRadius}&includeEntityTypes=address&key=${config.bingApiKey}`,
+    `${config.bingSearchUrl}/Locations/${lat},${lon}?radius=${config.reverseGeocodeRadius}&includeEntityTypes=address,AdminDivision1,AdminDivision2, CountryRegion&key=${config.bingApiKey}`,
     {
       headers: {
         'Content-Type': 'application/json',
@@ -42,8 +42,19 @@ export default async function reverseGeoCode(bbox) {
 
   let name;
   if (address && address.resourceSets[0].estimatedTotal) {
+    const result = address.resourceSets[0].resources[0];
+    const { entityType } = result;
+
+    switch (entityType) {
+      case 'Address':
+        name = result.address.locality;
+        break;
+      case 'AdminDivision1':
+      case 'AdminDivision2':
+      case 'CountryRegion':
+        name = result.name;
+    }
     // Use first result if there are any
-    name = address.resourceSets[0].resources[0].address.locality;
   } else {
     toasts.warn('AOI not geocodable, generic name used');
     name = 'Area';
