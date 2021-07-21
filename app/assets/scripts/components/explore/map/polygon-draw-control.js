@@ -5,8 +5,9 @@ const startNodeIcon = new L.DivIcon({
   className: 'leaflet-div-icon leaflet-editing-icon leaflet-edit-move',
 });
 class PolygonDrawControl {
-  constructor(map) {
+  constructor(map, onDrawFinish) {
     this._map = map;
+    this._onDrawFinish = onDrawFinish;
     this._nodes = [];
   }
 
@@ -44,7 +45,7 @@ class PolygonDrawControl {
     const coords = this._getEventLatLng(e);
 
     // Add node to polygon
-    this._nodes.push(coords);
+    this._nodes = this._nodes.concat([coords]);
 
     // Add start/close marker on first click
     if (this._nodes.length === 1) {
@@ -76,8 +77,16 @@ class PolygonDrawControl {
     // Disable this controller
     this.disable();
 
-    // Avoid firing other click events
-    e.stopPropagation();
+    // Make it a close polygon
+    this._nodes = this._nodes.concat([this._nodes[0]]);
+
+    // Pass geometry via onDrawFinish event
+    this._onDrawFinish({
+      geometry: {
+        type: 'Polygon',
+        coordinates: [this._nodes.map(([lat, lon]) => [lon, lat])],
+      },
+    });
   }
 
   enable() {
