@@ -99,6 +99,22 @@ wss.on('connection', function connection(ws, req) {
     sendServerMessages(ws);
   });
 
+  // Check if client is reconnecting
+  if (step > 0 && step < queue.length) {
+    if (queue[step] && queue[step].type === 'reconnect') {
+      // If this is the right step update counter
+      console.log('\n App client reconnected\n');
+      step += 1;
+    } else {
+      // Or print error
+      console.log(
+        `\n Error: app client reconnected, but expected step was:\n${JSON.stringify(
+          queue[step]
+        )}\n`
+      );
+    }
+  }
+
   // On connection, check if there are message to be sent by the server
   sendServerMessages(ws);
 });
