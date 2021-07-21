@@ -346,7 +346,7 @@ Cypress.Commands.add('mockRegularProject', () => {
       name: 'Seneca Rocks',
       created: '2021-04-30T18:05:26.309Z',
       storage: true,
-      bookmarked: false,
+      bookmarked: true,
       project_id: 1,
       checkpoint_id: '1',
       patches: [],
@@ -382,7 +382,7 @@ Cypress.Commands.add('mockRegularProject', () => {
       url: restApiEndpoint + '/api/project/1/aoi/2',
     },
     {
-      id: 1,
+      id: 2,
       name: 'Seneca Rocks',
       created: '2021-04-30T18:05:26.309Z',
       storage: true,
@@ -419,7 +419,7 @@ Cypress.Commands.add('mockRegularProject', () => {
 
   cy.intercept(
     {
-      url: restApiEndpoint + '/api/project/1/aoi/1/tiles',
+      url: restApiEndpoint + '/api/project/1/aoi/*/tiles',
     },
     {
       tilejson: '2.2.0',
@@ -443,7 +443,7 @@ Cypress.Commands.add('mockRegularProject', () => {
 
   cy.intercept(
     {
-      url: restApiEndpoint + '/api/project/1/aoi/1/tiles/**',
+      url: restApiEndpoint + '/api/project/1/aoi/*/tiles/**',
     },
     { fixture: 'tiles/png-tile.png' }
   );

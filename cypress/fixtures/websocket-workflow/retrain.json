@@ -14,7 +14,30 @@
       "data": {
         "is_aborting": false,
         "processing": false,
-        "aoi": 1,
+        "aoi": 2,
+        "checkpoint": 1
+      }
+    }
+  },
+  {
+    "type": "reconnect"
+  },
+  {
+    "type": "server",
+    "payload": { "message": "info#connected" }
+  },
+  {
+    "type": "client",
+    "payload": { "action": "model#status" }
+  },
+  {
+    "type": "server",
+    "payload": {
+      "message": "model#status",
+      "data": {
+        "is_aborting": false,
+        "processing": false,
+        "aoi": 2,
         "checkpoint": 1
       }
     }
@@ -24,7 +47,7 @@
     "payload": {
       "action": "model#retrain",
       "data": {
-        "name": "Area #1",
+        "name": "Seneca Rocks",
         "classes": [
           {
             "name": "Water / Wetland",
@@ -37,27 +60,23 @@
                   "type": "Polygon",
                   "coordinates": [
                     [
-                      [-79.387658, 38.843585],
-                      [-79.388022, 38.843652],
-                      [-79.388258, 38.843786],
-                      [-79.388344, 38.843886],
-                      [-79.388344, 38.844237],
-                      [-79.388258, 38.844939],
-                      [-79.388173, 38.845457],
-                      [-79.387336, 38.846643],
-                      [-79.387057, 38.846643],
-                      [-79.385684, 38.846426],
-                      [-79.385147, 38.846159],
-                      [-79.384933, 38.845858],
-                      [-79.384933, 38.845574],
-                      [-79.385469, 38.844588],
-                      [-79.386199, 38.844003],
-                      [-79.387057, 38.843702],
-                      [-79.387658, 38.843585]
+                      [-79.38652, 38.837568],
+                      [-79.389095, 38.840911],
+                      [-79.38652, 38.844254],
+                      [-79.382229, 38.840911],
+                      [-79.38652, 38.837568]
                     ]
                   ]
                 }
               ]
+            }
+          },
+          {
+            "name": "Emergent Wetlands",
+            "color": "#00A884",
+            "geometry": {
+              "type": "GeometryCollection",
+              "geometries": [{ "type": "MultiPoint", "coordinates": [] }]
             }
           },
           {
@@ -69,7 +88,15 @@
             }
           },
           {
-            "name": "Low Vegetation / Barren",
+            "name": "Shrubland",
+            "color": "#ABC964",
+            "geometry": {
+              "type": "GeometryCollection",
+              "geometries": [{ "type": "MultiPoint", "coordinates": [] }]
+            }
+          },
+          {
+            "name": "Low Vegetation",
             "color": "#D0F3AB",
             "geometry": {
               "type": "GeometryCollection",
@@ -77,8 +104,32 @@
             }
           },
           {
-            "name": "Built Environment",
+            "name": "Barren",
+            "color": "#D2AD74",
+            "geometry": {
+              "type": "GeometryCollection",
+              "geometries": [{ "type": "MultiPoint", "coordinates": [] }]
+            }
+          },
+          {
+            "name": "Structure",
+            "color": "#F10100",
+            "geometry": {
+              "type": "GeometryCollection",
+              "geometries": [{ "type": "MultiPoint", "coordinates": [] }]
+            }
+          },
+          {
+            "name": "Impervious Surface",
             "color": "#BFB5B5",
+            "geometry": {
+              "type": "GeometryCollection",
+              "geometries": [{ "type": "MultiPoint", "coordinates": [] }]
+            }
+          },
+          {
+            "name": "Impervious Road",
+            "color": "#320000",
             "geometry": {
               "type": "GeometryCollection",
               "geometries": [{ "type": "MultiPoint", "coordinates": [] }]
@@ -89,23 +140,22 @@
     }
   },
   {
+    "type": "server",
+    "payload": { "message": "model#retrain#complete" }
+  },
+  {
     "type": "client",
+    "payload": { "action": "model#status" }
+  },
+  {
+    "type": "server",
     "payload": {
-      "action": "model#prediction",
+      "message": "model#status",
       "data": {
-        "name": "Downtown Washington DC",
-        "polygon": {
-          "type": "Polygon",
-          "coordinates": [
-            [
-              [-77.04442620277406, 38.90095276229],
-              [-77.04051017761232, 38.90095276229],
-              [-77.04051017761232, 38.90339078351956],
-              [-77.04442620277406, 38.90339078351956],
-              [-77.04442620277406, 38.90095276229]
-            ]
-          ]
-        }
+        "is_aborting": false,
+        "processing": true,
+        "aoi": 2,
+        "checkpoint": 2
       }
     }
   },
@@ -113,28 +163,27 @@
     "type": "server",
     "payload": {
       "message": "model#checkpoint",
-      "data": { "name": "Downtown Washington DC", "id": 2 }
+      "data": { "name": "Seneca Rocks", "id": 3 }
     }
   },
   {
     "type": "client",
     "payload": { "action": "model#status" }
   },
-
   {
     "type": "server",
     "payload": {
       "message": "model#aoi",
       "data": {
-        "id": 1,
+        "id": 3,
         "live": true,
-        "name": "Downtown Washington DC",
-        "checkpoint_id": 2,
+        "name": "Area #1",
+        "checkpoint_id": 3,
         "bounds": [
-          -77.047119140625,
-          38.89958342598271,
-          -77.03887939453125,
-          38.903858339667764
+          -79.38995361328125,
+          38.833289356866885,
+          -79.37347412109375,
+          38.85040342169188
         ],
         "total": 6
       }
@@ -147,18 +196,17 @@
       "data": {
         "is_aborting": false,
         "processing": true,
-        "aoi": 1,
-        "checkpoint": 2
+        "aoi": 3,
+        "checkpoint": 3
       }
     }
   },
-
   {
     "type": "server",
     "payload": {
       "message": "model#prediction",
       "data": {
-        "aoi": 1,
+        "aoi": 3,
         "bounds": [
           -77.047119140625,
           38.901720914997945,
@@ -179,7 +227,7 @@
     "payload": {
       "message": "model#prediction",
       "data": {
-        "aoi": 1,
+        "aoi": 3,
         "bounds": [
           -77.047119140625,
           38.89958342598271,
@@ -201,7 +249,7 @@
     "payload": {
       "message": "model#prediction",
       "data": {
-        "aoi": 1,
+        "aoi": 3,
         "bounds": [
           -77.04437255859375,
           38.901720914997945,
@@ -223,7 +271,7 @@
     "payload": {
       "message": "model#prediction",
       "data": {
-        "aoi": 1,
+        "aoi": 3,
         "bounds": [
           -77.04437255859375,
           38.89958342598271,
@@ -244,7 +292,7 @@
     "payload": {
       "message": "model#prediction",
       "data": {
-        "aoi": 1,
+        "aoi": 3,
         "bounds": [
           -77.0416259765625,
           38.901720914997945,
@@ -265,7 +313,7 @@
     "payload": {
       "message": "model#prediction",
       "data": {
-        "aoi": 1,
+        "aoi": 3,
         "bounds": [
           -77.0416259765625,
           38.89958342598271,
@@ -285,7 +333,7 @@
     "type": "server",
     "payload": {
       "message": "model#prediction#complete",
-      "data": { "aoi": 1 }
+      "data": { "aoi": 3 }
     }
   },
   {
@@ -299,8 +347,8 @@
       "data": {
         "is_aborting": false,
         "processing": false,
-        "aoi": 1,
-        "checkpoint": 2
+        "aoi": 3,
+        "checkpoint": 3
       }
     }
   }
