@@ -126,16 +126,13 @@ function SessionOutputControl(props) {
 
   const { currentAoi } = useAoi();
 
-  const {
-    updateProjectName,
-    selectedModel,
-    predictions,
-    aoiName,
-  } = useContext(ExploreContext);
+  const { updateProjectName, selectedModel, predictions, aoiName } = useContext(
+    ExploreContext
+  );
 
-  const { projectName, currentProject, setProjectName  } = useProject();
+  const { projectName, currentProject, setProjectName } = useProject();
 
-  const initialName = projectName ||  'Untitled';
+  const initialName = projectName || 'Untitled';
 
   const [localProjectName, setLocalProjectName] = useState(projectName);
   const [titleEditMode, setTitleEditMode] = useState(false);
@@ -212,8 +209,6 @@ function SessionOutputControl(props) {
   const getEditInfo = () => {
     if (!isAuthenticated) {
       return 'Log in to set project name';
-    } else if (!selectedModel) {
-      return 'Model must be selected to set project name';
     } else if (localProjectName) {
       return 'Edit project Name';
     } else {
@@ -236,11 +231,12 @@ function SessionOutputControl(props) {
               size='xsmall'
               onClick={() => {
                 //isAuthenticated && selectedModel && setTitleEditMode(true);
-                isAuthenticated &&  setTitleEditMode(true);
+                isAuthenticated && setTitleEditMode(true);
               }}
               title={
                 !isAuthenticated ? 'Log in to set project name' : 'Project name'
               }
+              data-cy='project-name'
             >
               {localProjectName || 'Untitled Project'}
             </Heading>
@@ -249,10 +245,11 @@ function SessionOutputControl(props) {
               useIcon='pencil'
               hideText
               id='project-edit-trigger'
+              data-cy='project-name-edit'
               info={getEditInfo()}
               onClick={() => {
                 //isAuthenticated && selectedModel && setTitleEditMode(true);
-                isAuthenticated &&  setTitleEditMode(true);
+                isAuthenticated && setTitleEditMode(true);
               }}
             />
           </>
@@ -265,12 +262,14 @@ function SessionOutputControl(props) {
               value={localProjectName}
               disabled={!isAuthenticated}
               autoFocus
+              data-cy='project-input'
             />
             <Button
               type='submit'
               size='small'
               useIcon='tick--small'
               hideText
+              data-cy='project-name-confirm'
               title='Confirm project name'
             />
             <Button

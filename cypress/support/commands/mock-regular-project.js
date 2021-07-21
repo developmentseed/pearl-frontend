@@ -30,6 +30,7 @@ Cypress.Commands.add('mockRegularProject', () => {
   cy.intercept(
     {
       host: restApiEndpoint,
+      method: 'GET',
       path: '/api/project/1',
     },
     {
@@ -41,7 +42,25 @@ Cypress.Commands.add('mockRegularProject', () => {
         created: '2021-03-19T12:47:07.838Z',
       },
     }
-  );
+  ).as('getProject');
+
+  cy.intercept(
+    {
+      host: restApiEndpoint,
+      method: 'PATCH',
+      path: '/api/project/1',
+    },
+    {
+      body: {
+        id: 1,
+        name: 'New name',
+        model_id: 1,
+        mosaic: 'naip.latest',
+        created: '2021-03-19T12:47:07.838Z',
+      },
+    }
+  ).as('patchProjectName');
+
 
   cy.intercept(
     {
