@@ -25,6 +25,14 @@ describe('Open existing project', () => {
       .trigger('mousemove', 500, 350)
       .trigger('mouseup', 500, 350);
 
-    cy.get('[data-cy=run-button').click();
+    // Draw sample with polygon tool
+    cy.get('[data-cy=retrain-draw-polygon').click();
+    cy.get('#app-container')
+      .trigger('mousedown', 470, 420)
+      .trigger('mousedown', 500, 370)
+      .trigger('mousedown', 550, 420)
+      .trigger('mousedown', 500, 470)
+      .trigger('mousedown', 470, 420)
+      .trigger('mouseup');
   });
 });

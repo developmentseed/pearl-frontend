@@ -63,7 +63,7 @@ class PolygonDrawControl {
     }
   }
 
-  _closePolygon(e) {
+  _closePolygon() {
     // Replace polyline by a polygon
     this._shape.remove();
     this._shape = L.polygon(this._nodes, {
@@ -82,10 +82,8 @@ class PolygonDrawControl {
 
     // Pass geometry via onDrawFinish event
     this._onDrawFinish({
-      geometry: {
-        type: 'Polygon',
-        coordinates: [this._nodes.map(([lat, lon]) => [lon, lat])],
-      },
+      type: 'Polygon',
+      coordinates: [this._nodes.map(([lat, lon]) => [lon, lat])],
     });
   }
 

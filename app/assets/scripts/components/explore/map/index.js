@@ -43,6 +43,7 @@ import {
 import toasts from '../../common/toasts';
 import logger from '../../../utils/logger';
 import PolygonDrawControl from './polygon-draw-control';
+import get from 'lodash.get';
 
 const center = [38.889805, -77.009056];
 const zoom = 12;
@@ -307,6 +308,36 @@ function Map() {
     updateTileUrl();
   }, [currentAoi, currentProject, mapRef, aoiRef]);
 
+  /**
+   * Setup PolygonDrawControl: state of polygon layers are kept inside FreeHandDraw,
+   * this will wait for it to be ready before adding PolygonDraw. It also has activeClass
+   * as a dependency and will create a new instance when the controller changes.
+   */
+  const activeClass = currentCheckpoint && currentCheckpoint.activeItem;
+  useEffect(() => {
+    if (!mapRef || !currentCheckpoint || !mapRef.freehandDraw) return;
+
+    mapRef.polygonDraw = new PolygonDrawControl(
+      mapRef,
+      (newPolygonGeometry) => {
+        // Check if layer already has polygons
+        const currentPolygons = get(
+          currentCheckpoint,
+          `classes[${activeClass}].polygons`,
+          []
+        );
+
+        // Add or merge new polygon geometry
+        mapRef.freehandDraw.setLayerPolygons({
+          ...currentCheckpoint.classes,
+          [activeClass]: {
+            polygons: currentPolygons.concat(newPolygonGeometry),
+          },
+        });
+      }
+    );
+  }, [mapRef, currentCheckpoint, activeClass]);
+
   const displayMap = useMemo(() => {
     return (
       <MapContainer
@@ -333,8 +364,6 @@ function Map() {
           });
 
           m.freehandDraw = freehandDraw;
-
-          m.polygonDraw = new PolygonDrawControl(m);
 
           // Add map to state
           setMapRef(m);
