@@ -339,6 +339,65 @@ Cypress.Commands.add('mockRegularProject', () => {
 
   cy.intercept(
     {
+      url: restApiEndpoint + '/api/project/1/checkpoint/3',
+    },
+    {
+      id: 3,
+      project_id: 1,
+      parent: 2,
+      name: 'Seneca Rocks',
+      bookmarked: true,
+      classes: [
+        { name: 'Water / Wetland', color: '#486DA2' },
+        { name: 'Emergent Wetlands', color: '#00A884' },
+        { name: 'Tree', color: '#6CA966' },
+        { name: 'Shrubland', color: '#ABC964' },
+        { name: 'Low Vegetation', color: '#D0F3AB' },
+        { name: 'Barren', color: '#D2AD74' },
+        { name: 'Structure', color: '#F10100' },
+        { name: 'Impervious Surface', color: '#BFB5B5' },
+        { name: 'Impervious Road', color: '#320000' },
+      ],
+      created: '2021-04-30T18:05:26.176Z',
+      storage: true,
+      analytics: [
+        { counts: 50, f1score: 1, percent: 0 },
+        { counts: 0, f1score: 0, percent: 0 },
+        { counts: 0, f1score: 0, percent: 0 },
+        { counts: 0, f1score: 0, percent: 0 },
+        { counts: 0, f1score: 0, percent: 0 },
+        { counts: 0, f1score: 0, percent: 0 },
+        { counts: 0, f1score: 0, percent: 0 },
+        { counts: 0, f1score: 0, percent: 0 },
+        { counts: 0, f1score: 0, percent: 0 },
+      ],
+      retrain_geoms: [
+        { type: 'MultiPoint', coordinates: [] },
+        { type: 'MultiPoint', coordinates: [] },
+        { type: 'MultiPoint', coordinates: [] },
+        { type: 'MultiPoint', coordinates: [] },
+        { type: 'MultiPoint', coordinates: [] },
+        { type: 'MultiPoint', coordinates: [] },
+        { type: 'MultiPoint', coordinates: [] },
+        { type: 'MultiPoint', coordinates: [] },
+        { type: 'MultiPoint', coordinates: [] },
+      ],
+      input_geoms: [
+        { type: 'GeometryCollection', geometries: [] },
+        { type: 'GeometryCollection', geometries: [] },
+        { type: 'GeometryCollection', geometries: [] },
+        { type: 'GeometryCollection', geometries: [] },
+        { type: 'GeometryCollection', geometries: [] },
+        { type: 'GeometryCollection', geometries: [] },
+        { type: 'GeometryCollection', geometries: [] },
+        { type: 'GeometryCollection', geometries: [] },
+        { type: 'GeometryCollection', geometries: [] },
+      ],
+    }
+  );
+
+  cy.intercept(
+    {
       url: restApiEndpoint + '/api/project/1/aoi/1',
     },
     {
@@ -389,6 +448,46 @@ Cypress.Commands.add('mockRegularProject', () => {
       bookmarked: true,
       project_id: 1,
       checkpoint_id: '1',
+      patches: [],
+      classes: [
+        { name: 'Water / Wetland', color: '#486DA2' },
+        { name: 'Emergent Wetlands', color: '#00A884' },
+        { name: 'Tree', color: '#6CA966' },
+        { name: 'Shrubland', color: '#ABC964' },
+        { name: 'Low Vegetation', color: '#D0F3AB' },
+        { name: 'Barren', color: '#D2AD74' },
+        { name: 'Structure', color: '#F10100' },
+        { name: 'Impervious Surface', color: '#BFB5B5' },
+        { name: 'Impervious Road', color: '#320000' },
+      ],
+      bounds: {
+        type: 'Polygon',
+        coordinates: [
+          [
+            [-79.389824867, 38.828040665],
+            [-79.372229576, 38.828040665],
+            [-79.372229576, 38.846058444],
+            [-79.389824867, 38.846058444],
+            [-79.389824867, 38.828040665],
+          ],
+        ],
+      },
+      shares: [],
+    }
+  );
+  
+  cy.intercept(
+    {
+      url: restApiEndpoint + '/api/project/1/aoi/3',
+    },
+    {
+      id: 3,
+      name: 'Seneca Rocks',
+      created: '2021-04-30T18:05:26.309Z',
+      storage: true,
+      bookmarked: true,
+      project_id: 1,
+      checkpoint_id: '3',
       patches: [],
       classes: [
         { name: 'Water / Wetland', color: '#486DA2' },

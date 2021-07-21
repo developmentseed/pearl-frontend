@@ -34,5 +34,7 @@ describe('Open existing project', () => {
       .trigger('mousedown', 500, 470)
       .trigger('mousedown', 470, 420)
       .trigger('mouseup');
+
+    cy.get('[data-cy=run-button').click();
   });
 });

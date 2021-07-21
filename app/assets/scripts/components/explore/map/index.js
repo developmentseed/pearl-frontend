@@ -309,7 +309,7 @@ function Map() {
   }, [currentAoi, currentProject, mapRef, aoiRef]);
 
   /**
-   * Setup PolygonDrawControl: state of polygon layers are kept inside FreeHandDraw,
+   * Setup PolygonDrawControl: state of polygon map layers are handled by FreeHandDraw,
    * this will wait for it to be ready before adding PolygonDraw. It also has activeClass
    * as a dependency and will create a new instance when the controller changes.
    */
@@ -320,18 +320,28 @@ function Map() {
     mapRef.polygonDraw = new PolygonDrawControl(
       mapRef,
       (newPolygonGeometry) => {
-        // Check if layer already has polygons
-        const currentPolygons = get(
+        // Append new polygon to existing, if any
+        const updatedPolygons = get(
           currentCheckpoint,
           `classes[${activeClass}].polygons`,
           []
-        );
+        ).concat(newPolygonGeometry);
 
         // Add or merge new polygon geometry
         mapRef.freehandDraw.setLayerPolygons({
           ...currentCheckpoint.classes,
           [activeClass]: {
-            polygons: currentPolygons.concat(newPolygonGeometry),
+            polygons: updatedPolygons,
+          },
+        });
+
+        // Update polygons on state
+        dispatchCurrentCheckpoint({
+          type: checkpointActions.UPDATE_POLYGONS,
+          data: {
+            name: activeClass,
+            isCheckpointPolygon: activeClass.includes('checkpoint'),
+            polygons: updatedPolygons,
           },
         });
       }
