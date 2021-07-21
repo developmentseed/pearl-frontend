@@ -4,11 +4,17 @@ import T from 'prop-types';
 const ProjectContext = createContext(null);
 
 export function ProjectProvider(props) {
+  // Current Project object to be set after creation with api response
   const [currentProject, setCurrentProject] = useState(null);
+
+  // Front end state variable. Must be set before creating project
+  const [projectName, setProjectName] = useState(null);
 
   const value = {
     currentProject,
     setCurrentProject,
+
+    projectName, setProjectName
   };
 
   return (
@@ -36,13 +42,14 @@ const useProjectContext = (fnName) => {
 };
 
 export const useProject = () => {
-  const { currentProject, setCurrentProject } = useProjectContext('useProject');
+  const { currentProject, setCurrentProject, projectName, setProjectName } = useProjectContext('useProject');
 
   return useMemo(
     () => ({
       currentProject,
       setCurrentProject,
+      projectName, setProjectName
     }),
-    [currentProject]
+    [currentProject, projectName]
   );
 };

@@ -19,6 +19,7 @@ import { Heading } from '@devseed-ui/typography';
 import { Form, FormInput } from '@devseed-ui/form';
 import InfoButton from '../common/info-button';
 import { ExploreContext, useProjectId } from '../../context/explore';
+import { useProject } from '../../context/project';
 import { useAuth } from '../../context/auth';
 import { useAoi } from '../../context/aoi';
 import toasts from '../common/toasts';
@@ -117,7 +118,7 @@ const FormInputGroup = styled.div`
 
 function SessionOutputControl(props) {
   const { projectId } = useProjectId();
-  const { projectName, isMediumDown } = props;
+  const { isMediumDown } = props;
   const { isAuthenticated, restApiClient } = useAuth();
   const { setTourStep } = useTour();
 
@@ -127,22 +128,30 @@ function SessionOutputControl(props) {
 
   const {
     updateProjectName,
-    currentProject,
     selectedModel,
     predictions,
     aoiName,
   } = useContext(ExploreContext);
-  const initialName = currentProject ? currentProject.name : 'Untitled';
+
+  const { projectName, currentProject, setProjectName  } = useProject();
+
+  const initialName = projectName ||  'Untitled';
 
   const [localProjectName, setLocalProjectName] = useState(projectName);
   const [titleEditMode, setTitleEditMode] = useState(false);
   const [exportShareURL, setExportShareURL] = useState(null);
+
   useEffect(() => setLocalProjectName(initialName), [initialName]);
 
   const handleSubmit = (evt) => {
     evt.preventDefault();
     const name = evt.target.elements.projectName.value;
-    updateProjectName(name);
+
+    if (selectedModel) {
+      // Project already exists, PATCH name update to API
+      updateProjectName(name);
+    }
+    setProjectName(name);
     setTitleEditMode(false);
   };
 
@@ -226,7 +235,8 @@ function SessionOutputControl(props) {
               variation={localProjectName ? 'primary' : 'baseAlphaE'}
               size='xsmall'
               onClick={() => {
-                isAuthenticated && selectedModel && setTitleEditMode(true);
+                //isAuthenticated && selectedModel && setTitleEditMode(true);
+                isAuthenticated &&  setTitleEditMode(true);
               }}
               title={
                 !isAuthenticated ? 'Log in to set project name' : 'Project name'
@@ -241,7 +251,8 @@ function SessionOutputControl(props) {
               id='project-edit-trigger'
               info={getEditInfo()}
               onClick={() => {
-                isAuthenticated && selectedModel && setTitleEditMode(true);
+                //isAuthenticated && selectedModel && setTitleEditMode(true);
+                isAuthenticated &&  setTitleEditMode(true);
               }}
             />
           </>
