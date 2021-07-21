@@ -404,8 +404,7 @@ function SessionOutputControl(props) {
             >
               Create Project
             </Button>
-           
-          </ModalForm >
+          </ModalForm>
         }
       />
     </Wrapper>

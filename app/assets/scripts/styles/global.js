@@ -10,7 +10,7 @@ const darkStyles = () => css`
   .modal {
     background: ${themeVal('color.baseDarkAlphaC')} !important;
   }
-  .modal.faded-background { 
+  .modal.faded-background {
     background: ${rgba(themeVal('color.baseLight'), 0.7)} !important;
   }
 

@@ -51,7 +51,12 @@ export function ExploreProvider(props) {
   }, [tourStep]);
 
   const { restApiClient, isLoading: authIsLoading } = useAuth();
-  const { currentProject, setCurrentProject, projectName, setProjectName } = useProject();
+  const {
+    currentProject,
+    setCurrentProject,
+    projectName,
+    setProjectName,
+  } = useProject();
   const {
     aoiName,
     aoiRef,
@@ -429,9 +434,9 @@ export function ExploreProvider(props) {
       } else {
         try {
           project = await restApiClient.patch(`project/${currentProject.id}`, {
-            name
+            name,
           });
-          setCurrentProject(project)
+          setCurrentProject(project);
           toasts.success('Project name updated');
         } catch (err) {
           toasts.error('Could not update project name');
@@ -490,7 +495,6 @@ export function ExploreProvider(props) {
       setAoiArea(null);
     }
   }, [aoiRef]);
-
 
   return (
     <ExploreContext.Provider

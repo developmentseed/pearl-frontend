@@ -14,7 +14,8 @@ export function ProjectProvider(props) {
     currentProject,
     setCurrentProject,
 
-    projectName, setProjectName
+    projectName,
+    setProjectName,
   };
 
   return (
@@ -42,13 +43,19 @@ const useProjectContext = (fnName) => {
 };
 
 export const useProject = () => {
-  const { currentProject, setCurrentProject, projectName, setProjectName } = useProjectContext('useProject');
+  const {
+    currentProject,
+    setCurrentProject,
+    projectName,
+    setProjectName,
+  } = useProjectContext('useProject');
 
   return useMemo(
     () => ({
       currentProject,
       setCurrentProject,
-      projectName, setProjectName
+      projectName,
+      setProjectName,
     }),
     [currentProject, projectName]
   );
