@@ -475,7 +475,7 @@ Cypress.Commands.add('mockRegularProject', () => {
       shares: [],
     }
   );
-  
+
   cy.intercept(
     {
       url: restApiEndpoint + '/api/project/1/aoi/3',
