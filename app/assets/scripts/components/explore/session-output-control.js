@@ -28,6 +28,8 @@ import { useInstance } from '../../context/instance';
 import { downloadGeotiff as downloadGeotiffUtil } from '../../utils/map';
 import { useTour } from '../../context/explore';
 
+import { Modal } from '@devseed-ui/modal';
+
 const Wrapper = styled.div`
   flex: 1;
   display: grid;
@@ -114,6 +116,11 @@ const FormInputGroup = styled.div`
     background-color: unset;
     color: unset;
   }
+`;
+
+const ModalForm = styled(Form)`
+  display: grid;
+  grid-gap: ${glsp(1)};
 `;
 
 function SessionOutputControl(props) {
@@ -238,7 +245,7 @@ function SessionOutputControl(props) {
               }
               data-cy='project-name'
             >
-              {localProjectName || 'Untitled Project'}
+              {projectName || 'Untitled Project'}
             </Heading>
             <InfoButton
               size='small'
@@ -370,6 +377,38 @@ function SessionOutputControl(props) {
           </DropdownBody>
         </>
       </Dropdown>
+
+      <Modal
+        id='project-name-modal'
+        title='New project'
+        revealed={!projectName}
+        className='faded-background'
+        size='small'
+        closeButton={false}
+        content={
+          <ModalForm onSubmit={handleSubmit}>
+            <HeadingInput
+              name='projectName'
+              placeholder='Set Project Name'
+              onChange={(e) => setLocalProjectName(e.target.value)}
+              value={localProjectName}
+              disabled={!isAuthenticated}
+              autoFocus
+              data-cy='project-input'
+            />
+            <Button
+              type='submit'
+              size='medium'
+              useIcon={['arrow-right', 'after']}
+              data-cy='project-name-modal-confirm'
+              title='Set project name'
+            >
+              Create Project
+            </Button>
+           
+          </ModalForm >
+        }
+      />
     </Wrapper>
   );
 }
