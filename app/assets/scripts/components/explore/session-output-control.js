@@ -151,7 +151,7 @@ function SessionOutputControl(props) {
     evt.preventDefault();
     const name = evt.target.elements.projectName.value;
 
-    if (selectedModel) {
+    if (selectedModel && currentProject) {
       // Project already exists, PATCH name update to API
       updateProjectName(name);
     }
