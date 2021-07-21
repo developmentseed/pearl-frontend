@@ -237,7 +237,6 @@ function SessionOutputControl(props) {
               variation={localProjectName ? 'primary' : 'baseAlphaE'}
               size='xsmall'
               onClick={() => {
-                //isAuthenticated && selectedModel && setTitleEditMode(true);
                 isAuthenticated && setTitleEditMode(true);
               }}
               title={
@@ -255,7 +254,6 @@ function SessionOutputControl(props) {
               data-cy='project-name-edit'
               info={getEditInfo()}
               onClick={() => {
-                //isAuthenticated && selectedModel && setTitleEditMode(true);
                 isAuthenticated && setTitleEditMode(true);
               }}
             />
@@ -380,6 +378,7 @@ function SessionOutputControl(props) {
 
       <Modal
         id='project-name-modal'
+        data-cy='project-name-modal'
         title='New project'
         revealed={!projectName}
         className='faded-background'
@@ -394,13 +393,13 @@ function SessionOutputControl(props) {
               value={localProjectName}
               disabled={!isAuthenticated}
               autoFocus
-              data-cy='project-input'
+              data-cy='modal-project-input'
             />
             <Button
               type='submit'
               size='medium'
               useIcon={['arrow-right', 'after']}
-              data-cy='project-name-modal-confirm'
+              data-cy='create-project-button'
               title='Set project name'
             >
               Create Project
