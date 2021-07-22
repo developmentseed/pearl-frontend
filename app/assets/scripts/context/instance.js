@@ -32,6 +32,7 @@ import { actions as aoiPatchActions } from './reducers/aoi_patch';
 import { useModel } from './model';
 
 import { wrapLogReducer } from './reducers/utils';
+import turfHelper from '@turf/helpers';
 
 const messageQueueActionTypes = {
   ABORT: 'ABORT',
@@ -563,10 +564,7 @@ export function InstanceProvider(props) {
               return {
                 name: c.name,
                 color: c.color,
-                geometry: {
-                  type: 'GeometryCollection',
-                  geometries: [c.points, ...c.polygons],
-                },
+                geometry: turfHelper.featureCollection([c.points, ...c.polygons])
               };
             }),
           },
