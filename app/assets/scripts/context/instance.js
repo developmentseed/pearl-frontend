@@ -563,7 +563,7 @@ export function InstanceProvider(props) {
             classes: classes.map((c) => {
               // convert MultiPoint to Point Feature
               c.points = c.points.coordinates.map((p) => {
-                return feature(point(p));
+                return point(p);
               });
 
               // convert Polygons to Feature
