@@ -564,7 +564,10 @@ export function InstanceProvider(props) {
               return {
                 name: c.name,
                 color: c.color,
-                geometry: turfHelper.featureCollection([c.points, ...c.polygons])
+                geometry: turfHelper.featureCollection([
+                  c.points,
+                  ...c.polygons,
+                ]),
               };
             }),
           },
