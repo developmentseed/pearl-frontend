@@ -58,7 +58,7 @@ class PolygonDrawControl {
         this._shape = L.polyline(this._nodes, {
           weight: 4,
           fillOpacity: 0.4,
-        }).addTo(this._map);
+        }).addTo(this._markerGroup);
       }
     }
   }
@@ -71,12 +71,6 @@ class PolygonDrawControl {
       fillOpacity: 0.4,
     }).addTo(this._map);
 
-    // Remove nodes
-    this._markerGroup.remove();
-
-    // Disable this controller
-    this.disable();
-
     // Make it a close polygon
     this._nodes = this._nodes.concat([this._nodes[0]]);
 
@@ -85,6 +79,19 @@ class PolygonDrawControl {
       type: 'Polygon',
       coordinates: [this._nodes.map(([lat, lon]) => [lon, lat])],
     });
+
+    this.clear();
+  }
+
+  clear() {
+    // Remove starter node marker
+    if (this._markerGroup) {
+      this._markerGroup.remove();
+    }
+    // Remove polygon (or polyline)
+    if (this._shape) {
+      this._shape.remove();
+    }
   }
 
   enable() {
@@ -101,6 +108,9 @@ class PolygonDrawControl {
   disable() {
     // Remove click events
     this._map.off('mousedown', this._onMouseDown, this);
+
+    // Clear map
+    this.clear();
   }
 }
 

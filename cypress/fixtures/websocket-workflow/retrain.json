@@ -53,32 +53,39 @@
             "name": "Water / Wetland",
             "color": "#486DA2",
             "geometry": {
-              "type": "GeometryCollection",
-              "geometries": [
-                { "type": "MultiPoint", "coordinates": [] },
+              "type": "FeatureCollection",
+              "features": [
                 {
-                  "type": "Polygon",
-                  "coordinates": [
-                    [
-                      [-79.38652, 38.837568],
-                      [-79.389095, 38.840911],
-                      [-79.38652, 38.844254],
-                      [-79.382229, 38.840911],
-                      [-79.38652, 38.837568]
+                  "type": "Feature",
+                  "properties": {},
+                  "geometry": {
+                    "type": "Polygon",
+                    "coordinates": [
+                      [
+                        [-79.38652, 38.837568],
+                        [-79.389095, 38.840911],
+                        [-79.38652, 38.844254],
+                        [-79.382229, 38.840911],
+                        [-79.38652, 38.837568]
+                      ]
                     ]
-                  ]
+                  }
                 },
                 {
-                  "type": "Polygon",
-                  "coordinates": [
-                    [
-                      [-79.3890953063965, 38.832888196605985],
-                      [-79.3865203857422, 38.83623112969468],
-                      [-79.38222885131837, 38.832888196605985],
-                      [-79.3865203857422, 38.829545106506025],
-                      [-79.3890953063965, 38.832888196605985]
+                  "type": "Feature",
+                  "properties": {},
+                  "geometry": {
+                    "type": "Polygon",
+                    "coordinates": [
+                      [
+                        [-79.3890953063965, 38.832888196605985],
+                        [-79.3865203857422, 38.83623112969468],
+                        [-79.38222885131837, 38.832888196605985],
+                        [-79.3865203857422, 38.829545106506025],
+                        [-79.3890953063965, 38.832888196605985]
+                      ]
                     ]
-                  ]
+                  }
                 }
               ]
             }
@@ -86,66 +93,42 @@
           {
             "name": "Emergent Wetlands",
             "color": "#00A884",
-            "geometry": {
-              "type": "GeometryCollection",
-              "geometries": [{ "type": "MultiPoint", "coordinates": [] }]
-            }
+            "geometry": { "type": "FeatureCollection", "features": [] }
           },
           {
             "name": "Tree",
             "color": "#6CA966",
-            "geometry": {
-              "type": "GeometryCollection",
-              "geometries": [{ "type": "MultiPoint", "coordinates": [] }]
-            }
+            "geometry": { "type": "FeatureCollection", "features": [] }
           },
           {
             "name": "Shrubland",
             "color": "#ABC964",
-            "geometry": {
-              "type": "GeometryCollection",
-              "geometries": [{ "type": "MultiPoint", "coordinates": [] }]
-            }
+            "geometry": { "type": "FeatureCollection", "features": [] }
           },
           {
             "name": "Low Vegetation",
             "color": "#D0F3AB",
-            "geometry": {
-              "type": "GeometryCollection",
-              "geometries": [{ "type": "MultiPoint", "coordinates": [] }]
-            }
+            "geometry": { "type": "FeatureCollection", "features": [] }
           },
           {
             "name": "Barren",
             "color": "#D2AD74",
-            "geometry": {
-              "type": "GeometryCollection",
-              "geometries": [{ "type": "MultiPoint", "coordinates": [] }]
-            }
+            "geometry": { "type": "FeatureCollection", "features": [] }
           },
           {
             "name": "Structure",
             "color": "#F10100",
-            "geometry": {
-              "type": "GeometryCollection",
-              "geometries": [{ "type": "MultiPoint", "coordinates": [] }]
-            }
+            "geometry": { "type": "FeatureCollection", "features": [] }
           },
           {
             "name": "Impervious Surface",
             "color": "#BFB5B5",
-            "geometry": {
-              "type": "GeometryCollection",
-              "geometries": [{ "type": "MultiPoint", "coordinates": [] }]
-            }
+            "geometry": { "type": "FeatureCollection", "features": [] }
           },
           {
             "name": "Impervious Road",
             "color": "#320000",
-            "geometry": {
-              "type": "GeometryCollection",
-              "geometries": [{ "type": "MultiPoint", "coordinates": [] }]
-            }
+            "geometry": { "type": "FeatureCollection", "features": [] }
           }
         ]
       }

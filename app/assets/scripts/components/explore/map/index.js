@@ -24,6 +24,7 @@ import AoiEditControl from './aoi-edit-control';
 import FreehandDrawControl from './freehand-draw-control';
 import config from '../../../config';
 import { inRange } from '../../../utils/utils';
+import usePrevious from '../../../utils/use-previous';
 import { areaFromBounds } from '../../../utils/map';
 import {
   useCheckpoint,
@@ -103,6 +104,7 @@ function Map() {
   const { aoiPatchList } = useAoiPatch();
 
   const { mapState, mapModes, setMapMode } = useMapState();
+  const prevMapState = usePrevious(mapState);
   const { mapRef, setMapRef } = useMapRef();
   const [tileUrl, setTileUrl] = useState(null);
   const { dispatchPredictions } = usePredictions();
@@ -117,6 +119,20 @@ function Map() {
 
   // Manage changes in map mode
   useEffect(() => {
+    // Check if map mode changed and disable previous controls
+    if (prevMapState && mapState && mapState.mode !== prevMapState.mode) {
+      switch (prevMapState.mode) {
+        case mapModes.ADD_SAMPLE_POLYGON:
+          mapRef.polygonDraw.disable();
+          break;
+      }
+    }
+
+    /**
+     * The following block enables/disables map edit controls. Ideally we should use
+     * previous map mode to disable controls. In a refactor we should move disable actions
+     * to the code block above.
+     */
     switch (mapState.mode) {
       case mapModes.CREATE_AOI_MODE:
         mapRef.aoi.control.draw.enable();

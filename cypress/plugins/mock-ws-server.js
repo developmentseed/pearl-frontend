@@ -90,6 +90,13 @@ wss.on('connection', function connection(ws, req) {
       console.log('\nUnexpected websocket message data:');
       console.log('  Expected: ', JSON.stringify(queue[step].payload));
       console.log('  Received: ', JSON.stringify(message), '\n');
+      ws.send(
+        JSON.stringify({
+          message: 'error',
+          data: { error: 'Processing error' },
+        })
+      );
+      return;
     }
 
     // Move queue pointer to next message
