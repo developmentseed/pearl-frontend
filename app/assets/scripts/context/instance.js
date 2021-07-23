@@ -32,6 +32,7 @@ import { actions as aoiPatchActions } from './reducers/aoi_patch';
 import { useModel } from './model';
 
 import { wrapLogReducer } from './reducers/utils';
+import { featureCollection, feature } from '@turf/helpers';
 
 const messageQueueActionTypes = {
   ABORT: 'ABORT',
@@ -560,13 +561,25 @@ export function InstanceProvider(props) {
           data: {
             name: aoiName,
             classes: classes.map((c) => {
+              // sometimes there are only points or polygons
+              // convert MultiPoint to Feature
+              let features = [];
+              if (c.points.coordinates.length) {
+                c.points = feature(c.points);
+                features = features.concat(c.points);
+              }
+              if (c.polygons.length) {
+                // convert Polygons to Feature
+                c.polygons = c.polygons.map((p) => {
+                  return feature(p);
+                });
+                features = features.concat(c.polygons);
+              }
+
               return {
                 name: c.name,
                 color: c.color,
-                geometry: {
-                  type: 'GeometryCollection',
-                  geometries: [c.points, ...c.polygons],
-                },
+                geometry: featureCollection(features),
               };
             }),
           },

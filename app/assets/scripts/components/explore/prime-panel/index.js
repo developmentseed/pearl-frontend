@@ -139,7 +139,18 @@ function PrimePanel() {
     if (currentCheckpoint) {
       let sampleCount = Object.values(currentCheckpoint.classes || {}).reduce(
         (count, c) => {
-          return count + c.points.coordinates.length + c.polygons.length;
+          /**
+           * Check which format the point collection is following to get the feature count.
+           * This needs a refactor when possible. Feature initialization, map edit operations
+           * and retrain tasks should use the same format, which is not happening now.
+           */
+          const points =
+            c.points.type === 'Feature'
+              ? c.points.geometry.coordinates
+              : c.points.coordinates;
+
+          // Return the feature count
+          return count + points.length + c.polygons.length;
         },
         0
       );

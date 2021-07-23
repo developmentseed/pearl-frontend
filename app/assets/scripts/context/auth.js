@@ -40,7 +40,7 @@ function InnerAuthProvider(props) {
   const fetchToken = async () => {
     try {
       const token = await getAccessTokenSilently({
-        audience: config.audience,
+        audience: config.restApiEndpoint,
       });
       dispatchAuthState({
         type: actions.RECEIVE_LOGIN,
@@ -112,6 +112,7 @@ export function AuthProvider(props) {
     <Auth0Provider
       domain={config.auth0Domain}
       clientId={config.clientId}
+      audience={config.restApiEndpoint}
       redirectUri={window.location.origin}
       onRedirectCallback={onRedirectCallback}
     >
