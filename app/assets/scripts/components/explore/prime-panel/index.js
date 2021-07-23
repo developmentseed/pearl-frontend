@@ -139,7 +139,7 @@ function PrimePanel() {
     if (currentCheckpoint) {
       let sampleCount = Object.values(currentCheckpoint.classes || {}).reduce(
         (count, c) => {
-          return count + c.points.length + c.polygons.length;
+          return count + c.points.coordinates.length + c.polygons.length;
         },
         0
       );

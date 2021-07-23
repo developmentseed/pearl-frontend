@@ -564,7 +564,7 @@ export function InstanceProvider(props) {
               // sometimes there are only points or polygons
               // convert MultiPoint to Feature
               let features = [];
-              if (c.points.length) {
+              if (c.points.coordinates.length) {
                 c.points = feature(c.points);
                 features = features.concat(c.points);
               }
