@@ -32,7 +32,7 @@ import { actions as aoiPatchActions } from './reducers/aoi_patch';
 import { useModel } from './model';
 
 import { wrapLogReducer } from './reducers/utils';
-import { featureCollection, feature, point } from '@turf/helpers';
+import { featureCollection, feature } from '@turf/helpers';
 
 const messageQueueActionTypes = {
   ABORT: 'ABORT',
@@ -571,7 +571,7 @@ export function InstanceProvider(props) {
               if (c.polygons.length) {
                 // convert Polygons to Feature
                 c.polygons = c.polygons.map((p) => {
-                    return feature(p);
+                  return feature(p);
                 });
                 features = features.concat(c.polygons);
               }
