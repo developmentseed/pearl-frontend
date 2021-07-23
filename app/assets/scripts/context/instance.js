@@ -561,10 +561,8 @@ export function InstanceProvider(props) {
           data: {
             name: aoiName,
             classes: classes.map((c) => {
-              // convert MultiPoint to Point Feature
-              c.points = c.points.coordinates.map((p) => {
-                return point(p);
-              });
+              // convert MultiPoint to Feature
+              c.points = feature(c.points);
 
               // convert Polygons to Feature
               c.polygons = c.polygons.map((p) => {
