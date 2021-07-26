@@ -13,6 +13,7 @@
 // https://on.cypress.io/configuration
 // ***********************************************************
 
+import 'cypress-file-upload';
 require('./commands/start-server');
 require('./commands/fake-login');
 require('./commands/mock-regular-project');

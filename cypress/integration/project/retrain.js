@@ -60,6 +60,18 @@ describe('Open existing project', () => {
     //   .trigger('mousemove', ...feature3[3])
     //   .trigger('mouseup', ...feature3[3]);
 
-    cy.get('[data-cy=run-button').click();
+    // Open import modal
+    cy.get('[data-cy=open-upload-samples-modal-button').click();
+
+    // Open select file dialog
+    cy.get('[data-cy=select-samples-file-button').click();
+
+    // Apply file to input
+    cy.get('[data-cy=samples-upload-input]').attachFile('samples.geojson');
+
+    // Proceed importing
+    cy.get('[data-cy=import-samples-button').click();
+
+    // cy.get('[data-cy=run-button').click();
   });
 });
