@@ -138,7 +138,6 @@ function SessionOutputControl(props) {
   );
 
   const { projectName, currentProject, setProjectName } = useProject();
-  console.log(projectName, projectId)
 
   const initialName = projectName || 'Untitled';
 
