@@ -3,12 +3,18 @@ describe('Loads AOIs', () => {
 
   beforeEach(() => {
     cy.startServer();
+    cy.fakeLogin();
+    cy.mockRegularProject();
     cy.visit('/project/new');
+
+    cy.get('[data-cy=modal-project-input]').clear().type('Project name');
+    cy.get('[data-cy=create-project-button]').click({ force: true });
   });
 
   it('Can draw an aoi', () => {
     map = Cypress.map;
     map.setZoom(14);
+
     cy.get('[data-cy=aoi-edit-button]').click();
     cy.get('#map')
       .trigger('mousedown', 150, 150)
