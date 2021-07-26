@@ -138,6 +138,7 @@ function SessionOutputControl(props) {
   );
 
   const { projectName, currentProject, setProjectName } = useProject();
+  console.log(projectName, projectId)
 
   const initialName = projectName || 'Untitled';
 
@@ -380,7 +381,8 @@ function SessionOutputControl(props) {
         id='project-name-modal'
         data-cy='project-name-modal'
         title='New project'
-        revealed={!projectName}
+        // Reveal modal on mount for new projects, not existing ones
+        revealed={!projectName && projectId && projectId === 'new'}
         className='faded-background'
         size='small'
         closeButton={false}
