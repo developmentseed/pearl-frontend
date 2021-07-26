@@ -398,6 +398,7 @@ function SessionOutputControl(props) {
             />
             <Button
               type='submit'
+              variation='primary-raised-dark'
               size='medium'
               useIcon={['arrow-right', 'after']}
               data-cy='create-project-button'
