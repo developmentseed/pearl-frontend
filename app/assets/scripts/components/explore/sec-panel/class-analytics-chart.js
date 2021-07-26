@@ -93,7 +93,17 @@ const options = {
   maintainAspectRatio: false,
 };
 function ClassAnalyticsChart(props) {
-  const { checkpoint, label, metric } = props;
+  const { checkpoint, label, metric, formatter } = props;
+
+  const prettyPrint = (value, metric) => {
+    if (formatter) {
+      return formatter(value, metric);
+    } else if (metric === 'percent') {
+      return `${round(value, 2) * 100}%`;
+    } else {
+      return round(value, 2);
+    }
+  };
   return (
     <Wrapper>
       <ChartContainer>
@@ -121,9 +131,7 @@ function ClassAnalyticsChart(props) {
                 <Icon color={c.color} />
                 <Prose size='small'>{c.name}</Prose>
                 <Prose size='small' className='percent'>
-                  {metric === 'percent'
-                    ? `${round(checkpoint.analytics[i][metric], 2) * 100}%`
-                    : round(checkpoint.analytics[i][metric], 2)}
+                  {prettyPrint(checkpoint.analytics[i][metric], metric)}
                 </Prose>
               </ClassItem>
             )
@@ -136,6 +144,7 @@ ClassAnalyticsChart.propTypes = {
   checkpoint: T.object,
   label: T.string,
   metric: T.string,
+  formatter: T.func
 };
 
 export default ClassAnalyticsChart;

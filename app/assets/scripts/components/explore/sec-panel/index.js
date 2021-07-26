@@ -14,6 +14,7 @@ import { PlaceholderMessage } from '../../../styles/placeholder.js';
 
 import { glsp } from '@devseed-ui/theme-provider';
 import { useCheckpoint } from '../../../context/checkpoint';
+import { useAoi } from '../../../context/aoi';
 
 const StyledBlockBody = styled(PanelBlockBody)`
   justify-content: flex-start;
@@ -39,8 +40,11 @@ const PanelBlockScrollPadded = styled(PanelBlockScroll)`
 
 function SecPanel() {
   const { currentCheckpoint } = useCheckpoint();
+  const { currentAoi } = useAoi();
 
-  if (!currentCheckpoint) return null;
+  if (!currentCheckpoint || !currentAoi) return null;
+
+  const { px_stats } = currentAoi;
 
   return (
     <Panel
@@ -62,9 +66,16 @@ function SecPanel() {
                     <Subheading>Retraining Sample Distribution</Subheading>
                   </PanelBlockHeader>
                   <ClassAnalyticsChart
-                    checkpoint={currentCheckpoint}
+                    checkpoint={{
+                      ...currentCheckpoint,
+                      analytics: currentCheckpoint.analytics.map((c, ind) => ({
+                        ...c,
+                        px_stat: px_stats[ind],
+                      })),
+                    }}
                     label='Retraining Sample Distribution'
-                    metric='percent'
+                    metric='px_stat'
+                    formatter = {v => v}
                   />
                 </StyledBlockBody>
                 <StyledBlockBody>

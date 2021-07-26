@@ -114,6 +114,12 @@ Cypress.Commands.add('mockRegularProject', () => {
               { name: 'Impervious Surface', color: '#BFB5B5' },
               { name: 'Impervious Road', color: '#320000' },
             ],
+            px_stats: {
+              0: 0.002208709716796875,
+              1: 0.0003598531087239583,
+              2: 0.00007502237955729167,
+              3: 0,
+            },
             shares: [],
           },
           {
@@ -147,6 +153,12 @@ Cypress.Commands.add('mockRegularProject', () => {
               { name: 'Impervious Surface', color: '#BFB5B5' },
               { name: 'Impervious Road', color: '#320000' },
             ],
+            px_stats: {
+              0: 0.002208709716796875,
+              1: 0.0003598531087239583,
+              2: 0.00007502237955729167,
+              3: 0,
+            },
             shares: [],
           },
         ],
@@ -432,6 +444,14 @@ Cypress.Commands.add('mockRegularProject', () => {
           ],
         ],
       },
+
+      px_stats: {
+        0: 0.002208709716796875,
+        1: 0.0003598531087239583,
+        2: 0.00007502237955729167,
+        3: 0,
+      },
+
       shares: [],
     }
   );
@@ -472,6 +492,13 @@ Cypress.Commands.add('mockRegularProject', () => {
           ],
         ],
       },
+      px_stats: {
+        0: 0.002208709716796875,
+        1: 0.0003598531087239583,
+        2: 0.00007502237955729167,
+        3: 0,
+      },
+
       shares: [],
     }
   );
@@ -512,6 +539,13 @@ Cypress.Commands.add('mockRegularProject', () => {
           ],
         ],
       },
+      px_stats: {
+        0: 0.002208709716796875,
+        1: 0.0003598531087239583,
+        2: 0.00007502237955729167,
+        3: 0,
+      },
+
       shares: [],
     }
   );
