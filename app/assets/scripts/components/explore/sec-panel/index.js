@@ -10,11 +10,11 @@ import {
 } from '../../common/panel-block';
 import { Heading } from '@devseed-ui/typography';
 import { Subheading } from '../../../styles/type/heading';
-import { PlaceholderMessage } from '../../../styles/placeholder.js';
 
 import { glsp } from '@devseed-ui/theme-provider';
 import { useCheckpoint } from '../../../context/checkpoint';
 import { useAoi } from '../../../context/aoi';
+import { round } from '../../../utils/format';
 
 const StyledBlockBody = styled(PanelBlockBody)`
   justify-content: flex-start;
@@ -56,45 +56,44 @@ function SecPanel() {
           <PanelBlockHeader>
             <Heading size='xsmall'>Analysis</Heading>
           </PanelBlockHeader>
-          {currentCheckpoint.input_geoms &&
-          currentCheckpoint.retrain_geoms &&
-          currentCheckpoint.analytics ? (
-            <PanelBlockScrollPadded>
-              <ScrollBodyWrapper>
+          <PanelBlockScrollPadded>
+            <ScrollBodyWrapper>
+              {px_stats && (
                 <StyledBlockBody>
                   <PanelBlockHeader>
-                    <Subheading>Retraining Sample Distribution</Subheading>
+                    <Subheading>Checkpoint Class Distribution</Subheading>
                   </PanelBlockHeader>
                   <ClassAnalyticsChart
                     checkpoint={{
                       ...currentCheckpoint,
-                      analytics: currentCheckpoint.analytics.map((c, ind) => ({
-                        ...c,
-                        px_stat: px_stats[ind],
-                      })),
+                      analytics: Object.keys(currentCheckpoint.classes).map(
+                        (_, ind) => ({
+                          px_stat: px_stats[ind],
+                        })
+                      ),
                     }}
                     label='Retraining Sample Distribution'
                     metric='px_stat'
-                    formatter = {v => v}
+                    formatter={(v) => `${round(v, 2) * 100}%`}
                   />
                 </StyledBlockBody>
-                <StyledBlockBody>
-                  <PanelBlockHeader>
-                    <Subheading>Class F1 Scores</Subheading>
-                  </PanelBlockHeader>
-                  <ClassAnalyticsChart
-                    checkpoint={currentCheckpoint}
-                    label='Class F1 Score'
-                    metric='f1score'
-                  />
-                </StyledBlockBody>
-              </ScrollBodyWrapper>
-            </PanelBlockScrollPadded>
-          ) : (
-            <PanelBlockBody>
-              <PlaceholderMessage>Retrain to see metrics.</PlaceholderMessage>
-            </PanelBlockBody>
-          )}
+              )}
+              {currentCheckpoint.input_geoms &&
+                currentCheckpoint.retrain_geoms &&
+                currentCheckpoint.analytics && (
+                  <StyledBlockBody>
+                    <PanelBlockHeader>
+                      <Subheading>Class F1 Scores</Subheading>
+                    </PanelBlockHeader>
+                    <ClassAnalyticsChart
+                      checkpoint={currentCheckpoint}
+                      label='Class F1 Score'
+                      metric='f1score'
+                    />
+                  </StyledBlockBody>
+                )}
+            </ScrollBodyWrapper>
+          </PanelBlockScrollPadded>
         </PanelBlock>
       }
       data-cy='secondary-panel'

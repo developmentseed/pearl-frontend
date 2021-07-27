@@ -144,7 +144,7 @@ ClassAnalyticsChart.propTypes = {
   checkpoint: T.object,
   label: T.string,
   metric: T.string,
-  formatter: T.func
+  formatter: T.func,
 };
 
 export default ClassAnalyticsChart;
