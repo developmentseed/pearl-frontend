@@ -92,6 +92,8 @@ class PolygonDrawControl {
     if (this._shape) {
       this._shape.remove();
     }
+
+    this._nodes = [];
   }
 
   enable() {
