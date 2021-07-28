@@ -9,28 +9,21 @@ class PolygonDrawControl {
     this._map = map;
     this._onDrawFinish = onDrawFinish;
     this._nodes = [];
-  }
-
-  _initMarkers() {
-    if (!this._markerGroup) {
-      this._markerGroup = new L.LayerGroup();
-    }
+    this._ignoreNextClickEvent = false;
   }
 
   _addStartNode(coords) {
     // Create marker
-    const marker = new L.Marker(coords, {
+    this._starterMarker = new L.Marker(coords, {
       icon: startNodeIcon,
       zIndexOffset: 10,
+      bubblingMouseEvents: false,
     });
 
     // Add click event
-    marker.on('mousedown', this._closePolygon, this);
-
-    // Add to map
-    this._markerGroup.addLayer(marker);
-
-    return marker;
+    this._starterMarker
+      .on('mousedown', this._closePolygon, this)
+      .addTo(this._map);
   }
 
   _getEventLatLng(event) {
@@ -41,6 +34,13 @@ class PolygonDrawControl {
   }
 
   _onMouseDown(e) {
+    // _onMouseDown is called to _map and _starter makers, so it will be called
+    // unnecessarily after _closePolygon
+    if (this._ignoreNextClickEvent) {
+      this._ignoreNextClickEvent = false;
+      return;
+    }
+
     // Transform x/y to lat/lon
     const coords = this._getEventLatLng(e);
 
@@ -58,18 +58,13 @@ class PolygonDrawControl {
         this._shape = L.polyline(this._nodes, {
           weight: 4,
           fillOpacity: 0.4,
-        }).addTo(this._markerGroup);
+        }).addTo(this._map);
       }
     }
   }
 
   _closePolygon() {
-    // Replace polyline by a polygon
-    this._shape.remove();
-    this._shape = L.polygon(this._nodes, {
-      weight: 4,
-      fillOpacity: 0.4,
-    }).addTo(this._map);
+    this._ignoreNextClickEvent = true;
 
     // Make it a close polygon
     this._nodes = this._nodes.concat([this._nodes[0]]);
@@ -84,32 +79,26 @@ class PolygonDrawControl {
   }
 
   clear() {
-    // Remove starter node marker
-    if (this._markerGroup) {
-      this._markerGroup.remove();
+    if (this._starterMarker) {
+      this._starterMarker.remove();
+      this._starterMarker = null;
     }
-    // Remove polygon (or polyline)
     if (this._shape) {
       this._shape.remove();
+      this._shape = null;
     }
 
     this._nodes = [];
   }
 
   enable() {
-    // Init markers layer
-    if (!this._markerGroup) {
-      this._initMarkers();
-      this._map.addLayer(this._markerGroup);
-    }
-
     // Start capturing clicks on the map
     this._map.on('mousedown', this._onMouseDown, this);
   }
 
   disable() {
     // Remove click events
-    this._map.off('mousedown', this._onMouseDown, this);
+    this._map.off('mousedown');
 
     // Clear map
     this.clear();
