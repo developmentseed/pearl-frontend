@@ -5,11 +5,15 @@ const startNodeIcon = new L.DivIcon({
   className: 'leaflet-div-icon leaflet-editing-icon leaflet-edit-move',
 });
 class PolygonDrawControl {
-  constructor(map, onDrawFinish) {
+  constructor({ map, onDrawFinish }) {
     this._map = map;
     this._onDrawFinish = onDrawFinish;
     this._nodes = [];
     this._ignoreNextClickEvent = false;
+  }
+
+  setCheckpoint(checkpoint) {
+    this._checkpoint = checkpoint;
   }
 
   _addStartNode(coords) {
@@ -69,16 +73,28 @@ class PolygonDrawControl {
     // Make it a close polygon
     this._nodes = this._nodes.concat([this._nodes[0]]);
 
-    // Pass geometry via onDrawFinish event
+    // Get active class
+    const { activeItem } = this._checkpoint;
+    const activeClass = this._checkpoint.classes[activeItem];
+
+    // Add polygon to class and update checkpoint
     this._onDrawFinish({
-      type: 'Polygon',
-      coordinates: [this._nodes.map(([lat, lon]) => [lon, lat])],
+      ...this._checkpoint,
+      classes: {
+        ...this._checkpoint.classes,
+        [activeItem]: {
+          polygons: activeClass.polygons.concat({
+            type: 'Polygon',
+            coordinates: [this._nodes.map(([lat, lon]) => [lon, lat])],
+          }),
+        },
+      },
     });
 
-    this.clear();
+    this._clear();
   }
 
-  clear() {
+  _clear() {
     if (this._starterMarker) {
       this._starterMarker.remove();
       this._starterMarker = null;
@@ -92,16 +108,15 @@ class PolygonDrawControl {
   }
 
   enable() {
-    // Start capturing clicks on the map
     this._map.on('mousedown', this._onMouseDown, this);
   }
 
   disable() {
+    // Clear drawn polygon
+    this._clear();
+
     // Remove click events
     this._map.off('mousedown');
-
-    // Clear map
-    this.clear();
   }
 }
 

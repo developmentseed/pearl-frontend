@@ -65,7 +65,10 @@ function RetrainModel(props) {
               visuallyDisabled={!currentCheckpoint.activeItem}
               info={!currentCheckpoint.activeItem && 'No active item selected'}
               onClick={() => {
-                if (currentCheckpoint.activeItem) {
+                if (
+                  currentCheckpoint.activeItem &&
+                  mapState.mode !== mapModes.ADD_SAMPLE_POLYGON
+                ) {
                   setMapMode(mapModes.ADD_SAMPLE_POLYGON);
                 }
               }}
