@@ -121,7 +121,7 @@ export function InstanceProvider(props) {
     dispatchCurrentCheckpoint,
     fetchCheckpoint,
   } = useCheckpoint();
-  const { currentProject, setCurrentProject } = useProject();
+  const { currentProject, setCurrentProject, projectName } = useProject();
   const { dispatchPredictions } = usePredictions();
   const { currentAoi, aoiName, aoiRef } = useAoi();
   const { dispatchAoiPatch } = useAoiPatch();
@@ -426,7 +426,7 @@ export function InstanceProvider(props) {
             project = await restApiClient.createProject({
               model_id: selectedModel.id,
               mosaic: 'naip.latest',
-              name: 'Untitled',
+              name: projectName,
             });
             setCurrentProject(project);
             history.push(`/project/${project.id}`);
