@@ -18,10 +18,10 @@ describe('Open existing project', () => {
 
     // Base feature to perform map edit actions
     const baseFeature = [
-      [470, 300],
-      [500, 250],
-      [550, 300],
-      [500, 350],
+      [470, 250],
+      [490, 230],
+      [510, 250],
+      [490, 270],
     ];
 
     // Helper function to move feature around
@@ -29,7 +29,7 @@ describe('Open existing project', () => {
       return feature.map(([x, y]) => [x + xDiff, y + yDiff]);
     }
 
-    // Draw sample with freehand tool
+    // Draw with freehand tool
     cy.get('[data-cy=retrain-draw-freehand').click();
     const feature1 = baseFeature;
     cy.get('#app-container')
@@ -39,8 +39,8 @@ describe('Open existing project', () => {
       .trigger('mousemove', ...feature1[3])
       .trigger('mouseup', ...feature1[3]);
 
-    // Draw sample with polygon tool
-    const feature2 = translateFeature(feature1, 0, 120);
+    // Draw complete polygon with polygon draw
+    const feature2 = translateFeature(baseFeature, 0, 50);
     cy.get('[data-cy=retrain-draw-polygon').click();
     cy.get('#app-container')
       .trigger('mousedown', ...feature2[0])
@@ -50,15 +50,35 @@ describe('Open existing project', () => {
       .trigger('mousedown', ...feature2[0])
       .trigger('mouseup');
 
-    // Draw sample with freehand tool
-    // const feature3 = translateFeature(feature1, 100, 0);
-    // cy.get('[data-cy=retrain-draw-freehand').click();
-    // cy.get('#app-container')
-    //   .trigger('mousedown', ...feature3[0])
-    //   .trigger('mousemove', ...feature3[1])
-    //   .trigger('mousemove', ...feature3[2])
-    //   .trigger('mousemove', ...feature3[3])
-    //   .trigger('mouseup', ...feature3[3]);
+    // Draw incomplete than switch to other tool, should clear
+    const feature3 = translateFeature(baseFeature, 0, 100);
+    cy.get('#app-container')
+      .trigger('mousedown', ...feature3[0])
+      .trigger('mousedown', ...feature3[1])
+      .trigger('mousedown', ...feature3[2])
+      .trigger('mousedown', ...feature3[3])
+      .trigger('mouseup');
+    cy.get('[data-cy=retrain-draw-freehand').click();
+    cy.get('[data-cy=retrain-draw-polygon').click();
+    cy.get('#app-container')
+      .trigger('mousedown', ...feature3[0])
+      .trigger('mousedown', ...feature3[1])
+      .trigger('mousedown', ...feature3[2])
+      .trigger('mousedown', ...feature3[3])
+      .trigger('mousedown', ...feature3[0])
+      .trigger('mouseup');
+
+    // Polygon draw with different class
+    const feature4 = translateFeature(baseFeature, 0, 150);
+    cy.get('[data-cy=retrain-draw-polygon').click();
+    cy.get('[data-cy=Tree-class-button').click();
+    cy.get('#app-container')
+      .trigger('mousedown', ...feature4[0])
+      .trigger('mousedown', ...feature4[1])
+      .trigger('mousedown', ...feature4[2])
+      .trigger('mousedown', ...feature4[3])
+      .trigger('mousedown', ...feature4[0])
+      .trigger('mouseup');
 
     cy.get('[data-cy=run-button').click();
   });

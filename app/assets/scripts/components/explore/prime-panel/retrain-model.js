@@ -149,6 +149,7 @@ function RetrainModel(props) {
               return (
                 <Class
                   key={c.name}
+                  data-cy={`${c.name}-class-button`}
                   onClick={() => {
                     dispatchCurrentCheckpoint({
                       type: actions.SET_ACTIVE_CLASS,
