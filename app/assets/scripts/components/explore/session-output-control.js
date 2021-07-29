@@ -139,7 +139,7 @@ function SessionOutputControl(props) {
 
   const { projectName, currentProject, setProjectName } = useProject();
 
-  const initialName = projectName || 'Untitled';
+  const initialName = projectName;
 
   const [localProjectName, setLocalProjectName] = useState(projectName);
   const [titleEditMode, setTitleEditMode] = useState(false);
@@ -244,7 +244,7 @@ function SessionOutputControl(props) {
               }
               data-cy='project-name'
             >
-              {projectName || 'Untitled Project'}
+              {projectName}
             </Heading>
             <InfoButton
               size='small'
