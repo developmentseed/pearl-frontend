@@ -29,6 +29,9 @@ describe('Open existing project', () => {
       return feature.map(([x, y]) => [x + xDiff, y + yDiff]);
     }
 
+    // Select Barren class
+    cy.get('[data-cy="Barren-class-button"').click();
+
     // Draw with freehand tool
     cy.get('[data-cy=retrain-draw-freehand').click();
     const feature1 = baseFeature;
@@ -79,6 +82,24 @@ describe('Open existing project', () => {
       .trigger('mousedown', ...feature4[3])
       .trigger('mousedown', ...feature4[0])
       .trigger('mouseup');
+
+    // Add another feature
+    const feature5 = translateFeature(baseFeature, 70, 0);
+    cy.get('#app-container')
+      .trigger('mousedown', ...feature5[0])
+      .trigger('mousedown', ...feature5[1])
+      .trigger('mousedown', ...feature5[2])
+      .trigger('mousedown', ...feature5[3])
+      .trigger('mousedown', ...feature5[0])
+      .trigger('mouseup');
+
+    // Delete features
+    cy.get('[data-cy=eraser-button').click();
+    cy.get('[data-cy=Barren-class-button').click();
+    cy.get('#app-container').click(...feature1[0]);
+    cy.get('#app-container').click(...feature5[0]); // should not be able to delete
+    cy.get('[data-cy=Tree-class-button').click();
+    cy.get('#app-container').click(...feature4[0]); // should be able to delete
 
     cy.get('[data-cy=run-button').click();
   });

@@ -116,6 +116,7 @@ function RetrainModel(props) {
             </InfoButton>
 
             <InfoButton
+              data-cy='eraser-button'
               variation={
                 mapState.mode === mapModes.DELETE_SAMPLES
                   ? 'primary-raised-dark'
