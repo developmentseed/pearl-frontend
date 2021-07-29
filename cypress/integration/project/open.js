@@ -19,8 +19,8 @@ describe('Open existing project', () => {
     cy.get('[data-cy=project-name-edit]').click();
     cy.get('[data-cy=project-input]').clear().type('New name');
     cy.get('[data-cy=project-name-confirm]').click({ force: true });
-    cy.get('@patchProjectName').then(({ response }) => {
-      assert(response.body.name === 'New name');
+    cy.wait('@patchProjectName').then(({ response: { body } }) => {
+      assert(body.name === 'New name');
     });
 
     cy.get('[data-cy=global-loading]').should('not.exist');
