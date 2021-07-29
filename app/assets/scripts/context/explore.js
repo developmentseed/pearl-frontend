@@ -51,7 +51,12 @@ export function ExploreProvider(props) {
   }, [tourStep]);
 
   const { restApiClient, isLoading: authIsLoading } = useAuth();
-  const { currentProject, setCurrentProject } = useProject();
+  const {
+    currentProject,
+    setCurrentProject,
+    projectName,
+    setProjectName,
+  } = useProject();
   const {
     aoiName,
     aoiRef,
@@ -109,6 +114,7 @@ export function ExploreProvider(props) {
       showGlobalLoadingMessage('Fetching project metadata...');
       project = await restApiClient.getProject(projectId);
       setCurrentProject(project);
+      setProjectName(project.name);
     } catch (error) {
       hideGlobalLoading();
       logger(error);
@@ -420,31 +426,41 @@ export function ExploreProvider(props) {
     return bounds;
   }
 
-  async function updateProjectName(projectName) {
+  async function updateProjectName(name) {
     if (restApiClient) {
-      let project = currentProject;
-
-      //Create project if one does not already exist
-      if (!project) {
+      let project;
+      if (!currentProject) {
+        toasts.error('Project does not exist yet');
+      } else {
         try {
-          showGlobalLoadingMessage('Creating project...');
-          project = await restApiClient.createProject({
-            model_id: selectedModel.id,
-            mosaic: 'naip.latest',
-            name: projectName,
+          project = await restApiClient.patch(`project/${currentProject.id}`, {
+            name,
           });
           setCurrentProject(project);
-          history.push(`/project/${project.id}`);
-          hideGlobalLoading();
-        } catch (error) {
-          hideGlobalLoading();
-          toasts.error('Could not create project, please try again later.');
+          toasts.success('Project name updated');
+        } catch (err) {
+          toasts.error('Could not update project name');
         }
-      } else {
-        // just update project name
-        restApiClient.patch(`project/${project.id}`, {
+      }
+    }
+  }
+
+  async function createProject() {
+    if (restApiClient) {
+      let project;
+      try {
+        showGlobalLoadingMessage('Creating project...');
+        project = await restApiClient.createProject({
+          model_id: selectedModel.id,
+          mosaic: 'naip.latest',
           name: projectName,
         });
+        setCurrentProject(project);
+        history.push(`/project/${project.id}`);
+        hideGlobalLoading();
+      } catch (error) {
+        hideGlobalLoading();
+        toasts.error('Could not create project, please try again later.');
       }
     }
   }
@@ -523,6 +539,7 @@ export function ExploreProvider(props) {
         setSelectedModel,
 
         updateProjectName,
+        createProject,
         updateCheckpointName,
 
         dispatchAoiPatch,

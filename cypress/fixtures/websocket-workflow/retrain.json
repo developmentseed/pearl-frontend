@@ -52,6 +52,16 @@
           {
             "name": "Water / Wetland",
             "color": "#486DA2",
+            "geometry": { "type": "FeatureCollection", "features": [] }
+          },
+          {
+            "name": "Emergent Wetlands",
+            "color": "#00A884",
+            "geometry": { "type": "FeatureCollection", "features": [] }
+          },
+          {
+            "name": "Tree",
+            "color": "#6CA966",
             "geometry": {
               "type": "FeatureCollection",
               "features": [
@@ -62,43 +72,17 @@
                     "type": "Polygon",
                     "coordinates": [
                       [
-                        [-79.38652, 38.837568],
-                        [-79.389095, 38.840911],
-                        [-79.38652, 38.844254],
-                        [-79.382229, 38.840911],
-                        [-79.38652, 38.837568]
-                      ]
-                    ]
-                  }
-                },
-                {
-                  "type": "Feature",
-                  "properties": {},
-                  "geometry": {
-                    "type": "Polygon",
-                    "coordinates": [
-                      [
-                        [-79.3890953063965, 38.832888196605985],
-                        [-79.3865203857422, 38.83623112969468],
-                        [-79.38222885131837, 38.832888196605985],
-                        [-79.3865203857422, 38.829545106506025],
-                        [-79.3890953063965, 38.832888196605985]
+                        [-79.383087, 38.844254],
+                        [-79.381371, 38.845591],
+                        [-79.379654, 38.844254],
+                        [-79.381371, 38.842917],
+                        [-79.383087, 38.844254]
                       ]
                     ]
                   }
                 }
               ]
             }
-          },
-          {
-            "name": "Emergent Wetlands",
-            "color": "#00A884",
-            "geometry": { "type": "FeatureCollection", "features": [] }
-          },
-          {
-            "name": "Tree",
-            "color": "#6CA966",
-            "geometry": { "type": "FeatureCollection", "features": [] }
           },
           {
             "name": "Shrubland",
@@ -113,7 +97,43 @@
           {
             "name": "Barren",
             "color": "#D2AD74",
-            "geometry": { "type": "FeatureCollection", "features": [] }
+            "geometry": {
+              "type": "FeatureCollection",
+              "features": [
+                {
+                  "type": "Feature",
+                  "properties": {},
+                  "geometry": {
+                    "type": "Polygon",
+                    "coordinates": [
+                      [
+                        [-79.389095, 38.840911],
+                        [-79.387379, 38.842248],
+                        [-79.385662, 38.840911],
+                        [-79.387379, 38.839574],
+                        [-79.389095, 38.840911]
+                      ]
+                    ]
+                  }
+                },
+                {
+                  "type": "Feature",
+                  "properties": {},
+                  "geometry": {
+                    "type": "Polygon",
+                    "coordinates": [
+                      [
+                        [-79.389095, 38.837568],
+                        [-79.387379, 38.838905],
+                        [-79.385662, 38.837568],
+                        [-79.387379, 38.836231],
+                        [-79.389095, 38.837568]
+                      ]
+                    ]
+                  }
+                }
+              ]
+            }
           },
           {
             "name": "Structure",

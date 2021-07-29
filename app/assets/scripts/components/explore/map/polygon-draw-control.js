@@ -5,32 +5,30 @@ const startNodeIcon = new L.DivIcon({
   className: 'leaflet-div-icon leaflet-editing-icon leaflet-edit-move',
 });
 class PolygonDrawControl {
-  constructor(map, onDrawFinish) {
+  constructor({ map, onDrawFinish }) {
     this._map = map;
     this._onDrawFinish = onDrawFinish;
     this._nodes = [];
+    this._ignoreNextClickEvent = false;
   }
 
-  _initMarkers() {
-    if (!this._markerGroup) {
-      this._markerGroup = new L.LayerGroup();
-    }
+  setCheckpoint(checkpoint) {
+    this._checkpoint = checkpoint;
+    this._clear();
   }
 
   _addStartNode(coords) {
     // Create marker
-    const marker = new L.Marker(coords, {
+    this._starterMarker = new L.Marker(coords, {
       icon: startNodeIcon,
       zIndexOffset: 10,
+      bubblingMouseEvents: false,
     });
 
     // Add click event
-    marker.on('mousedown', this._closePolygon, this);
-
-    // Add to map
-    this._markerGroup.addLayer(marker);
-
-    return marker;
+    this._starterMarker
+      .on('mousedown', this._closePolygon, this)
+      .addTo(this._map);
   }
 
   _getEventLatLng(event) {
@@ -41,6 +39,13 @@ class PolygonDrawControl {
   }
 
   _onMouseDown(e) {
+    // _onMouseDown is called to _map and _starter makers, so it will be called
+    // unnecessarily after _closePolygon
+    if (this._ignoreNextClickEvent) {
+      this._ignoreNextClickEvent = false;
+      return;
+    }
+
     // Transform x/y to lat/lon
     const coords = this._getEventLatLng(e);
 
@@ -58,59 +63,61 @@ class PolygonDrawControl {
         this._shape = L.polyline(this._nodes, {
           weight: 4,
           fillOpacity: 0.4,
-        }).addTo(this._markerGroup);
+        }).addTo(this._map);
       }
     }
   }
 
   _closePolygon() {
-    // Replace polyline by a polygon
-    this._shape.remove();
-    this._shape = L.polygon(this._nodes, {
-      weight: 4,
-      fillOpacity: 0.4,
-    }).addTo(this._map);
+    this._ignoreNextClickEvent = true;
 
     // Make it a close polygon
     this._nodes = this._nodes.concat([this._nodes[0]]);
 
-    // Pass geometry via onDrawFinish event
+    // Get active class
+    const { activeItem } = this._checkpoint;
+    const activeClass = this._checkpoint.classes[activeItem];
+
+    // Add polygon to class and update checkpoint
     this._onDrawFinish({
-      type: 'Polygon',
-      coordinates: [this._nodes.map(([lat, lon]) => [lon, lat])],
+      ...this._checkpoint,
+      classes: {
+        ...this._checkpoint.classes,
+        [activeItem]: {
+          polygons: activeClass.polygons.concat({
+            type: 'Polygon',
+            coordinates: [this._nodes.map(([lat, lon]) => [lon, lat])],
+          }),
+        },
+      },
     });
 
-    this.clear();
+    this._clear();
   }
 
-  clear() {
-    // Remove starter node marker
-    if (this._markerGroup) {
-      this._markerGroup.remove();
+  _clear() {
+    if (this._starterMarker) {
+      this._starterMarker.remove();
+      this._starterMarker = null;
     }
-    // Remove polygon (or polyline)
     if (this._shape) {
       this._shape.remove();
+      this._shape = null;
     }
+
+    this._nodes = [];
   }
 
   enable() {
-    // Init markers layer
-    if (!this._markerGroup) {
-      this._initMarkers();
-      this._map.addLayer(this._markerGroup);
-    }
-
-    // Start capturing clicks on the map
     this._map.on('mousedown', this._onMouseDown, this);
   }
 
   disable() {
-    // Remove click events
-    this._map.off('mousedown', this._onMouseDown, this);
+    // Clear drawn polygon
+    this._clear();
 
-    // Clear map
-    this.clear();
+    // Remove click events
+    this._map.off('mousedown');
   }
 }
 

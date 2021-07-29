@@ -44,7 +44,6 @@ import {
 import toasts from '../../common/toasts';
 import logger from '../../../utils/logger';
 import PolygonDrawControl from './polygon-draw-control';
-import get from 'lodash.get';
 
 const center = [38.889805, -77.009056];
 const zoom = 12;
@@ -333,35 +332,31 @@ function Map() {
   useEffect(() => {
     if (!mapRef || !currentCheckpoint || !mapRef.freehandDraw) return;
 
-    mapRef.polygonDraw = new PolygonDrawControl(
-      mapRef,
-      (newPolygonGeometry) => {
-        // Append new polygon to existing, if any
-        const updatedPolygons = get(
-          currentCheckpoint,
-          `classes[${activeClass}].polygons`,
-          []
-        ).concat(newPolygonGeometry);
+    if (!mapRef.polygonDraw) {
+      mapRef.polygonDraw = new PolygonDrawControl({
+        map: mapRef,
+        onDrawFinish: (updatedCheckpoint) => {
+          // Update layers on free hand draw
+          mapRef.freehandDraw.setLayerPolygons(updatedCheckpoint.classes);
 
-        // Add or merge new polygon geometry
-        mapRef.freehandDraw.setLayerPolygons({
-          ...currentCheckpoint.classes,
-          [activeClass]: {
-            polygons: updatedPolygons,
-          },
-        });
+          // Update polygons on state
+          dispatchCurrentCheckpoint({
+            type: checkpointActions.UPDATE_POLYGONS,
+            data: {
+              name: updatedCheckpoint.activeItem,
+              isCheckpointPolygon: updatedCheckpoint.activeItem.includes(
+                'checkpoint'
+              ),
+              polygons:
+                updatedCheckpoint.classes[updatedCheckpoint.activeItem]
+                  .polygons,
+            },
+          });
+        },
+      });
+    }
 
-        // Update polygons on state
-        dispatchCurrentCheckpoint({
-          type: checkpointActions.UPDATE_POLYGONS,
-          data: {
-            name: activeClass,
-            isCheckpointPolygon: activeClass.includes('checkpoint'),
-            polygons: updatedPolygons,
-          },
-        });
-      }
-    );
+    mapRef.polygonDraw.setCheckpoint(currentCheckpoint);
   }, [mapRef, currentCheckpoint, activeClass]);
 
   const displayMap = useMemo(() => {

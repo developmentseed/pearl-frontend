@@ -75,7 +75,10 @@ function RetrainModel(props) {
               visuallyDisabled={!currentCheckpoint.activeItem}
               info={!currentCheckpoint.activeItem && 'No active item selected'}
               onClick={() => {
-                if (currentCheckpoint.activeItem) {
+                if (
+                  currentCheckpoint.activeItem &&
+                  mapState.mode !== mapModes.ADD_SAMPLE_POLYGON
+                ) {
                   setMapMode(mapModes.ADD_SAMPLE_POLYGON);
                 }
               }}
@@ -123,6 +126,7 @@ function RetrainModel(props) {
             </InfoButton>
 
             <InfoButton
+              data-cy='eraser-button'
               variation={
                 mapState.mode === mapModes.DELETE_SAMPLES
                   ? 'primary-raised-dark'
@@ -174,6 +178,7 @@ function RetrainModel(props) {
               return (
                 <Class
                   key={c.name}
+                  data-cy={`${c.name}-class-button`}
                   onClick={() => {
                     dispatchCurrentCheckpoint({
                       type: actions.SET_ACTIVE_CLASS,
