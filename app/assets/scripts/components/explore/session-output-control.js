@@ -402,7 +402,11 @@ function SessionOutputControl(props) {
               size='medium'
               useIcon={['arrow-right', 'after']}
               data-cy='create-project-button'
-              title='Set project name'
+              title={
+                !localProjectName
+                  ? 'Set project name to start new project'
+                  : 'Create new project'
+              }
             >
               Create Project
             </Button>
