@@ -53,8 +53,32 @@ function RetrainModel(props) {
           <RetrainTools>
             <Heading useAlt>Sample Selection Tools</Heading>
             <InfoButton
+              data-cy='retrain-draw-polygon'
               variation={
-                mapState.mode === mapModes.ADD_SAMPLE_FREE_HAND
+                mapState.mode === mapModes.ADD_SAMPLE_POLYGON
+                  ? 'primary-raised-dark'
+                  : 'primary-plain'
+              }
+              size='small'
+              radius='ellipsoid'
+              useIcon='pencil'
+              visuallyDisabled={!currentCheckpoint.activeItem}
+              info={!currentCheckpoint.activeItem && 'No active item selected'}
+              onClick={() => {
+                if (
+                  currentCheckpoint.activeItem &&
+                  mapState.mode !== mapModes.ADD_SAMPLE_POLYGON
+                ) {
+                  setMapMode(mapModes.ADD_SAMPLE_POLYGON);
+                }
+              }}
+            >
+              Polygon
+            </InfoButton>
+            <InfoButton
+              data-cy='retrain-draw-freehand'
+              variation={
+                mapState.mode === mapModes.ADD_SAMPLE_FREEHAND
                   ? 'primary-raised-dark'
                   : 'primary-plain'
               }
@@ -65,11 +89,11 @@ function RetrainModel(props) {
               info={!currentCheckpoint.activeItem && 'No active item selected'}
               onClick={() => {
                 if (currentCheckpoint.activeItem) {
-                  setMapMode(mapModes.ADD_SAMPLE_FREE_HAND);
+                  setMapMode(mapModes.ADD_SAMPLE_FREEHAND);
                 }
               }}
             >
-              Draw
+              Free Hand
             </InfoButton>
             <InfoButton
               variation={
@@ -92,6 +116,7 @@ function RetrainModel(props) {
             </InfoButton>
 
             <InfoButton
+              data-cy='eraser-button'
               variation={
                 mapState.mode === mapModes.DELETE_SAMPLES
                   ? 'primary-raised-dark'
@@ -125,6 +150,7 @@ function RetrainModel(props) {
               return (
                 <Class
                   key={c.name}
+                  data-cy={`${c.name}-class-button`}
                   onClick={() => {
                     dispatchCurrentCheckpoint({
                       type: actions.SET_ACTIVE_CLASS,

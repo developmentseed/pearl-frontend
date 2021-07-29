@@ -1,10 +1,7 @@
-// / <reference types="Cypress" />
 describe('The About Page', () => {
-  before(() => {
-    cy.visit('/about');
-  });
-
   it('successfully loads', () => {
+    cy.startServer();
+    cy.visit('/about');
     cy.get('body');
     cy.get('header');
   });

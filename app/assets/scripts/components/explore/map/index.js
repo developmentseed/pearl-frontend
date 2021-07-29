@@ -21,9 +21,10 @@ import { themeVal, multiply } from '@devseed-ui/theme-provider';
 import theme from '../../../styles/theme';
 import AoiDrawControl from './aoi-draw-control';
 import AoiEditControl from './aoi-edit-control';
-import PolygonDrawControl from './polygon-draw-control';
+import FreehandDrawControl from './freehand-draw-control';
 import config from '../../../config';
 import { inRange } from '../../../utils/utils';
+import usePrevious from '../../../utils/use-previous';
 import { areaFromBounds } from '../../../utils/map';
 import {
   useCheckpoint,
@@ -42,6 +43,7 @@ import {
 } from '../../../context/predictions';
 import toasts from '../../common/toasts';
 import logger from '../../../utils/logger';
+import PolygonDrawControl from './polygon-draw-control';
 
 const center = [38.889805, -77.009056];
 const zoom = 12;
@@ -101,6 +103,7 @@ function Map() {
   const { aoiPatchList } = useAoiPatch();
 
   const { mapState, mapModes, setMapMode } = useMapState();
+  const prevMapState = usePrevious(mapState);
   const { mapRef, setMapRef } = useMapRef();
   const [tileUrl, setTileUrl] = useState(null);
   const { dispatchPredictions } = usePredictions();
@@ -115,19 +118,33 @@ function Map() {
 
   // Manage changes in map mode
   useEffect(() => {
+    // Check if map mode changed and disable previous controls
+    if (prevMapState && mapState && mapState.mode !== prevMapState.mode) {
+      switch (prevMapState.mode) {
+        case mapModes.ADD_SAMPLE_POLYGON:
+          mapRef.polygonDraw.disable();
+          break;
+      }
+    }
+
+    /**
+     * The following block enables/disables map edit controls. Ideally we should use
+     * previous map mode to disable controls. In a refactor we should move disable actions
+     * to the code block above.
+     */
     switch (mapState.mode) {
       case mapModes.CREATE_AOI_MODE:
         mapRef.aoi.control.draw.enable();
-        mapRef.polygonDraw.disable();
+        mapRef.freehandDraw.disable();
         break;
       case mapModes.EDIT_AOI_MODE:
         mapRef.aoi.control.draw.disable();
         mapRef.aoi.control.edit.enable(aoiRef);
-        mapRef.polygonDraw.disable();
+        mapRef.freehandDraw.disable();
         break;
       case mapModes.BROWSE_MODE:
         if (mapRef) {
-          mapRef.polygonDraw.disable();
+          mapRef.freehandDraw.disable();
           if (aoiRef) {
             // Only disable if something has been drawn
             mapRef.aoi.control.draw.disable();
@@ -144,20 +161,26 @@ function Map() {
           }
         }
         break;
-      case mapModes.ADD_SAMPLE_FREE_HAND:
+      case mapModes.ADD_SAMPLE_POLYGON:
         if (currentCheckpoint && currentCheckpoint.activeItem) {
-          mapRef.polygonDraw.enableAdd(currentCheckpoint.activeItem);
+          mapRef.freehandDraw.disable();
+          mapRef.polygonDraw.enable(currentCheckpoint.activeItem);
+        }
+        break;
+      case mapModes.ADD_SAMPLE_FREEHAND:
+        if (currentCheckpoint && currentCheckpoint.activeItem) {
+          mapRef.freehandDraw.enableAdd(currentCheckpoint.activeItem);
         }
         break;
 
       case mapModes.DELETE_SAMPLES:
         if (currentCheckpoint && currentCheckpoint.activeItem) {
-          mapRef.polygonDraw.enableSubtract(currentCheckpoint.activeItem);
+          mapRef.freehandDraw.enableSubtract(currentCheckpoint.activeItem);
         }
         break;
 
       default:
-        mapRef.polygonDraw.disable();
+        mapRef.freehandDraw.disable();
         break;
     }
   }, [
@@ -174,13 +197,13 @@ function Map() {
 
   // Add polygon layers to be drawn when checkpoint has changed
   useEffect(() => {
-    if (!mapRef || !mapRef.polygonDraw) return;
+    if (!mapRef || !mapRef.freehandDraw) return;
 
-    mapRef.polygonDraw.clearLayers();
+    mapRef.freehandDraw.clearLayers();
 
     if (currentCheckpoint && currentCheckpoint.classes) {
-      mapRef.polygonDraw.setLayers(currentCheckpoint.classes);
-      mapRef.polygonDraw.setLayerPolygons(currentCheckpoint.classes);
+      mapRef.freehandDraw.setLayers(currentCheckpoint.classes);
+      mapRef.freehandDraw.setLayerPolygons(currentCheckpoint.classes);
     }
   }, [mapRef, id, classLength]);
 
@@ -300,6 +323,42 @@ function Map() {
     updateTileUrl();
   }, [currentAoi, currentProject, mapRef, aoiRef]);
 
+  /**
+   * Setup PolygonDrawControl: state of polygon map layers are handled by FreeHandDraw,
+   * this will wait for it to be ready before adding PolygonDraw. It also has activeClass
+   * as a dependency and will create a new instance when the controller changes.
+   */
+  const activeClass = currentCheckpoint && currentCheckpoint.activeItem;
+  useEffect(() => {
+    if (!mapRef || !currentCheckpoint || !mapRef.freehandDraw) return;
+
+    if (!mapRef.polygonDraw) {
+      mapRef.polygonDraw = new PolygonDrawControl({
+        map: mapRef,
+        onDrawFinish: (updatedCheckpoint) => {
+          // Update layers on free hand draw
+          mapRef.freehandDraw.setLayerPolygons(updatedCheckpoint.classes);
+
+          // Update polygons on state
+          dispatchCurrentCheckpoint({
+            type: checkpointActions.UPDATE_POLYGONS,
+            data: {
+              name: updatedCheckpoint.activeItem,
+              isCheckpointPolygon: updatedCheckpoint.activeItem.includes(
+                'checkpoint'
+              ),
+              polygons:
+                updatedCheckpoint.classes[updatedCheckpoint.activeItem]
+                  .polygons,
+            },
+          });
+        },
+      });
+    }
+
+    mapRef.polygonDraw.setCheckpoint(currentCheckpoint);
+  }, [mapRef, currentCheckpoint, activeClass]);
+
   const displayMap = useMemo(() => {
     return (
       <MapContainer
@@ -307,7 +366,7 @@ function Map() {
         zoom={zoom}
         style={{ height: '100%' }}
         whenCreated={(m) => {
-          const polygonDraw = new PolygonDrawControl(m, {
+          const freehandDraw = new FreehandDrawControl(m, {
             onUpdate: (name, polygons) => {
               let isCheckpointPolygon;
               if (name.includes('checkpoint')) {
@@ -325,7 +384,7 @@ function Map() {
             },
           });
 
-          m.polygonDraw = polygonDraw;
+          m.freehandDraw = freehandDraw;
 
           // Add map to state
           setMapRef(m);

@@ -1,91 +1,227 @@
 [
   {
-    "type": "send",
-    "data": { "action": "model#status" }
+    "type": "server",
+    "payload": { "message": "info#connected" }
   },
   {
-    "type": "receive",
-    "data": {
+    "type": "client",
+    "payload": { "action": "model#status" }
+  },
+  {
+    "type": "server",
+    "payload": {
       "message": "model#status",
       "data": {
         "is_aborting": false,
         "processing": false,
-        "aoi": false,
-        "checkpoint": false
+        "aoi": 2,
+        "checkpoint": 1
       }
     }
   },
   {
-    "type": "send",
-    "data": {
-      "action": "model#prediction",
+    "type": "reconnect"
+  },
+  {
+    "type": "server",
+    "payload": { "message": "info#connected" }
+  },
+  {
+    "type": "client",
+    "payload": { "action": "model#status" }
+  },
+  {
+    "type": "server",
+    "payload": {
+      "message": "model#status",
       "data": {
-        "name": "Downtown Washington DC",
-        "polygon": {
-          "type": "Polygon",
-          "coordinates": [
-            [
-              [-77.04442620277406, 38.90095276229],
-              [-77.04051017761232, 38.90095276229],
-              [-77.04051017761232, 38.90339078351956],
-              [-77.04442620277406, 38.90339078351956],
-              [-77.04442620277406, 38.90095276229]
-            ]
-          ]
-        }
+        "is_aborting": false,
+        "processing": false,
+        "aoi": 2,
+        "checkpoint": 1
       }
     }
   },
   {
-    "type": "receive",
-    "data": {
-      "message": "model#checkpoint",
-      "data": { "name": "Downtown Washington DC", "id": 2015 }
+    "type": "client",
+    "payload": {
+      "action": "model#retrain",
+      "data": {
+        "name": "Seneca Rocks",
+        "classes": [
+          {
+            "name": "Water / Wetland",
+            "color": "#486DA2",
+            "geometry": { "type": "FeatureCollection", "features": [] }
+          },
+          {
+            "name": "Emergent Wetlands",
+            "color": "#00A884",
+            "geometry": { "type": "FeatureCollection", "features": [] }
+          },
+          {
+            "name": "Tree",
+            "color": "#6CA966",
+            "geometry": {
+              "type": "FeatureCollection",
+              "features": [
+                {
+                  "type": "Feature",
+                  "properties": {},
+                  "geometry": {
+                    "type": "Polygon",
+                    "coordinates": [
+                      [
+                        [-79.383087, 38.844254],
+                        [-79.381371, 38.845591],
+                        [-79.379654, 38.844254],
+                        [-79.381371, 38.842917],
+                        [-79.383087, 38.844254]
+                      ]
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "Shrubland",
+            "color": "#ABC964",
+            "geometry": { "type": "FeatureCollection", "features": [] }
+          },
+          {
+            "name": "Low Vegetation",
+            "color": "#D0F3AB",
+            "geometry": { "type": "FeatureCollection", "features": [] }
+          },
+          {
+            "name": "Barren",
+            "color": "#D2AD74",
+            "geometry": {
+              "type": "FeatureCollection",
+              "features": [
+                {
+                  "type": "Feature",
+                  "properties": {},
+                  "geometry": {
+                    "type": "Polygon",
+                    "coordinates": [
+                      [
+                        [-79.389095, 38.840911],
+                        [-79.387379, 38.842248],
+                        [-79.385662, 38.840911],
+                        [-79.387379, 38.839574],
+                        [-79.389095, 38.840911]
+                      ]
+                    ]
+                  }
+                },
+                {
+                  "type": "Feature",
+                  "properties": {},
+                  "geometry": {
+                    "type": "Polygon",
+                    "coordinates": [
+                      [
+                        [-79.389095, 38.837568],
+                        [-79.387379, 38.838905],
+                        [-79.385662, 38.837568],
+                        [-79.387379, 38.836231],
+                        [-79.389095, 38.837568]
+                      ]
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "Structure",
+            "color": "#F10100",
+            "geometry": { "type": "FeatureCollection", "features": [] }
+          },
+          {
+            "name": "Impervious Surface",
+            "color": "#BFB5B5",
+            "geometry": { "type": "FeatureCollection", "features": [] }
+          },
+          {
+            "name": "Impervious Road",
+            "color": "#320000",
+            "geometry": { "type": "FeatureCollection", "features": [] }
+          }
+        ]
+      }
     }
   },
   {
-    "type": "send",
-    "data": { "action": "model#status" }
+    "type": "server",
+    "payload": { "message": "model#retrain#complete" }
   },
-
   {
-    "type": "receive",
-    "data": {
+    "type": "client",
+    "payload": { "action": "model#status" }
+  },
+  {
+    "type": "server",
+    "payload": {
+      "message": "model#status",
+      "data": {
+        "is_aborting": false,
+        "processing": true,
+        "aoi": 2,
+        "checkpoint": 2
+      }
+    }
+  },
+  {
+    "type": "server",
+    "payload": {
+      "message": "model#checkpoint",
+      "data": { "name": "Seneca Rocks", "id": 3 }
+    }
+  },
+  {
+    "type": "client",
+    "payload": { "action": "model#status" }
+  },
+  {
+    "type": "server",
+    "payload": {
       "message": "model#aoi",
       "data": {
-        "id": 2859,
+        "id": 3,
         "live": true,
-        "name": "Downtown Washington DC",
-        "checkpoint_id": 2015,
+        "name": "Area #1",
+        "checkpoint_id": 3,
         "bounds": [
-          -77.047119140625,
-          38.89958342598271,
-          -77.03887939453125,
-          38.903858339667764
+          -79.38995361328125,
+          38.833289356866885,
+          -79.37347412109375,
+          38.85040342169188
         ],
         "total": 6
       }
     }
   },
   {
-    "type": "receive",
-    "data": {
+    "type": "server",
+    "payload": {
       "message": "model#status",
       "data": {
         "is_aborting": false,
         "processing": true,
-        "aoi": 2859,
-        "checkpoint": 2015
+        "aoi": 3,
+        "checkpoint": 3
       }
     }
   },
-
   {
-    "type": "receive",
-    "data": {
+    "type": "server",
+    "payload": {
       "message": "model#prediction",
       "data": {
-        "aoi": 2859,
+        "aoi": 3,
         "bounds": [
           -77.047119140625,
           38.901720914997945,
@@ -102,11 +238,11 @@
     }
   },
   {
-    "type": "receive",
-    "data": {
+    "type": "server",
+    "payload": {
       "message": "model#prediction",
       "data": {
-        "aoi": 2859,
+        "aoi": 3,
         "bounds": [
           -77.047119140625,
           38.89958342598271,
@@ -124,11 +260,11 @@
   },
 
   {
-    "type": "receive",
-    "data": {
+    "type": "server",
+    "payload": {
       "message": "model#prediction",
       "data": {
-        "aoi": 2859,
+        "aoi": 3,
         "bounds": [
           -77.04437255859375,
           38.901720914997945,
@@ -146,11 +282,11 @@
   },
 
   {
-    "type": "receive",
-    "data": {
+    "type": "server",
+    "payload": {
       "message": "model#prediction",
       "data": {
-        "aoi": 2859,
+        "aoi": 3,
         "bounds": [
           -77.04437255859375,
           38.89958342598271,
@@ -167,11 +303,11 @@
     }
   },
   {
-    "type": "receive",
-    "data": {
+    "type": "server",
+    "payload": {
       "message": "model#prediction",
       "data": {
-        "aoi": 2859,
+        "aoi": 3,
         "bounds": [
           -77.0416259765625,
           38.901720914997945,
@@ -188,11 +324,11 @@
     }
   },
   {
-    "type": "receive",
-    "data": {
+    "type": "server",
+    "payload": {
       "message": "model#prediction",
       "data": {
-        "aoi": 2859,
+        "aoi": 3,
         "bounds": [
           -77.0416259765625,
           38.89958342598271,
@@ -209,25 +345,25 @@
     }
   },
   {
-    "type": "receive",
-    "data": {
+    "type": "server",
+    "payload": {
       "message": "model#prediction#complete",
-      "data": { "aoi": 2859 }
+      "data": { "aoi": 3 }
     }
   },
   {
-    "type": "send",
-    "data": { "action": "model#status" }
+    "type": "client",
+    "payload": { "action": "model#status" }
   },
   {
-    "type": "receive",
-    "data": {
+    "type": "server",
+    "payload": {
       "message": "model#status",
       "data": {
         "is_aborting": false,
         "processing": false,
-        "aoi": 2859,
-        "checkpoint": 2015
+        "aoi": 3,
+        "checkpoint": 3
       }
     }
   }

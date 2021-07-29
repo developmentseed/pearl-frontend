@@ -26,69 +26,102 @@ const workflows = {
   retrain: require('../fixtures/websocket-workflow/retrain.json'),
 };
 
-// Start websocket server
-const WebSocket = require('ws');
-const wss = new WebSocket.Server({ port: 1999 });
-console.log('WS mock server started');
-
 // Init websocket messages queue
 let step = 0;
 let queue = [];
 
-// Helper function to print queue
-function logQueue() {
-  console.log(`queue step: `, step);
-  console.log(queue);
+// Start websocket server
+const WebSocket = require('ws');
+const wss = new WebSocket.Server({ port: 1999 });
+console.log('\n\nWebsocket plugin server started.\n');
+
+function sendServerMessages(ws) {
+  while (queue[step] && queue[step].type === 'server') {
+    ws.send(JSON.stringify(queue[step].payload));
+    console.log(`\nWorkflow step ${step + 1}/${queue.length} (server message)`);
+    step += 1;
+  }
 }
 
-wss.on('connection', function connection(ws) {
-  ws.on('message', function incoming(messageString) {
-    console.log('WS received: %s', messageString);
+// Setup listeners
+wss.on('connection', function connection(ws, req) {
+  // Configure message handling for the Cypress client and return
+  if (req.url === '/?token=cypress') {
+    ws.on('message', function incoming(messageString) {
+      const message = JSON.parse(messageString);
+      if (message.type === 'cy:setup_workflow') {
+        // Internal cypress message to set the workflow
+        queue = workflows[message.data];
+        step = 0;
+        console.log('\nA new websocket workflow was set.\n');
+      } else {
+        console.log('\nUnexpected Cypress message!!\n');
+      }
+    });
+    return;
+  }
 
+  // Configure message handling for the app client
+  ws.on('message', function incoming(messageString) {
     // Keep ping/pong flow
     if (messageString.indexOf('ping#') === 0) {
       ws.send(`pong#${parseInt(messageString.split('#')[1])}`);
       return;
     }
 
-    // Handle message and response
-    try {
-      // If not ping/pong, parse JSON
-      const message = JSON.parse(messageString);
+    // Print message
+    console.log(`\nWorkflow step ${step + 1}/${queue.length} (client message)`);
 
-      // Sets expected WS messages sequence
-      if (message.type === 'cy:set_workflow') {
-        queue = workflows[message.data];
-        step = 0;
-        return;
-      }
+    // Parse message payload
+    const message = JSON.parse(messageString);
 
-      // Validate received message and return expected messages to the client
-      if (!queue[step] || queue[step].type !== 'send') {
-        console.log('Unexpected websocket message type: ', messageString);
-        logQueue();
-      }
-
-      if (!isEqual(queue[step].data, message.data)) {
-        console.log('Unexpected websocket message data: ', messageString);
-        logQueue();
-      }
-
-      // Update counter
-      step += 1;
-
-      // Send next if type is 'send'
-      while (queue[step] && queue[step].type === 'receive') {
-        ws.send(JSON.stringify(queue[step].data));
-        step += 1;
-      }
-    } catch (err) {
-      // Check errors
-      console.log(err); // eslint-disable
-      expect(err).to.not.exist();
+    // Check if workflow ended
+    if (!queue[step]) {
+      console.log(
+        '\n  Message sent by client after workflow ended: ',
+        messageString,
+        '\n'
+      );
+      return;
     }
+
+    // Check if payload is expected
+    if (!isEqual(queue[step].payload, message)) {
+      console.log('\nUnexpected websocket message data:');
+      console.log('  Expected: ', JSON.stringify(queue[step].payload));
+      console.log('  Received: ', JSON.stringify(message), '\n');
+      ws.send(
+        JSON.stringify({
+          message: 'error',
+          data: { error: 'Processing error' },
+        })
+      );
+      return;
+    }
+
+    // Move queue pointer to next message
+    step += 1;
+
+    // Send server messages, if any
+    sendServerMessages(ws);
   });
 
-  // Send info#connect right away
-  ws.send(JSON.stringify({ message: 'info#connected' }));
+  // Check if client is reconnecting
+  if (step > 0 && step < queue.length) {
+    if (queue[step] && queue[step].type === 'reconnect') {
+      // If this is the right step update counter
+      console.log('\n App client reconnected\n');
+      step += 1;
+    } else {
+      // Or print error
+      console.log(
+        `\n Error: app client reconnected, but expected step was:\n${JSON.stringify(
+          queue[step]
+        )}\n`
+      );
+    }
+  }
+
+  // On connection, check if there are message to be sent by the server
+  sendServerMessages(ws);
 });

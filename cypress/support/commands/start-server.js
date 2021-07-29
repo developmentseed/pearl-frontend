@@ -8,16 +8,14 @@ const {
 Cypress.Commands.add('startServer', () => {
   cy.intercept(
     {
-      host: restApiEndpoint,
-      path: '/health',
+      url: restApiEndpoint + '/health',
     },
     { healthy: true, message: 'Good to go' }
   );
 
   cy.intercept(
     {
-      host: restApiEndpoint,
-      path: '/api',
+      url: restApiEndpoint + '/api',
     },
     {
       version: '1.0.0',
@@ -31,8 +29,7 @@ Cypress.Commands.add('startServer', () => {
 
   cy.intercept(
     {
-      host: restApiEndpoint,
-      path: '/api/mosaic',
+      url: restApiEndpoint + '/api/mosaic',
     },
     { mosaics: ['naip.latest'] }
   );

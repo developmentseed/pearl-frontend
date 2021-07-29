@@ -1,162 +1,123 @@
 import L from 'leaflet';
-import 'leaflet-freehandshapes';
 
+const startNodeIcon = new L.DivIcon({
+  iconSize: new L.Point(10, 10),
+  className: 'leaflet-div-icon leaflet-editing-icon leaflet-edit-move',
+});
 class PolygonDrawControl {
-  constructor(map, events) {
+  constructor({ map, onDrawFinish }) {
     this._map = map;
-
-    this._group = new L.LayerGroup();
-
-    this._group.addTo(this._map);
-
-    this.onUpdate = events.onUpdate;
-    this.addLayer = this.addLayer.bind(this);
-    this.setLayerPolygons = this.setLayerPolygons.bind(this);
-    this.manualMode = false;
+    this._onDrawFinish = onDrawFinish;
+    this._nodes = [];
+    this._ignoreNextClickEvent = false;
   }
 
-  /* Clear geometry from layer */
-  clearLayers() {
-    this._group.eachLayer(function (layer) {
-      layer.clearLayers();
-    });
+  setCheckpoint(checkpoint) {
+    this._checkpoint = checkpoint;
+    this._clear();
   }
 
-  /*
-   * Create free hand shapes for each layer
-   * Layers are only added if they do not currently exist in polygon draw
-   */
-  setLayers(layers) {
-    const currentLayers = new Set();
-    this._group.eachLayer((l) => currentLayers.add(l.category));
-
-    Object.entries(layers).forEach(([name, layer]) => {
-      if (!currentLayers.has(name)) {
-        this.addLayer(layer);
-      }
+  _addStartNode(coords) {
+    // Create marker
+    this._starterMarker = new L.Marker(coords, {
+      icon: startNodeIcon,
+      zIndexOffset: 10,
+      bubblingMouseEvents: false,
     });
+
+    // Add click event
+    this._starterMarker
+      .on('mousedown', this._closePolygon, this)
+      .addTo(this._map);
   }
 
-  addLayer(layer) {
-    const { name, color } = layer;
-    const drawer = new L.FreeHandShapes({
-      polygon: {
-        color: color,
-        fillColor: color,
-        fillOpacity: 0.5,
-        weight: 3,
-        smoothFactor: 1,
-      },
-      simplify_tolerance: 0.000001,
-      polyline: {
-        color: color,
-        smoothFactor: 0,
-      },
-    });
-
-    drawer.category = name;
-
-    // Handle added polygon
-    drawer.on('layeradd', () => {
-      const polygons = this.getLayerAsGeoJSON(drawer);
-      if (!this.manualMode) {
-        this.onUpdate(name, polygons);
-      }
-    });
-    drawer.on('layerremove', () => {
-      // should not update history when merging
-      const polygons = this.getLayerAsGeoJSON(drawer);
-      if (!this.manualMode && drawer.mode === 'subtract') {
-        this.onUpdate(name, polygons);
-      }
-    });
-    drawer.on('layersubtract', (data) => {
-      // should not update history when merging
-      const polygons = this.getLayerAsGeoJSON(data.target);
-
-      if (!this.manualMode) {
-        this.onUpdate(name, polygons);
-      }
-    });
-
-    /*
-     * Override default functionality of freehand shapes
-     * Default functionality dictates that polygonClick only fires a remove event when in delete mode.
-     * Here it it firest the event only when in subtract mode so as to allow draw erase and click delete
-     * without changing tools
-     */
-    drawer.polygonClick = (polygon) => {
-      if (drawer.mode === 'subtract') {
-        drawer.removeLayer(polygon);
-      }
-    };
-
-    this._group.addLayer(drawer);
+  _getEventLatLng(event) {
+    const {
+      latlng: { lng, lat },
+    } = event;
+    return [lat, lng];
   }
 
-  /*
-   * Function to add polygons to layers without user input
-   * used when restoring from history using UNDO
-   */
-  setLayerPolygons(layerPolygons) {
-    const idMap = Object.entries(this._group._layers).reduce(
-      (accum, [id, { category }]) => ({
-        ...accum,
-        [category]: id,
-      }),
-      {}
-    );
-    Object.entries(layerPolygons).forEach(([layerName, { polygons }]) => {
-      const layer = this._group.getLayer(idMap[layerName]);
-      this.manualMode = true;
+  _onMouseDown(e) {
+    // _onMouseDown is called to _map and _starter makers, so it will be called
+    // unnecessarily after _closePolygon
+    if (this._ignoreNextClickEvent) {
+      this._ignoreNextClickEvent = false;
+      return;
+    }
 
-      layer.clearLayers();
-      polygons.forEach((poly) => {
-        const latlngs = [poly.coordinates[0].map(([lon, lat]) => [lat, lon])];
-        layer.addPolygon(latlngs, true, true, true);
-      });
-      this.manualMode = false;
-    });
-  }
+    // Transform x/y to lat/lon
+    const coords = this._getEventLatLng(e);
 
-  enableMode(mode, layerName) {
-    let present;
-    this._group.eachLayer(function (layer) {
-      if (layer.category === layerName) {
-        // enable drawing tool for type
-        layer.setMode(mode);
-        present = true;
+    // Add node to polygon
+    this._nodes = this._nodes.concat([coords]);
+
+    // Add start/close marker on first click
+    if (this._nodes.length === 1) {
+      this._addStartNode(coords, 'start');
+    } else {
+      // Add node to existing shape or create one
+      if (this._shape) {
+        this._shape.setLatLngs(this._nodes);
       } else {
-        // disables other freehand instances
-        layer.setMode('view');
+        this._shape = L.polyline(this._nodes, {
+          weight: 4,
+          fillOpacity: 0.4,
+        }).addTo(this._map);
       }
-    });
-    if (!present) {
-      throw new Error(`${layerName} not present in PolygonDraw Group.`);
     }
   }
 
-  enableAdd(layerName) {
-    this.enableMode('add', layerName);
+  _closePolygon() {
+    this._ignoreNextClickEvent = true;
+
+    // Make it a close polygon
+    this._nodes = this._nodes.concat([this._nodes[0]]);
+
+    // Get active class
+    const { activeItem } = this._checkpoint;
+    const activeClass = this._checkpoint.classes[activeItem];
+
+    // Add polygon to class and update checkpoint
+    this._onDrawFinish({
+      ...this._checkpoint,
+      classes: {
+        ...this._checkpoint.classes,
+        [activeItem]: {
+          polygons: activeClass.polygons.concat({
+            type: 'Polygon',
+            coordinates: [this._nodes.map(([lat, lon]) => [lon, lat])],
+          }),
+        },
+      },
+    });
+
+    this._clear();
   }
 
-  enableSubtract(layerName) {
-    this.enableMode('subtract', layerName);
+  _clear() {
+    if (this._starterMarker) {
+      this._starterMarker.remove();
+      this._starterMarker = null;
+    }
+    if (this._shape) {
+      this._shape.remove();
+      this._shape = null;
+    }
+
+    this._nodes = [];
   }
 
-  enableDelete(layerName) {
-    this.enableMode('delete', layerName);
+  enable() {
+    this._map.on('mousedown', this._onMouseDown, this);
   }
 
   disable() {
-    this._group.eachLayer((layer) => layer.setMode('view'));
-  }
+    // Clear drawn polygon
+    this._clear();
 
-  getLayerAsGeoJSON(layer) {
-    let polygons = layer.getLayers();
-    return polygons.map(function (poly) {
-      return poly.toGeoJSON();
-    });
+    // Remove click events
+    this._map.off('mousedown');
   }
 }
 
