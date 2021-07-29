@@ -32,8 +32,8 @@ export const actions = {
   CLEAR_SAMPLES: 'CLEAR_SAMPLES',
   RESET_CHECKPOINT: 'RESET_CHECKPOINT',
   UPDATE_POLYGONS: 'UPDATE_POLYGONS',
+  ADD_CLASS_SAMPLES: 'ADD_CLASS_SAMPLES',
   INPUT_UNDO: 'INPUT_UNDO',
-
   SET_AOI_CHECKED: 'SET_AOI_CHECKED',
 };
 
@@ -257,6 +257,33 @@ function checkpointReducer(state, action) {
           },
         };
       }
+    case actions.ADD_CLASS_SAMPLES:
+      return {
+        ...state,
+        history: [
+          ...state.history,
+          {
+            classes: state.classes,
+            checkpointBrushes: state.checkpointBrushes,
+          },
+        ],
+        classes: {
+          ...state.classes,
+          [action.data.name]: {
+            ...state.classes[action.data.name],
+            polygons: action.data.polygons,
+            points: {
+              ...state.classes[state.activeItem].points,
+              coordinates: uniqWith(
+                state.classes[state.activeItem].points.coordinates.concat(
+                  action.data.points
+                ),
+                isEqual
+              ),
+            },
+          },
+        },
+      };
     case actions.SET_ACTIVE_CLASS:
       return {
         ...state,

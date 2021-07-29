@@ -84,7 +84,7 @@ describe('Open existing project', () => {
       .trigger('mouseup');
 
     // Add another feature
-    const feature5 = translateFeature(baseFeature, 70, 0);
+    const feature5 = translateFeature(baseFeature, 120, 0);
     cy.get('#app-container')
       .trigger('mousedown', ...feature5[0])
       .trigger('mousedown', ...feature5[1])
@@ -102,9 +102,9 @@ describe('Open existing project', () => {
     cy.get('#app-container').click(...feature4[0]); // should be able to delete
 
     // Add some points
-    const feature6 = translateFeature(baseFeature, 70, 70);
+    const feature6 = translateFeature(baseFeature, 120, 70);
     cy.get('[data-cy=add-point-sample-button').click();
-    cy.get('[data-cy=Structure-class-button').click();
+    cy.get('[data-cy="Impervious Surface-class-button"').click();
     cy.get('#app-container')
       .click(...feature6[0])
       .click(...feature6[1]);
@@ -112,6 +112,9 @@ describe('Open existing project', () => {
     cy.get('#app-container')
       .click(...feature6[2])
       .click(...feature6[3]);
+
+    // Set class for the import
+    cy.get('[data-cy=Structure-class-button').click();
 
     // Open import modal
     cy.get('[data-cy=open-upload-samples-modal-button').click();
@@ -125,6 +128,7 @@ describe('Open existing project', () => {
     // Proceed importing
     cy.get('[data-cy=import-samples-button').click();
 
+    // Retrain
     cy.get('[data-cy=run-button').click();
   });
 });

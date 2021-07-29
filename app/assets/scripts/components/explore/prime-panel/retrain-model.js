@@ -106,6 +106,7 @@ function RetrainModel(props) {
               Free Hand
             </InfoButton>
             <InfoButton
+              data-cy='add-point-sample-button'
               variation={
                 mapState.mode === mapModes.ADD_SAMPLE_POINT
                   ? 'primary-raised-dark'

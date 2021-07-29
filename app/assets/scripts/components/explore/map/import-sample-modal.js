@@ -6,6 +6,11 @@ import { Button } from '@devseed-ui/button';
 import Prose from '../../../styles/type/prose';
 import { FauxFileDialog } from '../../common/faux-file-dialog';
 import toasts from '../../common/toasts';
+import {
+  actions as checkpointActions,
+  useCheckpoint,
+} from '../../../context/checkpoint';
+import { useMapRef } from '../../../context/map';
 
 const Wrapper = styled.div`
   display: grid;
@@ -22,6 +27,8 @@ const Wrapper = styled.div`
 function ImportSamplesModal({ revealed, setRevealed }) {
   const [warning, setWarning] = useState(null);
   const [file, setFile] = useState(null);
+  const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
+  const { mapRef } = useMapRef();
 
   const onFileSelect = async (uploadedFile) => {
     try {
@@ -51,9 +58,9 @@ function ImportSamplesModal({ revealed, setRevealed }) {
       // Get supported features
       geojson.features.forEach((f) => {
         if (f.geometry.type === 'Point') {
-          payload.points = payload.points.concat(f);
+          payload.points = payload.points.concat([f.geometry.coordinates]);
         } else if (f.geometry.type === 'Polygon') {
-          payload.polygons = payload.polygons.concat(f);
+          payload.polygons = payload.polygons.concat(f.geometry);
         } else {
           payload.other = payload.other + 1;
         }
@@ -66,13 +73,38 @@ function ImportSamplesModal({ revealed, setRevealed }) {
           `${payload.other} invalid or unsupported feature${plural} found and discarded.`
       );
 
-      setFile(uploadedFile);
+      setFile({
+        ...uploadedFile,
+        payload,
+      });
     } catch (error) {
       toasts.error(
         'An error occurred, please upload a valid GeoJSON file or try again later.'
       );
       setFile(null);
     }
+  };
+
+  const importFile = () => {
+    const activeClass = currentCheckpoint.classes[currentCheckpoint.activeItem];
+
+    // Update layers on free hand draw
+    mapRef.freehandDraw.setLayerPolygons({
+      ...currentCheckpoint.classes,
+      [currentCheckpoint.activeItem]: {
+        ...activeClass,
+        polygons: activeClass.polygons.concat(file.payload.polygons),
+      },
+    });
+
+    dispatchCurrentCheckpoint({
+      type: checkpointActions.ADD_CLASS_SAMPLES,
+      data: {
+        name: currentCheckpoint.activeItem,
+        points: file.payload.points,
+        polygons: file.payload.polygons,
+      },
+    });
   };
 
   return (
@@ -112,17 +144,19 @@ function ImportSamplesModal({ revealed, setRevealed }) {
           </FauxFileDialog>
           {file && <div>{file.name}</div>}
           {warning && <div>{warning}</div>}
+          <div>Importing to class: {currentCheckpoint.activeItem}</div>
           <Button
             data-cy='import-samples-button'
             variation='primary-raised-light'
             size='medium'
             useIcon='tick'
             visuallyDisabled={!file}
+            disabled={!file}
             style={{
               gridColumn: '2 / 1',
             }}
             onClick={() => {
-              toasts.info('File import not available yet');
+              importFile();
               setRevealed(false);
             }}
           >

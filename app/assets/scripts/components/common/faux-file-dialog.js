@@ -58,4 +58,5 @@ FauxFileDialog.propTypes = {
   id: T.string,
   onFileSelect: T.func,
   children: T.func,
+  'data-cy': T.string,
 };
