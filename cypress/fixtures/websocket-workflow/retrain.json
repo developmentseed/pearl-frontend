@@ -138,7 +138,22 @@
           {
             "name": "Structure",
             "color": "#F10100",
-            "geometry": { "type": "FeatureCollection", "features": [] }
+            "geometry": {
+              "type": "FeatureCollection",
+              "features": [
+                {
+                  "type": "Feature",
+                  "properties": {},
+                  "geometry": {
+                    "type": "MultiPoint",
+                    "coordinates": [
+                      [-79.38308715820314, 38.83957390576818],
+                      [-79.38137054443361, 38.8409109722324]
+                    ]
+                  }
+                }
+              ]
+            }
           },
           {
             "name": "Impervious Surface",
@@ -148,7 +163,22 @@
           {
             "name": "Impervious Road",
             "color": "#320000",
-            "geometry": { "type": "FeatureCollection", "features": [] }
+            "geometry": {
+              "type": "FeatureCollection",
+              "features": [
+                {
+                  "type": "Feature",
+                  "properties": {},
+                  "geometry": {
+                    "type": "MultiPoint",
+                    "coordinates": [
+                      [-79.37965393066408, 38.83957390576818],
+                      [-79.38137054443361, 38.83823681418088]
+                    ]
+                  }
+                }
+              ]
+            }
           }
         ]
       }

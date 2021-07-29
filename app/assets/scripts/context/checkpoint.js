@@ -27,7 +27,7 @@ export const actions = {
   RECEIVE_AOI_INFO: 'RECEIVE_AOI_INFO',
   RECEIVE_ANALYTICS: 'RECEIVE_ANALYTICS',
   SET_ACTIVE_CLASS: 'SET_ACTIVE_CLASS',
-  ADD_POINT_SAMPLE: 'ADD_POINT_SAMPLE',
+  ADD_POINT_SAMPLES: 'ADD_POINT_SAMPLES',
   REMOVE_POINT_SAMPLE: 'REMOVE_POINT_SAMPLE',
   CLEAR_SAMPLES: 'CLEAR_SAMPLES',
   RESET_CHECKPOINT: 'RESET_CHECKPOINT',
@@ -262,10 +262,7 @@ function checkpointReducer(state, action) {
         ...state,
         activeItem: action.data,
       };
-    case actions.ADD_POINT_SAMPLE: {
-      // Get coords
-      const { lat, lng } = action.data;
-
+    case actions.ADD_POINT_SAMPLES: {
       // Merge coords into class
       const currentClass = state.classes[state.activeItem];
       const updatedClass = {
@@ -273,7 +270,7 @@ function checkpointReducer(state, action) {
         points: {
           ...currentClass.points,
           coordinates: uniqWith(
-            currentClass.points.coordinates.concat([[lng, lat]]),
+            currentClass.points.coordinates.concat(action.data),
             isEqual
           ),
         },

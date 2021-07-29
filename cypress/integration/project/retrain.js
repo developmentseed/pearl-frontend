@@ -93,13 +93,25 @@ describe('Open existing project', () => {
       .trigger('mousedown', ...feature5[0])
       .trigger('mouseup');
 
-    // Delete features
+    // Delete polygon features
     cy.get('[data-cy=eraser-button').click();
     cy.get('[data-cy=Barren-class-button').click();
     cy.get('#app-container').click(...feature1[0]);
     cy.get('#app-container').click(...feature5[0]); // should not be able to delete
     cy.get('[data-cy=Tree-class-button').click();
     cy.get('#app-container').click(...feature4[0]); // should be able to delete
+
+    // Add some points
+    const feature6 = translateFeature(baseFeature, 70, 70);
+    cy.get('[data-cy=add-point-sample-button').click();
+    cy.get('[data-cy=Structure-class-button').click();
+    cy.get('#app-container')
+      .click(...feature6[0])
+      .click(...feature6[1]);
+    cy.get('[data-cy="Impervious Road-class-button"').click();
+    cy.get('#app-container')
+      .click(...feature6[2])
+      .click(...feature6[3]);
 
     // Open import modal
     cy.get('[data-cy=open-upload-samples-modal-button').click();
@@ -113,6 +125,6 @@ describe('Open existing project', () => {
     // Proceed importing
     cy.get('[data-cy=import-samples-button').click();
 
-    // cy.get('[data-cy=run-button').click();
+    cy.get('[data-cy=run-button').click();
   });
 });
