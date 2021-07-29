@@ -14,6 +14,7 @@ class PolygonDrawControl {
 
   setCheckpoint(checkpoint) {
     this._checkpoint = checkpoint;
+    this._clear();
   }
 
   _addStartNode(coords) {
