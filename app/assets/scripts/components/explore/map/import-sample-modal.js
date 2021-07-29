@@ -3,6 +3,7 @@ import T from 'prop-types';
 import styled from 'styled-components';
 import { Modal } from '@devseed-ui/modal';
 import { Button } from '@devseed-ui/button';
+import { themeVal } from '@devseed-ui/theme-provider';
 import Prose from '../../../styles/type/prose';
 import { FauxFileDialog } from '../../common/faux-file-dialog';
 import toasts from '../../common/toasts';
@@ -20,6 +21,9 @@ const Wrapper = styled.div`
   }
   div.prose {
     grid-column: 1 / -1;
+  }
+  .warning {
+    color: ${themeVal('color.danger')};
   }
   grid-gap: 1rem;
 `;
@@ -67,7 +71,7 @@ function ImportSamplesModal({ revealed, setRevealed }) {
       });
 
       // Set warning if unsupported features are found
-      const plural = payload.other > 1 ? 's were' : 'was';
+      const plural = payload.other > 1 ? 's were' : ' was';
       setWarning(
         payload.other > 0 &&
           `${payload.other} invalid or unsupported feature${plural} found and discarded.`
@@ -118,10 +122,15 @@ function ImportSamplesModal({ revealed, setRevealed }) {
         <Wrapper>
           <Prose className='prose'>
             Upload a pre-processed retraining sample set in .geojson format.
-            Select a file, than identify the existing class for the feature
-            collection&apos;s points and polygons. The uploaded retraining can
-            then be submitted to the model to retrain
           </Prose>
+          <Prose className='prose'>
+            First, select a file, than identify the existing class for the
+            feature collection&apos;s points and polygons. The uploaded
+            retraining sample set can then be submitted to the model to retrain.
+          </Prose>
+          <div className='prose'>
+            Importing to class: <strong>{currentCheckpoint.activeItem}</strong>
+          </div>
           <FauxFileDialog
             name='image-file'
             data-cy='samples-upload-input'
@@ -142,18 +151,22 @@ function ImportSamplesModal({ revealed, setRevealed }) {
               </Button>
             )}
           </FauxFileDialog>
-          {file && <div>{file.name}</div>}
-          {warning && <div>{warning}</div>}
-          <div>Importing to class: {currentCheckpoint.activeItem}</div>
+          {file && (
+            <div className='prose'>
+              <strong>Selected: </strong>
+              {file.name}
+            </div>
+          )}
+          {warning && <div className='prose warning'>{warning}</div>}
           <Button
             data-cy='import-samples-button'
-            variation='primary-raised-light'
+            variation='primary-raised-dark'
             size='medium'
             useIcon='tick'
             visuallyDisabled={!file}
             disabled={!file}
             style={{
-              gridColumn: '2 / 1',
+              gridColumn: '1 / -1',
             }}
             onClick={() => {
               importFile();
