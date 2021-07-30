@@ -150,7 +150,6 @@ function RefineModel(props) {
                       <Thumbnail />
                       <Heading size='xsmall'>
                         {c.name} ({c.id})
-                        {currentCheckpoint.activeItem === id ? ' (Active)' : ''}
                       </Heading>
                     </Item>
                   );
