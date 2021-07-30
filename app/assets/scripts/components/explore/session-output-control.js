@@ -19,6 +19,7 @@ import { Heading } from '@devseed-ui/typography';
 import { Form, FormInput } from '@devseed-ui/form';
 import InfoButton from '../common/info-button';
 import { ExploreContext, useProjectId } from '../../context/explore';
+import { useProject } from '../../context/project';
 import { useAuth } from '../../context/auth';
 import { useAoi } from '../../context/aoi';
 import toasts from '../common/toasts';
@@ -26,6 +27,8 @@ import logger from '../../utils/logger';
 import { useInstance } from '../../context/instance';
 import { downloadGeotiff as downloadGeotiffUtil } from '../../utils/map';
 import { useTour } from '../../context/explore';
+
+import { Modal } from '@devseed-ui/modal';
 
 const Wrapper = styled.div`
   flex: 1;
@@ -115,9 +118,14 @@ const FormInputGroup = styled.div`
   }
 `;
 
+const ModalForm = styled(Form)`
+  display: grid;
+  grid-gap: ${glsp(1)};
+`;
+
 function SessionOutputControl(props) {
   const { projectId } = useProjectId();
-  const { projectName, isMediumDown } = props;
+  const { isMediumDown } = props;
   const { isAuthenticated, restApiClient } = useAuth();
   const { setTourStep } = useTour();
 
@@ -125,24 +133,29 @@ function SessionOutputControl(props) {
 
   const { currentAoi } = useAoi();
 
-  const {
-    updateProjectName,
-    currentProject,
-    selectedModel,
-    predictions,
-    aoiName,
-  } = useContext(ExploreContext);
-  const initialName = currentProject ? currentProject.name : 'Untitled';
+  const { updateProjectName, selectedModel, predictions, aoiName } = useContext(
+    ExploreContext
+  );
+
+  const { projectName, currentProject, setProjectName } = useProject();
+
+  const initialName = projectName || 'Untitled';
 
   const [localProjectName, setLocalProjectName] = useState(projectName);
   const [titleEditMode, setTitleEditMode] = useState(false);
   const [exportShareURL, setExportShareURL] = useState(null);
+
   useEffect(() => setLocalProjectName(initialName), [initialName]);
 
   const handleSubmit = (evt) => {
     evt.preventDefault();
     const name = evt.target.elements.projectName.value;
-    updateProjectName(name);
+
+    if (selectedModel && currentProject) {
+      // Project already exists, PATCH name update to API
+      updateProjectName(name);
+    }
+    setProjectName(name);
     setTitleEditMode(false);
   };
 
@@ -203,8 +216,6 @@ function SessionOutputControl(props) {
   const getEditInfo = () => {
     if (!isAuthenticated) {
       return 'Log in to set project name';
-    } else if (!selectedModel) {
-      return 'Model must be selected to set project name';
     } else if (localProjectName) {
       return 'Edit project Name';
     } else {
@@ -226,22 +237,24 @@ function SessionOutputControl(props) {
               variation={localProjectName ? 'primary' : 'baseAlphaE'}
               size='xsmall'
               onClick={() => {
-                isAuthenticated && selectedModel && setTitleEditMode(true);
+                isAuthenticated && setTitleEditMode(true);
               }}
               title={
                 !isAuthenticated ? 'Log in to set project name' : 'Project name'
               }
+              data-cy='project-name'
             >
-              {localProjectName || 'Untitled Project'}
+              {projectName || 'Untitled Project'}
             </Heading>
             <InfoButton
               size='small'
               useIcon='pencil'
               hideText
               id='project-edit-trigger'
+              data-cy='project-name-edit'
               info={getEditInfo()}
               onClick={() => {
-                isAuthenticated && selectedModel && setTitleEditMode(true);
+                isAuthenticated && setTitleEditMode(true);
               }}
             />
           </>
@@ -254,12 +267,14 @@ function SessionOutputControl(props) {
               value={localProjectName}
               disabled={!isAuthenticated}
               autoFocus
+              data-cy='project-input'
             />
             <Button
               type='submit'
               size='small'
               useIcon='tick--small'
               hideText
+              data-cy='project-name-confirm'
               title='Confirm project name'
             />
             <Button
@@ -273,6 +288,7 @@ function SessionOutputControl(props) {
         )}
       </ProjectHeading>
       <StatusHeading
+        data-cy='session-status'
         variation={
           projectId === 'new' ||
           instance.gpuStatus === 'ready' ||
@@ -359,6 +375,40 @@ function SessionOutputControl(props) {
           </DropdownBody>
         </>
       </Dropdown>
+
+      <Modal
+        id='project-name-modal'
+        data-cy='project-name-modal'
+        title='New project'
+        // Reveal modal on mount for new projects, not existing ones
+        revealed={!projectName && projectId && projectId === 'new'}
+        className='faded-background'
+        size='small'
+        closeButton={false}
+        content={
+          <ModalForm onSubmit={handleSubmit}>
+            <HeadingInput
+              name='projectName'
+              placeholder='Set Project Name'
+              onChange={(e) => setLocalProjectName(e.target.value)}
+              value={localProjectName}
+              disabled={!isAuthenticated}
+              autoFocus
+              data-cy='modal-project-input'
+            />
+            <Button
+              type='submit'
+              variation='primary-raised-dark'
+              size='medium'
+              useIcon={['arrow-right', 'after']}
+              data-cy='create-project-button'
+              title='Set project name'
+            >
+              Create Project
+            </Button>
+          </ModalForm>
+        }
+      />
     </Wrapper>
   );
 }

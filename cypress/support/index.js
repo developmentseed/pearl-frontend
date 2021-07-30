@@ -13,8 +13,8 @@
 // https://on.cypress.io/configuration
 // ***********************************************************
 
-// Import commands.js using ES2015 syntax:
-import './commands'
-
-// Alternatively you can use CommonJS syntax:
-// require('./commands')
+import 'cypress-file-upload';
+require('./commands/start-server');
+require('./commands/fake-login');
+require('./commands/mock-regular-project');
+require('./commands/set-websocket-workflow');

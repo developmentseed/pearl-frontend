@@ -30,6 +30,8 @@ import {
   PickerDropdownFooter,
 } from './retrain-refine-styles';
 import { FormInput } from '@devseed-ui/form';
+import ImportSamplesModal from '../map/import-sample-modal';
+
 /*
  * Retrain Model
  * @param ready - true when checkpoint exists and we are in RETRAIN mode
@@ -46,13 +48,22 @@ function RetrainModel(props) {
 
   const [addClassName, setAddClassName] = useState('');
 
+  const [importSamplesModalRevealed, setImportSamplesModalRevealed] = useState(
+    false
+  );
+
   return (
     <ToolsWrapper className={className}>
       {ready && currentCheckpoint.classes && (
         <>
           <RetrainTools>
+            <ImportSamplesModal
+              setRevealed={setImportSamplesModalRevealed}
+              revealed={importSamplesModalRevealed}
+            />
             <Heading useAlt>Sample Selection Tools</Heading>
             <InfoButton
+              data-cy='retrain-draw-polygon'
               variation={
                 mapState.mode === mapModes.ADD_SAMPLE_POLYGON
                   ? 'primary-raised-dark'
@@ -64,14 +75,38 @@ function RetrainModel(props) {
               visuallyDisabled={!currentCheckpoint.activeItem}
               info={!currentCheckpoint.activeItem && 'No active item selected'}
               onClick={() => {
-                if (currentCheckpoint.activeItem) {
+                if (
+                  currentCheckpoint.activeItem &&
+                  mapState.mode !== mapModes.ADD_SAMPLE_POLYGON
+                ) {
                   setMapMode(mapModes.ADD_SAMPLE_POLYGON);
                 }
               }}
             >
-              Draw
+              Polygon
             </InfoButton>
             <InfoButton
+              data-cy='retrain-draw-freehand'
+              variation={
+                mapState.mode === mapModes.ADD_SAMPLE_FREEHAND
+                  ? 'primary-raised-dark'
+                  : 'primary-plain'
+              }
+              size='small'
+              radius='ellipsoid'
+              useIcon='pencil'
+              visuallyDisabled={!currentCheckpoint.activeItem}
+              info={!currentCheckpoint.activeItem && 'No active item selected'}
+              onClick={() => {
+                if (currentCheckpoint.activeItem) {
+                  setMapMode(mapModes.ADD_SAMPLE_FREEHAND);
+                }
+              }}
+            >
+              Free Hand
+            </InfoButton>
+            <InfoButton
+              data-cy='add-point-sample-button'
               variation={
                 mapState.mode === mapModes.ADD_SAMPLE_POINT
                   ? 'primary-raised-dark'
@@ -92,6 +127,7 @@ function RetrainModel(props) {
             </InfoButton>
 
             <InfoButton
+              data-cy='eraser-button'
               variation={
                 mapState.mode === mapModes.DELETE_SAMPLES
                   ? 'primary-raised-dark'
@@ -116,6 +152,24 @@ function RetrainModel(props) {
             >
               Erase
             </InfoButton>
+            <InfoButton
+              id='open-upload-samples-modal-button'
+              data-cy='open-upload-samples-modal-button'
+              variation={
+                importSamplesModalRevealed
+                  ? 'primary-raised-dark'
+                  : 'primary-plain'
+              }
+              size='small'
+              radius='ellipsoid'
+              useLocalButton
+              useIcon='upload'
+              visuallyDisabled={!currentCheckpoint.activeItem}
+              info='Upload samples as GeoJSON'
+              onClick={() => setImportSamplesModalRevealed(true)}
+            >
+              Upload
+            </InfoButton>
           </RetrainTools>
           <ClassList>
             <Heading useAlt>Classes</Heading>
@@ -125,6 +179,7 @@ function RetrainModel(props) {
               return (
                 <Class
                   key={c.name}
+                  data-cy={`${c.name}-class-button`}
                   onClick={() => {
                     dispatchCurrentCheckpoint({
                       type: actions.SET_ACTIVE_CLASS,

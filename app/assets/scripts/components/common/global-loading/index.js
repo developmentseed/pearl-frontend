@@ -101,6 +101,7 @@ export default function GlobalLoadingProvider(props) {
       timeout={{ enter: 300, exit: 300 }}
     >
       <GlobalLoadingWrapper
+        data-cy='global-loading'
         className={props.className}
         data-testid='global-loading'
       >

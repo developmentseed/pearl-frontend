@@ -14,8 +14,12 @@ import { Button } from '@devseed-ui/button';
 import { Heading } from '@devseed-ui/typography';
 import { themeVal, media, glsp } from '@devseed-ui/theme-provider';
 import { StyledLink } from '../../styles/links';
-import config from '../../config';
+
 import { fetchJSON } from '../../context/reducers/reduxeed';
+import { useAuth0 } from '@auth0/auth0-react';
+import { useAuth } from '../../context/auth';
+
+import config from '../../config';
 const { environment, baseUrl, restApiEndpoint } = config;
 
 const HomeBody = styled(InpageBody)`
@@ -121,6 +125,8 @@ const StatusSection = styled.section`
 
 function Home() {
   const [apiHealth, setApiHealth] = useState('Loading...');
+  const { loginWithRedirect } = useAuth0();
+  const { isAuthenticated } = useAuth();
 
   // Fetch API health message on mount
   useEffect(() => {
@@ -161,16 +167,29 @@ function Home() {
             >
               Read More
             </Button>
-            <Button
-              useIcon={['chevron-right', 'after']}
-              size='xlarge'
-              variation='primary-raised-dark'
-              to='/project/new'
-              as={StyledLink}
-              title='Start a new project'
-            >
-              Launch App
-            </Button>
+            {!isAuthenticated ? (
+              <Button
+                useIcon={['chevron-right', 'after']}
+                size='xlarge'
+                variation='primary-raised-dark'
+                className='button-class'
+                title='Log in to launch app'
+                onClick={() => loginWithRedirect()}
+              >
+                Sign Up to Start Mapping
+              </Button>
+            ) : (
+              <Button
+                useIcon={['chevron-right', 'after']}
+                size='xlarge'
+                variation='primary-raised-dark'
+                to='/project/new'
+                as={StyledLink}
+                title='Start a new project'
+              >
+                Launch App
+              </Button>
+            )}
           </HomeCTA>
         </HomeIntro>
         <HomeTout>

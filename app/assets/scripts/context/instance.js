@@ -32,6 +32,7 @@ import { actions as aoiPatchActions } from './reducers/aoi_patch';
 import { useModel } from './model';
 
 import { wrapLogReducer } from './reducers/utils';
+import { featureCollection, feature } from '@turf/helpers';
 
 const messageQueueActionTypes = {
   ABORT: 'ABORT',
@@ -120,7 +121,7 @@ export function InstanceProvider(props) {
     dispatchCurrentCheckpoint,
     fetchCheckpoint,
   } = useCheckpoint();
-  const { currentProject, setCurrentProject } = useProject();
+  const { currentProject, setCurrentProject, projectName } = useProject();
   const { dispatchPredictions } = usePredictions();
   const { currentAoi, aoiName, aoiRef } = useAoi();
   const { dispatchAoiPatch } = useAoiPatch();
@@ -425,7 +426,7 @@ export function InstanceProvider(props) {
             project = await restApiClient.createProject({
               model_id: selectedModel.id,
               mosaic: 'naip.latest',
-              name: 'Untitled',
+              name: projectName,
             });
             setCurrentProject(project);
             history.push(`/project/${project.id}`);
@@ -560,13 +561,25 @@ export function InstanceProvider(props) {
           data: {
             name: aoiName,
             classes: classes.map((c) => {
+              // sometimes there are only points or polygons
+              // convert MultiPoint to Feature
+              let features = [];
+              if (c.points.coordinates.length) {
+                c.points = feature(c.points);
+                features = features.concat(c.points);
+              }
+              if (c.polygons.length) {
+                // convert Polygons to Feature
+                c.polygons = c.polygons.map((p) => {
+                  return feature(p);
+                });
+                features = features.concat(c.polygons);
+              }
+
               return {
                 name: c.name,
                 color: c.color,
-                geometry: {
-                  type: 'GeometryCollection',
-                  geometries: [c.points, ...c.polygons],
-                },
+                geometry: featureCollection(features),
               };
             }),
           },
@@ -642,7 +655,7 @@ export function InstanceProvider(props) {
       });
 
       // Clear samples from the checkpoint object
-      // Prime panel calls mapRef.polygonDraw.clearLayers()
+      // Prime panel calls mapRef.freehandDraw.clearLayers()
       dispatchCurrentCheckpoint({
         type: checkpointActions.CLEAR_SAMPLES,
       });

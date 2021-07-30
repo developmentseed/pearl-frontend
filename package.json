@@ -1,6 +1,6 @@
 {
   "name": "lulc-frontend",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "description": "Web application of Microsoft Land Use and Land Classification (LULC) project.",
   "repository": {
     "type": "git",
@@ -62,7 +62,8 @@
     "browser-sync": "^2.26.13",
     "browserify": "^17.0.0",
     "collecticons-processor": "^4.1.0",
-    "cypress": "^6.2.1",
+    "cypress": "^8.0.0",
+    "cypress-file-upload": "^5.0.8",
     "del": "^6.0.0",
     "envify": "^4.1.0",
     "errorify": "^0.3.1",
@@ -96,7 +97,8 @@
     "through2": "^4.0.2",
     "vinyl-buffer": "^1.0.1",
     "vinyl-source-stream": "^2.0.0",
-    "watchify": "^3.11.1"
+    "watchify": "^3.11.1",
+    "ws": "^7.5.2"
   },
   "dependencies": {
     "@auth0/auth0-react": "^1.2.0",
@@ -116,6 +118,7 @@
     "@turf/bbox": "^6.3.0",
     "@turf/bbox-polygon": "^6.3.0",
     "@turf/centroid": "^6.3.0",
+    "@turf/helpers": "^6.5.0",
     "@welldone-software/why-did-you-render": "^6.1.1",
     "chart.js": "^2.9.4",
     "date-fns": "^2.20.3",
