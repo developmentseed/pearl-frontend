@@ -384,7 +384,8 @@ function SessionOutputControl(props) {
         revealed={!projectName && projectId && projectId === 'new'}
         className='faded-background'
         size='small'
-        closeButton={false}
+        closeButton={true}
+        onCloseClick={() => window.history.back()}
         content={
           <ModalForm onSubmit={handleSubmit}>
             <HeadingInput
