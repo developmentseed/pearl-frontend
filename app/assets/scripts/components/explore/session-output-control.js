@@ -1,4 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
+import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import T from 'prop-types';
 import copyTextToClipboard from '../../utils/copy-text-to-clipboard';
@@ -139,7 +140,7 @@ function SessionOutputControl(props) {
 
   const { projectName, currentProject, setProjectName } = useProject();
 
-  const initialName = projectName || 'Untitled';
+  const initialName = projectName;
 
   const [localProjectName, setLocalProjectName] = useState(projectName);
   const [titleEditMode, setTitleEditMode] = useState(false);
@@ -158,6 +159,8 @@ function SessionOutputControl(props) {
     setProjectName(name);
     setTitleEditMode(false);
   };
+
+  const history = useHistory();
 
   const downloadGeotiff = async () => {
     const projectId = currentProject.id;
@@ -244,7 +247,7 @@ function SessionOutputControl(props) {
               }
               data-cy='project-name'
             >
-              {projectName || 'Untitled Project'}
+              {projectName}
             </Heading>
             <InfoButton
               size='small'
@@ -384,7 +387,8 @@ function SessionOutputControl(props) {
         revealed={!projectName && projectId && projectId === 'new'}
         className='faded-background'
         size='small'
-        closeButton={false}
+        closeButton={true}
+        onCloseClick={() => history.goBack()}
         content={
           <ModalForm onSubmit={handleSubmit}>
             <HeadingInput
@@ -402,7 +406,12 @@ function SessionOutputControl(props) {
               size='medium'
               useIcon={['arrow-right', 'after']}
               data-cy='create-project-button'
-              title='Set project name'
+              title={
+                !localProjectName
+                  ? 'Set project name to start new project'
+                  : 'Create new project'
+              }
+              disabled={!localProjectName}
             >
               Create Project
             </Button>
