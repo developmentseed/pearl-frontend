@@ -136,20 +136,21 @@ function ImportSamplesModal({ revealed, setRevealed }) {
             data-cy='samples-upload-input'
             onFileSelect={onFileSelect}
           >
-            {(fieProps) => (
-              <Button
-                data-cy='select-samples-file-button'
-                variation='primary-raised-light'
-                size='medium'
-                useIcon='upload'
-                style={{
-                  gridColumn: '2 / 1',
-                }}
-                {...fieProps}
-              >
-                {!file ? 'Select file' : 'Upload another file'}
-              </Button>
-            )}
+            {(fieProps) =>
+              !file && (
+                <Button
+                  data-cy='select-samples-file-button'
+                  variation='primary-raised-light'
+                  size='medium'
+                  useIcon='upload'
+                  style={{
+                    gridColumn: '2 / 1',
+                  }}
+                  {...fieProps}
+                >
+                  Select file to upload
+                </Button>
+              )}
           </FauxFileDialog>
           {file && (
             <div className='prose'>
