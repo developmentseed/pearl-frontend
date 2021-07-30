@@ -1,4 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
+import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import T from 'prop-types';
 import copyTextToClipboard from '../../utils/copy-text-to-clipboard';
@@ -158,6 +159,8 @@ function SessionOutputControl(props) {
     setProjectName(name);
     setTitleEditMode(false);
   };
+
+  const history = useHistory();
 
   const downloadGeotiff = async () => {
     const projectId = currentProject.id;
@@ -385,7 +388,7 @@ function SessionOutputControl(props) {
         className='faded-background'
         size='small'
         closeButton={true}
-        onCloseClick={() => window.history.back()}
+        onCloseClick={() => history.goBack()}
         content={
           <ModalForm onSubmit={handleSubmit}>
             <HeadingInput
