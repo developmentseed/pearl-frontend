@@ -405,9 +405,10 @@ function Map() {
               if (mapState.mode !== mapModes.ADD_SAMPLE_POINT) {
                 return;
               }
+              const { lat, lng } = e.latlng;
               dispatchCurrentCheckpoint({
-                type: checkpointActions.ADD_POINT_SAMPLE,
-                data: e.latlng,
+                type: checkpointActions.ADD_POINT_SAMPLES,
+                data: [[lng, lat]],
               });
             }}
           />

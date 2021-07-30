@@ -69,7 +69,7 @@ Compiles the javascript and launches the server making the site available at `ht
 The system will watch files and execute tasks whenever one of them changes.
 The site will automatically refresh since it is bundled with livereload.
 
-## Testing
+## Test
 
 The app is using cypress to perform end-to-end testing. New tests should be added to `cypress/integrations/*.spec.js`.
 
@@ -79,17 +79,17 @@ Start the front-end in testing mode:
 yarn run serve:testing
 ```
 
-To run tests using cypress gui:
-
-```sh
-yarn run cy:open
-```
-
-To run tests using in CLI:
+Run tests:
 
 ```sh
 yarn run cy:run
 ```
+
+## Develop with Cypress Dashboard
+
+Start the dashboard: `yarn cy:open`.
+
+Copy config file `testing.js` to `local.js` and run `yarn serve`. This will enable live reload on Cypress Dashboard.
 
 ## Deployment
 

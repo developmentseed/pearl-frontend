@@ -72,11 +72,11 @@
                     "type": "Polygon",
                     "coordinates": [
                       [
-                        [-79.383087, 38.844254],
-                        [-79.381371, 38.845591],
-                        [-79.379654, 38.844254],
-                        [-79.381371, 38.842917],
-                        [-79.383087, 38.844254]
+                        [-79.378796, 38.844254],
+                        [-79.377079, 38.845591],
+                        [-79.375362, 38.844254],
+                        [-79.377079, 38.842917],
+                        [-79.378796, 38.844254]
                       ]
                     ]
                   }
@@ -138,17 +138,78 @@
           {
             "name": "Structure",
             "color": "#F10100",
-            "geometry": { "type": "FeatureCollection", "features": [] }
+            "geometry": {
+              "type": "FeatureCollection",
+              "features": [
+                {
+                  "type": "Feature",
+                  "properties": {},
+                  "geometry": {
+                    "type": "MultiPoint",
+                    "coordinates": [
+                      [-79.38308715820314, 38.83957390576818],
+                      [-79.38137054443361, 38.8409109722324]
+                    ]
+                  }
+                },
+                {
+                  "type": "Feature",
+                  "properties": {},
+                  "geometry": {
+                    "type": "Polygon",
+                    "coordinates": [
+                      [
+                        [-79.383087, 38.844254],
+                        [-79.381371, 38.845591],
+                        [-79.379654, 38.844254],
+                        [-79.381371, 38.842917],
+                        [-79.383087, 38.844254]
+                      ]
+                    ]
+                  }
+                }
+              ]
+            }
           },
           {
             "name": "Impervious Surface",
             "color": "#BFB5B5",
-            "geometry": { "type": "FeatureCollection", "features": [] }
+            "geometry": {
+              "type": "FeatureCollection",
+              "features": [
+                {
+                  "type": "Feature",
+                  "properties": {},
+                  "geometry": {
+                    "type": "MultiPoint",
+                    "coordinates": [
+                      [-79.37879562377931, 38.83957390576818],
+                      [-79.37707901000978, 38.8409109722324]
+                    ]
+                  }
+                }
+              ]
+            }
           },
           {
             "name": "Impervious Road",
             "color": "#320000",
-            "geometry": { "type": "FeatureCollection", "features": [] }
+            "geometry": {
+              "type": "FeatureCollection",
+              "features": [
+                {
+                  "type": "Feature",
+                  "properties": {},
+                  "geometry": {
+                    "type": "MultiPoint",
+                    "coordinates": [
+                      [-79.37536239624025, 38.83957390576818],
+                      [-79.37707901000978, 38.83823681418088]
+                    ]
+                  }
+                }
+              ]
+            }
           }
         ]
       }

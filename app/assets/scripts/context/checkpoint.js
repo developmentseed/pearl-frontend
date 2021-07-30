@@ -27,13 +27,13 @@ export const actions = {
   RECEIVE_AOI_INFO: 'RECEIVE_AOI_INFO',
   RECEIVE_ANALYTICS: 'RECEIVE_ANALYTICS',
   SET_ACTIVE_CLASS: 'SET_ACTIVE_CLASS',
-  ADD_POINT_SAMPLE: 'ADD_POINT_SAMPLE',
+  ADD_POINT_SAMPLES: 'ADD_POINT_SAMPLES',
   REMOVE_POINT_SAMPLE: 'REMOVE_POINT_SAMPLE',
   CLEAR_SAMPLES: 'CLEAR_SAMPLES',
   RESET_CHECKPOINT: 'RESET_CHECKPOINT',
   UPDATE_POLYGONS: 'UPDATE_POLYGONS',
+  ADD_CLASS_SAMPLES: 'ADD_CLASS_SAMPLES',
   INPUT_UNDO: 'INPUT_UNDO',
-
   SET_AOI_CHECKED: 'SET_AOI_CHECKED',
 };
 
@@ -257,15 +257,39 @@ function checkpointReducer(state, action) {
           },
         };
       }
+    case actions.ADD_CLASS_SAMPLES:
+      return {
+        ...state,
+        history: [
+          ...state.history,
+          {
+            classes: state.classes,
+            checkpointBrushes: state.checkpointBrushes,
+          },
+        ],
+        classes: {
+          ...state.classes,
+          [action.data.name]: {
+            ...state.classes[action.data.name],
+            polygons: action.data.polygons,
+            points: {
+              ...state.classes[state.activeItem].points,
+              coordinates: uniqWith(
+                state.classes[state.activeItem].points.coordinates.concat(
+                  action.data.points
+                ),
+                isEqual
+              ),
+            },
+          },
+        },
+      };
     case actions.SET_ACTIVE_CLASS:
       return {
         ...state,
         activeItem: action.data,
       };
-    case actions.ADD_POINT_SAMPLE: {
-      // Get coords
-      const { lat, lng } = action.data;
-
+    case actions.ADD_POINT_SAMPLES: {
       // Merge coords into class
       const currentClass = state.classes[state.activeItem];
       const updatedClass = {
@@ -273,7 +297,7 @@ function checkpointReducer(state, action) {
         points: {
           ...currentClass.points,
           coordinates: uniqWith(
-            currentClass.points.coordinates.concat([[lng, lat]]),
+            currentClass.points.coordinates.concat(action.data),
             isEqual
           ),
         },
