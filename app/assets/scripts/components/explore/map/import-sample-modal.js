@@ -124,8 +124,8 @@ function ImportSamplesModal({ revealed, setRevealed }) {
             Upload training sample data in .geojson format.
           </Prose>
           <Prose className='prose'>
-            Select a GeoJSON file with FeatureCollection of Points and Polygons. Once imported, these can be
-            submitted to the model to retrain.
+            Select a GeoJSON file with FeatureCollection of Points and Polygons.
+            Once imported, these can be submitted to the model to retrain.
           </Prose>
           <div className='prose'>
             Importing to class: <strong>{currentCheckpoint.activeItem}</strong>
