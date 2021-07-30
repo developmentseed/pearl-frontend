@@ -142,19 +142,16 @@ export const Thumbnail = styled.div`
 
 export const ToolBox = styled.section`
   padding: 0 1.5rem;
-  display: flex;
-  flex-flow: row wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  grid-gap: 0.5rem;
   ${Heading} {
-    flex-basis: 100%;
+    grid-column: 1 / -1;
   }
   ${Button} {
     padding: 0.25rem 0.75rem 0.25rem 0.5rem;
     box-shadow: none;
     border: 2px solid ${themeVal('color.primaryAlphaB')};
-
-    & ~ ${Button} {
-      margin-left: ${glsp()};
-    }
   }
 `;
 
