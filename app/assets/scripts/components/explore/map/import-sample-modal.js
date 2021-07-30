@@ -36,9 +36,9 @@ function ImportSamplesModal({ revealed, setRevealed }) {
 
   const onFileSelect = async (uploadedFile) => {
     try {
-      // Check if file type is JSON
-      const validFileTypes = ['application/geo+json', 'application/json'];
-      if (!validFileTypes.includes(uploadedFile.type)) {
+      // Check if file extension
+      const filename = uploadedFile.name;
+      if (!filename.endsWith('.json') && !filename.endsWith('.geojson')) {
         toasts.error(`Invalid file type, please upload a GeoJSON file.`);
         return;
       }
@@ -78,7 +78,7 @@ function ImportSamplesModal({ revealed, setRevealed }) {
       );
 
       setFile({
-        name: uploadedFile.name,
+        name: filename,
         payload,
       });
     } catch (error) {
@@ -150,7 +150,8 @@ function ImportSamplesModal({ revealed, setRevealed }) {
                 >
                   Select file to upload
                 </Button>
-              )}
+              )
+            }
           </FauxFileDialog>
           {file && (
             <div className='prose'>
