@@ -78,7 +78,7 @@ function ImportSamplesModal({ revealed, setRevealed }) {
       );
 
       setFile({
-        ...uploadedFile,
+        name: uploadedFile.name,
         payload,
       });
     } catch (error) {
