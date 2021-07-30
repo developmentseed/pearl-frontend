@@ -426,7 +426,7 @@ function Map() {
               attribution='&copy; NAIP'
               url={config.tileUrlTemplate.replace('{LAYER_NAME}', layer)}
               minZoom={12}
-              maxZoom={18}
+              maxZoom={20}
               pane='tilePane'
               eventHandlers={{
                 add: (v) => {
@@ -521,7 +521,7 @@ function Map() {
           !predictions.fetching && (
             <TileLayerWithHeaders
               url={tileUrl}
-              maxZoom={18}
+              maxZoom={20}
               headers={[
                 {
                   header: 'Authorization',
