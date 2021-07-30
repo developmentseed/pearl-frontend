@@ -407,6 +407,7 @@ function SessionOutputControl(props) {
                   ? 'Set project name to start new project'
                   : 'Create new project'
               }
+              disabled={!localProjectName}
             >
               Create Project
             </Button>
