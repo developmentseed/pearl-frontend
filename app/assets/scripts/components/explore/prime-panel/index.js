@@ -40,8 +40,11 @@ import { useAoi } from '../../../context/aoi';
 import { usePredictions } from '../../../context/predictions';
 
 const StyledPanelBlock = styled(PanelBlock)`
-  ${media.xlargeUp`
+  ${media.largeUp`
     width: ${glsp(24)};
+  `}
+  ${media.xlargeUp`
+    width: ${glsp(28)};
   `}
 `;
 

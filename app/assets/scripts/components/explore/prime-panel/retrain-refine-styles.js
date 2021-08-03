@@ -1,4 +1,4 @@
-import { glsp, themeVal, truncated } from '@devseed-ui/theme-provider';
+import { glsp, themeVal, truncated, media } from '@devseed-ui/theme-provider';
 import { PlaceholderMessage } from '../../../styles/placeholder.js';
 import {
   DropdownBody,
@@ -143,8 +143,11 @@ export const Thumbnail = styled.div`
 export const ToolBox = styled.section`
   padding: 0 1.5rem;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(6rem, 1fr));
   grid-gap: 0.5rem;
+  ${media.largeUp`
+    grid-template-columns: repeat(auto-fill, minmax(5rem, 1fr));
+  `}
   ${Heading} {
     grid-column: 1 / -1;
   }
