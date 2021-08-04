@@ -37,4 +37,17 @@ describe('Loads AOIs', () => {
     cy.wait('@reverseGeocodeRural');
     cy.get('[data-cy=aoi-selection-trigger]').contains('Huntingdon County');
   });
+
+  it.only('Can upload an AOI', () => {
+    cy.get('[data-cy=upload-aoi-modal-button]').click();
+
+    // Open select file dialog
+    cy.get('[data-cy=select-aoi-file-button').click();
+
+    // Apply file to input
+    cy.get('[data-cy=aoi-upload-input]').attachFile('aoi-to-upload.geojson');
+
+    // Proceed importing
+    cy.get('[data-cy=import-aoi-button').click();
+  });
 });
