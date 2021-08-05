@@ -140,7 +140,7 @@ Cypress.Commands.add('mockRegularProject', () => {
           },
           {
             id: 2,
-            name: 'Seneca Rocks',
+            name: 'Seneca Rocks #1',
             bookmarked: true,
             bounds: {
               type: 'Polygon',
@@ -180,7 +180,7 @@ Cypress.Commands.add('mockRegularProject', () => {
         ],
       },
     }
-  );
+  ).as('loadAois');
 
   cy.intercept(
     {

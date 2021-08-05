@@ -28,7 +28,7 @@ export const DropdownBody = styled.ul`
 `;
 export const DropdownItem = styled.a`
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: 1fr auto;
   justify-items: start;
   padding: ${glsp(0.25)} ${glsp()};
   grid-gap: ${glsp()};
@@ -41,7 +41,7 @@ export const DropdownItem = styled.a`
   ${({ useIcon }) =>
     useIcon &&
     css`
-      grid-template-columns: max-content 1fr;
+      grid-template-columns: max-content 1fr auto;
       ::before {
         ${collecticon(useIcon)}
       }
@@ -51,7 +51,7 @@ export const DropdownItem = styled.a`
   ${({ checked }) =>
     checked &&
     css`
-      grid-template-columns: max-content 1fr;
+      grid-template-columns: max-content 1fr auto;
       ::before {
         ${collecticon('tick')}
       }

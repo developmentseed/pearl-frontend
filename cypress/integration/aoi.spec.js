@@ -1,3 +1,5 @@
+import config from '../../app/assets/scripts/config/testing';
+const { restApiEndpoint } = config.default;
 describe('Loads AOIs', () => {
   let map;
 
@@ -38,7 +40,21 @@ describe('Loads AOIs', () => {
     cy.wait('@reverseGeocodeRural');
     cy.get('[data-cy=aoi-selection-trigger]').contains('Huntingdon County');
   });
+});
 
-  it('Can delete an aoi', () => {
-  })
+describe('Can delete AOIs', () => {
+  beforeEach(() => {
+    cy.startServer();
+  });
+
+  it.only('Displays delete button on header', () => {
+    cy.fakeLogin();
+    cy.mockRegularProject();
+
+    cy.setWebsocketWorkflow('retrain');
+    cy.visit('/project/1');
+    cy.wait('@loadAois');
+    cy.get('[data-cy=delete-current-aoi-button]');
+    cy.get('[data-cy=delete-current-aoi-button]').click();
+  });
 });

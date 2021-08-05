@@ -35,14 +35,27 @@ const ModalFooter = styled(BaseModalFooter)`
 export function AoiEditButtons(props) {
   const { mapState, setMapMode, mapModes } = useMapState();
   const { updateAoiName } = useAoiName();
-  const { setCurrentAoi, activeModal, setActiveModal, setAoiArea } = useAoi();
+  const {
+    currentAoi,
+    setCurrentAoi,
+    activeModal,
+    setActiveModal,
+    setAoiArea,
+  } = useAoi();
   const { mapRef } = useMapRef();
 
   const { dispatchCurrentCheckpoint } = useCheckpoint();
 
   const { apiLimits } = useApiMeta();
 
-  const { aoiRef, aoiArea, aoiBounds, setAoiBounds, setAoiRef } = props;
+  const {
+    aoiRef,
+    aoiArea,
+    aoiBounds,
+    setAoiBounds,
+    setAoiRef,
+    deleteAoi,
+  } = props;
 
   // Display confirm/cancel buttons when AOI edition is active
   if (
@@ -182,17 +195,32 @@ export function AoiEditButtons(props) {
   }
 
   return (
-    <EditButton
-      onClick={() => {
-        setMapMode(!aoiRef ? mapModes.CREATE_AOI_MODE : mapModes.EDIT_AOI_MODE);
-      }}
-      title='Draw Area of Interest'
-      id='edit-aoi-trigger'
-      useIcon='pencil'
-      data-cy='aoi-edit-button'
-    >
-      Select AOI
-    </EditButton>
+    <>
+      {currentAoi && (
+        <EditButton
+          onClick={() => deleteAoi(currentAoi)}
+          title='Delete current aoi'
+          id='delete-aoi'
+          useIcon='trash-bin'
+          data-cy='delete-current-aoi-button'
+        >
+          Delete current Aoi
+        </EditButton>
+      )}
+      <EditButton
+        onClick={() => {
+          setMapMode(
+            !aoiRef ? mapModes.CREATE_AOI_MODE : mapModes.EDIT_AOI_MODE
+          );
+        }}
+        title='Draw Area of Interest'
+        id='edit-aoi-trigger'
+        useIcon='pencil'
+        data-cy='aoi-edit-button'
+      >
+        Select AOI
+      </EditButton>
+    </>
   );
 }
 

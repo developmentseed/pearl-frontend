@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import T from 'prop-types';
 import styled, { css } from 'styled-components';
 import { Heading } from '@devseed-ui/typography';
@@ -26,7 +26,10 @@ import {
 } from '../../../styles/dropdown';
 import { AoiEditButtons } from './aoi-edit-buttons';
 import { useModels } from '../../../context/global';
+import { useAuth } from '../../../context/auth';
+import { useAoi } from '../../../context/aoi';
 
+import toasts from '../../common/toasts';
 const SelectAoiTrigger = styled.div`
   cursor: pointer;
 `;
@@ -119,6 +122,8 @@ function Header(props) {
   } = props;
 
   const { models } = useModels();
+  const { restApiClient } = useAuth();
+  const { setAoiList } = useAoi();
 
   const renderAoiHeader = (triggerProps) => {
     let header;
@@ -205,6 +210,27 @@ function Header(props) {
     return 'No models available';
   };
 
+  const deleteAoi = useCallback(
+    async (targetAoi) => {
+      try {
+        const deleteReqs = aoiList.map((aoi) => {
+          if (aoi.name === targetAoi.name) {
+            return restApiClient.deleteAoi(aoi.id, currentProject.id);
+          } else {
+            return null;
+          }
+        });
+
+        await Promise.all(deleteReqs);
+        const aoiReq = await restApiClient.getAois(currentProject.id);
+        setAoiList(aoiReq.aois);
+      } catch (err) {
+        toasts.error(err.message);
+      }
+    },
+    [aoiList, currentProject, restApiClient]
+  );
+
   return (
     <PanelBlockHeader>
       <HeadOption hasSubtitle>
@@ -256,6 +282,8 @@ function Header(props) {
                         e.stopPropagation();
 
                         e.preventDefault();
+
+                        deleteAoi(a);
                       }}
                     >
                       Delete AOI
@@ -291,6 +319,7 @@ function Header(props) {
             aoiArea={aoiArea}
             setAoiBounds={setAoiBounds}
             aoiBounds={aoiBounds}
+            deleteAoi={deleteAoi}
           />
         </HeadOptionToolbar>
       </HeadOption>
