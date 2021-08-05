@@ -222,7 +222,7 @@ function Header(props) {
         });
 
         await Promise.all(deleteReqs);
-        const aoiReq = await restApiClient.getAois(currentProject.id);
+        const aoiReq = await restApiClient.getAOIs(currentProject.id);
         setAoiList(aoiReq.aois);
       } catch (err) {
         toasts.error(err.message);
@@ -277,6 +277,7 @@ function Header(props) {
                     <div data-dropdown='click.close'>{`${a.name}`}</div>
                     <EditButton
                       useIcon='trash-bin'
+                      className='aoi-delete-button'
                       hideText
                       onClick={(e) => {
                         e.stopPropagation();

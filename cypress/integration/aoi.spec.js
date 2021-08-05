@@ -1,3 +1,5 @@
+import config from '../../app/assets/scripts/config/testing';
+const { restApiEndpoint } = config.default;
 describe('Loads AOIs', () => {
   let map;
 
@@ -50,9 +52,33 @@ describe('Can delete AOIs', () => {
     cy.mockRegularProject();
 
     cy.setWebsocketWorkflow('retrain');
+
     cy.visit('/project/1');
     cy.wait('@loadAois');
+
+    cy.intercept(
+      {
+        url: restApiEndpoint + '/api/project/1/aoi/1',
+        method: 'DELETE',
+      },
+      {
+        statusCode: 200,
+        body: {},
+      }
+    ).as('deleteAoi');
+
+    cy.intercept(
+      {
+        url: restApiEndpoint + '/api/project/1/aoi',
+      },
+      {
+        fixture: 'aois.1.json',
+      }
+    ).as('loadAois1');
+
     cy.get('[data-cy=delete-current-aoi-button]');
     cy.get('[data-cy=delete-current-aoi-button]').click();
+    cy.get('[data-cy=aoi-selection-trigger]').click();
+    cy.get('.aoi-delete-button').should('have.length', 1);
   });
 });
