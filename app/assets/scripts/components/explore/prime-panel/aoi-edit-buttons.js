@@ -230,4 +230,5 @@ AoiEditButtons.propTypes = {
   aoiBounds: T.object,
   setAoiBounds: T.func,
   aoiArea: T.oneOfType([T.bool, T.number]),
+  deleteAoi: T.func,
 };

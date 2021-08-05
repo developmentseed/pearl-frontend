@@ -1,5 +1,3 @@
-import config from '../../app/assets/scripts/config/testing';
-const { restApiEndpoint } = config.default;
 describe('Loads AOIs', () => {
   let map;
 
