@@ -38,16 +38,29 @@ describe('Loads AOIs', () => {
     cy.get('[data-cy=aoi-selection-trigger]').contains('Huntingdon County');
   });
 
-  it.only('Can upload an AOI', () => {
+  it('Can upload an AOI', () => {
+    // Open import modal
     cy.get('[data-cy=upload-aoi-modal-button]').click();
 
     // Open select file dialog
     cy.get('[data-cy=select-aoi-file-button').click();
 
-    // Apply file to input
-    cy.get('[data-cy=aoi-upload-input]').attachFile('aoi-to-upload.geojson');
+    // Apply large aoi file to input
+    cy.get('[data-cy=aoi-upload-input]').attachFile('aoi-upload/aoi-1.json');
+
+    // Importing should not be allowed
+    cy.get('[data-cy=import-aoi-button').should('be.disabled');
+
+    // Open select file dialog again
+    cy.get('[data-cy=select-aoi-file-button').click();
+
+    // Apply valid file to input
+    cy.get('[data-cy=aoi-upload-input]').attachFile('aoi-upload/aoi-2.geojson');
 
     // Proceed importing
     cy.get('[data-cy=import-aoi-button').click();
+
+    // Set AOI
+    cy.get('[data-cy=aoi-edit-confirm-button').click();
   });
 });

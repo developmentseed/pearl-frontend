@@ -1,4 +1,5 @@
 import React from 'react';
+import L from 'leaflet';
 import styled from 'styled-components';
 import { Button } from '@devseed-ui/button';
 import { glsp, themeVal } from '@devseed-ui/theme-provider';
@@ -8,7 +9,6 @@ import Prose from '../../../styles/type/prose';
 import T from 'prop-types';
 import { formatThousands } from '../../../utils/format';
 import { FauxFileDialog } from '../../common/faux-file-dialog';
-import toasts from '../../common/toasts';
 
 import {
   Modal,
@@ -27,6 +27,7 @@ import { areaFromBounds } from '../../../utils/map';
 import { useState } from 'react';
 import bbox from '@turf/bbox';
 import logger from '../../../utils/logger';
+import { BOUNDS_PADDING } from '../../common/map/constants';
 
 const ModalFooter = styled(BaseModalFooter)`
   padding: ${glsp(2)} 0 0 0;
@@ -53,7 +54,7 @@ const Wrapper = styled.div`
   grid-gap: 1rem;
 `;
 
-function UploadAoiModal({ revealed, setRevealed }) {
+function UploadAoiModal({ revealed, setRevealed, onImport, apiLimits }) {
   const [file, setFile] = useState(null);
   const [warning, setWarning] = useState(null);
   const onFileSelect = async (uploadedFile) => {
@@ -77,17 +78,21 @@ function UploadAoiModal({ revealed, setRevealed }) {
       }
 
       const bounds = bbox(geojson);
-
       const totalArea = areaFromBounds(bounds);
 
-      setWarning(
-        `Area too big ${totalArea}`
-      );
-      return;
+      // Check area size
+      if (apiLimits.max_inference > totalArea) {
+        setWarning('Due to area size live inference will not be available.');
+      } else if (apiLimits.live_inference < totalArea) {
+        setWarning('Area is too large, please upload another file.');
+        return;
+      }
 
+      // File is ok, allow importing
       setFile({
         name: filename,
-        bounds: bbox(geojson),
+        bounds,
+        totalArea,
       });
     } catch (error) {
       logger(error);
@@ -160,7 +165,7 @@ function UploadAoiModal({ revealed, setRevealed }) {
           )}
           {warning && <div className='prose warning'>{warning}</div>}
           <Button
-            data-cy='import-samples-button'
+            data-cy='import-aoi-button'
             variation='primary-raised-dark'
             size='medium'
             useIcon='tick'
@@ -170,8 +175,13 @@ function UploadAoiModal({ revealed, setRevealed }) {
               gridColumn: '1 / -1',
             }}
             onClick={() => {
-              // importFile();
-              setRevealed(false);
+              if (onImport(file)) {
+                setRevealed(false);
+              } else {
+                setWarning(
+                  'An unexpected error occurred, please upload a valid GeoJSON file or try again later.'
+                );
+              }
             }}
           >
             Import
@@ -181,6 +191,13 @@ function UploadAoiModal({ revealed, setRevealed }) {
     />
   );
 }
+
+UploadAoiModal.propTypes = {
+  revealed: T.bool,
+  setRevealed: T.func,
+  onImport: T.func,
+  apiLimits: T.object,
+};
 
 export function AoiEditButtons(props) {
   const { mapState, setMapMode, mapModes } = useMapState();
@@ -334,7 +351,40 @@ export function AoiEditButtons(props) {
 
   return (
     <>
-      <UploadAoiModal revealed={showUploadAoiModal} />
+      <UploadAoiModal
+        revealed={showUploadAoiModal}
+        setRevealed={setShowUploadAoiModal}
+        apiLimits={apiLimits}
+        onImport={({ bounds, totalArea }) => {
+          try {
+            let aoiShape;
+            const [minX, minY, maxX, maxY] = bounds;
+            const leafletBounds = [
+              [minY, minX],
+              [maxY, maxX],
+            ];
+            if (!aoiRef) {
+              aoiShape = L.rectangle(leafletBounds).addTo(mapRef);
+              setAoiRef(aoiShape);
+            } else {
+              aoiShape = aoiRef;
+              aoiRef.setBounds(leafletBounds);
+            }
+
+            mapRef.fitBounds(aoiShape.getBounds(), {
+              padding: BOUNDS_PADDING,
+            });
+            setAoiArea(totalArea);
+            setAoiBounds(aoiShape.getBounds());
+            setMapMode(mapModes.EDIT_AOI_MODE);
+
+            return true;
+          } catch (error) {
+            logger(error);
+            return false;
+          }
+        }}
+      />
       <EditButton
         onClick={() => {
           setMapMode(
