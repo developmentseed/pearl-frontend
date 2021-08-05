@@ -38,5 +38,7 @@ describe('Loads AOIs', () => {
     cy.wait('@reverseGeocodeRural');
     cy.get('[data-cy=aoi-selection-trigger]').contains('Huntingdon County');
   });
-  //});
+
+  it('Can delete an aoi', () => {
+  })
 });

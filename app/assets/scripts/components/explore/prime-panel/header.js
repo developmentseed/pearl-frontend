@@ -228,7 +228,7 @@ function Header(props) {
             </DropdownHeader>
             <DropdownBody>
               {filterAoiList(aoiList).map((a) => (
-                <li key={a.id} data-dropdown='click.close'>
+                <li key={a.id}>
                   <DropdownItem
                     checked={a.name == aoiName}
                     onClick={() => {
@@ -248,7 +248,18 @@ function Header(props) {
                       );
                     }}
                   >
-                    {`${a.name}`}
+                    <div data-dropdown='click.close'>{`${a.name}`}</div>
+                    <EditButton
+                      useIcon='trash-bin'
+                      hideText
+                      onClick={(e) => {
+                        e.stopPropagation();
+
+                        e.preventDefault();
+                      }}
+                    >
+                      Delete AOI
+                    </EditButton>
                   </DropdownItem>
                 </li>
               ))}
