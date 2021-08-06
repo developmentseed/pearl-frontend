@@ -37,10 +37,44 @@ Cypress.Commands.add('mockRegularProject', () => {
         model_id: 1,
         mosaic: 'naip.latest',
         created: '2021-03-19T12:47:07.838Z',
-        checkpoints: []
+        checkpoints: [],
       },
     }
   ).as('getProject');
+
+  cy.intercept(
+    {
+      url: restApiEndpoint + '/api/project/?page=*&limit=20',
+    },
+    {
+      body: {
+        total: 2,
+        projects: [
+          {
+            id: 1,
+            name: 'Untitled',
+            model_id: 1,
+            mosaic: 'naip.latest',
+            created: '2021-03-19T12:47:07.838Z',
+            checkpoints: [],
+            aois: []
+          },
+          {
+            id: 2,
+            name: 'Project 2',
+            model_id: 1,
+            mosaic: 'naip.latest',
+            created: '2021-03-20T12:47:07.838Z',
+            checkpoints: [],
+            aois: []
+          },
+
+        ],
+      },
+    }
+  ).as('getProject');
+
+  //api.lulc-staging.ds.io/api/project/?page=0&limit=20
 
   cy.intercept(
     {
