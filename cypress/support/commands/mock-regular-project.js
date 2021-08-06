@@ -37,6 +37,7 @@ Cypress.Commands.add('mockRegularProject', () => {
         model_id: 1,
         mosaic: 'naip.latest',
         created: '2021-03-19T12:47:07.838Z',
+        checkpoints: []
       },
     }
   ).as('getProject');
