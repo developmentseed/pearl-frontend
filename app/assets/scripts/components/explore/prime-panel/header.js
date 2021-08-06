@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import T from 'prop-types';
 import styled, { css } from 'styled-components';
 import { Heading } from '@devseed-ui/typography';
@@ -29,7 +29,21 @@ import { useModels } from '../../../context/global';
 import { useAuth } from '../../../context/auth';
 import { useAoi } from '../../../context/aoi';
 
+import { Modal } from '@devseed-ui/modal';
+import { Button } from '@devseed-ui/button';
+
 import toasts from '../../common/toasts';
+const ModalWrapper = styled.div`
+  display: grid;
+  grid-template-areas:
+    'a a'
+    'b c';
+  grid-gap: ${glsp(1)};
+  padding: ${glsp()};
+  div {
+    grid-area: a;
+  }
+`;
 const SelectAoiTrigger = styled.div`
   cursor: pointer;
 `;
@@ -121,6 +135,7 @@ function Header(props) {
     currentProject,
   } = props;
 
+  const [deleteAoi, setDeleteAoi] = useState();
   const { models } = useModels();
   const { restApiClient } = useAuth();
   const { setAoiList } = useAoi();
@@ -210,7 +225,7 @@ function Header(props) {
     return 'No models available';
   };
 
-  const deleteAoi = useCallback(
+  const deleteAoiFunc = useCallback(
     async (targetAoi) => {
       try {
         const deleteReqs = aoiList.map((aoi) => {
@@ -284,7 +299,8 @@ function Header(props) {
 
                         e.preventDefault();
 
-                        deleteAoi(a);
+                        //deleteAoi(a);
+                        setDeleteAoi(a);
                       }}
                     >
                       Delete AOI
@@ -320,10 +336,47 @@ function Header(props) {
             aoiArea={aoiArea}
             setAoiBounds={setAoiBounds}
             aoiBounds={aoiBounds}
-            deleteAoi={deleteAoi}
+            deleteAoi={(aoi) => setDeleteAoi(aoi)}
           />
         </HeadOptionToolbar>
       </HeadOption>
+      <Modal
+        id='confirm-delete-aoi-modal'
+        data-cy='confirm-delete-aoi-modal'
+        revealed={deleteAoi}
+        onOverlayClick={() => setDeleteAoi(null)}
+        onCloseClick={() => setDeleteAoi(null)}
+        title='Delete AOI'
+        size='small'
+        content={
+          <ModalWrapper>
+            <div>Are you sure you want to delete this AOI?</div>
+            <Button
+              data-cy='cancel-aoi-delete'
+              variation='primary-raised-dark'
+              size='medium'
+              useIcon='tick'
+              onClick={() => {
+                setDeleteAoi(null);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              data-cy='confirm-aoi-delete'
+              variation='primary-raised-dark'
+              size='medium'
+              useIcon='tick'
+              onClick={() => {
+                deleteAoiFunc(deleteAoi);
+                setDeleteAoi(null);
+              }}
+            >
+              Delete AOI
+            </Button>
+          </ModalWrapper>
+        }
+      />
 
       <HeadOption>
         <HeadOptionHeadline>
@@ -375,7 +428,7 @@ function Header(props) {
               <>
                 <SubheadingStrong
                   {...props}
-                onClick={(e) => !disabled && props.onClick(e)} // eslint-disable-line
+                  onClick={(e) => !disabled && props.onClick(e)} // eslint-disable-line
                   title={
                     checkpointList
                       ? 'Change checkpoint'
@@ -403,7 +456,7 @@ function Header(props) {
                         : null
                     }
                     {...props}
-                  onClick={(e) => !disabled && props.onClick(e)} // eslint-disable-line
+                    onClick={(e) => !disabled && props.onClick(e)} // eslint-disable-line
                     visuallyDisabled={disabled}
                   >
                     Edit Checkpoint Selection

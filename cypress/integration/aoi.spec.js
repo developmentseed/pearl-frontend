@@ -78,6 +78,9 @@ describe('Can delete AOIs', () => {
 
     cy.get('[data-cy=delete-current-aoi-button]');
     cy.get('[data-cy=delete-current-aoi-button]').click();
+    cy.get('[data-cy=confirm-delete-aoi-modal]').should('exist');
+    cy.get('[data-cy=confirm-aoi-delete]').should('exist').click();
+    cy.get('[data-cy=confirm-delete-aoi-modal]').should('not.exist');
     cy.get('[data-cy=aoi-selection-trigger]').click();
     cy.get('.aoi-delete-button').should('have.length', 1);
   });
