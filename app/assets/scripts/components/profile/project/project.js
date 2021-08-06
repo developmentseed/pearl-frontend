@@ -288,7 +288,7 @@ function Project() {
                     size='small'
                     content={
                       <ModalWrapper>
-                        <div>Are you sure you want to delete this AOI?</div>
+                        <div>Are you sure you want to delete this project?</div>
                         <Button
                           data-cy='cancel-project-delete'
                           variation='primary-raised-dark'
