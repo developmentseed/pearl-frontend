@@ -28,6 +28,7 @@ import { useState } from 'react';
 import bbox from '@turf/bbox';
 import logger from '../../../utils/logger';
 import { BOUNDS_PADDING } from '../../common/map/constants';
+import { inRange } from '../../../utils/utils';
 
 const ModalFooter = styled(BaseModalFooter)`
   padding: ${glsp(2)} 0 0 0;
@@ -80,12 +81,26 @@ function UploadAoiModal({ revealed, setRevealed, onImport, apiLimits }) {
       const bounds = bbox(geojson);
       const totalArea = areaFromBounds(bounds);
 
-      // Check area size
-      if (apiLimits.max_inference > totalArea) {
-        setWarning('Due to area size live inference will not be available.');
-      } else if (apiLimits.live_inference < totalArea) {
-        setWarning('Area is too large, please upload another file.');
+      if (isNaN(totalArea) || totalArea === 0) {
+        // Area should be bigger than zero, abort import
+        setWarning(
+          'File is empty or does not conform a valid area, please upload another file.'
+        );
+        setFile(null);
         return;
+      } else if (totalArea > apiLimits.max_inference) {
+        // Area should be lower than max_inference, abort import
+        setWarning('Area is too large, please upload another file.');
+        setFile(null);
+        return;
+      } else if (
+        inRange(totalArea, apiLimits.live_inference, apiLimits.max_inference)
+      ) {
+        // If area is bigger than apiLimits.live_inference, show warning and proceed import
+        setWarning('Due to area size live inference will not be available.');
+      } else {
+        // Area is ok, clear warning
+        setWarning(null);
       }
 
       // File is ok, allow importing
@@ -163,7 +178,11 @@ function UploadAoiModal({ revealed, setRevealed, onImport, apiLimits }) {
               </div>
             </>
           )}
-          {warning && <div className='prose warning'>{warning}</div>}
+          {warning && (
+            <div data-cy='import-aoi-warning-text' className='prose warning'>
+              {warning}
+            </div>
+          )}
           <Button
             data-cy='import-aoi-button'
             variation='primary-raised-dark'
@@ -322,6 +341,7 @@ export function AoiEditButtons(props) {
                   <Button
                     size='xlarge'
                     variation='base-plain'
+                    data-cy='proceed-anyway-button'
                     onClick={() => {
                       setActiveModal(false);
                       setMapMode(mapModes.BROWSE_MODE);
