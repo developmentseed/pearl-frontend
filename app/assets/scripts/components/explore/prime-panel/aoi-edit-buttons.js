@@ -1,11 +1,14 @@
 import React from 'react';
+import L from 'leaflet';
 import styled from 'styled-components';
 import { Button } from '@devseed-ui/button';
-import { glsp } from '@devseed-ui/theme-provider';
+import { glsp, themeVal } from '@devseed-ui/theme-provider';
 import { EditButton } from '../../../styles/button';
 import { useMapState } from '../../../context/explore';
+import Prose from '../../../styles/type/prose';
 import T from 'prop-types';
 import { formatThousands } from '../../../utils/format';
+import { FauxFileDialog } from '../../common/faux-file-dialog';
 
 import {
   Modal,
@@ -21,6 +24,11 @@ import {
   checkpointModes,
 } from '../../../context/checkpoint';
 import { areaFromBounds } from '../../../utils/map';
+import { useState } from 'react';
+import bbox from '@turf/bbox';
+import logger from '../../../utils/logger';
+import { BOUNDS_PADDING } from '../../common/map/constants';
+import { inRange } from '../../../utils/utils';
 
 const ModalFooter = styled(BaseModalFooter)`
   padding: ${glsp(2)} 0 0 0;
@@ -32,8 +40,187 @@ const ModalFooter = styled(BaseModalFooter)`
   }
 `;
 
+const Wrapper = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  h1 {
+    grid-column: 1 / -1;
+  }
+  div.prose {
+    grid-column: 1 / -1;
+  }
+  .warning {
+    color: ${themeVal('color.danger')};
+  }
+  grid-gap: 1rem;
+`;
+
+function UploadAoiModal({ revealed, setRevealed, onImport, apiLimits }) {
+  const [file, setFile] = useState(null);
+  const [warning, setWarning] = useState(null);
+  const onFileSelect = async (uploadedFile) => {
+    try {
+      // Check if file extension
+      const filename = uploadedFile.name;
+      if (!filename.endsWith('.json') && !filename.endsWith('.geojson')) {
+        setWarning(`Invalid file extension, please upload a valid file.`);
+        return;
+      }
+
+      // Parse JSON
+      const geojson = JSON.parse(await uploadedFile.text());
+
+      // Check for a FeatureCollection
+      if (geojson.type !== 'FeatureCollection') {
+        setWarning(
+          'GeoJSON must be of FeatureCollection type, please upload a valid file.'
+        );
+        return;
+      }
+
+      const bounds = bbox(geojson);
+      const totalArea = areaFromBounds(bounds);
+
+      if (isNaN(totalArea) || totalArea === 0) {
+        // Area should be bigger than zero, abort import
+        setWarning(
+          'File is empty or does not conform a valid area, please upload another file.'
+        );
+        setFile(null);
+        return;
+      } else if (totalArea > apiLimits.max_inference) {
+        // Area should be lower than max_inference, abort import
+        setWarning('Area is too large, please upload another file.');
+        setFile(null);
+        return;
+      } else if (
+        inRange(totalArea, apiLimits.live_inference, apiLimits.max_inference)
+      ) {
+        // If area is bigger than apiLimits.live_inference, show warning and proceed import
+        setWarning('Due to area size live inference will not be available.');
+      } else {
+        // Area is ok, clear warning
+        setWarning(null);
+      }
+
+      // File is ok, allow importing
+      setFile({
+        name: filename,
+        bounds,
+        totalArea,
+      });
+    } catch (error) {
+      logger(error);
+      setWarning(
+        'An unexpected error occurred, please upload a valid GeoJSON file or try again later.'
+      );
+    }
+  };
+
+  return (
+    <Modal
+      id='import-aoi-modal'
+      size='small'
+      revealed={revealed}
+      title='Upload an AOI'
+      onCloseClick={() => setRevealed(false)}
+      content={
+        <Wrapper>
+          {!file && (
+            <Prose className='prose'>
+              Once imported, the bounding box containing all features in the
+              file will be set as an AOI.
+            </Prose>
+          )}
+          <FauxFileDialog
+            name='image-file'
+            data-cy='aoi-upload-input'
+            onFileSelect={onFileSelect}
+          >
+            {(fieProps) =>
+              !file && (
+                <Button
+                  data-cy='select-aoi-file-button'
+                  variation='primary-raised-light'
+                  size='medium'
+                  useIcon='upload'
+                  style={{
+                    gridColumn: '2 / 1',
+                  }}
+                  {...fieProps}
+                >
+                  Select GeoJSON file
+                </Button>
+              )
+            }
+          </FauxFileDialog>
+          {file && (
+            <>
+              <div className='prose'>
+                <strong>Selected file: </strong>
+                {file.name}
+              </div>
+              <div className='prose'>
+                <strong>MinX: </strong>
+                {file.bounds[0]}
+              </div>
+              <div className='prose'>
+                <strong>MinY: </strong>
+                {file.bounds[1]}
+              </div>
+              <div className='prose'>
+                <strong>MaxX: </strong>
+                {file.bounds[2]}
+              </div>
+              <div className='prose'>
+                <strong>MaxY: </strong>
+                {file.bounds[3]}
+              </div>
+            </>
+          )}
+          {warning && (
+            <div data-cy='import-aoi-warning-text' className='prose warning'>
+              {warning}
+            </div>
+          )}
+          <Button
+            data-cy='import-aoi-button'
+            variation='primary-raised-dark'
+            size='medium'
+            useIcon='tick'
+            visuallyDisabled={!file}
+            disabled={!file}
+            style={{
+              gridColumn: '1 / -1',
+            }}
+            onClick={() => {
+              if (onImport(file)) {
+                setRevealed(false);
+              } else {
+                setWarning(
+                  'An unexpected error occurred, please upload a valid GeoJSON file or try again later.'
+                );
+              }
+            }}
+          >
+            Import
+          </Button>
+        </Wrapper>
+      }
+    />
+  );
+}
+
+UploadAoiModal.propTypes = {
+  revealed: T.bool,
+  setRevealed: T.func,
+  onImport: T.func,
+  apiLimits: T.object,
+};
+
 export function AoiEditButtons(props) {
   const { mapState, setMapMode, mapModes } = useMapState();
+  const [showUploadAoiModal, setShowUploadAoiModal] = useState(false);
   const { updateAoiName } = useAoiName();
   const { setCurrentAoi, activeModal, setActiveModal, setAoiArea } = useAoi();
   const { mapRef } = useMapRef();
@@ -154,6 +341,7 @@ export function AoiEditButtons(props) {
                   <Button
                     size='xlarge'
                     variation='base-plain'
+                    data-cy='proceed-anyway-button'
                     onClick={() => {
                       setActiveModal(false);
                       setMapMode(mapModes.BROWSE_MODE);
@@ -182,17 +370,64 @@ export function AoiEditButtons(props) {
   }
 
   return (
-    <EditButton
-      onClick={() => {
-        setMapMode(!aoiRef ? mapModes.CREATE_AOI_MODE : mapModes.EDIT_AOI_MODE);
-      }}
-      title='Draw Area of Interest'
-      id='edit-aoi-trigger'
-      useIcon='pencil'
-      data-cy='aoi-edit-button'
-    >
-      Select AOI
-    </EditButton>
+    <>
+      <UploadAoiModal
+        revealed={showUploadAoiModal}
+        setRevealed={setShowUploadAoiModal}
+        apiLimits={apiLimits}
+        onImport={({ bounds, totalArea }) => {
+          try {
+            let aoiShape;
+            const [minX, minY, maxX, maxY] = bounds;
+            const leafletBounds = [
+              [minY, minX],
+              [maxY, maxX],
+            ];
+            if (!aoiRef) {
+              aoiShape = L.rectangle(leafletBounds).addTo(mapRef);
+              setAoiRef(aoiShape);
+            } else {
+              aoiShape = aoiRef;
+              aoiRef.setBounds(leafletBounds);
+            }
+
+            mapRef.fitBounds(aoiShape.getBounds(), {
+              padding: BOUNDS_PADDING,
+            });
+            setAoiArea(totalArea);
+            setAoiBounds(aoiShape.getBounds());
+            setMapMode(mapModes.EDIT_AOI_MODE);
+
+            return true;
+          } catch (error) {
+            logger(error);
+            return false;
+          }
+        }}
+      />
+      <EditButton
+        onClick={() => {
+          setMapMode(
+            !aoiRef ? mapModes.CREATE_AOI_MODE : mapModes.EDIT_AOI_MODE
+          );
+        }}
+        title='Draw Area of Interest'
+        id='edit-aoi-trigger'
+        useIcon='pencil'
+        data-cy='aoi-edit-button'
+      >
+        Select AOI
+      </EditButton>
+      <EditButton
+        title='Upload AOI GeoJSON'
+        data-cy='upload-aoi-modal-button'
+        id='upload-aoi-modal-button'
+        useIcon='upload'
+        onClick={() => setShowUploadAoiModal(true)}
+      >
+        Upload AOI
+      </EditButton>
+    </>
   );
 }
 

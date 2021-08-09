@@ -7,7 +7,6 @@ describe('Create new project', () => {
     cy.fakeLogin();
     cy.mockRegularProject();
 
-    //cy.setWebsocketWorkflow('retrain');
     cy.visit('/project/new');
 
     cy.get('[data-cy=session-status]').should(
