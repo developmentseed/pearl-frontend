@@ -180,5 +180,17 @@ describe('Can delete AOIs', () => {
     cy.get('[data-cy=confirm-delete-aoi-modal]').should('not.exist');
     cy.get('[data-cy=aoi-selection-trigger]').click();
     cy.get('.aoi-delete-button').should('have.length', 1);
+    cy.intercept(
+      {
+        url: restApiEndpoint + '/api/project/1/aoi',
+      },
+      {
+        fixture: 'aois.0.json',
+      }
+    ).as('loadAois1');
+    cy.get('.aoi-delete-button').first().click()
+    cy.get('[data-cy=confirm-aoi-delete]').should('exist').click();
+
+
   });
 });

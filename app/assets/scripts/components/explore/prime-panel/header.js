@@ -239,6 +239,23 @@ function Header(props) {
         await Promise.all(deleteReqs);
         const aoiReq = await restApiClient.getAOIs(currentProject.id);
         setAoiList(aoiReq.aois);
+
+        if (aoiReq.aois.length) {
+          const { aois } = aoiReq;
+          loadAoi(
+            currentProject,
+            aois[aois.length - 1],
+            aois[aois.length - 1].checkpoint_id === currentCheckpoint?.id
+          );
+        } else {
+          createNewAoi();
+          console.log(mapRef)
+
+          mapRef.aoi.control.draw.disable();
+          //Layer must be removed from the map
+          mapRef.aoi.control.draw.clear();
+
+        }
       } catch (err) {
         toasts.error(err.message);
       }
