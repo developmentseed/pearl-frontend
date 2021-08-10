@@ -57,7 +57,7 @@ Cypress.Commands.add('mockRegularProject', () => {
             mosaic: 'naip.latest',
             created: '2021-03-19T12:47:07.838Z',
             checkpoints: [],
-            aois: []
+            aois: [],
           },
           {
             id: 2,
@@ -66,9 +66,8 @@ Cypress.Commands.add('mockRegularProject', () => {
             mosaic: 'naip.latest',
             created: '2021-03-20T12:47:07.838Z',
             checkpoints: [],
-            aois: []
+            aois: [],
           },
-
         ],
       },
     }
@@ -631,4 +630,14 @@ Cypress.Commands.add('mockRegularProject', () => {
     },
     { fixture: 'tiles/png-tile.png' }
   );
+  cy.intercept(
+    {
+      method: 'DELETE',
+      url: restApiEndpoint + '/api/project/1',
+    },
+    {
+      statusCode: 200,
+      body: {},
+    }
+  ).as('deleteProject');
 });

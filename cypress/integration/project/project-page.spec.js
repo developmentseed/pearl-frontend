@@ -15,6 +15,7 @@ describe('Has project page', () => {
     cy.get('[data-cy=confirm-delete-project-modal]').should('exist');
     cy.get('[data-cy=confirm-project-delete]').click();
     cy.get('[data-cy=confirm-delete-project-modal]').should('not.exist');
+    cy.wait('@deleteProject');
     cy.location().should((loc) => {
       expect(loc.pathname).to.eq('/profile/projects');
     });
