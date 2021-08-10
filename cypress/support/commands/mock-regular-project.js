@@ -71,9 +71,7 @@ Cypress.Commands.add('mockRegularProject', () => {
         ],
       },
     }
-  ).as('getProject');
-
-  //api.lulc-staging.ds.io/api/project/?page=0&limit=20
+  ).as('getProjects');
 
   cy.intercept(
     {

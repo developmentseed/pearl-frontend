@@ -284,7 +284,7 @@ function Project() {
                     revealed={deleteProject}
                     onOverlayClick={() => setDeleteProject(null)}
                     onCloseClick={() => setDeleteProject(null)}
-                    title='Delete AOI'
+                    title='Delete Project'
                     size='small'
                     content={
                       <ModalWrapper>
