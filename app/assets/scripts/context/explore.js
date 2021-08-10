@@ -199,7 +199,6 @@ export function ExploreProvider(props) {
 
       if (predictions.fetched && predictions.data.predictions?.length > 0) {
         restApiClient.get(`project/${currentProject.id}/aoi/`).then((aois) => {
-          //const list = filterAoiList(aois.aois);
           setAoiList(aois.aois);
         });
         // Refresh checkpoint list, prediction finished

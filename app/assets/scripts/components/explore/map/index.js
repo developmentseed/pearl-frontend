@@ -521,7 +521,6 @@ function Map() {
           !predictions.fetching && (
             <TileLayerWithHeaders
               url={tileUrl}
-              maxZoom={20}
               headers={[
                 {
                   header: 'Authorization',
@@ -531,6 +530,7 @@ function Map() {
               options={{
                 pane: 'overlayPane',
                 bounds: currentAoi.bounds,
+                maxZoom: 20,
               }}
               opacity={
                 userLayers.predictions.visible

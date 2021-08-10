@@ -21,7 +21,7 @@ Cypress.Commands.add('startServer', () => {
       version: '1.0.0',
       limits: {
         live_inference: 10000000,
-        max_inference: 10000000,
+        max_inference: 100000000,
         instance_window: 600,
       },
     }
