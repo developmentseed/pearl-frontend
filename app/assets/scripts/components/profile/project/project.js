@@ -291,9 +291,9 @@ function Project() {
                         <div>Are you sure you want to delete this project?</div>
                         <Button
                           data-cy='cancel-project-delete'
-                          variation='primary-raised-dark'
+                          variation='base-plain'
                           size='medium'
-                          useIcon='tick'
+                          useIcon='xmark'
                           onClick={() => {
                             setDeleteProject(null);
                           }}
