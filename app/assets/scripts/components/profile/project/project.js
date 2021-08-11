@@ -269,7 +269,7 @@ function Project() {
                 </Heading>
                 <InpageToolbar>
                   <Button
-                    variation='base-plain'
+                    variation='danger-plain'
                     data-cy='delete-project-button'
                     title='Delete Project'
                     useIcon='trash-bin'
