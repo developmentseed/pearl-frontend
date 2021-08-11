@@ -14,6 +14,7 @@ import { ExploreContext, useMapState } from '../../../context/explore';
 import { useMapRef, useMapLayers, useUserLayers } from '../../../context/map';
 
 import GeoCoder from '../../common/map/geocoder';
+import GenericControl from '../../common/map/generic-control';
 import { BOUNDS_PADDING } from '../../common/map/constants';
 import CenterMap from '../../common/map/center-map';
 
@@ -603,6 +604,9 @@ function Map() {
               ))
           )}
         <FeatureGroup>
+          <GenericControl 
+            id='layer-control'
+          />
           <GeoCoder />
           {aoiRef && <CenterMap aoiRef={aoiRef} />}
         </FeatureGroup>

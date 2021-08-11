@@ -49,4 +49,22 @@ export default () => css`
       border-radius: 0.25rem;
     }
   }
+
+  .leaflet-control.generic-leaflet-control {
+    background: ${themeVal('color.baseDark')};
+  }
+  .leaflet-control.generic-leaflet-control:hover {
+    cursor: pointer;
+  }
+  .leaflet-control.generic-leaflet-control::after {
+    ${collecticon('iso-stack')};
+    color: ${themeVal('baseLight')};
+    color: #ffffff;
+    top: unset;
+    left: unset;
+    height: 100%;
+    width: 100%;
+    border-radius: unset;
+    border: unset;
+  }
 `;
