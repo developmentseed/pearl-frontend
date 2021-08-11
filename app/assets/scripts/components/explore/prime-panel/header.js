@@ -370,9 +370,9 @@ function Header(props) {
             <div>Are you sure you want to delete this AOI?</div>
             <Button
               data-cy='cancel-aoi-delete'
-              variation='primary-raised-dark'
+              variation='primary-plain'
               size='medium'
-              useIcon='tick'
+              useIcon='xmark'
               onClick={() => {
                 setDeleteAoi(null);
               }}
