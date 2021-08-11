@@ -302,7 +302,7 @@ function Project() {
                         </Button>
                         <Button
                           data-cy='confirm-project-delete'
-                          variation='primary-raised-dark'
+                          variation='danger-raised-dark'
                           size='medium'
                           useIcon='tick'
                           onClick={async () => {
@@ -317,7 +317,7 @@ function Project() {
                             setDeleteProject(null);
                           }}
                         >
-                          Delete AOI
+                          Delete Project
                         </Button>
                       </ModalWrapper>
                     }
