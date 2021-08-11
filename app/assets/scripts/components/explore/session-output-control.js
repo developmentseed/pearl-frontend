@@ -267,7 +267,7 @@ function SessionOutputControl(props) {
               name='projectName'
               placeholder='Set Project Name'
               onChange={(e) => setLocalProjectName(e.target.value)}
-              value={localProjectName}
+              value={localProjectName || ''}
               disabled={!isAuthenticated}
               autoFocus
               data-cy='project-input'
@@ -395,7 +395,7 @@ function SessionOutputControl(props) {
               name='projectName'
               placeholder='Set Project Name'
               onChange={(e) => setLocalProjectName(e.target.value)}
-              value={localProjectName}
+              value={localProjectName || ''}
               disabled={!isAuthenticated}
               autoFocus
               data-cy='modal-project-input'
