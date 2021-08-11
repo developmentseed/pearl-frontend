@@ -381,7 +381,7 @@ function Header(props) {
             </Button>
             <Button
               data-cy='confirm-aoi-delete'
-              variation='primary-raised-dark'
+              variation='danger-raised-dark'
               size='medium'
               useIcon='tick'
               onClick={() => {
