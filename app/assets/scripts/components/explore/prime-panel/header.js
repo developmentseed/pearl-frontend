@@ -249,12 +249,10 @@ function Header(props) {
           );
         } else {
           createNewAoi();
-          console.log(mapRef)
 
           mapRef.aoi.control.draw.disable();
           //Layer must be removed from the map
           mapRef.aoi.control.draw.clear();
-
         }
       } catch (err) {
         toasts.error(err.message);

@@ -188,9 +188,7 @@ describe('Can delete AOIs', () => {
         fixture: 'aois.0.json',
       }
     ).as('loadAois1');
-    cy.get('.aoi-delete-button').first().click()
+    cy.get('.aoi-delete-button').first().click();
     cy.get('[data-cy=confirm-aoi-delete]').should('exist').click();
-
-
   });
 });
