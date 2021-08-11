@@ -249,16 +249,12 @@ function Header(props) {
           );
         } else {
           createNewAoi();
-
-          mapRef.aoi.control.draw.disable();
-          //Layer must be removed from the map
-          mapRef.aoi.control.draw.clear();
         }
       } catch (err) {
         toasts.error(err.message);
       }
     },
-    [aoiList, currentProject, restApiClient]
+    [aoiList, currentProject, restApiClient, mapRef]
   );
 
   return (
@@ -383,7 +379,13 @@ function Header(props) {
               size='medium'
               useIcon='tick'
               onClick={() => {
+                //mapRef.aoi.control.draw.clear()
+                mapRef.aoi.control.draw.disable();
+                //Layer must be removed from the map
+                mapRef.aoi.control.draw.clear();
+
                 deleteAoiFunc(deleteAoi);
+
                 setDeleteAoi(null);
               }}
             >
