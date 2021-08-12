@@ -87,6 +87,7 @@ function ModelCard({ model, onClick }) {
   });
   return (
     <Card
+      data-cy={`select-model-${model.id}-card`}
       title={model.name}
       subtitle={model.meta.description}
       details={details}
