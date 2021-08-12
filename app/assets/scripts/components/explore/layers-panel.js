@@ -20,16 +20,18 @@ import { useCheckpoint } from '../../context/checkpoint';
 const LayersPanelInner = styled.div`
   opacity: ${({ show }) => (show ? 1 : 0)};
   transition: opacity 0.16s ease 0s;
-  padding: 0.5rem;
+  padding: 1.5rem;
   overflow-x: hidden;
   margin-left: 1rem;
   position: fixed;
-  background: ${themeVal('color.baseDark')};
+  background: ${themeVal('color.surface')};
+  box-shadow: ${themeVal('boxshadow.ElevationC')};
   z-index: 1;
 `;
-const Wrapper = styled.div`
+const LayersWrapper = styled.div`
   display: grid;
   grid-gap: 1rem;
+  padding: ${glsp(1)} 0;
 `;
 const LayerWrapper = styled.div`
   display: grid;
@@ -64,7 +66,6 @@ const SliderWrapper = styled.div`
 const AccordionFold = styled(BaseFold)`
   background: unset;
   header {
-    padding: ${glsp()} 0;
     a {
       padding: ${glsp(0.5)} 0;
       h1 {
@@ -153,7 +154,7 @@ function Category({
       isFoldExpanded={checkExpanded()}
       setFoldExpanded={setExpanded}
       renderBody={() => (
-        <Wrapper>
+        <LayersWrapper>
           {Object.entries(layers)
             .filter(([, layer]) => layer.active)
             .map(([key, layer]) => (
@@ -166,7 +167,7 @@ function Category({
                 info={layer.info}
               />
             ))}
-        </Wrapper>
+        </LayersWrapper>
       )}
     />
   );
