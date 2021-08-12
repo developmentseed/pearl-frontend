@@ -19,6 +19,8 @@ import { useCheckpoint } from '../../context/checkpoint';
 
 const LayersPanelInner = styled.div`
   opacity: ${({ show }) => (show ? 1 : 0)};
+  display: ${({ show }) => !show && 'none'};
+
   transition: opacity 0.16s ease 0s;
   padding: 1.5rem;
   overflow-x: hidden;
