@@ -35,7 +35,7 @@ const LayersWrapper = styled.div`
 `;
 const LayerWrapper = styled.div`
   display: grid;
-  grid-template-columns: 2fr 4fr 1fr 1fr;
+  grid-template-columns: 4fr 1fr;
   ${Button} {
     place-self: center;
     max-width: ${glsp(1)};
@@ -45,12 +45,6 @@ const LayerWrapper = styled.div`
     max-width: ${glsp(1)};
     grid-column: 4;
   }
-`;
-
-const IconPlaceholder = styled.div`
-  width: 3rem;
-  height: 3rem;
-  background: ${themeVal('color.baseAlphaD')};
 `;
 
 const SliderWrapper = styled.div`
@@ -83,7 +77,6 @@ function Layer({ layer, onSliderChange, onVisibilityToggle, info, name }) {
   const [visible, setVisible] = useState(true);
   return (
     <LayerWrapper>
-      <IconPlaceholder />
       <SliderWrapper>
         <Heading as='h4' size='xsmall'>
           {name}
