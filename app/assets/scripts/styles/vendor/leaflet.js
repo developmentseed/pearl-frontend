@@ -51,15 +51,16 @@ export default () => css`
   }
 
   #layer-control.leaflet-control.generic-leaflet-control {
-    background: ${themeVal('color.baseDark')};
+    background: ${themeVal('color.surface')};
+    line-height: 30px;
+    text-align: center;
   }
   #layer-control.leaflet-control.generic-leaflet-control {
     cursor: pointer;
   }
   #layer-control.leaflet-control.generic-leaflet-control::after {
     ${collecticon('iso-stack')};
-    color: ${themeVal('baseLight')};
-    color: #ffffff;
+    color: ${themeVal('color.base')};
     top: unset;
     left: unset;
     height: 100%;
