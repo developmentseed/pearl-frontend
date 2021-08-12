@@ -43,7 +43,6 @@ function ModelCard({ model, onClick }) {
             display: false,
             maxTicksLimit: 1,
             fontSize: 12,
-            // callback: (v) => `${v * 100}%`,
             min: 0,
             max: 1,
           },
