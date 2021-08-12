@@ -91,7 +91,7 @@ function PrimePanel() {
   const { mosaicList } = useContext(GlobalContext);
   const { models } = useModels();
 
-  const { mapLayers } = useMapLayers();
+  //const { mapLayers } = useMapLayers();
 
   const { predictions } = usePredictions();
 
@@ -303,6 +303,7 @@ function PrimePanel() {
                   }}
                 />
               </TabbedBlock>
+            {/*
                 <LayersPanel
                   onTabClick={() => {
                     setActiveTab('LAYERS');
@@ -318,7 +319,7 @@ function PrimePanel() {
                       ? mosaicList.getData().mosaics
                       : []
                   }
-                />
+                />*/}
 
             </PanelBlockBody>
             {activeTab !== 'LAYERS' && (

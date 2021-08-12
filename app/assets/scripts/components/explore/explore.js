@@ -17,6 +17,7 @@ import Tour from '../common/tour';
 
 import { tourSteps } from './tour';
 import { useApiMeta } from '../../context/api-meta';
+import LayersPanel from './layers-panel';
 
 const ExploreBody = styled(InpageBody)`
   display: grid;
@@ -57,6 +58,19 @@ function Explore() {
           <ExploreCarto>
             <Map />
           </ExploreCarto>
+          <LayersPanel
+            //disabled={mapState.mode === mapModes.EDIT_AOI_MODE}
+            parentId='layer-control'
+            className='padded'
+            //mapLayers={mapLayers}
+            /*
+            baseLayerNames={
+              mosaicList.isReady() && !mosaicList.hasError()
+                ? mosaicList.getData().mosaics
+                : []
+             }*/
+          />
+
           <SecPanel />
         </ExploreBody>
         {steps && <Tour steps={steps} />}

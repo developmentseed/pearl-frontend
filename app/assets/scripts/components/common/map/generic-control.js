@@ -31,6 +31,8 @@ function GenericControl({ position, onClick, id}) {
       container.appendChild(button);
       setCntrl(button);
 
+      /*L.DomEvent.on(container, 'mousewheel', L.DomEvent.stopPropagation);
+      L.DomEvent.on(container, 'click', L.DomEvent.stopPropagation);*/
       return container;
     },
   });

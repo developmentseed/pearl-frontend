@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import ReactDOM from 'react-dom';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import T from 'prop-types';
 import styled from 'styled-components';
 import { Button } from '@devseed-ui/button';
@@ -9,17 +8,25 @@ import { themeVal, glsp } from '@devseed-ui/theme-provider';
 import InputRange from 'react-input-range';
 import { Accordion, AccordionFold as BaseFold } from '@devseed-ui/accordion';
 import throttle from 'lodash.throttle';
-import { useMapLayers, useUserLayers, useLayersPanel } from '../../context/map';
+import {
+  useMapLayers,
+  useUserLayers,
+  useLayersPanel,
+  useMapRef,
+} from '../../context/map';
+import { useMapState } from '../../context/explore';
 import { useCheckpoint } from '../../context/checkpoint';
+import GlobalContext from '../../context/global';
 
 const LayersPanelInner = styled.div`
-  opacity: ${({ show }) => show ? 1 : 0};
-  transition: opacity .16s ease 0s;
+  opacity: ${({ show }) => (show ? 1 : 0)};
+  transition: opacity 0.16s ease 0s;
   padding: 0.5rem;
   overflow-x: hidden;
-  margin-left: 2rem;
+  margin-left: 1rem;
   position: fixed;
   background: ${themeVal('color.baseDark')};
+  z-index: 1;
 `;
 const Wrapper = styled.div`
   display: grid;
@@ -82,6 +89,10 @@ function Layer({ layer, onSliderChange, onVisibilityToggle, info, name }) {
           {name}
         </Heading>
         <InputRange
+          onMouseDown={(e) => {
+            console.log(e);
+            e.stopPropagation();
+          }}
           onChange={throttle((v) => {
             setValue(v);
             onSliderChange(layer, v);
@@ -178,12 +189,29 @@ Category.propTypes = {
 function LayersPanel(props) {
   const { className, parentId } = props;
 
+  const { mapState, mapModes } = useMapState();
+  const disabled = mapState.mode === mapModes.EDIT_AOI_MODE;
+
   const { userLayers, setUserLayers } = useUserLayers();
   const { showLayersPanel } = useLayersPanel();
   const { mapLayers } = useMapLayers();
+  const { mapRef } = useMapRef();
   const { currentCheckpoint } = useCheckpoint();
 
-  const parentNode = document.getElementById(parentId);
+  const { mosaicList } = useContext(GlobalContext);
+  const baseLayerNames =
+    mosaicList.isReady() && !mosaicList.hasError()
+      ? mosaicList.getData().mosaics
+      : [];
+
+  const [position, setPosition] = useState({});
+
+  const parentNodeQuery = document.getElementById(parentId);
+  const parentNode = useRef();
+
+  useEffect(() => {
+    parentNode.current = parentNodeQuery;
+  }, [parentNodeQuery]);
 
   useEffect(() => {
     setUserLayers({
@@ -195,15 +223,35 @@ function LayersPanel(props) {
     });
   }, [currentCheckpoint && currentCheckpoint.retrain_geoms]);
 
-  console.log(showLayersPanel);
+  React.useEffect(() => {
+    function updatePosition() {
+      //setSearchResultTop(searchBarReference.current.getBoundingClientRect().bottom);
+      if (parentNode.current) {
+        setPosition(parentNode.current.getBoundingClientRect());
+      }
+    }
+    const observer = new ResizeObserver(throttle(updatePosition, 100));
+
+    if (mapRef) {
+      //mapRef.getContainer().addEventListener('resize', updatePosition);
+      observer.observe(mapRef.getContainer());
+    }
+    return () => mapRef && observer.unobserver(mapRef.getContainer());
+  }, [mapRef, parentNode]);
 
   if (!parentNode) {
     return null;
   }
 
-  return ReactDOM.createPortal(
-    <LayersPanelInner className={className} show={showLayersPanel}
-      onClick={e => e.stopPropagation()}
+  //return ReactDOM.createPortal(
+  return (
+    <LayersPanelInner
+      className={className}
+      show={showLayersPanel}
+      style={{
+        top: position.top || 0,
+        left: position.right || 0,
+      }}
     >
       <Accordion
         className={className}
@@ -260,8 +308,8 @@ function LayersPanel(props) {
           /* eslint-disable-next-line react/jsx-curly-newline */
         }
       </Accordion>
-    </LayersPanelInner>,
-    parentNode
+    </LayersPanelInner> /*,
+    parentNode*/
   );
 }
 
