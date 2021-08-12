@@ -23,6 +23,8 @@ Cypress.Commands.add('startServer', () => {
         live_inference: 10000000,
         max_inference: 100000000,
         instance_window: 600,
+        total_gpus: 15,
+        active_gpus: null, // https://github.com/developmentseed/lulc-infra/issues/443
       },
     }
   );
@@ -36,11 +38,11 @@ Cypress.Commands.add('startServer', () => {
 
   cy.intercept(
     {
-      url:
-        'https://dev.virtualearth.net/REST/v1/Locations/38.89497406962095,-77.01622009277345?*',
+      url: 'https://dev.virtualearth.net/REST/v1/Locations/*?*',
     },
     { fixture: 'geocoder/dc.json' }
   ).as('reverseGeocodeCity');
+
   cy.intercept(
     {
       url:
