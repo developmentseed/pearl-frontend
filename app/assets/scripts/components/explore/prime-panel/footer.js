@@ -13,9 +13,6 @@ import InfoButton from '../../common/info-button';
 import { PanelBlockFooter } from '../../common/panel-block';
 import { checkpointModes } from '../../../context/checkpoint';
 import { useInstance } from '../../../context/instance';
-import { useAuth } from '../../../context/auth';
-import toasts from '../../common/toasts';
-import logger from '../../../utils/logger';
 
 const PanelControls = styled(PanelBlockFooter)`
   display: grid;
@@ -34,7 +31,6 @@ const SaveCheckpoint = styled(DropdownBody)`
 
 function PrimeButton({ currentCheckpoint, allowInferenceRun, mapRef }) {
   const { runInference, retrain, refine } = useInstance();
-  const { restApiClient } = useAuth();
 
   // If in refine mode, this button save refinements
   if (currentCheckpoint && currentCheckpoint.mode === checkpointModes.REFINE) {
@@ -72,41 +68,11 @@ function PrimeButton({ currentCheckpoint, allowInferenceRun, mapRef }) {
       style={{
         gridColumn: '1 / -1',
       }}
-      onClick={async () => {
-        // Run inference if no previous checkpoints
-        if (
-          !currentCheckpoint ||
-          currentCheckpoint.mode === checkpointModes.RUN
-        ) {
-          try {
-            // Get available instances
-            const {
-              limits: { active_gpus, total_gpus },
-            } = await restApiClient.get('');
-            const availableGpus = total_gpus - (active_gpus || 0);
-
-            // Do not run when no instances are available
-            if (availableGpus && availableGpus > 0) {
-              runInference();
-            } else {
-              toasts.error(
-                'No instance available to run the model, please try again later.',
-                { autoClose: false, toastId: 'run-model-error' }
-              );
-            }
-          } catch (error) {
-            logger(error);
-            toasts.error('Unexpected error, please try again later.');
-          }
-
-          // Finish run inference workflow
-          return;
-        }
-
-        // Retrain workflow
-        retrain();
-        mapRef.freehandDraw.clearLayers();
-      }}
+      onClick={
+        !currentCheckpoint || currentCheckpoint.mode === checkpointModes.RUN
+          ? runInference
+          : () => retrain() && mapRef.freehandDraw.clearLayers()
+      }
       visuallyDisabled={!allowInferenceRun}
       id='apply-button-trigger'
     >

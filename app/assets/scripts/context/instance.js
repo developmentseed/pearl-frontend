@@ -254,6 +254,17 @@ export function InstanceProvider(props) {
       websocketClient.close();
     }
 
+    // Check if instance slots are available
+    const {
+      limits: { active_gpus, total_gpus },
+    } = await restApiClient.get('');
+    const availableGpus = total_gpus - (active_gpus || 0);
+
+    // Do not run when no instances are available
+    if (!availableGpus) {
+      throw Error('No instances available');
+    }
+
     applyInstanceStatus({
       gpuStatus: 'initializing',
       wsConnected: false,
@@ -468,7 +479,16 @@ export function InstanceProvider(props) {
           );
         } catch (error) {
           logger(error);
-          toasts.error('Could not create instance, please try again later.');
+          if (error.message === 'No instances available') {
+            toasts.error(
+              'No instance available to run the model, please try again later.',
+              { autoClose: false, toastId: 'run-model-error' }
+            );
+          } else {
+            toasts.error('Could not create instance, please try again later.');
+          }
+          hideGlobalLoading();
+          return;
         }
 
         showGlobalLoadingMessage(
