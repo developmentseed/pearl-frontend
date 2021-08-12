@@ -12,7 +12,15 @@ import throttle from 'lodash.throttle';
 import { useMapLayers, useUserLayers, useLayersPanel } from '../../context/map';
 import { useCheckpoint } from '../../context/checkpoint';
 
-const LayersPanelInner = styled.div``;
+const LayersPanelInner = styled.div`
+  opacity: ${({ show }) => show ? 1 : 0};
+  transition: opacity .16s ease 0s;
+  padding: 0.5rem;
+  overflow-x: hidden;
+  margin-left: 2rem;
+  position: fixed;
+  background: ${themeVal('color.baseDark')};
+`;
 const Wrapper = styled.div`
   display: grid;
   grid-gap: 1rem;
@@ -193,7 +201,9 @@ function LayersPanel(props) {
   }
 
   return ReactDOM.createPortal(
-    <LayersPanelInner className={className}>
+    <LayersPanelInner className={className} show={showLayersPanel}
+      onClick={e => e.stopPropagation()}
+    >
       <Accordion
         className={className}
         allowMultiple
