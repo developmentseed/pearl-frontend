@@ -613,8 +613,7 @@ function Map() {
           <GenericControl
             id='layer-control'
             onClick={(e) => {
-              console.log(e.target)
-              e.stopPropagation()
+              e.stopPropagation();
               setShowLayersPanel(!showLayersPanel);
             }}
           />
@@ -640,7 +639,7 @@ function Map() {
     aoiPatchList,
     tileUrl,
     showLayersPanel,
-    setShowLayersPanel
+    setShowLayersPanel,
   ]);
 
   return (

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useContext } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import T from 'prop-types';
 import styled from 'styled-components';
 import { Button } from '@devseed-ui/button';
@@ -16,7 +16,6 @@ import {
 } from '../../context/map';
 import { useMapState } from '../../context/explore';
 import { useCheckpoint } from '../../context/checkpoint';
-import GlobalContext from '../../context/global';
 
 const LayersPanelInner = styled.div`
   opacity: ${({ show }) => (show ? 1 : 0)};
@@ -89,10 +88,6 @@ function Layer({ layer, onSliderChange, onVisibilityToggle, info, name }) {
           {name}
         </Heading>
         <InputRange
-          onMouseDown={(e) => {
-            console.log(e);
-            e.stopPropagation();
-          }}
           onChange={throttle((v) => {
             setValue(v);
             onSliderChange(layer, v);
@@ -198,12 +193,6 @@ function LayersPanel(props) {
   const { mapRef } = useMapRef();
   const { currentCheckpoint } = useCheckpoint();
 
-  const { mosaicList } = useContext(GlobalContext);
-  const baseLayerNames =
-    mosaicList.isReady() && !mosaicList.hasError()
-      ? mosaicList.getData().mosaics
-      : [];
-
   const [position, setPosition] = useState({});
 
   const parentNodeQuery = document.getElementById(parentId);
@@ -247,11 +236,12 @@ function LayersPanel(props) {
   return (
     <LayersPanelInner
       className={className}
-      show={showLayersPanel}
+      show={!disabled && showLayersPanel}
       style={{
         top: position.top || 0,
         left: position.right || 0,
       }}
+      data-cy='layers-panel'
     >
       <Accordion
         className={className}
@@ -315,6 +305,7 @@ function LayersPanel(props) {
 
 LayersPanel.propTypes = {
   className: T.string,
+  parentId: T.string.isRequired,
 };
 
 export default LayersPanel;

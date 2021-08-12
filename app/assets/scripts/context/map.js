@@ -79,7 +79,7 @@ export function MapProvider(props) {
         setUserLayers,
 
         setShowLayersPanel,
-        showLayersPanel
+        showLayersPanel,
       }}
     >
       {props.children}

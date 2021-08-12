@@ -6,9 +6,9 @@ import Panel from '../../common/panel';
 import { PanelBlock, PanelBlockBody } from '../../common/panel-block';
 import SelectModal from '../../common/select-modal';
 import ModelCard from './model-card';
-import { useMapLayers, useMapRef } from '../../../context/map';
+import { useMapRef } from '../../../context/map';
 import { ExploreContext, useMapState } from '../../../context/explore';
-import GlobalContext, { useModels } from '../../../context/global';
+import { useModels } from '../../../context/global';
 
 import { Heading } from '@devseed-ui/typography';
 // import {
@@ -26,8 +26,6 @@ import RefineModel from './refine-model';
 
 import PanelHeader from './header';
 import PanelFooter from './footer';
-
-import LayersPanel from '../layers-panel';
 
 import { useAuth } from '../../../context/auth';
 import {
@@ -88,7 +86,6 @@ function PrimePanel() {
 
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
 
-  const { mosaicList } = useContext(GlobalContext);
   const { models } = useModels();
 
   //const { mapLayers } = useMapLayers();
@@ -303,24 +300,6 @@ function PrimePanel() {
                   }}
                 />
               </TabbedBlock>
-            {/*
-                <LayersPanel
-                  onTabClick={() => {
-                    setActiveTab('LAYERS');
-                  }}
-                  disabled={mapState.mode === mapModes.EDIT_AOI_MODE}
-                  parentId='layer-control'
-                  className='padded'
-                  name='layers'
-                  tabId='layers-tab-trigger'
-                  mapLayers={mapLayers}
-                  baseLayerNames={
-                    mosaicList.isReady() && !mosaicList.hasError()
-                      ? mosaicList.getData().mosaics
-                      : []
-                  }
-                />*/}
-
             </PanelBlockBody>
             {activeTab !== 'LAYERS' && (
               <PanelFooter
@@ -366,25 +345,10 @@ function PrimePanel() {
                 Close modal
               </Button>
             </Headline>
-            {/* <FormGroup>
-              <FormGroupHeader>
-                <FormLabel htmlFor='model-filter'>Search Models</FormLabel>
-              </FormGroupHeader>
-              <FormGroupBody>
-                <FormInput
-                  type='text'
-                  id='model-filter'
-                  name='model-filter'
-                  onChange={(e) => setModelFilterString(e.target.value)}
-                  placeholder='Filter models'
-                />
-              </FormGroupBody>
-            </FormGroup> */}
           </ModalHeader>
         )}
         filterCard={(card) => {
           return card.name.includes('');
-          // return card.name.includes(modelFilterString.toLowerCase());
         }}
         renderCard={(model) => (
           <ModelCard

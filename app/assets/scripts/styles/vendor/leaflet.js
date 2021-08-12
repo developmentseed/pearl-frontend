@@ -50,13 +50,13 @@ export default () => css`
     }
   }
 
-  #layer-control.leaflet-control .generic-leaflet-control {
+  #layer-control.leaflet-control.generic-leaflet-control {
     background: ${themeVal('color.baseDark')};
   }
-  #layer-control.leaflet-control .generic-leaflet-control {
+  #layer-control.leaflet-control.generic-leaflet-control {
     cursor: pointer;
   }
-  #layer-control.leaflet-control .generic-leaflet-control::after {
+  #layer-control.leaflet-control.generic-leaflet-control::after {
     ${collecticon('iso-stack')};
     color: ${themeVal('baseLight')};
     color: #ffffff;
