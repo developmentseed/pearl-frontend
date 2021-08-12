@@ -195,6 +195,7 @@ function LayersPanel(props) {
     });
   }, [currentCheckpoint && currentCheckpoint.retrain_geoms]);
 
+  console.log(showLayersPanel);
 
   if (!parentNode) {
     return null;

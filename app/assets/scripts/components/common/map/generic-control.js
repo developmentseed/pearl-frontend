@@ -1,10 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useMap } from 'react-leaflet';
 import L from 'leaflet';
 import theme from '../../../styles/theme';
 
 function GenericControl({ position, onClick, id}) {
   const map = useMap();
+  const [cntrl, setCntrl] = useState()
 
   const GenericControl = L.Control.extend({
     options: {
@@ -28,6 +29,7 @@ function GenericControl({ position, onClick, id}) {
       button.onclick = onClick;
 
       container.appendChild(button);
+      setCntrl(button);
 
       return container;
     },
@@ -38,8 +40,10 @@ function GenericControl({ position, onClick, id}) {
   }, [map]);
 
   useEffect(() => {
-    document.getElementById(id).onclick = onClick
-  }, [onClick])
+    if (cntrl) {
+      cntrl.onclick = onClick
+    }
+  }, [cntrl, onClick])
   return null;
 }
 

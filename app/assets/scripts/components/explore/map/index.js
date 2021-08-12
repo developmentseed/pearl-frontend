@@ -613,6 +613,7 @@ function Map() {
           <GenericControl
             id='layer-control'
             onClick={(e) => {
+              console.log(e.target)
               e.stopPropagation()
               setShowLayersPanel(!showLayersPanel);
             }}
