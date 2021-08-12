@@ -39,7 +39,6 @@ function GenericControl({ position, onClick, id}) {
 
   useEffect(() => {
     document.getElementById(id).onclick = onClick
-    console.log('updating onclick')
   }, [onClick])
   return null;
 }
