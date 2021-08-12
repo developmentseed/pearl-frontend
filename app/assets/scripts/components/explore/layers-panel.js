@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import ReactDOM from 'react-dom';
 import T from 'prop-types';
 import styled from 'styled-components';
 import { Button } from '@devseed-ui/button';
@@ -8,9 +9,10 @@ import { themeVal, glsp } from '@devseed-ui/theme-provider';
 import InputRange from 'react-input-range';
 import { Accordion, AccordionFold as BaseFold } from '@devseed-ui/accordion';
 import throttle from 'lodash.throttle';
-import { useMapLayers, useUserLayers } from '../../context/map';
+import { useMapLayers, useUserLayers, useLayersPanel } from '../../context/map';
 import { useCheckpoint } from '../../context/checkpoint';
 
+const LayersPanelInner = styled.div``;
 const Wrapper = styled.div`
   display: grid;
   grid-gap: 1rem;
@@ -166,11 +168,14 @@ Category.propTypes = {
 };
 
 function LayersPanel(props) {
-  const { className } = props;
+  const { className, parentId } = props;
 
   const { userLayers, setUserLayers } = useUserLayers();
+  const { showLayersPanel } = useLayersPanel();
   const { mapLayers } = useMapLayers();
   const { currentCheckpoint } = useCheckpoint();
+
+  const parentNode = document.getElementById(parentId);
 
   useEffect(() => {
     setUserLayers({
@@ -182,8 +187,13 @@ function LayersPanel(props) {
     });
   }, [currentCheckpoint && currentCheckpoint.retrain_geoms]);
 
-  return (
-    <div className={className}>
+
+  if (!parentNode) {
+    return null;
+  }
+
+  return ReactDOM.createPortal(
+    <LayersPanelInner className={className}>
       <Accordion
         className={className}
         allowMultiple
@@ -239,7 +249,8 @@ function LayersPanel(props) {
           /* eslint-disable-next-line react/jsx-curly-newline */
         }
       </Accordion>
-    </div>
+    </LayersPanelInner>,
+    parentNode
   );
 }
 

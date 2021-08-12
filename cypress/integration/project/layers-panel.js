@@ -11,4 +11,3 @@ describe('Open existing project', () => {
     cy.visit('/project/1');
   });
 });
-

@@ -302,11 +302,13 @@ function PrimePanel() {
                     }
                   }}
                 />
+              </TabbedBlock>
                 <LayersPanel
                   onTabClick={() => {
                     setActiveTab('LAYERS');
                   }}
                   disabled={mapState.mode === mapModes.EDIT_AOI_MODE}
+                  parentId='layer-control'
                   className='padded'
                   name='layers'
                   tabId='layers-tab-trigger'
@@ -317,7 +319,7 @@ function PrimePanel() {
                       : []
                   }
                 />
-              </TabbedBlock>
+
             </PanelBlockBody>
             {activeTab !== 'LAYERS' && (
               <PanelFooter
