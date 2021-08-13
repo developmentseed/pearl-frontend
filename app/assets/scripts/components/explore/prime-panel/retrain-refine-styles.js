@@ -122,6 +122,7 @@ export const Thumbnail = styled.div`
   width: ${glsp(1.5)};
   height: ${glsp(1.5)};
   background: ${({ color }) => color || themeVal('color.baseAlphaD')};
+  border: 1px solid ${themeVal('color.baseAlphaD')};
   display: grid;
   justify-content: center;
   align-content: center;

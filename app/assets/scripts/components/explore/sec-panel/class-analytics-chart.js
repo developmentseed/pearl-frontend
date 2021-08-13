@@ -116,6 +116,8 @@ function ClassAnalyticsChart(props) {
                 backgroundColor: Object.values(checkpoint.classes).map(
                   (c) => c.color
                 ),
+                borderColor: 'rgba(240,244,255,0.24)',
+                borderWidth: 1,
               },
             ],
             labels: Object.values(checkpoint.classes).map((c) => c.name),
