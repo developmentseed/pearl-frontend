@@ -2,7 +2,6 @@ describe('Has project page', () => {
   beforeEach(() => {
     cy.startServer();
     cy.fakeLogin();
-    cy.mockRegularProject();
     cy.visit('/profile/projects/1');
   });
 

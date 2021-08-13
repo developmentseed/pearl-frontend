@@ -5,24 +5,10 @@ const {
 describe('Instance status', () => {
   beforeEach(() => {
     cy.startServer();
-
-    cy.intercept(
-      {
-        url: restApiEndpoint + '/api/project',
-        method: 'POST',
-      },
-      {
-        id: 1,
-        uid: 1,
-        name: 'A test project',
-        model_id: 1,
-        mosaic: 'naip.latest',
-        created: '2021-08-12T13:59:25.070Z',
-      }
-    ).as('createProject');
   });
 
   it('New project', () => {
+    cy.startServer();
     cy.fakeLogin();
 
     cy.visit('/project/new');
@@ -95,11 +81,19 @@ describe('Instance status', () => {
         },
       }
     ).as('fetchAvailableInstancesCount');
+
+    // Request model run
+    cy.get('[data-cy=run-button').click();
+
+    // Wait for outbound request
+    cy.wait('@fetchAvailableInstancesCount');
+
+    // Should display modal
+    cy.get('#run-model-error').should('not.exist');
   });
 
   it('Project exists, active instance, running', () => {
     cy.fakeLogin();
-    cy.mockRegularProject();
 
     cy.setWebsocketWorkflow('retrain');
 

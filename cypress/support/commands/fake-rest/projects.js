@@ -1,11 +1,32 @@
 const {
   restApiEndpoint,
-} = require('../../../app/assets/scripts/config/testing').default;
+} = require('../../../../app/assets/scripts/config/testing').default;
 
 /**
  * Mock a project scenario: an instance is running with checkpoint 2 and AOI 2 applied.
  */
-Cypress.Commands.add('mockRegularProject', () => {
+export default function () {
+  /**
+   * POST /project
+   */
+  cy.intercept(
+    {
+      url: restApiEndpoint + '/api/project',
+      method: 'POST',
+    },
+    {
+      id: 1,
+      uid: 1,
+      name: 'A test project',
+      model_id: 1,
+      mosaic: 'naip.latest',
+      created: '2021-08-12T13:59:25.070Z',
+    }
+  ).as('postProject');
+
+  /**
+   * GET /project/:id
+   */
   cy.intercept(
     {
       url: restApiEndpoint + '/api/project/1',
@@ -22,6 +43,9 @@ Cypress.Commands.add('mockRegularProject', () => {
     }
   ).as('getProject');
 
+  /**
+   * GET /project
+   */
   cy.intercept(
     {
       url: restApiEndpoint + '/api/project/?page=*&limit=20',
@@ -53,6 +77,9 @@ Cypress.Commands.add('mockRegularProject', () => {
     }
   ).as('getProjects');
 
+  /**
+   * PATCH /project/:id
+   */
   cy.intercept(
     {
       url: restApiEndpoint + '/api/project/1',
@@ -69,6 +96,9 @@ Cypress.Commands.add('mockRegularProject', () => {
     }
   ).as('patchProjectName');
 
+  /**
+   * GET /project/:id/aoi
+   */
   cy.intercept(
     {
       url: restApiEndpoint + '/api/project/1/aoi',
@@ -161,6 +191,9 @@ Cypress.Commands.add('mockRegularProject', () => {
     }
   );
 
+  /**
+   * GET /project/:id/checkpoint
+   */
   cy.intercept(
     {
       url: restApiEndpoint + '/api/project/1/checkpoint',
@@ -189,7 +222,9 @@ Cypress.Commands.add('mockRegularProject', () => {
     }
   );
 
-  // An instance is running
+  /**
+   * GET /project/:id/instance
+   */
   cy.intercept(
     {
       url: restApiEndpoint + '/api/project/1/instance/?status=active',
@@ -208,7 +243,9 @@ Cypress.Commands.add('mockRegularProject', () => {
     }
   );
 
-  // Get instance details
+  /**
+   * GET /project/:id/instance/:id
+   */
   cy.intercept(
     {
       url: restApiEndpoint + '/api/project/1/instance/1',
@@ -226,6 +263,9 @@ Cypress.Commands.add('mockRegularProject', () => {
     }
   );
 
+  /**
+   * GET /project/:id/checkpoint/1
+   */
   cy.intercept(
     {
       url: restApiEndpoint + '/api/project/1/checkpoint/1',
@@ -285,6 +325,9 @@ Cypress.Commands.add('mockRegularProject', () => {
     }
   );
 
+  /**
+   * GET /project/:id/checkpoint/2
+   */
   cy.intercept(
     {
       url: restApiEndpoint + '/api/project/1/checkpoint/2',
@@ -344,6 +387,9 @@ Cypress.Commands.add('mockRegularProject', () => {
     }
   );
 
+  /**
+   * GET /project/:id/checkpoint/3
+   */
   cy.intercept(
     {
       url: restApiEndpoint + '/api/project/1/checkpoint/3',
@@ -403,6 +449,9 @@ Cypress.Commands.add('mockRegularProject', () => {
     }
   );
 
+  /**
+   * GET /project/1/aoi/1
+   */
   cy.intercept(
     {
       url: restApiEndpoint + '/api/project/1/aoi/1',
@@ -451,6 +500,9 @@ Cypress.Commands.add('mockRegularProject', () => {
     }
   );
 
+  /**
+   * GET /project/1/aoi/2
+   */
   cy.intercept(
     {
       url: restApiEndpoint + '/api/project/1/aoi/2',
@@ -498,6 +550,9 @@ Cypress.Commands.add('mockRegularProject', () => {
     }
   );
 
+  /**
+   * GET /project/1/aoi/3
+   */
   cy.intercept(
     {
       url: restApiEndpoint + '/api/project/1/aoi/3',
@@ -545,6 +600,9 @@ Cypress.Commands.add('mockRegularProject', () => {
     }
   );
 
+  //
+  // GET /project/1/aoi/*/tiles
+  //
   cy.intercept(
     {
       url: restApiEndpoint + '/api/project/1/aoi/*/tiles',
@@ -569,6 +627,9 @@ Cypress.Commands.add('mockRegularProject', () => {
     }
   );
 
+  //
+  // GET /project/1/aoi/*/tiles/**
+  //
   cy.intercept(
     {
       url: restApiEndpoint + '/api/project/1/aoi/*/tiles/**',
@@ -585,4 +646,4 @@ Cypress.Commands.add('mockRegularProject', () => {
       body: {},
     }
   ).as('deleteProject');
-});
+}

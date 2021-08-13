@@ -5,7 +5,6 @@ describe('Create new project', () => {
 
   it('Can set name from modal', () => {
     cy.fakeLogin();
-    cy.mockRegularProject();
 
     cy.visit('/project/new');
 

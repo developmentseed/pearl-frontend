@@ -1,11 +1,14 @@
 const {
   restApiEndpoint,
-} = require('../../../app/assets/scripts/config/testing').default;
+} = require('../../../../app/assets/scripts/config/testing').default;
 
 /**
- * Intercepts general API routes
+ * Intercepts API routes
  */
 Cypress.Commands.add('startServer', () => {
+  // Add /projects routes from separate file
+  require('./projects')();
+
   cy.intercept(
     {
       url: restApiEndpoint + '/health',
