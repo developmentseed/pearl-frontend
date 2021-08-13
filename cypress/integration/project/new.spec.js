@@ -2,9 +2,29 @@ const {
   restApiEndpoint,
 } = require('../../../app/assets/scripts/config/testing').default;
 
-describe('Instance status', () => {
+describe('Create new project', () => {
   beforeEach(() => {
     cy.startServer();
+  });
+
+  it('Can set name from modal', () => {
+    cy.fakeLogin();
+
+    cy.visit('/project/new');
+
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Waiting for model run'
+    );
+
+    cy.get('[data-cy=project-name-modal]').should('be.visible');
+    cy.get('[data-cy=modal-project-input]').clear().type('Project name');
+    cy.get('[data-cy=create-project-button]').click({ force: true });
+
+    cy.get('[data-cy=project-name]').should('have.text', 'Project name');
+    cy.get('[data-cy=project-name-edit]').click();
+    cy.get('[data-cy=project-input]').clear().type('New name');
+    cy.get('[data-cy=project-name-confirm]').click({ force: true });
   });
 
   it('New project', () => {
@@ -93,23 +113,4 @@ describe('Instance status', () => {
     // Should display modal
     cy.get('#no-instance-available-error').should('not.exist');
   });
-
-  it('Project exists, active instance, running', () => {
-    cy.fakeLogin();
-
-    cy.setWebsocketWorkflow('retrain');
-
-    cy.visit('/project/1');
-
-    cy.get('[data-cy=session-status]').should(
-      'have.text',
-      'Session Status: Ready to go'
-    );
-
-    cy.get('[data-cy=global-loading]').should('not.exist');
-  });
-
-  it('Project exists, active instance, scheduled');
-
-  it('Project exists, active instance, failed');
 });

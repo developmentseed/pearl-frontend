@@ -2,7 +2,7 @@ const {
   restApiEndpoint,
 } = require('../../../app/assets/scripts/config/testing').default;
 
-describe('Open existing project', () => {
+describe('Retrain existing project', () => {
   beforeEach(() => {
     cy.startServer();
   });
