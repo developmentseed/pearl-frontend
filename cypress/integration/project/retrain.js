@@ -1,3 +1,7 @@
+const {
+  restApiEndpoint,
+} = require('../../../app/assets/scripts/config/testing').default;
+
 describe('Open existing project', () => {
   beforeEach(() => {
     cy.startServer();
@@ -127,7 +131,61 @@ describe('Open existing project', () => {
     // Proceed importing
     cy.get('[data-cy=import-samples-button').click();
 
-    // Retrain
+    // Set no instances available
+    cy.intercept(
+      {
+        url: restApiEndpoint + '/api',
+      },
+      {
+        version: '1.0.0',
+        limits: {
+          live_inference: 10000000,
+          max_inference: 100000000,
+          instance_window: 600,
+          total_gpus: 15,
+          active_gpus: 15,
+        },
+      }
+    ).as('fetchAvailableInstancesCount');
+
+    // Request model run
     cy.get('[data-cy=run-button').click();
+
+    // Wait for outbound request
+    cy.wait('@fetchAvailableInstancesCount');
+
+    // Should display modal
+    cy.get('#no-instance-available-error')
+      .should(
+        'contain',
+        'No instance available to run the model, please try again later.'
+      )
+      .click();
+
+    // Set no instances available
+    cy.intercept(
+      {
+        url: restApiEndpoint + '/api',
+      },
+      {
+        version: '1.0.0',
+        limits: {
+          live_inference: 10000000,
+          max_inference: 100000000,
+          instance_window: 600,
+          total_gpus: 15,
+          active_gpus: 5,
+        },
+      }
+    ).as('fetchAvailableInstancesCount');
+
+    // Request model run
+    cy.get('[data-cy=run-button').click();
+
+    // Wait for outbound request
+    cy.wait('@fetchAvailableInstancesCount');
+
+    // Should display modal
+    cy.get('#no-instance-available-error').should('not.exist');
   });
 });

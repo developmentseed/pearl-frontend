@@ -68,11 +68,16 @@ function PrimeButton({ currentCheckpoint, allowInferenceRun, mapRef }) {
       style={{
         gridColumn: '1 / -1',
       }}
-      onClick={
-        !currentCheckpoint || currentCheckpoint.mode === checkpointModes.RUN
-          ? runInference
-          : () => retrain() && mapRef.freehandDraw.clearLayers()
-      }
+      onClick={() => {
+        if (
+          !currentCheckpoint ||
+          currentCheckpoint.mode === checkpointModes.RUN
+        ) {
+          runInference();
+        } else {
+          retrain();
+        }
+      }}
       visuallyDisabled={!allowInferenceRun}
       id='apply-button-trigger'
     >

@@ -482,7 +482,7 @@ export function InstanceProvider(props) {
           if (error.message === 'No instances available') {
             toasts.error(
               'No instance available to run the model, please try again later.',
-              { autoClose: false, toastId: 'run-model-error' }
+              { autoClose: false, toastId: 'no-instance-available-error' }
             );
           } else {
             toasts.error('Could not create instance, please try again later.');
@@ -559,7 +559,16 @@ export function InstanceProvider(props) {
         );
       } catch (error) {
         logger(error);
-        toasts.error('Could not create instance, please try again later.');
+        if (error.message === 'No instances available') {
+          toasts.error(
+            'No instance available to run the model, please try again later.',
+            { autoClose: false, toastId: 'no-instance-available-error' }
+          );
+        } else {
+          toasts.error('Could not create instance, please try again later.');
+        }
+        hideGlobalLoading();
+        return;
       }
 
       showGlobalLoadingMessage(

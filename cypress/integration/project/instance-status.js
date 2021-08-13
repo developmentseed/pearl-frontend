@@ -60,7 +60,7 @@ describe('Instance status', () => {
     cy.wait('@fetchAvailableInstancesCount');
 
     // Should display modal
-    cy.get('#run-model-error')
+    cy.get('#no-instance-available-error')
       .should(
         'contain',
         'No instance available to run the model, please try again later.'
@@ -91,7 +91,7 @@ describe('Instance status', () => {
     cy.wait('@fetchAvailableInstancesCount');
 
     // Should display modal
-    cy.get('#run-model-error').should('not.exist');
+    cy.get('#no-instance-available-error').should('not.exist');
   });
 
   it('Project exists, active instance, running', () => {
