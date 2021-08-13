@@ -24,6 +24,7 @@ const isEqual = require('lodash.isequal');
 // Load workflow fixtures
 const workflows = {
   retrain: require('../fixtures/websocket-workflow/retrain.json'),
+  prediction: require('../fixtures/websocket-workflow/prediction.json'),
 };
 
 // Init websocket messages queue
@@ -52,6 +53,9 @@ wss.on('connection', function connection(ws, req) {
       if (message.type === 'cy:setup_workflow') {
         // Internal cypress message to set the workflow
         queue = workflows[message.data];
+        if (!queue) {
+          throw Error('Websocket workflow not found!');
+        }
         step = 0;
         console.log('\nA new websocket workflow was set.\n');
       } else {

@@ -11,6 +11,8 @@ describe('Instance status', () => {
     cy.startServer();
     cy.fakeLogin();
 
+    cy.setWebsocketWorkflow('prediction');
+
     cy.visit('/project/new');
 
     cy.get('[data-cy=session-status]').should(
