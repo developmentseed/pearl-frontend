@@ -4,7 +4,6 @@ import get from 'lodash.get';
 import { Button } from '@devseed-ui/button';
 import { ChromePicker } from 'react-color';
 import InfoButton from '../../common/info-button';
-import { Heading } from '@devseed-ui/typography';
 import { PlaceholderMessage } from '../../../styles/placeholder.js';
 import { actions, useCheckpoint } from '../../../context/checkpoint.js';
 import { useMapState } from '../../../context/explore.js';
@@ -31,6 +30,7 @@ import {
 } from './retrain-refine-styles';
 import { FormInput } from '@devseed-ui/form';
 import ImportSamplesModal from '../map/import-sample-modal';
+import { Subheading } from '../../../styles/type/heading';
 
 /*
  * Retrain Model
@@ -61,7 +61,7 @@ function RetrainModel(props) {
               setRevealed={setImportSamplesModalRevealed}
               revealed={importSamplesModalRevealed}
             />
-            <Heading useAlt>Sample Selection Tools</Heading>
+            <Subheading>Sample Selection Tools</Subheading>
             <InfoButton
               data-cy='retrain-draw-polygon'
               variation={
@@ -172,7 +172,7 @@ function RetrainModel(props) {
             </InfoButton>
           </RetrainTools>
           <ClassList>
-            <Heading useAlt>Classes</Heading>
+            <Subheading>Classes</Subheading>
             {Object.values(currentCheckpoint.classes).map((c) => {
               let polygons = get(c, 'polygons.length');
               let points = get(c, 'points.coordinates.length');

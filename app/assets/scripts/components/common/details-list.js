@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import T from 'prop-types';
 import { Heading } from '@devseed-ui/typography';
 import { toTitleCase } from '../../utils/format';
+import { Subheading } from '../../styles/type/heading';
 const List = styled.ol`
   display: grid;
   grid-gap: 0.25rem;
@@ -27,9 +28,7 @@ function DetailsList(props) {
       {Object.entries(details).map(([key, value]) => (
         <li key={key}>
           <>
-            <Heading as='dt' useAlt>
-              {toTitleCase(key)}
-            </Heading>
+            <Subheading>{toTitleCase(key)}</Subheading>
             {React.isValidElement(value) ? value : <dd>{value}</dd>}
           </>
         </li>

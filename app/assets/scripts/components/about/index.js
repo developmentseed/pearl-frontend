@@ -15,6 +15,7 @@ import { Heading } from '@devseed-ui/typography';
 import { glsp, media } from '@devseed-ui/theme-provider';
 
 import App from '../common/app';
+import { Subheading } from '../../styles/type/heading';
 
 const AboutBody = styled(InpageBody)`
   ${Prose} {
@@ -60,9 +61,7 @@ class About extends React.Component {
             <InpageHeader>
               <InpageHeaderInner>
                 <InpageHeadline>
-                  <Heading useAlt size='small'>
-                    About &amp; User Guide
-                  </Heading>
+                  <Subheading>About &amp; User Guide</Subheading>
                   <InpageTitle>
                     PEARL Planetary Computer Land Cover Mapping
                   </InpageTitle>

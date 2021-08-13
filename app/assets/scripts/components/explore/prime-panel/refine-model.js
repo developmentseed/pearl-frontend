@@ -29,6 +29,7 @@ import {
   DropdownBody,
   DropdownItem,
 } from '../../../styles/dropdown';
+import { Subheading } from '../../../styles/type/heading';
 
 const CheckpointSection = styled(ItemList)`
   max-height: ${glsp(7.5)};
@@ -67,7 +68,7 @@ function RefineModel(props) {
       {ready ? (
         <>
           <RefineTools>
-            <Heading useAlt>Refinement Tools</Heading>
+            <Subheading>Refinement Tools</Subheading>
             <InfoButton
               variation={
                 mapState.mode === mapModes.ADD_SAMPLE_FREEHAND
@@ -117,7 +118,7 @@ function RefineModel(props) {
           {checkpointList && (
             <CheckpointSection>
               <ItemList>
-                <Heading useAlt>Checkpoint List</Heading>
+                <Subheading>Checkpoint List</Subheading>
 
                 {checkpointList.map((c) => {
                   const id = `checkpoint-${c.name}-${c.id}`;
@@ -196,7 +197,7 @@ function RefineModel(props) {
             </CheckpointSection>
           )}
           <ItemList>
-            <Heading useAlt>Class List</Heading>
+            <Subheading>Class List</Subheading>
             {Object.values(currentCheckpoint.classes).map((c) => {
               let polygons = get(c, 'polygons.length');
               return (

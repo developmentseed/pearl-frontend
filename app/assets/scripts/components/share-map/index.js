@@ -20,6 +20,7 @@ import {
 } from '../explore/prime-panel/retrain-refine-styles';
 import { themeVal, glsp } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
+import { Subheading } from '../../styles/type/heading';
 
 const { restApiEndpoint, tileUrlTemplate } = config;
 
@@ -114,7 +115,7 @@ function ShareMap() {
           {leafletLayer}
         </MapContainer>
         <ClassLegend>
-          <Heading useAlt>LULC Classes</Heading>
+          <Subheading>LULC Classes</Subheading>
           {classes.length > 1
             ? classes.map((c) => (
                 <Class key={c.name} noHover>

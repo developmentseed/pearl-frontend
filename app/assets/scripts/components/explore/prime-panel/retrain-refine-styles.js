@@ -9,6 +9,7 @@ import styled, { css } from 'styled-components';
 import { Heading } from '@devseed-ui/typography';
 import collecticon from '@devseed-ui/collecticons';
 import { Button } from '@devseed-ui/button';
+import { Subheading } from '../../../styles/type/heading.js';
 
 export const ToolsWrapper = styled.div`
   display: grid;
@@ -22,8 +23,8 @@ export const ToolsWrapper = styled.div`
 export const ClassList = styled.section`
   display: grid;
 
-  > ${Heading} {
-    padding: 0 1.5rem;
+  > ${Subheading} {
+    padding: 0.25rem 1.5rem;
   }
 `;
 
@@ -149,8 +150,10 @@ export const ToolBox = styled.section`
   ${media.largeUp`
     grid-template-columns: repeat(auto-fill, minmax(5rem, 1fr));
   `}
-  ${Heading} {
+  ${Heading},
+  ${Subheading} {
     grid-column: 1 / -1;
+    padding: 0.25rem 0;
   }
   ${Button} {
     padding: 0.25rem 0.75rem 0.25rem 0.5rem;
