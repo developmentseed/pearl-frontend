@@ -92,7 +92,7 @@ const type = {
     regular: 400,
     medium: 600,
     bold: 700,
-    weight: 700,
+    weight: 600,
     textTransform: 'none',
   },
   button: {
