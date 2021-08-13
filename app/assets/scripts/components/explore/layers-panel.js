@@ -20,14 +20,15 @@ import { useCheckpoint } from '../../context/checkpoint';
 const LayersPanelInner = styled.div`
   opacity: ${({ show }) => (show ? 1 : 0)};
   display: ${({ show }) => !show && 'none'};
-
+  min-width: 16rem;
   transition: opacity 0.16s ease 0s;
   padding: 1.5rem;
-  overflow-x: hidden;
+  overflow-y: hidden;
+  overflow-x: auto;
   margin-left: 1rem;
   position: fixed;
   background: ${themeVal('color.surface')};
-  box-shadow: ${themeVal('boxshadow.ElevationC')};
+  box-shadow: ${themeVal('boxShadow.ElevationB')};
   z-index: 1;
 `;
 const LayersWrapper = styled.div`
@@ -38,6 +39,7 @@ const LayersWrapper = styled.div`
 const LayerWrapper = styled.div`
   display: grid;
   grid-template-columns: 4fr 1fr;
+  grid-gap: ${glsp(2)};
   ${Button} {
     place-self: center;
     max-width: ${glsp(1)};
@@ -45,7 +47,7 @@ const LayerWrapper = styled.div`
   ${Button}:last-child {
     place-self: center;
     max-width: ${glsp(1)};
-    grid-column: 4;
+    grid-column: 2;
   }
 `;
 
@@ -71,6 +73,9 @@ const AccordionFold = styled(BaseFold)`
         opacity: 0.64;
       }
     }
+  }
+  > div {
+    overflow: unset;
   }
 `;
 
