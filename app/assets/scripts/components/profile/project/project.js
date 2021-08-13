@@ -245,8 +245,7 @@ function Project() {
           <InpageHeaderInner>
             <InpageHeadline>
               <ProjectTagline>
-                <StyledLink to='/profile/projects'>Projects</StyledLink> /{' '}
-                {!isProjectLoading ? project.name : ''}
+                <StyledLink to='/profile/projects'>Projects</StyledLink>
               </ProjectTagline>
               <InpageTitleWrapper>
                 <Heading>{!isProjectLoading ? project.name : ''}</Heading>
