@@ -1,4 +1,5 @@
 import { format, parseISO } from 'date-fns';
+import logger from './logger';
 
 /**
  * Rounds a number to a specified amount of decimals.
@@ -125,7 +126,19 @@ export function toTitleCase(str) {
  * @param {String} datetime - datetime string
  * @return {String} Formatted datetime - eg. "10/03/2021 12:45:03"
  */
-export function formatDateTime(str) {
-  const dt = parseISO(str);
-  return format(dt, 'dd/MM/yyyy kk:mm:ss');
+export function formatDateTime(dateTime) {
+  let result;
+
+  // Format date, catch errors
+  try {
+    result = format(
+      typeof dateTime === 'string' ? parseISO(dateTime) : dateTime,
+      'dd/MM/yyyy kk:mm:ss'
+    );
+  } catch (error) {
+    logger(error);
+    result = 'Invalid date';
+  }
+
+  return result;
 }
