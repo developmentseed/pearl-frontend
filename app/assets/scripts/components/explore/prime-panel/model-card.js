@@ -43,7 +43,6 @@ function ModelCard({ model, onClick }) {
             display: false,
             maxTicksLimit: 1,
             fontSize: 12,
-            // callback: (v) => `${v * 100}%`,
             min: 0,
             max: 1,
           },
@@ -87,6 +86,7 @@ function ModelCard({ model, onClick }) {
   });
   return (
     <Card
+      data-cy={`select-model-${model.id}-card`}
       title={model.name}
       subtitle={model.meta.description}
       details={details}

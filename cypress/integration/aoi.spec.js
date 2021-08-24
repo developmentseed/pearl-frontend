@@ -4,7 +4,6 @@ describe('Loads AOIs', () => {
   beforeEach(() => {
     cy.startServer();
     cy.fakeLogin();
-    cy.mockRegularProject();
     cy.visit('/project/new');
 
     cy.get('[data-cy=modal-project-input]').clear().type('Project name');

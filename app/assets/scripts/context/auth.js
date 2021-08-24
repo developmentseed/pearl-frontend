@@ -11,6 +11,10 @@ import config from '../config';
 import logger from '../utils/logger';
 import history from '../history';
 import RestApiClient from '../utils/rest-api-client';
+import {
+  getLocalStorageItem,
+  setLocalStorageItem,
+} from '../utils/local-storage';
 
 const AuthContext = createContext(null);
 
@@ -28,12 +32,20 @@ function InnerAuthProvider(props) {
   const [authState, dispatchAuthState] = useReducer(authReducer, {});
 
   useEffect(() => {
-    const lsAuthState = window.localStorage.getItem('authState');
-    if (lsAuthState) {
-      dispatchAuthState({
-        type: actions.LOAD_AUTH_STATE,
-        data: JSON.parse(lsAuthState),
-      });
+    // Read auth state from local storage, logout on error
+    const lsAuthStateString = getLocalStorageItem('authState');
+    if (lsAuthStateString) {
+      try {
+        dispatchAuthState({
+          type: actions.LOAD_AUTH_STATE,
+          data: JSON.parse(lsAuthStateString),
+        });
+      } catch (error) {
+        dispatchAuthState({
+          type: actions.LOGOUT,
+        });
+        logger(error);
+      }
     }
   }, []);
 
@@ -175,7 +187,13 @@ const authReducer = function (state, action) {
 
   // Persist auth state to local storage it not using Cypress
   if (!window.Cypress) {
-    window.localStorage.setItem('authState', JSON.stringify(newState));
+    // Write auth state to local storage
+    try {
+      setLocalStorageItem('authState', JSON.stringify(newState));
+    } catch (error) {
+      logger('Cannot persist auth state to local storage.');
+      logger(error);
+    }
   }
 
   return newState;

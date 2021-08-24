@@ -1,26 +1,7 @@
 [
   {
     "type": "server",
-    "payload": { "message": "info#connected" }
-  },
-  {
-    "type": "client",
-    "payload": { "action": "model#status" }
-  },
-  {
-    "type": "server",
-    "payload": {
-      "message": "model#status",
-      "data": {
-        "is_aborting": false,
-        "processing": false,
-        "aoi": 2,
-        "checkpoint": 1
-      }
-    }
-  },
-  {
-    "type": "reconnect"
+    "payload": { "message": "info#disconnected" }
   },
   {
     "type": "server",
@@ -37,201 +18,29 @@
       "data": {
         "is_aborting": false,
         "processing": false,
-        "aoi": 2,
-        "checkpoint": 1
+        "aoi": false,
+        "checkpoint": false
       }
     }
   },
   {
     "type": "client",
     "payload": {
-      "action": "model#retrain",
+      "action": "model#prediction",
       "data": {
-        "name": "Seneca Rocks",
-        "classes": [
-          {
-            "name": "Water / Wetland",
-            "color": "#486DA2",
-            "geometry": { "type": "FeatureCollection", "features": [] }
-          },
-          {
-            "name": "Emergent Wetlands",
-            "color": "#00A884",
-            "geometry": { "type": "FeatureCollection", "features": [] }
-          },
-          {
-            "name": "Tree",
-            "color": "#6CA966",
-            "geometry": {
-              "type": "FeatureCollection",
-              "features": [
-                {
-                  "type": "Feature",
-                  "properties": {},
-                  "geometry": {
-                    "type": "Polygon",
-                    "coordinates": [
-                      [
-                        [-79.379911, 38.840677],
-                        [-79.379053, 38.841346],
-                        [-79.378195, 38.840677],
-                        [-79.379053, 38.840008],
-                        [-79.379911, 38.840677]
-                      ]
-                    ]
-                  }
-                }
-              ]
-            }
-          },
-          {
-            "name": "Shrubland",
-            "color": "#ABC964",
-            "geometry": { "type": "FeatureCollection", "features": [] }
-          },
-          {
-            "name": "Low Vegetation",
-            "color": "#D0F3AB",
-            "geometry": { "type": "FeatureCollection", "features": [] }
-          },
-          {
-            "name": "Barren",
-            "color": "#D2AD74",
-            "geometry": {
-              "type": "FeatureCollection",
-              "features": [
-                {
-                  "type": "Feature",
-                  "properties": {},
-                  "geometry": {
-                    "type": "Polygon",
-                    "coordinates": [
-                      [
-                        [-79.385061, 38.839006],
-                        [-79.384203, 38.839674],
-                        [-79.383345, 38.839006],
-                        [-79.384203, 38.838337],
-                        [-79.385061, 38.839006]
-                      ]
-                    ]
-                  }
-                },
-                {
-                  "type": "Feature",
-                  "properties": {},
-                  "geometry": {
-                    "type": "Polygon",
-                    "coordinates": [
-                      [
-                        [-79.385061, 38.837334],
-                        [-79.384203, 38.838003],
-                        [-79.383345, 38.837334],
-                        [-79.384203, 38.836666],
-                        [-79.385061, 38.837334]
-                      ]
-                    ]
-                  }
-                }
-              ]
-            }
-          },
-          {
-            "name": "Structure",
-            "color": "#F10100",
-            "geometry": {
-              "type": "FeatureCollection",
-              "features": [
-                {
-                  "type": "Feature",
-                  "properties": {},
-                  "geometry": {
-                    "type": "MultiPoint",
-                    "coordinates": [
-                      [-79.38308715820314, 38.83957390576818],
-                      [-79.38137054443361, 38.8409109722324]
-                    ]
-                  }
-                },
-                {
-                  "type": "Feature",
-                  "properties": {},
-                  "geometry": {
-                    "type": "Polygon",
-                    "coordinates": [
-                      [
-                        [-79.383087, 38.844254],
-                        [-79.381371, 38.845591],
-                        [-79.379654, 38.844254],
-                        [-79.381371, 38.842917],
-                        [-79.383087, 38.844254]
-                      ]
-                    ]
-                  }
-                }
-              ]
-            }
-          },
-          {
-            "name": "Impervious Surface",
-            "color": "#BFB5B5",
-            "geometry": {
-              "type": "FeatureCollection",
-              "features": [
-                {
-                  "type": "Feature",
-                  "properties": {},
-                  "geometry": {
-                    "type": "MultiPoint",
-                    "coordinates": [
-                      [-79.3799114227295, 38.838337096921364],
-                      [-79.37905311584474, 38.83900564491327]
-                    ]
-                  }
-                }
-              ]
-            }
-          },
-          {
-            "name": "Impervious Road",
-            "color": "#320000",
-            "geometry": {
-              "type": "FeatureCollection",
-              "features": [
-                {
-                  "type": "Feature",
-                  "properties": {},
-                  "geometry": {
-                    "type": "MultiPoint",
-                    "coordinates": [
-                      [-79.37819480895998, 38.838337096921364],
-                      [-79.37905311584474, 38.83766854264875]
-                    ]
-                  }
-                }
-              ]
-            }
-          }
-        ]
-      }
-    }
-  },
-  {
-    "type": "server",
-    "payload": { "message": "model#retrain#complete" }
-  },
-  {
-    "type": "client",
-    "payload": { "action": "model#status" }
-  },
-  {
-    "type": "server",
-    "payload": {
-      "message": "model#status",
-      "data": {
-        "is_aborting": false,
-        "processing": true,
-        "aoi": 2,
-        "checkpoint": 2
+        "name": "Judiciary Square",
+        "polygon": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [-77.0632553100586, 38.91694866167228],
+              [-77.0460891723633, 38.91694866167228],
+              [-77.0460891723633, 38.93030364446068],
+              [-77.0632553100586, 38.93030364446068],
+              [-77.0632553100586, 38.91694866167228]
+            ]
+          ]
+        }
       }
     }
   },
@@ -239,7 +48,7 @@
     "type": "server",
     "payload": {
       "message": "model#checkpoint",
-      "data": { "name": "Seneca Rocks", "id": 3 }
+      "data": { "name": "Judiciary Square", "id": 1 }
     }
   },
   {
@@ -251,17 +60,17 @@
     "payload": {
       "message": "model#aoi",
       "data": {
-        "id": 3,
+        "id": 1,
         "live": true,
-        "name": "Area #1",
-        "checkpoint_id": 3,
+        "name": "Judiciary Square",
+        "checkpoint_id": 1,
         "bounds": [
-          -79.38995361328125,
-          38.833289356866885,
-          -79.37347412109375,
-          38.85040342169188
+          -77.06085205078125,
+          38.87606680031535,
+          -77.03338623046875,
+          38.89317057287494
         ],
-        "total": 6
+        "total": 10
       }
     }
   },
@@ -272,8 +81,8 @@
       "data": {
         "is_aborting": false,
         "processing": true,
-        "aoi": 3,
-        "checkpoint": 3
+        "aoi": 1,
+        "checkpoint": 1
       }
     }
   },
@@ -282,7 +91,7 @@
     "payload": {
       "message": "model#prediction",
       "data": {
-        "aoi": 3,
+        "aoi": 1,
         "bounds": [
           -77.047119140625,
           38.901720914997945,
@@ -303,7 +112,7 @@
     "payload": {
       "message": "model#prediction",
       "data": {
-        "aoi": 3,
+        "aoi": 1,
         "bounds": [
           -77.047119140625,
           38.89958342598271,
@@ -325,7 +134,7 @@
     "payload": {
       "message": "model#prediction",
       "data": {
-        "aoi": 3,
+        "aoi": 1,
         "bounds": [
           -77.04437255859375,
           38.901720914997945,
@@ -347,7 +156,7 @@
     "payload": {
       "message": "model#prediction",
       "data": {
-        "aoi": 3,
+        "aoi": 1,
         "bounds": [
           -77.04437255859375,
           38.89958342598271,
@@ -368,7 +177,7 @@
     "payload": {
       "message": "model#prediction",
       "data": {
-        "aoi": 3,
+        "aoi": 1,
         "bounds": [
           -77.0416259765625,
           38.901720914997945,
@@ -389,7 +198,7 @@
     "payload": {
       "message": "model#prediction",
       "data": {
-        "aoi": 3,
+        "aoi": 1,
         "bounds": [
           -77.0416259765625,
           38.89958342598271,
@@ -405,27 +214,13 @@
       }
     }
   },
+
   {
     "type": "server",
-    "payload": {
-      "message": "model#prediction#complete",
-      "data": { "aoi": 3 }
-    }
+    "payload": { "message": "model#prediction#complete", "data": { "aoi": 1 } }
   },
   {
     "type": "client",
     "payload": { "action": "model#status" }
-  },
-  {
-    "type": "server",
-    "payload": {
-      "message": "model#status",
-      "data": {
-        "is_aborting": false,
-        "processing": false,
-        "aoi": 3,
-        "checkpoint": 3
-      }
-    }
   }
 ]
