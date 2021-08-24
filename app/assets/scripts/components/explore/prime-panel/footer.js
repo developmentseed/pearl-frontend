@@ -3,7 +3,6 @@ import T from 'prop-types';
 import styled, { css } from 'styled-components';
 import { glsp, disabled as disabledStyles } from '@devseed-ui/theme-provider';
 
-import { Heading } from '@devseed-ui/typography';
 import { Button } from '@devseed-ui/button';
 import { Form, FormInput } from '@devseed-ui/form';
 import { Dropdown, DropdownBody } from '../../../styles/dropdown';
@@ -13,6 +12,7 @@ import InfoButton from '../../common/info-button';
 import { PanelBlockFooter } from '../../common/panel-block';
 import { checkpointModes } from '../../../context/checkpoint';
 import { useInstance } from '../../../context/instance';
+import { Subheading } from '../../../styles/type/heading';
 
 const PanelControls = styled(PanelBlockFooter)`
   display: grid;
@@ -186,7 +186,7 @@ function Footer(props) {
           )}
         >
           <SaveCheckpoint>
-            <Heading useAlt>Checkpoint name:</Heading>
+            <Subheading>Checkpoint name:</Subheading>
             <Form
               onSubmit={(evt) => {
                 evt.preventDefault();

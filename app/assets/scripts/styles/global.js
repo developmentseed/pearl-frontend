@@ -8,9 +8,6 @@ import { themeVal, rgba } from '@devseed-ui/theme-provider';
 
 const darkStyles = () => css`
   .modal {
-    background: ${themeVal('color.baseDarkAlphaC')} !important;
-  }
-  .modal.faded-background {
     background: ${rgba(themeVal('color.background'), 0.7)} !important;
   }
 

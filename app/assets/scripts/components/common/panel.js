@@ -80,6 +80,7 @@ export const PanelToolbar = styled.div`
 
 export const PanelTitle = styled.h1`
   ${headingAlt}
+  opacity: 1;
   margin: 0;
 `;
 

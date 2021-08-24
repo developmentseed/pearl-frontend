@@ -1,7 +1,6 @@
 import React from 'react';
 import T from 'prop-types';
 import styled, { css } from 'styled-components';
-import { Heading } from '@devseed-ui/typography';
 
 import { themeVal, glsp, truncated } from '@devseed-ui/theme-provider';
 
@@ -33,6 +32,7 @@ const SelectAoiTrigger = styled.div`
 
 const SubheadingStrong = styled.h3`
   color: ${themeVal('color.base')};
+  font-weight: ${themeVal('type.heading.weight')};
   font-size: 1.125rem;
   line-height: 1.5rem;
   ${truncated}
@@ -154,11 +154,7 @@ function Header(props) {
         >
           {header}
         </SubheadingStrong>
-        {area && (
-          <Heading className='subtitle' useAlt>
-            {area}
-          </Heading>
-        )}
+        {area && <Subheading className='subtitle'>{area}</Subheading>}
       </SelectAoiTrigger>
     );
   };
@@ -222,9 +218,7 @@ function Header(props) {
         >
           <>
             <DropdownHeader unshaded>
-              <Heading useAlt size='xsmall'>
-                Available Areas of Interest
-              </Heading>
+              <Subheading>Available Areas of Interest</Subheading>
             </DropdownHeader>
             <DropdownBody>
               {filterAoiList(aoiList).map((a) => (

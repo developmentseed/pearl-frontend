@@ -3,7 +3,7 @@ import styled, { css } from 'styled-components';
 import { rgba } from 'polished';
 import T from 'prop-types';
 import { glsp, themeVal, stylizeFunction } from '@devseed-ui/theme-provider';
-import { Heading } from '@devseed-ui/typography';
+import { Subheading } from '../../styles/type/heading';
 
 const _rgba = stylizeFunction(rgba);
 
@@ -83,9 +83,9 @@ function Table({ headers, data, renderRow, extraData, hoverable }) {
       <TableHeader>
         <TableRow>
           {headers.map((header) => (
-            <Heading key={header} as='th' useAlt>
+            <Subheading key={header} as='th'>
               {header}
-            </Heading>
+            </Subheading>
           ))}
         </TableRow>
       </TableHeader>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import styled from 'styled-components';
-import { glsp } from '@devseed-ui/theme-provider';
+import { media, glsp } from '@devseed-ui/theme-provider';
 
 import Panel from '../../common/panel';
 import { PanelBlock, PanelBlockBody } from '../../common/panel-block';
@@ -40,7 +40,12 @@ import { useAoi } from '../../../context/aoi';
 import { usePredictions } from '../../../context/predictions';
 
 const StyledPanelBlock = styled(PanelBlock)`
-  width: ${glsp(24)};
+  ${media.largeUp`
+    width: ${glsp(24)};
+  `}
+  ${media.xlargeUp`
+    width: ${glsp(28)};
+  `}
 `;
 
 const ModalHeader = styled.header`

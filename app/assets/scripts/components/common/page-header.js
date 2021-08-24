@@ -110,8 +110,8 @@ const PageTitlePrimeLink = styled.a`
     ${media.mediumUp`
       font-size: 0.75rem;
       display: block;
-      opacity: 0.84;
-      letter-spacing: 2px;
+      opacity: 0.875;
+      letter-spacing: 1.5px;
     `}
   }
   strong {

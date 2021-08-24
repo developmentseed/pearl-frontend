@@ -385,7 +385,6 @@ function SessionOutputControl(props) {
         title='New project'
         // Reveal modal on mount for new projects, not existing ones
         revealed={!projectName && projectId && projectId === 'new'}
-        className='faded-background'
         size='small'
         closeButton={true}
         onCloseClick={() => history.goBack()}
