@@ -5,7 +5,6 @@ describe('Open existing project', () => {
 
   it('successfully loads', () => {
     cy.fakeLogin();
-    cy.mockRegularProject();
     cy.visit('/project/1');
 
     cy.get('#layer-control').click({ force: true });
