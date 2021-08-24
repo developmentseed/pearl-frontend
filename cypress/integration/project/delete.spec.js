@@ -1,8 +1,7 @@
-describe('Has project page', () => {
+describe('Delete a project', () => {
   beforeEach(() => {
     cy.startServer();
     cy.fakeLogin();
-    cy.mockRegularProject();
     cy.visit('/profile/projects/1');
   });
 

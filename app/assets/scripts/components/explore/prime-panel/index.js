@@ -363,25 +363,10 @@ function PrimePanel() {
                 Close modal
               </Button>
             </Headline>
-            {/* <FormGroup>
-              <FormGroupHeader>
-                <FormLabel htmlFor='model-filter'>Search Models</FormLabel>
-              </FormGroupHeader>
-              <FormGroupBody>
-                <FormInput
-                  type='text'
-                  id='model-filter'
-                  name='model-filter'
-                  onChange={(e) => setModelFilterString(e.target.value)}
-                  placeholder='Filter models'
-                />
-              </FormGroupBody>
-            </FormGroup> */}
           </ModalHeader>
         )}
         filterCard={(card) => {
           return card.name.includes('');
-          // return card.name.includes(modelFilterString.toLowerCase());
         }}
         renderCard={(model) => (
           <ModelCard
