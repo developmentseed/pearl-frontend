@@ -88,7 +88,6 @@ function PrimePanel() {
 
   const { models } = useModels();
 
-
   const { predictions } = usePredictions();
 
   const [showSelectModelModal, setShowSelectModelModal] = useState(false);
