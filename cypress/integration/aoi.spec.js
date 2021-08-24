@@ -143,10 +143,8 @@ describe('Can delete AOIs', () => {
     cy.startServer();
   });
 
-  it('Displays delete button on header', () => {
+  it.only('Displays delete button on header', () => {
     cy.fakeLogin();
-    cy.mockRegularProject();
-
     cy.setWebsocketWorkflow('retrain');
 
     cy.visit('/project/1');

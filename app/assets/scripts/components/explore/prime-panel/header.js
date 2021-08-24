@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useState } from 'react';
 import T from 'prop-types';
 import styled, { css } from 'styled-components';
 import { Heading } from '@devseed-ui/typography';
@@ -225,45 +225,42 @@ function Header(props) {
     return 'No models available';
   };
 
-  const deleteAoiFunc = useCallback(
-    async (targetAoi) => {
-      //mapRef.aoi.control.draw.disable();
-      //Layer must be removed from the map
+  const deleteAoiFunc = async (targetAoi) => {
+    //mapRef.aoi.control.draw.disable();
+    //Layer must be removed from the map
 
-      try {
-        const deleteReqs = aoiList.map((aoi) => {
-          if (aoi.name === targetAoi.name) {
-            return restApiClient.deleteAoi(aoi.id, currentProject.id);
-          } else {
-            return null;
-          }
-        });
-
-        await Promise.all(deleteReqs);
-        const aoiReq = await restApiClient.getAOIs(currentProject.id);
-        setAoiList(aoiReq.aois);
-
-        if (aoiReq.aois.length) {
-          const { aois } = aoiReq;
-          loadAoi(
-            currentProject,
-            aois[aois.length - 1],
-            aois[aois.length - 1].checkpoint_id === currentCheckpoint?.id
-          ).then((bounds) =>
-            mapRef.fitBounds(bounds, {
-              padding: BOUNDS_PADDING,
-            })
-          );
+    try {
+      const deleteReqs = aoiList.map((aoi) => {
+        if (aoi.name === targetAoi.name) {
+          return restApiClient.deleteAoi(aoi.id, currentProject.id);
         } else {
-          mapRef.aoi.control.draw.clear();
-          createNewAoi();
+          return null;
         }
-      } catch (err) {
-        toasts.error(err.message);
+      });
+
+      await Promise.all(deleteReqs);
+      const aoiReq = await restApiClient.getAOIs(currentProject.id);
+      setAoiList(aoiReq.aois);
+
+      if (aoiReq.aois.length) {
+        const { aois } = aoiReq;
+        loadAoi(
+          currentProject,
+          aois[aois.length - 1],
+          aois[aois.length - 1].checkpoint_id === currentCheckpoint?.id
+        ).then((bounds) =>
+          mapRef.fitBounds(bounds, {
+            padding: BOUNDS_PADDING,
+          })
+        );
+      } else {
+        mapRef.aoi.control.draw.clear();
+        createNewAoi();
       }
-    },
-    [aoiList, currentProject, restApiClient, mapRef]
-  );
+    } catch (err) {
+      toasts.error(err.message);
+    }
+  };
 
   return (
     <PanelBlockHeader>
@@ -392,6 +389,7 @@ function Header(props) {
                 //Layer must be removed from the map
                 mapRef.aoi.control.draw.clear();
                 */
+                //mapRef.aoi.control.draw.clear()
 
                 deleteAoiFunc(deleteAoi);
 
