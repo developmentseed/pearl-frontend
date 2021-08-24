@@ -9,6 +9,35 @@ Cypress.Commands.add('startServer', () => {
   // Add /projects routes from separate file
   require('./projects')();
 
+  // Fake OSM Tiles
+  cy.intercept(
+    {
+      hostname: 'a.tile.openstreetmap.org',
+    },
+    { fixture: 'tiles/osm-tile.png' }
+  );
+  cy.intercept(
+    {
+      hostname: 'b.tile.openstreetmap.org',
+    },
+    { fixture: 'tiles/osm-tile.png' }
+  );
+  cy.intercept(
+    {
+      hostname: 'c.tile.openstreetmap.org',
+    },
+    { fixture: 'tiles/osm-tile.png' }
+  );
+
+  // Fake Imagery Layer
+  cy.intercept(
+    {
+      url: 'https://tiles.lulc.ds.io/**',
+    },
+    { fixture: 'tiles/imagery-tile.png' }
+  );
+
+  // API Health
   cy.intercept(
     {
       url: restApiEndpoint + '/health',
@@ -16,6 +45,7 @@ Cypress.Commands.add('startServer', () => {
     { healthy: true, message: 'Good to go' }
   );
 
+  // API Limits
   cy.intercept(
     {
       url: restApiEndpoint + '/api',
@@ -32,6 +62,7 @@ Cypress.Commands.add('startServer', () => {
     }
   );
 
+  // Mosaic
   cy.intercept(
     {
       url: restApiEndpoint + '/api/mosaic',
@@ -39,13 +70,13 @@ Cypress.Commands.add('startServer', () => {
     { mosaics: ['naip.latest'] }
   );
 
+  // Geocoder
   cy.intercept(
     {
       url: 'https://dev.virtualearth.net/REST/v1/Locations/*?*',
     },
     { fixture: 'geocoder/dc.json' }
   ).as('reverseGeocodeCity');
-
   cy.intercept(
     {
       url:
@@ -54,6 +85,7 @@ Cypress.Commands.add('startServer', () => {
     { fixture: 'geocoder/rural.json' }
   ).as('reverseGeocodeRural');
 
+  // Models
   cy.intercept(
     {
       url: restApiEndpoint + '/api/model',
@@ -160,7 +192,6 @@ Cypress.Commands.add('startServer', () => {
       },
     }
   );
-
   cy.intercept(
     {
       url: restApiEndpoint + '/api/model/1',
