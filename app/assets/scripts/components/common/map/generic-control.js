@@ -23,6 +23,10 @@ function GenericControl({ position, onClick, id }) {
       container.id = id;
 
       container.onclick = onClick;
+      container.ondblclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      };
       setCntrl(container);
 
       return container;
