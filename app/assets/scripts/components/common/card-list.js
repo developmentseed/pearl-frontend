@@ -110,21 +110,23 @@ export const CardWrapper = styled.article`
   }
 `;
 
-export const Card = ({
-  id,
-  title,
-  subtitle,
-  size,
-  onClick,
-  borderlessMedia,
-  cardMedia,
-  details,
-  expanded,
-  hoverTransform,
-}) => {
+export const Card = (props) => {
+  const {
+    id,
+    title,
+    subtitle,
+    size,
+    onClick,
+    borderlessMedia,
+    cardMedia,
+    details,
+    expanded,
+    hoverTransform,
+  } = props;
   return (
     <CardWrapper
       id={id}
+      data-cy={props['data-cy']}
       size={size}
       onClick={onClick}
       expanded={expanded}
@@ -149,6 +151,7 @@ export const Card = ({
 
 Card.propTypes = {
   id: T.oneOfType([T.number, T.string]),
+  'data-cy': T.string,
   title: T.string,
   subtitle: T.string,
   size: T.oneOf(['small', 'large']),
