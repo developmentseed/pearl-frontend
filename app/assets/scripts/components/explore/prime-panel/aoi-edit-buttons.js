@@ -330,8 +330,12 @@ export function AoiEditButtons(props) {
                 </div>
               ) : (
                 <div>
-                  Area size is limited to{' '}
-                  {formatThousands(apiLimits.max_inference / 1e6)} km².
+                  The area has {formatThousands(aoiArea / 1e6, { decimals: 0 })}{' '}
+                  km², please select an area smaller than{' '}
+                  {formatThousands(apiLimits.max_inference / 1e6, {
+                    decimals: 0,
+                  })}{' '}
+                  km².
                 </div>
               )
             }
