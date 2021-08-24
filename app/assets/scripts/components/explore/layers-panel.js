@@ -224,7 +224,7 @@ function LayersPanel(props) {
     if (mapRef) {
       observer.observe(mapRef.getContainer());
     }
-    return () => mapRef && observer.unobserver(mapRef.getContainer());
+    return () => mapRef && observer.unobserve(mapRef.getContainer());
   }, [mapRef, parentNode]);
 
   if (!parentNode) {
