@@ -215,7 +215,6 @@ function LayersPanel(props) {
 
   React.useEffect(() => {
     function updatePosition() {
-      //setSearchResultTop(searchBarReference.current.getBoundingClientRect().bottom);
       if (parentNode.current) {
         setPosition(parentNode.current.getBoundingClientRect());
       }
@@ -223,7 +222,6 @@ function LayersPanel(props) {
     const observer = new ResizeObserver(throttle(updatePosition, 100));
 
     if (mapRef) {
-      //mapRef.getContainer().addEventListener('resize', updatePosition);
       observer.observe(mapRef.getContainer());
     }
     return () => mapRef && observer.unobserver(mapRef.getContainer());
@@ -233,7 +231,6 @@ function LayersPanel(props) {
     return null;
   }
 
-  //return ReactDOM.createPortal(
   return (
     <LayersPanelInner
       className={className}
@@ -299,8 +296,7 @@ function LayersPanel(props) {
           /* eslint-disable-next-line react/jsx-curly-newline */
         }
       </Accordion>
-    </LayersPanelInner> /*,
-    parentNode*/
+    </LayersPanelInner>
   );
 }
 

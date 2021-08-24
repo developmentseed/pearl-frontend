@@ -14,8 +14,6 @@ function GenericControl({ position, onClick, id }) {
     onAdd: function () {
       const container = L.DomUtil.create('div');
 
-      //container.style.backgroundColor = theme.baseDark;
-      //container.style.backgroundImage = "url(https://t1.gstatic.com/images?q=tbn:ANd9GcR6FCUMW5bPn8C4PbKak2BJQQsmC-K9-mbYBeFZm1ZM2w2GRy40Ew)";
       container.style.backgroundSize = '30px 30px';
       container.style.width = '30px';
       container.style.height = '30px';
@@ -27,8 +25,6 @@ function GenericControl({ position, onClick, id }) {
       container.onclick = onClick;
       setCntrl(container);
 
-      /*L.DomEvent.on(container, 'mousewheel', L.DomEvent.stopPropagation);
-      L.DomEvent.on(container, 'click', L.DomEvent.stopPropagation);*/
       return container;
     },
   });
@@ -46,4 +42,3 @@ function GenericControl({ position, onClick, id }) {
 }
 
 export default GenericControl;
-// http://www.coffeegnome.net/creating-contr…button-leaflet

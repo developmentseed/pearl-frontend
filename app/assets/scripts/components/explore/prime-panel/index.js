@@ -88,12 +88,10 @@ function PrimePanel() {
 
   const { models } = useModels();
 
-  //const { mapLayers } = useMapLayers();
 
   const { predictions } = usePredictions();
 
   const [showSelectModelModal, setShowSelectModelModal] = useState(false);
-  // const [modelFilterString, setModelFilterString] = useState('');
   const [localCheckpointName, setLocalCheckpointName] = useState(
     (currentCheckpoint &&
       currentCheckpoint.bookmarked &&

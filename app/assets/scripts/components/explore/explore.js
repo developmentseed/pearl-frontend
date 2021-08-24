@@ -58,19 +58,7 @@ function Explore() {
           <ExploreCarto>
             <Map />
           </ExploreCarto>
-          <LayersPanel
-            //disabled={mapState.mode === mapModes.EDIT_AOI_MODE}
-            parentId='layer-control'
-            className='padded'
-            //mapLayers={mapLayers}
-            /*
-            baseLayerNames={
-              mosaicList.isReady() && !mosaicList.hasError()
-                ? mosaicList.getData().mosaics
-                : []
-             }*/
-          />
-
+          <LayersPanel parentId='layer-control' className='padded' />
           <SecPanel />
         </ExploreBody>
         {steps && <Tour steps={steps} />}
