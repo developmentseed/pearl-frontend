@@ -16,7 +16,6 @@ import { Button } from '@devseed-ui/button';
 import TabbedBlock from '../../common/tabbed-block-body';
 import RetrainModel from './tabs/retrain-model';
 import RefineResults from './tabs/refine-results';
-import LayersPanel from './tabs/layers';
 
 import PanelHeader from './header';
 import PanelFooter from './footer';

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import T from 'prop-types';
 import styled, { css } from 'styled-components';
 import { Button } from '@devseed-ui/button';
-import InfoButton from '../../../../components/common/info-button';
+import InfoButton from '../../components/common/info-button';
 import { Heading } from '@devseed-ui/typography';
 import { themeVal, glsp } from '@devseed-ui/theme-provider';
 import InputRange from 'react-input-range';
@@ -13,9 +13,9 @@ import {
   useUserLayers,
   useLayersPanel,
   useMapRef,
-} from '../../../../context/map';
-import { useMapState } from '../../../../context/explore';
-import { useCheckpoint } from '../../../../context/checkpoint';
+} from '../../context/map';
+import { useMapState } from '../../context/explore';
+import { useCheckpoint } from '../../context/checkpoint';
 
 const LayersPanelInner = styled.div`
   opacity: ${({ show }) => (show ? 1 : 0)};
