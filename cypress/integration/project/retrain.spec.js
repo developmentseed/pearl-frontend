@@ -188,5 +188,4 @@ describe('Retrain existing project', () => {
     // Should display modal
     cy.get('#no-instance-available-error').should('not.exist');
   });
- });
-
+});

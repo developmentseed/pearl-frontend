@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useMap } from 'react-leaflet';
 import L from 'leaflet';
 
-function GenericControl({ position, onClick, id, 'data-cy': dataCy }) {
+function GenericControl({ position, onClick, id }) {
   const map = useMap();
   const [cntrl, setCntrl] = useState();
 
