@@ -63,19 +63,21 @@ function SecPanel() {
                   <PanelBlockHeader>
                     <Subheading>Checkpoint Class Distribution</Subheading>
                   </PanelBlockHeader>
-                  <ClassAnalyticsChart
-                    checkpoint={{
-                      ...currentCheckpoint,
-                      analytics: Object.keys(currentCheckpoint.classes).map(
-                        (_, ind) => ({
-                          px_stat: px_stats[ind],
-                        })
-                      ),
-                    }}
-                    label='Retraining Sample Distribution'
-                    metric='px_stat'
-                    formatter={(v) => `${round(v, 2) * 100}%`}
-                  />
+                  {currentCheckpoint.classes && (
+                    <ClassAnalyticsChart
+                      checkpoint={{
+                        ...currentCheckpoint,
+                        analytics: Object.keys(currentCheckpoint.classes).map(
+                          (_, ind) => ({
+                            px_stat: px_stats[ind],
+                          })
+                        ),
+                      }}
+                      label='Retraining Sample Distribution'
+                      metric='px_stat'
+                      formatter={(v) => `${round(v, 2) * 100}%`}
+                    />
+                  )}
                 </StyledBlockBody>
               )}
               {currentCheckpoint.input_geoms &&

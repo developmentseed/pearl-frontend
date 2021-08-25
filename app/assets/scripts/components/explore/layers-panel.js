@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import T from 'prop-types';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { Button } from '@devseed-ui/button';
 import InfoButton from '../../components/common/info-button';
 import { Heading } from '@devseed-ui/typography';
@@ -28,13 +28,19 @@ const LayersPanelInner = styled.div`
   margin-left: 1rem;
   position: fixed;
   background: ${themeVal('color.surface')};
-  box-shadow: ${themeVal('boxShadow.ElevationB')};
+  box-shadow: ${themeVal('boxShadow.elevationB')};
   z-index: 1;
 `;
 const LayersWrapper = styled.div`
   display: grid;
   grid-gap: 1rem;
   padding: ${glsp(1)} 0;
+
+  ${({ isFoldExpanded }) =>
+    !isFoldExpanded &&
+    css`
+      pointer-events: none;
+    `};
 `;
 const LayerWrapper = styled.div`
   display: grid;
@@ -147,14 +153,15 @@ function Category({
   if (!Object.values(layers).find((f) => f.active)) {
     return null;
   }
+  const isFoldExpanded = checkExpanded();
   return (
     <AccordionFold
       id={`${category}-fold`}
       title={category}
-      isFoldExpanded={checkExpanded()}
+      isFoldExpanded={isFoldExpanded}
       setFoldExpanded={setExpanded}
       renderBody={() => (
-        <LayersWrapper>
+        <LayersWrapper isFoldExpanded={isFoldExpanded}>
           {Object.entries(layers)
             .filter(([, layer]) => layer.active)
             .map(([key, layer]) => (
