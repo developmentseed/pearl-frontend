@@ -612,6 +612,7 @@ function Map() {
         <FeatureGroup>
           <GenericControl
             id='layer-control'
+            data-cy='layer-control'
             onClick={(e) => {
               e.stopPropagation();
               setShowLayersPanel(!showLayersPanel);

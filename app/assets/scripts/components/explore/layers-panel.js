@@ -89,7 +89,9 @@ function Layer({ layer, onSliderChange, onVisibilityToggle, info, name }) {
   const [value, setValue] = useState(layer.opacity || 1);
   const [visible, setVisible] = useState(true);
   return (
-    <LayerWrapper>
+    <LayerWrapper
+      data-cy={name}
+    >
       <SliderWrapper>
         <Heading as='h4' size='xsmall'>
           {name}
