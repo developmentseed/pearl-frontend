@@ -101,7 +101,7 @@ function checkpointReducer(state, action) {
       // Action used to load existing or initialize a new checkpoint
       return {
         ...action.data,
-        project_id: action.data.project_id || state.project_id,
+        project_id: action.data.project_id || (state && state.project_id),
         name:
           state && state.mode === checkpointModes.RUN
             ? state.name
