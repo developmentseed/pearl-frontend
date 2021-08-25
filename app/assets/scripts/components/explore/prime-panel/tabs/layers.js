@@ -2,14 +2,14 @@ import React, { useState, useEffect } from 'react';
 import T from 'prop-types';
 import styled from 'styled-components';
 import { Button } from '@devseed-ui/button';
-import InfoButton from '../../components/common/info-button';
+import InfoButton from '../../../../components/common/info-button';
 import { Heading } from '@devseed-ui/typography';
 import { themeVal, glsp } from '@devseed-ui/theme-provider';
 import InputRange from 'react-input-range';
 import { Accordion, AccordionFold as BaseFold } from '@devseed-ui/accordion';
 import throttle from 'lodash.throttle';
-import { useMapLayers, useUserLayers } from '../../context/map';
-import { useCheckpoint } from '../../context/checkpoint';
+import { useMapLayers, useUserLayers } from '../../../../context/map';
+import { useCheckpoint } from '../../../../context/checkpoint';
 
 const Wrapper = styled.div`
   display: grid;

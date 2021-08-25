@@ -11,23 +11,16 @@ import { ExploreContext, useMapState } from '../../../context/explore';
 import GlobalContext, { useModels } from '../../../context/global';
 
 import { Heading } from '@devseed-ui/typography';
-// import {
-//   FormGroup,
-//   FormGroupHeader,
-//   FormGroupBody,
-//   FormLabel,
-//   FormInput,
-// } from '@devseed-ui/form';
 import { Button } from '@devseed-ui/button';
 
 import TabbedBlock from '../../common/tabbed-block-body';
-import RetrainModel from './retrain-model';
-import RefineModel from './refine-model';
+import RetrainModel from './tabs/retrain-model';
+import RefineResults from './tabs/refine-results';
+import LayersPanel from './tabs/layers';
 
 import PanelHeader from './header';
 import PanelFooter from './footer';
 
-import LayersPanel from '../layers-panel';
 
 import { useAuth } from '../../../context/auth';
 import {
@@ -101,7 +94,7 @@ function PrimePanel() {
   const { predictions } = usePredictions();
 
   const [showSelectModelModal, setShowSelectModelModal] = useState(false);
-  // const [modelFilterString, setModelFilterString] = useState('');
+
   const [localCheckpointName, setLocalCheckpointName] = useState(
     (currentCheckpoint &&
       currentCheckpoint.bookmarked &&
@@ -270,7 +263,7 @@ function PrimePanel() {
                     }
                   }}
                 />
-                <RefineModel
+                <RefineResults
                   name='Refine Results'
                   tabId='refine-tab-trigger'
                   className='refine-model'

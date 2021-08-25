@@ -3,16 +3,16 @@ import T from 'prop-types';
 import get from 'lodash.get';
 import { Button } from '@devseed-ui/button';
 import { ChromePicker } from 'react-color';
-import InfoButton from '../../common/info-button';
-import { PlaceholderMessage } from '../../../styles/placeholder.js';
-import { actions, useCheckpoint } from '../../../context/checkpoint.js';
-import { useMapState } from '../../../context/explore.js';
+import InfoButton from '../../../common/info-button';
+import { PlaceholderMessage } from '../../../../styles/placeholder.js';
+import { actions, useCheckpoint } from '../../../../context/checkpoint.js';
+import { useMapState } from '../../../../context/explore.js';
 import {
   Dropdown,
   DropdownHeader,
   DropdownItem,
   DropdownTrigger,
-} from '../../../styles/dropdown';
+} from '../../../../styles/dropdown';
 import {
   ToolsWrapper,
   ClassList,
@@ -29,8 +29,8 @@ import {
   PickerDropdownFooter,
 } from './retrain-refine-styles';
 import { FormInput } from '@devseed-ui/form';
-import ImportSamplesModal from '../map/import-sample-modal';
-import { Subheading } from '../../../styles/type/heading';
+import ImportSamplesModal from '../../map/import-sample-modal';
+import { Subheading } from '../../../../styles/type/heading';
 
 /*
  * Retrain Model
