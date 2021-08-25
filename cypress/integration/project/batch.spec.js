@@ -21,5 +21,12 @@ describe('Retrain existing project', () => {
 
     cy.get('[data-cy=proceed-anyway-button]').should('exist').click();
     cy.wait('@reverseGeocodeCity');
+
+    // Retrain tab should be hidden
+
+    // Request model run
+    // cy.get('[data-cy=run-button')
+    //   .should('have.text', 'Run Batch Prediction')
+    //   .click();
   });
 });

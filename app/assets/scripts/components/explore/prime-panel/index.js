@@ -29,6 +29,7 @@ import {
 import { useInstance } from '../../../context/instance';
 import { useAoi } from '../../../context/aoi';
 import { usePredictions } from '../../../context/predictions';
+import RunPrediction from './tabs/run-prediction';
 
 const StyledPanelBlock = styled(PanelBlock)`
   ${media.largeUp`
@@ -219,6 +220,17 @@ function PrimePanel() {
             />
             <PanelBlockBody>
               <TabbedBlock>
+                <RunPrediction
+                  name='Run Prediction'
+                  className='run-prediction-tab'
+                  message={
+                    (aoiRef && selectedModel) || !currentAoi
+                      ? `Click the "Run Model" button to generate the class LULC map for your AOI`
+                      : aoiRef && !selectedModel
+                      ? `Select a model to use for inference`
+                      : `Define an Area of Interest to run models at your selected location`
+                  }
+                />
                 <RetrainModel
                   name='retrain model'
                   className='retrain-model'
