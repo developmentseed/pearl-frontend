@@ -1,4 +1,4 @@
-describe('Retrain existing project', () => {
+describe('Batch predictions', () => {
   beforeEach(() => {
     cy.startServer();
   });
