@@ -1,3 +1,5 @@
+import config from '../../app/assets/scripts/config/testing';
+const { restApiEndpoint } = config.default;
 describe('Loads AOIs', () => {
   let map;
 
@@ -133,5 +135,57 @@ describe('Loads AOIs', () => {
 
     // Set AOI
     cy.get('[data-cy=aoi-edit-confirm-button').click();
+  });
+});
+
+describe('Can delete AOIs', () => {
+  beforeEach(() => {
+    cy.startServer();
+  });
+
+  it.only('Displays delete button on header', () => {
+    cy.fakeLogin();
+    cy.setWebsocketWorkflow('retrain');
+
+    cy.visit('/project/1');
+    cy.wait('@loadAois');
+
+    cy.intercept(
+      {
+        url: restApiEndpoint + '/api/project/1/aoi/1',
+        method: 'DELETE',
+      },
+      {
+        statusCode: 200,
+        body: {},
+      }
+    ).as('deleteAoi');
+
+    cy.intercept(
+      {
+        url: restApiEndpoint + '/api/project/1/aoi',
+      },
+      {
+        fixture: 'aois.1.json',
+      }
+    ).as('loadAois1');
+
+    cy.get('[data-cy=delete-current-aoi-button]');
+    cy.get('[data-cy=delete-current-aoi-button]').click();
+    cy.get('[data-cy=confirm-delete-aoi-modal]').should('exist');
+    cy.get('[data-cy=confirm-aoi-delete]').should('exist').click();
+    cy.get('[data-cy=confirm-delete-aoi-modal]').should('not.exist');
+    cy.get('[data-cy=aoi-selection-trigger]').click();
+    cy.get('.aoi-delete-button').should('have.length', 1);
+    cy.intercept(
+      {
+        url: restApiEndpoint + '/api/project/1/aoi',
+      },
+      {
+        fixture: 'aois.0.json',
+      }
+    ).as('loadAois1');
+    cy.get('.aoi-delete-button').first().click();
+    cy.get('[data-cy=confirm-aoi-delete]').should('exist').click();
   });
 });
