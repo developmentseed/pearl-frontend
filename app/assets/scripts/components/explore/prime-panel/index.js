@@ -339,7 +339,10 @@ function PrimePanel() {
 
                   disabled:
                     mapState.mode === mapModes.EDIT_AOI_MODE ||
-                    !checkpointHasSamples(),
+                    (currentCheckpoint &&
+                      (currentCheckpoint.mode === checkpointModes.RETRAIN ||
+                        currentCheckpoint.mode === checkpointModes.REFINE) &&
+                      !checkpointHasSamples()),
 
                   allowInferenceRun,
                 }}
