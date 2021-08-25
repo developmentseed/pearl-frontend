@@ -226,9 +226,6 @@ function Header(props) {
   };
 
   const deleteAoiFunc = async (targetAoi) => {
-    //mapRef.aoi.control.draw.disable();
-    //Layer must be removed from the map
-
     try {
       const deleteReqs = aoiList.map((aoi) => {
         if (aoi.name === targetAoi.name) {
@@ -315,7 +312,6 @@ function Header(props) {
 
                         e.preventDefault();
 
-                        //deleteAoi(a);
                         setDeleteAoi(a);
                       }}
                     >
@@ -384,13 +380,6 @@ function Header(props) {
               size='medium'
               useIcon='tick'
               onClick={() => {
-                /*
-                mapRef.aoi.control.draw.disable();
-                //Layer must be removed from the map
-                mapRef.aoi.control.draw.clear();
-                */
-                //mapRef.aoi.control.draw.clear()
-
                 deleteAoiFunc(deleteAoi);
 
                 setDeleteAoi(null);
