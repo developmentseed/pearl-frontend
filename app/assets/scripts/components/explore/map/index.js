@@ -11,9 +11,15 @@ import {
 import L from 'leaflet';
 import GlobalContext from '../../../context/global';
 import { ExploreContext, useMapState } from '../../../context/explore';
-import { useMapRef, useMapLayers, useUserLayers } from '../../../context/map';
+import {
+  useMapRef,
+  useMapLayers,
+  useUserLayers,
+  useLayersPanel,
+} from '../../../context/map';
 
 import GeoCoder from '../../common/map/geocoder';
+import GenericControl from '../../common/map/generic-control';
 import { BOUNDS_PADDING } from '../../common/map/constants';
 import CenterMap from '../../common/map/center-map';
 
@@ -110,6 +116,7 @@ function Map() {
 
   const { mapLayers, setMapLayers } = useMapLayers();
   const { userLayers, setUserLayers } = useUserLayers();
+  const { setShowLayersPanel, showLayersPanel } = useLayersPanel();
 
   const { mosaicList } = useContext(GlobalContext);
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
@@ -603,6 +610,13 @@ function Map() {
               ))
           )}
         <FeatureGroup>
+          <GenericControl
+            id='layer-control'
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowLayersPanel(!showLayersPanel);
+            }}
+          />
           <GeoCoder />
           {aoiRef && <CenterMap aoiRef={aoiRef} />}
         </FeatureGroup>
@@ -624,6 +638,8 @@ function Map() {
     setMapRef,
     aoiPatchList,
     tileUrl,
+    showLayersPanel,
+    setShowLayersPanel,
   ]);
 
   return (

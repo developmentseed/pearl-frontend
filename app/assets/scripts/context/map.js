@@ -14,6 +14,8 @@ export function MapProvider(props) {
   const [mapLayers, setMapLayers] = useState({});
   const { aoiPatch } = useAoiPatch();
 
+  const [showLayersPanel, setShowLayersPanel] = useState(false);
+
   const [predictionLayerSettings, setPredictionLayerSettings] = useState({
     opacity: 1,
     visible: true,
@@ -75,6 +77,9 @@ export function MapProvider(props) {
 
         userLayers,
         setUserLayers,
+
+        setShowLayersPanel,
+        showLayersPanel,
       }}
     >
       {props.children}
@@ -142,5 +147,18 @@ export const usePredictionLayer = () => {
       setPredictionLayerSettings,
     }),
     [predictionLayerSettings, setPredictionLayerSettings]
+  );
+};
+
+export const useLayersPanel = () => {
+  const { setShowLayersPanel, showLayersPanel } = useMapContext(
+    'useLayersPanel'
+  );
+  return useMemo(
+    () => ({
+      setShowLayersPanel,
+      showLayersPanel,
+    }),
+    [setShowLayersPanel, showLayersPanel]
   );
 };

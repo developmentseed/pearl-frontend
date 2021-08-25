@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import T from 'prop-types';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { Button } from '@devseed-ui/button';
 import InfoButton from '../../components/common/info-button';
 import { Heading } from '@devseed-ui/typography';
@@ -8,16 +8,44 @@ import { themeVal, glsp } from '@devseed-ui/theme-provider';
 import InputRange from 'react-input-range';
 import { Accordion, AccordionFold as BaseFold } from '@devseed-ui/accordion';
 import throttle from 'lodash.throttle';
-import { useMapLayers, useUserLayers } from '../../context/map';
+import {
+  useMapLayers,
+  useUserLayers,
+  useLayersPanel,
+  useMapRef,
+} from '../../context/map';
+import { useMapState } from '../../context/explore';
 import { useCheckpoint } from '../../context/checkpoint';
 
-const Wrapper = styled.div`
+const LayersPanelInner = styled.div`
+  opacity: ${({ show }) => (show ? 1 : 0)};
+  display: ${({ show }) => !show && 'none'};
+  min-width: 16rem;
+  transition: opacity 0.16s ease 0s;
+  padding: 1.5rem;
+  overflow-y: hidden;
+  overflow-x: auto;
+  margin-left: 1rem;
+  position: fixed;
+  background: ${themeVal('color.surface')};
+  box-shadow: ${themeVal('boxShadow.elevationB')};
+  z-index: 1;
+`;
+const LayersWrapper = styled.div`
   display: grid;
   grid-gap: 1rem;
+  padding: ${glsp(1)} 0;
+
+  ${({ isFoldExpanded }) =>
+    !isFoldExpanded &&
+    css`
+      pointer-events: none;
+    `};
 `;
 const LayerWrapper = styled.div`
   display: grid;
-  grid-template-columns: 2fr 4fr 1fr 1fr;
+  grid-template-columns: 4fr 1fr;
+  grid-gap: ${glsp(2)};
   ${Button} {
     place-self: center;
     max-width: ${glsp(1)};
@@ -25,14 +53,8 @@ const LayerWrapper = styled.div`
   ${Button}:last-child {
     place-self: center;
     max-width: ${glsp(1)};
-    grid-column: 4;
+    grid-column: 2;
   }
-`;
-
-const IconPlaceholder = styled.div`
-  width: 3rem;
-  height: 3rem;
-  background: ${themeVal('color.baseAlphaD')};
 `;
 
 const SliderWrapper = styled.div`
@@ -48,7 +70,6 @@ const SliderWrapper = styled.div`
 const AccordionFold = styled(BaseFold)`
   background: unset;
   header {
-    padding: ${glsp()} 0;
     a {
       padding: ${glsp(0.5)} 0;
       h1 {
@@ -59,6 +80,9 @@ const AccordionFold = styled(BaseFold)`
       }
     }
   }
+  > div {
+    overflow: unset;
+  }
 `;
 
 function Layer({ layer, onSliderChange, onVisibilityToggle, info, name }) {
@@ -66,7 +90,6 @@ function Layer({ layer, onSliderChange, onVisibilityToggle, info, name }) {
   const [visible, setVisible] = useState(true);
   return (
     <LayerWrapper>
-      <IconPlaceholder />
       <SliderWrapper>
         <Heading as='h4' size='xsmall'>
           {name}
@@ -130,14 +153,15 @@ function Category({
   if (!Object.values(layers).find((f) => f.active)) {
     return null;
   }
+  const isFoldExpanded = checkExpanded();
   return (
     <AccordionFold
       id={`${category}-fold`}
       title={category}
-      isFoldExpanded={checkExpanded()}
+      isFoldExpanded={isFoldExpanded}
       setFoldExpanded={setExpanded}
       renderBody={() => (
-        <Wrapper>
+        <LayersWrapper isFoldExpanded={isFoldExpanded}>
           {Object.entries(layers)
             .filter(([, layer]) => layer.active)
             .map(([key, layer]) => (
@@ -150,7 +174,7 @@ function Category({
                 info={layer.info}
               />
             ))}
-        </Wrapper>
+        </LayersWrapper>
       )}
     />
   );
@@ -166,11 +190,25 @@ Category.propTypes = {
 };
 
 function LayersPanel(props) {
-  const { className } = props;
+  const { className, parentId } = props;
+
+  const { mapState, mapModes } = useMapState();
+  const disabled = mapState.mode === mapModes.EDIT_AOI_MODE;
 
   const { userLayers, setUserLayers } = useUserLayers();
+  const { showLayersPanel } = useLayersPanel();
   const { mapLayers } = useMapLayers();
+  const { mapRef } = useMapRef();
   const { currentCheckpoint } = useCheckpoint();
+
+  const [position, setPosition] = useState({});
+
+  const parentNodeQuery = document.getElementById(parentId);
+  const parentNode = useRef();
+
+  useEffect(() => {
+    parentNode.current = parentNodeQuery;
+  }, [parentNodeQuery]);
 
   useEffect(() => {
     setUserLayers({
@@ -182,8 +220,34 @@ function LayersPanel(props) {
     });
   }, [currentCheckpoint && currentCheckpoint.retrain_geoms]);
 
+  React.useEffect(() => {
+    function updatePosition() {
+      if (parentNode.current) {
+        setPosition(parentNode.current.getBoundingClientRect());
+      }
+    }
+    const observer = new ResizeObserver(throttle(updatePosition, 100));
+
+    if (mapRef) {
+      observer.observe(mapRef.getContainer());
+    }
+    return () => mapRef && observer.unobserve(mapRef.getContainer());
+  }, [mapRef, parentNode]);
+
+  if (!parentNode) {
+    return null;
+  }
+
   return (
-    <div className={className}>
+    <LayersPanelInner
+      className={className}
+      show={!disabled && showLayersPanel}
+      style={{
+        top: position.top || 0,
+        left: position.right || 0,
+      }}
+      data-cy='layers-panel'
+    >
       <Accordion
         className={className}
         allowMultiple
@@ -239,12 +303,13 @@ function LayersPanel(props) {
           /* eslint-disable-next-line react/jsx-curly-newline */
         }
       </Accordion>
-    </div>
+    </LayersPanelInner>
   );
 }
 
 LayersPanel.propTypes = {
   className: T.string,
+  parentId: T.string.isRequired,
 };
 
 export default LayersPanel;
