@@ -6,9 +6,9 @@ import Panel from '../../common/panel';
 import { PanelBlock, PanelBlockBody } from '../../common/panel-block';
 import SelectModal from '../../common/select-modal';
 import ModelCard from './model-card';
-import { useMapLayers, useMapRef } from '../../../context/map';
+import { useMapRef } from '../../../context/map';
 import { ExploreContext, useMapState } from '../../../context/explore';
-import GlobalContext, { useModels } from '../../../context/global';
+import { useModels } from '../../../context/global';
 
 import { Heading } from '@devseed-ui/typography';
 import { Button } from '@devseed-ui/button';
@@ -20,7 +20,6 @@ import LayersPanel from './tabs/layers';
 
 import PanelHeader from './header';
 import PanelFooter from './footer';
-
 
 import { useAuth } from '../../../context/auth';
 import {
@@ -86,10 +85,7 @@ function PrimePanel() {
 
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
 
-  const { mosaicList } = useContext(GlobalContext);
   const { models } = useModels();
-
-  const { mapLayers } = useMapLayers();
 
   const { predictions } = usePredictions();
 
@@ -299,21 +295,6 @@ function PrimePanel() {
                       }
                     }
                   }}
-                />
-                <LayersPanel
-                  onTabClick={() => {
-                    setActiveTab('LAYERS');
-                  }}
-                  disabled={mapState.mode === mapModes.EDIT_AOI_MODE}
-                  className='padded'
-                  name='layers'
-                  tabId='layers-tab-trigger'
-                  mapLayers={mapLayers}
-                  baseLayerNames={
-                    mosaicList.isReady() && !mosaicList.hasError()
-                      ? mosaicList.getData().mosaics
-                      : []
-                  }
                 />
               </TabbedBlock>
             </PanelBlockBody>

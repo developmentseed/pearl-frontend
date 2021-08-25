@@ -89,6 +89,10 @@ class RestApiClient {
     return this.get(`project/${projectId}/aoi`);
   }
 
+  deleteAoi(aoiId, projectId) {
+    return this.delete(`project/${projectId}/aoi/${aoiId}`);
+  }
+
   getBookmarkedAOIs(projectId, page, limit) {
     const offset = (page - 1) * limit;
     return this.get(

@@ -299,7 +299,7 @@ export function InstanceProvider(props) {
           fetchCheckpoint(
             projectId,
             checkpointId,
-            checkpointModes.RETRAIN,
+            aoiId ? checkpointModes.RETRAIN : checkpointModes.RUN,
             true
           );
         }

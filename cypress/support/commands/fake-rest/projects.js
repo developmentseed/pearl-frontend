@@ -149,7 +149,7 @@ export default function () {
           },
           {
             id: 2,
-            name: 'Seneca Rocks',
+            name: 'Seneca Rocks #1',
             bookmarked: true,
             bounds: {
               type: 'Polygon',
@@ -189,7 +189,7 @@ export default function () {
         ],
       },
     }
-  );
+  ).as('loadAois');
 
   /**
    * GET /project/:id/checkpoint

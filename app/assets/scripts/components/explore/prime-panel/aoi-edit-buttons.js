@@ -222,14 +222,27 @@ export function AoiEditButtons(props) {
   const { mapState, setMapMode, mapModes } = useMapState();
   const [showUploadAoiModal, setShowUploadAoiModal] = useState(false);
   const { updateAoiName } = useAoiName();
-  const { setCurrentAoi, activeModal, setActiveModal, setAoiArea } = useAoi();
+  const {
+    currentAoi,
+    setCurrentAoi,
+    activeModal,
+    setActiveModal,
+    setAoiArea,
+  } = useAoi();
   const { mapRef } = useMapRef();
 
   const { dispatchCurrentCheckpoint } = useCheckpoint();
 
   const { apiLimits } = useApiMeta();
 
-  const { aoiRef, aoiArea, aoiBounds, setAoiBounds, setAoiRef } = props;
+  const {
+    aoiRef,
+    aoiArea,
+    aoiBounds,
+    setAoiBounds,
+    setAoiRef,
+    deleteAoi,
+  } = props;
 
   // Confirm AOI, used in finish edit button and "confirm batch inference" modal
   function applyAoi() {
@@ -378,6 +391,17 @@ export function AoiEditButtons(props) {
 
   return (
     <>
+      {currentAoi && (
+        <EditButton
+          onClick={() => deleteAoi(currentAoi)}
+          title='Delete current aoi'
+          id='delete-aoi'
+          useIcon='trash-bin'
+          data-cy='delete-current-aoi-button'
+        >
+          Delete current Aoi
+        </EditButton>
+      )}
       <UploadAoiModal
         revealed={showUploadAoiModal}
         setRevealed={setShowUploadAoiModal}
@@ -444,4 +468,5 @@ AoiEditButtons.propTypes = {
   aoiBounds: T.object,
   setAoiBounds: T.func,
   aoiArea: T.oneOfType([T.bool, T.number]),
+  deleteAoi: T.func,
 };

@@ -69,4 +69,23 @@ export default () => css`
       border-radius: 0.25rem;
     }
   }
+
+  #layer-control.leaflet-control.generic-leaflet-control {
+    background: ${themeVal('color.surface')};
+    line-height: 30px;
+    text-align: center;
+  }
+  #layer-control.leaflet-control.generic-leaflet-control {
+    cursor: pointer;
+  }
+  #layer-control.leaflet-control.generic-leaflet-control::after {
+    ${collecticon('iso-stack')};
+    color: ${themeVal('color.base')};
+    top: unset;
+    left: unset;
+    height: 100%;
+    width: 100%;
+    border-radius: unset;
+    border: unset;
+  }
 `;

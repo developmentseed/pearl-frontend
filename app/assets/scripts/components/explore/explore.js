@@ -17,6 +17,7 @@ import Tour from '../common/tour';
 
 import { tourSteps } from './tour';
 import { useApiMeta } from '../../context/api-meta';
+import LayersPanel from '../explore/prime-panel/tabs/layers';
 
 const ExploreBody = styled(InpageBody)`
   display: grid;
@@ -57,6 +58,7 @@ function Explore() {
           <ExploreCarto>
             <Map />
           </ExploreCarto>
+          <LayersPanel parentId='layer-control' className='padded' />
           <SecPanel />
         </ExploreBody>
         {steps && <Tour steps={steps} />}
