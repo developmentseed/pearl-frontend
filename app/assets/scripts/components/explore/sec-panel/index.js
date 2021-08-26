@@ -52,7 +52,9 @@ function SecPanel() {
 
   const { px_stats } = currentAoi;
 
-  const sampleCount = currentCheckpoint.analytics && currentCheckpoint.analytics.reduce((count, cl) => count +cl.counts)
+  const sampleCount =
+    currentCheckpoint.analytics &&
+    currentCheckpoint.analytics.reduce((count, cl) => count + cl.counts, 0);
 
   return (
     <Panel
@@ -68,7 +70,8 @@ function SecPanel() {
             <ScrollBodyWrapper>
               {currentCheckpoint.input_geoms &&
                 currentCheckpoint.retrain_geoms &&
-                currentCheckpoint.analytics && (
+                currentCheckpoint.analytics &&
+                sampleCount > 0 && (
                   <StyledBlockBody>
                     <PanelBlockHeader>
                       <Subheading>Training Samples Submitted</Subheading>
