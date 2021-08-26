@@ -22,6 +22,10 @@ describe('Batch predictions', () => {
     cy.get('[data-cy=proceed-anyway-button]').should('exist').click();
     cy.wait('@reverseGeocodeCity');
 
+    // Set model
+    cy.get('[data-cy=select-model-label]').should('exist').click();
+    cy.get('[data-cy=select-model-1-card]').should('exist').click();
+
     // Retrain tab should be hidden
 
     // Request model run

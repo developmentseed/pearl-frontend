@@ -13,6 +13,8 @@ import { PanelBlockFooter } from '../../common/panel-block';
 import { checkpointModes } from '../../../context/checkpoint';
 import { useInstance } from '../../../context/instance';
 import { Subheading } from '../../../styles/type/heading';
+import { useAoi } from '../../../context/aoi';
+import { useApiMeta } from '../../../context/api-meta';
 
 const PanelControls = styled(PanelBlockFooter)`
   display: grid;
@@ -30,7 +32,9 @@ const SaveCheckpoint = styled(DropdownBody)`
 `;
 
 function PrimeButton({ currentCheckpoint, allowInferenceRun, mapRef }) {
-  const { runInference, retrain, refine } = useInstance();
+  const { runInference, runBatchPrediction, retrain, refine } = useInstance();
+  const { aoiArea } = useAoi();
+  const { apiLimits } = useApiMeta();
 
   // If in refine mode, this button save refinements
   if (currentCheckpoint && currentCheckpoint.mode === checkpointModes.REFINE) {
@@ -54,10 +58,29 @@ function PrimeButton({ currentCheckpoint, allowInferenceRun, mapRef }) {
     );
   }
 
-  const runText =
-    !currentCheckpoint || !currentCheckpoint.parent
-      ? 'Run model'
-      : 'Run checkpoint';
+  const runType =
+    !currentCheckpoint || currentCheckpoint.mode === checkpointModes.RUN
+      ? !apiLimits || aoiArea <= apiLimits.live_inference
+        ? 'live-prediction'
+        : 'batch-prediction'
+      : 'retrain';
+
+  const runTypes = {
+    retrain: {
+      label: 'Retrain',
+      action: retrain,
+    },
+    'live-prediction': {
+      label: 'Run Model',
+      action: runInference,
+    },
+    'batch-prediction': {
+      label: 'Run Batch Prediction',
+      action: runBatchPrediction,
+    },
+  };
+
+  const run = runTypes[runType];
 
   return (
     <InfoButton
@@ -68,22 +91,11 @@ function PrimeButton({ currentCheckpoint, allowInferenceRun, mapRef }) {
       style={{
         gridColumn: '1 / -1',
       }}
-      onClick={() => {
-        if (
-          !currentCheckpoint ||
-          currentCheckpoint.mode === checkpointModes.RUN
-        ) {
-          runInference();
-        } else {
-          retrain();
-        }
-      }}
+      onClick={run.action}
       visuallyDisabled={!allowInferenceRun}
       id='apply-button-trigger'
     >
-      {!currentCheckpoint || currentCheckpoint.mode === checkpointModes.RUN
-        ? runText
-        : 'Retrain Model'}
+      {run.label}
     </InfoButton>
   );
 }

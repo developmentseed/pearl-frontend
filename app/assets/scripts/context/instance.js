@@ -532,6 +532,49 @@ export function InstanceProvider(props) {
         }
       }
     },
+    runBatchPrediction: async function () {
+      if (restApiClient) {
+        let project = currentProject;
+
+        // Create project if new
+        if (!project) {
+          try {
+            showGlobalLoadingMessage('Creating project...');
+            project = await restApiClient.createProject({
+              model_id: selectedModel.id,
+              mosaic: 'naip.latest',
+              name: projectName,
+            });
+            setCurrentProject(project);
+            history.push(`/project/${project.id}`);
+          } catch (error) {
+            logger(error);
+            hideGlobalLoading();
+            toasts.error('Could not create project, please try again later.');
+            return; // abort inference run
+          }
+        }
+
+        // Request batch prediction
+        try {
+          const options = {
+            name: aoiName,
+            bounds: aoiBoundsToPolygon(aoiRef.getBounds()),
+          };
+
+          if (currentCheckpoint) {
+            options['checkpoint_id'] = currentCheckpoint.id;
+          }
+          await restApiClient.post(`project/${project.id}/batch`, options);
+        } catch (error) {
+          logger(error);
+          toasts.error(
+            'Could not request batch prediction, please try again later.'
+          );
+          return; // abort
+        }
+      }
+    },
     retrain: async function () {
       // Check if all classes have the minimum number of samples
       const classes = Object.values(currentCheckpoint.classes);
@@ -760,6 +803,7 @@ export const useInstance = () => {
     sendAbortMessage,
     initInstance,
     runInference,
+    runBatchPrediction,
     retrain,
     refine,
     applyCheckpoint,
@@ -773,6 +817,7 @@ export const useInstance = () => {
       sendAbortMessage,
       initInstance,
       runInference,
+      runBatchPrediction,
       retrain,
       refine,
       applyCheckpoint,
