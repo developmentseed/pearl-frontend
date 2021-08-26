@@ -52,11 +52,13 @@ function SecPanel() {
 
   const { px_stats } = currentAoi;
 
+  const sampleCount = currentCheckpoint.analytics && currentCheckpoint.analytics.reduce((count, cl) => count +cl.counts)
+
   return (
     <Panel
       collapsible
       direction='right'
-      initialState={true}
+      initialState={currentCheckpoint.classes}
       bodyContent={
         <PanelBlock>
           <PanelBlockHeader>
