@@ -9,6 +9,7 @@ import {
   PanelBlockScroll,
 } from '../../common/panel-block';
 import { Heading } from '@devseed-ui/typography';
+import Prose from '../../../styles/type/prose';
 import { Subheading } from '../../../styles/type/heading';
 
 import { glsp } from '@devseed-ui/theme-provider';
@@ -37,6 +38,11 @@ const PanelBlockScrollPadded = styled(PanelBlockScroll)`
   padding: 0 1.5rem;
   margin: 0 -1.5rem;
 `;
+const CountList = styled.div`
+  display: grid;
+  grid-template-columns: auto auto;
+  justify-content: space-between;
+`;
 
 function SecPanel() {
   const { currentCheckpoint } = useCheckpoint();
@@ -58,6 +64,28 @@ function SecPanel() {
           </PanelBlockHeader>
           <PanelBlockScrollPadded>
             <ScrollBodyWrapper>
+              {currentCheckpoint.input_geoms &&
+                currentCheckpoint.retrain_geoms &&
+                currentCheckpoint.analytics && (
+                  <StyledBlockBody>
+                    <PanelBlockHeader>
+                      <Subheading>Training Samples Submitted</Subheading>
+                    </PanelBlockHeader>
+                    <CountList>
+                      {Object.values(currentCheckpoint.classes).map((cl, ind) => {
+                        return (
+                          <>
+                            <Prose size='small'>{cl.name}</Prose>
+                            <Prose size='small'>
+                              {`${currentCheckpoint.analytics[ind].counts}`}
+                            </Prose>
+                          </>
+                        );
+                      })}
+                    </CountList>
+                  </StyledBlockBody>
+                )}
+
               {px_stats && (
                 <StyledBlockBody>
                   <PanelBlockHeader>
