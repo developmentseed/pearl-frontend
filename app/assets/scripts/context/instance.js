@@ -387,8 +387,23 @@ export function InstanceProvider(props) {
         const { batch } = await restApiClient.get(
           `project/${currentProject.id}/batch?completed=false`
         );
-        console.log({batch})
-        setRunningBatch(batch.length > 0 ? batch[0] : false);
+        if (batch.length > 0) {
+          const activeBatch = batch[0];
+
+          // Update running batch if changed
+          if (!runningBatch || runningBatch.id !== activeBatch.id) {
+            const batchAoi = await restApiClient.get(
+              `project/${currentProject.id}/aoi/${activeBatch.aoi}`
+            );
+
+            setRunningBatch({
+              ...activeBatch,
+              aoi: batchAoi,
+            });
+          }
+        } else {
+          setRunningBatch(false);
+        }
       } catch (error) {
         logger(error);
         setRunningBatch(false);
@@ -576,6 +591,7 @@ export function InstanceProvider(props) {
 
         // Request batch prediction
         try {
+          showGlobalLoadingMessage('Requesting batch predictions...');
           const options = {
             name: aoiName,
             bounds: aoiBoundsToPolygon(aoiRef.getBounds()),
@@ -592,6 +608,7 @@ export function InstanceProvider(props) {
           );
           return; // abort
         }
+        fetchRunningBatchStatus();
         hideGlobalLoading();
       }
     },
@@ -846,7 +863,14 @@ export const useInstance = () => {
       refine,
       applyCheckpoint,
     }),
-    [instance, initInstance, runInference, retrain, applyCheckpoint]
+    [
+      instance,
+      initInstance,
+      runInference,
+      retrain,
+      applyCheckpoint,
+      runningBatch,
+    ]
   );
 };
 

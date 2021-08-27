@@ -52,7 +52,7 @@ describe('Batch predictions', () => {
             abort: false,
             created: 1630056802895,
             updated: 1630056976364,
-            aoi: 3068,
+            aoi: 1,
             name: 'Wesley Heights',
             completed: false,
             progress: 60,
@@ -62,25 +62,20 @@ describe('Batch predictions', () => {
     );
 
     // Batch message should be displayed
-    cy.get('[data-cy=batch-progress-message').should(
-      'include.text',
-      'Batch prediction in progress: 60%'
-    );
+    cy.get('[data-cy=batch-progress-message')
+      .should('include.text', 'Batch prediction in progress: 60%')
+      .click();
 
-    // Clicking on run button display confirmation modal to abort previous one
+    // Modal is open and include AOI details
+    cy.get('[data-cy=batch-progress-modal-content]')
+      .should('include.text', 'AOI Name: Seneca')
+      .should('include.text', 'AOI Size: 3.06')
+      .click();
 
     // Close modal
+    cy.get('[data-cy=close-batch-prediction-modal').should('exist').click();
 
-    // Open again and abort
-
-    // Clicking in the batch message show modal with status
-
-    // Aborting show confirmation
-
-    // Batch message is cleared
-
-    // Now let one full batch run
-
-    // On finish, visit project page and inspect batch there
+    // Confirm modal is hidden
+    cy.get('[data-cy=batch-progress-modal-content]').should('not.exist');
   });
 });

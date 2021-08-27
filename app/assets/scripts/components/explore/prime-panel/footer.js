@@ -15,6 +15,9 @@ import { useInstance } from '../../../context/instance';
 import { Subheading } from '../../../styles/type/heading';
 import { useAoi } from '../../../context/aoi';
 import { useApiMeta } from '../../../context/api-meta';
+import { Spinner } from '../../common/global-loading/styles';
+import BatchPredictionProgressModal from './batch-progress-modal';
+import { useState } from 'react';
 
 const PanelControls = styled(PanelBlockFooter)`
   display: grid;
@@ -117,6 +120,7 @@ function Footer({
   allowInferenceRun,
   disabled,
 }) {
+  const [displayBatchProgress, setDisplayBatchProgress] = useState(false);
   const { runningBatch } = useInstance();
   return (
     <PanelControls disabled={disabled}>
@@ -223,9 +227,25 @@ function Footer({
         </Dropdown>
       )}
       {runningBatch && (
-        <div data-cy='batch-progress-message'>
-          Batch prediction in progress: {runningBatch.progress}%
-        </div>
+        <>
+          <BatchPredictionProgressModal
+            revealed={displayBatchProgress}
+            onCloseClick={() => setDisplayBatchProgress(false)}
+          />
+          <Spinner />
+          <Button
+            data-cy='batch-progress-message'
+            variation='base-plain'
+            size='medium'
+            title='Status of running prediction'
+            onClick={() => {
+              setDisplayBatchProgress(true);
+            }}
+            id='undo-button-trigger'
+          >
+            Batch prediction in progress: {runningBatch.progress}%
+          </Button>
+        </>
       )}
     </PanelControls>
   );
