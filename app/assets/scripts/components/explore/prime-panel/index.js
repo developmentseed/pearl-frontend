@@ -80,7 +80,7 @@ function PrimePanel() {
 
   const { aoiRef, setAoiRef, aoiName, currentAoi } = useAoi();
 
-  const { applyCheckpoint } = useInstance();
+  const { applyCheckpoint, fetchRunningBatchStatus } = useInstance();
 
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
 
@@ -176,6 +176,15 @@ function PrimePanel() {
       }
     }
   }, [currentCheckpoint]);
+
+  useEffect(() => {
+    if (currentProject) {
+      const interval = setInterval(() => {
+        fetchRunningBatchStatus();
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [currentProject]);
 
   return (
     <>

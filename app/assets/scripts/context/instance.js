@@ -134,6 +134,8 @@ export function InstanceProvider(props) {
     instanceInitialState
   );
 
+  const [runningBatch, setRunningBatch] = useState(false);
+
   // Apply instance status
   const applyInstanceStatus = (status) => {
     dispatchInstance({
@@ -378,6 +380,22 @@ export function InstanceProvider(props) {
     });
   }
 
+  async function fetchRunningBatchStatus() {
+    if (currentProject && restApiClient) {
+      try {
+        // Fetch running batch(es)
+        const { batch } = await restApiClient.get(
+          `project/${currentProject.id}/batch?completed=false`
+        );
+        console.log({batch})
+        setRunningBatch(batch.length > 0 ? batch[0] : false);
+      } catch (error) {
+        logger(error);
+        setRunningBatch(false);
+      }
+    }
+  }
+
   const abortJob = (queueNext) => {
     // If GPU is not connected, just clear the message queue
     if (!instance.gpuConnected) {
@@ -416,7 +434,6 @@ export function InstanceProvider(props) {
     initInstance,
     loadAoiOnInstance: (id) => {
       showGlobalLoadingMessage('Loading AOI on Instance...');
-      //return
       dispatchMessageQueue({
         type: messageQueueActionTypes.ADD_EXPRESS,
         data: {
@@ -427,6 +444,8 @@ export function InstanceProvider(props) {
         },
       });
     },
+    fetchRunningBatchStatus,
+    runningBatch,
     runInference: async () => {
       if (restApiClient) {
         let project = currentProject;
@@ -549,8 +568,8 @@ export function InstanceProvider(props) {
             history.push(`/project/${project.id}`);
           } catch (error) {
             logger(error);
-            hideGlobalLoading();
             toasts.error('Could not create project, please try again later.');
+            hideGlobalLoading();
             return; // abort inference run
           }
         }
@@ -573,6 +592,7 @@ export function InstanceProvider(props) {
           );
           return; // abort
         }
+        hideGlobalLoading();
       }
     },
     retrain: async function () {
@@ -800,6 +820,8 @@ export const useInstance = () => {
   const {
     instance,
     setInstanceStatusMessage,
+    fetchRunningBatchStatus,
+    runningBatch,
     sendAbortMessage,
     initInstance,
     runInference,
@@ -814,6 +836,8 @@ export const useInstance = () => {
       instance,
       loadAoiOnInstance,
       setInstanceStatusMessage,
+      fetchRunningBatchStatus,
+      runningBatch,
       sendAbortMessage,
       initInstance,
       runInference,

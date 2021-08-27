@@ -106,23 +106,18 @@ PrimeButton.propTypes = {
   mapRef: T.object,
 };
 
-function Footer(props) {
-  const {
-    dispatchCurrentCheckpoint,
-    currentCheckpoint,
-    checkpointActions,
-
-    updateCheckpointName,
-    localCheckpointName,
-    setLocalCheckpointName,
-
-    mapRef,
-
-    allowInferenceRun,
-
-    disabled,
-  } = props;
-
+function Footer({
+  dispatchCurrentCheckpoint,
+  currentCheckpoint,
+  checkpointActions,
+  updateCheckpointName,
+  localCheckpointName,
+  setLocalCheckpointName,
+  mapRef,
+  allowInferenceRun,
+  disabled,
+}) {
+  const { runningBatch } = useInstance();
   return (
     <PanelControls disabled={disabled}>
       <Button
@@ -226,6 +221,11 @@ function Footer(props) {
             </Form>
           </SaveCheckpoint>
         </Dropdown>
+      )}
+      {runningBatch && (
+        <div data-cy='batch-progress-message'>
+          Batch prediction in progress: {runningBatch.progress}%
+        </div>
       )}
     </PanelControls>
   );

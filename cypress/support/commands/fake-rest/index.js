@@ -8,6 +8,7 @@ const {
 Cypress.Commands.add('startServer', () => {
   // Add /projects routes from separate file
   require('./projects')();
+  require('./batch')();
 
   // Fake OSM Tiles
   cy.intercept(
