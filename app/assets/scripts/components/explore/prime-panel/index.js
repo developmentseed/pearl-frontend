@@ -29,6 +29,7 @@ import {
 import { useInstance } from '../../../context/instance';
 import { useAoi } from '../../../context/aoi';
 import { usePredictions } from '../../../context/predictions';
+import { useApiMeta } from '../../../context/api-meta';
 
 const StyledPanelBlock = styled(PanelBlock)`
   ${media.largeUp`
@@ -63,6 +64,7 @@ function PrimePanel() {
   const { isAuthenticated } = useAuth();
   const { mapState, mapModes, setMapMode } = useMapState();
   const { mapRef } = useMapRef();
+  const { apiLimits } = useApiMeta();
 
   const {
     currentProject,
@@ -124,7 +126,11 @@ function PrimePanel() {
       // If predictions are ready, do not need a placeholder
       return null;
     }
-    if ((aoiRef && selectedModel) || !currentAoi) {
+    if (
+      (aoiRef && selectedModel) ||
+      !currentAoi ||
+      aoiArea > apiLimits['live_inference']
+    ) {
       return `Click the "Run Model" button to generate the class LULC map for your AOI`;
     } else if (aoiRef && !selectedModel) {
       return `Select a model to use for inference`;

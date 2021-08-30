@@ -61,12 +61,14 @@ function PrimeButton({ currentCheckpoint, allowInferenceRun, mapRef }) {
     );
   }
 
-  const runType =
-    !currentCheckpoint || currentCheckpoint.mode === checkpointModes.RUN
-      ? !apiLimits || aoiArea <= apiLimits.live_inference
-        ? 'live-prediction'
-        : 'batch-prediction'
-      : 'retrain';
+  const isBatchArea =
+    aoiArea && apiLimits && aoiArea > apiLimits['live_inference'];
+
+  const runType = isBatchArea
+    ? 'batch-prediction'
+    : !currentCheckpoint || currentCheckpoint.mode === checkpointModes.RUN
+    ? 'live-prediction'
+    : 'retrain';
 
   const runTypes = {
     retrain: {
@@ -214,7 +216,6 @@ function Footer({
               />
               <LocalButton
                 type='submit'
-                // size='small'
                 variation='primary-plain'
                 useIcon='save-disk'
                 title='Rename checkpoint'
