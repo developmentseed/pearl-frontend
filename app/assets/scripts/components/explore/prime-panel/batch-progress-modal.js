@@ -6,10 +6,7 @@ import { Button } from '@devseed-ui/button';
 import { Heading } from '@devseed-ui/typography';
 import Prose from '../../../styles/type/prose';
 import { useInstance } from '../../../context/instance';
-import { areaFromBounds } from '../../../utils/map';
-import bbox from '@turf/bbox';
-import logger from '../../../utils/logger';
-import { formatThousands } from '../../../utils/format';
+import { formatDateTime } from '../../../utils/format';
 
 const Wrapper = styled.div`
   display: grid;
@@ -25,15 +22,6 @@ const Wrapper = styled.div`
 
 function BatchPredictionProgressModal({ revealed, onCloseClick }) {
   const { runningBatch } = useInstance();
-  const { aoi } = runningBatch;
-
-  // Calculate AOI Area
-  let batchAoiArea;
-  try {
-    batchAoiArea = formatThousands(areaFromBounds(bbox(aoi.bounds)) / 1e6);
-  } catch (error) {
-    logger(error);
-  }
 
   return (
     <Modal
@@ -48,11 +36,9 @@ function BatchPredictionProgressModal({ revealed, onCloseClick }) {
           <Prose data-cy='batch-progress-modal-content' className='prose'>
             Batch predictions runs as a background process. You can still
             retrain smaller areas of interest (AOIs) while larger areas are
-            running as batch prediction jobs. Cancel a batch prediction from
-            here or from the project page any time.
+            running as batch prediction jobs.
             <ul>
-              <li>AOI Name: {aoi.name}</li>
-              <li>AOI Size: {`${batchAoiArea} km²` || 'Unknown'}</li>
+              <li>Job started: {formatDateTime(runningBatch.created)}</li>
             </ul>
           </Prose>
           <Button

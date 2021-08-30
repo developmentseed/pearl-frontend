@@ -389,18 +389,7 @@ export function InstanceProvider(props) {
         );
         if (batch.length > 0) {
           const activeBatch = batch[0];
-
-          // Update running batch if changed
-          if (!runningBatch || runningBatch.id !== activeBatch.id) {
-            const batchAoi = await restApiClient.get(
-              `project/${currentProject.id}/aoi/${activeBatch.aoi}`
-            );
-
-            setRunningBatch({
-              ...activeBatch,
-              aoi: batchAoi,
-            });
-          }
+          setRunningBatch(activeBatch);
         } else {
           setRunningBatch(false);
         }
