@@ -135,6 +135,7 @@ export function InstanceProvider(props) {
   );
 
   const [runningBatch, setRunningBatch] = useState(false);
+  const [runningBatchWatcher, setRunningBatchWatcher] = useState(null);
 
   // Apply instance status
   const applyInstanceStatus = (status) => {
@@ -380,16 +381,37 @@ export function InstanceProvider(props) {
     });
   }
 
-  async function fetchRunningBatchStatus() {
+  async function refreshRunningBatch(batchId) {
+    try {
+      const batch = await restApiClient.get(
+        `project/${currentProject.id}/batch/${batchId}`
+      );
+      if (batch.completed) {
+        clearInterval(runningBatchWatcher);
+        setRunningBatch(false);
+      } else {
+        setRunningBatch(batch);
+      }
+    } catch (error) {
+      logger(error);
+      setRunningBatch(false);
+      if (runningBatchWatcher) {
+        clearInterval(runningBatchWatcher);
+      }
+    }
+  }
+
+  async function getRunningBatch() {
     if (currentProject && restApiClient) {
       try {
-        // Fetch running batch(es)
-        const { batch } = await restApiClient.get(
+        const { batch: batches } = await restApiClient.get(
           `project/${currentProject.id}/batch?completed=false`
         );
-        if (batch.length > 0) {
-          const activeBatch = batch[0];
-          setRunningBatch(activeBatch);
+        if (batches.length > 0) {
+          const { id: batchId } = batches[0];
+          setRunningBatchWatcher(
+            setInterval(() => refreshRunningBatch(batchId), 2000)
+          );
         } else {
           setRunningBatch(false);
         }
@@ -448,7 +470,7 @@ export function InstanceProvider(props) {
         },
       });
     },
-    fetchRunningBatchStatus,
+    getRunningBatch,
     runningBatch,
     runInference: async () => {
       if (restApiClient) {
@@ -589,7 +611,12 @@ export function InstanceProvider(props) {
           if (currentCheckpoint) {
             options['checkpoint_id'] = currentCheckpoint.id;
           }
-          await restApiClient.post(`project/${project.id}/batch`, options);
+          const batch = await restApiClient.post(
+            `project/${project.id}/batch`,
+            options
+          );
+          setRunningBatch(batch);
+          getRunningBatch();
         } catch (error) {
           logger(error);
           toasts.error(
@@ -597,7 +624,7 @@ export function InstanceProvider(props) {
           );
           return; // abort
         }
-        fetchRunningBatchStatus();
+        getRunningBatch();
         hideGlobalLoading();
       }
     },
@@ -826,7 +853,7 @@ export const useInstance = () => {
   const {
     instance,
     setInstanceStatusMessage,
-    fetchRunningBatchStatus,
+    getRunningBatch,
     runningBatch,
     sendAbortMessage,
     initInstance,
@@ -842,7 +869,7 @@ export const useInstance = () => {
       instance,
       loadAoiOnInstance,
       setInstanceStatusMessage,
-      fetchRunningBatchStatus,
+      getRunningBatch,
       runningBatch,
       sendAbortMessage,
       initInstance,
