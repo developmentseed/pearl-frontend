@@ -67,7 +67,9 @@ describe('Batch predictions', () => {
       .click();
 
     // Modal is open and include AOI details
-    cy.get('[data-cy=batch-progress-modal-content]').should('exist');
+    cy.get('[data-cy=batch-progress-modal-content]')
+      .should('include.text', 'AOI Size: 71.67')
+      .should('include.text', 'AOI Name: Wesley Heights');
 
     // Close modal
     cy.get('[data-cy=close-batch-prediction-modal').should('exist').click();

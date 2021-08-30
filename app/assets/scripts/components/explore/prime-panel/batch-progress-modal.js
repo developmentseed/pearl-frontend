@@ -6,7 +6,10 @@ import { Button } from '@devseed-ui/button';
 import { Heading } from '@devseed-ui/typography';
 import Prose from '../../../styles/type/prose';
 import { useInstance } from '../../../context/instance';
-import { formatDateTime } from '../../../utils/format';
+import { areaFromBounds } from '../../../utils/map';
+import bbox from '@turf/bbox';
+import logger from '../../../utils/logger';
+import { formatThousands } from '../../../utils/format';
 
 const Wrapper = styled.div`
   display: grid;
@@ -23,6 +26,16 @@ const Wrapper = styled.div`
 function BatchPredictionProgressModal({ revealed, onCloseClick }) {
   const { runningBatch } = useInstance();
 
+  // Calculate AOI Area
+  let batchAoiArea;
+  try {
+    batchAoiArea = formatThousands(
+      areaFromBounds(bbox(runningBatch.bounds)) / 1e6
+    );
+  } catch (error) {
+    logger(error);
+  }
+
   return (
     <Modal
       id='batch-prediction-progress-modal'
@@ -38,7 +51,8 @@ function BatchPredictionProgressModal({ revealed, onCloseClick }) {
             retrain smaller areas of interest (AOIs) while larger areas are
             running as batch prediction jobs.
             <ul>
-              <li>Job started: {formatDateTime(runningBatch.created)}</li>
+              <li>AOI Name: {runningBatch.name}</li>
+              <li>AOI Size: {`${batchAoiArea} km²` || 'Unknown'}</li>
             </ul>
           </Prose>
           <Button
