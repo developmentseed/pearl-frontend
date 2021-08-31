@@ -119,6 +119,7 @@ function TabbedBlock(props) {
               <li key={name}>
                 <Tab
                   id={tabId || `${name}-tab`}
+                  data-cy={`${name}-tab`}
                   active={ind === activeTab}
                   useIcon={icon}
                   title='Show menu'
