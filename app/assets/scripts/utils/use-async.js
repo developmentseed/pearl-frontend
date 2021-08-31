@@ -1,4 +1,6 @@
+import { useRef } from 'react';
 import { useCallback, useEffect, useState } from 'react';
+import { useAuth } from '../context/auth';
 
 export default function useAsync(asyncFunction, immediate = true) {
   const [status, setStatus] = useState('idle');
@@ -36,3 +38,45 @@ export default function useAsync(asyncFunction, immediate = true) {
 
   return { execute, status, value, error };
 }
+
+/**
+ * This hook should replace useAsync when possible.
+ */
+export const useFetchList = (urlPath, authRequired = true) => {
+  const request = useRef();
+  const { restApiClient, isAuthenticated, logout } = useAuth();
+
+  const [status, setStatus] = useState('idle');
+  const [error, setError] = useState();
+  const [result, setResult] = useState([]);
+
+  function fetch() {
+    if (authRequired && !isAuthenticated) {
+      return;
+    }
+    setStatus('loading');
+    request.current = setTimeout(() => {
+      restApiClient
+        .get(urlPath)
+        .then((res) => {
+          setResult(res);
+          setStatus('success');
+        })
+        .catch(({ message }) => {
+          if (message === 'Invalid Token') {
+            logout();
+          }
+          setError(message);
+          setStatus('error');
+        });
+    }, 250);
+  }
+
+  // fetch request on page load, clear on unmount
+  useEffect(() => {
+    fetch();
+    return () => clearTimeout(request.current);
+  }, [urlPath, authRequired, isAuthenticated]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  return { fetch, result, status, isLoading: status === 'loading', error };
+};

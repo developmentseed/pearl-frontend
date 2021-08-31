@@ -77,4 +77,10 @@ describe('Batch predictions', () => {
     // Confirm modal is hidden
     cy.get('[data-cy=batch-progress-modal-content]').should('not.exist');
   });
+
+  it('in project page, display completed and running batch jobs', () => {
+    cy.fakeLogin();
+
+    cy.visit('/profile/projects/1');
+  });
 });
