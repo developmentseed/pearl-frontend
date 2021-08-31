@@ -106,8 +106,8 @@ describe('Batch predictions', () => {
     cy.get('tbody tr:nth-child(3) td').should('include.text', 'AOI 8');
 
     // Check if page button works
-    cy.get('[data-cy=page-5-button').click();
+    cy.get('[data-cy=page-4-button').click();
     cy.get('tbody').find('tr').should('have.length', 5);
-    cy.get('tbody tr:nth-child(3) td').should('include.text', 'AOI 13');
+    cy.get('tbody tr:nth-child(3) td').should('include.text', 'AOI 18');
   });
 });
