@@ -82,5 +82,32 @@ describe('Batch predictions', () => {
     cy.fakeLogin();
 
     cy.visit('/profile/projects/1');
+
+    cy.wait('@getBatchList');
+
+    // Check available columns
+    cy.get('th')
+      .should('have.length', 5)
+      .should('include.text', 'Id')
+      .should('include.text', 'AOI Name')
+      .should('include.text', 'Status')
+      .should('include.text', 'Started')
+      .should('include.text', 'Download');
+
+    // Check if page is well-formed
+    cy.get('tbody').find('tr').should('have.length', 5);
+    cy.get('tbody tr:nth-child(1) td')
+      .should('include.text', 'AOI 1')
+      .should('include.text', 'In Progress (60%)');
+
+    // Check if next page works
+    cy.get('[data-cy=next-page-button').click();
+    cy.get('tbody').find('tr').should('have.length', 5);
+    cy.get('tbody tr:nth-child(3) td').should('include.text', 'AOI 8');
+
+    // Check if page button works
+    cy.get('[data-cy=page-5-button').click();
+    cy.get('tbody').find('tr').should('have.length', 5);
+    cy.get('tbody tr:nth-child(3) td').should('include.text', 'AOI 13');
   });
 });
