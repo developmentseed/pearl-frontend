@@ -8,7 +8,7 @@ const {
 const paginatedBatchList = (req) => {
   let total = 25;
   const page = getQueryElement('page', req.url) || 0;
-  const limit = 10;
+  const limit = getQueryElement('limit', req.url) || 10;
 
   function fakeItem(i) {
     return {

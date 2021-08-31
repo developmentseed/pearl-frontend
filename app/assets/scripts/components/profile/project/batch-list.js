@@ -8,6 +8,7 @@ import { formatDateTime } from '../../../utils/format';
 import { useState } from 'react';
 import Paginator from '../../common/paginator';
 
+const TABLE_PAGE_SIZE = 5;
 const TABLE_HEADERS = ['Id', 'AOI Name', 'Status', 'Started'];
 function renderRow({ id, name, completed, progress, created }) {
   return (
@@ -23,9 +24,9 @@ function renderRow({ id, name, completed, progress, created }) {
 }
 
 function BatchList({ projectId }) {
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(1);
   const { result, status, error } = useFetchList(
-    `project/${projectId}/batch?page=${page}`
+    `project/${projectId}/batch?page=${page - 1}&limit=${TABLE_PAGE_SIZE}`
   );
 
   if (status === 'idle' || status === 'loading') {
@@ -52,7 +53,7 @@ function BatchList({ projectId }) {
         currentPage={page}
         gotoPage={setPage}
         totalItems={result.total}
-        itemsPerPage={10}
+        itemsPerPage={TABLE_PAGE_SIZE}
       />
     </>
   );
