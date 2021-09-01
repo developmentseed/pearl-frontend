@@ -242,7 +242,7 @@ function Footer({
             onClick={() => {
               setDisplayBatchProgress(true);
             }}
-            id='undo-button-trigger'
+            id='batch-progress-message'
           >
             Batch prediction in progress: {runningBatch.progress}%
           </Button>
