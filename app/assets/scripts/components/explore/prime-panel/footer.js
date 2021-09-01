@@ -33,6 +33,16 @@ const PanelControls = styled(PanelBlockFooter)`
 const SaveCheckpoint = styled(DropdownBody)`
   padding: ${glsp()};
 `;
+const ProgressButtonWrapper = styled.div`
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: center;
+  grid-column: 1 / -1;
+  > *,
+  > *:before {
+    font-size: 1rem;
+  }
+`;
 
 function PrimeButton({ currentCheckpoint, allowInferenceRun, mapRef }) {
   const { runInference, runBatchPrediction, retrain, refine } = useInstance();
@@ -233,19 +243,21 @@ function Footer({
             revealed={displayBatchProgress}
             onCloseClick={() => setDisplayBatchProgress(false)}
           />
-          <Spinner />
-          <Button
-            data-cy='batch-progress-message'
-            variation='base-plain'
-            size='medium'
-            title='Status of running prediction'
-            onClick={() => {
-              setDisplayBatchProgress(true);
-            }}
-            id='batch-progress-message'
-          >
-            Batch prediction in progress: {runningBatch.progress}%
-          </Button>
+          <ProgressButtonWrapper>
+            <Spinner />
+            <Button
+              data-cy='batch-progress-message'
+              variation='primary-plain'
+              size='small'
+              title='Status of running prediction'
+              onClick={() => {
+                setDisplayBatchProgress(true);
+              }}
+              id='batch-progress-message'
+            >
+              Batch prediction in progress: {runningBatch.progress}%
+            </Button>
+          </ProgressButtonWrapper>
         </>
       )}
     </PanelControls>
