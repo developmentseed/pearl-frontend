@@ -32,6 +32,7 @@ import ProjectCard from './project-card';
 import copyTextToClipboard from '../../../utils/copy-text-to-clipboard';
 import logger from '../../../utils/logger';
 import { downloadGeotiff } from '../../../utils/map';
+import BatchList from './batch-list';
 
 // Controls the size of each page
 const AOIS_PER_PAGE = 20;
@@ -344,6 +345,7 @@ function Project() {
                 aois={aois}
               />
             ) : null}
+            <BatchList projectId={projectId} />
             {aois &&
               (aois.length ? (
                 <>

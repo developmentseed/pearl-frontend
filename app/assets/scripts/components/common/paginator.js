@@ -89,6 +89,7 @@ function Paginator({ currentPage, gotoPage, totalItems, itemsPerPage }) {
           {fill(1, numPages).map((pageNumber) => (
             <PageButton
               key={pageNumber}
+              data-cy={`page-${pageNumber}-button`}
               isCurrent={pageNumber === currentPage}
               variation={
                 pageNumber === currentPage ? 'primary-plain' : 'base-plain'
@@ -105,6 +106,7 @@ function Paginator({ currentPage, gotoPage, totalItems, itemsPerPage }) {
             size='small'
             variation='primary-raised-dark'
             useIcon='chevron-right--small'
+            data-cy='next-page-button'
             hideText
             onClick={() => {
               if (hasNext) {
