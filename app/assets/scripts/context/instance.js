@@ -47,7 +47,7 @@ const instanceActionTypes = {
 };
 
 const instanceInitialState = {
-  gpuMessage: 'Loading...',
+  gpuMessage: 'Waiting for model run',
   gpuStatus: 'not-started', // 'ready', 'processing', 'aborting'
   wsConnected: false,
   gpuConnected: false,
@@ -269,6 +269,7 @@ export function InstanceProvider(props) {
     }
 
     applyInstanceStatus({
+      gpuMessage: 'Initializing',
       gpuStatus: 'initializing',
       wsConnected: false,
       gpuConnected: false,
