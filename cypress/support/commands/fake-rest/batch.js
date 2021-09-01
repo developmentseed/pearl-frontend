@@ -37,5 +37,4 @@ export default function () {
       instance: 1,
     }
   ).as('postBatch');
-
 }

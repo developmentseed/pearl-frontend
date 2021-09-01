@@ -7,7 +7,7 @@ import { useInstance } from '../../../context/instance';
 import { areaFromBounds } from '../../../utils/map';
 import bbox from '@turf/bbox';
 import logger from '../../../utils/logger';
-import { formatThousands } from '../../../utils/format';
+import { formatDateTime, formatThousands } from '../../../utils/format';
 import DetailsList from '../../common/details-list';
 
 const Wrapper = styled.div`
@@ -37,14 +37,15 @@ function BatchPredictionProgressModal({ revealed, onCloseClick }) {
       closeButton={true}
       onCloseClick={onCloseClick}
       content={
-        <Wrapper>
-          <Prose data-cy='batch-progress-modal-content' className='prose'>
+        <Wrapper data-cy='batch-progress-modal-content'>
+          <Prose className='prose'>
             Batch predictions run as a background process. You can still retrain
             smaller areas of interest (AOIs) while larger areas are running as
             batch prediction jobs.
           </Prose>
           <DetailsList
             details={{
+              'Started at': formatDateTime(runningBatch.created),
               'AOI Name': runningBatch.name,
               'AOI Size': `${batchAoiArea} km²` || 'Unknown',
             }}

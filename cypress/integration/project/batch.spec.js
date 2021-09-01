@@ -1,3 +1,5 @@
+const format = require('date-fns/format').default;
+
 const {
   restApiEndpoint,
 } = require('../../../app/assets/scripts/config/testing').default;
@@ -138,11 +140,19 @@ describe('Batch predictions', () => {
 
     // Modal is open and include AOI details
     cy.get('[data-cy=batch-progress-modal-content]')
-      .should('include.text', 'AOI Size: 71.67')
-      .should('include.text', 'AOI Name: Wesley Heights');
+      .should(
+        'include.text',
+        `${format(batchJob.created, 'dd/MM/yyyy kk:mm:ss')}`
+      )
+      .should('include.text', '71.67')
+      .should('include.text', 'Wesley Heights');
 
     // Close modal
-    cy.get('[data-cy=close-batch-prediction-modal').should('exist').click();
+    cy.get('#batch-prediction-progress-modal')
+      .find('button')
+      .first()
+      .should('exist')
+      .click();
 
     // Confirm modal is hidden
     cy.get('[data-cy=batch-progress-modal-content]').should('not.exist');
