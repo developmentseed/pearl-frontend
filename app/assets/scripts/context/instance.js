@@ -137,6 +137,11 @@ export function InstanceProvider(props) {
   const [runningBatch, setRunningBatch] = useState(false);
   const [runningBatchWatcher, setRunningBatchWatcher] = useState(null);
 
+  // Clear interval on page unmount
+  useEffect(() => {
+    return () => runningBatchWatcher && clearInterval(runningBatchWatcher);
+  }, []);
+
   // Apply instance status
   const applyInstanceStatus = (status) => {
     dispatchInstance({
