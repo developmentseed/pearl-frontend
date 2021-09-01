@@ -38,7 +38,7 @@ describe('Batch predictions', () => {
       .should('have.text', 'Run Batch Prediction')
       .click();
 
-    // Mock running batch
+    // Mock batch job at 0%
     cy.intercept(
       {
         url: restApiEndpoint + `/api/project/1/batch?completed=false`,
@@ -55,15 +55,83 @@ describe('Batch predictions', () => {
             aoi: 1,
             name: 'Wesley Heights',
             completed: false,
-            progress: 60,
+            progress: 0,
           },
         ],
       }
     );
 
+    const batchJob = {
+      id: 1,
+      uid: 1,
+      project_id: 1,
+      created: 1630056802895,
+      updated: 1630056802895,
+      aoi: null,
+      name: 'Wesley Heights',
+      bounds: {
+        type: 'Polygon',
+        coordinates: [
+          [
+            [-77.13016844644744, 38.88544827129372],
+            [-77.04706107549731, 38.88544827129372],
+            [-77.04706107549731, 38.974905373957455],
+            [-77.13016844644744, 38.974905373957455],
+            [-77.13016844644744, 38.88544827129372],
+          ],
+        ],
+      },
+      abort: false,
+      completed: false,
+      progress: 0,
+      instance: 1,
+    };
+
+    cy.intercept(
+      {
+        url: restApiEndpoint + '/api/project/1/batch/1',
+        method: 'GET',
+      },
+      batchJob
+    );
+
     // Batch message should be displayed
+    cy.get('[data-cy=batch-progress-message').should(
+      'include.text',
+      'Batch prediction in progress: 0%'
+    );
+
+    // Make batch job at 10%
+    cy.intercept(
+      {
+        url: restApiEndpoint + '/api/project/1/batch/1',
+        method: 'GET',
+      },
+      {
+        ...batchJob,
+        progress: 10,
+      }
+    );
+
+    cy.get('[data-cy=batch-progress-message').should(
+      'include.text',
+      'Batch prediction in progress: 10%'
+    );
+
+    // Make batch job at 20%
+    cy.intercept(
+      {
+        url: restApiEndpoint + '/api/project/1/batch/1',
+        method: 'GET',
+      },
+      {
+        ...batchJob,
+        progress: 20,
+      }
+    );
+
     cy.get('[data-cy=batch-progress-message')
-      .should('include.text', 'Batch prediction in progress: 60%')
+      .should('include.text', 'Batch prediction in progress: 20%')
       .click();
 
     // Modal is open and include AOI details
