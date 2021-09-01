@@ -17,7 +17,7 @@ import {
   Class,
   Thumbnail as ClassThumbnail,
   ClassHeading,
-} from '../explore/prime-panel/retrain-refine-styles';
+} from '../explore/prime-panel/tabs/retrain-refine-styles';
 import { themeVal, glsp } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
 import { Subheading } from '../../styles/type/heading';

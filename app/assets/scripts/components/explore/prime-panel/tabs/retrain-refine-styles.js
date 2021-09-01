@@ -1,15 +1,15 @@
 import { glsp, themeVal, truncated, media } from '@devseed-ui/theme-provider';
-import { PlaceholderMessage } from '../../../styles/placeholder.js';
+import { PlaceholderMessage } from '../../../../styles/placeholder.js';
 import {
   DropdownBody,
   DropdownItem,
   DropdownFooter,
-} from '../../../styles/dropdown';
+} from '../../../../styles/dropdown';
 import styled, { css } from 'styled-components';
 import { Heading } from '@devseed-ui/typography';
 import collecticon from '@devseed-ui/collecticons';
 import { Button } from '@devseed-ui/button';
-import { Subheading } from '../../../styles/type/heading.js';
+import { Subheading } from '../../../../styles/type/heading.js';
 
 export const ToolsWrapper = styled.div`
   display: grid;

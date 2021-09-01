@@ -3,16 +3,16 @@ import T from 'prop-types';
 import get from 'lodash.get';
 import { Button } from '@devseed-ui/button';
 import { ChromePicker } from 'react-color';
-import InfoButton from '../../common/info-button';
-import { PlaceholderMessage } from '../../../styles/placeholder.js';
-import { actions, useCheckpoint } from '../../../context/checkpoint.js';
-import { useMapState } from '../../../context/explore.js';
+import InfoButton from '../../../common/info-button';
+import { PlaceholderMessage } from '../../../../styles/placeholder.js';
+import { actions, useCheckpoint } from '../../../../context/checkpoint.js';
+import { useMapState } from '../../../../context/explore.js';
 import {
   Dropdown,
   DropdownHeader,
   DropdownItem,
   DropdownTrigger,
-} from '../../../styles/dropdown';
+} from '../../../../styles/dropdown';
 import {
   ToolsWrapper,
   ClassList,
@@ -29,8 +29,10 @@ import {
   PickerDropdownFooter,
 } from './retrain-refine-styles';
 import { FormInput } from '@devseed-ui/form';
-import ImportSamplesModal from '../map/import-sample-modal';
-import { Subheading } from '../../../styles/type/heading';
+import ImportSamplesModal from '../../map/import-sample-modal';
+import { Subheading } from '../../../../styles/type/heading';
+import { useAoi } from '../../../../context/aoi';
+import { useApiMeta } from '../../../../context/api-meta';
 
 /*
  * Retrain Model
@@ -52,9 +54,15 @@ function RetrainModel(props) {
     false
   );
 
+  const { aoiArea } = useAoi();
+  const { apiLimits } = useApiMeta();
+
+  const isBatchArea =
+    aoiArea && apiLimits && aoiArea > apiLimits['live_inference'];
+
   return (
     <ToolsWrapper className={className}>
-      {ready && currentCheckpoint.classes && (
+      {!isBatchArea && ready && currentCheckpoint.classes && (
         <>
           <RetrainTools>
             <ImportSamplesModal
@@ -207,10 +215,6 @@ function RetrainModel(props) {
                         `selected since last retrain`}
                     </ClassSamples>
                   </ClassInfoWrapper>
-
-                  {/* <ClassOptions useIcon='cog' hideText variation='base-plain'>
-                    Options
-                  </ClassOptions> */}
                 </Class>
               );
             })}
@@ -289,7 +293,7 @@ function RetrainModel(props) {
         </>
       )}
 
-      {!currentCheckpoint && placeholderMessage && (
+      {(!currentCheckpoint || isBatchArea) && placeholderMessage && (
         <ClassList>
           {[1, 2, 3].map((i) => (
             // +true workaround
@@ -299,7 +303,6 @@ function RetrainModel(props) {
             <Class key={i} placeholder={+true} className='placeholder-class'>
               <ClassThumbnail />
               <ClassHeading size='xsmall' placeholder={+true} />
-              {/* <ClassThumbnail /> */}
             </Class>
           ))}
           <PlaceholderMessage>{placeholderMessage}</PlaceholderMessage>

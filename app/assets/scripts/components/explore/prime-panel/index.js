@@ -11,18 +11,11 @@ import { ExploreContext, useMapState } from '../../../context/explore';
 import { useModels } from '../../../context/global';
 
 import { Heading } from '@devseed-ui/typography';
-// import {
-//   FormGroup,
-//   FormGroupHeader,
-//   FormGroupBody,
-//   FormLabel,
-//   FormInput,
-// } from '@devseed-ui/form';
 import { Button } from '@devseed-ui/button';
 
 import TabbedBlock from '../../common/tabbed-block-body';
-import RetrainModel from './retrain-model';
-import RefineModel from './refine-model';
+import RetrainModel from './tabs/retrain-model';
+import RefineResults from './tabs/refine-results';
 
 import PanelHeader from './header';
 import PanelFooter from './footer';
@@ -36,6 +29,7 @@ import {
 import { useInstance } from '../../../context/instance';
 import { useAoi } from '../../../context/aoi';
 import { usePredictions } from '../../../context/predictions';
+import { useApiMeta } from '../../../context/api-meta';
 
 const StyledPanelBlock = styled(PanelBlock)`
   ${media.largeUp`
@@ -70,6 +64,7 @@ function PrimePanel() {
   const { isAuthenticated } = useAuth();
   const { mapState, mapModes, setMapMode } = useMapState();
   const { mapRef } = useMapRef();
+  const { apiLimits } = useApiMeta();
 
   const {
     currentProject,
@@ -87,7 +82,7 @@ function PrimePanel() {
 
   const { aoiRef, setAoiRef, aoiName, currentAoi } = useAoi();
 
-  const { applyCheckpoint } = useInstance();
+  const { applyCheckpoint, runningBatch, getRunningBatch } = useInstance();
 
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
 
@@ -96,6 +91,7 @@ function PrimePanel() {
   const { predictions } = usePredictions();
 
   const [showSelectModelModal, setShowSelectModelModal] = useState(false);
+
   const [localCheckpointName, setLocalCheckpointName] = useState(
     (currentCheckpoint &&
       currentCheckpoint.bookmarked &&
@@ -126,7 +122,11 @@ function PrimePanel() {
       // If predictions are ready, do not need a placeholder
       return null;
     }
-    if ((aoiRef && selectedModel) || !currentAoi) {
+    if (
+      (aoiRef && selectedModel) ||
+      !currentAoi ||
+      aoiArea > apiLimits['live_inference']
+    ) {
       return `Click the "Run Model" button to generate the class LULC map for your AOI`;
     } else if (aoiRef && !selectedModel) {
       return `Select a model to use for inference`;
@@ -182,6 +182,13 @@ function PrimePanel() {
       }
     }
   }, [currentCheckpoint]);
+
+  // Check if any job is running on project load
+  useEffect(() => {
+    if (currentProject && !runningBatch) {
+      getRunningBatch();
+    }
+  }, [currentProject, runningBatch]);
 
   return (
     <>
@@ -264,7 +271,7 @@ function PrimePanel() {
                     }
                   }}
                 />
-                <RefineModel
+                <RefineResults
                   name='Refine Results'
                   tabId='refine-tab-trigger'
                   className='refine-model'

@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import {
   useCheckpoint,
   actions as checkpointActions,
-} from '../../../context/checkpoint';
+} from '../../../../context/checkpoint';
 import {
   ToolsWrapper,
   ClassList as ItemList,
@@ -17,19 +17,19 @@ import {
 } from './retrain-refine-styles';
 import { Heading } from '@devseed-ui/typography';
 import { Button } from '@devseed-ui/button';
-import InfoButton from '../../common/info-button';
+import InfoButton from '../../../common/info-button';
 import get from 'lodash.get';
 import { glsp } from '@devseed-ui/theme-provider';
-import { useMapState, useExploreContext } from '../../../context/explore.js';
-import { useMapRef } from '../../../context/map';
-import { PlaceholderMessage } from '../../../styles/placeholder';
+import { useMapState, useExploreContext } from '../../../../context/explore.js';
+import { useMapRef } from '../../../../context/map';
+import { PlaceholderMessage } from '../../../../styles/placeholder';
 import {
   Dropdown,
   DropdownHeader,
   DropdownBody,
   DropdownItem,
-} from '../../../styles/dropdown';
-import { Subheading } from '../../../styles/type/heading';
+} from '../../../../styles/dropdown';
+import { Subheading } from '../../../../styles/type/heading';
 
 const CheckpointSection = styled(ItemList)`
   max-height: ${glsp(7.5)};

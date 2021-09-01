@@ -245,15 +245,6 @@ function Map() {
           setAoiArea(areaFromBounds(bbox));
         },
         onDrawEnd: (bbox, shape) => {
-          /*
-          setAoiRef(shape);
-
-          const bounds = shape.getBounds();
-          setAoiBounds(bounds);
-          setMapMode(mapModes.BROWSE_MODE);
-          updateAoiName(bounds);
-          */
-
           const area = areaFromBounds(bbox);
 
           if (!apiLimits || apiLimits.live_inference > area) {
@@ -266,7 +257,7 @@ function Map() {
             //Current aoi should only be set after aoi has been sent to the api
             setCurrentAoi(null);
           } else if (apiLimits.max_inference > area) {
-            setActiveModal('no-live-inference');
+            setActiveModal('batch-inference');
           } else {
             setActiveModal('area-too-large');
           }

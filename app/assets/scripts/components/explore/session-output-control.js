@@ -293,16 +293,14 @@ function SessionOutputControl(props) {
       <StatusHeading
         data-cy='session-status'
         variation={
-          projectId === 'new' ||
-          instance.gpuStatus === 'ready' ||
-          instance.gpuStatus === 'processing'
+          instance.gpuStatus === 'ready' || instance.gpuStatus === 'not-started'
             ? 'primary'
             : 'danger'
         }
         size='xxsmall'
       >
-        <span>Session Status:</span>{' '}
-        {projectId === 'new' ? 'Waiting for model run' : instance.gpuMessage}
+        <span>Session Status: </span>
+        {instance.gpuMessage}
       </StatusHeading>
       <Button
         variation='primary-plain'

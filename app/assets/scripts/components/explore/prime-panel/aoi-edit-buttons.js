@@ -244,7 +244,26 @@ export function AoiEditButtons(props) {
     deleteAoi,
   } = props;
 
-  // Display confirm/cancel buttons when AOI edition is active
+  // Confirm AOI, used in finish edit button and "confirm batch inference" modal
+  function applyAoi() {
+    setMapMode(mapModes.BROWSE_MODE);
+    let bounds = aoiRef.getBounds();
+    setAoiBounds(bounds);
+    updateAoiName(bounds);
+
+    // When AOI is edited -> we go to run mode
+    dispatchCurrentCheckpoint({
+      type: checkpointActions.SET_CHECKPOINT_MODE,
+      data: {
+        mode: checkpointModes.RUN,
+      },
+    });
+
+    //Current aoi should only be set after aoi has been sent to the api
+    setCurrentAoi(null);
+  }
+
+  // Display confirm/cancel buttons when AOI editing is active
   if (
     mapState.mode === mapModes.CREATE_AOI_MODE ||
     mapState.mode === mapModes.EDIT_AOI_MODE
@@ -253,25 +272,10 @@ export function AoiEditButtons(props) {
       <>
         <EditButton
           onClick={function () {
-            let bounds;
             if (!apiLimits || apiLimits.live_inference > aoiArea) {
-              setMapMode(mapModes.BROWSE_MODE);
-              bounds = aoiRef.getBounds();
-              setAoiBounds(bounds);
-              updateAoiName(bounds);
-
-              // When AOI is edited -> we go to run mode
-              dispatchCurrentCheckpoint({
-                type: checkpointActions.SET_CHECKPOINT_MODE,
-                data: {
-                  mode: checkpointModes.RUN,
-                },
-              });
-
-              //Current aoi should only be set after aoi has been sent to the api
-              setCurrentAoi(null);
+              applyAoi();
             } else if (apiLimits.max_inference > aoiArea) {
-              setActiveModal('no-live-inference');
+              setActiveModal('batch-inference');
             } else {
               setActiveModal('area-too-large');
             }
@@ -325,15 +329,15 @@ export function AoiEditButtons(props) {
             closeButton={false}
             renderHeadline={() => (
               <ModalHeadline>
-                {activeModal === 'no-live-inference' ? (
-                  <h1>Save Area</h1>
+                {activeModal === 'batch-inference' ? (
+                  <h1>Save Area For Batch Prediction</h1>
                 ) : (
                   <h1>Area too large</h1>
                 )}
               </ModalHeadline>
             )}
             content={
-              activeModal === 'no-live-inference' ? (
+              activeModal === 'batch-inference' ? (
                 <div>
                   Live inference is not available for areas larger than{' '}
                   {formatThousands(apiLimits.live_inference / 1e6)} km². You can
@@ -343,8 +347,12 @@ export function AoiEditButtons(props) {
                 </div>
               ) : (
                 <div>
-                  Area size is limited to{' '}
-                  {formatThousands(apiLimits.max_inference / 1e6)} km².
+                  The area has {formatThousands(aoiArea / 1e6, { decimals: 0 })}{' '}
+                  km², please select an area smaller than{' '}
+                  {formatThousands(apiLimits.max_inference / 1e6, {
+                    decimals: 0,
+                  })}{' '}
+                  km².
                 </div>
               )
             }
@@ -357,8 +365,7 @@ export function AoiEditButtons(props) {
                     data-cy='proceed-anyway-button'
                     onClick={() => {
                       setActiveModal(false);
-                      setMapMode(mapModes.BROWSE_MODE);
-                      setAoiBounds(aoiRef.getBounds());
+                      applyAoi();
                     }}
                   >
                     Proceed anyway

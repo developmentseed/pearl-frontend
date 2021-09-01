@@ -13,6 +13,11 @@ import { PanelBlockFooter } from '../../common/panel-block';
 import { checkpointModes } from '../../../context/checkpoint';
 import { useInstance } from '../../../context/instance';
 import { Subheading } from '../../../styles/type/heading';
+import { useAoi } from '../../../context/aoi';
+import { useApiMeta } from '../../../context/api-meta';
+import { Spinner } from '../../common/global-loading/styles';
+import BatchPredictionProgressModal from './batch-progress-modal';
+import { useState } from 'react';
 
 const PanelControls = styled(PanelBlockFooter)`
   display: grid;
@@ -28,9 +33,27 @@ const PanelControls = styled(PanelBlockFooter)`
 const SaveCheckpoint = styled(DropdownBody)`
   padding: ${glsp()};
 `;
+const ProgressButtonWrapper = styled.div`
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: center;
+  grid-column: 1 / -1;
+  > *,
+  > *:before {
+    font-size: 1rem;
+  }
+`;
 
 function PrimeButton({ currentCheckpoint, allowInferenceRun, mapRef }) {
-  const { runInference, retrain, refine } = useInstance();
+  const {
+    runInference,
+    runBatchPrediction,
+    runningBatch,
+    retrain,
+    refine,
+  } = useInstance();
+  const { aoiArea } = useAoi();
+  const { apiLimits } = useApiMeta();
 
   // If in refine mode, this button save refinements
   if (currentCheckpoint && currentCheckpoint.mode === checkpointModes.REFINE) {
@@ -54,36 +77,49 @@ function PrimeButton({ currentCheckpoint, allowInferenceRun, mapRef }) {
     );
   }
 
-  const runText =
-    !currentCheckpoint || !currentCheckpoint.parent
-      ? 'Run model'
-      : 'Run checkpoint';
+  const isBatchArea =
+    aoiArea && apiLimits && aoiArea > apiLimits['live_inference'];
+
+  const runType = isBatchArea
+    ? 'batch-prediction'
+    : !currentCheckpoint || currentCheckpoint.mode === checkpointModes.RUN
+    ? 'live-prediction'
+    : 'retrain';
+
+  const runTypes = {
+    retrain: {
+      label: 'Retrain',
+      action: retrain,
+    },
+    'live-prediction': {
+      label: 'Run Model',
+      action: runInference,
+    },
+    'batch-prediction': {
+      label: 'Run Batch Prediction',
+      action: runBatchPrediction,
+    },
+  };
+
+  const run = runTypes[runType];
+
+  const isDisabled = !allowInferenceRun || (runningBatch && isBatchArea);
 
   return (
     <InfoButton
       data-cy='run-button'
+      data-disabled={isDisabled}
       variation='primary-raised-dark'
       size='medium'
       useIcon='tick--small'
       style={{
         gridColumn: '1 / -1',
       }}
-      onClick={() => {
-        if (
-          !currentCheckpoint ||
-          currentCheckpoint.mode === checkpointModes.RUN
-        ) {
-          runInference();
-        } else {
-          retrain();
-        }
-      }}
-      visuallyDisabled={!allowInferenceRun}
+      onClick={run.action}
+      visuallyDisabled={isDisabled}
       id='apply-button-trigger'
     >
-      {!currentCheckpoint || currentCheckpoint.mode === checkpointModes.RUN
-        ? runText
-        : 'Retrain Model'}
+      {run.label}
     </InfoButton>
   );
 }
@@ -94,23 +130,19 @@ PrimeButton.propTypes = {
   mapRef: T.object,
 };
 
-function Footer(props) {
-  const {
-    dispatchCurrentCheckpoint,
-    currentCheckpoint,
-    checkpointActions,
-
-    updateCheckpointName,
-    localCheckpointName,
-    setLocalCheckpointName,
-
-    mapRef,
-
-    allowInferenceRun,
-
-    disabled,
-  } = props;
-
+function Footer({
+  dispatchCurrentCheckpoint,
+  currentCheckpoint,
+  checkpointActions,
+  updateCheckpointName,
+  localCheckpointName,
+  setLocalCheckpointName,
+  mapRef,
+  allowInferenceRun,
+  disabled,
+}) {
+  const [displayBatchProgress, setDisplayBatchProgress] = useState(false);
+  const { runningBatch } = useInstance();
   return (
     <PanelControls
       data-cy='footer-panel-controls'
@@ -207,7 +239,6 @@ function Footer(props) {
               />
               <LocalButton
                 type='submit'
-                // size='small'
                 variation='primary-plain'
                 useIcon='save-disk'
                 title='Rename checkpoint'
@@ -218,6 +249,29 @@ function Footer(props) {
             </Form>
           </SaveCheckpoint>
         </Dropdown>
+      )}
+      {runningBatch && (
+        <>
+          <BatchPredictionProgressModal
+            revealed={displayBatchProgress}
+            onCloseClick={() => setDisplayBatchProgress(false)}
+          />
+          <ProgressButtonWrapper>
+            <Spinner />
+            <Button
+              data-cy='batch-progress-message'
+              variation='primary-plain'
+              size='small'
+              title='Status of running prediction'
+              onClick={() => {
+                setDisplayBatchProgress(true);
+              }}
+              id='batch-progress-message'
+            >
+              Batch prediction in progress: {runningBatch.progress}%
+            </Button>
+          </ProgressButtonWrapper>
+        </>
       )}
     </PanelControls>
   );
