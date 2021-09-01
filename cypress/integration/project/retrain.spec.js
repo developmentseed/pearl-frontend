@@ -19,6 +19,13 @@ describe('Retrain existing project', () => {
     );
     cy.get('[data-cy=global-loading]').should('not.exist');
 
+    // Check if retrain button panel is disabled
+    cy.get('[data-cy=footer-panel-controls]').should(
+      'have.attr',
+      'data-disabled',
+      'true'
+    );
+
     // Base feature to perform map edit actions
     const baseFeature = [
       [470, 250],
@@ -44,6 +51,13 @@ describe('Retrain existing project', () => {
       .trigger('mousemove', ...feature1[2])
       .trigger('mousemove', ...feature1[3])
       .trigger('mouseup', ...feature1[3]);
+
+    // Check if retrain button panel is enabled after a sampled is added
+    cy.get('[data-cy=footer-panel-controls]').should(
+      'have.attr',
+      'data-disabled',
+      'false'
+    );
 
     // Draw complete polygon with polygon draw
     const feature2 = translateFeature(baseFeature, 0, 50);

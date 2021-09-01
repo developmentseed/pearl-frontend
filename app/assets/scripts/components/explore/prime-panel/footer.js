@@ -112,7 +112,11 @@ function Footer(props) {
   } = props;
 
   return (
-    <PanelControls disabled={disabled}>
+    <PanelControls
+      data-cy='footer-panel-controls'
+      data-disabled={disabled}
+      disabled={disabled}
+    >
       <Button
         variation='base-plain'
         size='medium'
