@@ -47,7 +47,7 @@ const instanceActionTypes = {
 };
 
 const instanceInitialState = {
-  gpuMessage: 'Loading...',
+  gpuMessage: 'Waiting for model run',
   gpuStatus: 'not-started', // 'ready', 'processing', 'aborting'
   wsConnected: false,
   gpuConnected: false,
@@ -136,6 +136,11 @@ export function InstanceProvider(props) {
 
   const [runningBatch, setRunningBatch] = useState(false);
   const [runningBatchWatcher, setRunningBatchWatcher] = useState(null);
+
+  // Clear interval on page unmount
+  useEffect(() => {
+    return () => runningBatchWatcher && clearInterval(runningBatchWatcher);
+  }, []);
 
   // Apply instance status
   const applyInstanceStatus = (status) => {
@@ -269,6 +274,7 @@ export function InstanceProvider(props) {
     }
 
     applyInstanceStatus({
+      gpuMessage: 'Initializing',
       gpuStatus: 'initializing',
       wsConnected: false,
       gpuConnected: false,

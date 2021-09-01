@@ -33,9 +33,25 @@ const PanelControls = styled(PanelBlockFooter)`
 const SaveCheckpoint = styled(DropdownBody)`
   padding: ${glsp()};
 `;
+const ProgressButtonWrapper = styled.div`
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: center;
+  grid-column: 1 / -1;
+  > *,
+  > *:before {
+    font-size: 1rem;
+  }
+`;
 
 function PrimeButton({ currentCheckpoint, allowInferenceRun, mapRef }) {
-  const { runInference, runBatchPrediction, retrain, refine } = useInstance();
+  const {
+    runInference,
+    runBatchPrediction,
+    runningBatch,
+    retrain,
+    refine,
+  } = useInstance();
   const { aoiArea } = useAoi();
   const { apiLimits } = useApiMeta();
 
@@ -87,9 +103,12 @@ function PrimeButton({ currentCheckpoint, allowInferenceRun, mapRef }) {
 
   const run = runTypes[runType];
 
+  const isDisabled = !allowInferenceRun || (runningBatch && isBatchArea);
+
   return (
     <InfoButton
       data-cy='run-button'
+      data-disabled={isDisabled}
       variation='primary-raised-dark'
       size='medium'
       useIcon='tick--small'
@@ -97,7 +116,7 @@ function PrimeButton({ currentCheckpoint, allowInferenceRun, mapRef }) {
         gridColumn: '1 / -1',
       }}
       onClick={run.action}
-      visuallyDisabled={!allowInferenceRun}
+      visuallyDisabled={isDisabled}
       id='apply-button-trigger'
     >
       {run.label}
@@ -233,19 +252,21 @@ function Footer({
             revealed={displayBatchProgress}
             onCloseClick={() => setDisplayBatchProgress(false)}
           />
-          <Spinner />
-          <Button
-            data-cy='batch-progress-message'
-            variation='base-plain'
-            size='medium'
-            title='Status of running prediction'
-            onClick={() => {
-              setDisplayBatchProgress(true);
-            }}
-            id='undo-button-trigger'
-          >
-            Batch prediction in progress: {runningBatch.progress}%
-          </Button>
+          <ProgressButtonWrapper>
+            <Spinner />
+            <Button
+              data-cy='batch-progress-message'
+              variation='primary-plain'
+              size='small'
+              title='Status of running prediction'
+              onClick={() => {
+                setDisplayBatchProgress(true);
+              }}
+              id='batch-progress-message'
+            >
+              Batch prediction in progress: {runningBatch.progress}%
+            </Button>
+          </ProgressButtonWrapper>
         </>
       )}
     </PanelControls>

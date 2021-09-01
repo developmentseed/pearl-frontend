@@ -2,24 +2,16 @@ import React from 'react';
 import T from 'prop-types';
 import styled from 'styled-components';
 import { Modal } from '@devseed-ui/modal';
-import { Button } from '@devseed-ui/button';
-import { Heading } from '@devseed-ui/typography';
 import Prose from '../../../styles/type/prose';
 import { useInstance } from '../../../context/instance';
 import { areaFromBounds } from '../../../utils/map';
 import bbox from '@turf/bbox';
 import logger from '../../../utils/logger';
-import { formatThousands } from '../../../utils/format';
+import { formatDateTime, formatThousands } from '../../../utils/format';
+import DetailsList from '../../common/details-list';
 
 const Wrapper = styled.div`
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  h1 {
-    grid-column: 1 / -1;
-  }
-  div.prose {
-    grid-column: 1 / -1;
-  }
   grid-gap: 1rem;
 `;
 
@@ -41,32 +33,23 @@ function BatchPredictionProgressModal({ revealed, onCloseClick }) {
       id='batch-prediction-progress-modal'
       size='small'
       revealed={revealed}
-      renderHeader={() => null}
-      closeButton={false}
+      title='Batch Prediction Job Progress'
+      closeButton={true}
+      onCloseClick={onCloseClick}
       content={
-        <Wrapper>
-          <Heading>Batch Prediction Job Progress</Heading>
-          <Prose data-cy='batch-progress-modal-content' className='prose'>
-            Batch predictions runs as a background process. You can still
-            retrain smaller areas of interest (AOIs) while larger areas are
-            running as batch prediction jobs.
-            <ul>
-              <li>AOI Name: {runningBatch.name}</li>
-              <li>AOI Size: {`${batchAoiArea} km²` || 'Unknown'}</li>
-            </ul>
+        <Wrapper data-cy='batch-progress-modal-content'>
+          <Prose className='prose'>
+            Batch predictions run as a background process. You can still retrain
+            smaller areas of interest (AOIs) while larger areas are running as
+            batch prediction jobs.
           </Prose>
-          <Button
-            data-cy='close-batch-prediction-modal'
-            variation='primary-plain'
-            size='medium'
-            useIcon='xmark--small'
-            style={{
-              gridColumn: '1 / 2',
+          <DetailsList
+            details={{
+              'Started at': formatDateTime(runningBatch.created),
+              'AOI Name': runningBatch.name,
+              'AOI Size': `${batchAoiArea} km²` || 'Unknown',
             }}
-            onClick={onCloseClick}
-          >
-            Close this
-          </Button>
+          />
         </Wrapper>
       }
     />

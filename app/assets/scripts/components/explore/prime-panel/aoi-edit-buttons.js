@@ -330,7 +330,7 @@ export function AoiEditButtons(props) {
             renderHeadline={() => (
               <ModalHeadline>
                 {activeModal === 'batch-inference' ? (
-                  <h1>Save Area</h1>
+                  <h1>Save Area For Batch Prediction</h1>
                 ) : (
                   <h1>Area too large</h1>
                 )}
