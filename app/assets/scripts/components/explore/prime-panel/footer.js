@@ -45,7 +45,13 @@ const ProgressButtonWrapper = styled.div`
 `;
 
 function PrimeButton({ currentCheckpoint, allowInferenceRun, mapRef }) {
-  const { runInference, runBatchPrediction, retrain, refine } = useInstance();
+  const {
+    runInference,
+    runBatchPrediction,
+    runningBatch,
+    retrain,
+    refine,
+  } = useInstance();
   const { aoiArea } = useAoi();
   const { apiLimits } = useApiMeta();
 
@@ -97,9 +103,12 @@ function PrimeButton({ currentCheckpoint, allowInferenceRun, mapRef }) {
 
   const run = runTypes[runType];
 
+  const isDisabled = !allowInferenceRun || (runningBatch && isBatchArea);
+
   return (
     <InfoButton
       data-cy='run-button'
+      data-disabled={isDisabled}
       variation='primary-raised-dark'
       size='medium'
       useIcon='tick--small'
@@ -107,7 +116,7 @@ function PrimeButton({ currentCheckpoint, allowInferenceRun, mapRef }) {
         gridColumn: '1 / -1',
       }}
       onClick={run.action}
-      visuallyDisabled={!allowInferenceRun}
+      visuallyDisabled={isDisabled}
       id='apply-button-trigger'
     >
       {run.label}

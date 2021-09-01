@@ -101,6 +101,8 @@ describe('Batch predictions', () => {
       'Batch prediction in progress: 0%'
     );
 
+    cy.get('[data-cy=run-button').should('have.attr', 'data-disabled', 'true');
+
     // Make batch job at 10%
     cy.intercept(
       {
@@ -144,5 +146,22 @@ describe('Batch predictions', () => {
 
     // Confirm modal is hidden
     cy.get('[data-cy=batch-progress-modal-content]').should('not.exist');
+
+    // Make batch job complete
+    cy.intercept(
+      {
+        url: restApiEndpoint + '/api/project/1/batch/1',
+        method: 'GET',
+      },
+      {
+        ...batchJob,
+        progress: 100,
+        completed: true,
+      }
+    );
+
+    // New runs are allowed
+    cy.get('[data-cy=run-button').should('have.attr', 'data-disabled', 'false');
+    cy.get('[data-cy=batch-progress-message').should('not.exist');
   });
 });
