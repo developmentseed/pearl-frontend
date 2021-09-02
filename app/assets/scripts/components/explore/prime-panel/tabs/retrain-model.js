@@ -293,25 +293,22 @@ function RetrainModel(props) {
         </>
       )}
 
-      {(!currentCheckpoint || isBatchArea) && placeholderMessage && (
-        <ClassList>
-          {[1, 2, 3].map((i) => (
-            // +true workaround
-            // Styled components will try to pass true to the DOM element
-            // assing a + casts it to int which is logically equivalent
-            // but does not cause the DOM error
-            <Class key={i} placeholder={+true} className='placeholder-class'>
-              <ClassThumbnail />
-              <ClassHeading size='xsmall' placeholder={+true} />
-            </Class>
-          ))}
-          <PlaceholderMessage>{placeholderMessage}</PlaceholderMessage>
-        </ClassList>
-      )}
-
-      {!ready && currentCheckpoint && (
-        <PlaceholderMessage>{placeholderMessage}</PlaceholderMessage>
-      )}
+      {(!currentCheckpoint || isBatchArea || (!ready && currentCheckpoint)) &&
+        placeholderMessage && (
+          <ClassList>
+            {[1, 2, 3].map((i) => (
+              // +true workaround
+              // Styled components will try to pass true to the DOM element
+              // assing a + casts it to int which is logically equivalent
+              // but does not cause the DOM error
+              <Class key={i} placeholder={+true} className='placeholder-class'>
+                <ClassThumbnail />
+                <ClassHeading size='xsmall' placeholder={+true} />
+              </Class>
+            ))}
+            <PlaceholderMessage>{placeholderMessage}</PlaceholderMessage>
+          </ClassList>
+        )}
     </ToolsWrapper>
   );
 }
