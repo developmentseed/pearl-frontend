@@ -34,6 +34,8 @@ import { useModel } from './model';
 import { wrapLogReducer } from './reducers/utils';
 import { featureCollection, feature } from '@turf/helpers';
 
+const BATCH_REFRESH_INTERVAL = 4000;
+
 const messageQueueActionTypes = {
   ABORT: 'ABORT',
   ADD: 'ADD',
@@ -416,7 +418,10 @@ export function InstanceProvider(props) {
         if (batches.length > 0) {
           const { id: batchId } = batches[0];
           setRunningBatchWatcher(
-            setInterval(() => refreshRunningBatch(batchId), 2000)
+            setInterval(
+              () => refreshRunningBatch(batchId),
+              BATCH_REFRESH_INTERVAL
+            )
           );
         } else {
           setRunningBatch(false);
