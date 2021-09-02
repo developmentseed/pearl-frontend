@@ -6,11 +6,45 @@ export default () => css`
   .leaflet-geosearch-button.active .leaflet-bar-part.leaflet-bar-part-single {
     width: 30px;
   }
-  .leaflet-control-geosearch form {
-    border-radius: 4px;
-  }
-  .leaflet-control-geosearch .reset {
-    display: none;
+
+  .leaflet-control-geosearch {
+    & form {
+      border-radius: 4px;
+      color: ${themeVal('color.base')};
+      background: ${themeVal('color.surface')};
+      input {
+        color: ${themeVal('color.base')};
+        background: ${themeVal('color.surface')};
+      }
+    }
+    .results,
+    .results.active {
+      color: ${themeVal('color.base')};
+      background: ${themeVal('color.surface')};
+      > :hover {
+        background: ${themeVal('color.primaryAlphaA')};
+      }
+    }
+    & a.reset {
+      color: ${themeVal('color.base')};
+      background: ${themeVal('color.surface')};
+      &:hover {
+        background: inherit;
+        color: ${themeVal('color.primary')};
+      }
+    }
+    & a.leaflet-bar-part::before {
+      content: none;
+    }
+    & a.leaflet-bar-part.leaflet-bar-part-single::after {
+      ${collecticon('magnifier-left')};
+      top: unset;
+      left: unset;
+      height: 100%;
+      width: 100%;
+      border-radius: unset;
+      border: unset;
+    }
   }
 
   .leaflet-bar a,
@@ -21,20 +55,6 @@ export default () => css`
     &.leaflet-disabled {
       background: #5d5c66;
     }
-  }
-
-  .leaflet-control-geosearch a.leaflet-bar-part::before {
-    content: none;
-  }
-
-  .leaflet-control-geosearch a.leaflet-bar-part.leaflet-bar-part-single::after {
-    ${collecticon('magnifier-left')};
-    top: unset;
-    left: unset;
-    height: 100%;
-    width: 100%;
-    border-radius: unset;
-    border: unset;
   }
 
   .leaflet-control.leaflet-bar a.centerMap::after {
@@ -48,5 +68,24 @@ export default () => css`
       border: none;
       border-radius: 0.25rem;
     }
+  }
+
+  #layer-control.leaflet-control.generic-leaflet-control {
+    background: ${themeVal('color.surface')};
+    line-height: 30px;
+    text-align: center;
+  }
+  #layer-control.leaflet-control.generic-leaflet-control {
+    cursor: pointer;
+  }
+  #layer-control.leaflet-control.generic-leaflet-control::after {
+    ${collecticon('iso-stack')};
+    color: ${themeVal('color.base')};
+    top: unset;
+    left: unset;
+    height: 100%;
+    width: 100%;
+    border-radius: unset;
+    border: unset;
   }
 `;

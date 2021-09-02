@@ -16,6 +16,10 @@ function CenterMap({ aoiRef }) {
       button.onclick = () =>
         map.fitBounds(aoiRef.getBounds(), { padding: BOUNDS_PADDING });
 
+      button.ondblclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      };
       return container;
     },
     // Don't need to do anything on remove

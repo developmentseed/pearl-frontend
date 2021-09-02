@@ -97,6 +97,7 @@ export function ExploreProvider(props) {
     setInstanceStatusMessage,
     initInstance,
     loadAoiOnInstance,
+    getRunningBatch,
   } = useInstance();
 
   async function loadInitialData() {
@@ -115,6 +116,7 @@ export function ExploreProvider(props) {
       project = await restApiClient.getProject(projectId);
       setCurrentProject(project);
       setProjectName(project.name);
+      getRunningBatch(projectId);
     } catch (error) {
       hideGlobalLoading();
       logger(error);
@@ -132,7 +134,6 @@ export function ExploreProvider(props) {
       const aoiReq = await restApiClient.get(`project/${project.id}/aoi`);
       const aois = aoiReq.aois;
 
-      //const filteredList = filterAoiList(aois.aois);
       setAoiList(aois);
 
       showGlobalLoadingMessage('Fetching checkpoints...');
@@ -199,7 +200,6 @@ export function ExploreProvider(props) {
 
       if (predictions.fetched && predictions.data.predictions?.length > 0) {
         restApiClient.get(`project/${currentProject.id}/aoi/`).then((aois) => {
-          //const list = filterAoiList(aois.aois);
           setAoiList(aois.aois);
         });
         // Refresh checkpoint list, prediction finished

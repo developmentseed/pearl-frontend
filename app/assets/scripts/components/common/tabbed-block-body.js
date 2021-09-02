@@ -26,6 +26,7 @@ const Tab = styled(InfoButton)`
   padding: ${glsp(0.25)} 0;
   color: ${themeVal('color.base')};
   ${headingAlt()};
+  opacity: 1;
   letter-spacing: 0.5px;
   &,
   &:visited {
@@ -118,6 +119,7 @@ function TabbedBlock(props) {
               <li key={name}>
                 <Tab
                   id={tabId || `${name}-tab`}
+                  data-cy={`${name}-tab`}
                   active={ind === activeTab}
                   useIcon={icon}
                   title='Show menu'

@@ -1,33 +1,24 @@
 import React, { useEffect, useState, useContext } from 'react';
 import styled from 'styled-components';
-import { glsp } from '@devseed-ui/theme-provider';
+import { media, glsp } from '@devseed-ui/theme-provider';
 
 import Panel from '../../common/panel';
 import { PanelBlock, PanelBlockBody } from '../../common/panel-block';
 import SelectModal from '../../common/select-modal';
 import ModelCard from './model-card';
-import { useMapLayers, useMapRef } from '../../../context/map';
+import { useMapRef } from '../../../context/map';
 import { ExploreContext, useMapState } from '../../../context/explore';
-import GlobalContext, { useModels } from '../../../context/global';
+import { useModels } from '../../../context/global';
 
 import { Heading } from '@devseed-ui/typography';
-// import {
-//   FormGroup,
-//   FormGroupHeader,
-//   FormGroupBody,
-//   FormLabel,
-//   FormInput,
-// } from '@devseed-ui/form';
 import { Button } from '@devseed-ui/button';
 
 import TabbedBlock from '../../common/tabbed-block-body';
-import RetrainModel from './retrain-model';
-import RefineModel from './refine-model';
+import RetrainModel from './tabs/retrain-model';
+import RefineResults from './tabs/refine-results';
 
 import PanelHeader from './header';
 import PanelFooter from './footer';
-
-import LayersPanel from '../layers-panel';
 
 import { useAuth } from '../../../context/auth';
 import {
@@ -38,9 +29,15 @@ import {
 import { useInstance } from '../../../context/instance';
 import { useAoi } from '../../../context/aoi';
 import { usePredictions } from '../../../context/predictions';
+import { useApiMeta } from '../../../context/api-meta';
 
 const StyledPanelBlock = styled(PanelBlock)`
-  width: ${glsp(24)};
+  ${media.largeUp`
+    width: ${glsp(24)};
+  `}
+  ${media.xlargeUp`
+    width: ${glsp(28)};
+  `}
 `;
 
 const ModalHeader = styled.header`
@@ -67,6 +64,7 @@ function PrimePanel() {
   const { isAuthenticated } = useAuth();
   const { mapState, mapModes, setMapMode } = useMapState();
   const { mapRef } = useMapRef();
+  const { apiLimits } = useApiMeta();
 
   const {
     currentProject,
@@ -84,19 +82,16 @@ function PrimePanel() {
 
   const { aoiRef, setAoiRef, aoiName, currentAoi } = useAoi();
 
-  const { applyCheckpoint } = useInstance();
+  const { applyCheckpoint, runningBatch, getRunningBatch } = useInstance();
 
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
 
-  const { mosaicList } = useContext(GlobalContext);
   const { models } = useModels();
-
-  const { mapLayers } = useMapLayers();
 
   const { predictions } = usePredictions();
 
   const [showSelectModelModal, setShowSelectModelModal] = useState(false);
-  // const [modelFilterString, setModelFilterString] = useState('');
+
   const [localCheckpointName, setLocalCheckpointName] = useState(
     (currentCheckpoint &&
       currentCheckpoint.bookmarked &&
@@ -127,7 +122,11 @@ function PrimePanel() {
       // If predictions are ready, do not need a placeholder
       return null;
     }
-    if ((aoiRef && selectedModel) || !currentAoi) {
+    if (
+      (aoiRef && selectedModel) ||
+      !currentAoi ||
+      aoiArea > apiLimits['live_inference']
+    ) {
       return `Click the "Run Model" button to generate the class LULC map for your AOI`;
     } else if (aoiRef && !selectedModel) {
       return `Select a model to use for inference`;
@@ -183,6 +182,13 @@ function PrimePanel() {
       }
     }
   }, [currentCheckpoint]);
+
+  // Check if any job is running on project load
+  useEffect(() => {
+    if (currentProject && !runningBatch) {
+      getRunningBatch();
+    }
+  }, [currentProject, runningBatch]);
 
   return (
     <>
@@ -265,7 +271,7 @@ function PrimePanel() {
                     }
                   }}
                 />
-                <RefineModel
+                <RefineResults
                   name='Refine Results'
                   tabId='refine-tab-trigger'
                   className='refine-model'
@@ -302,21 +308,6 @@ function PrimePanel() {
                     }
                   }}
                 />
-                <LayersPanel
-                  onTabClick={() => {
-                    setActiveTab('LAYERS');
-                  }}
-                  disabled={mapState.mode === mapModes.EDIT_AOI_MODE}
-                  className='padded'
-                  name='layers'
-                  tabId='layers-tab-trigger'
-                  mapLayers={mapLayers}
-                  baseLayerNames={
-                    mosaicList.isReady() && !mosaicList.hasError()
-                      ? mosaicList.getData().mosaics
-                      : []
-                  }
-                />
               </TabbedBlock>
             </PanelBlockBody>
             {activeTab !== 'LAYERS' && (
@@ -332,7 +323,12 @@ function PrimePanel() {
 
                   mapRef,
 
-                  disabled: mapState.mode === mapModes.EDIT_AOI_MODE,
+                  disabled:
+                    mapState.mode === mapModes.EDIT_AOI_MODE ||
+                    (currentCheckpoint &&
+                      (currentCheckpoint.mode === checkpointModes.RETRAIN ||
+                        currentCheckpoint.mode === checkpointModes.REFINE) &&
+                      !checkpointHasSamples()),
 
                   allowInferenceRun,
                 }}
@@ -363,25 +359,10 @@ function PrimePanel() {
                 Close modal
               </Button>
             </Headline>
-            {/* <FormGroup>
-              <FormGroupHeader>
-                <FormLabel htmlFor='model-filter'>Search Models</FormLabel>
-              </FormGroupHeader>
-              <FormGroupBody>
-                <FormInput
-                  type='text'
-                  id='model-filter'
-                  name='model-filter'
-                  onChange={(e) => setModelFilterString(e.target.value)}
-                  placeholder='Filter models'
-                />
-              </FormGroupBody>
-            </FormGroup> */}
           </ModalHeader>
         )}
         filterCard={(card) => {
           return card.name.includes('');
-          // return card.name.includes(modelFilterString.toLowerCase());
         }}
         renderCard={(model) => (
           <ModelCard

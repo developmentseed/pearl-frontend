@@ -86,12 +86,12 @@ function TileLayerWithHeaders({
     }
     const l = L.tileLayer(url, options, headers);
 
-    Object.entries(eventHandlers).forEach(([event, func]) => {
-      l.on(event, func);
-    });
-
     l.on('add', () => {
       setLayer(l);
+      // Call event add handler on mount
+      if (eventHandlers.add) {
+        eventHandlers.add();
+      }
     });
 
     l.addTo(map);
@@ -100,6 +100,22 @@ function TileLayerWithHeaders({
       l.remove();
     };
   }, [url]);
+
+  useEffect(() => {
+    if (layer) {
+      Object.entries(eventHandlers).forEach(([event, func]) => {
+        layer.on(event, func);
+      });
+    }
+
+    return () => {
+      if (layer) {
+        Object.entries(eventHandlers).forEach(([event, func]) => {
+          layer.off(event, func);
+        });
+      }
+    };
+  }, [eventHandlers, layer]);
 
   useEffect(() => {
     if (layer) {

@@ -6,7 +6,7 @@ import InfoButton from '../components/common/info-button';
 
 export const DropdownHeader = styled.header`
   background: ${({ unshaded }) =>
-    unshaded ? 'none' : themeVal('color.baseAlphaB')};
+    unshaded ? 'none' : themeVal('color.baseDarkAlphaE')};
   display: grid;
   padding: ${glsp()};
   p {
@@ -23,12 +23,12 @@ export const DropdownHeader = styled.header`
 export const DropdownBody = styled.ul`
   display: grid;
   grid-gap: ${glsp(0.5)};
-  padding: ${glsp(0.5)} 0;
+  padding: ${glsp(0.5)} 0 ${glsp(1)};
   overflow: auto;
 `;
 export const DropdownItem = styled.a`
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: 1fr auto;
   justify-items: start;
   padding: ${glsp(0.25)} ${glsp()};
   grid-gap: ${glsp()};
@@ -41,7 +41,7 @@ export const DropdownItem = styled.a`
   ${({ useIcon }) =>
     useIcon &&
     css`
-      grid-template-columns: max-content 1fr;
+      grid-template-columns: max-content 1fr auto;
       ::before {
         ${collecticon(useIcon)}
       }
@@ -51,7 +51,7 @@ export const DropdownItem = styled.a`
   ${({ checked }) =>
     checked &&
     css`
-      grid-template-columns: max-content 1fr;
+      grid-template-columns: max-content 1fr auto;
       ::before {
         ${collecticon('tick')}
       }
@@ -80,17 +80,17 @@ export const DropdownItem = styled.a`
 `;
 export const DropdownFooter = styled.footer`
   border-top: 1px solid ${themeVal('color.baseAlphaD')};
-  padding: ${glsp(0.5)} 0;
+  padding: ${glsp(1)} 0;
 `;
 
 export const Dropdown = styled(BaseDropdown)`
   padding: 0;
-  background: ${themeVal('color.background')};
+  background: ${themeVal('color.surface')};
   color: ${themeVal('color.base')};
   max-width: 18rem;
   box-shadow: 0 0 0 1px ${themeVal('color.baseAlphaB')},
-    0 0 32px 2px ${themeVal('color.baseDarkAlphaD')},
-    0 16px 48px -16px ${themeVal('color.baseDarkAlphaE')};
+    0 0 32px 2px ${themeVal('color.baseDarkAlphaE')},
+    0 16px 48px -16px ${themeVal('color.baseDark')};
 `;
 export const DropdownTrigger = styled(InfoButton)`
   &::before {

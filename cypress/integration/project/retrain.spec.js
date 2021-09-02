@@ -1,11 +1,14 @@
-describe('Open existing project', () => {
+const {
+  restApiEndpoint,
+} = require('../../../app/assets/scripts/config/testing').default;
+
+describe('Retrain existing project', () => {
   beforeEach(() => {
     cy.startServer();
   });
 
   it('successfully loads', () => {
     cy.fakeLogin();
-    cy.mockRegularProject();
 
     cy.setWebsocketWorkflow('retrain');
 
@@ -15,6 +18,13 @@ describe('Open existing project', () => {
       'Session Status: Ready to go'
     );
     cy.get('[data-cy=global-loading]').should('not.exist');
+
+    // Check if retrain button panel is disabled
+    cy.get('[data-cy=footer-panel-controls]').should(
+      'have.attr',
+      'data-disabled',
+      'true'
+    );
 
     // Base feature to perform map edit actions
     const baseFeature = [
@@ -41,6 +51,13 @@ describe('Open existing project', () => {
       .trigger('mousemove', ...feature1[2])
       .trigger('mousemove', ...feature1[3])
       .trigger('mouseup', ...feature1[3]);
+
+    // Check if retrain button panel is enabled after a sampled is added
+    cy.get('[data-cy=footer-panel-controls]').should(
+      'have.attr',
+      'data-disabled',
+      'false'
+    );
 
     // Draw complete polygon with polygon draw
     const feature2 = translateFeature(baseFeature, 0, 50);
@@ -128,7 +145,61 @@ describe('Open existing project', () => {
     // Proceed importing
     cy.get('[data-cy=import-samples-button').click();
 
-    // Retrain
+    // Set no instances available
+    cy.intercept(
+      {
+        url: restApiEndpoint + '/api',
+      },
+      {
+        version: '1.0.0',
+        limits: {
+          live_inference: 10000000,
+          max_inference: 100000000,
+          instance_window: 600,
+          total_gpus: 15,
+          active_gpus: 15,
+        },
+      }
+    ).as('fetchAvailableInstancesCount');
+
+    // Request model run
     cy.get('[data-cy=run-button').click();
+
+    // Wait for outbound request
+    cy.wait('@fetchAvailableInstancesCount');
+
+    // Should display modal
+    cy.get('#no-instance-available-error')
+      .should(
+        'contain',
+        'No instance available to run the model, please try again later.'
+      )
+      .click();
+
+    // Set no instances available
+    cy.intercept(
+      {
+        url: restApiEndpoint + '/api',
+      },
+      {
+        version: '1.0.0',
+        limits: {
+          live_inference: 10000000,
+          max_inference: 100000000,
+          instance_window: 600,
+          total_gpus: 15,
+          active_gpus: 5,
+        },
+      }
+    ).as('fetchAvailableInstancesCount');
+
+    // Request model run
+    cy.get('[data-cy=run-button').click();
+
+    // Wait for outbound request
+    cy.wait('@fetchAvailableInstancesCount');
+
+    // Should display modal
+    cy.get('#no-instance-available-error').should('not.exist');
   });
 });

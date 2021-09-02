@@ -1,14 +1,15 @@
-import { glsp, themeVal, truncated } from '@devseed-ui/theme-provider';
-import { PlaceholderMessage } from '../../../styles/placeholder.js';
+import { glsp, themeVal, truncated, media } from '@devseed-ui/theme-provider';
+import { PlaceholderMessage } from '../../../../styles/placeholder.js';
 import {
   DropdownBody,
   DropdownItem,
   DropdownFooter,
-} from '../../../styles/dropdown';
+} from '../../../../styles/dropdown';
 import styled, { css } from 'styled-components';
 import { Heading } from '@devseed-ui/typography';
 import collecticon from '@devseed-ui/collecticons';
 import { Button } from '@devseed-ui/button';
+import { Subheading } from '../../../../styles/type/heading.js';
 
 export const ToolsWrapper = styled.div`
   display: grid;
@@ -22,8 +23,8 @@ export const ToolsWrapper = styled.div`
 export const ClassList = styled.section`
   display: grid;
 
-  > ${Heading} {
-    padding: 0 1.5rem;
+  > ${Subheading} {
+    padding: 0.25rem 1.5rem;
   }
 `;
 
@@ -122,6 +123,7 @@ export const Thumbnail = styled.div`
   width: ${glsp(1.5)};
   height: ${glsp(1.5)};
   background: ${({ color }) => color || themeVal('color.baseAlphaD')};
+  border: 1px solid ${themeVal('color.baseAlphaD')};
   display: grid;
   justify-content: center;
   align-content: center;
@@ -142,19 +144,21 @@ export const Thumbnail = styled.div`
 
 export const ToolBox = styled.section`
   padding: 0 1.5rem;
-  display: flex;
-  flex-flow: row wrap;
-  ${Heading} {
-    flex-basis: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(6rem, 1fr));
+  grid-gap: 0.5rem;
+  ${media.largeUp`
+    grid-template-columns: repeat(auto-fill, minmax(5rem, 1fr));
+  `}
+  ${Heading},
+  ${Subheading} {
+    grid-column: 1 / -1;
+    padding: 0.25rem 0;
   }
   ${Button} {
     padding: 0.25rem 0.75rem 0.25rem 0.5rem;
     box-shadow: none;
     border: 2px solid ${themeVal('color.primaryAlphaB')};
-
-    & ~ ${Button} {
-      margin-left: ${glsp()};
-    }
   }
 `;
 

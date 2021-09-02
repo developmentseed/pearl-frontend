@@ -1,4 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
+import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import T from 'prop-types';
 import copyTextToClipboard from '../../utils/copy-text-to-clipboard';
@@ -139,7 +140,7 @@ function SessionOutputControl(props) {
 
   const { projectName, currentProject, setProjectName } = useProject();
 
-  const initialName = projectName || 'Untitled';
+  const initialName = projectName;
 
   const [localProjectName, setLocalProjectName] = useState(projectName);
   const [titleEditMode, setTitleEditMode] = useState(false);
@@ -158,6 +159,8 @@ function SessionOutputControl(props) {
     setProjectName(name);
     setTitleEditMode(false);
   };
+
+  const history = useHistory();
 
   const downloadGeotiff = async () => {
     const projectId = currentProject.id;
@@ -244,7 +247,7 @@ function SessionOutputControl(props) {
               }
               data-cy='project-name'
             >
-              {projectName || 'Untitled Project'}
+              {projectName}
             </Heading>
             <InfoButton
               size='small'
@@ -264,7 +267,7 @@ function SessionOutputControl(props) {
               name='projectName'
               placeholder='Set Project Name'
               onChange={(e) => setLocalProjectName(e.target.value)}
-              value={localProjectName}
+              value={localProjectName || ''}
               disabled={!isAuthenticated}
               autoFocus
               data-cy='project-input'
@@ -290,16 +293,14 @@ function SessionOutputControl(props) {
       <StatusHeading
         data-cy='session-status'
         variation={
-          projectId === 'new' ||
-          instance.gpuStatus === 'ready' ||
-          instance.gpuStatus === 'processing'
+          instance.gpuStatus === 'ready' || instance.gpuStatus === 'not-started'
             ? 'primary'
             : 'danger'
         }
         size='xxsmall'
       >
-        <span>Session Status:</span>{' '}
-        {projectId === 'new' ? 'Waiting for model run' : instance.gpuMessage}
+        <span>Session Status: </span>
+        {instance.gpuMessage}
       </StatusHeading>
       <Button
         variation='primary-plain'
@@ -382,16 +383,16 @@ function SessionOutputControl(props) {
         title='New project'
         // Reveal modal on mount for new projects, not existing ones
         revealed={!projectName && projectId && projectId === 'new'}
-        className='faded-background'
         size='small'
-        closeButton={false}
+        closeButton={true}
+        onCloseClick={() => history.goBack()}
         content={
           <ModalForm onSubmit={handleSubmit}>
             <HeadingInput
               name='projectName'
               placeholder='Set Project Name'
               onChange={(e) => setLocalProjectName(e.target.value)}
-              value={localProjectName}
+              value={localProjectName || ''}
               disabled={!isAuthenticated}
               autoFocus
               data-cy='modal-project-input'
@@ -402,7 +403,12 @@ function SessionOutputControl(props) {
               size='medium'
               useIcon={['arrow-right', 'after']}
               data-cy='create-project-button'
-              title='Set project name'
+              title={
+                !localProjectName
+                  ? 'Set project name to start new project'
+                  : 'Create new project'
+              }
+              disabled={!localProjectName}
             >
               Create Project
             </Button>

@@ -34,6 +34,8 @@ import { useModel } from './model';
 import { wrapLogReducer } from './reducers/utils';
 import { featureCollection, feature } from '@turf/helpers';
 
+const BATCH_REFRESH_INTERVAL = 4000;
+
 const messageQueueActionTypes = {
   ABORT: 'ABORT',
   ADD: 'ADD',
@@ -47,7 +49,7 @@ const instanceActionTypes = {
 };
 
 const instanceInitialState = {
-  gpuMessage: 'Loading...',
+  gpuMessage: 'Waiting for model run',
   gpuStatus: 'not-started', // 'ready', 'processing', 'aborting'
   wsConnected: false,
   gpuConnected: false,
@@ -133,6 +135,14 @@ export function InstanceProvider(props) {
     instanceReducer,
     instanceInitialState
   );
+
+  const [runningBatch, setRunningBatch] = useState(false);
+  const [runningBatchWatcher, setRunningBatchWatcher] = useState(null);
+
+  // Clear interval on page unmount
+  useEffect(() => {
+    return () => runningBatchWatcher && clearInterval(runningBatchWatcher);
+  }, []);
 
   // Apply instance status
   const applyInstanceStatus = (status) => {
@@ -254,7 +264,19 @@ export function InstanceProvider(props) {
       websocketClient.close();
     }
 
+    // Check if instance slots are available
+    const {
+      limits: { active_gpus, total_gpus },
+    } = await restApiClient.get('');
+    const availableGpus = total_gpus - (active_gpus || 0);
+
+    // Do not run when no instances are available
+    if (!availableGpus) {
+      throw Error('No instances available');
+    }
+
     applyInstanceStatus({
+      gpuMessage: 'Initializing',
       gpuStatus: 'initializing',
       wsConnected: false,
       gpuConnected: false,
@@ -288,7 +310,7 @@ export function InstanceProvider(props) {
           fetchCheckpoint(
             projectId,
             checkpointId,
-            checkpointModes.RETRAIN,
+            aoiId ? checkpointModes.RETRAIN : checkpointModes.RUN,
             true
           );
         }
@@ -367,6 +389,50 @@ export function InstanceProvider(props) {
     });
   }
 
+  async function refreshRunningBatch(batchId) {
+    try {
+      const batch = await restApiClient.get(
+        `project/${currentProject.id}/batch/${batchId}`
+      );
+      if (batch.completed) {
+        clearInterval(runningBatchWatcher);
+        setRunningBatch(false);
+      } else {
+        setRunningBatch(batch);
+      }
+    } catch (error) {
+      logger(error);
+      setRunningBatch(false);
+      if (runningBatchWatcher) {
+        clearInterval(runningBatchWatcher);
+      }
+    }
+  }
+
+  async function getRunningBatch() {
+    if (currentProject && restApiClient) {
+      try {
+        const { batch: batches } = await restApiClient.get(
+          `project/${currentProject.id}/batch?completed=false`
+        );
+        if (batches.length > 0) {
+          const { id: batchId } = batches[0];
+          setRunningBatchWatcher(
+            setInterval(
+              () => refreshRunningBatch(batchId),
+              BATCH_REFRESH_INTERVAL
+            )
+          );
+        } else {
+          setRunningBatch(false);
+        }
+      } catch (error) {
+        logger(error);
+        setRunningBatch(false);
+      }
+    }
+  }
+
   const abortJob = (queueNext) => {
     // If GPU is not connected, just clear the message queue
     if (!instance.gpuConnected) {
@@ -405,7 +471,6 @@ export function InstanceProvider(props) {
     initInstance,
     loadAoiOnInstance: (id) => {
       showGlobalLoadingMessage('Loading AOI on Instance...');
-      //return
       dispatchMessageQueue({
         type: messageQueueActionTypes.ADD_EXPRESS,
         data: {
@@ -416,6 +481,8 @@ export function InstanceProvider(props) {
         },
       });
     },
+    getRunningBatch,
+    runningBatch,
     runInference: async () => {
       if (restApiClient) {
         let project = currentProject;
@@ -468,7 +535,16 @@ export function InstanceProvider(props) {
           );
         } catch (error) {
           logger(error);
-          toasts.error('Could not create instance, please try again later.');
+          if (error.message === 'No instances available') {
+            toasts.error(
+              'No instance available to run the model, please try again later.',
+              { autoClose: false, toastId: 'no-instance-available-error' }
+            );
+          } else {
+            toasts.error('Could not create instance, please try again later.');
+          }
+          hideGlobalLoading();
+          return;
         }
 
         showGlobalLoadingMessage(
@@ -512,6 +588,57 @@ export function InstanceProvider(props) {
         }
       }
     },
+    runBatchPrediction: async function () {
+      if (restApiClient) {
+        let project = currentProject;
+
+        // Create project if new
+        if (!project) {
+          try {
+            showGlobalLoadingMessage('Creating project...');
+            project = await restApiClient.createProject({
+              model_id: selectedModel.id,
+              mosaic: 'naip.latest',
+              name: projectName,
+            });
+            setCurrentProject(project);
+            history.push(`/project/${project.id}`);
+          } catch (error) {
+            logger(error);
+            toasts.error('Could not create project, please try again later.');
+            hideGlobalLoading();
+            return; // abort inference run
+          }
+        }
+
+        // Request batch prediction
+        try {
+          showGlobalLoadingMessage('Requesting batch predictions...');
+          const options = {
+            name: aoiName,
+            bounds: aoiBoundsToPolygon(aoiRef.getBounds()),
+          };
+
+          if (currentCheckpoint) {
+            options['checkpoint_id'] = currentCheckpoint.id;
+          }
+          const batch = await restApiClient.post(
+            `project/${project.id}/batch`,
+            options
+          );
+          setRunningBatch(batch);
+          getRunningBatch();
+        } catch (error) {
+          logger(error);
+          toasts.error(
+            'Could not request batch prediction, please try again later.'
+          );
+          return; // abort
+        }
+        getRunningBatch();
+        hideGlobalLoading();
+      }
+    },
     retrain: async function () {
       // Check if all classes have the minimum number of samples
       const classes = Object.values(currentCheckpoint.classes);
@@ -539,7 +666,16 @@ export function InstanceProvider(props) {
         );
       } catch (error) {
         logger(error);
-        toasts.error('Could not create instance, please try again later.');
+        if (error.message === 'No instances available') {
+          toasts.error(
+            'No instance available to run the model, please try again later.',
+            { autoClose: false, toastId: 'no-instance-available-error' }
+          );
+        } else {
+          toasts.error('Could not create instance, please try again later.');
+        }
+        hideGlobalLoading();
+        return;
       }
 
       showGlobalLoadingMessage(
@@ -728,9 +864,12 @@ export const useInstance = () => {
   const {
     instance,
     setInstanceStatusMessage,
+    getRunningBatch,
+    runningBatch,
     sendAbortMessage,
     initInstance,
     runInference,
+    runBatchPrediction,
     retrain,
     refine,
     applyCheckpoint,
@@ -741,14 +880,24 @@ export const useInstance = () => {
       instance,
       loadAoiOnInstance,
       setInstanceStatusMessage,
+      getRunningBatch,
+      runningBatch,
       sendAbortMessage,
       initInstance,
       runInference,
+      runBatchPrediction,
       retrain,
       refine,
       applyCheckpoint,
     }),
-    [instance, initInstance, runInference, retrain, applyCheckpoint]
+    [
+      instance,
+      initInstance,
+      runInference,
+      retrain,
+      applyCheckpoint,
+      runningBatch,
+    ]
   );
 };
 

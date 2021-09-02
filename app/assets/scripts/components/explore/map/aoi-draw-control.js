@@ -22,9 +22,6 @@ class AoiDrawControl {
 
   // Draw control is initialized with a shape
   initialize(bounds) {
-    //this._start = L.LatLng(bounds[0][0], bounds[0][1])
-    //this._end= L.LatLng(bounds[1][0], bounds[1][1])
-
     this._shape = L.rectangle(bounds).addTo(this._map);
     this.onInitialize(this.getBbox(), this._shape);
   }
