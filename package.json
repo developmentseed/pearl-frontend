@@ -121,6 +121,7 @@
     "@turf/centroid": "^6.3.0",
     "@turf/helpers": "^6.5.0",
     "@welldone-software/why-did-you-render": "^6.1.1",
+    "babel-preset-env": "^1.7.0",
     "chart.js": "^2.9.4",
     "date-fns": "^2.20.3",
     "element-resize-event": "^3.0.3",
@@ -157,6 +158,7 @@
     "react-transition-group": "^4.3.0",
     "reconnecting-websocket": "^4.4.0",
     "request-promise": "^4.2.6",
+    "resize-observer": "^1.0.2",
     "styled-components": "^5.2.1"
   }
 }
