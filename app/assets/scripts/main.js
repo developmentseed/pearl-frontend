@@ -1,6 +1,6 @@
 import './wdyr';
 import '@babel/polyfill';
-import { install as installResizeObersever} from "resize-observer";
+import { install as installResizeObersever } from 'resize-observer';
 import React, { useEffect } from 'react';
 import { DevseedUiThemeProvider } from '@devseed-ui/theme-provider';
 
@@ -29,7 +29,7 @@ import Project from './components/profile/project';
 import { AuthProvider } from './context/auth';
 import { ApiMetaProvider } from './context/api-meta';
 
-installResizeObersever()
+installResizeObersever();
 
 const ProtectedRoute = (
   { component, ...args } // eslint-disable-line react/prop-types
