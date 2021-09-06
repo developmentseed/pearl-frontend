@@ -285,8 +285,55 @@ export function InstanceProvider(props) {
     // Fetch active instances for this project
     const activeInstances = await restApiClient.getActiveInstances(projectId);
 
-    // Get instance token
+    // Init instance
     let instance;
+
+    // Helper function to handle instance creation errors
+    async function createInstance(options) {
+      try {
+        applyInstanceStatus({
+          gpuMessage: 'Creating Instance...',
+          gpuStatus: 'creating-instance',
+        });
+
+        let instanceStatus;
+        let creationDuration = 0;
+
+        const { id: instanceId } = await restApiClient.createInstance(
+          projectId,
+          options
+        );
+
+        while (!instanceStatus) {
+          // Check timeout
+          if (creationDuration >= config.instanceCreationTimeout) {
+            throw new Error();
+          }
+
+          // Update creation duration
+          creationDuration += config.instanceCreationCheckInterval;
+
+          instanceStatus = await restApiClient.getInstance(
+            projectId,
+            instanceId
+          );
+
+          const instancePhase = get(instanceStatus, 'status.phase');
+
+          if (instancePhase === 'Succeeded') {
+            return instanceStatus;
+          }
+
+          if (instancePhase === 'Failed') {
+            throw new Error();
+          }
+        }
+      } catch (error) {
+        logger(error);
+        throw new Error('Instance creation failed');
+      }
+    }
+
     let doHideGlobalLoading = true;
     if (activeInstances.total > 0) {
       const { id: instanceId } = activeInstances.instances[0];
@@ -329,7 +376,7 @@ export function InstanceProvider(props) {
         });
       }
     } else if (checkpointId) {
-      instance = await restApiClient.createInstance(projectId, {
+      instance = await createInstance(projectId, {
         checkpoint_id: checkpointId,
         aoi_id: aoiId,
       });
@@ -337,7 +384,7 @@ export function InstanceProvider(props) {
       // Apply checkpoint to the interface as the instance will start with it applied.
       fetchCheckpoint(projectId, checkpointId, checkpointModes.RETRAIN);
     } else {
-      instance = await restApiClient.createInstance(projectId);
+      instance = await createInstance(projectId);
     }
 
     // Use a Promise to stand by for GPU connection
@@ -410,6 +457,7 @@ export function InstanceProvider(props) {
   }
 
   async function getRunningBatch() {
+    return;
     if (currentProject && restApiClient) {
       try {
         const { batch: batches } = await restApiClient.get(
@@ -541,6 +589,10 @@ export function InstanceProvider(props) {
               { autoClose: false, toastId: 'no-instance-available-error' }
             );
           } else {
+            applyInstanceStatus({
+              gpuMessage: 'Instance creation failed.',
+              gpuStatus: 'creation-failed',
+            });
             toasts.error('Could not create instance, please try again later.');
           }
           hideGlobalLoading();

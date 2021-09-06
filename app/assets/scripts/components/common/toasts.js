@@ -29,6 +29,7 @@ CloseButton.propTypes = {
 
 export const ToastContainerCustom = () => (
   <ToastContainer
+    containerId='a-toast'
     position={toast.POSITION.BOTTOM_RIGHT}
     closeButton={<CloseButton />}
   />
