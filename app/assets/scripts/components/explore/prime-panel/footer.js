@@ -46,7 +46,7 @@ const ProgressButtonWrapper = styled.div`
 
 function PrimeButton({ currentCheckpoint, allowInferenceRun, mapRef }) {
   const {
-    runInference,
+    runPrediction,
     runBatchPrediction,
     runningBatch,
     retrain,
@@ -93,7 +93,7 @@ function PrimeButton({ currentCheckpoint, allowInferenceRun, mapRef }) {
     },
     'live-prediction': {
       label: 'Run Model',
-      action: runInference,
+      action: runPrediction,
     },
     'batch-prediction': {
       label: 'Run Batch Prediction',
@@ -290,7 +290,7 @@ Footer.propTypes = {
 
   instance: T.object,
   allowInferenceRun: T.bool.isRequired,
-  runInference: T.func,
+  runPrediction: T.func,
   retrain: T.func,
   refine: T.func,
 

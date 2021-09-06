@@ -483,7 +483,7 @@ export function InstanceProvider(props) {
     },
     getRunningBatch,
     runningBatch,
-    runInference: async () => {
+    runPrediction: async () => {
       if (restApiClient) {
         let project = currentProject;
 
@@ -868,7 +868,7 @@ export const useInstance = () => {
     runningBatch,
     sendAbortMessage,
     initInstance,
-    runInference,
+    runPrediction,
     runBatchPrediction,
     retrain,
     refine,
@@ -884,7 +884,7 @@ export const useInstance = () => {
       runningBatch,
       sendAbortMessage,
       initInstance,
-      runInference,
+      runPrediction,
       runBatchPrediction,
       retrain,
       refine,
@@ -893,7 +893,7 @@ export const useInstance = () => {
     [
       instance,
       initInstance,
-      runInference,
+      runPrediction,
       retrain,
       applyCheckpoint,
       runningBatch,
