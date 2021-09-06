@@ -31,7 +31,7 @@ describe('Create new project', () => {
     cy.startServer();
     cy.fakeLogin();
 
-    cy.setWebsocketWorkflow('prediction');
+    cy.setWebsocketWorkflow('base-model-prediction');
 
     cy.visit('/project/new');
 
