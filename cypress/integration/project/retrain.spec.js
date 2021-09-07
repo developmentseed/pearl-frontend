@@ -5,17 +5,31 @@ const {
 describe('Retrain existing project', () => {
   beforeEach(() => {
     cy.startServer();
+    cy.fakeLogin();
+    cy.setWebsocketWorkflow('retrain');
+    cy.visit('/project/1');
+  });
+
+  it.only('check loading sequence when active instance exists', () => {
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Initializing'
+    );
+
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Ready to run'
+    );
+  });
+
+  it('check loading sequence when no active instance exists', () => {
+
   });
 
   it('successfully loads', () => {
-    cy.fakeLogin();
-
-    cy.setWebsocketWorkflow('retrain');
-
-    cy.visit('/project/1');
     cy.get('[data-cy=session-status]').should(
       'have.text',
-      'Session Status: Ready to go'
+      'Session Status: Initializing'
     );
     cy.get('[data-cy=global-loading]').should('not.exist');
 

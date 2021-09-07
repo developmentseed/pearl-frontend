@@ -289,9 +289,10 @@ export function InstanceProvider(props) {
     // Init instance
     let instance;
 
-    // Helper function to handle instance creation
+    /**
+     * Helper function to handle instance creation
+     */
     async function createInstance(options) {
-      // try {
       applyInstanceStatus({
         gpuMessage: 'Creating Instance...',
         gpuStatus: 'creating-instance',
@@ -300,11 +301,13 @@ export function InstanceProvider(props) {
       let instanceStatus;
       let creationDuration = 0;
 
+      // Request a new instance
       const { id: instanceId } = await restApiClient.createInstance(
         projectId,
         options
       );
 
+      // Start loop to wait for "Running" status
       while (
         !instanceStatus ||
         creationDuration < config.instanceCreationTimeout
@@ -314,20 +317,20 @@ export function InstanceProvider(props) {
           throw new Error('Instance creation timeout');
         }
 
+        // Get instance status
         instanceStatus = await restApiClient.get(
           `/project/${projectId}/instance/${instanceId}`
         );
-
         const instancePhase = get(instanceStatus, 'pod.status.phase');
 
+        // Process status
         if (instancePhase === 'Running') {
           return instanceStatus;
-        }
-
-        if (instancePhase === 'Failed') {
+        } else if (instancePhase === 'Failed') {
           throw new Error('Instance creation failed');
         }
 
+        // Update timer
         await delay(config.instanceCreationCheckInterval);
         creationDuration += config.instanceCreationCheckInterval;
       }
@@ -394,7 +397,6 @@ export function InstanceProvider(props) {
       const newWebsocketClient = new WebsocketClient({
         token: instance.token,
         applyInstanceStatus,
-        dispatchInstance,
         dispatchCurrentCheckpoint,
         fetchCheckpoint: (checkpointId, mode, created) =>
           fetchCheckpoint(projectId, checkpointId, mode, created),
