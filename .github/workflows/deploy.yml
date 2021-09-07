@@ -61,7 +61,7 @@ jobs:
         if: github.ref == 'refs/heads/develop'
         uses: azure/login@v1
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          creds: ${{ secrets.AZURE_CREDENTIALS_STAGING }}
 
       - name: Azure Login
         if: github.ref == 'refs/heads/main'
