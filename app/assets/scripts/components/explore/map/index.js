@@ -360,6 +360,7 @@ function Map() {
   const displayMap = useMemo(() => {
     return (
       <MapContainer
+        tap={false}
         center={center}
         zoom={zoom}
         style={{ height: '100%' }}
