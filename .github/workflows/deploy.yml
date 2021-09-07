@@ -7,10 +7,10 @@ on:
     - 'main'
 
 env:
-  STAGING_STORAGE_ACCOUNT_NAME: lulc
+  STAGING_STORAGE_ACCOUNT_NAME: lulcstagingfrontend
   STAGING_CDN_PROFILE_NAME: lulc
   STAGING_CDN_ENDPOINT: lulcstaging
-  STAGING_RESOURCE_GROUP: lulcStaging
+  STAGING_RESOURCE_GROUP: lulc-staging_rg
   PRODUCTION_STORAGE_ACCOUNT_NAME: lulcproductionfrontend
   PRODUCTION_CDN_PROFILE_NAME: lulcproduction
   PRODUCTION_CDN_ENDPOINT: lulcproduction
