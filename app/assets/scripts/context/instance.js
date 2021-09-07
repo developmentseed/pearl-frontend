@@ -33,6 +33,7 @@ import { useModel } from './model';
 
 import { wrapLogReducer } from './reducers/utils';
 import { featureCollection, feature } from '@turf/helpers';
+import { delay } from './reducers/reduxeed';
 
 const BATCH_REFRESH_INTERVAL = 4000;
 
@@ -288,50 +289,51 @@ export function InstanceProvider(props) {
     // Init instance
     let instance;
 
-    // Helper function to handle instance creation errors
+    // Helper function to handle instance creation
     async function createInstance(options) {
-      try {
-        applyInstanceStatus({
-          gpuMessage: 'Creating Instance...',
-          gpuStatus: 'creating-instance',
-        });
+      // try {
+      applyInstanceStatus({
+        gpuMessage: 'Creating Instance...',
+        gpuStatus: 'creating-instance',
+      });
 
-        let instanceStatus;
-        let creationDuration = 0;
+      let instanceStatus;
+      let creationDuration = 0;
 
-        const { id: instanceId } = await restApiClient.createInstance(
-          projectId,
-          options
+      const { id: instanceId } = await restApiClient.createInstance(
+        projectId,
+        options
+      );
+
+      while (
+        !instanceStatus ||
+        creationDuration < config.instanceCreationTimeout
+      ) {
+        // Check timeout
+        if (creationDuration >= config.instanceCreationTimeout) {
+          throw new Error('Instance creation timeout');
+        }
+
+        instanceStatus = await restApiClient.get(
+          `/project/${projectId}/instance/${instanceId}`
         );
 
-        while (!instanceStatus) {
-          // Check timeout
-          if (creationDuration >= config.instanceCreationTimeout) {
-            throw new Error();
-          }
+        const instancePhase = get(instanceStatus, 'pod.status.phase');
 
-          // Update creation duration
-          creationDuration += config.instanceCreationCheckInterval;
-
-          instanceStatus = await restApiClient.getInstance(
-            projectId,
-            instanceId
-          );
-
-          const instancePhase = get(instanceStatus, 'status.phase');
-
-          if (instancePhase === 'Succeeded') {
-            return instanceStatus;
-          }
-
-          if (instancePhase === 'Failed') {
-            throw new Error();
-          }
+        if (instancePhase === 'Running') {
+          return instanceStatus;
         }
-      } catch (error) {
-        logger(error);
-        throw new Error('Instance creation failed');
+
+        if (instancePhase === 'Failed') {
+          throw new Error('Instance creation failed');
+        }
+
+        await delay(config.instanceCreationCheckInterval);
+        creationDuration += config.instanceCreationCheckInterval;
       }
+
+      // Instance should have been created successfully in the loop above, raise error
+      throw new Error('Instance creation failed');
     }
 
     let doHideGlobalLoading = true;
@@ -376,7 +378,7 @@ export function InstanceProvider(props) {
         });
       }
     } else if (checkpointId) {
-      instance = await createInstance(projectId, {
+      instance = await createInstance({
         checkpoint_id: checkpointId,
         aoi_id: aoiId,
       });
@@ -384,7 +386,7 @@ export function InstanceProvider(props) {
       // Apply checkpoint to the interface as the instance will start with it applied.
       fetchCheckpoint(projectId, checkpointId, checkpointModes.RETRAIN);
     } else {
-      instance = await createInstance(projectId);
+      instance = await createInstance();
     }
 
     // Use a Promise to stand by for GPU connection
@@ -457,7 +459,6 @@ export function InstanceProvider(props) {
   }
 
   async function getRunningBatch() {
-    return;
     if (currentProject && restApiClient) {
       try {
         const { batch: batches } = await restApiClient.get(
