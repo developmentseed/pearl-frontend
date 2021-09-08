@@ -52,12 +52,24 @@ describe('Create new project', () => {
     // Visit page
     cy.visit('/project/new');
 
+    // Check session status message
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Set Project Name'
+    );
+
     // Set project name
     cy.get('[data-cy=modal-project-input]')
       .should('exist')
       .clear()
       .type('Project name');
     cy.get('[data-cy=create-project-button]').should('exist').click();
+
+    // Check session status message
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Set AOI'
+    );
 
     // Draw AOI
     cy.get('[data-cy=aoi-edit-button]').should('exist').click();
@@ -67,9 +79,21 @@ describe('Create new project', () => {
       .trigger('mouseup');
     cy.wait('@reverseGeocodeCity');
 
+    // Check session status message
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Select Model'
+    );
+
     // Select model
     cy.get('[data-cy=select-model-label]').should('exist').click();
     cy.get('[data-cy=select-model-1-card]').should('exist').click();
+
+    // Check session status message
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Ready for prediction run'
+    );
 
     // Instance pending
     cy.intercept(
@@ -87,10 +111,10 @@ describe('Create new project', () => {
     // Run
     cy.get('[data-cy=run-button').click();
 
-    // Get to prediction halt point
+    // Check session status message
     cy.get('[data-cy=session-status]').should(
       'have.text',
-      'Session Status: Creating Instance...'
+      'Session Status: Starting instance'
     );
 
     // Instance failed
@@ -108,16 +132,16 @@ describe('Create new project', () => {
       }
     );
 
-    // Get to prediction halt point
+    // Check session status message
     cy.get('[data-cy=session-status]').should(
       'have.text',
-      'Session Status: Instance creation failed.'
+      'Session Status: Ready to run model'
     );
 
     // Show toast
     cy.get('#a-toast').should(
       'contain',
-      'Could not create instance, please try again later.'
+      'Could not start instance at the moment, please try again later.'
     );
 
     // Instance pending
@@ -138,10 +162,10 @@ describe('Create new project', () => {
     // Run
     cy.get('[data-cy=run-button').should('exist').click();
 
-    // Get to prediction halt point
+    // Check session status message
     cy.get('[data-cy=session-status]').should(
       'have.text',
-      'Session Status: Creating Instance...'
+      'Session Status: Starting instance'
     );
 
     // Wait one interval cycle
@@ -162,9 +186,10 @@ describe('Create new project', () => {
       }
     );
 
+    // Check session status message
     cy.get('[data-cy=session-status]').should(
       'have.text',
-      'Session Status: Waiting for predictions...'
+      'Session Status: Running prediction'
     );
   });
 });

@@ -18,6 +18,7 @@ import { useApiMeta } from '../../../context/api-meta';
 import { Spinner } from '../../common/global-loading/styles';
 import BatchPredictionProgressModal from './batch-progress-modal';
 import { useState } from 'react';
+import { useSessionStatus } from '../../../context/explore';
 
 const PanelControls = styled(PanelBlockFooter)`
   display: grid;
@@ -45,6 +46,7 @@ const ProgressButtonWrapper = styled.div`
 `;
 
 function PrimeButton({ currentCheckpoint, allowInferenceRun, mapRef }) {
+  const { setSessionStatusMode } = useSessionStatus();
   const {
     runPrediction,
     runBatchPrediction,
@@ -93,7 +95,10 @@ function PrimeButton({ currentCheckpoint, allowInferenceRun, mapRef }) {
     },
     'live-prediction': {
       label: 'Run Model',
-      action: runPrediction,
+      action: () => {
+        setSessionStatusMode('running-prediction');
+        runPrediction();
+      },
     },
     'batch-prediction': {
       label: 'Run Batch Prediction',

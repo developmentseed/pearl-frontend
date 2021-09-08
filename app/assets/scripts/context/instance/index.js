@@ -79,6 +79,7 @@ const InstanceContext = createContext(null);
 export function InstanceProvider(props) {
   const history = useHistory();
   const { restApiClient } = useAuth();
+
   const {
     currentCheckpoint,
     dispatchCurrentCheckpoint,
@@ -495,112 +496,110 @@ export function InstanceProvider(props) {
     getRunningBatch,
     runningBatch,
     runPrediction: async () => {
-      if (restApiClient) {
-        let project = currentProject;
+      let project = currentProject;
 
-        if (!project) {
-          try {
-            showGlobalLoadingMessage('Creating project...');
-            project = await restApiClient.createProject({
-              model_id: selectedModel.id,
-              mosaic: 'naip.latest',
-              name: projectName,
-            });
-            setCurrentProject(project);
-            history.push(`/project/${project.id}`);
-          } catch (error) {
-            logger(error);
-            hideGlobalLoading();
-            toasts.error('Could not create project, please try again later.');
-            return; // abort inference run
-          }
-        }
-
+      if (!project) {
         try {
-          showGlobalLoadingMessage('Fetching classes...');
-          const { classes } = await restApiClient.getModel(selectedModel.id);
-          dispatchCurrentCheckpoint({
-            type: checkpointActions.SET_CHECKPOINT,
-            data: {
-              classes,
-            },
+          showGlobalLoadingMessage('Creating project...');
+          project = await restApiClient.createProject({
+            model_id: selectedModel.id,
+            mosaic: 'naip.latest',
+            name: projectName,
           });
+          setCurrentProject(project);
+          history.push(`/project/${project.id}`);
         } catch (error) {
           logger(error);
-          toasts.error('Could fetch model classes, please try again later.');
           hideGlobalLoading();
+          toasts.error('Could not create project, please try again later.');
           return; // abort inference run
         }
+      }
 
-        if (!aoiName) {
-          toasts.error('AOI Name must be set before running inference');
-          hideGlobalLoading();
-          return; // abort inference run
-        }
+      try {
+        showGlobalLoadingMessage('Fetching classes...');
+        const { classes } = await restApiClient.getModel(selectedModel.id);
+        dispatchCurrentCheckpoint({
+          type: checkpointActions.SET_CHECKPOINT,
+          data: {
+            classes,
+          },
+        });
+      } catch (error) {
+        logger(error);
+        toasts.error('Could fetch model classes, please try again later.');
+        hideGlobalLoading();
+        return; // abort inference run
+      }
 
-        try {
-          await initInstance(
-            project.id,
-            currentCheckpoint && currentCheckpoint.id,
-            currentAoi && currentAoi.id
-          );
-        } catch (error) {
-          logger(error);
-          if (error.message === 'No instances available') {
-            toasts.error(
-              'No instance available to run the model, please try again later.',
-              { autoClose: false, toastId: 'no-instance-available-error' }
-            );
-          } else {
-            applyInstanceStatus({
-              gpuMessage: 'Instance creation failed.',
-              gpuStatus: 'creation-failed',
-            });
-            toasts.error('Could not create instance, please try again later.');
-          }
-          hideGlobalLoading();
-          return;
-        }
+      if (!aoiName) {
+        toasts.error('AOI Name must be set before running inference');
+        hideGlobalLoading();
+        return; // abort inference run
+      }
 
-        showGlobalLoadingMessage(
-          <>
-            Running model and loading class predictions...
-            <Button
-              style={{ display: 'block', margin: '1rem auto 0' }}
-              variation='danger-raised-dark'
-              onClick={() => {
-                abortJob();
-              }}
-            >
-              Abort Process
-            </Button>
-          </>
+      try {
+        await initInstance(
+          project.id,
+          currentCheckpoint && currentCheckpoint.id,
+          currentAoi && currentAoi.id
         );
-
-        try {
-          // Reset predictions state
-          dispatchPredictions({
-            type: predictionsActions.START_PREDICTION,
-            data: {
-              type: checkpointModes.RUN,
-            },
+      } catch (error) {
+        logger(error);
+        if (error.message === 'No instances available') {
+          toasts.error(
+            'No instance available to run the model, please try again later.',
+            { autoClose: false, toastId: 'no-instance-available-error' }
+          );
+        } else {
+          applyInstanceStatus({
+            gpuMessage: 'Instance creation failed.',
+            gpuStatus: 'creation-failed',
           });
-
-          // Add prediction request to queue
-          dispatchMessageQueue({
-            type: messageQueueActionTypes.ADD,
-            data: {
-              action: 'model#prediction',
-              data: {
-                name: aoiName,
-                polygon: aoiBoundsToPolygon(aoiRef.getBounds()),
-              },
-            },
-          });
-        } catch (error) {
-          logger(error);
           toasts.error('Could not create instance, please try again later.');
         }
+        hideGlobalLoading();
+        return;
+      }
+
+      showGlobalLoadingMessage(
+        <>
+          Running model and loading class predictions...
+          <Button
+            style={{ display: 'block', margin: '1rem auto 0' }}
+            variation='danger-raised-dark'
+            onClick={() => {
+              abortJob();
+            }}
+          >
+            Abort Process
+          </Button>
+        </>
+      );
+
+      try {
+        // Reset predictions state
+        dispatchPredictions({
+          type: predictionsActions.START_PREDICTION,
+          data: {
+            type: checkpointModes.RUN,
+          },
+        });
+
+        // Add prediction request to queue
+        dispatchMessageQueue({
+          type: messageQueueActionTypes.ADD,
+          data: {
+            action: 'model#prediction',
+            data: {
+              name: aoiName,
+              polygon: aoiBoundsToPolygon(aoiRef.getBounds()),
+            },
+          },
+        });
+      } catch (error) {
+        logger(error);
+        toasts.error('Could not create instance, please try again later.');
       }
     },
     runBatchPrediction: async function () {
