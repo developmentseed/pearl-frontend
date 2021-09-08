@@ -8,32 +8,33 @@ import React, {
 } from 'react';
 import { useHistory } from 'react-router';
 import T from 'prop-types';
-import config from '../config';
-import logger from '../utils/logger';
+import config from '../../config';
+import logger from '../../utils/logger';
 import get from 'lodash.get';
 import ReconnectingWebsocket from 'reconnecting-websocket';
 import {
   showGlobalLoadingMessage,
   hideGlobalLoading,
-} from '../components/common/global-loading';
+} from '../../components/common/global-loading';
 import { Button } from '@devseed-ui/button';
-import toasts from '../components/common/toasts';
-import { useAuth } from './auth';
+import toasts from '../../components/common/toasts';
+import { useAuth } from '../auth';
 import {
   actions as checkpointActions,
   checkpointModes,
   useCheckpoint,
-} from './checkpoint';
+} from '../checkpoint';
 
-import { actions as predictionsActions, usePredictions } from './predictions';
-import { useProject } from './project';
-import { useAoi, useAoiPatch } from './aoi';
-import { actions as aoiPatchActions } from './reducers/aoi_patch';
-import { useModel } from './model';
+import { actions as predictionsActions, usePredictions } from '../predictions';
+import { useProject } from '../project';
+import { useAoi, useAoiPatch } from '../aoi';
+import { actions as aoiPatchActions } from '../reducers/aoi_patch';
+import { useModel } from '../model';
 
-import { wrapLogReducer } from './reducers/utils';
+import { wrapLogReducer } from '../reducers/utils';
 import { featureCollection, feature } from '@turf/helpers';
-import { delay } from './reducers/reduxeed';
+import { delay } from '../reducers/reduxeed';
+import instanceReducer, { instanceActionTypes } from './reducer';
 
 const BATCH_REFRESH_INTERVAL = 4000;
 
@@ -45,53 +46,12 @@ const messageQueueActionTypes = {
   CLEAR: 'CLEAR',
 };
 
-const instanceActionTypes = {
-  APPLY_STATUS: 'APPLY_STATUS',
-};
-
 const instanceInitialState = {
   gpuMessage: 'Waiting for model run',
   gpuStatus: 'not-started', // 'ready', 'processing', 'aborting'
   wsConnected: false,
   gpuConnected: false,
 };
-
-function instanceReducer(state, action) {
-  const { type, data } = action;
-  let newState = state;
-
-  switch (type) {
-    case instanceActionTypes.APPLY_STATUS: {
-      // gpuStatus will change, update previousGpuStatus
-      if (data.gpuStatus && data.gpuStatus !== state.gpuStatus) {
-        newState.previousGpuStatus = state.gpuStatus;
-      }
-
-      // Apply passed data
-      newState = {
-        ...newState,
-        ...data,
-      };
-
-      break;
-    }
-    default:
-      logger('Unexpected instance action type: ', action);
-      throw new Error('Unexpected error.');
-  }
-
-  // Update display message for some GPU states.
-  if (data.gpuStatus === 'aborting') {
-    newState.gpuMessage = 'Aborting...';
-  } else if (data.gpuStatus === 'ready') {
-    newState.gpuMessage = 'Ready to go';
-  }
-
-  // Uncomment this to log instance state
-  // logger(newState);
-
-  return newState;
-}
 
 function aoiBoundsToPolygon(bounds) {
   // Get bbox polygon from AOI
