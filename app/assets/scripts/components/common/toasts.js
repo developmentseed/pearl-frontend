@@ -12,6 +12,7 @@ const ButtonIconXmark = styled(Button)`
 // The close button is set globally in the toast container.
 export const CloseButton = ({ closeToast }) => (
   <ButtonIconXmark
+    data-cy='toast-close-button'
     className='toast-close-button'
     variation='achromic-plain'
     size='small'

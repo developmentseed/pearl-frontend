@@ -538,29 +538,11 @@ export function InstanceProvider(props) {
         return; // abort inference run
       }
 
-      try {
-        await initInstance(
-          project.id,
-          currentCheckpoint && currentCheckpoint.id,
-          currentAoi && currentAoi.id
-        );
-      } catch (error) {
-        logger(error);
-        if (error.message === 'No instances available') {
-          toasts.error(
-            'No instance available to run the model, please try again later.',
-            { autoClose: false, toastId: 'no-instance-available-error' }
-          );
-        } else {
-          applyInstanceStatus({
-            gpuMessage: 'Instance creation failed.',
-            gpuStatus: 'creation-failed',
-          });
-          toasts.error('Could not create instance, please try again later.');
-        }
-        hideGlobalLoading();
-        return;
-      }
+      await initInstance(
+        project.id,
+        currentCheckpoint && currentCheckpoint.id,
+        currentAoi && currentAoi.id
+      );
 
       showGlobalLoadingMessage(
         <>

@@ -29,7 +29,7 @@ import { useProject } from '../project';
 import { useModel } from '../model';
 import { useInstance } from '../instance';
 import logger from '../../utils/logger';
-import { wrapLogReducer } from '../reducers/reduxeed';
+import { wrapLogReducer } from '../reducers/utils';
 import {
   actions as sessionActions,
   useSessionStatusReducer,

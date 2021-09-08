@@ -19,6 +19,9 @@ import { Spinner } from '../../common/global-loading/styles';
 import BatchPredictionProgressModal from './batch-progress-modal';
 import { useState } from 'react';
 import { useSessionStatus } from '../../../context/explore';
+import logger from '../../../utils/logger';
+import { hideGlobalLoading } from '../../common/global-loading';
+import toasts from '../../common/toasts';
 
 const PanelControls = styled(PanelBlockFooter)`
   display: grid;
@@ -95,9 +98,24 @@ function PrimeButton({ currentCheckpoint, allowInferenceRun, mapRef }) {
     },
     'live-prediction': {
       label: 'Run Model',
-      action: () => {
-        setSessionStatusMode('running-prediction');
-        runPrediction();
+      action: async () => {
+        try {
+          setSessionStatusMode('running-prediction');
+          await runPrediction();
+          setSessionStatusMode('retrain-ready');
+        } catch (error) {
+          logger(error);
+
+          hideGlobalLoading();
+          if (error.message === 'Instance creation failed') {
+            toasts.error(
+              'Could not start instance at the moment, please try again later.'
+            );
+          } else {
+            toasts.error('Unexpected error, please try again later');
+          }
+          setSessionStatusMode('prediction-ready');
+        }
       },
     },
     'batch-prediction': {

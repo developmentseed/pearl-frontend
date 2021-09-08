@@ -39,6 +39,11 @@ const modes = [
     level: 'info',
     message: 'Running prediction',
   },
+  {
+    mode: 'retrain-ready',
+    level: 'info',
+    message: 'Ready for retrain run',
+  },
 ];
 
 export default function sessionStatusReducer(state, action) {

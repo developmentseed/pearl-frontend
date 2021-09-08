@@ -114,7 +114,7 @@ describe('Create new project', () => {
     // Check session status message
     cy.get('[data-cy=session-status]').should(
       'have.text',
-      'Session Status: Starting instance'
+      'Session Status: Running prediction'
     );
 
     // Instance failed
@@ -132,16 +132,19 @@ describe('Create new project', () => {
       }
     );
 
-    // Check session status message
-    cy.get('[data-cy=session-status]').should(
-      'have.text',
-      'Session Status: Ready to run model'
-    );
-
     // Show toast
     cy.get('#a-toast').should(
       'contain',
       'Could not start instance at the moment, please try again later.'
+    );
+
+    cy.get('[data-cy=toast-close-button]').click();
+    cy.get('[data-cy=toast-close-button]').should('not.exist');
+
+    // Check session status message
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Ready for prediction run'
     );
 
     // Instance pending
@@ -165,7 +168,7 @@ describe('Create new project', () => {
     // Check session status message
     cy.get('[data-cy=session-status]').should(
       'have.text',
-      'Session Status: Starting instance'
+      'Session Status: Running prediction'
     );
 
     // Wait one interval cycle
@@ -186,10 +189,19 @@ describe('Create new project', () => {
       }
     );
 
-    // Check session status message
     cy.get('[data-cy=session-status]').should(
       'have.text',
-      'Session Status: Running prediction'
+      'Session Status: Received image 1 of 6...'
+    );
+
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Received image 6 of 6...'
+    );
+
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Ready for retrain'
     );
   });
 });
