@@ -7,29 +7,29 @@ import React, {
   useMemo,
 } from 'react';
 import T from 'prop-types';
-import { useAuth } from './auth';
+import { useAuth } from '../auth';
 import {
   showGlobalLoadingMessage,
   hideGlobalLoading,
-} from '../components/common/global-loading';
-import toasts from '../components/common/toasts';
+} from '../../components/common/global-loading';
+import toasts from '../../components/common/toasts';
 import { useHistory, useParams } from 'react-router-dom';
-import { actions as predictionActions, usePredictions } from './predictions';
-import { mapStateReducer, mapModes, mapActionTypes } from './reducers/map';
+import { actions as predictionActions, usePredictions } from '../predictions';
+import { mapStateReducer, mapModes, mapActionTypes } from '../reducers/map';
 import tBbox from '@turf/bbox';
 
 import {
   actions as checkpointActions,
   checkpointModes,
   useCheckpoint,
-} from './checkpoint';
-import { wrapLogReducer } from './reducers/utils';
-import { useAoi, useAoiPatch } from './aoi';
-import { actions as aoiPatchActions } from './reducers/aoi_patch';
-import { useProject } from './project';
-import { useModel } from './model';
-import { useInstance } from './instance';
-import logger from '../utils/logger';
+} from '../checkpoint';
+import { useAoi, useAoiPatch } from '../aoi';
+import { actions as aoiPatchActions } from '../reducers/aoi_patch';
+import { useProject } from '../project';
+import { useModel } from '../model';
+import { useInstance } from '../instance';
+import logger from '../../utils/logger';
+import { wrapLogReducer } from '../reducers/reduxeed';
 
 /**
  * Context & Provider
