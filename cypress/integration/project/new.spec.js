@@ -11,10 +11,8 @@ const instance = {
   created: '2021-07-12T09:58:57.459Z',
   active: true,
   token: 'app_client',
-  pod: {
-    status: {
-      phase: 'Pending',
-    },
+  status: {
+    phase: 'Pending',
   },
 };
 
@@ -123,10 +121,8 @@ describe('Create new project', () => {
       },
       {
         ...instance,
-        pod: {
-          status: {
-            phase: 'Failed',
-          },
+        status: {
+          phase: 'Failed',
         },
       }
     );
@@ -153,10 +149,8 @@ describe('Create new project', () => {
       },
       {
         ...instance,
-        pod: {
-          status: {
-            phase: 'Pending',
-          },
+        status: {
+          phase: 'Pending',
         },
       }
     );
@@ -177,10 +171,8 @@ describe('Create new project', () => {
       },
       {
         ...instance,
-        pod: {
-          status: {
-            phase: 'Running',
-          },
+        status: {
+          phase: 'Running',
         },
       }
     );

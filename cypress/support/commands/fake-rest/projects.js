@@ -258,7 +258,9 @@ export default function () {
       last_update: '2021-07-12T09:59:04.442Z',
       created: '2021-07-12T09:58:57.459Z',
       active: true,
-      status: {},
+      status: {
+        phase: 'Running',
+      },
       token: 'app_client',
     }
   );

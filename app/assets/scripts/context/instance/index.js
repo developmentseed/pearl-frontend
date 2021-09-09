@@ -217,6 +217,11 @@ export function InstanceProvider(props) {
       websocketClient.close();
     }
 
+    applyInstanceStatus({
+      gpuMessage: 'Creating Instance...',
+      gpuStatus: 'creating-instance',
+    });
+
     // Check if instance slots are available
     const {
       limits: { active_gpus, total_gpus },
@@ -228,120 +233,91 @@ export function InstanceProvider(props) {
       throw Error('No instances available');
     }
 
-    applyInstanceStatus({
-      gpuMessage: 'Initializing',
-      gpuStatus: 'initializing',
-      wsConnected: false,
-      gpuConnected: false,
-    });
+    let doHideGlobalLoading = true;
 
     // Fetch active instances for this project
-    const activeInstances = await restApiClient.getActiveInstances(projectId);
-
-    // Init instance
     let instance;
-
-    /**
-     * Helper function to handle instance creation
-     */
-    async function createInstance(options) {
-      applyInstanceStatus({
-        gpuMessage: 'Creating Instance...',
-        gpuStatus: 'creating-instance',
-      });
-
-      let instanceStatus;
-      let creationDuration = 0;
-
-      // Request a new instance
-      const { id: instanceId } = await restApiClient.createInstance(
-        projectId,
-        options
-      );
-
-      // Start loop to wait for "Running" status
-      while (
-        !instanceStatus ||
-        creationDuration < config.instanceCreationTimeout
-      ) {
-        // Check timeout
-        if (creationDuration >= config.instanceCreationTimeout) {
-          throw new Error('Instance creation timeout');
-        }
-
-        // Get instance status
-        instanceStatus = await restApiClient.get(
-          `/project/${projectId}/instance/${instanceId}`
-        );
-        const instancePhase = get(instanceStatus, 'pod.status.phase');
-
-        // Process status
-        if (instancePhase === 'Running') {
-          return instanceStatus;
-        } else if (instancePhase === 'Failed') {
-          throw new Error('Instance creation failed');
-        }
-
-        // Update timer
-        await delay(config.instanceCreationCheckInterval);
-        creationDuration += config.instanceCreationCheckInterval;
-      }
-
-      // Instance should have been created successfully in the loop above, raise error
-      throw new Error('Instance creation failed');
-    }
-
-    let doHideGlobalLoading = true;
+    const activeInstances = await restApiClient.getActiveInstances(projectId);
     if (activeInstances.total > 0) {
       const { id: instanceId } = activeInstances.instances[0];
       instance = await restApiClient.getInstance(projectId, instanceId);
+    } else if (checkpointId) {
+      instance = await restApiClient.createInstance(projectId, {
+        checkpoint_id: checkpointId,
+        aoi_id: aoiId,
+      });
+    } else {
+      instance = await restApiClient.createInstance(projectId);
+    }
 
-      // As the instance is already running, apply desired checkpoint when
-      // ready.
-      if (checkpointId) {
-        if (checkpointId !== instance.checkpoint_id) {
-          doHideGlobalLoading = false; // globalLoading will be hidden once checkpoint is in
-          dispatchMessageQueue({
-            type: messageQueueActionTypes.ADD,
-            data: {
-              action: 'model#checkpoint',
-              data: {
-                id: checkpointId,
-              },
-            },
-          });
-        } else {
-          fetchCheckpoint(
-            projectId,
-            checkpointId,
-            aoiId ? checkpointModes.RETRAIN : checkpointModes.RUN,
-            true
-          );
-        }
+    // Confirm instance has running status
+    let instanceStatus;
+    let creationDuration = 0;
+    while (
+      !instanceStatus ||
+      creationDuration < config.instanceCreationTimeout
+    ) {
+      // Get instance status
+      instanceStatus = await restApiClient.get(
+        `/project/${projectId}/instance/${instance.id}`
+      );
+      const instancePhase = get(instanceStatus, 'status.phase');
+
+      // Process status
+      if (instancePhase === 'Running') {
+        break;
+      } else if (instancePhase === 'Failed') {
+        throw new Error('Instance creation failed');
       }
 
-      if (aoiId && aoiId !== instance.aoi_id) {
+      // Update timer
+      await delay(config.instanceCreationCheckInterval);
+      creationDuration += config.instanceCreationCheckInterval;
+
+      // Check timeout
+      if (creationDuration >= config.instanceCreationTimeout) {
+        throw new Error('Instance creation timeout');
+      }
+    }
+
+    // Apply checkpoint when set
+    if (checkpointId) {
+      if (checkpointId !== instance.checkpoint_id) {
         doHideGlobalLoading = false; // globalLoading will be hidden once checkpoint is in
         dispatchMessageQueue({
           type: messageQueueActionTypes.ADD,
           data: {
-            action: 'model#aoi',
+            action: 'model#checkpoint',
             data: {
-              id: aoiId,
+              id: checkpointId,
             },
           },
         });
-      }
-    } else if (checkpointId) {
-      instance = await createInstance({
-        checkpoint_id: checkpointId,
-        aoi_id: aoiId,
-      });
 
-      // Apply checkpoint to the interface as the instance will start with it applied.
-      fetchCheckpoint(projectId, checkpointId, checkpointModes.RETRAIN);
-    } else {
-      instance = await createInstance();
+        // Apply checkpoint to the interface as the instance will start with it applied.
+        fetchCheckpoint(projectId, checkpointId, checkpointModes.RETRAIN);
+      } else {
+        fetchCheckpoint(
+          projectId,
+          checkpointId,
+          aoiId ? checkpointModes.RETRAIN : checkpointModes.RUN,
+          true
+        );
+      }
+    }
+
+    // Apply AOI when set
+    if (aoiId && aoiId !== instance.aoi_id) {
+      doHideGlobalLoading = false; // globalLoading will be hidden once checkpoint is in
+      dispatchMessageQueue({
+        type: messageQueueActionTypes.ADD,
+        data: {
+          action: 'model#aoi',
+          data: {
+            id: aoiId,
+          },
+        },
+      });
     }
 
     // Use a Promise to stand by for GPU connection
@@ -572,7 +548,9 @@ export function InstanceProvider(props) {
         });
       } catch (error) {
         logger(error);
-        toasts.error('Could not create instance, please try again later.');
+        toasts.error(
+          'Could not start instance at the moment, please try again later.'
+        );
       }
     },
     runBatchPrediction: async function () {
@@ -659,7 +637,7 @@ export function InstanceProvider(props) {
             { autoClose: false, toastId: 'no-instance-available-error' }
           );
         } else {
-          toasts.error('Could not create instance, please try again later.');
+          toasts.error('Could not start instance, please try again later.');
         }
         hideGlobalLoading();
         return;

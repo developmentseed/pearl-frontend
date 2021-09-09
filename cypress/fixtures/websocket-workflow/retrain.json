@@ -15,7 +15,7 @@
         "is_aborting": false,
         "processing": false,
         "aoi": 2,
-        "checkpoint": 1
+        "checkpoint": 2
       }
     }
   },
@@ -38,7 +38,7 @@
         "is_aborting": false,
         "processing": false,
         "aoi": 2,
-        "checkpoint": 1
+        "checkpoint": 2
       }
     }
   },
@@ -47,7 +47,7 @@
     "payload": {
       "action": "model#retrain",
       "data": {
-        "name": "Seneca Rocks",
+        "name": "Seneca Rocks #1",
         "classes": [
           {
             "name": "Water / Wetland",
