@@ -102,7 +102,6 @@ function PrimeButton({ currentCheckpoint, allowInferenceRun, mapRef }) {
         try {
           setSessionStatusMode('running-prediction');
           await runPrediction();
-          setSessionStatusMode('retrain-ready');
         } catch (error) {
           logger(error);
 

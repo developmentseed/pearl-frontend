@@ -1,6 +1,5 @@
 const {
   restApiEndpoint,
-  instanceCreationCheckInterval,
 } = require('../../../app/assets/scripts/config/testing').default;
 
 const instance = {
@@ -171,9 +170,6 @@ describe('Create new project', () => {
       'Session Status: Running prediction'
     );
 
-    // Wait one interval cycle
-    cy.wait(instanceCreationCheckInterval);
-
     // Instance is running
     cy.intercept(
       {
@@ -191,17 +187,7 @@ describe('Create new project', () => {
 
     cy.get('[data-cy=session-status]').should(
       'have.text',
-      'Session Status: Received image 1 of 6...'
-    );
-
-    cy.get('[data-cy=session-status]').should(
-      'have.text',
-      'Session Status: Received image 6 of 6...'
-    );
-
-    cy.get('[data-cy=session-status]').should(
-      'have.text',
-      'Session Status: Ready for retrain'
+      'Session Status: Ready for retrain run'
     );
   });
 });

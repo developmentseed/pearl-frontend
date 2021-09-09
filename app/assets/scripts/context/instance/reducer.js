@@ -1,26 +1,28 @@
+import { useReducer } from 'react';
 import logger from '../../utils/logger';
+import { wrapLogReducer } from '../reducers/utils';
 
-export const instanceActionTypes = {
-  APPLY_STATUS: 'APPLY_STATUS',
+export const actions = {
+  SET_STATUS: 'SET_STATUS',
+};
+
+export const initialState = {
+  gpuMessage: 'Initializing',
+  gpuStatus: 'initializing',
+  wsConnected: false,
+  gpuConnected: false,
 };
 
 export default function instanceReducer(state, action) {
   const { type, data } = action;
-  let newState = state;
+  let nextState;
 
   switch (type) {
-    case instanceActionTypes.APPLY_STATUS: {
-      // gpuStatus will change, update previousGpuStatus
-      if (data.gpuStatus && data.gpuStatus !== state.gpuStatus) {
-        newState.previousGpuStatus = state.gpuStatus;
-      }
-
-      // Apply passed data
-      newState = {
-        ...newState,
+    case actions.SET_STATUS: {
+      nextState = {
+        ...state,
         ...data,
       };
-
       break;
     }
     default:
@@ -28,15 +30,9 @@ export default function instanceReducer(state, action) {
       throw new Error('Unexpected error.');
   }
 
-  // Update display message for some GPU states.
-  if (data.gpuStatus === 'aborting') {
-    newState.gpuMessage = 'Aborting...';
-  } else if (data.gpuStatus === 'ready') {
-    newState.gpuMessage = 'Ready to go';
-  }
+  return nextState;
+}
 
-  // Uncomment this to log instance state
-  // logger(newState);
-
-  return newState;
+export function useInstanceReducer() {
+  return useReducer(wrapLogReducer(instanceReducer), initialState);
 }

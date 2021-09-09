@@ -34,7 +34,7 @@ import { useModel } from '../model';
 import { wrapLogReducer } from '../reducers/utils';
 import { featureCollection, feature } from '@turf/helpers';
 import { delay } from '../reducers/reduxeed';
-import instanceReducer, { instanceActionTypes } from './reducer';
+import { actions as instanceActions, useInstanceReducer } from './reducer';
 
 const BATCH_REFRESH_INTERVAL = 4000;
 
@@ -44,13 +44,6 @@ const messageQueueActionTypes = {
   ADD_EXPRESS: 'ADD_EXPRESS',
   SEND: 'SEND',
   CLEAR: 'CLEAR',
-};
-
-const instanceInitialState = {
-  gpuMessage: 'Waiting for model run',
-  gpuStatus: 'not-started', // 'ready', 'processing', 'aborting'
-  wsConnected: false,
-  gpuConnected: false,
 };
 
 function aoiBoundsToPolygon(bounds) {
@@ -93,10 +86,16 @@ export function InstanceProvider(props) {
 
   const [websocketClient, setWebsocketClient] = useState(null);
 
-  const [instance, dispatchInstance] = useReducer(
-    instanceReducer,
-    instanceInitialState
-  );
+  /**
+   * Instance reducer
+   */
+  const [instance, dispatchInstance] = useInstanceReducer();
+  const applyInstanceStatus = (status) => {
+    dispatchInstance({
+      type: instanceActions.SET_STATUS,
+      data: status,
+    });
+  };
 
   const [runningBatch, setRunningBatch] = useState(false);
   const [runningBatchWatcher, setRunningBatchWatcher] = useState(null);
@@ -105,14 +104,6 @@ export function InstanceProvider(props) {
   useEffect(() => {
     return () => runningBatchWatcher && clearInterval(runningBatchWatcher);
   }, []);
-
-  // Apply instance status
-  const applyInstanceStatus = (status) => {
-    dispatchInstance({
-      type: instanceActionTypes.APPLY_STATUS,
-      data: status,
-    });
-  };
 
   // Create a message queue to wait for instance connection
   const [messageQueue, dispatchMessageQueue] = useReducer(

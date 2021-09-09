@@ -218,7 +218,7 @@ export function ExploreProvider(props) {
       if (!total) {
         setSessionStatusMessage(`Waiting for predictions...`);
       } else {
-        setSessionStatusMessage(`Receiving images ${processed} of ${total}...`);
+        setSessionStatusMessage(`Received image ${processed} of ${total}...`);
       }
     } else if (predictions.isReady()) {
       // Update aoi List with newest aoi
@@ -243,6 +243,8 @@ export function ExploreProvider(props) {
           .then((aoi) => {
             setCurrentAoi(aoi);
           });
+
+        setSessionStatusMode('retrain-ready');
       }
 
       if (predictions.error) {

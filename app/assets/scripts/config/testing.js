@@ -5,6 +5,6 @@ module.exports = {
     restApiEndpoint: 'http://localhost:2000',
     websocketEndpoint: 'ws://localhost:1999',
     instanceCreationTimeout: 5000,
-    instanceCreationCheckInterval: 1000,
+    instanceCreationCheckInterval: 500,
   },
 };
