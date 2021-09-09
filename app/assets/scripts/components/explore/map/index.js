@@ -143,6 +143,7 @@ function Map() {
     switch (mapState.mode) {
       case mapModes.CREATE_AOI_MODE:
         mapRef.aoi.control.draw.enable();
+        mapRef._container.style.cursor = 'crosshair';
         mapRef.freehandDraw.disable();
         break;
       case mapModes.EDIT_AOI_MODE:
@@ -165,6 +166,7 @@ function Map() {
             ) {
               // On confirm, zoom to bounds
               mapRef.fitBounds(aoiRef.getBounds(), { padding: BOUNDS_PADDING });
+              mapRef._container.style.cursor = 'grab';
             }
           }
         }
