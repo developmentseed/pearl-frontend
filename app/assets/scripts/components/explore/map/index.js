@@ -53,6 +53,7 @@ import PolygonDrawControl from './polygon-draw-control';
 
 const center = [38.889805, -77.009056];
 const zoom = 12;
+const osmTilesMaxZoom = 19;
 
 const MAX = 3;
 const NO_LIVE = 2;
@@ -363,6 +364,7 @@ function Map() {
         tap={false}
         center={center}
         zoom={zoom}
+        maxZoom={osmTilesMaxZoom}
         style={{ height: '100%' }}
         whenCreated={(m) => {
           const freehandDraw = new FreehandDrawControl(m, {
@@ -416,7 +418,7 @@ function Map() {
         <TileLayer
           attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
           url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-          maxZoom={18}
+          maxZoom={osmTilesMaxZoom}
         />
         {mosaics &&
           mosaics.map((layer) => (
