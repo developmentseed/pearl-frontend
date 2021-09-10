@@ -105,6 +105,10 @@ describe('Loads AOIs', () => {
       '81.11  km2'
     );
 
+    cy.get('[data-cy=panel-aoi-confirm]')
+      .should('exist')
+      .should('not.be.disabled');
+
     // Set AOI
     cy.get('[data-cy=aoi-edit-confirm-button').click();
 
@@ -132,6 +136,10 @@ describe('Loads AOIs', () => {
       'include.text',
       '6.56  km2'
     );
+
+    cy.get('[data-cy=panel-aoi-confirm]')
+      .should('exist')
+      .should('not.be.disabled');
 
     // Set AOI
     cy.get('[data-cy=aoi-edit-confirm-button').click();

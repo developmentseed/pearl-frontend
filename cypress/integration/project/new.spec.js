@@ -52,6 +52,15 @@ describe('Create new project', () => {
       .trigger('mouseup');
     cy.wait('@reverseGeocodeCity');
 
+    // Re-enter edit mode
+    cy.get('[data-cy=aoi-edit-button]').click();
+
+    // Panel prime button should be in AOI Confirm mode
+    cy.get('[data-cy=panel-aoi-confirm]')
+      .should('exist')
+      .should('not.be.disabled')
+      .click();
+
     // Set model
     cy.get('[data-cy=select-model-label]').should('exist').click();
     cy.get('[data-cy=select-model-1-card]').should('exist').click();

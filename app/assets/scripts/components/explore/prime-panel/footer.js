@@ -191,7 +191,7 @@ PrimeButton.propTypes = {
   allowInferenceRun: T.bool.isRequired,
   mapRef: T.object,
   setAoiBounds: T.func,
-  dispatchCurrentCheckpoint: T.func
+  dispatchCurrentCheckpoint: T.func,
 };
 
 function Footer({
@@ -363,6 +363,6 @@ Footer.propTypes = {
 
   disabled: T.bool,
 
-  setAoiBounds: T.func
+  setAoiBounds: T.func,
 };
 export default Footer;
