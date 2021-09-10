@@ -109,7 +109,7 @@ function SecPanel() {
                     }}
                     label='Retraining Sample Distribution'
                     metric='px_stat'
-                    formatter={(v) => `${round(v, 2) * 100}%`}
+                    formatter={(v) => `${round(v * 100, 0)}%`}
                   />
                 </StyledBlockBody>
               )}
