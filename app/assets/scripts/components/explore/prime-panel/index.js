@@ -323,12 +323,13 @@ function PrimePanel() {
 
                   mapRef,
 
+                  setAoiBounds,
+
                   disabled:
-                    mapState.mode === mapModes.EDIT_AOI_MODE ||
-                    (currentCheckpoint &&
-                      (currentCheckpoint.mode === checkpointModes.RETRAIN ||
-                        currentCheckpoint.mode === checkpointModes.REFINE) &&
-                      !checkpointHasSamples()),
+                    currentCheckpoint &&
+                    (currentCheckpoint.mode === checkpointModes.RETRAIN ||
+                      currentCheckpoint.mode === checkpointModes.REFINE) &&
+                    !checkpointHasSamples(),
 
                   allowInferenceRun,
                 }}
