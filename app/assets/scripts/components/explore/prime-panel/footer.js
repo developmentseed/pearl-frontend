@@ -68,13 +68,7 @@ function PrimeButton({
     retrain,
     refine,
   } = useInstance();
-  const {
-    aoiArea,
-    setActiveModal,
-    aoiRef,
-    setCurrentAoi,
-    currentAoi,
-  } = useAoi();
+  const { aoiArea, setActiveModal, aoiRef, setCurrentAoi } = useAoi();
   const { updateAoiName } = useAoiName();
   const { apiLimits } = useApiMeta();
   const { mapState, setMapMode } = useMapState();

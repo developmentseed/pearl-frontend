@@ -223,6 +223,7 @@ export function AoiEditButtons(props) {
   const [showUploadAoiModal, setShowUploadAoiModal] = useState(false);
   const { updateAoiName } = useAoiName();
   const {
+    currentAoi,
     setCurrentAoi,
     activeModal,
     setActiveModal,
