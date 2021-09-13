@@ -147,7 +147,7 @@ function PrimeButton({
         onClick={aoiRef ? confirmAoi : cancelAoi}
         id='panel-aoi-confirm'
       >
-        {aoiRef ? 'Confirm Aoi' : 'Cancel Draw'}
+        {aoiRef ? 'Confirm Area Draw' : 'Cancel Area Draw'}
       </InfoButton>
     );
   }
