@@ -236,7 +236,6 @@ function Footer({
     <PanelControls
       data-cy='footer-panel-controls'
       data-disabled={disabled}
-      //disabled={disabled}
     >
       <Button
         variation='base-plain'
