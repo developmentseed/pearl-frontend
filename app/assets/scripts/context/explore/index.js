@@ -35,6 +35,8 @@ import {
   useSessionStatusReducer,
 } from './session-status';
 
+import { useShortcutReducer, actions as shortcutActions } from './shortcuts';
+
 /**
  * Context & Provider
  */
@@ -103,6 +105,11 @@ export function ExploreProvider(props) {
    * Session status
    */
   const [sessionStatus, dispatchSessionStatus] = useSessionStatusReducer();
+
+  /*
+   * Keyboard shortcuts
+   */
+  const [shortcutState, dispatchShortcutState] = useShortcutReducer();
 
   // Action handlers
   const setSessionStatusMessage = (message) =>
@@ -585,6 +592,9 @@ export function ExploreProvider(props) {
 
         sessionStatus,
         setSessionStatusMode,
+
+        shortcutState,
+        dispatchShortcutState,
       }}
     >
       {props.children}
@@ -617,6 +627,20 @@ export const useSessionStatus = () => {
   return useMemo(() => ({ sessionStatus, setSessionStatusMode }), [
     sessionStatus,
   ]);
+};
+
+export const useShortcutState = () => {
+  const { shortcutState, dispatchShortcutState } = useExploreContext(
+    'useSessionStatus'
+  );
+
+  return useMemo(
+    () => ({
+      shortcutState,
+      dispatchShortcutState,
+    }),
+    [shortcutState, dispatchShortcutState]
+  );
 };
 
 export const useMapState = () => {
