@@ -75,9 +75,6 @@ export default function sessionStatusReducer(state, action) {
       throw new Error('Unexpected error.');
   }
 
-  // Uncomment this to log
-  logger(newState);
-
   return newState;
 }
 
