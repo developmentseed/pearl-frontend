@@ -259,7 +259,7 @@ export function InstanceProvider(props) {
     ) {
       // Get instance status
       instanceStatus = await restApiClient.get(
-        `/project/${projectId}/instance/${instance.id}`
+        `project/${projectId}/instance/${instance.id}`
       );
       const instancePhase = get(instanceStatus, 'status.phase');
 

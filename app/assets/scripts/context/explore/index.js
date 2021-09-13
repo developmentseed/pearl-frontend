@@ -116,25 +116,36 @@ export function ExploreProvider(props) {
       data: mode,
     });
 
-  // Control session modes for new projects
+  // Handle session mode updates
   useEffect(() => {
-    if (sessionStatus.mode === 'set-project-name' && projectName) {
+    const { mode } = sessionStatus;
+    if (mode === 'set-project-name' && projectName) {
       setSessionStatusMode('set-aoi');
-    } else if (sessionStatus.mode === 'set-aoi' && aoiRef) {
+    } else if (mode === 'set-aoi' && aoiRef) {
       setSessionStatusMode('select-model');
-    } else if (sessionStatus.mode === 'select-model' && selectedModel) {
+    } else if (mode === 'select-model' && selectedModel) {
       setSessionStatusMode('prediction-ready');
+    } else if (mode === 'loading-project' && aoiRef && currentCheckpoint) {
+      setSessionStatusMode('retrain-ready');
     }
-  }, [sessionStatus.mode, projectName, aoiRef, selectedModel]);
+  }, [
+    sessionStatus.mode,
+    projectName,
+    aoiRef,
+    selectedModel,
+    currentCheckpoint,
+  ]);
 
   async function loadInitialData() {
     showGlobalLoadingMessage('Loading configuration...');
 
-    // Bypass loading project when new
+    // Update session status
     if (projectId === 'new') {
       setSessionStatusMode('set-project-name');
       hideGlobalLoading();
-      return;
+      return; // Bypass loading project when new
+    } else {
+      setSessionStatusMode('loading-project');
     }
 
     let project;

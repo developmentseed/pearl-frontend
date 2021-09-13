@@ -40,6 +40,11 @@ const modes = [
     message: 'Running prediction',
   },
   {
+    mode: 'loading-project',
+    level: 'info',
+    message: 'Loading project...',
+  },
+  {
     mode: 'retrain-ready',
     level: 'info',
     message: 'Ready for retrain run',

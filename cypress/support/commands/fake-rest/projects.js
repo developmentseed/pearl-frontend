@@ -387,7 +387,7 @@ export default function () {
         { type: 'GeometryCollection', geometries: [] },
       ],
     }
-  );
+  ).as('fetchCheckpoint2');
 
   /**
    * GET /project/:id/checkpoint/3
@@ -550,7 +550,7 @@ export default function () {
 
       shares: [],
     }
-  );
+  ).as('fetchAoi2');
 
   /**
    * GET /project/1/aoi/3

@@ -36,9 +36,19 @@ describe('Retrain existing project', () => {
   });
 
   it('successfully loads', () => {
+    // Check initial status
     cy.get('[data-cy=session-status]').should(
       'have.text',
-      'Session Status: Loading...'
+      'Session Status: Loading project...'
+    );
+
+    // Wait for data loading
+    cy.wait(['@fetchAoi2', '@fetchCheckpoint2']);
+
+    // Check ready for retrain status
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Ready for retrain run'
     );
 
     cy.get('[data-cy=global-loading]').should('not.exist');
