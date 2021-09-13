@@ -148,6 +148,19 @@ export function ExploreProvider(props) {
       setSessionStatusMode('loading-project');
     }
 
+    const { availableGpus } = await restApiClient.getApiMeta('');
+
+    // Do not run when no instances are available
+    if (!availableGpus || availableGpus === 0) {
+      hideGlobalLoading();
+      toasts.error('No instances available, please try again later.', {
+        autoClose: false,
+        toastId: 'no-instance-available-error',
+      });
+      history.push('/profile/projects');
+      return;
+    }
+
     let project;
     try {
       // Get project metadata

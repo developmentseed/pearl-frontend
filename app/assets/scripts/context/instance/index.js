@@ -223,10 +223,7 @@ export function InstanceProvider(props) {
     });
 
     // Check if instance slots are available
-    const {
-      limits: { active_gpus, total_gpus },
-    } = await restApiClient.get('');
-    const availableGpus = total_gpus - (active_gpus || 0);
+    const { availableGpus } = await restApiClient.getApiMeta('');
 
     // Do not run when no instances are available
     if (!availableGpus) {
