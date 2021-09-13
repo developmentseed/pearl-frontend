@@ -98,6 +98,7 @@ function Layer({ layer, onSliderChange, onVisibilityToggle, info, name }) {
           onChange={throttle((v) => {
             setValue(v);
             onSliderChange(layer, v);
+            if (v > 0) setVisible(true);
           }, 500)}
           value={value}
           formatLabel={() => null}
@@ -220,7 +221,7 @@ function LayersPanel(props) {
     });
   }, [currentCheckpoint && currentCheckpoint.retrain_geoms]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     function updatePosition() {
       if (parentNode.current) {
         setPosition(parentNode.current.getBoundingClientRect());
@@ -268,6 +269,7 @@ function LayersPanel(props) {
                     [layer.id]: {
                       ...layer,
                       opacity: value,
+                      visible: value > 0,
                     },
                   });
                 }}

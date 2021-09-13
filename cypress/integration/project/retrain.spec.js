@@ -2,21 +2,55 @@ const {
   restApiEndpoint,
 } = require('../../../app/assets/scripts/config/testing').default;
 
+const instance = {
+  id: 1,
+  project_id: 1,
+  aoi_id: 2,
+  checkpoint_id: 2,
+  last_update: '2021-07-12T09:59:04.442Z',
+  created: '2021-07-12T09:58:57.459Z',
+  active: true,
+  token: 'app_client',
+  status: {
+    phase: 'Running',
+  },
+};
+
 describe('Retrain existing project', () => {
   beforeEach(() => {
     cy.startServer();
+    cy.fakeLogin();
+    cy.setWebsocketWorkflow('retrain');
+
+    /**
+     * GET /project/:id/instance/:id
+     */
+    cy.intercept(
+      {
+        url: restApiEndpoint + '/api/project/1/instance/1',
+      },
+      instance
+    );
+
+    cy.visit('/project/1');
   });
 
   it('successfully loads', () => {
-    cy.fakeLogin();
-
-    cy.setWebsocketWorkflow('retrain');
-
-    cy.visit('/project/1');
+    // Check initial status
     cy.get('[data-cy=session-status]').should(
       'have.text',
-      'Session Status: Ready to go'
+      'Session Status: Loading project...'
     );
+
+    // Wait for data loading
+    cy.wait(['@fetchAoi2', '@fetchCheckpoint2']);
+
+    // Check ready for retrain status
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Ready for retrain run'
+    );
+
     cy.get('[data-cy=global-loading]').should('not.exist');
 
     // Check if retrain button panel is disabled
@@ -176,7 +210,7 @@ describe('Retrain existing project', () => {
       )
       .click();
 
-    // Set no instances available
+    // Make instances available
     cy.intercept(
       {
         url: restApiEndpoint + '/api',
@@ -193,6 +227,19 @@ describe('Retrain existing project', () => {
       }
     ).as('fetchAvailableInstancesCount');
 
+    // Instance pending
+    cy.intercept(
+      {
+        url: restApiEndpoint + '/api/project/1/instance/1',
+      },
+      {
+        ...instance,
+        status: {
+          phase: 'Pending',
+        },
+      }
+    );
+
     // Request model run
     cy.get('[data-cy=run-button').click();
 
@@ -201,5 +248,47 @@ describe('Retrain existing project', () => {
 
     // Should display modal
     cy.get('#no-instance-available-error').should('not.exist');
+
+    // Instance is failed
+    cy.intercept(
+      {
+        url: restApiEndpoint + '/api/project/1/instance/1',
+      },
+      {
+        ...instance,
+        status: {
+          phase: 'Failed',
+        },
+      }
+    );
+
+    // Show toast
+    cy.get('#a-toast').should(
+      'contain',
+      'Could not start instance, please try again later.'
+    );
+    cy.get('[data-cy=toast-close-button]').click();
+    cy.get('[data-cy=toast-close-button]').should('not.exist');
+
+    // Instance is running
+    cy.intercept(
+      {
+        url: restApiEndpoint + '/api/project/1/instance/1',
+      },
+      {
+        ...instance,
+        status: {
+          phase: 'Running',
+        },
+      }
+    );
+
+    // Request model run
+    cy.get('[data-cy=run-button').click();
+
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Ready for retrain run'
+    );
   });
 });

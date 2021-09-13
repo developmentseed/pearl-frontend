@@ -62,7 +62,7 @@
     "browser-sync": "^2.26.13",
     "browserify": "^17.0.0",
     "collecticons-processor": "^4.1.0",
-    "cypress": "^8.3.0",
+    "cypress": "^8.3.1",
     "cypress-file-upload": "^5.0.8",
     "del": "^6.0.0",
     "envify": "^4.1.0",

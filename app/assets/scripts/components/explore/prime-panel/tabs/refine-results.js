@@ -20,7 +20,7 @@ import { Button } from '@devseed-ui/button';
 import InfoButton from '../../../common/info-button';
 import get from 'lodash.get';
 import { glsp } from '@devseed-ui/theme-provider';
-import { useMapState, useExploreContext } from '../../../../context/explore.js';
+import { useMapState, useExploreContext } from '../../../../context/explore';
 import { useMapRef } from '../../../../context/map';
 import { PlaceholderMessage } from '../../../../styles/placeholder';
 import {

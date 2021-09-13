@@ -23,6 +23,10 @@ import { mapModes } from '../../../context/reducers/map';
 
 import { Spinner } from '../../common/global-loading/styles';
 import BatchPredictionProgressModal from './batch-progress-modal';
+import { useSessionStatus } from '../../../context/explore';
+import logger from '../../../utils/logger';
+import { hideGlobalLoading } from '../../common/global-loading';
+import toasts from '../../common/toasts';
 
 const PanelControls = styled(PanelBlockFooter)`
   display: grid;
@@ -56,17 +60,20 @@ function PrimeButton({
   mapRef,
   setAoiBounds,
 }) {
+  const { setSessionStatusMode } = useSessionStatus();
   const {
-    runInference,
+    runPrediction,
     runBatchPrediction,
     runningBatch,
     retrain,
     refine,
   } = useInstance();
-  const { aoiArea, setActiveModal, aoiRef, setCurrentAoi } = useAoi();
+  const { aoiArea, setActiveModal, aoiRef, setCurrentAoi, currentAoi} = useAoi();
   const { updateAoiName } = useAoiName();
   const { apiLimits } = useApiMeta();
   const { mapState, setMapMode } = useMapState();
+
+  console.log(aoiArea, aoiRef, currentAoi)
 
   const applyAoi = () => {
     setMapMode(mapModes.BROWSE_MODE);
@@ -153,7 +160,24 @@ function PrimeButton({
     },
     'live-prediction': {
       label: 'Run Model',
-      action: runInference,
+      action: async () => {
+        try {
+          setSessionStatusMode('running-prediction');
+          await runPrediction();
+        } catch (error) {
+          logger(error);
+
+          hideGlobalLoading();
+          if (error.message === 'Instance creation failed') {
+            toasts.error(
+              'Could not start instance at the moment, please try again later.'
+            );
+          } else {
+            toasts.error('Unexpected error, please try again later');
+          }
+          setSessionStatusMode('prediction-ready');
+        }
+      },
     },
     'batch-prediction': {
       label: 'Run Batch Prediction',
@@ -357,7 +381,7 @@ Footer.propTypes = {
 
   instance: T.object,
   allowInferenceRun: T.bool.isRequired,
-  runInference: T.func,
+  runPrediction: T.func,
   retrain: T.func,
   refine: T.func,
 

@@ -7,29 +7,33 @@ import React, {
   useMemo,
 } from 'react';
 import T from 'prop-types';
-import { useAuth } from './auth';
+import { useAuth } from '../auth';
 import {
   showGlobalLoadingMessage,
   hideGlobalLoading,
-} from '../components/common/global-loading';
-import toasts from '../components/common/toasts';
+} from '../../components/common/global-loading';
+import toasts from '../../components/common/toasts';
 import { useHistory, useParams } from 'react-router-dom';
-import { actions as predictionActions, usePredictions } from './predictions';
-import { mapStateReducer, mapModes, mapActionTypes } from './reducers/map';
+import { actions as predictionActions, usePredictions } from '../predictions';
+import { mapStateReducer, mapModes, mapActionTypes } from '../reducers/map';
 import tBbox from '@turf/bbox';
 
 import {
   actions as checkpointActions,
   checkpointModes,
   useCheckpoint,
-} from './checkpoint';
-import { wrapLogReducer } from './reducers/utils';
-import { useAoi, useAoiPatch } from './aoi';
-import { actions as aoiPatchActions } from './reducers/aoi_patch';
-import { useProject } from './project';
-import { useModel } from './model';
-import { useInstance } from './instance';
-import logger from '../utils/logger';
+} from '../checkpoint';
+import { useAoi, useAoiPatch } from '../aoi';
+import { actions as aoiPatchActions } from '../reducers/aoi_patch';
+import { useProject } from '../project';
+import { useModel } from '../model';
+import { useInstance } from '../instance';
+import logger from '../../utils/logger';
+import { wrapLogReducer } from '../reducers/utils';
+import {
+  actions as sessionActions,
+  useSessionStatusReducer,
+} from './session-status';
 
 /**
  * Context & Provider
@@ -93,20 +97,55 @@ export function ExploreProvider(props) {
   );
   const [checkpointList, setCheckpointList] = useState(null);
   const [currentInstance, setCurrentInstance] = useState(null);
-  const {
-    setInstanceStatusMessage,
-    initInstance,
-    loadAoiOnInstance,
-    getRunningBatch,
-  } = useInstance();
+  const { initInstance, loadAoiOnInstance, getRunningBatch } = useInstance();
+
+  /**
+   * Session status
+   */
+  const [sessionStatus, dispatchSessionStatus] = useSessionStatusReducer();
+
+  // Action handlers
+  const setSessionStatusMessage = (message) =>
+    dispatchSessionStatus({
+      type: sessionActions.SET_MESSAGE,
+      data: message,
+    });
+  const setSessionStatusMode = (mode) =>
+    dispatchSessionStatus({
+      type: sessionActions.SET_MODE,
+      data: mode,
+    });
+
+  // Handle session mode updates
+  useEffect(() => {
+    const { mode } = sessionStatus;
+    if (mode === 'set-project-name' && projectName) {
+      setSessionStatusMode('set-aoi');
+    } else if (mode === 'set-aoi' && aoiRef) {
+      setSessionStatusMode('select-model');
+    } else if (mode === 'select-model' && selectedModel) {
+      setSessionStatusMode('prediction-ready');
+    } else if (mode === 'loading-project' && aoiRef && currentCheckpoint) {
+      setSessionStatusMode('retrain-ready');
+    }
+  }, [
+    sessionStatus.mode,
+    projectName,
+    aoiRef,
+    selectedModel,
+    currentCheckpoint,
+  ]);
 
   async function loadInitialData() {
     showGlobalLoadingMessage('Loading configuration...');
 
-    // Bypass loading project when new
+    // Update session status
     if (projectId === 'new') {
+      setSessionStatusMode('set-project-name');
       hideGlobalLoading();
-      return;
+      return; // Bypass loading project when new
+    } else {
+      setSessionStatusMode('loading-project');
     }
 
     let project;
@@ -188,11 +227,9 @@ export function ExploreProvider(props) {
     if (predictions.fetching) {
       const { processed, total } = predictions;
       if (!total) {
-        setInstanceStatusMessage(`Waiting for predictions...`);
+        setSessionStatusMessage(`Waiting for predictions...`);
       } else {
-        setInstanceStatusMessage(
-          `Receiving images ${processed} of ${total}...`
-        );
+        setSessionStatusMessage(`Received image ${processed} of ${total}...`);
       }
     } else if (predictions.isReady()) {
       // Update aoi List with newest aoi
@@ -217,6 +254,8 @@ export function ExploreProvider(props) {
           .then((aoi) => {
             setCurrentAoi(aoi);
           });
+
+        setSessionStatusMode('retrain-ready');
       }
 
       if (predictions.error) {
@@ -543,6 +582,9 @@ export function ExploreProvider(props) {
         updateCheckpointName,
 
         dispatchAoiPatch,
+
+        sessionStatus,
+        setSessionStatusMode,
       }}
     >
       {props.children}
@@ -565,6 +607,16 @@ export const useExploreContext = (fnName) => {
   }
 
   return context;
+};
+
+export const useSessionStatus = () => {
+  const { sessionStatus, setSessionStatusMode } = useExploreContext(
+    'useSessionStatus'
+  );
+
+  return useMemo(() => ({ sessionStatus, setSessionStatusMode }), [
+    sessionStatus,
+  ]);
 };
 
 export const useMapState = () => {

@@ -1,4 +1,4 @@
-import { glsp, themeVal, truncated, media } from '@devseed-ui/theme-provider';
+import { glsp, themeVal, truncated } from '@devseed-ui/theme-provider';
 import { PlaceholderMessage } from '../../../../styles/placeholder.js';
 import {
   DropdownBody,
@@ -103,7 +103,7 @@ export const ClassHeading = styled(Heading).attrs({ as: 'h4' })`
     placeholder ? themeVal('color.baseAlphaD') : 'none'};
   width: ${({ placeholder }) => (placeholder ? '10rem' : 'initial')};
   height: ${({ placeholder }) => (placeholder ? '1rem' : 'auto')};
-  line-height: 1;
+  line-height: 1.5rem;
   grid-column: ${(placeholder) => placeholder && '2'};
   grid-row: ${(placeholder) => placeholder && '1 / 3'};
 `;
@@ -147,9 +147,6 @@ export const ToolBox = styled.section`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(6rem, 1fr));
   grid-gap: 0.5rem;
-  ${media.largeUp`
-    grid-template-columns: repeat(auto-fill, minmax(5rem, 1fr));
-  `}
   ${Heading},
   ${Subheading} {
     grid-column: 1 / -1;

@@ -24,7 +24,7 @@ const isEqual = require('lodash.isequal');
 // Load workflow fixtures
 const workflows = {
   retrain: require('../fixtures/websocket-workflow/retrain.json'),
-  prediction: require('../fixtures/websocket-workflow/prediction.json'),
+  'base-model-prediction': require('../fixtures/websocket-workflow/base-model-prediction.json'),
 };
 
 // Init websocket messages queue
