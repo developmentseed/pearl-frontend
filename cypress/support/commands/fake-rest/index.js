@@ -58,7 +58,7 @@ Cypress.Commands.add('startServer', () => {
         max_inference: 100000000,
         instance_window: 600,
         total_gpus: 15,
-        active_gpus: null, // https://github.com/developmentseed/lulc-infra/issues/443
+        active_gpus: 5,
       },
     }
   );

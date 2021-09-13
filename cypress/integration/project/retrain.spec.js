@@ -92,22 +92,6 @@ describe('Retrain existing project', () => {
   });
 
   it('successfully loads', () => {
-    cy.intercept(
-      {
-        url: restApiEndpoint + '/api',
-      },
-      {
-        version: '1.0.0',
-        limits: {
-          live_inference: 10000000,
-          max_inference: 100000000,
-          instance_window: 600,
-          total_gpus: 15,
-          active_gpus: 5,
-        },
-      }
-    );
-
     cy.visit('/project/1');
 
     // Check initial status
