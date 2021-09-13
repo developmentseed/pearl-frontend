@@ -68,12 +68,16 @@ function PrimeButton({
     retrain,
     refine,
   } = useInstance();
-  const { aoiArea, setActiveModal, aoiRef, setCurrentAoi, currentAoi} = useAoi();
+  const {
+    aoiArea,
+    setActiveModal,
+    aoiRef,
+    setCurrentAoi,
+    currentAoi,
+  } = useAoi();
   const { updateAoiName } = useAoiName();
   const { apiLimits } = useApiMeta();
   const { mapState, setMapMode } = useMapState();
-
-  console.log(aoiArea, aoiRef, currentAoi)
 
   const applyAoi = () => {
     setMapMode(mapModes.BROWSE_MODE);
@@ -91,6 +95,24 @@ function PrimeButton({
 
     //Current aoi should only be set after aoi has been sent to the api
     setCurrentAoi(null);
+  };
+
+  const confirmAoi = () => {
+    if (!apiLimits || apiLimits.live_inference > aoiArea) {
+      applyAoi();
+    } else if (apiLimits.max_inference > aoiArea) {
+      setActiveModal('batch-inference');
+    } else {
+      setActiveModal('area-too-large');
+    }
+  };
+  const cancelAoi = () => {
+    setMapMode(mapModes.BROWSE_MODE);
+    mapRef.aoi.control.draw.disable();
+    //Edit mode is enabled as soon as draw is done
+    if (mapRef.aoi.control.edit._shape) {
+      mapRef.aoi.control.edit.disable();
+    }
   };
 
   // If in refine mode, this button save refinements
@@ -128,18 +150,10 @@ function PrimeButton({
         style={{
           gridColumn: '1 / -1',
         }}
-        onClick={() => {
-          if (!apiLimits || apiLimits.live_inference > aoiArea) {
-            applyAoi();
-          } else if (apiLimits.max_inference > aoiArea) {
-            setActiveModal('batch-inference');
-          } else {
-            setActiveModal('area-too-large');
-          }
-        }}
+        onClick={aoiRef ? confirmAoi : cancelAoi}
         id='panel-aoi-confirm'
       >
-        Confirm Aoi
+        {aoiRef ? 'Confirm Aoi' : 'Cancel Draw'}
       </InfoButton>
     );
   }
@@ -233,10 +247,7 @@ function Footer({
   const [displayBatchProgress, setDisplayBatchProgress] = useState(false);
   const { runningBatch } = useInstance();
   return (
-    <PanelControls
-      data-cy='footer-panel-controls'
-      data-disabled={disabled}
-    >
+    <PanelControls data-cy='footer-panel-controls' data-disabled={disabled}>
       <Button
         variation='base-plain'
         size='medium'
