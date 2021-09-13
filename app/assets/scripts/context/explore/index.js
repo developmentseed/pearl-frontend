@@ -151,7 +151,7 @@ export function ExploreProvider(props) {
     const { availableGpus } = await restApiClient.getApiMeta('');
 
     // Do not run when no instances are available
-    if (!availableGpus || availableGpus === 0) {
+    if (!availableGpus) {
       hideGlobalLoading();
       toasts.error('No instances available, please try again later.', {
         autoClose: false,
