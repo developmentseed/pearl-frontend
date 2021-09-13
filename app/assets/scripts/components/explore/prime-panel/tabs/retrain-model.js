@@ -6,7 +6,7 @@ import { ChromePicker } from 'react-color';
 import InfoButton from '../../../common/info-button';
 import { PlaceholderMessage } from '../../../../styles/placeholder.js';
 import { actions, useCheckpoint } from '../../../../context/checkpoint.js';
-import { useMapState } from '../../../../context/explore.js';
+import { useMapState } from '../../../../context/explore';
 import {
   Dropdown,
   DropdownHeader,

@@ -2,115 +2,184 @@ const {
   restApiEndpoint,
 } = require('../../../app/assets/scripts/config/testing').default;
 
+const instance = {
+  id: 1,
+  project_id: 1,
+  aoi_id: null,
+  checkpoint_id: null,
+  last_update: '2021-07-12T09:59:04.442Z',
+  created: '2021-07-12T09:58:57.459Z',
+  active: true,
+  token: 'app_client',
+  status: {
+    phase: 'Pending',
+  },
+};
+
 describe('Create new project', () => {
   beforeEach(() => {
     cy.startServer();
-  });
-
-  it('Can set name from modal', () => {
     cy.fakeLogin();
 
-    cy.visit('/project/new');
-
-    cy.get('[data-cy=session-status]').should(
-      'have.text',
-      'Session Status: Waiting for model run'
+    // Active instances list
+    cy.intercept(
+      {
+        url: restApiEndpoint + '/api/project/1/instance/?status=active',
+      },
+      {
+        total: 0,
+        instances: [],
+      }
     );
 
-    cy.get('[data-cy=project-name-modal]').should('be.visible');
-    cy.get('[data-cy=modal-project-input]').clear().type('Project name');
-    cy.get('[data-cy=create-project-button]').click({ force: true });
-
-    cy.get('[data-cy=project-name]').should('have.text', 'Project name');
-    cy.get('[data-cy=project-name-edit]').click();
-    cy.get('[data-cy=project-input]').clear().type('New name');
-    cy.get('[data-cy=project-name-confirm]').click({ force: true });
+    // POST /project/:id/instance
+    cy.intercept(
+      {
+        url: restApiEndpoint + '/api/project/1/instance',
+        method: 'POST',
+      },
+      instance
+    );
   });
 
-  it('New project', () => {
-    cy.startServer();
-    cy.fakeLogin();
+  it('New project, instance creation fails', () => {
+    // Set mock WS workflow in case creation succeeds (it shouldn't here)
+    cy.setWebsocketWorkflow('base-model-prediction');
 
-    cy.setWebsocketWorkflow('prediction');
-
+    // Visit page
     cy.visit('/project/new');
 
+    // Check session status message
     cy.get('[data-cy=session-status]').should(
       'have.text',
-      'Session Status: Waiting for model run'
+      'Session Status: Set Project Name'
     );
 
     // Set project name
-    cy.get('[data-cy=modal-project-input]').type('Project name');
+    cy.get('[data-cy=modal-project-input]')
+      .should('exist')
+      .clear()
+      .type('Project name');
     cy.get('[data-cy=create-project-button]').should('exist').click();
 
-    // Set AOI
-    cy.get('[data-cy=aoi-edit-button]').click();
+    // Check session status message
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Set AOI'
+    );
+
+    // Draw AOI
+    cy.get('[data-cy=aoi-edit-button]').should('exist').click();
     cy.get('#map')
       .trigger('mousedown', 150, 150)
       .trigger('mousemove', 200, 200)
       .trigger('mouseup');
     cy.wait('@reverseGeocodeCity');
 
-    // Set model
+    // Check session status message
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Select Model'
+    );
+
+    // Select model
     cy.get('[data-cy=select-model-label]').should('exist').click();
     cy.get('[data-cy=select-model-1-card]').should('exist').click();
 
-    // Set no instances available
+    // Check session status message
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Ready for prediction run'
+    );
+
+    // Instance pending
     cy.intercept(
       {
-        url: restApiEndpoint + '/api',
+        url: restApiEndpoint + '/api/project/1/instance/1',
       },
       {
-        version: '1.0.0',
-        limits: {
-          live_inference: 10000000,
-          max_inference: 100000000,
-          instance_window: 600,
-          total_gpus: 15,
-          active_gpus: 15,
+        ...instance,
+        status: {
+          phase: 'Pending',
         },
       }
-    ).as('fetchAvailableInstancesCount');
+    );
 
-    // Request model run
+    // Run
     cy.get('[data-cy=run-button').click();
 
-    // Wait for outbound request
-    cy.wait('@fetchAvailableInstancesCount');
+    // Check session status message
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Running prediction'
+    );
 
-    // Should display modal
-    cy.get('#no-instance-available-error')
-      .should(
-        'contain',
-        'No instance available to run the model, please try again later.'
-      )
-      .click();
-
-    // Set no instances available
+    // Instance failed
     cy.intercept(
       {
-        url: restApiEndpoint + '/api',
+        url: restApiEndpoint + '/api/project/1/instance/1',
       },
       {
-        version: '1.0.0',
-        limits: {
-          live_inference: 10000000,
-          max_inference: 100000000,
-          instance_window: 600,
-          total_gpus: 15,
-          active_gpus: 5,
+        ...instance,
+        status: {
+          phase: 'Failed',
         },
       }
-    ).as('fetchAvailableInstancesCount');
+    );
 
-    // Request model run
-    cy.get('[data-cy=run-button').click();
+    // Show toast
+    cy.get('#a-toast').should(
+      'contain',
+      'Could not start instance at the moment, please try again later.'
+    );
 
-    // Wait for outbound request
-    cy.wait('@fetchAvailableInstancesCount');
+    cy.get('[data-cy=toast-close-button]').click();
+    cy.get('[data-cy=toast-close-button]').should('not.exist');
 
-    // Should display modal
-    cy.get('#no-instance-available-error').should('not.exist');
+    // Check session status message
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Ready for prediction run'
+    );
+
+    // Instance pending
+    cy.intercept(
+      {
+        url: restApiEndpoint + '/api/project/1/instance/1',
+      },
+      {
+        ...instance,
+        status: {
+          phase: 'Pending',
+        },
+      }
+    );
+
+    // Run
+    cy.get('[data-cy=run-button').should('exist').click();
+
+    // Check session status message
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Running prediction'
+    );
+
+    // Instance is running
+    cy.intercept(
+      {
+        url: restApiEndpoint + '/api/project/1/instance/1',
+      },
+      {
+        ...instance,
+        status: {
+          phase: 'Running',
+        },
+      }
+    );
+
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Ready for retrain run'
+    );
   });
 });

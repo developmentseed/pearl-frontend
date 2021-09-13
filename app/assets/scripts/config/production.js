@@ -21,5 +21,7 @@ module.exports = {
     tileUrlTemplate:
       'https://tiles.lulc.ds.io/mosaic/{LAYER_NAME}/tiles/{z}/{x}/{y}?bidx=1%2C2%2C3',
     appInsightsKey: '0291f153-9634-463e-8aa0-34700141d37c',
+    instanceCreationTimeout: 30000,
+    instanceCreationCheckInterval: 5000,
   },
 };

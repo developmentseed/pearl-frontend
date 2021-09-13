@@ -18,6 +18,10 @@ import { useApiMeta } from '../../../context/api-meta';
 import { Spinner } from '../../common/global-loading/styles';
 import BatchPredictionProgressModal from './batch-progress-modal';
 import { useState } from 'react';
+import { useSessionStatus } from '../../../context/explore';
+import logger from '../../../utils/logger';
+import { hideGlobalLoading } from '../../common/global-loading';
+import toasts from '../../common/toasts';
 
 const PanelControls = styled(PanelBlockFooter)`
   display: grid;
@@ -45,8 +49,9 @@ const ProgressButtonWrapper = styled.div`
 `;
 
 function PrimeButton({ currentCheckpoint, allowInferenceRun, mapRef }) {
+  const { setSessionStatusMode } = useSessionStatus();
   const {
-    runInference,
+    runPrediction,
     runBatchPrediction,
     runningBatch,
     retrain,
@@ -93,7 +98,24 @@ function PrimeButton({ currentCheckpoint, allowInferenceRun, mapRef }) {
     },
     'live-prediction': {
       label: 'Run Model',
-      action: runInference,
+      action: async () => {
+        try {
+          setSessionStatusMode('running-prediction');
+          await runPrediction();
+        } catch (error) {
+          logger(error);
+
+          hideGlobalLoading();
+          if (error.message === 'Instance creation failed') {
+            toasts.error(
+              'Could not start instance at the moment, please try again later.'
+            );
+          } else {
+            toasts.error('Unexpected error, please try again later');
+          }
+          setSessionStatusMode('prediction-ready');
+        }
+      },
     },
     'batch-prediction': {
       label: 'Run Batch Prediction',
@@ -290,7 +312,7 @@ Footer.propTypes = {
 
   instance: T.object,
   allowInferenceRun: T.bool.isRequired,
-  runInference: T.func,
+  runPrediction: T.func,
   retrain: T.func,
   refine: T.func,
 

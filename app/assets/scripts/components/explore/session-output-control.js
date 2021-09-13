@@ -25,7 +25,6 @@ import { useAuth } from '../../context/auth';
 import { useAoi } from '../../context/aoi';
 import toasts from '../common/toasts';
 import logger from '../../utils/logger';
-import { useInstance } from '../../context/instance';
 import { downloadGeotiff as downloadGeotiffUtil } from '../../utils/map';
 import { useTour } from '../../context/explore';
 
@@ -130,13 +129,15 @@ function SessionOutputControl(props) {
   const { isAuthenticated, restApiClient } = useAuth();
   const { setTourStep } = useTour();
 
-  const { instance } = useInstance();
-
   const { currentAoi } = useAoi();
 
-  const { updateProjectName, selectedModel, predictions, aoiName } = useContext(
-    ExploreContext
-  );
+  const {
+    updateProjectName,
+    selectedModel,
+    predictions,
+    aoiName,
+    sessionStatus,
+  } = useContext(ExploreContext);
 
   const { projectName, currentProject, setProjectName } = useProject();
 
@@ -292,15 +293,11 @@ function SessionOutputControl(props) {
       </ProjectHeading>
       <StatusHeading
         data-cy='session-status'
-        variation={
-          instance.gpuStatus === 'ready' || instance.gpuStatus === 'not-started'
-            ? 'primary'
-            : 'danger'
-        }
+        variation={sessionStatus.level === 'error' ? 'danger' : 'primary'}
         size='xxsmall'
       >
         <span>Session Status: </span>
-        {instance.gpuMessage}
+        {sessionStatus.message}
       </StatusHeading>
       <Button
         variation='primary-plain'

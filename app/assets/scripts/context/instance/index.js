@@ -8,31 +8,33 @@ import React, {
 } from 'react';
 import { useHistory } from 'react-router';
 import T from 'prop-types';
-import config from '../config';
-import logger from '../utils/logger';
+import config from '../../config';
+import logger from '../../utils/logger';
 import get from 'lodash.get';
 import ReconnectingWebsocket from 'reconnecting-websocket';
 import {
   showGlobalLoadingMessage,
   hideGlobalLoading,
-} from '../components/common/global-loading';
+} from '../../components/common/global-loading';
 import { Button } from '@devseed-ui/button';
-import toasts from '../components/common/toasts';
-import { useAuth } from './auth';
+import toasts from '../../components/common/toasts';
+import { useAuth } from '../auth';
 import {
   actions as checkpointActions,
   checkpointModes,
   useCheckpoint,
-} from './checkpoint';
+} from '../checkpoint';
 
-import { actions as predictionsActions, usePredictions } from './predictions';
-import { useProject } from './project';
-import { useAoi, useAoiPatch } from './aoi';
-import { actions as aoiPatchActions } from './reducers/aoi_patch';
-import { useModel } from './model';
+import { actions as predictionsActions, usePredictions } from '../predictions';
+import { useProject } from '../project';
+import { useAoi, useAoiPatch } from '../aoi';
+import { actions as aoiPatchActions } from '../reducers/aoi_patch';
+import { useModel } from '../model';
 
-import { wrapLogReducer } from './reducers/utils';
+import { wrapLogReducer } from '../reducers/utils';
 import { featureCollection, feature } from '@turf/helpers';
+import { delay } from '../reducers/reduxeed';
+import { actions as instanceActions, useInstanceReducer } from './reducer';
 
 const BATCH_REFRESH_INTERVAL = 4000;
 
@@ -43,54 +45,6 @@ const messageQueueActionTypes = {
   SEND: 'SEND',
   CLEAR: 'CLEAR',
 };
-
-const instanceActionTypes = {
-  APPLY_STATUS: 'APPLY_STATUS',
-};
-
-const instanceInitialState = {
-  gpuMessage: 'Waiting for model run',
-  gpuStatus: 'not-started', // 'ready', 'processing', 'aborting'
-  wsConnected: false,
-  gpuConnected: false,
-};
-
-function instanceReducer(state, action) {
-  const { type, data } = action;
-  let newState = state;
-
-  switch (type) {
-    case instanceActionTypes.APPLY_STATUS: {
-      // gpuStatus will change, update previousGpuStatus
-      if (data.gpuStatus && data.gpuStatus !== state.gpuStatus) {
-        newState.previousGpuStatus = state.gpuStatus;
-      }
-
-      // Apply passed data
-      newState = {
-        ...newState,
-        ...data,
-      };
-
-      break;
-    }
-    default:
-      logger('Unexpected instance action type: ', action);
-      throw new Error('Unexpected error.');
-  }
-
-  // Update display message for some GPU states.
-  if (data.gpuStatus === 'aborting') {
-    newState.gpuMessage = 'Aborting...';
-  } else if (data.gpuStatus === 'ready') {
-    newState.gpuMessage = 'Ready to go';
-  }
-
-  // Uncomment this to log instance state
-  // logger(newState);
-
-  return newState;
-}
 
 function aoiBoundsToPolygon(bounds) {
   // Get bbox polygon from AOI
@@ -118,6 +72,7 @@ const InstanceContext = createContext(null);
 export function InstanceProvider(props) {
   const history = useHistory();
   const { restApiClient } = useAuth();
+
   const {
     currentCheckpoint,
     dispatchCurrentCheckpoint,
@@ -131,10 +86,16 @@ export function InstanceProvider(props) {
 
   const [websocketClient, setWebsocketClient] = useState(null);
 
-  const [instance, dispatchInstance] = useReducer(
-    instanceReducer,
-    instanceInitialState
-  );
+  /**
+   * Instance reducer
+   */
+  const [instance, dispatchInstance] = useInstanceReducer();
+  const applyInstanceStatus = (status) => {
+    dispatchInstance({
+      type: instanceActions.SET_STATUS,
+      data: status,
+    });
+  };
 
   const [runningBatch, setRunningBatch] = useState(false);
   const [runningBatchWatcher, setRunningBatchWatcher] = useState(null);
@@ -143,14 +104,6 @@ export function InstanceProvider(props) {
   useEffect(() => {
     return () => runningBatchWatcher && clearInterval(runningBatchWatcher);
   }, []);
-
-  // Apply instance status
-  const applyInstanceStatus = (status) => {
-    dispatchInstance({
-      type: instanceActionTypes.APPLY_STATUS,
-      data: status,
-    });
-  };
 
   // Create a message queue to wait for instance connection
   const [messageQueue, dispatchMessageQueue] = useReducer(
@@ -264,6 +217,11 @@ export function InstanceProvider(props) {
       websocketClient.close();
     }
 
+    applyInstanceStatus({
+      gpuMessage: 'Creating Instance...',
+      gpuStatus: 'creating-instance',
+    });
+
     // Check if instance slots are available
     const {
       limits: { active_gpus, total_gpus },
@@ -275,69 +233,91 @@ export function InstanceProvider(props) {
       throw Error('No instances available');
     }
 
-    applyInstanceStatus({
-      gpuMessage: 'Initializing',
-      gpuStatus: 'initializing',
-      wsConnected: false,
-      gpuConnected: false,
-    });
+    let doHideGlobalLoading = true;
 
     // Fetch active instances for this project
-    const activeInstances = await restApiClient.getActiveInstances(projectId);
-
-    // Get instance token
     let instance;
-    let doHideGlobalLoading = true;
+    const activeInstances = await restApiClient.getActiveInstances(projectId);
     if (activeInstances.total > 0) {
       const { id: instanceId } = activeInstances.instances[0];
       instance = await restApiClient.getInstance(projectId, instanceId);
-
-      // As the instance is already running, apply desired checkpoint when
-      // ready.
-      if (checkpointId) {
-        if (checkpointId !== instance.checkpoint_id) {
-          doHideGlobalLoading = false; // globalLoading will be hidden once checkpoint is in
-          dispatchMessageQueue({
-            type: messageQueueActionTypes.ADD,
-            data: {
-              action: 'model#checkpoint',
-              data: {
-                id: checkpointId,
-              },
-            },
-          });
-        } else {
-          fetchCheckpoint(
-            projectId,
-            checkpointId,
-            aoiId ? checkpointModes.RETRAIN : checkpointModes.RUN,
-            true
-          );
-        }
-      }
-
-      if (aoiId && aoiId !== instance.aoi_id) {
-        doHideGlobalLoading = false; // globalLoading will be hidden once checkpoint is in
-        dispatchMessageQueue({
-          type: messageQueueActionTypes.ADD,
-          data: {
-            action: 'model#aoi',
-            data: {
-              id: aoiId,
-            },
-          },
-        });
-      }
     } else if (checkpointId) {
       instance = await restApiClient.createInstance(projectId, {
         checkpoint_id: checkpointId,
         aoi_id: aoiId,
       });
-
-      // Apply checkpoint to the interface as the instance will start with it applied.
-      fetchCheckpoint(projectId, checkpointId, checkpointModes.RETRAIN);
     } else {
       instance = await restApiClient.createInstance(projectId);
+    }
+
+    // Confirm instance has running status
+    let instanceStatus;
+    let creationDuration = 0;
+    while (
+      !instanceStatus ||
+      creationDuration < config.instanceCreationTimeout
+    ) {
+      // Get instance status
+      instanceStatus = await restApiClient.get(
+        `project/${projectId}/instance/${instance.id}`
+      );
+      const instancePhase = get(instanceStatus, 'status.phase');
+
+      // Process status
+      if (instancePhase === 'Running') {
+        break;
+      } else if (instancePhase === 'Failed') {
+        throw new Error('Instance creation failed');
+      }
+
+      // Update timer
+      await delay(config.instanceCreationCheckInterval);
+      creationDuration += config.instanceCreationCheckInterval;
+
+      // Check timeout
+      if (creationDuration >= config.instanceCreationTimeout) {
+        throw new Error('Instance creation timeout');
+      }
+    }
+
+    // Apply checkpoint when set
+    if (checkpointId) {
+      if (checkpointId !== instance.checkpoint_id) {
+        doHideGlobalLoading = false; // globalLoading will be hidden once checkpoint is in
+        dispatchMessageQueue({
+          type: messageQueueActionTypes.ADD,
+          data: {
+            action: 'model#checkpoint',
+            data: {
+              id: checkpointId,
+            },
+          },
+        });
+
+        // Apply checkpoint to the interface as the instance will start with it applied.
+        fetchCheckpoint(projectId, checkpointId, checkpointModes.RETRAIN);
+      } else {
+        fetchCheckpoint(
+          projectId,
+          checkpointId,
+          aoiId ? checkpointModes.RETRAIN : checkpointModes.RUN,
+          true
+        );
+      }
+    }
+
+    // Apply AOI when set
+    if (aoiId && aoiId !== instance.aoi_id) {
+      doHideGlobalLoading = false; // globalLoading will be hidden once checkpoint is in
+      dispatchMessageQueue({
+        type: messageQueueActionTypes.ADD,
+        data: {
+          action: 'model#aoi',
+          data: {
+            id: aoiId,
+          },
+        },
+      });
     }
 
     // Use a Promise to stand by for GPU connection
@@ -345,7 +325,6 @@ export function InstanceProvider(props) {
       const newWebsocketClient = new WebsocketClient({
         token: instance.token,
         applyInstanceStatus,
-        dispatchInstance,
         dispatchCurrentCheckpoint,
         fetchCheckpoint: (checkpointId, mode, created) =>
           fetchCheckpoint(projectId, checkpointId, mode, created),
@@ -483,109 +462,95 @@ export function InstanceProvider(props) {
     },
     getRunningBatch,
     runningBatch,
-    runInference: async () => {
-      if (restApiClient) {
-        let project = currentProject;
+    runPrediction: async () => {
+      let project = currentProject;
 
-        if (!project) {
-          try {
-            showGlobalLoadingMessage('Creating project...');
-            project = await restApiClient.createProject({
-              model_id: selectedModel.id,
-              mosaic: 'naip.latest',
-              name: projectName,
-            });
-            setCurrentProject(project);
-            history.push(`/project/${project.id}`);
-          } catch (error) {
-            logger(error);
-            hideGlobalLoading();
-            toasts.error('Could not create project, please try again later.');
-            return; // abort inference run
-          }
-        }
-
+      if (!project) {
         try {
-          showGlobalLoadingMessage('Fetching classes...');
-          const { classes } = await restApiClient.getModel(selectedModel.id);
-          dispatchCurrentCheckpoint({
-            type: checkpointActions.SET_CHECKPOINT,
-            data: {
-              classes,
-            },
+          showGlobalLoadingMessage('Creating project...');
+          project = await restApiClient.createProject({
+            model_id: selectedModel.id,
+            mosaic: 'naip.latest',
+            name: projectName,
           });
+          setCurrentProject(project);
+          history.push(`/project/${project.id}`);
         } catch (error) {
           logger(error);
-          toasts.error('Could fetch model classes, please try again later.');
           hideGlobalLoading();
+          toasts.error('Could not create project, please try again later.');
           return; // abort inference run
         }
+      }
 
-        if (!aoiName) {
-          toasts.error('AOI Name must be set before running inference');
-          hideGlobalLoading();
-          return; // abort inference run
-        }
+      try {
+        showGlobalLoadingMessage('Fetching classes...');
+        const { classes } = await restApiClient.getModel(selectedModel.id);
+        dispatchCurrentCheckpoint({
+          type: checkpointActions.SET_CHECKPOINT,
+          data: {
+            classes,
+          },
+        });
+      } catch (error) {
+        logger(error);
+        toasts.error('Could fetch model classes, please try again later.');
+        hideGlobalLoading();
+        return; // abort inference run
+      }
 
-        try {
-          await initInstance(
-            project.id,
-            currentCheckpoint && currentCheckpoint.id,
-            currentAoi && currentAoi.id
-          );
-        } catch (error) {
-          logger(error);
-          if (error.message === 'No instances available') {
-            toasts.error(
-              'No instance available to run the model, please try again later.',
-              { autoClose: false, toastId: 'no-instance-available-error' }
-            );
-          } else {
-            toasts.error('Could not create instance, please try again later.');
-          }
-          hideGlobalLoading();
-          return;
-        }
+      if (!aoiName) {
+        toasts.error('AOI Name must be set before running inference');
+        hideGlobalLoading();
+        return; // abort inference run
+      }
 
-        showGlobalLoadingMessage(
-          <>
-            Running model and loading class predictions...
-            <Button
-              style={{ display: 'block', margin: '1rem auto 0' }}
-              variation='danger-raised-dark'
-              onClick={() => {
-                abortJob();
-              }}
-            >
-              Abort Process
-            </Button>
-          </>
+      await initInstance(
+        project.id,
+        currentCheckpoint && currentCheckpoint.id,
+        currentAoi && currentAoi.id
+      );
+
+      showGlobalLoadingMessage(
+        <>
+          Running model and loading class predictions...
+          <Button
+            style={{ display: 'block', margin: '1rem auto 0' }}
+            variation='danger-raised-dark'
+            onClick={() => {
+              abortJob();
+            }}
+          >
+            Abort Process
+          </Button>
+        </>
+      );
+
+      try {
+        // Reset predictions state
+        dispatchPredictions({
+          type: predictionsActions.START_PREDICTION,
+          data: {
+            type: checkpointModes.RUN,
+          },
+        });
+
+        // Add prediction request to queue
+        dispatchMessageQueue({
+          type: messageQueueActionTypes.ADD,
+          data: {
+            action: 'model#prediction',
+            data: {
+              name: aoiName,
+              polygon: aoiBoundsToPolygon(aoiRef.getBounds()),
+            },
+          },
+        });
+      } catch (error) {
+        logger(error);
+        toasts.error(
+          'Could not start instance at the moment, please try again later.'
         );
-
-        try {
-          // Reset predictions state
-          dispatchPredictions({
-            type: predictionsActions.START_PREDICTION,
-            data: {
-              type: checkpointModes.RUN,
-            },
-          });
-
-          // Add prediction request to queue
-          dispatchMessageQueue({
-            type: messageQueueActionTypes.ADD,
-            data: {
-              action: 'model#prediction',
-              data: {
-                name: aoiName,
-                polygon: aoiBoundsToPolygon(aoiRef.getBounds()),
-              },
-            },
-          });
-        } catch (error) {
-          logger(error);
-          toasts.error('Could not create instance, please try again later.');
-        }
       }
     },
     runBatchPrediction: async function () {
@@ -672,7 +637,7 @@ export function InstanceProvider(props) {
             { autoClose: false, toastId: 'no-instance-available-error' }
           );
         } else {
-          toasts.error('Could not create instance, please try again later.');
+          toasts.error('Could not start instance, please try again later.');
         }
         hideGlobalLoading();
         return;
@@ -868,7 +833,7 @@ export const useInstance = () => {
     runningBatch,
     sendAbortMessage,
     initInstance,
-    runInference,
+    runPrediction,
     runBatchPrediction,
     retrain,
     refine,
@@ -884,7 +849,7 @@ export const useInstance = () => {
       runningBatch,
       sendAbortMessage,
       initInstance,
-      runInference,
+      runPrediction,
       runBatchPrediction,
       retrain,
       refine,
@@ -893,7 +858,7 @@ export const useInstance = () => {
     [
       instance,
       initInstance,
-      runInference,
+      runPrediction,
       retrain,
       applyCheckpoint,
       runningBatch,
