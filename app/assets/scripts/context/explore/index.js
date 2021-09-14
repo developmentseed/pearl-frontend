@@ -12,6 +12,7 @@ import {
   showGlobalLoadingMessage,
   hideGlobalLoading,
 } from '../../components/common/global-loading';
+import { areaFromBounds } from '../../utils/map';
 import toasts from '../../components/common/toasts';
 import { useHistory, useParams } from 'react-router-dom';
 import { actions as predictionActions, usePredictions } from '../predictions';
@@ -412,6 +413,8 @@ export function ExploreProvider(props) {
       setAoiInitializer(bounds);
       setAoiName(aoiObject.name);
     }
+
+    setAoiArea(areaFromBounds(tBbox(aoi.bounds)));
 
     if (!aoiMatchesCheckpoint) {
       toasts.error(
