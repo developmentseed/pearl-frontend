@@ -27,9 +27,9 @@ const { restApiEndpoint, tileUrlTemplate } = config;
 const ClassLegend = styled(ClassList)`
   ${panelSkin};
   position: absolute;
-  bottom: ${glsp(4)};
-  right: ${glsp(4)};
-  padding: ${glsp(2)} ${glsp(2.5)} ${glsp(2)} ${glsp(1.5)};
+  bottom: ${glsp(2)};
+  right: ${glsp(2)};
+  padding: ${glsp(0.75)} ${glsp(2.5)} ${glsp(1)} ${glsp(1.5)};
   grid-gap: ${glsp()};
   z-index: 99997;
   width: 16rem;
@@ -85,11 +85,9 @@ function ShareMap() {
     fetchData();
   }, [uuid, mapRef, tileUrl]);
 
-  let leafletLayer;
+  let predictionLayer;
   if (tileUrl) {
-    leafletLayer = <TileLayer url={tileUrl} />;
-  } else {
-    leafletLayer = null;
+    predictionLayer = <TileLayer url={tileUrl} />;
   }
 
   let mosaicLayer;
@@ -97,8 +95,6 @@ function ShareMap() {
     mosaicLayer = (
       <TileLayer url={tileUrlTemplate.replace('{LAYER_NAME}', mosaic)} />
     );
-  } else {
-    mosaicLayer = null;
   }
 
   return (
@@ -107,12 +103,10 @@ function ShareMap() {
       <PageBody role='main'>
         <MapContainer
           style={{ height: '100%' }}
-          whenCreated={(m) => {
-            setMapRef(m);
-          }}
+          whenCreated={(m) => setMapRef(m)}
         >
           {mosaicLayer}
-          {leafletLayer}
+          {predictionLayer}
         </MapContainer>
         <ClassLegend>
           <Subheading>LULC Classes</Subheading>
