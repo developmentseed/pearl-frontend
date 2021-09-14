@@ -60,6 +60,7 @@ const ProjectHeading = styled.div`
   align-items: center;
   line-height: 1.5;
   max-width: 14rem;
+  z-index: 5;
   p {
     font-size: 0.875rem;
     text-transform: uppercase;
