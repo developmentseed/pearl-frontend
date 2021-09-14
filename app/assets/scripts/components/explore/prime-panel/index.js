@@ -7,7 +7,11 @@ import { PanelBlock, PanelBlockBody } from '../../common/panel-block';
 import SelectModal from '../../common/select-modal';
 import ModelCard from './model-card';
 import { useMapRef } from '../../../context/map';
-import { ExploreContext, useMapState } from '../../../context/explore';
+import {
+  ExploreContext,
+  useMapState,
+  useShortcutState,
+} from '../../../context/explore';
 import { useModels } from '../../../context/global';
 
 import { Heading } from '@devseed-ui/typography';
@@ -30,6 +34,7 @@ import { useInstance } from '../../../context/instance';
 import { useAoi } from '../../../context/aoi';
 import { usePredictions } from '../../../context/predictions';
 import { useApiMeta } from '../../../context/api-meta';
+import { actions as shortcutActions } from '../../../context/explore/shortcuts';
 
 const StyledPanelBlock = styled(PanelBlock)`
   ${media.largeUp`
@@ -65,6 +70,7 @@ function PrimePanel() {
   const { mapState, mapModes, setMapMode } = useMapState();
   const { mapRef } = useMapRef();
   const { apiLimits } = useApiMeta();
+  const { shortcutState, dispatchShortcutState } = useShortcutState();
 
   const {
     currentProject,
@@ -195,6 +201,11 @@ function PrimePanel() {
       <Panel
         data-cy='primary-panel'
         collapsible
+        overrideControl
+        revealed={shortcutState.left_panel}
+        onPanelChange={() => {
+          dispatchShortcutState({ type: shortcutActions.TOGGLE_LEFT_PANEL });
+        }}
         direction='left'
         initialState={true}
         fitContent

@@ -33,7 +33,6 @@ export function useShortcutReducer() {
   return useReducer(wrapLogReducer(shortcutReducer), initialState);
 }
 
-
 export const KEY_ACTIONS = {
   [KEYS.I_KEY]: actions.TOGGLE_LEFT_PANEL,
   [KEYS.O_KEY]: actions.TOGGLE_RIGHT_PANEL,
@@ -44,4 +43,3 @@ export function listenForShortcuts(event, dispatch) {
     dispatch({ type: KEY_ACTIONS[event.keyCode] });
   }
 }
-

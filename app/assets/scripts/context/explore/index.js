@@ -38,7 +38,6 @@ import {
 
 import {
   useShortcutReducer,
-  actions as shortcutActions,
   listenForShortcuts,
 } from './shortcuts';
 
