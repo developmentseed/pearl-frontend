@@ -36,10 +36,7 @@ import {
   useSessionStatusReducer,
 } from './session-status';
 
-import {
-  useShortcutReducer,
-  listenForShortcuts,
-} from './shortcuts';
+import { useShortcutReducer, listenForShortcuts } from './shortcuts';
 
 /**
  * Context & Provider
