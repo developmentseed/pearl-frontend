@@ -15,7 +15,7 @@ import {
   DropdownTrigger,
 } from '../../styles/dropdown';
 import { Button } from '@devseed-ui/button';
-import { themeVal, glsp, media } from '@devseed-ui/theme-provider';
+import { themeVal, glsp, media, truncated } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
 import { Form, FormInput } from '@devseed-ui/form';
 import InfoButton from '../common/info-button';
@@ -80,6 +80,7 @@ const ProjectHeading = styled.div`
     &:hover {
       border: 1px solid ${themeVal('color.baseAlphaE')};
     }
+    ${truncated()}
   }
   ${Form} {
     grid-gap: ${glsp(0.5)};
