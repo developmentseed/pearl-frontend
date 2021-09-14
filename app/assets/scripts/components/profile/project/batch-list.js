@@ -19,6 +19,54 @@ import useFetch from '../../../utils/use-fetch';
 
 const TABLE_PAGE_SIZE = 5;
 const TABLE_HEADERS = ['Id', 'AOI Name', 'Status', 'Started', 'Download'];
+
+export function DownloadAoiButton({
+  disabled = false,
+  projectId,
+  aoi,
+  restApiClient,
+  children,
+}) {
+  return (
+    <Button
+      variation='primary-plain'
+      useIcon='download'
+      visuallyDisabled={disabled}
+      onClick={async () => {
+        try {
+          showGlobalLoadingMessage(
+            'Preparing raw GeoTIFF, this may take a while...'
+          );
+          await restApiClient.get(
+            `project/${projectId}/aoi/${aoi}/download/raw`,
+            'binary'
+          );
+          const arrayBuffer = await restApiClient.downloadGeotiff(
+            projectId,
+            aoi
+          );
+          const filename = `${aoi}.tiff`;
+          downloadGeotiff(arrayBuffer, filename);
+        } catch (err) {
+          logger('Failed to download geotiff', err);
+          toasts.error('Failed to download GeoTIFF');
+        }
+        hideGlobalLoading();
+      }}
+    >
+      {children}
+    </Button>
+  );
+}
+
+DownloadAoiButton.propTypes = {
+  disabled: T.bool,
+  projectId: T.number,
+  aoi: T.number,
+  restApiClient: T.object,
+  children: T.node,
+};
+
 function renderRow({
   id,
   aoi,
@@ -38,32 +86,11 @@ function renderRow({
       </TableCell>
       <TableCell>{formatDateTime(created)}</TableCell>
       <TableCell>
-        <Button
-          variation='primary-plain'
-          useIcon='download'
-          visuallyDisabled={!completed}
-          hideText
-          onClick={async () => {
-            try {
-              showGlobalLoadingMessage(
-                'Preparing raw GeoTIFF, this may take a while...'
-              );
-              await restApiClient.get(
-                `project/${projectId}/aoi/${aoi}/download/raw`,
-                'binary'
-              );
-              const arrayBuffer = await restApiClient.downloadGeotiff(
-                projectId,
-                aoi
-              );
-              const filename = `${aoi}.tiff`;
-              downloadGeotiff(arrayBuffer, filename);
-            } catch (err) {
-              logger('Failed to download geotiff', err);
-              toasts.error('Failed to download GeoTIFF');
-            }
-            hideGlobalLoading();
-          }}
+        <DownloadAoiButton
+          aoi={aoi}
+          projectId={projectId}
+          restApiClient={restApiClient}
+          completed={!completed}
         />
       </TableCell>
     </TableRow>

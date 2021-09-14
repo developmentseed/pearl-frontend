@@ -21,8 +21,20 @@ import {
 import { themeVal, glsp } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
 import { Subheading } from '../../styles/type/heading';
+import { DownloadAoiButton } from '../profile/project/batch-list';
 
 const { restApiEndpoint, tileUrlTemplate } = config;
+
+const DownloadMap = styled.div`
+  ${panelSkin};
+  position: absolute;
+  top: ${glsp(5)};
+  right: ${glsp(2)};
+  padding: ${glsp(0.75)};
+  grid-gap: ${glsp()};
+  z-index: 99997;
+  overflow: hidden;
+`;
 
 const ClassLegend = styled(ClassList)`
   ${panelSkin};
@@ -60,6 +72,7 @@ function ShareMap() {
   const { restApiClient } = useAuth();
   const [tileUrl, setTileUrl] = useState(null);
   const [classes, setClasses] = useState([]);
+  const [aoiInfo, setAoiInfo] = useState({ id: null, projectId: null });
   const { mosaicList } = useContext(GlobalContext);
   const mosaics = mosaicList.isReady() ? mosaicList.getData().mosaics : null;
   const mosaic = mosaics && mosaics.length > 0 ? mosaics[0] : null;
@@ -77,6 +90,7 @@ function ShareMap() {
         mapRef.fitBounds(bounds);
         const aoiData = await restApiClient.getAOIFromUUID(uuid);
         setClasses(aoiData.classes);
+        setAoiInfo({ id: aoiData.aoi_id, projectId: aoiData.project_id });
       } catch (error) {
         logger(error);
         toasts.error('Could not load AOI map');
@@ -108,6 +122,15 @@ function ShareMap() {
           {mosaicLayer}
           {predictionLayer}
         </MapContainer>
+        <DownloadMap>
+          <DownloadAoiButton
+            aoi={aoiInfo.id}
+            projectId={aoiInfo.projectId}
+            restApiClient={restApiClient}
+          >
+            Download map
+          </DownloadAoiButton>
+        </DownloadMap>
         <ClassLegend>
           <Subheading>LULC Classes</Subheading>
           {classes.length > 1
