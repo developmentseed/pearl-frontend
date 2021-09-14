@@ -147,6 +147,7 @@ function Map() {
         mapRef.freehandDraw.disable();
         break;
       case mapModes.EDIT_AOI_MODE:
+        mapRef._container.style.cursor = 'crosshair';
         mapRef.aoi.control.draw.disable();
         mapRef.aoi.control.edit.enable(aoiRef);
         mapRef.freehandDraw.disable();
@@ -171,26 +172,31 @@ function Map() {
           }
         }
         break;
+      case mapModes.ADD_SAMPLE_POINT:
+        mapRef._container.style.cursor = 'crosshair';
+        break;
       case mapModes.ADD_SAMPLE_POLYGON:
         if (currentCheckpoint && currentCheckpoint.activeItem) {
           mapRef.freehandDraw.disable();
+          mapRef._container.style.cursor = 'crosshair';
           mapRef.polygonDraw.enable(currentCheckpoint.activeItem);
         }
         break;
       case mapModes.ADD_SAMPLE_FREEHAND:
         if (currentCheckpoint && currentCheckpoint.activeItem) {
+          mapRef._container.style.cursor = 'crosshair';
           mapRef.freehandDraw.enableAdd(currentCheckpoint.activeItem);
         }
         break;
-
       case mapModes.DELETE_SAMPLES:
         if (currentCheckpoint && currentCheckpoint.activeItem) {
+          mapRef._container.style.cursor = 'grab';
           mapRef.freehandDraw.enableSubtract(currentCheckpoint.activeItem);
         }
         break;
-
       default:
         mapRef.freehandDraw.disable();
+        mapRef._container.style.cursor = 'grab';
         break;
     }
   }, [

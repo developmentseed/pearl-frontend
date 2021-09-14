@@ -22,7 +22,7 @@ class AoiDrawControl {
 
   // Draw control is initialized with a shape
   initialize(bounds) {
-    this._shape = L.rectangle(bounds).addTo(this._map);
+    this._shape = L.rectangle(bounds, { interactive: false }).addTo(this._map);
     this.onInitialize(this.getBbox(), this._shape);
   }
 
@@ -53,6 +53,7 @@ class AoiDrawControl {
         this._shape = L.rectangle([this._start, this._end], {
           weight: 4,
           fillOpacity: 0.4,
+          interactive: false,
         }).addTo(this._map);
         this.onDrawStart(this._shape);
       } else {
