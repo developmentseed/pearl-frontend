@@ -31,11 +31,69 @@ describe('Retrain existing project', () => {
       },
       instance
     );
+  });
+
+  it('fail to load existing project if no instances are available', () => {
+    // No instances available
+    cy.intercept(
+      {
+        url: restApiEndpoint + '/api',
+      },
+      {
+        version: '1.0.0',
+        limits: {
+          live_inference: 10000000,
+          max_inference: 100000000,
+          instance_window: 600,
+          total_gpus: 15,
+          active_gpus: 15,
+        },
+      }
+    );
 
     cy.visit('/project/1');
+
+    // Should display modal
+    cy.get('#no-instance-available-error')
+      .should('contain', 'No instances available, please try again later.')
+      .click();
+
+    cy.location().should((loc) => {
+      expect(loc.pathname).to.eq('/profile/projects');
+    });
+
+    cy.visit('/project/1');
+
+    // Malformed object
+    cy.intercept(
+      {
+        url: restApiEndpoint + '/api',
+      },
+      {
+        version: '1.0.0',
+        limits: {
+          live_inference: 10000000,
+          max_inference: 100000000,
+          instance_window: 600,
+          total_gpus: 15,
+          active_gpus: 20,
+        },
+      }
+    );
+
+    // Should display modal
+    cy.get('#no-instance-available-error')
+      .should('contain', 'No instances available, please try again later.')
+      .click();
+
+    cy.location().should((loc) => {
+      expect(loc.pathname).to.eq('/profile/projects');
+    });
   });
 
   it('successfully loads', () => {
+    cy.visit('/project/1');
+
     // Check initial status
     cy.get('[data-cy=session-status]').should(
       'have.text',

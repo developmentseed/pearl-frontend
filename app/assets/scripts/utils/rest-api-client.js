@@ -1,3 +1,4 @@
+import get from 'lodash.get';
 import config from '../config';
 import { fetchJSON } from '../context/reducers/reduxeed';
 const { restApiEndpoint } = config;
@@ -57,7 +58,21 @@ class RestApiClient {
   }
 
   getApiMeta() {
-    return this.get('');
+    return this.get('').then((apiMeta) => {
+      // Calculate available slots
+      const totalGpus = get(apiMeta, 'limits.total_gpus');
+      const activeGpus = get(apiMeta, 'limits.active_gpus');
+
+      const availableGpus =
+        Number.isInteger(totalGpus) &&
+        Number.isInteger(activeGpus) &&
+        Math.max(totalGpus - activeGpus, 0);
+
+      return {
+        ...apiMeta,
+        availableGpus,
+      };
+    });
   }
 
   getProject(id) {
