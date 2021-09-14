@@ -61,7 +61,7 @@ class RestApiClient {
     return this.get('').then((apiMeta) => {
       // Calculate available slots
       const totalGpus = get(apiMeta, 'limits.total_gpus');
-      const activeGpus = get(apiMeta, 'limits.active_gpus', 0);
+      const activeGpus = get(apiMeta, 'limits.active_gpus') || 0;
 
       const availableGpus =
         Number.isInteger(totalGpus) &&
