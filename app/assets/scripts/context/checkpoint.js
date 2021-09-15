@@ -19,7 +19,7 @@ export const checkpointModes = {
 
 export const actions = {
   ADD_CLASS: 'ADD_CLASS',
-  SET_CHECKPOINT: 'SET_CHECKPOINT',
+  RECEIVE_CHECKPOINT: 'RECEIVE_CHECKPOINT',
   SET_CHECKPOINT_NAME: 'SET_CHECKPOINT_NAME',
   SET_CHECKPOINT_MODE: 'SET_CHECKPOINT_MODE',
   ADD_CHECKPOINT_BRUSH: 'ADD_CHECKPOINT_BRUSH',
@@ -65,11 +65,10 @@ export function CheckpointProvider(props) {
 
       _data.checkAoi = noCheck ? false : true;
       dispatchCurrentCheckpoint({
-        type: actions.SET_CHECKPOINT,
+        type: actions.RECEIVE_CHECKPOINT,
         data: {
           ...checkpoint,
           ..._data,
-          //mode: checkpointModes.RETRAIN
         },
       });
     } catch (error) {
@@ -97,8 +96,8 @@ CheckpointProvider.propTypes = {
 
 function checkpointReducer(state, action) {
   switch (action.type) {
-    case actions.SET_CHECKPOINT:
-      // Action used to load existing or initialize a new checkpoint
+    case actions.RECEIVE_CHECKPOINT:
+      // Action used to load existing or initialize a new checkpoint from the API
       return {
         ...action.data,
         project_id: action.data.project_id || (state && state.project_id),
@@ -141,7 +140,6 @@ function checkpointReducer(state, action) {
         // User action history of classes and checkpoint brushes
         history: [],
       };
-
     case actions.SET_AOI_CHECKED:
       return {
         ...state,

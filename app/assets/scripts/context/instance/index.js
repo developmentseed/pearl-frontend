@@ -468,7 +468,7 @@ export function InstanceProvider(props) {
         showGlobalLoadingMessage('Fetching classes...');
         const { classes } = await restApiClient.getModel(selectedModel.id);
         dispatchCurrentCheckpoint({
-          type: checkpointActions.SET_CHECKPOINT,
+          type: checkpointActions.RECEIVE_CHECKPOINT,
           data: {
             classes,
           },
@@ -955,7 +955,7 @@ export class WebsocketClient extends ReconnectingWebsocket {
             break;
           case 'model#aoi':
             dispatchCurrentCheckpoint({
-              type: checkpointActions.SET_CHECKPOINT,
+              type: checkpointActions.RECEIVE_CHECKPOINT,
               data: {
                 id: data.checkpoint_id,
               },
