@@ -414,20 +414,12 @@ export function InstanceProvider(props) {
     }
   }
 
-  const abortJob = () => {
-    dispatchCurrentCheckpoint({
-      type: checkpointActions.RESET_CHECKPOINT,
-    });
-  };
-
   const value = {
     instance,
     setInstanceStatusMessage: (message) =>
       applyInstanceStatus({
         gpuMessage: message,
       }),
-
-    abortJob,
     initInstance,
     loadAoiOnInstance: (id) => {
       showGlobalLoadingMessage('Loading AOI on Instance...');
@@ -600,7 +592,7 @@ export function InstanceProvider(props) {
         hideGlobalLoading();
       }
     },
-    retrain: async function () {
+    retrain: async function ({ onAbort }) {
       // Check if all classes have the minimum number of samples
       const classes = Object.values(currentCheckpoint.classes);
       let sampleCount = 0;
@@ -619,28 +611,59 @@ export function InstanceProvider(props) {
         return;
       }
 
-      try {
-        await initInstance(
-          currentCheckpoint.project_id,
-          currentCheckpoint.id,
-          currentAoi.id
-        );
-      } catch (error) {
-        logger(error);
-        if (error.message === 'No instances available') {
-          toasts.error(
-            'No instance available to run the model, please try again later.',
-            { autoClose: false, toastId: 'no-instance-available-error' }
-          );
-        } else {
-          toasts.error('Could not start instance, please try again later.');
-        }
-        hideGlobalLoading();
-        return;
-      }
+      await initInstance(
+        currentCheckpoint.project_id,
+        currentCheckpoint.id,
+        currentAoi.id
+      );
 
       showGlobalLoadingMessage(
-        <>Retraining model and loading predictions...</>
+        <>
+          <>Retraining model and loading predictions...</>
+          <Button
+            data-cy='abort-run-button'
+            style={{ display: 'block', margin: '1rem auto 0' }}
+            variation='danger-raised-dark'
+            onClick={async () => {
+              showGlobalLoadingMessage('Aborting...');
+
+              dispatchMessageQueue({
+                type: messageQueueActionTypes.TERMINATE_INSTANCE,
+              });
+
+              dispatchPredictions({
+                type: predictionsActions.CLEAR_PREDICTION,
+              });
+
+              try {
+                await initInstance(
+                  currentCheckpoint.project_id,
+                  currentCheckpoint.id,
+                  currentAoi.id
+                );
+                hideGlobalLoading();
+                onAbort();
+              } catch (error) {
+                if (error.message === 'No instances available') {
+                  toasts.error(
+                    'No instances available, please try again later.',
+                    {
+                      toastId: 'no-instance-available-error',
+                    }
+                  );
+                } else {
+                  toasts.error('Unexpected error, please try again later.');
+                }
+                hideGlobalLoading();
+                history.push(
+                  `/profile/projects/${currentCheckpoint.project_id}`
+                );
+              }
+            }}
+          >
+            Abort Process
+          </Button>
+        </>
       );
 
       // Reset predictions state

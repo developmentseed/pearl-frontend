@@ -97,7 +97,7 @@ CheckpointProvider.propTypes = {
 function checkpointReducer(state, action) {
   switch (action.type) {
     case actions.RECEIVE_CHECKPOINT:
-      // Action used to load existing or initialize a new checkpoint from the API
+      // Modify checkpoint loaded from the API and apply
       return {
         ...action.data,
         project_id: action.data.project_id || (state && state.project_id),

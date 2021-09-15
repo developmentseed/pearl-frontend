@@ -59,7 +59,7 @@ describe('Retrain existing project', () => {
       .click();
 
     cy.location().should((loc) => {
-      expect(loc.pathname).to.eq('/profile/projects');
+      expect(loc.pathname).to.eq('/profile/projects/1');
     });
 
     cy.visit('/project/1');
@@ -87,7 +87,7 @@ describe('Retrain existing project', () => {
       .click();
 
     cy.location().should((loc) => {
-      expect(loc.pathname).to.eq('/profile/projects');
+      expect(loc.pathname).to.eq('/profile/projects/1');
     });
   });
 
@@ -262,10 +262,7 @@ describe('Retrain existing project', () => {
 
     // Should display modal
     cy.get('#no-instance-available-error')
-      .should(
-        'contain',
-        'No instance available to run the model, please try again later.'
-      )
+      .should('contain', 'No instances available, please try again later.')
       .click();
 
     // Make instances available
@@ -323,7 +320,7 @@ describe('Retrain existing project', () => {
     // Show toast
     cy.get('#a-toast').should(
       'contain',
-      'Could not start instance, please try again later.'
+      'Could not start instance at the moment, please try again later.'
     );
     cy.get('[data-cy=toast-close-button]').click();
     cy.get('[data-cy=toast-close-button]').should('not.exist');

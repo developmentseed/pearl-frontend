@@ -25,8 +25,14 @@ import { Spinner } from '../../common/global-loading/styles';
 import BatchPredictionProgressModal from './batch-progress-modal';
 import { useSessionStatus } from '../../../context/explore';
 import logger from '../../../utils/logger';
-import { hideGlobalLoading } from '../../common/global-loading';
+import {
+  hideGlobalLoading,
+  showGlobalLoading,
+  showGlobalLoadingMessage,
+} from '../../common/global-loading';
 import toasts from '../../common/toasts';
+import { useProject } from '../../../context/project';
+import { useHistory } from 'react-router';
 
 const PanelControls = styled(PanelBlockFooter)`
   display: grid;
@@ -60,6 +66,8 @@ function PrimeButton({
   mapRef,
   setAoiBounds,
 }) {
+  const history = useHistory();
+  const { currentProject } = useProject();
   const { setSessionStatusMode } = useSessionStatus();
   const {
     runPrediction,
@@ -164,7 +172,32 @@ function PrimeButton({
   const runTypes = {
     retrain: {
       label: 'Retrain',
-      action: retrain,
+      action: async () => {
+        try {
+          showGlobalLoadingMessage('Starting retraining...');
+          await retrain({
+            onAbort: () => {
+              setSessionStatusMode('retrain-ready');
+            },
+          });
+        } catch (error) {
+          logger(error);
+          if (error.message === 'No instances available') {
+            toasts.error('No instances available, please try again later.', {
+              autoClose: false,
+              toastId: 'no-instance-available-error',
+            });
+          } else if (error.message === 'Instance creation failed') {
+            toasts.error(
+              'Could not start instance at the moment, please try again later.'
+            );
+          } else {
+            toasts.error('Unexpected error, please try again later.');
+          }
+          hideGlobalLoading();
+          return;
+        }
+      },
     },
     'live-prediction': {
       label: 'Run Model',

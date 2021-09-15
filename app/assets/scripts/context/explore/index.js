@@ -157,7 +157,7 @@ export function ExploreProvider(props) {
         autoClose: false,
         toastId: 'no-instance-available-error',
       });
-      history.push('/profile/projects');
+      history.push(`/profile/projects/${projectId}`);
       return;
     }
 
