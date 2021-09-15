@@ -106,8 +106,8 @@ const PanelBlockScroll = styled(ScrollableBody)`
 `;
 
 function TabbedBlock(props) {
-  const { children } = props;
-  const [activeTab, setActiveTab] = useState(0);
+  const { children, activeTab, setActiveTab } = props;
+  //const [activeTab, setActiveTab] = useState(0);
 
   return (
     <>
@@ -129,7 +129,7 @@ function TabbedBlock(props) {
                   onClick={(e) => {
                     e.preventDefault();
                     if (!disabled) {
-                      setActiveTab(ind);
+                      //setActiveTab(ind);
                       child.props.onTabClick && child.props.onTabClick(e);
                     }
                   }}

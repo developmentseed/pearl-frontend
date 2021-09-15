@@ -99,7 +99,7 @@ function PrimePanel() {
       ''
   );
 
-  const [activeTab, setActiveTab] = useState(checkpointModes.RETRAIN);
+  const [activeTab, setActiveTab] = useState(0);
 
   // Check if AOI and selected model are defined, and if view mode is runnable
   const allowInferenceRun =
@@ -231,7 +231,7 @@ function PrimePanel() {
               }}
             />
             <PanelBlockBody>
-              <TabbedBlock>
+              <TabbedBlock activeTab={activeTab}>
                 <RetrainModel
                   name='retrain model'
                   className='retrain-model'
@@ -249,23 +249,30 @@ function PrimePanel() {
                     mapState.mode === mapModes.EDIT_AOI_MODE
                   }
                   onTabClick={() => {
-                    setActiveTab(checkpointModes.RETRAIN);
-                    if (currentCheckpoint && currentAoi) {
-                      setMapMode(mapModes.BROWSE_MODE);
-                      dispatchCurrentCheckpoint({
-                        type: checkpointActions.SET_ACTIVE_CLASS,
-                        data: undefined,
-                      });
-                      if (currentCheckpoint.mode != checkpointModes.RETRAIN) {
-                        // If current checkpoint has not been set,
-                        // mode does not need to be set
-                        if (!checkpointHasSamples()) {
+                    const hasSamples = checkpointHasSamples();
+
+                    if (hasSamples) {
+                      //show modal
+                      console.error('has samples, clear first');
+                    } else {
+                      setActiveTab(0);
+                      if (currentCheckpoint && currentAoi) {
+                        setMapMode(mapModes.BROWSE_MODE);
+                        dispatchCurrentCheckpoint({
+                          type: checkpointActions.SET_ACTIVE_CLASS,
+                          data: undefined,
+                        });
+                        if (currentCheckpoint.mode != checkpointModes.RETRAIN) {
+                          // If current checkpoint has not been set,
+                          // mode does not need to be set
+                          //if (!checkpointHasSamples()) {
                           dispatchCurrentCheckpoint({
                             type: checkpointActions.SET_CHECKPOINT_MODE,
                             data: {
                               mode: checkpointModes.RETRAIN,
                             },
                           });
+                          //}
                         }
                       }
                     }
@@ -286,17 +293,22 @@ function PrimePanel() {
                   }
                   tabTooltip='Refine is not available until model has been run or retrained.'
                   onTabClick={() => {
-                    setActiveTab(checkpointModes.REFINE);
-                    if (currentCheckpoint) {
-                      setMapMode(mapModes.BROWSE_MODE);
-                      dispatchCurrentCheckpoint({
-                        type: checkpointActions.SET_ACTIVE_CLASS,
-                        data: undefined,
-                      });
-                      if (currentCheckpoint.mode !== checkpointModes.REFINE) {
-                        // If current checkpoint has not been set,
-                        // mode does not need to be set
-                        if (!checkpointHasSamples()) {
+                    const hasSamples = checkpointHasSamples();
+
+                    if (hasSamples) {
+                      //show modal
+                      console.error('has samples, clear first');
+                    } else {
+                      setActiveTab(1);
+                      if (currentCheckpoint) {
+                        setMapMode(mapModes.BROWSE_MODE);
+                        dispatchCurrentCheckpoint({
+                          type: checkpointActions.SET_ACTIVE_CLASS,
+                          data: undefined,
+                        });
+                        if (currentCheckpoint.mode !== checkpointModes.REFINE) {
+                          // If current checkpoint has not been set,
+                          // mode does not need to be set
                           dispatchCurrentCheckpoint({
                             type: checkpointActions.SET_CHECKPOINT_MODE,
                             data: {
@@ -310,31 +322,29 @@ function PrimePanel() {
                 />
               </TabbedBlock>
             </PanelBlockBody>
-            {activeTab !== 'LAYERS' && (
-              <PanelFooter
-                {...{
-                  dispatchCurrentCheckpoint,
-                  currentCheckpoint,
-                  checkpointActions,
+            <PanelFooter
+              {...{
+                dispatchCurrentCheckpoint,
+                currentCheckpoint,
+                checkpointActions,
 
-                  updateCheckpointName,
-                  localCheckpointName,
-                  setLocalCheckpointName,
+                updateCheckpointName,
+                localCheckpointName,
+                setLocalCheckpointName,
 
-                  mapRef,
+                mapRef,
 
-                  setAoiBounds,
+                setAoiBounds,
 
-                  disabled:
-                    currentCheckpoint &&
-                    (currentCheckpoint.mode === checkpointModes.RETRAIN ||
-                      currentCheckpoint.mode === checkpointModes.REFINE) &&
-                    !checkpointHasSamples(),
+                disabled:
+                  currentCheckpoint &&
+                  (currentCheckpoint.mode === checkpointModes.RETRAIN ||
+                    currentCheckpoint.mode === checkpointModes.REFINE) &&
+                  !checkpointHasSamples(),
 
-                  allowInferenceRun,
-                }}
-              />
-            )}
+                allowInferenceRun,
+              }}
+            />
           </StyledPanelBlock>
         }
       />
