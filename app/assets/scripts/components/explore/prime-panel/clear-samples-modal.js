@@ -28,10 +28,9 @@ function ClearSamplesModal({ revealed, onClear, onCancel }) {
       closeButton={false}
       content={
         <Wrapper>
-          <Heading>Are you still working?</Heading>
+          <Heading>Your map contains input geometry.</Heading>
           <Prose className='prose'>
-            Your session will expire in 5 minutes. Extend it to keep working, or
-            end it to save and exit
+            Please submit or clear your input data before changing tabs.
           </Prose>
           <Button
             variation='danger-raised-light'
@@ -48,7 +47,7 @@ function ClearSamplesModal({ revealed, onClear, onCancel }) {
           <Button
             variation='primary-raised-light'
             size='medium'
-            useIcon='arrow-semi-spin-cw'
+            useIcon='trash-bin'
             style={{
               gridColumn: '2 / -1',
             }}
