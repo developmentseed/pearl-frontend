@@ -40,10 +40,11 @@ const BATCH_REFRESH_INTERVAL = 4000;
 
 const messageQueueActionTypes = {
   ABORT: 'ABORT',
-  ADD: 'ADD',
   ADD_EXPRESS: 'ADD_EXPRESS',
-  SEND: 'SEND',
+  ADD: 'ADD',
   CLEAR: 'CLEAR',
+  SEND: 'SEND',
+  TERMINATE_INSTANCE: 'TERMINATE_INSTANCE',
 };
 
 function aoiBoundsToPolygon(bounds) {
@@ -157,6 +158,10 @@ export function InstanceProvider(props) {
           return state.slice(1);
         }
         case messageQueueActionTypes.CLEAR: {
+          return [];
+        }
+        case messageQueueActionTypes.TERMINATE_INSTANCE: {
+          websocketClient.sendMessage({ action: 'instance#terminate' });
           return [];
         }
         default:
@@ -409,28 +414,7 @@ export function InstanceProvider(props) {
     }
   }
 
-  const abortJob = (queueNext) => {
-    // If GPU is not connected, just clear the message queue
-    if (!instance.gpuConnected) {
-      dispatchMessageQueue({
-        type: messageQueueActionTypes.CLEAR,
-        data: {
-          action: 'model#abort',
-        },
-      });
-    } else {
-      dispatchMessageQueue({
-        type: messageQueueActionTypes.ABORT,
-        data: {
-          queueNext,
-        },
-      });
-    }
-
-    // Clear prediction and checkpoint
-    dispatchPredictions({
-      type: predictionsActions.CLEAR_PREDICTION,
-    });
+  const abortJob = () => {
     dispatchCurrentCheckpoint({
       type: checkpointActions.RESET_CHECKPOINT,
     });
@@ -459,7 +443,7 @@ export function InstanceProvider(props) {
     },
     getRunningBatch,
     runningBatch,
-    runPrediction: async () => {
+    runPrediction: async ({ onAbort }) => {
       let project = currentProject;
 
       if (!project) {
@@ -512,10 +496,25 @@ export function InstanceProvider(props) {
         <>
           Running model and loading class predictions...
           <Button
+            data-cy='abort-run-button'
             style={{ display: 'block', margin: '1rem auto 0' }}
             variation='danger-raised-dark'
             onClick={() => {
-              abortJob();
+              dispatchMessageQueue({
+                type: messageQueueActionTypes.TERMINATE_INSTANCE,
+              });
+
+              dispatchPredictions({
+                type: predictionsActions.CLEAR_PREDICTION,
+              });
+
+              dispatchCurrentCheckpoint({
+                type: checkpointActions.RESET_CHECKPOINT,
+              });
+
+              hideGlobalLoading();
+
+              onAbort();
             }}
           >
             Abort Process

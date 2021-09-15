@@ -22,9 +22,11 @@ const isEqual = require('lodash.isequal');
 //
 
 // Load workflow fixtures
+// TODO load file via parameter
 const workflows = {
   retrain: require('../fixtures/websocket-workflow/retrain.json'),
   'base-model-prediction': require('../fixtures/websocket-workflow/base-model-prediction.json'),
+  'run-prediction-aborted': require('../fixtures/websocket-workflow/run-prediction-aborted.json'),
 };
 
 // Init websocket messages queue

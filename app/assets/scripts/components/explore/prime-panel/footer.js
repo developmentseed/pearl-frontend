@@ -171,7 +171,11 @@ function PrimeButton({
       action: async () => {
         try {
           setSessionStatusMode('running-prediction');
-          await runPrediction();
+          await runPrediction({
+            onAbort: () => {
+              setSessionStatusMode('prediction-ready');
+            },
+          });
         } catch (error) {
           logger(error);
 
