@@ -3,11 +3,15 @@ import styled from 'styled-components';
 import PageHeader from '../common/page-header';
 import toasts from '../common/toasts';
 import { PageBody } from '../../styles/page';
-import { MapContainer, TileLayer } from 'react-leaflet';
+import { MapContainer, TileLayer, FeatureGroup } from 'react-leaflet';
 import GlobalContext from '../../context/global';
 
 import { useParams } from 'react-router-dom';
 import App from '../common/app';
+import {
+  MAX_BASE_MAP_ZOOM_LEVEL,
+  BaseMapLayer,
+} from '../common/map/base-map-layer';
 import config from '../../config';
 import { useAuth } from '../../context/auth';
 import logger from '../../utils/logger';
@@ -22,6 +26,8 @@ import { themeVal, glsp } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
 import { Subheading } from '../../styles/type/heading';
 import { DownloadAoiButton } from '../profile/project/batch-list';
+import LayersPanel from './layers-control';
+import GenericControl from '../common/map/generic-control';
 
 const { restApiEndpoint, tileUrlTemplate } = config;
 
@@ -66,11 +72,30 @@ const ClassLegend = styled(ClassList)`
   }
 `;
 
+const INITIAL_MAP_LAYERS = {
+  mosaic: {
+    id: 'mosaic',
+    name: 'naip.latest',
+    opacity: 1,
+    visible: true,
+    active: true,
+  },
+  predictions: {
+    id: 'predictions',
+    name: 'Prediction Results',
+    opacity: 1,
+    visible: true,
+    active: true,
+  },
+};
+
 function ShareMap() {
   const { uuid } = useParams();
   const [mapRef, setMapRef] = useState(null);
   const { restApiClient } = useAuth();
   const [tileUrl, setTileUrl] = useState(null);
+  const [mapLayers, setMapLayers] = useState(INITIAL_MAP_LAYERS);
+  const [showLayersControl, setShowLayersControl] = useState(false);
   const [classes, setClasses] = useState([]);
   const [aoiInfo, setAoiInfo] = useState({ id: null, projectId: null });
   const { mosaicList } = useContext(GlobalContext);
@@ -99,29 +124,55 @@ function ShareMap() {
     fetchData();
   }, [uuid, mapRef, tileUrl]);
 
-  let predictionLayer;
-  if (tileUrl) {
-    predictionLayer = <TileLayer url={tileUrl} />;
-  }
-
-  let mosaicLayer;
-  if (mosaic) {
-    mosaicLayer = (
-      <TileLayer url={tileUrlTemplate.replace('{LAYER_NAME}', mosaic)} />
-    );
-  }
-
   return (
     <App pageTitle='AOI Map'>
       <PageHeader />
       <PageBody role='main'>
         <MapContainer
           style={{ height: '100%' }}
+          maxZoom={MAX_BASE_MAP_ZOOM_LEVEL}
           whenCreated={(m) => setMapRef(m)}
         >
-          {mosaicLayer}
-          {predictionLayer}
+          <BaseMapLayer />
+          {mosaic && (
+            <TileLayer
+              url={tileUrlTemplate.replace('{LAYER_NAME}', mosaic)}
+              attribution='&copy; NAIP'
+              minZoom={12}
+              maxZoom={20}
+              opacity={mapLayers.mosaic.visible ? mapLayers.mosaic.opacity : 0}
+            />
+          )}
+          {tileUrl && (
+            <TileLayer
+              url={tileUrl}
+              minZoom={12}
+              maxZoom={20}
+              opacity={
+                mapLayers.predictions.visible
+                  ? mapLayers.predictions.opacity
+                  : 0
+              }
+            />
+          )}
+          <FeatureGroup>
+            <GenericControl
+              id='layer-control'
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowLayersControl(!showLayersControl);
+              }}
+            />
+          </FeatureGroup>
         </MapContainer>
+        <LayersPanel
+          mapRef={mapRef}
+          parentId='layer-control'
+          className='padded'
+          active={showLayersControl}
+          mapLayers={mapLayers}
+          setMapLayers={setMapLayers}
+        />
         <DownloadMap>
           <DownloadAoiButton
             aoi={aoiInfo.id}

@@ -14,7 +14,7 @@ import { actions as shortcutActions } from '../../context/explore/shortcuts';
 import { useCheckpoint } from '../../context/checkpoint';
 import { round } from '../../utils/format';
 
-const LayersPanelInner = styled.div`
+export const LayersPanelInner = styled.div`
   opacity: ${({ show }) => (show ? 1 : 0)};
   display: ${({ show }) => !show && 'none'};
   min-width: 16rem;
@@ -26,7 +26,7 @@ const LayersPanelInner = styled.div`
   position: fixed;
   background: ${themeVal('color.surface')};
   box-shadow: ${themeVal('boxShadow.elevationB')};
-  z-index: 1;
+  z-index: 400;
 `;
 const LayersWrapper = styled.div`
   display: grid;
@@ -82,7 +82,13 @@ const AccordionFold = styled(BaseFold)`
   }
 `;
 
-function Layer({ layer, onSliderChange, onVisibilityToggle, info, name }) {
+export function Layer({
+  layer,
+  onSliderChange,
+  onVisibilityToggle,
+  info,
+  name,
+}) {
   const [value, setValue] = useState(layer.opacity || 1);
   const [visible, setVisible] = useState(true);
 
@@ -147,7 +153,7 @@ Layer.propTypes = {
   name: T.string,
 };
 
-function Category({
+export function Category({
   checkExpanded,
   setExpanded,
   category,
