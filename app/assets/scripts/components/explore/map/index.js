@@ -147,7 +147,6 @@ function Map() {
         mapRef.freehandDraw.disable();
         break;
       case mapModes.EDIT_AOI_MODE:
-        mapRef._container.style.cursor = 'crosshair';
         mapRef.aoi.control.draw.disable();
         mapRef.aoi.control.edit.enable(aoiRef);
         mapRef.freehandDraw.disable();
