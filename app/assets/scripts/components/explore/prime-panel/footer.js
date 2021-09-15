@@ -27,12 +27,9 @@ import { useSessionStatus } from '../../../context/explore';
 import logger from '../../../utils/logger';
 import {
   hideGlobalLoading,
-  showGlobalLoading,
   showGlobalLoadingMessage,
 } from '../../common/global-loading';
 import toasts from '../../common/toasts';
-import { useProject } from '../../../context/project';
-import { useHistory } from 'react-router';
 
 const PanelControls = styled(PanelBlockFooter)`
   display: grid;
@@ -66,8 +63,6 @@ function PrimeButton({
   mapRef,
   setAoiBounds,
 }) {
-  const history = useHistory();
-  const { currentProject } = useProject();
   const { setSessionStatusMode } = useSessionStatus();
   const {
     runPrediction,

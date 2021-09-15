@@ -25,6 +25,7 @@ const isEqual = require('lodash.isequal');
 // TODO load file via parameter
 const workflows = {
   retrain: require('../fixtures/websocket-workflow/retrain.json'),
+  'retrain-one-sample-aborted': require('../fixtures/websocket-workflow/retrain-one-sample-aborted.json'),
   'base-model-prediction': require('../fixtures/websocket-workflow/base-model-prediction.json'),
   'run-prediction-aborted': require('../fixtures/websocket-workflow/run-prediction-aborted.json'),
 };
