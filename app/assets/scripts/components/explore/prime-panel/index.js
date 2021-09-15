@@ -30,6 +30,7 @@ import { useInstance } from '../../../context/instance';
 import { useAoi } from '../../../context/aoi';
 import { usePredictions } from '../../../context/predictions';
 import { useApiMeta } from '../../../context/api-meta';
+import ClearSamplesModal from './clear-samples-modal';
 
 const StyledPanelBlock = styled(PanelBlock)`
   ${media.largeUp`
@@ -59,6 +60,8 @@ const Headline = styled.div`
     align-self: center;
   }
 `;
+const TABS = [0, 1];
+const [RETRAIN_TAB_INDEX, REFINE_TAB_INDEX] = TABS;
 
 function PrimePanel() {
   const { isAuthenticated } = useAuth();
@@ -91,6 +94,7 @@ function PrimePanel() {
   const { predictions } = usePredictions();
 
   const [showSelectModelModal, setShowSelectModelModal] = useState(false);
+  const [showClearSamplesModal, setShowClearSamplesModal] = useState(null);
 
   const [localCheckpointName, setLocalCheckpointName] = useState(
     (currentCheckpoint &&
@@ -250,12 +254,8 @@ function PrimePanel() {
                   }
                   onTabClick={() => {
                     const hasSamples = checkpointHasSamples();
-
-                    if (hasSamples) {
-                      //show modal
-                      console.error('has samples, clear first');
-                    } else {
-                      setActiveTab(0);
+                    function onContinue() {
+                      setActiveTab(RETRAIN_TAB_INDEX);
                       if (currentCheckpoint && currentAoi) {
                         setMapMode(mapModes.BROWSE_MODE);
                         dispatchCurrentCheckpoint({
@@ -276,6 +276,12 @@ function PrimePanel() {
                         }
                       }
                     }
+                    if (hasSamples) {
+                      //show modal
+                      setShowClearSamplesModal(() => onContinue);
+                    } else {
+                      onContinue();
+                    }
                   }}
                 />
                 <RefineResults
@@ -294,12 +300,8 @@ function PrimePanel() {
                   tabTooltip='Refine is not available until model has been run or retrained.'
                   onTabClick={() => {
                     const hasSamples = checkpointHasSamples();
-
-                    if (hasSamples) {
-                      //show modal
-                      console.error('has samples, clear first');
-                    } else {
-                      setActiveTab(1);
+                    function onContinue() {
+                      setActiveTab(REFINE_TAB_INDEX);
                       if (currentCheckpoint) {
                         setMapMode(mapModes.BROWSE_MODE);
                         dispatchCurrentCheckpoint({
@@ -317,6 +319,12 @@ function PrimePanel() {
                           });
                         }
                       }
+                    }
+
+                    if (hasSamples) {
+                      setShowClearSamplesModal(() => onContinue);
+                    } else {
+                      onContinue();
                     }
                   }}
                 />
@@ -386,6 +394,21 @@ function PrimePanel() {
           />
         )}
         nonScrolling
+      />
+      <ClearSamplesModal
+        revealed={showClearSamplesModal !== null}
+        onClear={() => {
+          dispatchCurrentCheckpoint({
+            type: checkpointActions.CLEAR_SAMPLES,
+          });
+          mapRef.freehandDraw.clearLayers();
+          let clearAndContinue = showClearSamplesModal;
+          clearAndContinue();
+          setShowClearSamplesModal(null);
+        }}
+        onCancel={() => {
+          setShowClearSamplesModal(null);
+        }}
       />
     </>
   );
