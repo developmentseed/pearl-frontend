@@ -1,7 +1,9 @@
-const I_KEY = 73;
-const O_KEY = 79;
-
 export const KEYS = {
-  I_KEY,
-  O_KEY,
+  a_KEY: 65,
+  s_KEY: 83,
+  d_KEY: 68,
+  f_KEY: 70,
+
+  i_KEY: 73,
+  o_KEY: 79,
 };

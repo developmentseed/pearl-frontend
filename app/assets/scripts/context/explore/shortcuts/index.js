@@ -36,8 +36,8 @@ export function useShortcutReducer() {
 }
 
 export const KEY_ACTIONS = {
-  [KEYS.I_KEY]: actions.TOGGLE_LEFT_PANEL,
-  [KEYS.O_KEY]: actions.TOGGLE_RIGHT_PANEL,
+  [KEYS.i_KEY]: actions.TOGGLE_LEFT_PANEL,
+  [KEYS.o_KEY]: actions.TOGGLE_RIGHT_PANEL,
 };
 
 export function listenForShortcuts(event, dispatch) {
