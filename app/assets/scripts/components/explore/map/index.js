@@ -10,7 +10,7 @@ import {
 } from 'react-leaflet';
 import L from 'leaflet';
 import GlobalContext from '../../../context/global';
-import { ExploreContext, useMapState } from '../../../context/explore';
+import { ExploreContext, useMapState, useShortcutState } from '../../../context/explore';
 import {
   useMapRef,
   useMapLayers,
@@ -121,6 +121,8 @@ function Map() {
 
   const { mosaicList } = useContext(GlobalContext);
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
+
+  const { shortcutState } = useShortcutState();
 
   const { mosaics } = mosaicList.isReady() ? mosaicList.getData() : {};
 
@@ -461,7 +463,7 @@ function Map() {
               bounds={p.bounds}
               opacity={
                 userLayers.predictions.visible
-                  ? userLayers.predictions.opacity
+                  ? shortcutState.prediction_layer_opacity
                   : 0
               }
             />
@@ -542,7 +544,7 @@ function Map() {
               }}
               opacity={
                 userLayers.predictions.visible
-                  ? userLayers.predictions.opacity
+                  ? shortcutState.prediction_layer_opacity
                   : 0
               }
               eventHandlers={{
@@ -641,6 +643,7 @@ function Map() {
     tileUrl,
     showLayersPanel,
     setShowLayersPanel,
+    shortcutState
   ]);
 
   return (

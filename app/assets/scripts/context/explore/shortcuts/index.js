@@ -13,6 +13,7 @@ export const actions = {
 };
 
 const initialState = {
+  prediction_layer_opacity: 1,
   left_panel: true,
   right_panel: true,
 };
@@ -20,13 +21,32 @@ const initialState = {
 export function shortcutReducer(state, action) {
   switch (action.type) {
     case actions.SET_PREDICTION_OPACITY_0:
-      return state;
+      return {
+        ...state,
+        prediction_layer_opacity: 0,
+      };
     case actions.DECREMENT_PREDICTION_OPACITY:
-      return state;
+      return {
+        ...state,
+        prediction_layer_opacity:
+          state.prediction_layer_opacity - 0.1 < 0
+            ? 0
+            : state.prediction_layer_opacity - 0.1,
+      };
     case actions.INCREMENT_PREDICTION_OPACITY:
-      return state;
+      return {
+        ...state,
+        prediction_layer_opacity:
+          state.prediction_layer_opacity + 0.1 > 1
+            ? 1
+            : state.prediction_layer_opacity + 0.1,
+      };
     case actions.SET_PREDICTION_OPACITY_100:
-      return state;
+      return {
+        ...state,
+        prediction_layer_opacity: 100,
+      };
+
     case actions.TOGGLE_LEFT_PANEL:
       return {
         ...state,

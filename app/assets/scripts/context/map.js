@@ -16,10 +16,11 @@ export function MapProvider(props) {
 
   const [showLayersPanel, setShowLayersPanel] = useState(false);
 
+  /*
   const [predictionLayerSettings, setPredictionLayerSettings] = useState({
     opacity: 1,
     visible: true,
-  });
+  });*/
 
   /*
    * Object tracking user layers to be controlled in frontend.
@@ -72,8 +73,10 @@ export function MapProvider(props) {
         mapLayers,
         setMapLayers,
 
+        /*
         predictionLayerSettings,
         setPredictionLayerSettings,
+        */
 
         userLayers,
         setUserLayers,
@@ -137,6 +140,7 @@ export const useUserLayers = () => {
   );
 };
 
+/*
 export const usePredictionLayer = () => {
   const { predictionLayerSettings, setPredictionLayerSettings } = useMapContext(
     'usePredictionLayer'
@@ -148,7 +152,7 @@ export const usePredictionLayer = () => {
     }),
     [predictionLayerSettings, setPredictionLayerSettings]
   );
-};
+};*/
 
 export const useLayersPanel = () => {
   const { setShowLayersPanel, showLayersPanel } = useMapContext(
