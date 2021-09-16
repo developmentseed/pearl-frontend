@@ -68,7 +68,7 @@ function SecPanel() {
       onPanelChange={() => {
         dispatchShortcutState({ type: shortcutActions.TOGGLE_RIGHT_PANEL });
       }}
-      initialState={currentCheckpoint.classes}
+      initialState={currentCheckpoint.classes ? true : false}
       bodyContent={
         <PanelBlock>
           <PanelBlockHeader>

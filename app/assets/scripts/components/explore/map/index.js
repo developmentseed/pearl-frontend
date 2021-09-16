@@ -450,6 +450,7 @@ function Map() {
                       layer: v.target,
                       active: true,
                       name: layer,
+                      opacity: 1,
                     },
                   });
                 },
