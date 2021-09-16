@@ -20,7 +20,6 @@ import {
   useMapRef,
   useMapLayers,
   useUserLayers,
-  useLayersPanel,
 } from '../../../context/map';
 
 import GeoCoder from '../../common/map/geocoder';
