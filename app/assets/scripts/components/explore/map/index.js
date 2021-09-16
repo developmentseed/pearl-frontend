@@ -15,6 +15,7 @@ import {
   useMapState,
   useShortcutState,
 } from '../../../context/explore';
+import { actions as shortcutActions } from '../../../context/explore/shortcuts';
 import {
   useMapRef,
   useMapLayers,
@@ -121,12 +122,11 @@ function Map() {
 
   const { mapLayers, setMapLayers } = useMapLayers();
   const { userLayers, setUserLayers } = useUserLayers();
-  const { setShowLayersPanel, showLayersPanel } = useLayersPanel();
 
   const { mosaicList } = useContext(GlobalContext);
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
 
-  const { shortcutState } = useShortcutState();
+  const { shortcutState, dispatchShortcutState } = useShortcutState();
 
   const { mosaics } = mosaicList.isReady() ? mosaicList.getData() : {};
 
@@ -622,7 +622,9 @@ function Map() {
             id='layer-control'
             onClick={(e) => {
               e.stopPropagation();
-              setShowLayersPanel(!showLayersPanel);
+              dispatchShortcutState({
+                type: shortcutActions.TOGGLE_LAYER_TRAY,
+              });
             }}
           />
           <GeoCoder />
@@ -646,8 +648,6 @@ function Map() {
     setMapRef,
     aoiPatchList,
     tileUrl,
-    showLayersPanel,
-    setShowLayersPanel,
     shortcutState,
   ]);
 

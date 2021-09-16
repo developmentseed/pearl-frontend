@@ -8,12 +8,7 @@ import { themeVal, glsp } from '@devseed-ui/theme-provider';
 import InputRange from 'react-input-range';
 import { Accordion, AccordionFold as BaseFold } from '@devseed-ui/accordion';
 import throttle from 'lodash.throttle';
-import {
-  useMapLayers,
-  useUserLayers,
-  useLayersPanel,
-  useMapRef,
-} from '../../context/map';
+import { useMapLayers, useUserLayers, useMapRef } from '../../context/map';
 import { useMapState, useShortcutState } from '../../context/explore';
 import { actions as shortcutActions } from '../../context/explore/shortcuts';
 import { useCheckpoint } from '../../context/checkpoint';
@@ -215,7 +210,6 @@ function LayersPanel(props) {
     },
   };
 
-  const { showLayersPanel } = useLayersPanel();
   const { mapLayers } = useMapLayers();
   const { mapRef } = useMapRef();
   const { currentCheckpoint } = useCheckpoint();
@@ -260,7 +254,7 @@ function LayersPanel(props) {
   return (
     <LayersPanelInner
       className={className}
-      show={!disabled && showLayersPanel}
+      show={!disabled && shortcutState.layer_tray}
       style={{
         top: position.top || 0,
         left: position.right || 0,

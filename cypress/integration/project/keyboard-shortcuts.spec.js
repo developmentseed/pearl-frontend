@@ -69,6 +69,19 @@ describe('Test keyboard shortcuts', () => {
     cy.get('body').trigger('keydown', { keyCode: 68 });
     // prediction opacity should be 1
   });
+
+  it('Hide and show layers panel', () => {
+    cy.wait(['@fetchAoi2', '@fetchCheckpoint2']);
+    // Check ready for retrain status
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Ready for retrain run'
+    );
+    cy.get('[data-cy=layers-panel]').should('not.be.visible');
+
+    cy.get('body').trigger('keydown', { keyCode: 76 });
+    cy.get('[data-cy=layers-panel]').should('be.visible');
+  });
   it('Hide and collapse panels', () => {
     cy.wait(['@fetchAoi2', '@fetchCheckpoint2']);
     // Check ready for retrain status
