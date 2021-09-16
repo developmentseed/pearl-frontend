@@ -5,6 +5,7 @@ import React, {
   useReducer,
   useContext,
   useMemo,
+  useRef,
 } from 'react';
 import T from 'prop-types';
 import { useAuth } from '../auth';
@@ -35,6 +36,8 @@ import {
   useSessionStatusReducer,
 } from './session-status';
 
+import { useShortcutReducer, listenForShortcuts } from './shortcuts';
+
 /**
  * Context & Provider
  */
@@ -43,6 +46,8 @@ export const ExploreContext = createContext(null);
 export function ExploreProvider(props) {
   const history = useHistory();
   let { projectId } = useParams();
+
+  const isInitialized = useRef(false);
 
   const [tourStep, setTourStep] = useState(
     localStorage.getItem('site-tour')
@@ -104,6 +109,11 @@ export function ExploreProvider(props) {
    */
   const [sessionStatus, dispatchSessionStatus] = useSessionStatusReducer();
 
+  /*
+   * Keyboard shortcuts
+   */
+  const [shortcutState, dispatchShortcutState] = useShortcutReducer();
+
   // Action handlers
   const setSessionStatusMessage = (message) =>
     dispatchSessionStatus({
@@ -120,12 +130,14 @@ export function ExploreProvider(props) {
   useEffect(() => {
     const { mode } = sessionStatus;
     if (mode === 'set-project-name' && projectName) {
+      isInitialized.current = true;
       setSessionStatusMode('set-aoi');
     } else if (mode === 'set-aoi' && aoiRef) {
       setSessionStatusMode('select-model');
     } else if (mode === 'select-model' && selectedModel) {
       setSessionStatusMode('prediction-ready');
     } else if (mode === 'loading-project' && aoiRef && currentCheckpoint) {
+      isInitialized.current = true;
       setSessionStatusMode('retrain-ready');
     }
   }, [
@@ -135,6 +147,18 @@ export function ExploreProvider(props) {
     selectedModel,
     currentCheckpoint,
   ]);
+
+  useEffect(() => {
+    if (isInitialized.current) {
+      const wrappedFunc = (e) => listenForShortcuts(e, dispatchShortcutState);
+
+      document.addEventListener('keydown', wrappedFunc);
+
+      return () => {
+        document.removeEventListener('keydown', wrappedFunc);
+      };
+    }
+  }, [isInitialized.current, dispatchShortcutState]);
 
   async function loadInitialData() {
     showGlobalLoadingMessage('Loading configuration...');
@@ -598,6 +622,9 @@ export function ExploreProvider(props) {
 
         sessionStatus,
         setSessionStatusMode,
+
+        shortcutState,
+        dispatchShortcutState,
       }}
     >
       {props.children}
@@ -630,6 +657,20 @@ export const useSessionStatus = () => {
   return useMemo(() => ({ sessionStatus, setSessionStatusMode }), [
     sessionStatus,
   ]);
+};
+
+export const useShortcutState = () => {
+  const { shortcutState, dispatchShortcutState } = useExploreContext(
+    'useSessionStatus'
+  );
+
+  return useMemo(
+    () => ({
+      shortcutState,
+      dispatchShortcutState,
+    }),
+    [shortcutState, dispatchShortcutState]
+  );
 };
 
 export const useMapState = () => {
