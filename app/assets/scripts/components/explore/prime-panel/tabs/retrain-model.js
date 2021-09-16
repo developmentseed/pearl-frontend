@@ -246,7 +246,7 @@ function RetrainModel(props) {
                     <FormInput
                       id='addClassName'
                       value={addClassName}
-                      onKeyDown={e => {
+                      onKeyDown={(e) => {
                         e.stopPropagation();
                       }}
                       onChange={(e) => {

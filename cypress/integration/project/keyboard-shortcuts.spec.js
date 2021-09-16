@@ -34,7 +34,19 @@ describe('Test keyboard shortcuts', () => {
 
     cy.visit('/project/1');
   });
-  it('Does not capture 
+  it('Stops shortcuts during input', () => {
+    cy.wait(['@fetchAoi2', '@fetchCheckpoint2']);
+    // Check ready for retrain status
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Ready for retrain run'
+    );
+
+    cy.get('[data-cy=project-name]').click();
+    cy.get('[data-cy=project-input]').type('l');
+    cy.get('[data-cy=layers-panel]').should('not.be.visible');
+  });
+
   it('Prediction layer opacity changes', () => {
     cy.wait(['@fetchAoi2', '@fetchCheckpoint2']);
     // Check ready for retrain status

@@ -330,7 +330,7 @@ function Footer({
                 placeholder='Set Checkpoint Name'
                 value={localCheckpointName}
                 onKeyDown={(e) => {
-                  e.stopPropagation()
+                  e.stopPropagation();
                 }}
                 onChange={(e) => setLocalCheckpointName(e.target.value)}
                 autoFocus
