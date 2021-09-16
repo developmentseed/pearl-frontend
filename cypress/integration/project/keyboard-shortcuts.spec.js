@@ -34,6 +34,7 @@ describe('Test keyboard shortcuts', () => {
 
     cy.visit('/project/1');
   });
+  it('Does not capture 
   it('Prediction layer opacity changes', () => {
     cy.wait(['@fetchAoi2', '@fetchCheckpoint2']);
     // Check ready for retrain status

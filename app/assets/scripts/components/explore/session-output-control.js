@@ -390,7 +390,13 @@ function SessionOutputControl(props) {
             <HeadingInput
               name='projectName'
               placeholder='Set Project Name'
-              onChange={(e) => setLocalProjectName(e.target.value)}
+              onKeyDown={(e) => {
+                e.stopPropagation();
+              }}
+              onChange={(e) => {
+                e.stopPropagation();
+                setLocalProjectName(e.target.value);
+              }}
               value={localProjectName || ''}
               disabled={!isAuthenticated}
               autoFocus
