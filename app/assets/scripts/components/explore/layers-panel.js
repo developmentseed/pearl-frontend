@@ -15,6 +15,7 @@ import {
   useMapRef,
 } from '../../context/map';
 import { useMapState, useShortcutState } from '../../context/explore';
+import { actions as shortcutActions } from '../../context/explore/shortcuts';
 import { useCheckpoint } from '../../context/checkpoint';
 
 const LayersPanelInner = styled.div`
@@ -88,7 +89,14 @@ const AccordionFold = styled(BaseFold)`
 function Layer({ layer, onSliderChange, onVisibilityToggle, info, name }) {
   const [value, setValue] = useState(layer.opacity || 1);
   const [visible, setVisible] = useState(true);
-  console.log(layer, value)
+
+
+  useEffect(() => {
+    if (layer.opacity !== value) {
+      setValue(layer.opacity)
+    }
+  }, [layer.opacity])
+
   return (
     <LayerWrapper data-cy={name}>
       <SliderWrapper>
@@ -198,7 +206,7 @@ function LayersPanel(props) {
   const disabled = mapState.mode === mapModes.EDIT_AOI_MODE;
 
   const { userLayers: baseUserLayers, setUserLayers } = useUserLayers();
-  const { shortcutState } = useShortcutState();
+  const { shortcutState, dispatchShortcutState } = useShortcutState();
 
   const userLayers = {
     ...baseUserLayers,
@@ -207,7 +215,6 @@ function LayersPanel(props) {
       opacity: shortcutState.prediction_layer_opacity,
     },
   };
-
 
   const { showLayersPanel } = useLayersPanel();
   const { mapLayers } = useMapLayers();
@@ -284,6 +291,16 @@ function LayersPanel(props) {
                       visible: value > 0,
                     },
                   });
+
+                  
+                  if (layer.id === 'predictions') {
+                    dispatchShortcutState({
+                      type: shortcutActions.UPDATE,
+                      data: {
+                        prediction_layer_opacity: value,
+                      },
+                    });
+                  }
                 }}
                 onVisibilityToggle={(layer) => {
                   setUserLayers({

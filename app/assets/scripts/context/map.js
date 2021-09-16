@@ -44,6 +44,7 @@ export function MapProvider(props) {
     },
 
     predictions: {
+      // Prediction layer opacity is handled by shortcut state
       opacity: 1,
       visible: true,
       active: false,

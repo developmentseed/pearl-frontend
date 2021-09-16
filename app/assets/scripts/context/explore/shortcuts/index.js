@@ -10,6 +10,7 @@ export const actions = {
   INCREMENT_PREDICTION_OPACITY: 'INCREMENT_PREDICTION_OPACITY',
   DECREMENT_PREDICTION_OPACITY: 'DECREMENT_PREDICTION_OPACITY',
   SET_PREDICTION_OPACITY_100: 'SET_PREDICTION_OPACITY_100',
+  UPDATE: 'UPDATE'
 };
 
 const initialState = {
@@ -44,7 +45,7 @@ export function shortcutReducer(state, action) {
     case actions.SET_PREDICTION_OPACITY_100:
       return {
         ...state,
-        prediction_layer_opacity: 100,
+        prediction_layer_opacity: 1,
       };
 
     case actions.TOGGLE_LEFT_PANEL:
@@ -57,6 +58,13 @@ export function shortcutReducer(state, action) {
         ...state,
         right_panel: !state.right_panel,
       };
+
+    // Generic value update
+    case actions.UPDATE:
+      return {
+        ...state,
+        ...action.data
+      }
     default:
       logger('Unexpected shortcut action: ', action.type);
       throw new Error('Unexpected error.');
