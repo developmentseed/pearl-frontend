@@ -10,7 +10,7 @@ export const actions = {
   INCREMENT_PREDICTION_OPACITY: 'INCREMENT_PREDICTION_OPACITY',
   DECREMENT_PREDICTION_OPACITY: 'DECREMENT_PREDICTION_OPACITY',
   SET_PREDICTION_OPACITY_100: 'SET_PREDICTION_OPACITY_100',
-  UPDATE: 'UPDATE'
+  UPDATE: 'UPDATE',
 };
 
 const initialState = {
@@ -63,8 +63,8 @@ export function shortcutReducer(state, action) {
     case actions.UPDATE:
       return {
         ...state,
-        ...action.data
-      }
+        ...action.data,
+      };
     default:
       logger('Unexpected shortcut action: ', action.type);
       throw new Error('Unexpected error.');

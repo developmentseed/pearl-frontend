@@ -90,12 +90,11 @@ function Layer({ layer, onSliderChange, onVisibilityToggle, info, name }) {
   const [value, setValue] = useState(layer.opacity || 1);
   const [visible, setVisible] = useState(true);
 
-
   useEffect(() => {
     if (layer.opacity !== value) {
-      setValue(layer.opacity)
+      setValue(layer.opacity);
     }
-  }, [layer.opacity])
+  }, [layer.opacity]);
 
   return (
     <LayerWrapper data-cy={name}>
@@ -292,7 +291,6 @@ function LayersPanel(props) {
                     },
                   });
 
-                  
                   if (layer.id === 'predictions') {
                     dispatchShortcutState({
                       type: shortcutActions.UPDATE,

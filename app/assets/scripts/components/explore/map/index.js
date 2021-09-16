@@ -10,7 +10,11 @@ import {
 } from 'react-leaflet';
 import L from 'leaflet';
 import GlobalContext from '../../../context/global';
-import { ExploreContext, useMapState, useShortcutState } from '../../../context/explore';
+import {
+  ExploreContext,
+  useMapState,
+  useShortcutState,
+} from '../../../context/explore';
 import {
   useMapRef,
   useMapLayers,
@@ -643,7 +647,7 @@ function Map() {
     tileUrl,
     showLayersPanel,
     setShowLayersPanel,
-    shortcutState
+    shortcutState,
   ]);
 
   return (
