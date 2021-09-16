@@ -1,16 +1,18 @@
 import { useReducer } from 'react';
-import logger from '../reducers/utils';
-import { wrapLogReducer } from '../reducers/utils';
-import { KEYS } from './shortcuts-table';
+import logger from '../../../utils/logger';
+import { wrapLogReducer } from '../../reducers/utils';
+import { KEYS } from './keys';
 
 export const actions = {
   TOGGLE_LEFT_PANEL: 'TOGGLE_LEFT_PANEL',
   TOGGLE_RIGHT_PANEL: 'TOGGLE_RIGHT_PANEL',
 };
+
 const initialState = {
   left_panel: true,
   right_panel: true,
 };
+
 export function shortcutReducer(state, action) {
   switch (action.type) {
     case actions.TOGGLE_LEFT_PANEL:
