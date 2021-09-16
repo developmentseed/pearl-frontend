@@ -33,9 +33,9 @@ function ClearSamplesModal({ revealed, onClear, onCancel }) {
             Please submit or clear your input data before changing tabs.
           </Prose>
           <Button
-            variation='danger-raised-light'
+            variation='primary-plain'
             size='medium'
-            useIcon='xmark--small'
+            useIcon='xmark'
             style={{
               gridColumn: '1 / 2',
             }}
@@ -45,7 +45,7 @@ function ClearSamplesModal({ revealed, onClear, onCancel }) {
             Cancel
           </Button>
           <Button
-            variation='primary-raised-light'
+            variation='danger-raised-dark'
             size='medium'
             useIcon='trash-bin'
             style={{
