@@ -29,7 +29,8 @@ export function DownloadAoiButton({
 }) {
   return (
     <Button
-      variation='primary-plain'
+      variation='primary-raised-dark'
+      hideText={!children}
       useIcon='download'
       visuallyDisabled={disabled}
       onClick={async () => {
