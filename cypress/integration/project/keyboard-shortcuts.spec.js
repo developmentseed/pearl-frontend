@@ -34,7 +34,42 @@ describe('Test keyboard shortcuts', () => {
 
     cy.visit('/project/1');
   });
-  it('successfully loads', () => {
+  it('Prediction layer opacity changes', () => {
+    cy.wait(['@fetchAoi2', '@fetchCheckpoint2']);
+    // Check ready for retrain status
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Ready for retrain run'
+    );
+
+    // Open layer panel for visual test
+    cy.get('#layer-control').click({ force: true });
+
+    /* a  */
+    cy.get('body').trigger('keydown', { keyCode: 65 });
+    // prediction opacity should be 0
+
+    /* f  */
+    cy.get('body').trigger('keydown', { keyCode: 70 });
+    // prediction opacity should be 1
+
+    /* s  */
+    cy.get('body').trigger('keydown', { keyCode: 83 });
+    cy.get('body').trigger('keydown', { keyCode: 83 });
+    cy.get('body').trigger('keydown', { keyCode: 83 });
+    cy.get('body').trigger('keydown', { keyCode: 83 });
+    cy.get('body').trigger('keydown', { keyCode: 83 });
+    // prediction opacity should be 0.5
+
+    /* d  */
+    cy.get('body').trigger('keydown', { keyCode: 68 });
+    cy.get('body').trigger('keydown', { keyCode: 68 });
+    cy.get('body').trigger('keydown', { keyCode: 68 });
+    cy.get('body').trigger('keydown', { keyCode: 68 });
+    cy.get('body').trigger('keydown', { keyCode: 68 });
+    // prediction opacity should be 1
+  });
+  it('Hide and collapse panels', () => {
     cy.wait(['@fetchAoi2', '@fetchCheckpoint2']);
     // Check ready for retrain status
     cy.get('[data-cy=session-status]').should(
