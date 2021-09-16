@@ -15,7 +15,6 @@ import {
 import config from '../../config';
 import { useAuth } from '../../context/auth';
 import logger from '../../utils/logger';
-import { panelSkin } from '../../styles/skins';
 import {
   ClassList,
   Class,
@@ -31,25 +30,14 @@ import GenericControl from '../common/map/generic-control';
 
 const { restApiEndpoint, tileUrlTemplate } = config;
 
-const DownloadMap = styled.div`
-  ${panelSkin};
-  position: absolute;
-  top: ${glsp(5)};
-  right: ${glsp(2)};
-  padding: ${glsp(0.75)};
-  grid-gap: ${glsp()};
-  z-index: 99997;
-  overflow: hidden;
-`;
-
 const ClassLegend = styled(ClassList)`
-  ${panelSkin};
+  background: ${themeVal('color.surface')};
   position: absolute;
   bottom: ${glsp(2)};
   right: ${glsp(2)};
   padding: ${glsp(1.5)};
   grid-gap: ${glsp()};
-  z-index: 99997;
+  z-index: 401;
   width: 16rem;
   overflow: hidden;
 
