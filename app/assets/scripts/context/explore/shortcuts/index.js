@@ -6,6 +6,10 @@ import { KEYS } from './keys';
 export const actions = {
   TOGGLE_LEFT_PANEL: 'TOGGLE_LEFT_PANEL',
   TOGGLE_RIGHT_PANEL: 'TOGGLE_RIGHT_PANEL',
+  SET_PREDICTION_OPACITY_0: 'SET_PREDICTION_OPACITY_0',
+  INCREMENT_PREDICTION_OPACITY: 'INCREMENT_PREDICTION_OPACITY',
+  DECREMENT_PREDICTION_OPACITY: 'DECREMENT_PREDICTION_OPACITY',
+  SET_PREDICTION_OPACITY_100: 'SET_PREDICTION_OPACITY_100',
 };
 
 const initialState = {
@@ -15,6 +19,14 @@ const initialState = {
 
 export function shortcutReducer(state, action) {
   switch (action.type) {
+    case actions.SET_PREDICTION_OPACITY_0:
+      return state;
+    case actions.DECREMENT_PREDICTION_OPACITY:
+      return state;
+    case actions.INCREMENT_PREDICTION_OPACITY:
+      return state;
+    case actions.SET_PREDICTION_OPACITY_100:
+      return state;
     case actions.TOGGLE_LEFT_PANEL:
       return {
         ...state,
@@ -36,6 +48,10 @@ export function useShortcutReducer() {
 }
 
 export const KEY_ACTIONS = {
+  [KEYS.a_KEY]: actions.SET_PREDICTION_OPACITY_0,
+  [KEYS.s_KEY]: actions.DECREMENT_PREDICTION_OPACITY,
+  [KEYS.d_KEY]: actions.INCREMENT_PREDICTION_OPACITY,
+  [KEYS.f_KEY]: actions.SET_PREDICTION_OPACITY_100,
   [KEYS.i_KEY]: actions.TOGGLE_LEFT_PANEL,
   [KEYS.o_KEY]: actions.TOGGLE_RIGHT_PANEL,
 };
