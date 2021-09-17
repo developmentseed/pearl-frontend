@@ -15,10 +15,10 @@ export const actions = {
 };
 
 const initialState = {
-  prediction_layer_opacity: 1,
-  left_panel: true,
-  right_panel: true,
-  layer_tray: false,
+  predictionLayerOpacity: 1,
+  leftPanel: true,
+  rightPanel: true,
+  layerTray: false,
 };
 
 export function shortcutReducer(state, action) {
@@ -26,45 +26,45 @@ export function shortcutReducer(state, action) {
     case actions.SET_PREDICTION_OPACITY_0:
       return {
         ...state,
-        prediction_layer_opacity: 0,
+        predictionLayerOpacity: 0,
       };
     case actions.DECREMENT_PREDICTION_OPACITY:
       return {
         ...state,
-        prediction_layer_opacity:
-          state.prediction_layer_opacity - 0.1 < 0
+        predictionLayerOpacity:
+          state.predictionLayerOpacity - 0.1 < 0
             ? 0
-            : state.prediction_layer_opacity - 0.1,
+            : state.predictionLayerOpacity - 0.1,
       };
     case actions.INCREMENT_PREDICTION_OPACITY:
       return {
         ...state,
-        prediction_layer_opacity:
-          state.prediction_layer_opacity + 0.1 > 1
+        predictionLayerOpacity:
+          state.predictionLayerOpacity + 0.1 > 1
             ? 1
-            : state.prediction_layer_opacity + 0.1,
+            : state.predictionLayerOpacity + 0.1,
       };
     case actions.SET_PREDICTION_OPACITY_100:
       return {
         ...state,
-        prediction_layer_opacity: 1,
+        predictionLayerOpacity: 1,
       };
 
     case actions.TOGGLE_LEFT_PANEL:
       return {
         ...state,
-        left_panel: !state.left_panel,
+        leftPanel: !state.leftPanel,
       };
     case actions.TOGGLE_RIGHT_PANEL:
       return {
         ...state,
-        right_panel: !state.right_panel,
+        rightPanel: !state.rightPanel,
       };
 
     case actions.TOGGLE_LAYER_TRAY:
       return {
         ...state,
-        layer_tray: !state.layer_tray,
+        layerTray: !state.layerTray,
       };
     // Generic value update
     case actions.UPDATE:

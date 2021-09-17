@@ -463,7 +463,7 @@ function Map() {
               bounds={p.bounds}
               opacity={
                 userLayers.predictions.visible
-                  ? shortcutState.prediction_layer_opacity
+                  ? shortcutState.predictionLayerOpacity
                   : 0
               }
             />
@@ -544,7 +544,7 @@ function Map() {
               }}
               opacity={
                 userLayers.predictions.visible
-                  ? shortcutState.prediction_layer_opacity
+                  ? shortcutState.predictionLayerOpacity
                   : 0
               }
               eventHandlers={{

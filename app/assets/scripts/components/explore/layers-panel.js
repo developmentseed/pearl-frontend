@@ -206,7 +206,7 @@ function LayersPanel(props) {
     ...baseUserLayers,
     predictions: {
       ...baseUserLayers.predictions,
-      opacity: shortcutState.prediction_layer_opacity,
+      opacity: shortcutState.predictionLayerOpacity,
     },
   };
 
@@ -254,7 +254,7 @@ function LayersPanel(props) {
   return (
     <LayersPanelInner
       className={className}
-      show={!disabled && shortcutState.layer_tray}
+      show={!disabled && shortcutState.layerTray}
       style={{
         top: position.top || 0,
         left: position.right || 0,
@@ -289,7 +289,7 @@ function LayersPanel(props) {
                     dispatchShortcutState({
                       type: shortcutActions.UPDATE,
                       data: {
-                        prediction_layer_opacity: value,
+                        predictionLayerOpacity: value,
                       },
                     });
                   }
