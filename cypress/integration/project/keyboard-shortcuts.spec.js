@@ -2,6 +2,7 @@ const {
   restApiEndpoint,
 } = require('../../../app/assets/scripts/config/testing').default;
 
+/* eslint-disable camelcase */
 const instance = {
   id: 1,
   project_id: 1,
@@ -15,6 +16,7 @@ const instance = {
     phase: 'Running',
   },
 };
+/* eslint-enable camelcase */
 
 describe('Test keyboard shortcuts', () => {
   beforeEach(() => {
@@ -60,11 +62,18 @@ describe('Test keyboard shortcuts', () => {
 
     /* a  */
     cy.get('body').trigger('keydown', { keyCode: 65 });
+    cy.get('[data-cy="Prediction Results"]')
+      .invoke('attr', 'data-opacity')
+      .should('eq', 0);
     // prediction opacity should be 0
 
     /* f  */
     cy.get('body').trigger('keydown', { keyCode: 70 });
     // prediction opacity should be 1
+    cy.get('[data-cy="Prediction Results"]')
+      .invoke('attr', 'data-opacity')
+      .should('eq', 1);
+    //
 
     /* s  */
     cy.get('body').trigger('keydown', { keyCode: 83 });
@@ -72,6 +81,9 @@ describe('Test keyboard shortcuts', () => {
     cy.get('body').trigger('keydown', { keyCode: 83 });
     cy.get('body').trigger('keydown', { keyCode: 83 });
     cy.get('body').trigger('keydown', { keyCode: 83 });
+    cy.get('[data-cy="Prediction Results"]')
+      .invoke('attr', 'data-opacity')
+      .should('eq', 0.5);
     // prediction opacity should be 0.5
 
     /* d  */
@@ -80,6 +92,10 @@ describe('Test keyboard shortcuts', () => {
     cy.get('body').trigger('keydown', { keyCode: 68 });
     cy.get('body').trigger('keydown', { keyCode: 68 });
     cy.get('body').trigger('keydown', { keyCode: 68 });
+    cy.get('[data-cy="Prediction Results"]')
+      .invoke('attr', 'data-opacity')
+      .should('eq', 1);
+
     // prediction opacity should be 1
   });
 

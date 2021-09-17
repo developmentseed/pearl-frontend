@@ -25,9 +25,6 @@
     "sourceType": "module" // Allows for the use of imports
   },
   "rules": {
-    "camelcase": ["error", {
-      "properties": "always"
-    }],
     "prettier/prettier": ["error", {"semi": true, "singleQuote": true, "jsxSingleQuote": true, "parser": "flow"}],
     "comma-dangle": 0,
     "inclusive-language/use-inclusive-words": "error",
