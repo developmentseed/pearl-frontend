@@ -15,12 +15,6 @@ export function MapProvider(props) {
   const { aoiPatch } = useAoiPatch();
 
   /*
-  const [predictionLayerSettings, setPredictionLayerSettings] = useState({
-    opacity: 1,
-    visible: true,
-  });*/
-
-  /*
    * Object tracking user layers to be controlled in frontend.
    * Add objects here to control new layers
    */
