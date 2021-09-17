@@ -266,7 +266,6 @@ export function AoiEditButtons(props) {
     //Current aoi should only be set after aoi has been sent to the api
     setCurrentAoi(null);
   }
-  console.log(aoiRef)
 
   // Display confirm/cancel buttons when AOI editing is active
   if (
