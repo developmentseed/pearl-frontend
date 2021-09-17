@@ -64,7 +64,7 @@ describe('Test keyboard shortcuts', () => {
     cy.get('body').trigger('keydown', { keyCode: 65 });
     cy.get('[data-cy="Prediction Results"]')
       .invoke('attr', 'data-opacity')
-      .should('eq', 0);
+      .should('eq', '0');
     // prediction opacity should be 0
 
     /* f  */
@@ -72,7 +72,7 @@ describe('Test keyboard shortcuts', () => {
     // prediction opacity should be 1
     cy.get('[data-cy="Prediction Results"]')
       .invoke('attr', 'data-opacity')
-      .should('eq', 1);
+      .should('eq', '1');
     //
 
     /* s  */
@@ -83,7 +83,7 @@ describe('Test keyboard shortcuts', () => {
     cy.get('body').trigger('keydown', { keyCode: 83 });
     cy.get('[data-cy="Prediction Results"]')
       .invoke('attr', 'data-opacity')
-      .should('eq', 0.5);
+      .should('eq', '0.5');
     // prediction opacity should be 0.5
 
     /* d  */
@@ -94,7 +94,7 @@ describe('Test keyboard shortcuts', () => {
     cy.get('body').trigger('keydown', { keyCode: 68 });
     cy.get('[data-cy="Prediction Results"]')
       .invoke('attr', 'data-opacity')
-      .should('eq', 1);
+      .should('eq', '1');
 
     // prediction opacity should be 1
   });

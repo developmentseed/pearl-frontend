@@ -12,6 +12,7 @@ import { useMapLayers, useUserLayers, useMapRef } from '../../context/map';
 import { useMapState, useShortcutState } from '../../context/explore';
 import { actions as shortcutActions } from '../../context/explore/shortcuts';
 import { useCheckpoint } from '../../context/checkpoint';
+import { round } from '../../utils/format';
 
 const LayersPanelInner = styled.div`
   opacity: ${({ show }) => (show ? 1 : 0)};
@@ -92,7 +93,7 @@ function Layer({ layer, onSliderChange, onVisibilityToggle, info, name }) {
   }, [layer.opacity]);
 
   return (
-    <LayerWrapper data-cy={name} data-opacity={value}>
+    <LayerWrapper data-cy={name} data-opacity={round(value, 2)}>
       <SliderWrapper>
         <Heading as='h4' size='xsmall'>
           {name}
