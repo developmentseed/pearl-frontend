@@ -111,21 +111,6 @@ function PrimePanel() {
 
   const [activeTab, setActiveTab] = useState(0);
 
-  // Check if AOI and selected model are defined, and if view mode is runnable
-  const allowInferenceRun =
-    [
-      mapModes.BROWSE_MODE,
-      mapModes.ADD_CLASS_SAMPLES,
-      mapModes.ADD_SAMPLE_POINT,
-      mapModes.ADD_SAMPLE_POLYGON,
-      mapModes.ADD_SAMPLE_FREEHAND,
-      mapModes.REMOVE_SAMPLE,
-    ].includes(mapState.mode) &&
-    typeof aoiRef !== 'undefined' &&
-    aoiArea > 0 &&
-    typeof selectedModel !== 'undefined' &&
-    selectedModel !== null;
-
   // Retrain Panel Tab Empty State message
   const retrainPlaceHolderMessage = () => {
     if (predictions.isReady()) {
@@ -145,43 +130,8 @@ function PrimePanel() {
     }
   };
 
-  const checkpointHasSamples = () => {
-    if (currentCheckpoint) {
-      let sampleCount = Object.values(currentCheckpoint.classes || {}).reduce(
-        (count, c) => {
-          /**
-           * Check which format the point collection is following to get the feature count.
-           * This needs a refactor when possible. Feature initialization, map edit operations
-           * and retrain tasks should use the same format, which is not happening now.
-           */
-          const points =
-            c.points.type === 'Feature'
-              ? c.points.geometry.coordinates
-              : c.points.coordinates;
-
-          // Return the feature count
-          return count + points.length + c.polygons.length;
-        },
-        0
-      );
-
-      sampleCount += Object.values(
-        currentCheckpoint.checkpointBrushes || {}
-      ).reduce((count, c) => {
-        return count + c.polygons.length;
-      }, 0);
-
-      // There should be no polygon or point samples on the map
-      // User must submit or clear retrain samples before starting refine
-      if (sampleCount > 0) {
-        return true;
-      } else {
-        return false;
-      }
-    } else {
-      return false;
-    }
-  };
+  const checkpointHasSamples =
+    currentCheckpoint && currentCheckpoint.sampleCount > 0;
 
   useEffect(() => {
     if (currentCheckpoint && currentCheckpoint.name) {
@@ -236,7 +186,7 @@ function PrimePanel() {
                 checkpointList,
                 applyCheckpoint,
 
-                checkpointHasSamples: checkpointHasSamples(),
+                checkpointHasSamples,
 
                 setShowSelectModelModal,
                 selectedModel,
@@ -264,7 +214,6 @@ function PrimePanel() {
                     mapState.mode === mapModes.EDIT_AOI_MODE
                   }
                   onTabClick={() => {
-                    const hasSamples = checkpointHasSamples();
                     function onContinue() {
                       setActiveTab(RETRAIN_TAB_INDEX);
                       if (currentCheckpoint && currentAoi) {
@@ -274,21 +223,16 @@ function PrimePanel() {
                           data: undefined,
                         });
                         if (currentCheckpoint.mode != checkpointModes.RETRAIN) {
-                          // If current checkpoint has not been set,
-                          // mode does not need to be set
-                          //if (!checkpointHasSamples()) {
                           dispatchCurrentCheckpoint({
                             type: checkpointActions.SET_CHECKPOINT_MODE,
                             data: {
                               mode: checkpointModes.RETRAIN,
                             },
                           });
-                          //}
                         }
                       }
                     }
-                    if (hasSamples) {
-                      //show modal
+                    if (checkpointHasSamples) {
                       setShowClearSamplesModal(() => onContinue);
                     } else {
                       onContinue();
@@ -310,7 +254,6 @@ function PrimePanel() {
                   }
                   tabTooltip='Refine is not available until model has been run or retrained.'
                   onTabClick={() => {
-                    const hasSamples = checkpointHasSamples();
                     function onContinue() {
                       setActiveTab(REFINE_TAB_INDEX);
                       if (currentCheckpoint) {
@@ -332,7 +275,7 @@ function PrimePanel() {
                       }
                     }
 
-                    if (hasSamples) {
+                    if (checkpointHasSamples) {
                       setShowClearSamplesModal(() => onContinue);
                     } else {
                       onContinue();
@@ -358,10 +301,7 @@ function PrimePanel() {
                 disabled:
                   currentCheckpoint &&
                   (currentCheckpoint.mode === checkpointModes.RETRAIN ||
-                    currentCheckpoint.mode === checkpointModes.REFINE) &&
-                  !checkpointHasSamples(),
-
-                allowInferenceRun,
+                    currentCheckpoint.mode === checkpointModes.REFINE),
               }}
             />
           </StyledPanelBlock>

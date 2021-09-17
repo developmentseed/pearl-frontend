@@ -413,6 +413,32 @@ function checkpointReducer(state, action) {
       logger('Invalid action', action);
   }
 
+  if (nextState && nextState.classes) {
+    nextState.sampleCount = Object.values(nextState.classes).reduce(
+      (count, c) => {
+        /**
+         * Check which format the point collection is following to get the feature count.
+         * This needs a refactor when possible. Feature initialization, map edit operations
+         * and retrain tasks should use the same format, which is not happening now.
+         */
+        const points =
+          c.points.type === 'Feature'
+            ? c.points.geometry.coordinates
+            : c.points.coordinates;
+
+        // Return the feature count
+        return count + points.length + c.polygons.length;
+      },
+      0
+    );
+
+    nextState.sampleCount += Object.values(
+      nextState.checkpointBrushes || {}
+    ).reduce((count, c) => {
+      return count + c.polygons.length;
+    }, 0);
+  }
+
   return nextState;
 }
 
