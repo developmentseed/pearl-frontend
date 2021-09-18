@@ -125,6 +125,22 @@ const ModalForm = styled(Form)`
   grid-gap: ${glsp(1)};
 `;
 
+const ShortcutsWrapper = styled.dl`
+  display: grid;
+  grid-template-columns: min-content 1fr;
+  align-items: baseline;
+  justify-content: space-between;
+  grid-gap: ${glsp()};
+`;
+const Shortcut = styled.dt`
+  background: ${themeVal('color.background')};
+  border: 1px solid ${themeVal('color.primaryAlphaB')};
+  font-weight: ${themeVal('type.heading.weight')};
+  text-align: center;
+  height: ${glsp(1.75)};
+  width: ${glsp(1.75)};
+`;
+
 function ExploreHeader(props) {
   const { projectId } = useProjectId();
   const { isMediumDown } = props;
@@ -148,6 +164,7 @@ function ExploreHeader(props) {
   const [localProjectName, setLocalProjectName] = useState(projectName);
   const [titleEditMode, setTitleEditMode] = useState(false);
   const [exportShareURL, setExportShareURL] = useState(null);
+  const [showShortcutsModal, setShowShortcutsModal] = useState(false);
 
   useEffect(() => setLocalProjectName(initialName), [initialName]);
 
@@ -304,6 +321,35 @@ function ExploreHeader(props) {
         <span>Session Status: </span>
         {sessionStatus.message}
       </StatusHeading>
+      <Button
+        useIcon='keyboard'
+        variation='primary-plain'
+        hideText
+        title='Show keyboard shortcuts'
+        onClick={() => setShowShortcutsModal(true)}
+      />
+      <Modal
+        id='keyboard-shortcuts-modal'
+        title='Keyboard Shortcuts'
+        closeButton={false}
+        revealed={showShortcutsModal}
+        size='small'
+        onOverlayClick={() => setShowShortcutsModal(false)}
+        content={
+          <ShortcutsWrapper>
+            <Shortcut>l</Shortcut>
+            <dd>open layers tray</dd>
+            <Shortcut>a</Shortcut>
+            <dd>Set prediction layer opacity to 0%</dd>
+            <Shortcut>s</Shortcut>
+            <dd>Decrease prediction layer opacity by 1%</dd>
+            <Shortcut>d</Shortcut>
+            <dd>Increase prediction layer opacity by 1%</dd>
+            <Shortcut>f</Shortcut>
+            <dd>Set prediction layer opacity to 100%</dd>
+          </ShortcutsWrapper>
+        }
+      />
       <Button
         variation='primary-plain'
         useIcon='circle-question'
