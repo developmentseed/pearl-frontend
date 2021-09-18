@@ -7,7 +7,6 @@ import { ExploreProvider } from '../../context/explore';
 import { MapProvider } from '../../context/map';
 import SizeAwareElement from '../common/size-aware-element';
 import theme from '../../styles/theme';
-import SessionTimeoutModal from '../common/timeout-modal';
 import ExploreHeader from './explore-header';
 import { CheckpointProvider } from '../../context/checkpoint';
 import { AoiProvider } from '../../context/aoi';
@@ -49,7 +48,6 @@ function Explore() {
         <PageBody role='main'>
           <ExploreComponent />
         </PageBody>
-        <SessionTimeoutModal revealed={false} />
       </Composer>
     </App>
   );
