@@ -125,7 +125,7 @@ const ModalForm = styled(Form)`
   grid-gap: ${glsp(1)};
 `;
 
-function SessionOutputControl(props) {
+function ExploreHeader(props) {
   const { projectId } = useProjectId();
   const { isMediumDown } = props;
   const { isAuthenticated, restApiClient } = useAuth();
@@ -427,7 +427,7 @@ function SessionOutputControl(props) {
   );
 }
 
-SessionOutputControl.propTypes = {
+ExploreHeader.propTypes = {
   status: T.string,
   projectName: T.string,
   setProjectName: T.func,
@@ -435,4 +435,4 @@ SessionOutputControl.propTypes = {
   isMediumDown: T.bool,
 };
 
-export default SessionOutputControl;
+export default ExploreHeader;
