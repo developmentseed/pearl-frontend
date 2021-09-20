@@ -7,8 +7,7 @@ import { ExploreProvider } from '../../context/explore';
 import { MapProvider } from '../../context/map';
 import SizeAwareElement from '../common/size-aware-element';
 import theme from '../../styles/theme';
-import SessionTimeoutModal from '../common/timeout-modal';
-import SessionOutputControl from './session-output-control';
+import ExploreHeader from './explore-header';
 import { CheckpointProvider } from '../../context/checkpoint';
 import { AoiProvider } from '../../context/aoi';
 import { ProjectProvider } from '../../context/project';
@@ -43,13 +42,12 @@ function Explore() {
           onChange={resizeListener}
         >
           <PageHeader>
-            <SessionOutputControl isMediumDown={isMediumDown} />
+            <ExploreHeader isMediumDown={isMediumDown} />
           </PageHeader>
         </SizeAwareElement>
         <PageBody role='main'>
           <ExploreComponent />
         </PageBody>
-        <SessionTimeoutModal revealed={false} />
       </Composer>
     </App>
   );

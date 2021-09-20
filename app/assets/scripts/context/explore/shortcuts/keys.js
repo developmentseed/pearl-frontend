@@ -4,6 +4,8 @@ export const KEYS = {
   d_KEY: 68,
   f_KEY: 70,
 
+  k_KEY: 75,
+
   l_KEY: 76,
 
   i_KEY: 73,

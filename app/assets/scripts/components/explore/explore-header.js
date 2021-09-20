@@ -19,7 +19,12 @@ import { themeVal, glsp, media, truncated } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
 import { Form, FormInput } from '@devseed-ui/form';
 import InfoButton from '../common/info-button';
-import { ExploreContext, useProjectId } from '../../context/explore';
+import {
+  ExploreContext,
+  useProjectId,
+  useShortcutState,
+} from '../../context/explore';
+import { actions as shortcutActions } from '../../context/explore/shortcuts';
 import { useProject } from '../../context/project';
 import { useAuth } from '../../context/auth';
 import { useAoi } from '../../context/aoi';
@@ -125,7 +130,23 @@ const ModalForm = styled(Form)`
   grid-gap: ${glsp(1)};
 `;
 
-function SessionOutputControl(props) {
+const ShortcutsWrapper = styled.dl`
+  display: grid;
+  grid-template-columns: min-content 1fr;
+  align-items: baseline;
+  justify-content: space-between;
+  grid-gap: ${glsp()};
+`;
+const Shortcut = styled.dt`
+  background: ${themeVal('color.background')};
+  border: 1px solid ${themeVal('color.primaryAlphaB')};
+  font-weight: ${themeVal('type.heading.weight')};
+  text-align: center;
+  height: ${glsp(1.75)};
+  width: ${glsp(1.75)};
+`;
+
+function ExploreHeader(props) {
   const { projectId } = useProjectId();
   const { isMediumDown } = props;
   const { isAuthenticated, restApiClient } = useAuth();
@@ -142,6 +163,8 @@ function SessionOutputControl(props) {
   } = useContext(ExploreContext);
 
   const { projectName, currentProject, setProjectName } = useProject();
+
+  const { shortcutState, dispatchShortcutState } = useShortcutState();
 
   const initialName = projectName;
 
@@ -305,6 +328,45 @@ function SessionOutputControl(props) {
         {sessionStatus.message}
       </StatusHeading>
       <Button
+        useIcon='keyboard'
+        variation='primary-plain'
+        hideText
+        title='Show keyboard shortcuts'
+        onClick={() => {
+          dispatchShortcutState({
+            type: shortcutActions.TOGGLE_SHORTCUTS_HELP,
+          });
+        }}
+      />
+      <Modal
+        id='keyboard-shortcuts-modal'
+        title='Keyboard Shortcuts'
+        closeButton={false}
+        revealed={shortcutState.shortcutsHelp}
+        size='small'
+        onOverlayClick={() => {
+          dispatchShortcutState({
+            type: shortcutActions.TOGGLE_SHORTCUTS_HELP,
+          });
+        }}
+        content={
+          <ShortcutsWrapper>
+            <Shortcut>l</Shortcut>
+            <dd>Open layers tray</dd>
+            <Shortcut>a</Shortcut>
+            <dd>Set prediction layer opacity to 0%</dd>
+            <Shortcut>s</Shortcut>
+            <dd>Decrease prediction layer opacity by 1%</dd>
+            <Shortcut>d</Shortcut>
+            <dd>Increase prediction layer opacity by 1%</dd>
+            <Shortcut>f</Shortcut>
+            <dd>Set prediction layer opacity to 100%</dd>
+            <Shortcut>k</Shortcut>
+            <dd>Open shortcuts help</dd>
+          </ShortcutsWrapper>
+        }
+      />
+      <Button
         variation='primary-plain'
         useIcon='circle-question'
         onClick={() => setTourStep(0)}
@@ -427,7 +489,7 @@ function SessionOutputControl(props) {
   );
 }
 
-SessionOutputControl.propTypes = {
+ExploreHeader.propTypes = {
   status: T.string,
   projectName: T.string,
   setProjectName: T.func,
@@ -435,4 +497,4 @@ SessionOutputControl.propTypes = {
   isMediumDown: T.bool,
 };
 
-export default SessionOutputControl;
+export default ExploreHeader;
