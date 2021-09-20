@@ -93,7 +93,7 @@ export const KEY_ACTIONS = {
 };
 
 export function listenForShortcuts(event, dispatch) {
-  if (event.getModifierState('Meta')) {
+  if (event.metaKey) {
     return;
   } else if (KEY_ACTIONS[event.keyCode]) {
     dispatch({ type: KEY_ACTIONS[event.keyCode] });
