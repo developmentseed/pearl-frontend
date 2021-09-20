@@ -221,6 +221,7 @@ UploadAoiModal.propTypes = {
 export function AoiEditButtons(props) {
   const { mapState, setMapMode, mapModes } = useMapState();
   const [showUploadAoiModal, setShowUploadAoiModal] = useState(false);
+  // updateAoiName applies geocoding
   const { updateAoiName } = useAoiName();
   const {
     currentAoi,
@@ -228,6 +229,9 @@ export function AoiEditButtons(props) {
     activeModal,
     setActiveModal,
     setAoiArea,
+
+    // Set aoiname sets a string directly
+    setAoiName,
   } = useAoi();
   const { mapRef } = useMapRef();
 
@@ -391,7 +395,10 @@ export function AoiEditButtons(props) {
 
   return (
     <>
-      {currentAoi && (
+      {currentAoi ? (
+        /*  If currentAoi, aoi has been submitted to api
+         *  on delete, delete it via the api
+         */
         <EditButton
           onClick={() => deleteAoi(currentAoi)}
           title='Delete current aoi'
@@ -401,6 +408,28 @@ export function AoiEditButtons(props) {
         >
           Delete current Aoi
         </EditButton>
+      ) : (
+        /* If not currentAoi but aoiRef exists, aoi has not been submitted to aoi
+         * just clear it from the map and return to create
+         * new aoi state
+         */
+        aoiRef && (
+          <EditButton
+            onClick={() => {
+              mapRef.aoi.control.draw.clear();
+              setAoiRef(null);
+              setAoiBounds(null);
+              setAoiArea(null);
+              setAoiName(null);
+            }}
+            title='Delete current aoi'
+            id='delete-aoi'
+            useIcon='trash-bin'
+            data-cy='delete-current-aoi-button'
+          >
+            Delete current Aoi
+          </EditButton>
+        )
       )}
       <UploadAoiModal
         revealed={showUploadAoiModal}
