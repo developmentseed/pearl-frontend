@@ -6,24 +6,71 @@ import { KEYS } from './keys';
 export const actions = {
   TOGGLE_LEFT_PANEL: 'TOGGLE_LEFT_PANEL',
   TOGGLE_RIGHT_PANEL: 'TOGGLE_RIGHT_PANEL',
+  SET_PREDICTION_OPACITY_0: 'SET_PREDICTION_OPACITY_0',
+  INCREMENT_PREDICTION_OPACITY: 'INCREMENT_PREDICTION_OPACITY',
+  DECREMENT_PREDICTION_OPACITY: 'DECREMENT_PREDICTION_OPACITY',
+  SET_PREDICTION_OPACITY_100: 'SET_PREDICTION_OPACITY_100',
+  TOGGLE_LAYER_TRAY: 'TOGGLE_LAYER_TRAY',
+  UPDATE: 'UPDATE',
 };
 
 const initialState = {
-  left_panel: true,
-  right_panel: true,
+  predictionLayerOpacity: 1,
+  leftPanel: true,
+  rightPanel: true,
+  layerTray: false,
 };
 
 export function shortcutReducer(state, action) {
   switch (action.type) {
+    case actions.SET_PREDICTION_OPACITY_0:
+      return {
+        ...state,
+        predictionLayerOpacity: 0,
+      };
+    case actions.DECREMENT_PREDICTION_OPACITY:
+      return {
+        ...state,
+        predictionLayerOpacity:
+          state.predictionLayerOpacity - 0.1 < 0
+            ? 0
+            : state.predictionLayerOpacity - 0.1,
+      };
+    case actions.INCREMENT_PREDICTION_OPACITY:
+      return {
+        ...state,
+        predictionLayerOpacity:
+          state.predictionLayerOpacity + 0.1 > 1
+            ? 1
+            : state.predictionLayerOpacity + 0.1,
+      };
+    case actions.SET_PREDICTION_OPACITY_100:
+      return {
+        ...state,
+        predictionLayerOpacity: 1,
+      };
+
     case actions.TOGGLE_LEFT_PANEL:
       return {
         ...state,
-        left_panel: !state.left_panel,
+        leftPanel: !state.leftPanel,
       };
     case actions.TOGGLE_RIGHT_PANEL:
       return {
         ...state,
-        right_panel: !state.right_panel,
+        rightPanel: !state.rightPanel,
+      };
+
+    case actions.TOGGLE_LAYER_TRAY:
+      return {
+        ...state,
+        layerTray: !state.layerTray,
+      };
+    // Generic value update
+    case actions.UPDATE:
+      return {
+        ...state,
+        ...action.data,
       };
     default:
       logger('Unexpected shortcut action: ', action.type);
@@ -36,8 +83,13 @@ export function useShortcutReducer() {
 }
 
 export const KEY_ACTIONS = {
-  [KEYS.I_KEY]: actions.TOGGLE_LEFT_PANEL,
-  [KEYS.O_KEY]: actions.TOGGLE_RIGHT_PANEL,
+  [KEYS.a_KEY]: actions.SET_PREDICTION_OPACITY_0,
+  [KEYS.s_KEY]: actions.DECREMENT_PREDICTION_OPACITY,
+  [KEYS.d_KEY]: actions.INCREMENT_PREDICTION_OPACITY,
+  [KEYS.f_KEY]: actions.SET_PREDICTION_OPACITY_100,
+  [KEYS.l_KEY]: actions.TOGGLE_LAYER_TRAY,
+  [KEYS.i_KEY]: actions.TOGGLE_LEFT_PANEL,
+  [KEYS.o_KEY]: actions.TOGGLE_RIGHT_PANEL,
 };
 
 export function listenForShortcuts(event, dispatch) {
