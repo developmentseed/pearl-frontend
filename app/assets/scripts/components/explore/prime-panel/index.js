@@ -156,7 +156,7 @@ function PrimePanel() {
         data-cy='primary-panel'
         collapsible
         overrideControl
-        revealed={shortcutState.left_panel}
+        revealed={shortcutState.leftPanel}
         onPanelChange={() => {
           dispatchShortcutState({ type: shortcutActions.TOGGLE_LEFT_PANEL });
         }}

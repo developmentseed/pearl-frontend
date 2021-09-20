@@ -64,11 +64,11 @@ function SecPanel() {
       collapsible
       direction='right'
       overrideControl
-      revealed={shortcutState.right_panel}
+      revealed={shortcutState.rightPanel}
       onPanelChange={() => {
         dispatchShortcutState({ type: shortcutActions.TOGGLE_RIGHT_PANEL });
       }}
-      initialState={currentCheckpoint.classes}
+      initialState={currentCheckpoint.classes ? true : false}
       bodyContent={
         <PanelBlock>
           <PanelBlockHeader>

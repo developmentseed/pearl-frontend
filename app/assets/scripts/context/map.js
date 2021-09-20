@@ -14,13 +14,6 @@ export function MapProvider(props) {
   const [mapLayers, setMapLayers] = useState({});
   const { aoiPatch } = useAoiPatch();
 
-  const [showLayersPanel, setShowLayersPanel] = useState(false);
-
-  const [predictionLayerSettings, setPredictionLayerSettings] = useState({
-    opacity: 1,
-    visible: true,
-  });
-
   /*
    * Object tracking user layers to be controlled in frontend.
    * Add objects here to control new layers
@@ -43,6 +36,7 @@ export function MapProvider(props) {
     },
 
     predictions: {
+      // Prediction layer opacity is handled by shortcut state
       opacity: 1,
       visible: true,
       active: false,
@@ -72,14 +66,8 @@ export function MapProvider(props) {
         mapLayers,
         setMapLayers,
 
-        predictionLayerSettings,
-        setPredictionLayerSettings,
-
         userLayers,
         setUserLayers,
-
-        setShowLayersPanel,
-        showLayersPanel,
       }}
     >
       {props.children}
@@ -134,31 +122,5 @@ export const useUserLayers = () => {
       setUserLayers,
     }),
     [userLayers, setUserLayers]
-  );
-};
-
-export const usePredictionLayer = () => {
-  const { predictionLayerSettings, setPredictionLayerSettings } = useMapContext(
-    'usePredictionLayer'
-  );
-  return useMemo(
-    () => ({
-      predictionLayerSettings,
-      setPredictionLayerSettings,
-    }),
-    [predictionLayerSettings, setPredictionLayerSettings]
-  );
-};
-
-export const useLayersPanel = () => {
-  const { setShowLayersPanel, showLayersPanel } = useMapContext(
-    'useLayersPanel'
-  );
-  return useMemo(
-    () => ({
-      setShowLayersPanel,
-      showLayersPanel,
-    }),
-    [setShowLayersPanel, showLayersPanel]
   );
 };

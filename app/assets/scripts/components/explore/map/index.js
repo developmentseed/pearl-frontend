@@ -10,13 +10,13 @@ import {
 } from 'react-leaflet';
 import L from 'leaflet';
 import GlobalContext from '../../../context/global';
-import { ExploreContext, useMapState } from '../../../context/explore';
 import {
-  useMapRef,
-  useMapLayers,
-  useUserLayers,
-  useLayersPanel,
-} from '../../../context/map';
+  ExploreContext,
+  useMapState,
+  useShortcutState,
+} from '../../../context/explore';
+import { actions as shortcutActions } from '../../../context/explore/shortcuts';
+import { useMapRef, useMapLayers, useUserLayers } from '../../../context/map';
 
 import GeoCoder from '../../common/map/geocoder';
 import GenericControl from '../../common/map/generic-control';
@@ -117,10 +117,11 @@ function Map() {
 
   const { mapLayers, setMapLayers } = useMapLayers();
   const { userLayers, setUserLayers } = useUserLayers();
-  const { setShowLayersPanel, showLayersPanel } = useLayersPanel();
 
   const { mosaicList } = useContext(GlobalContext);
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
+
+  const { shortcutState, dispatchShortcutState } = useShortcutState();
 
   const { mosaics } = mosaicList.isReady() ? mosaicList.getData() : {};
 
@@ -444,6 +445,7 @@ function Map() {
                       layer: v.target,
                       active: true,
                       name: layer,
+                      opacity: 1,
                     },
                   });
                 },
@@ -461,7 +463,7 @@ function Map() {
               bounds={p.bounds}
               opacity={
                 userLayers.predictions.visible
-                  ? userLayers.predictions.opacity
+                  ? shortcutState.predictionLayerOpacity
                   : 0
               }
             />
@@ -542,7 +544,7 @@ function Map() {
               }}
               opacity={
                 userLayers.predictions.visible
-                  ? userLayers.predictions.opacity
+                  ? shortcutState.predictionLayerOpacity
                   : 0
               }
               eventHandlers={{
@@ -615,7 +617,9 @@ function Map() {
             id='layer-control'
             onClick={(e) => {
               e.stopPropagation();
-              setShowLayersPanel(!showLayersPanel);
+              dispatchShortcutState({
+                type: shortcutActions.TOGGLE_LAYER_TRAY,
+              });
             }}
           />
           <GeoCoder />
@@ -639,8 +643,7 @@ function Map() {
     setMapRef,
     aoiPatchList,
     tileUrl,
-    showLayersPanel,
-    setShowLayersPanel,
+    shortcutState,
   ]);
 
   return (
