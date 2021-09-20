@@ -338,7 +338,7 @@ function ExploreHeader(props) {
         content={
           <ShortcutsWrapper>
             <Shortcut>l</Shortcut>
-            <dd>open layers tray</dd>
+            <dd>Open layers tray</dd>
             <Shortcut>a</Shortcut>
             <dd>Set prediction layer opacity to 0%</dd>
             <Shortcut>s</Shortcut>
