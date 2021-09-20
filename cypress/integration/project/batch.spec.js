@@ -196,8 +196,6 @@ describe('Batch predictions', () => {
       'Batch prediction in progress: 0%'
     );
 
-    cy.get('[data-cy=run-button').should('have.attr', 'data-disabled', 'true');
-
     // Make batch job at 10%
     cy.intercept(
       {

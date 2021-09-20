@@ -95,10 +95,12 @@ CheckpointProvider.propTypes = {
 };
 
 function checkpointReducer(state, action) {
+  let nextState;
+
   switch (action.type) {
     case actions.RECEIVE_CHECKPOINT:
-      // Modify checkpoint loaded from the API and apply
-      return {
+      // Action used to load existing or initialize a new checkpoint
+      nextState = {
         ...action.data,
         project_id: action.data.project_id || (state && state.project_id),
         name:
@@ -140,44 +142,48 @@ function checkpointReducer(state, action) {
         // User action history of classes and checkpoint brushes
         history: [],
       };
+      break;
     case actions.SET_AOI_CHECKED:
-      return {
+      nextState = {
         ...state,
         checkAoi: action.data.checkAoi,
       };
+      break;
     case actions.SET_CHECKPOINT_NAME:
-      return {
+      nextState = {
         ...state,
         ...action.data,
       };
+      break;
     case actions.SET_CHECKPOINT_MODE:
-      return {
+      nextState = {
         ...state,
         ...action.data,
       };
-
+      break;
     // Modifies current checkpoint classes to add a custom user defined class
-    case actions.ADD_CLASS: {
-      const newClass = {
-        name: action.data.name,
-        color: action.data.color,
-        points: {
-          type: 'MultiPoint',
-          coordinates: [],
-        },
-        polygons: [],
-      };
-      return {
-        ...state,
-        classes: {
-          ...state.classes,
-          [newClass.name]: newClass,
-        },
-      };
-    }
-
+    case actions.ADD_CLASS:
+      {
+        const newClass = {
+          name: action.data.name,
+          color: action.data.color,
+          points: {
+            type: 'MultiPoint',
+            coordinates: [],
+          },
+          polygons: [],
+        };
+        nextState = {
+          ...state,
+          classes: {
+            ...state.classes,
+            [newClass.name]: newClass,
+          },
+        };
+      }
+      break;
     case actions.ADD_CHECKPOINT_BRUSH:
-      return {
+      nextState = {
         ...state,
         checkpointBrushes: {
           ...state.checkpointBrushes,
@@ -187,8 +193,9 @@ function checkpointReducer(state, action) {
           },
         },
       };
+      break;
     case actions.RECEIVE_AOI_INFO:
-      return {
+      nextState = {
         ...state,
         ...action.data,
         checkpointBrushes: {},
@@ -206,58 +213,61 @@ function checkpointReducer(state, action) {
           };
         }, {}),
       };
+      break;
     case actions.RECEIVE_METRICS:
-      return state;
+      nextState = state;
+      break;
     case actions.RECEIVE_ANALYTICS:
-      return {
+      nextState = {
         ...state,
         ...action.data,
       };
+      break;
     case actions.RECEIVE_METADATA:
-      return {
+      nextState = {
         ...state,
         ...action.data,
       };
+      break;
     case actions.UPDATE_POLYGONS:
-      if (action.data.isCheckpointPolygon) {
-        return {
-          ...state,
-          history: [
-            ...state.history,
-            {
-              classes: state.classes,
-              checkpointBrushes: state.checkpointBrushes,
+      nextState = action.data.isCheckpointPolygon
+        ? {
+            ...state,
+            history: [
+              ...state.history,
+              {
+                classes: state.classes,
+                checkpointBrushes: state.checkpointBrushes,
+              },
+            ],
+            checkpointBrushes: {
+              ...state.checkpointBrushes,
+              [action.data.name]: {
+                ...state.checkpointBrushes[action.data.name],
+                polygons: action.data.polygons,
+              },
             },
-          ],
-          checkpointBrushes: {
-            ...state.checkpointBrushes,
-            [action.data.name]: {
-              ...state.checkpointBrushes[action.data.name],
-              polygons: action.data.polygons,
+          }
+        : {
+            ...state,
+            history: [
+              ...state.history,
+              {
+                classes: state.classes,
+                checkpointBrushes: state.checkpointBrushes,
+              },
+            ],
+            classes: {
+              ...state.classes,
+              [action.data.name]: {
+                ...state.classes[action.data.name],
+                polygons: action.data.polygons,
+              },
             },
-          },
-        };
-      } else {
-        return {
-          ...state,
-          history: [
-            ...state.history,
-            {
-              classes: state.classes,
-              checkpointBrushes: state.checkpointBrushes,
-            },
-          ],
-          classes: {
-            ...state.classes,
-            [action.data.name]: {
-              ...state.classes[action.data.name],
-              polygons: action.data.polygons,
-            },
-          },
-        };
-      }
+          };
+      break;
     case actions.ADD_CLASS_SAMPLES:
-      return {
+      nextState = {
         ...state,
         history: [
           ...state.history,
@@ -283,11 +293,13 @@ function checkpointReducer(state, action) {
           },
         },
       };
+      break;
     case actions.SET_ACTIVE_CLASS:
-      return {
+      nextState = {
         ...state,
         activeItem: action.data,
       };
+      break;
     case actions.ADD_POINT_SAMPLES: {
       // Merge coords into class
       const currentClass = state.classes[state.activeItem];
@@ -302,7 +314,7 @@ function checkpointReducer(state, action) {
         },
       };
       // Return with updated class
-      return {
+      nextState = {
         ...state,
         history: [
           ...state.history,
@@ -316,6 +328,7 @@ function checkpointReducer(state, action) {
           [state.activeItem]: updatedClass,
         },
       };
+      break;
     }
     case actions.REMOVE_POINT_SAMPLE: {
       // Get coords
@@ -336,7 +349,7 @@ function checkpointReducer(state, action) {
       };
 
       // Return with updated class
-      return {
+      nextState = {
         ...state,
         history: [
           ...state.history,
@@ -351,10 +364,11 @@ function checkpointReducer(state, action) {
           [state.activeItem]: updatedClass,
         },
       };
+      break;
     }
 
     case actions.CLEAR_SAMPLES: {
-      return {
+      nextState = {
         ...state,
         // Clear history when samples are cleared
         // If we retain history we can get into a complicated situation
@@ -375,6 +389,7 @@ function checkpointReducer(state, action) {
           };
         }, {}),
       };
+      break;
     }
 
     case actions.INPUT_UNDO: {
@@ -383,18 +398,47 @@ function checkpointReducer(state, action) {
 
       if (!latest) return state;
 
-      return {
+      nextState = {
         ...state,
         ...latest,
         history: state.history.slice(0, -1),
       };
+      break;
     }
     case actions.RESET_CHECKPOINT: {
-      return;
+      break;
     }
     default:
-      throw new Error('Unexpected error.');
+      logger('Invalid action', action);
   }
+
+  if (nextState && nextState.classes) {
+    nextState.sampleCount = Object.values(nextState.classes).reduce(
+      (count, c) => {
+        /**
+         * Check which format the point collection is following to get the feature count.
+         * This needs a refactor when possible. Feature initialization, map edit operations
+         * and retrain tasks should use the same format, which is not happening now.
+         */
+        const points =
+          c.points.type === 'Feature'
+            ? c.points.geometry.coordinates
+            : c.points.coordinates;
+
+        // Return the feature count
+        return count + points.length + c.polygons.length;
+      },
+      0
+    );
+
+    nextState.sampleCount += Object.values(
+      nextState.checkpointBrushes || {}
+    ).reduce((count, c) => {
+      return count + c.polygons.length;
+    }, 0);
+  }
+
+  return nextState;
 }
 
 // Check if consumer function is used properly

@@ -16,6 +16,8 @@ import { glsp } from '@devseed-ui/theme-provider';
 import { useCheckpoint } from '../../../context/checkpoint';
 import { useAoi } from '../../../context/aoi';
 import { round } from '../../../utils/format';
+import { useShortcutState } from '../../../context/explore';
+import { actions as shortcutActions } from '../../../context/explore/shortcuts';
 
 const StyledBlockBody = styled(PanelBlockBody)`
   justify-content: flex-start;
@@ -47,6 +49,7 @@ const CountList = styled.div`
 function SecPanel() {
   const { currentCheckpoint } = useCheckpoint();
   const { currentAoi } = useAoi();
+  const { shortcutState, dispatchShortcutState } = useShortcutState();
 
   if (!currentCheckpoint || !currentAoi) return null;
 
@@ -60,7 +63,12 @@ function SecPanel() {
     <Panel
       collapsible
       direction='right'
-      initialState={currentCheckpoint.classes}
+      overrideControl
+      revealed={shortcutState.rightPanel}
+      onPanelChange={() => {
+        dispatchShortcutState({ type: shortcutActions.TOGGLE_RIGHT_PANEL });
+      }}
+      initialState={currentCheckpoint.classes ? true : false}
       bodyContent={
         <PanelBlock>
           <PanelBlockHeader>

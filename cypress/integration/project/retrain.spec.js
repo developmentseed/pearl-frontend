@@ -112,12 +112,11 @@ describe('Retrain existing project', () => {
 
     cy.get('[data-cy=global-loading]').should('not.exist');
 
-    // Check if retrain button panel is disabled
-    cy.get('[data-cy=footer-panel-controls]').should(
-      'have.attr',
-      'data-disabled',
-      'true'
-    );
+    // Check if retrain button panel is disabled (no samples added yet)
+    cy.get('[data-cy=run-button]').should('have.attr', 'data-disabled', 'true');
+
+    // Save checkpoint is enabled
+    cy.get('[data-cy=save-checkpoint-button]').should('not.be.disabled');
 
     // Base feature to perform map edit actions
     const baseFeature = [
@@ -146,7 +145,7 @@ describe('Retrain existing project', () => {
       .trigger('mouseup', ...feature1[3]);
 
     // Check if retrain button panel is enabled after a sampled is added
-    cy.get('[data-cy=footer-panel-controls]').should(
+    cy.get('[data-cy=run-button]').should(
       'have.attr',
       'data-disabled',
       'false'
@@ -346,6 +345,9 @@ describe('Retrain existing project', () => {
       'have.text',
       'Session Status: Ready for retrain run'
     );
+
+    // Save checkpoint is enabled
+    cy.get('[data-cy=save-checkpoint-button]').should('not.be.disabled');
 
     // Go to home page to avoid spilling state to next test
     cy.visit('/');

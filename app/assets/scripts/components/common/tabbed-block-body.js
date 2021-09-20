@@ -1,4 +1,4 @@
-import React, { useState, Children } from 'react';
+import React, { Children } from 'react';
 import T from 'prop-types';
 import styled, { css } from 'styled-components';
 import InfoButton from '../common/info-button';
@@ -106,8 +106,7 @@ const PanelBlockScroll = styled(ScrollableBody)`
 `;
 
 function TabbedBlock(props) {
-  const { children } = props;
-  const [activeTab, setActiveTab] = useState(0);
+  const { children, activeTab } = props;
 
   return (
     <>
@@ -129,7 +128,6 @@ function TabbedBlock(props) {
                   onClick={(e) => {
                     e.preventDefault();
                     if (!disabled) {
-                      setActiveTab(ind);
                       child.props.onTabClick && child.props.onTabClick(e);
                     }
                   }}
@@ -167,5 +165,6 @@ function TabbedBlock(props) {
 
 TabbedBlock.propTypes = {
   children: T.node.isRequired,
+  activeTab: T.number.isRequired,
 };
 export default TabbedBlock;

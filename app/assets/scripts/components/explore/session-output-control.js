@@ -15,7 +15,7 @@ import {
   DropdownTrigger,
 } from '../../styles/dropdown';
 import { Button } from '@devseed-ui/button';
-import { themeVal, glsp, media } from '@devseed-ui/theme-provider';
+import { themeVal, glsp, media, truncated } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
 import { Form, FormInput } from '@devseed-ui/form';
 import InfoButton from '../common/info-button';
@@ -60,6 +60,7 @@ const ProjectHeading = styled.div`
   align-items: center;
   line-height: 1.5;
   max-width: 14rem;
+  z-index: 5;
   p {
     font-size: 0.875rem;
     text-transform: uppercase;
@@ -80,6 +81,7 @@ const ProjectHeading = styled.div`
     &:hover {
       border: 1px solid ${themeVal('color.baseAlphaE')};
     }
+    ${truncated()}
   }
   ${Form} {
     grid-gap: ${glsp(0.5)};
@@ -268,6 +270,9 @@ function SessionOutputControl(props) {
               name='projectName'
               placeholder='Set Project Name'
               onChange={(e) => setLocalProjectName(e.target.value)}
+              onKeyDown={(e) => {
+                e.stopPropagation();
+              }}
               value={localProjectName || ''}
               disabled={!isAuthenticated}
               autoFocus
@@ -388,7 +393,13 @@ function SessionOutputControl(props) {
             <HeadingInput
               name='projectName'
               placeholder='Set Project Name'
-              onChange={(e) => setLocalProjectName(e.target.value)}
+              onKeyDown={(e) => {
+                e.stopPropagation();
+              }}
+              onChange={(e) => {
+                e.stopPropagation();
+                setLocalProjectName(e.target.value);
+              }}
               value={localProjectName || ''}
               disabled={!isAuthenticated}
               autoFocus

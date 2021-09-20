@@ -59,11 +59,10 @@ const ProgressButtonWrapper = styled.div`
 function PrimeButton({
   currentCheckpoint,
   dispatchCurrentCheckpoint,
-  allowInferenceRun,
   mapRef,
   setAoiBounds,
 }) {
-  const { setSessionStatusMode } = useSessionStatus();
+  const { sessionStatus, setSessionStatusMode } = useSessionStatus();
   const {
     runPrediction,
     runBatchPrediction,
@@ -227,7 +226,14 @@ function PrimeButton({
 
   const run = runTypes[runType];
 
-  const isDisabled = !allowInferenceRun || (runningBatch && isBatchArea);
+  const { mode } = sessionStatus;
+  let isDisabled = !(
+    mode === 'prediction-ready' ||
+    (mode === 'retrain-ready' &&
+      currentCheckpoint &&
+      currentCheckpoint.sampleCount > 0) ||
+    (runningBatch && isBatchArea)
+  );
 
   return (
     <InfoButton
@@ -252,7 +258,6 @@ function PrimeButton({
 
 PrimeButton.propTypes = {
   currentCheckpoint: T.object,
-  allowInferenceRun: T.bool.isRequired,
   mapRef: T.object,
   setAoiBounds: T.func,
   dispatchCurrentCheckpoint: T.func,
@@ -261,17 +266,18 @@ PrimeButton.propTypes = {
 function Footer({
   dispatchCurrentCheckpoint,
   currentCheckpoint,
+  checkpointHasSamples,
   checkpointActions,
   updateCheckpointName,
   localCheckpointName,
   setLocalCheckpointName,
   mapRef,
-  allowInferenceRun,
   disabled,
   setAoiBounds,
 }) {
   const [displayBatchProgress, setDisplayBatchProgress] = useState(false);
   const { runningBatch } = useInstance();
+
   return (
     <PanelControls data-cy='footer-panel-controls' data-disabled={disabled}>
       <Button
@@ -283,8 +289,8 @@ function Footer({
         }}
         title='Clear all samples drawn since last retrain or save'
         id='reset-button-trigger'
-        disabled={!currentCheckpoint}
-        visuallyDisabled={!currentCheckpoint}
+        disabled={!currentCheckpoint || !checkpointHasSamples}
+        visuallyDisabled={!currentCheckpoint || !checkpointHasSamples}
         onClick={() => {
           dispatchCurrentCheckpoint({
             type: checkpointActions.CLEAR_SAMPLES,
@@ -323,7 +329,6 @@ function Footer({
       <PrimeButton
         currentCheckpoint={currentCheckpoint}
         dispatchCurrentCheckpoint={dispatchCurrentCheckpoint}
-        allowInferenceRun={allowInferenceRun}
         mapRef={mapRef}
         setAoiBounds={setAoiBounds}
       />
@@ -333,6 +338,7 @@ function Footer({
           direction='up'
           triggerElement={(triggerProps) => (
             <InfoButton
+              data-cy='save-checkpoint-button'
               variation='primary-plain'
               size='medium'
               useIcon='save-disk'
@@ -342,7 +348,6 @@ function Footer({
               }}
               id='rename-button-trigger'
               {...triggerProps}
-              disabled={!currentCheckpoint}
             >
               Save Checkpoint
             </InfoButton>
@@ -361,6 +366,9 @@ function Footer({
                 name='checkpointName'
                 placeholder='Set Checkpoint Name'
                 value={localCheckpointName}
+                onKeyDown={(e) => {
+                  e.stopPropagation();
+                }}
                 onChange={(e) => setLocalCheckpointName(e.target.value)}
                 autoFocus
               />
@@ -407,6 +415,7 @@ function Footer({
 Footer.propTypes = {
   dispatchCurrentCheckpoint: T.func,
   currentCheckpoint: T.object,
+  checkpointHasSamples: T.bool,
   checkpointActions: T.object,
   checkpointModes: T.object,
   updateCheckpointName: T.func,
@@ -416,7 +425,6 @@ Footer.propTypes = {
   mapRef: T.object,
 
   instance: T.object,
-  allowInferenceRun: T.bool.isRequired,
   runPrediction: T.func,
   retrain: T.func,
   refine: T.func,
