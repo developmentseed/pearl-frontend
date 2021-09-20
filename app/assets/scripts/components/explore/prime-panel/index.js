@@ -224,6 +224,8 @@ function PrimePanel() {
                             .name,
                         });
                         if (currentCheckpoint.mode != checkpointModes.RETRAIN) {
+                          // If current checkpoint has not been set,
+                          // mode does not need to be set
                           dispatchCurrentCheckpoint({
                             type: checkpointActions.SET_CHECKPOINT_MODE,
                             data: {
