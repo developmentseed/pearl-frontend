@@ -11,6 +11,8 @@ export const actions = {
   DECREMENT_PREDICTION_OPACITY: 'DECREMENT_PREDICTION_OPACITY',
   SET_PREDICTION_OPACITY_100: 'SET_PREDICTION_OPACITY_100',
   TOGGLE_LAYER_TRAY: 'TOGGLE_LAYER_TRAY',
+
+  TOGGLE_SHORTCUTS_HELP: 'TOGGLE_SHORTCUTS_HELP',
   UPDATE: 'UPDATE',
 };
 
@@ -19,6 +21,7 @@ const initialState = {
   leftPanel: true,
   rightPanel: true,
   layerTray: false,
+  shortcutsHelp: false,
 };
 
 export function shortcutReducer(state, action) {
@@ -27,6 +30,12 @@ export function shortcutReducer(state, action) {
       return {
         ...state,
         predictionLayerOpacity: 0,
+      };
+
+    case actions.TOGGLE_SHORTCUTS_HELP:
+      return {
+        ...state,
+        shortcutsHelp: !state.shortcutsHelp,
       };
     case actions.DECREMENT_PREDICTION_OPACITY:
       return {
@@ -87,6 +96,7 @@ export const KEY_ACTIONS = {
   [KEYS.s_KEY]: actions.DECREMENT_PREDICTION_OPACITY,
   [KEYS.d_KEY]: actions.INCREMENT_PREDICTION_OPACITY,
   [KEYS.f_KEY]: actions.SET_PREDICTION_OPACITY_100,
+  [KEYS.k_KEY]: actions.TOGGLE_SHORTCUTS_HELP,
   [KEYS.l_KEY]: actions.TOGGLE_LAYER_TRAY,
   [KEYS.i_KEY]: actions.TOGGLE_LEFT_PANEL,
   [KEYS.o_KEY]: actions.TOGGLE_RIGHT_PANEL,

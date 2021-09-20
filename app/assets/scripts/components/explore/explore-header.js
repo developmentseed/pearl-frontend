@@ -19,7 +19,12 @@ import { themeVal, glsp, media, truncated } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
 import { Form, FormInput } from '@devseed-ui/form';
 import InfoButton from '../common/info-button';
-import { ExploreContext, useProjectId } from '../../context/explore';
+import {
+  ExploreContext,
+  useProjectId,
+  useShortcutState,
+} from '../../context/explore';
+import { actions as shortcutActions } from '../../context/explore/shortcuts';
 import { useProject } from '../../context/project';
 import { useAuth } from '../../context/auth';
 import { useAoi } from '../../context/aoi';
@@ -159,12 +164,13 @@ function ExploreHeader(props) {
 
   const { projectName, currentProject, setProjectName } = useProject();
 
+  const { shortcutState, dispatchShortcutState } = useShortcutState();
+
   const initialName = projectName;
 
   const [localProjectName, setLocalProjectName] = useState(projectName);
   const [titleEditMode, setTitleEditMode] = useState(false);
   const [exportShareURL, setExportShareURL] = useState(null);
-  const [showShortcutsModal, setShowShortcutsModal] = useState(false);
 
   useEffect(() => setLocalProjectName(initialName), [initialName]);
 
@@ -326,15 +332,23 @@ function ExploreHeader(props) {
         variation='primary-plain'
         hideText
         title='Show keyboard shortcuts'
-        onClick={() => setShowShortcutsModal(true)}
+        onClick={() => {
+          dispatchShortcutState({
+            type: shortcutActions.TOGGLE_SHORTCUTS_HELP,
+          });
+        }}
       />
       <Modal
         id='keyboard-shortcuts-modal'
         title='Keyboard Shortcuts'
         closeButton={false}
-        revealed={showShortcutsModal}
+        revealed={shortcutState.shortcutsHelp}
         size='small'
-        onOverlayClick={() => setShowShortcutsModal(false)}
+        onOverlayClick={() => {
+          dispatchShortcutState({
+            type: shortcutActions.TOGGLE_SHORTCUTS_HELP,
+          });
+        }}
         content={
           <ShortcutsWrapper>
             <Shortcut>l</Shortcut>
@@ -347,6 +361,8 @@ function ExploreHeader(props) {
             <dd>Increase prediction layer opacity by 1%</dd>
             <Shortcut>f</Shortcut>
             <dd>Set prediction layer opacity to 100%</dd>
+            <Shortcut>k</Shortcut>
+            <dd>Open shortcuts help</dd>
           </ShortcutsWrapper>
         }
       />
