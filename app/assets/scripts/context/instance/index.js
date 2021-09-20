@@ -40,10 +40,11 @@ const BATCH_REFRESH_INTERVAL = 4000;
 
 const messageQueueActionTypes = {
   ABORT: 'ABORT',
-  ADD: 'ADD',
   ADD_EXPRESS: 'ADD_EXPRESS',
-  SEND: 'SEND',
+  ADD: 'ADD',
   CLEAR: 'CLEAR',
+  SEND: 'SEND',
+  TERMINATE_INSTANCE: 'TERMINATE_INSTANCE',
 };
 
 function aoiBoundsToPolygon(bounds) {
@@ -157,6 +158,10 @@ export function InstanceProvider(props) {
           return state.slice(1);
         }
         case messageQueueActionTypes.CLEAR: {
+          return [];
+        }
+        case messageQueueActionTypes.TERMINATE_INSTANCE: {
+          websocketClient.sendMessage({ action: 'instance#terminate' });
           return [];
         }
         default:
@@ -409,41 +414,12 @@ export function InstanceProvider(props) {
     }
   }
 
-  const abortJob = (queueNext) => {
-    // If GPU is not connected, just clear the message queue
-    if (!instance.gpuConnected) {
-      dispatchMessageQueue({
-        type: messageQueueActionTypes.CLEAR,
-        data: {
-          action: 'model#abort',
-        },
-      });
-    } else {
-      dispatchMessageQueue({
-        type: messageQueueActionTypes.ABORT,
-        data: {
-          queueNext,
-        },
-      });
-    }
-
-    // Clear prediction and checkpoint
-    dispatchPredictions({
-      type: predictionsActions.CLEAR_PREDICTION,
-    });
-    dispatchCurrentCheckpoint({
-      type: checkpointActions.RESET_CHECKPOINT,
-    });
-  };
-
   const value = {
     instance,
     setInstanceStatusMessage: (message) =>
       applyInstanceStatus({
         gpuMessage: message,
       }),
-
-    abortJob,
     initInstance,
     loadAoiOnInstance: (id) => {
       showGlobalLoadingMessage('Loading AOI on Instance...');
@@ -459,7 +435,7 @@ export function InstanceProvider(props) {
     },
     getRunningBatch,
     runningBatch,
-    runPrediction: async () => {
+    runPrediction: async ({ onAbort }) => {
       let project = currentProject;
 
       if (!project) {
@@ -484,7 +460,7 @@ export function InstanceProvider(props) {
         showGlobalLoadingMessage('Fetching classes...');
         const { classes } = await restApiClient.getModel(selectedModel.id);
         dispatchCurrentCheckpoint({
-          type: checkpointActions.SET_CHECKPOINT,
+          type: checkpointActions.RECEIVE_CHECKPOINT,
           data: {
             classes,
           },
@@ -512,10 +488,25 @@ export function InstanceProvider(props) {
         <>
           Running model and loading class predictions...
           <Button
+            data-cy='abort-run-button'
             style={{ display: 'block', margin: '1rem auto 0' }}
             variation='danger-raised-dark'
             onClick={() => {
-              abortJob();
+              dispatchMessageQueue({
+                type: messageQueueActionTypes.TERMINATE_INSTANCE,
+              });
+
+              dispatchPredictions({
+                type: predictionsActions.CLEAR_PREDICTION,
+              });
+
+              dispatchCurrentCheckpoint({
+                type: checkpointActions.RESET_CHECKPOINT,
+              });
+
+              hideGlobalLoading();
+
+              onAbort();
             }}
           >
             Abort Process
@@ -601,7 +592,7 @@ export function InstanceProvider(props) {
         hideGlobalLoading();
       }
     },
-    retrain: async function () {
+    retrain: async function ({ onAbort }) {
       // Check if all classes have the minimum number of samples
       const classes = Object.values(currentCheckpoint.classes);
       let sampleCount = 0;
@@ -620,28 +611,59 @@ export function InstanceProvider(props) {
         return;
       }
 
-      try {
-        await initInstance(
-          currentCheckpoint.project_id,
-          currentCheckpoint.id,
-          currentAoi.id
-        );
-      } catch (error) {
-        logger(error);
-        if (error.message === 'No instances available') {
-          toasts.error(
-            'No instance available to run the model, please try again later.',
-            { autoClose: false, toastId: 'no-instance-available-error' }
-          );
-        } else {
-          toasts.error('Could not start instance, please try again later.');
-        }
-        hideGlobalLoading();
-        return;
-      }
+      await initInstance(
+        currentCheckpoint.project_id,
+        currentCheckpoint.id,
+        currentAoi.id
+      );
 
       showGlobalLoadingMessage(
-        <>Retraining model and loading predictions...</>
+        <>
+          <>Retraining model and loading predictions...</>
+          <Button
+            data-cy='abort-run-button'
+            style={{ display: 'block', margin: '1rem auto 0' }}
+            variation='danger-raised-dark'
+            onClick={async () => {
+              showGlobalLoadingMessage('Aborting...');
+
+              dispatchMessageQueue({
+                type: messageQueueActionTypes.TERMINATE_INSTANCE,
+              });
+
+              dispatchPredictions({
+                type: predictionsActions.CLEAR_PREDICTION,
+              });
+
+              try {
+                await initInstance(
+                  currentCheckpoint.project_id,
+                  currentCheckpoint.id,
+                  currentAoi.id
+                );
+                hideGlobalLoading();
+                onAbort();
+              } catch (error) {
+                if (error.message === 'No instances available') {
+                  toasts.error(
+                    'No instances available, please try again later.',
+                    {
+                      toastId: 'no-instance-available-error',
+                    }
+                  );
+                } else {
+                  toasts.error('Unexpected error, please try again later.');
+                }
+                hideGlobalLoading();
+                history.push(
+                  `/profile/projects/${currentCheckpoint.project_id}`
+                );
+              }
+            }}
+          >
+            Abort Process
+          </Button>
+        </>
       );
 
       // Reset predictions state
@@ -956,7 +978,7 @@ export class WebsocketClient extends ReconnectingWebsocket {
             break;
           case 'model#aoi':
             dispatchCurrentCheckpoint({
-              type: checkpointActions.SET_CHECKPOINT,
+              type: checkpointActions.RECEIVE_CHECKPOINT,
               data: {
                 id: data.checkpoint_id,
               },

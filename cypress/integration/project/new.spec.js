@@ -42,7 +42,7 @@ describe('Create new project', () => {
     );
   });
 
-  it('New project, instance creation fails', () => {
+  it('Run new project', () => {
     // Set mock WS workflow in case creation succeeds (it shouldn't here)
     cy.setWebsocketWorkflow('base-model-prediction');
 
@@ -187,6 +187,104 @@ describe('Create new project', () => {
       }
     );
 
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Ready for retrain run'
+    );
+  });
+
+  it('Abort new project', () => {
+    cy.setWebsocketWorkflow('run-prediction-aborted');
+
+    // Visit page
+    cy.visit('/project/new');
+
+    // Check session status message
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Set Project Name'
+    );
+
+    // Set project name
+    cy.get('[data-cy=modal-project-input]')
+      .should('exist')
+      .clear()
+      .type('Project name');
+    cy.get('[data-cy=create-project-button]').should('exist').click();
+
+    // Check session status message
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Set AOI'
+    );
+
+    // Draw AOI
+    cy.get('[data-cy=aoi-edit-button]').should('exist').click();
+    cy.get('#map')
+      .trigger('mousedown', 150, 150)
+      .trigger('mousemove', 200, 200)
+      .trigger('mouseup');
+    cy.wait('@reverseGeocodeCity');
+
+    // Re-enter edit mode
+    cy.get('[data-cy=aoi-edit-button]').click();
+
+    // Panel prime button should be in AOI Confirm mode
+    cy.get('[data-cy=panel-aoi-confirm]')
+      .should('exist')
+      .should('not.be.disabled')
+      .click();
+
+    // Set model
+    // Check session status message
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Select Model'
+    );
+
+    // Select model
+    cy.get('[data-cy=select-model-label]').should('exist').click();
+    cy.get('[data-cy=select-model-1-card]').should('exist').click();
+
+    // Check session status message
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Ready for prediction run'
+    );
+
+    // Instance pending
+    cy.intercept(
+      {
+        url: restApiEndpoint + '/api/project/1/instance/1',
+      },
+      {
+        ...instance,
+        status: {
+          phase: 'Running',
+        },
+      }
+    );
+
+    cy.get('[data-cy=run-button]').click();
+
+    // Prediction is halted
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Received image 3 of 6...'
+    );
+
+    // Abort
+    cy.get('[data-cy=abort-run-button]').should('exist').click();
+
+    // Wait for prediction ready
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Ready for prediction run'
+    );
+
+    // Run a prediction to the end
+    cy.setWebsocketWorkflow('base-model-prediction');
+    cy.get('[data-cy=run-button]').click();
     cy.get('[data-cy=session-status]').should(
       'have.text',
       'Session Status: Ready for retrain run'

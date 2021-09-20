@@ -20,7 +20,6 @@ describe('Retrain existing project', () => {
   beforeEach(() => {
     cy.startServer();
     cy.fakeLogin();
-    cy.setWebsocketWorkflow('retrain');
 
     /**
      * GET /project/:id/instance/:id
@@ -59,7 +58,7 @@ describe('Retrain existing project', () => {
       .click();
 
     cy.location().should((loc) => {
-      expect(loc.pathname).to.eq('/profile/projects');
+      expect(loc.pathname).to.eq('/profile/projects/1');
     });
 
     cy.visit('/project/1');
@@ -87,11 +86,13 @@ describe('Retrain existing project', () => {
       .click();
 
     cy.location().should((loc) => {
-      expect(loc.pathname).to.eq('/profile/projects');
+      expect(loc.pathname).to.eq('/profile/projects/1');
     });
   });
 
   it('successfully loads', () => {
+    cy.setWebsocketWorkflow('retrain');
+
     cy.visit('/project/1');
 
     // Check initial status
@@ -261,10 +262,7 @@ describe('Retrain existing project', () => {
 
     // Should display modal
     cy.get('#no-instance-available-error')
-      .should(
-        'contain',
-        'No instance available to run the model, please try again later.'
-      )
+      .should('contain', 'No instances available, please try again later.')
       .click();
 
     // Make instances available
@@ -322,7 +320,7 @@ describe('Retrain existing project', () => {
     // Show toast
     cy.get('#a-toast').should(
       'contain',
-      'Could not start instance, please try again later.'
+      'Could not start instance at the moment, please try again later.'
     );
     cy.get('[data-cy=toast-close-button]').click();
     cy.get('[data-cy=toast-close-button]').should('not.exist');
@@ -350,5 +348,112 @@ describe('Retrain existing project', () => {
 
     // Save checkpoint is enabled
     cy.get('[data-cy=save-checkpoint-button]').should('not.be.disabled');
+
+    // Go to home page to avoid spilling state to next test
+    cy.visit('/');
+    cy.location().should((loc) => {
+      expect(loc.pathname).to.eq('/');
+    });
+  });
+
+  it('abort retrain', () => {
+    cy.setWebsocketWorkflow('retrain-one-sample-aborted');
+
+    cy.visit('/project/1');
+
+    // Check initial status
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Loading project...'
+    );
+
+    // Wait for data loading
+    cy.wait(['@fetchAoi2', '@fetchCheckpoint2']);
+
+    // Check ready for retrain status
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Ready for retrain run'
+    );
+
+    const pointSample = [470, 250];
+    cy.get('[data-cy="Barren-class-button"').click();
+    cy.get('[data-cy=add-point-sample-button').click();
+    cy.get('#app-container').click(...pointSample);
+
+    // Set 1 instance available
+    cy.intercept(
+      {
+        url: restApiEndpoint + '/api',
+      },
+      {
+        version: '1.0.0',
+        limits: {
+          live_inference: 10000000,
+          max_inference: 100000000,
+          instance_window: 600,
+          total_gpus: 1,
+          active_gpus: 0,
+        },
+      }
+    ).as('fetchAvailableInstancesCount');
+
+    // Request model run
+    cy.get('[data-cy=run-button').click();
+
+    // Prediction is halted
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Received image 3 of 6...'
+    );
+
+    // Abort
+    cy.get('[data-cy=abort-run-button]').should('exist').click();
+
+    // Reset WS workflow
+    cy.setWebsocketWorkflow('retrain-one-sample-aborted');
+
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Ready for retrain run'
+    );
+
+    // Retrain again
+    cy.get('[data-cy="Barren-class-button"').click();
+    cy.get('[data-cy=add-point-sample-button').click();
+    cy.get('#app-container').click(...pointSample);
+
+    // Request model run
+    cy.get('[data-cy=run-button').click();
+
+    // Prediction is halted
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Received image 3 of 6...'
+    );
+
+    // Set no instances available
+    cy.intercept(
+      {
+        url: restApiEndpoint + '/api',
+      },
+      {
+        version: '1.0.0',
+        limits: {
+          live_inference: 10000000,
+          max_inference: 100000000,
+          instance_window: 600,
+          total_gpus: 1,
+          active_gpus: 1,
+        },
+      }
+    ).as('fetchAvailableInstancesCount');
+
+    // Abort
+    cy.get('[data-cy=abort-run-button]').should('exist').click();
+
+    cy.location().should((loc) => {
+      expect(loc.pathname).to.eq('/profile/projects/1');
+    });
   });
 });

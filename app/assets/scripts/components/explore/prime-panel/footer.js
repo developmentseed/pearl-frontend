@@ -25,7 +25,10 @@ import { Spinner } from '../../common/global-loading/styles';
 import BatchPredictionProgressModal from './batch-progress-modal';
 import { useSessionStatus } from '../../../context/explore';
 import logger from '../../../utils/logger';
-import { hideGlobalLoading } from '../../common/global-loading';
+import {
+  hideGlobalLoading,
+  showGlobalLoadingMessage,
+} from '../../common/global-loading';
 import toasts from '../../common/toasts';
 
 const PanelControls = styled(PanelBlockFooter)`
@@ -163,14 +166,43 @@ function PrimeButton({
   const runTypes = {
     retrain: {
       label: 'Retrain',
-      action: retrain,
+      action: async () => {
+        try {
+          showGlobalLoadingMessage('Starting retraining...');
+          await retrain({
+            onAbort: () => {
+              setSessionStatusMode('retrain-ready');
+            },
+          });
+        } catch (error) {
+          logger(error);
+          if (error.message === 'No instances available') {
+            toasts.error('No instances available, please try again later.', {
+              autoClose: false,
+              toastId: 'no-instance-available-error',
+            });
+          } else if (error.message === 'Instance creation failed') {
+            toasts.error(
+              'Could not start instance at the moment, please try again later.'
+            );
+          } else {
+            toasts.error('Unexpected error, please try again later.');
+          }
+          hideGlobalLoading();
+          return;
+        }
+      },
     },
     'live-prediction': {
       label: 'Run Model',
       action: async () => {
         try {
           setSessionStatusMode('running-prediction');
-          await runPrediction();
+          await runPrediction({
+            onAbort: () => {
+              setSessionStatusMode('prediction-ready');
+            },
+          });
         } catch (error) {
           logger(error);
 
