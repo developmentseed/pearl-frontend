@@ -103,7 +103,7 @@ export const KEY_ACTIONS = {
 };
 
 export function listenForShortcuts(event, dispatch) {
-  if (event.metaKey) {
+  if (event.metaKey || event.shiftKey || event.ctrlKey) {
     return;
   } else if (KEY_ACTIONS[event.keyCode]) {
     dispatch({ type: KEY_ACTIONS[event.keyCode] });
