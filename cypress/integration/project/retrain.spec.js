@@ -456,4 +456,37 @@ describe('Retrain existing project', () => {
       expect(loc.pathname).to.eq('/profile/projects/1');
     });
   });
+
+  it('load existing checkpoint, can predict new AOI', () => {
+    cy.visit('/project/1');
+
+    // Check initial status
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Loading project...'
+    );
+
+    // Wait for data loading
+    cy.wait(['@fetchAoi2', '@fetchCheckpoint2']);
+
+    // Check ready for retrain status
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Ready for retrain run'
+    );
+
+    cy.get('[data-cy=aoi-selection-trigger]').click();
+
+    cy.get('[data-cy=add-aoi-button]').click();
+
+    // Draw AOI
+    cy.get('#map')
+      .trigger('mousedown', 150, 150)
+      .trigger('mousemove', 300, 300)
+      .trigger('mouseup');
+    cy.wait('@reverseGeocodeCity');
+    cy.get('[data-cy=aoi-selection-trigger]').contains('Judiciary Square');
+
+    cy.get('[data-cy=run-button]').should('be.enabled');
+  });
 });
