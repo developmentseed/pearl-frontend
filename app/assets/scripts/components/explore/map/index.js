@@ -13,6 +13,7 @@ import GlobalContext from '../../../context/global';
 import {
   ExploreContext,
   useMapState,
+  useSessionStatus,
   useShortcutState,
 } from '../../../context/explore';
 import { actions as shortcutActions } from '../../../context/explore/shortcuts';
@@ -96,6 +97,8 @@ function Map() {
     currentProject,
   } = useContext(ExploreContext);
 
+  const { setSessionStatusMode } = useSessionStatus();
+
   const { apiLimits } = useApiMeta();
   const {
     aoiRef,
@@ -168,6 +171,7 @@ function Map() {
               // On confirm, zoom to bounds
               mapRef.fitBounds(aoiRef.getBounds(), { padding: BOUNDS_PADDING });
               mapRef._container.style.cursor = 'grab';
+              setSessionStatusMode('set-aoi');
             }
           }
         }
