@@ -194,7 +194,7 @@ function PrimeButton({
       },
     },
     'live-prediction': {
-      label: 'Run Model',
+      label: 'Ready for prediction run',
       action: async () => {
         try {
           setSessionStatusMode('running-prediction');

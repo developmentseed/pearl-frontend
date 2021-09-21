@@ -171,7 +171,7 @@ function Map() {
               // On confirm, zoom to bounds
               mapRef.fitBounds(aoiRef.getBounds(), { padding: BOUNDS_PADDING });
               mapRef._container.style.cursor = 'grab';
-              setSessionStatusMode('prediction-ready');
+              setSessionStatusMode('set-aoi');
             }
           }
         }
