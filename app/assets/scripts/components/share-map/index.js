@@ -118,7 +118,7 @@ function ShareMap() {
         <DownloadAoiButton
           aoi={aoiInfo.id}
           projectId={aoiInfo.projectId}
-          restApiClient={restApiClient}
+          uuid={uuid}
           variation='primary-raised-dark'
         >
           Download map
