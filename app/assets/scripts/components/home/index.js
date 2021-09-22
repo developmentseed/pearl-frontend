@@ -130,6 +130,9 @@ function Home() {
 
   // Fetch API health message on mount
   useEffect(() => {
+    // Do not fetch on production
+    if (environment === 'production') return;
+
     fetchJSON(`${restApiEndpoint}/health`)
       .then(({ body }) => {
         setApiHealth(body.message || 'Ok.');
