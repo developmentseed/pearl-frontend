@@ -15,7 +15,7 @@ import { Heading } from '@devseed-ui/typography';
 import { themeVal, media, glsp } from '@devseed-ui/theme-provider';
 import { StyledLink } from '../../styles/links';
 
-import { fetchJSON } from '../../context/reducers/reduxeed';
+import { fetchJSON } from '../../utils/utils';
 import { useAuth0 } from '@auth0/auth0-react';
 import { useAuth } from '../../context/auth';
 
