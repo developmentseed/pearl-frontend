@@ -91,7 +91,8 @@ function UserDropdown() {
         <Button
           variation='primary-plain'
           className='button-class'
-          title='sample button'
+          data-cy='login-button'
+          title='log in button'
           onClick={() => loginWithRedirect()}
         >
           Log in
@@ -107,6 +108,7 @@ function UserDropdown() {
               usePreIcon='user'
               title='Open dropdown'
               className='user-options-trigger'
+              data-cy='account-button'
               size='medium'
               {...props}
             >
