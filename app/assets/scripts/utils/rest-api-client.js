@@ -1,6 +1,6 @@
 import get from 'lodash.get';
 import config from '../config';
-import { fetchJSON } from '../context/reducers/reduxeed';
+import { fetchJSON } from './utils';
 const { restApiEndpoint } = config;
 
 class RestApiClient {

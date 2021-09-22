@@ -1,6 +1,6 @@
 import toasts from '../components/common/toasts';
 import config from '../config';
-import { fetchJSON } from '../context/reducers/reduxeed';
+import { fetchJSON } from './utils';
 import history from '../history';
 import logger from './logger';
 const { restApiEndpoint } = config;
