@@ -1,6 +1,6 @@
 import get from 'lodash.get';
 import config from '../../config';
-import { fetchJSON } from '../../utils/utils';
+import { delay, fetchJSON } from '../../utils/utils';
 const { environment, reduxeedLogs } = config;
 
 /**
@@ -405,13 +405,4 @@ export function wrapLogReducer(reducer) {
     return nextState;
   };
   /* eslint-enable no-console */
-}
-
-/**
- * Delays the execution in x milliseconds.
- *
- * @param {int} millis Milliseconds
- */
-export function delay(millis) {
-  return new Promise((resolve) => setTimeout(resolve, millis));
 }

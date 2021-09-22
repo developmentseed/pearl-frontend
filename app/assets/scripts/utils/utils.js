@@ -7,6 +7,15 @@ export function inRange(value, min, max, exclusive) {
 }
 
 /**
+ * Delays the execution in x milliseconds.
+ *
+ * @param {int} millis Milliseconds
+ */
+export function delay(millis) {
+  return new Promise((resolve) => setTimeout(resolve, millis));
+}
+
+/**
  * Performs a request to the given url returning the response in json format
  * or throwing an error.
  *
