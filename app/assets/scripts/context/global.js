@@ -12,11 +12,20 @@ import { createQueryApiGetReducer, queryApiGet } from './reducers/api';
 import { createQueryApiPostReducer } from './reducers/api';
 import { useAuth } from './auth';
 import useAsync from '../utils/use-async';
+import { useFetch } from '../utils/use-fetch';
 
 const GlobalContext = createContext({});
+
 export function GlobalContextProvider(props) {
   const { apiToken, restApiClient } = useAuth();
   const [tourStep, setTourStep] = useState(0);
+
+  const apiLimits = useFetch('', {
+    authRequired: false,
+    mutator: (body) => {
+      return body && body.limits;
+    },
+  });
 
   const models = useAsync(() => restApiClient.getModels(), false);
 
@@ -56,6 +65,8 @@ export function GlobalContextProvider(props) {
     <>
       <GlobalContext.Provider
         value={{
+          apiLimits: apiLimits.isReady && !apiLimits.hasError && apiLimits.data,
+
           models,
 
           mosaicList,
@@ -101,6 +112,17 @@ export const useModels = () => {
       models,
     }),
     [models]
+  );
+};
+
+export const useApiLimits = () => {
+  const { apiLimits } = useGlobalContext('useApiLimits');
+
+  return useMemo(
+    () => ({
+      apiLimits,
+    }),
+    [apiLimits]
   );
 };
 

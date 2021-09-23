@@ -33,7 +33,7 @@ import {
 import { useInstance } from '../../../context/instance';
 import { useAoi } from '../../../context/aoi';
 import { usePredictions } from '../../../context/predictions';
-import { useApiMeta } from '../../../context/api-meta';
+import { useApiLimits } from '../../../context/global';
 import ClearSamplesModal from './clear-samples-modal';
 import { actions as shortcutActions } from '../../../context/explore/shortcuts';
 
@@ -72,7 +72,7 @@ function PrimePanel() {
   const { isAuthenticated } = useAuth();
   const { mapState, mapModes, setMapMode } = useMapState();
   const { mapRef } = useMapRef();
-  const { apiLimits } = useApiMeta();
+  const { apiLimits } = useApiLimits();
   const { shortcutState, dispatchShortcutState } = useShortcutState();
 
   const {

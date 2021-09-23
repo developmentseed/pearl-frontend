@@ -16,7 +16,7 @@ import {
   ModalFooter as BaseModalFooter,
 } from '@devseed-ui/modal';
 import { useMapRef } from '../../../context/map';
-import { useApiMeta } from '../../../context/api-meta';
+import { useApiLimits } from '../../../context/global';
 import { useAoi, useAoiName } from '../../../context/aoi';
 import {
   useCheckpoint,
@@ -237,7 +237,7 @@ export function AoiEditButtons(props) {
 
   const { dispatchCurrentCheckpoint } = useCheckpoint();
 
-  const { apiLimits } = useApiMeta();
+  const { apiLimits } = useApiLimits();
 
   const {
     aoiRef,

@@ -17,7 +17,7 @@ import {
 import { useInstance } from '../../../context/instance';
 import { Subheading } from '../../../styles/type/heading';
 import { useAoi, useAoiName } from '../../../context/aoi';
-import { useApiMeta } from '../../../context/api-meta';
+import { useApiLimits } from '../../../context/global';
 import { useMapState } from '../../../context/explore';
 import { mapModes } from '../../../context/reducers/map';
 
@@ -72,7 +72,7 @@ function PrimeButton({
   } = useInstance();
   const { aoiArea, setActiveModal, aoiRef, setCurrentAoi } = useAoi();
   const { updateAoiName } = useAoiName();
-  const { apiLimits } = useApiMeta();
+  const { apiLimits } = useApiLimits();
   const { mapState, setMapMode } = useMapState();
 
   const applyAoi = () => {

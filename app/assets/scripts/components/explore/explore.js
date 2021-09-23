@@ -16,7 +16,7 @@ import Map from './map';
 import Tour from '../common/tour';
 
 import { tourSteps } from './tour';
-import { useApiMeta } from '../../context/api-meta';
+import { useApiLimits } from '../../context/global';
 import LayersPanel from './layers-panel';
 
 const ExploreBody = styled(InpageBody)`
@@ -26,7 +26,7 @@ const ExploreBody = styled(InpageBody)`
 
 const ExploreCarto = styled.section``;
 function Explore() {
-  const { apiLimits } = useApiMeta();
+  const { apiLimits } = useApiLimits();
 
   const [steps, setSteps] = useState(null);
 

@@ -32,7 +32,7 @@ import { FormInput } from '@devseed-ui/form';
 import ImportSamplesModal from '../../map/import-sample-modal';
 import { Subheading } from '../../../../styles/type/heading';
 import { useAoi } from '../../../../context/aoi';
-import { useApiMeta } from '../../../../context/api-meta';
+import { useApiLimits } from '../../../../context/global';
 
 /*
  * Retrain Model
@@ -55,7 +55,7 @@ function RetrainModel(props) {
   );
 
   const { aoiArea } = useAoi();
-  const { apiLimits } = useApiMeta();
+  const { apiLimits } = useApiLimits();
 
   const isBatchArea =
     aoiArea && apiLimits && aoiArea > apiLimits['live_inference'];
