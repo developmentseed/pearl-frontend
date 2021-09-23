@@ -173,12 +173,6 @@ function Map() {
         break;
       case mapModes.BROWSE_MODE:
         if (mapRef && aoiRef) {
-          /*
-          // Only disable if something has been drawn
-          mapRef.aoi.control.draw.disable();
-          if (mapRef.aoi.control.edit._shape) {
-            mapRef.aoi.control.edit.disable();
-          }*/
           if (
             mapState.previousMode === mapModes.CREATE_AOI_MODE ||
             mapState.previousMode === mapModes.EDIT_AOI_MODE
