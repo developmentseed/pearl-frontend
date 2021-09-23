@@ -55,7 +55,7 @@ jobs:
         run: yarn stage
 
       - name: Build Prod
-        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/update-prod-stack-resources'
         run: yarn build
         
       - name: Azure Login
