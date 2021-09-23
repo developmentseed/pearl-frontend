@@ -11,5 +11,5 @@ export const KEYS = {
   i_KEY: 'i',
   o_KEY: 'o',
 
-  shift_KEY: 'Shift'
+  space_KEY: ' ',
 };

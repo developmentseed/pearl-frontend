@@ -377,6 +377,7 @@ function Map() {
         center={center}
         zoom={zoom}
         maxZoom={osmTilesMaxZoom}
+        boxZoom={false}
         style={{ height: '100%' }}
         whenCreated={(m) => {
           const freehandDraw = new FreehandDrawControl(m, {
