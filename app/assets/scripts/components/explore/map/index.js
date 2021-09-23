@@ -130,9 +130,14 @@ function Map() {
   // Manage changes in map mode
   useEffect(() => {
     // Check if map mode changed and disable previous controls
-
-    if (mapState && mapState.previousMode) {
+    if (mapState?.previousMode) {
       switch (mapState.previousMode) {
+        case mapModes.CREATE_AOI_MODE:
+          mapRef.aoi.control.draw.disable();
+          break;
+        case mapModes.EDIT_AOI_MODE:
+          mapRef.aoi.control.edit.disable();
+          break;
         case mapModes.ADD_SAMPLE_POLYGON:
           if (shortcutState.overrideBrowseMode) {
             mapRef.polygonDraw?.pause();
@@ -163,16 +168,17 @@ function Map() {
         mapRef._container.style.cursor = 'crosshair';
         break;
       case mapModes.EDIT_AOI_MODE:
-        mapRef.aoi.control.draw.disable();
+        //mapRef.aoi.control.draw.disable();
         mapRef.aoi.control.edit.enable(aoiRef);
         break;
       case mapModes.BROWSE_MODE:
         if (mapRef && aoiRef) {
+          /*
           // Only disable if something has been drawn
           mapRef.aoi.control.draw.disable();
           if (mapRef.aoi.control.edit._shape) {
             mapRef.aoi.control.edit.disable();
-          }
+          }*/
           if (
             mapState.previousMode === mapModes.CREATE_AOI_MODE ||
             mapState.previousMode === mapModes.EDIT_AOI_MODE
