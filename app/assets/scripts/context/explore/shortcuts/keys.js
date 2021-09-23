@@ -1,15 +1,15 @@
 export const KEYS = {
-  a_KEY: 65,
-  s_KEY: 83,
-  d_KEY: 68,
-  f_KEY: 70,
+  a_KEY: 'a',
+  s_KEY: 's',
+  d_KEY: 'd',
+  f_KEY: 'f',
 
-  k_KEY: 75,
+  k_KEY: 'k',
 
-  l_KEY: 76,
+  l_KEY: 'l',
 
-  i_KEY: 73,
-  o_KEY: 79,
+  i_KEY: 'i',
+  o_KEY: 'o',
 
-  shift_KEY: 16
+  shift_KEY: 'Shift'
 };

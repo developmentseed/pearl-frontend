@@ -23,7 +23,7 @@ const initialState = {
   rightPanel: true,
   layerTray: false,
   shortcutsHelp: false,
-  overrideBrowseMode: false
+  overrideBrowseMode: false,
 };
 
 export function shortcutReducer(state, action) {
@@ -80,8 +80,8 @@ export function shortcutReducer(state, action) {
     case actions.OVERRIDE_BROWSE_MODE:
       return {
         ...state,
-        overrideBrowseMode: !state.overrideBrowseMode
-      }
+        overrideBrowseMode: !state.overrideBrowseMode,
+      };
     // Generic value update
     case actions.UPDATE:
       return {
@@ -98,10 +98,11 @@ export function useShortcutReducer() {
   return useReducer(wrapLogReducer(shortcutReducer), initialState);
 }
 
+const ALT = 'altKey';
 const SHIFT = 'shiftKey';
 const META = 'metaKey';
 const CTRL = 'ctrlKey';
-const MODIFIERS = [SHIFT, META, CTRL];
+const MODIFIERS = [SHIFT, META, CTRL, ALT];
 
 export const KEY_ACTIONS = {
   [KEYS.a_KEY]: {
@@ -143,13 +144,12 @@ export const KEY_ACTIONS = {
 };
 
 export function listenForShortcuts(event, dispatch) {
-  if (KEY_ACTIONS[event.keyCode]) {
+  if (KEY_ACTIONS[event.key]) {
     for (let m of MODIFIERS) {
-        console.log(KEY_ACTIONS[event.keyCode].modifiers.includes(m))
-      if (event[m] && !KEY_ACTIONS[event.keyCode].modifiers.includes(m)) {
+      if (event[m] && !KEY_ACTIONS[event.key].modifiers.includes(m)) {
         return;
       }
     }
-    dispatch({ type: KEY_ACTIONS[event.keyCode].action });
+    dispatch({ type: KEY_ACTIONS[event.key].action });
   }
 }
