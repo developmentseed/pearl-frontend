@@ -5,6 +5,7 @@ on:
     branches:
     - 'develop'
     - 'main'
+    - 'update-prod-stack-resources'
 
 env:
   STAGING_STORAGE_ACCOUNT_NAME: lulcstagingfrontend
