@@ -31,7 +31,6 @@ import AoiEditControl from './aoi-edit-control';
 import FreehandDrawControl from './freehand-draw-control';
 import config from '../../../config';
 import { inRange } from '../../../utils/utils';
-import usePrevious from '../../../utils/use-previous';
 import { areaFromBounds } from '../../../utils/map';
 import {
   useCheckpoint,
@@ -113,7 +112,7 @@ function Map() {
   const { aoiPatchList } = useAoiPatch();
 
   const { mapState, mapModes, setMapMode } = useMapState();
-  const prevMapState = usePrevious(mapState);
+  //const prevMapState = usePrevious(mapState);
   const { mapRef, setMapRef } = useMapRef();
   const [tileUrl, setTileUrl] = useState(null);
   const { dispatchPredictions } = usePredictions();
@@ -131,13 +130,17 @@ function Map() {
   // Manage changes in map mode
   useEffect(() => {
     // Check if map mode changed and disable previous controls
-    if (prevMapState && mapState && mapState.mode !== prevMapState.mode) {
-      switch (prevMapState.mode) {
+    /*
+    if (mapState && mapState.previousMode) {
+      switch (mapState.previousMode) {
         case mapModes.ADD_SAMPLE_POLYGON:
-          mapRef.polygonDraw.disable();
+          if (!shortcutState.overrideBrowseMode) {
+            // In override browse mode, we are enterring browse mode temporarily so se should not disable the polygon draw
+            mapRef.polygonDraw.disable();
+          }
           break;
       }
-    }
+    }*/
 
     /**
      * The following block enables/disables map edit controls. Ideally we should use
@@ -148,16 +151,23 @@ function Map() {
       case mapModes.CREATE_AOI_MODE:
         mapRef.aoi.control.draw.enable();
         mapRef._container.style.cursor = 'crosshair';
-        mapRef.freehandDraw.disable();
+        mapRef.freehandDraw?.disable();
+        mapRef.polygonDraw?.disable();
         break;
       case mapModes.EDIT_AOI_MODE:
         mapRef.aoi.control.draw.disable();
         mapRef.aoi.control.edit.enable(aoiRef);
-        mapRef.freehandDraw.disable();
+        mapRef.freehandDraw?.disable();
+        mapRef.polygonDraw?.disable();
         break;
       case mapModes.BROWSE_MODE:
         if (mapRef) {
-          mapRef.freehandDraw.disable();
+          mapRef.freehandDraw?.disable();
+
+          // When override browse mode, we should pause polygon draw so as to preserve an inprogress polygon
+          if (shortcutState.overrideBrowseMode) {
+            mapRef.polygonDraw?.pause();
+          }
           if (aoiRef) {
             // Only disable if something has been drawn
             mapRef.aoi.control.draw.disable();
@@ -177,29 +187,35 @@ function Map() {
         }
         break;
       case mapModes.ADD_SAMPLE_POINT:
+        mapRef.freehandDraw?.disable();
+        mapRef.polygonDraw?.disable();
         mapRef._container.style.cursor = 'crosshair';
         break;
       case mapModes.ADD_SAMPLE_POLYGON:
         if (currentCheckpoint && currentCheckpoint.activeItem) {
-          mapRef.freehandDraw.disable();
+          mapRef.freehandDraw?.disable();
           mapRef._container.style.cursor = 'crosshair';
           mapRef.polygonDraw.enable(currentCheckpoint.activeItem);
         }
         break;
       case mapModes.ADD_SAMPLE_FREEHAND:
+        mapRef.polygonDraw?.disable();
         if (currentCheckpoint && currentCheckpoint.activeItem) {
           mapRef._container.style.cursor = 'crosshair';
           mapRef.freehandDraw.enableAdd(currentCheckpoint.activeItem);
         }
         break;
       case mapModes.DELETE_SAMPLES:
+        mapRef.polygonDraw?.disable();
+        mapRef.freehandDraw?.disable();
         if (currentCheckpoint && currentCheckpoint.activeItem) {
           mapRef._container.style.cursor = 'grab';
           mapRef.freehandDraw.enableSubtract(currentCheckpoint.activeItem);
         }
         break;
       default:
-        mapRef.freehandDraw.disable();
+        mapRef.freehandDraw?.disable();
+        mapRef.polygonDraw?.disable();
         mapRef._container.style.cursor = 'grab';
         break;
     }
@@ -207,6 +223,7 @@ function Map() {
     mapState.mode,
     aoiRef,
     currentCheckpoint && currentCheckpoint.activeItem,
+    shortcutState.overrideBrowseMode,
   ]);
 
   const classLength =

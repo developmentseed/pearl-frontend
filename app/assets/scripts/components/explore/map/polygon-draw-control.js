@@ -119,6 +119,10 @@ class PolygonDrawControl {
     // Remove click events
     this._map.off('mousedown');
   }
+
+  pause() {
+    this._map.off('mousedown');
+  }
 }
 
 export default PolygonDrawControl;
