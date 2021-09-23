@@ -1,5 +1,6 @@
 import get from 'lodash.get';
 import config from '../config';
+import logger from './logger';
 import { fetchJSON } from './utils';
 const { restApiEndpoint } = config;
 
@@ -37,8 +38,11 @@ class RestApiClient {
     }
 
     // Fetch data and let errors to be handle by the caller
-    const res = await fetchJSON(url, options);
-    return res.body;
+    return fetchJSON(url, options)
+      .then((res) => res.body)
+      .catch((e) =>
+        e.statusCode === 401 ? this.handleUnauthorized() : logger(e)
+      );
   }
 
   get(path, format = 'json') {
