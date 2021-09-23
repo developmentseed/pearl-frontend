@@ -5,7 +5,6 @@ on:
     branches:
     - 'develop'
     - 'main'
-    - 'update-prod-stack-resources'
 
 env:
   STAGING_STORAGE_ACCOUNT_NAME: lulcstagingfrontend
@@ -55,7 +54,7 @@ jobs:
         run: yarn stage
 
       - name: Build Prod
-        if: github.ref == 'refs/heads/update-prod-stack-resources'
+        if: github.ref == 'refs/heads/main'
         run: yarn build
         
       - name: Azure Login
@@ -65,7 +64,7 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS_STAGING }}
 
       - name: Azure Login
-        if: github.ref == 'refs/heads/update-prod-stack-resources'
+        if: github.ref == 'refs/heads/main'
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS_PRODUCTION }}
@@ -80,7 +79,7 @@ jobs:
               az storage blob upload-batch --account-name $STAGING_STORAGE_ACCOUNT_NAME -d '$web' -s ./dist
 
       - name: Upload to blob storage
-        if: github.ref == 'refs/heads/update-prod-stack-resources'
+        if: github.ref == 'refs/heads/main'
         uses: azure/CLI@v1
         with:
           azcliversion: 2.0.72
@@ -97,7 +96,7 @@ jobs:
             az cdn endpoint purge --content-paths  "/*" --profile-name $STAGING_CDN_PROFILE_NAME --name $STAGING_CDN_ENDPOINT --resource-group $STAGING_RESOURCE_GROUP
 
       - name: Purge CDN endpoint
-        if: github.ref == 'refs/heads/update-prod-stack-resources'
+        if: github.ref == 'refs/heads/main'
         uses: azure/CLI@v1
         with:
           azcliversion: 2.0.72
