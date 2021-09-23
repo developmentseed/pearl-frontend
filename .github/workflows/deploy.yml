@@ -64,10 +64,10 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS_STAGING }}
 
       - name: Azure Login
-        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/update-prod-stack-resources'
         uses: azure/login@v1
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS_PROD }}
+          creds: ${{ secrets.AZURE_CREDENTIALS_PRODUCTION }}
 
 
       - name: Upload to blob storage
@@ -79,7 +79,7 @@ jobs:
               az storage blob upload-batch --account-name $STAGING_STORAGE_ACCOUNT_NAME -d '$web' -s ./dist
 
       - name: Upload to blob storage
-        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/update-prod-stack-resources'
         uses: azure/CLI@v1
         with:
           azcliversion: 2.0.72
@@ -96,7 +96,7 @@ jobs:
             az cdn endpoint purge --content-paths  "/*" --profile-name $STAGING_CDN_PROFILE_NAME --name $STAGING_CDN_ENDPOINT --resource-group $STAGING_RESOURCE_GROUP
 
       - name: Purge CDN endpoint
-        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/update-prod-stack-resources'
         uses: azure/CLI@v1
         with:
           azcliversion: 2.0.72
