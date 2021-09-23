@@ -11,6 +11,7 @@ import config from '../config';
 import logger from '../utils/logger';
 import history from '../history';
 import RestApiClient from '../utils/rest-api-client';
+import toasts from '../components/common/toasts';
 import {
   getLocalStorageItem,
   setLocalStorageItem,
@@ -179,6 +180,7 @@ const authReducer = function (state, action) {
         ...initialState,
         isAuthenticated: false,
       };
+      toasts.error('Authentication error. Log in and try again.');
       break;
     }
     default:

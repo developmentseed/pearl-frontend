@@ -257,7 +257,11 @@ export async function fetchJSON(url, options) {
       throw err;
     }
 
-    return { body: data, headers: response.headers };
+    return {
+      body: data,
+      headers: response.headers,
+      statusCode: response.status,
+    };
   } catch (error) {
     error.statusCode = response ? response.status || null : null;
     throw error;
