@@ -11,10 +11,10 @@ env:
   STAGING_CDN_PROFILE_NAME: lulc
   STAGING_CDN_ENDPOINT: lulcstaging
   STAGING_RESOURCE_GROUP: lulcterraformdev
-  PRODUCTION_STORAGE_ACCOUNT_NAME: lulcproductionfrontend
-  PRODUCTION_CDN_PROFILE_NAME: lulcproduction
-  PRODUCTION_CDN_ENDPOINT: lulcproduction
-  PRODUCTION_RESOURCE_GROUP: lulcProduction
+  PRODUCTION_STORAGE_ACCOUNT_NAME: lulctfproductionfrontend
+  PRODUCTION_CDN_PROFILE_NAME: lulctfproduction
+  PRODUCTION_CDN_ENDPOINT: lulctfproduction
+  PRODUCTION_RESOURCE_GROUP: lulc-production_rg
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
