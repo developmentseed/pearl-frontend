@@ -13,6 +13,7 @@ export const actions = {
   TOGGLE_LAYER_TRAY: 'TOGGLE_LAYER_TRAY',
 
   TOGGLE_SHORTCUTS_HELP: 'TOGGLE_SHORTCUTS_HELP',
+  OVERRIDE_BROWSE_MODE: 'OVERRIDE_BROWSE_MODE',
   UPDATE: 'UPDATE',
 };
 
@@ -22,6 +23,7 @@ const initialState = {
   rightPanel: true,
   layerTray: false,
   shortcutsHelp: false,
+  overrideBrowseMode: false
 };
 
 export function shortcutReducer(state, action) {
@@ -75,6 +77,11 @@ export function shortcutReducer(state, action) {
         ...state,
         layerTray: !state.layerTray,
       };
+    case actions.OVERRIDE_BROWSE_MODE:
+      return {
+        ...state,
+        overrideBrowseMode: !state.overrideBrowseMode
+      }
     // Generic value update
     case actions.UPDATE:
       return {
@@ -91,21 +98,58 @@ export function useShortcutReducer() {
   return useReducer(wrapLogReducer(shortcutReducer), initialState);
 }
 
+const SHIFT = 'shiftKey';
+const META = 'metaKey';
+const CTRL = 'ctrlKey';
+const MODIFIERS = [SHIFT, META, CTRL];
+
 export const KEY_ACTIONS = {
-  [KEYS.a_KEY]: actions.SET_PREDICTION_OPACITY_0,
-  [KEYS.s_KEY]: actions.DECREMENT_PREDICTION_OPACITY,
-  [KEYS.d_KEY]: actions.INCREMENT_PREDICTION_OPACITY,
-  [KEYS.f_KEY]: actions.SET_PREDICTION_OPACITY_100,
-  [KEYS.k_KEY]: actions.TOGGLE_SHORTCUTS_HELP,
-  [KEYS.l_KEY]: actions.TOGGLE_LAYER_TRAY,
-  [KEYS.i_KEY]: actions.TOGGLE_LEFT_PANEL,
-  [KEYS.o_KEY]: actions.TOGGLE_RIGHT_PANEL,
+  [KEYS.a_KEY]: {
+    action: actions.SET_PREDICTION_OPACITY_0,
+    modifiers: [],
+  },
+  [KEYS.s_KEY]: {
+    action: actions.DECREMENT_PREDICTION_OPACITY,
+    modifiers: [],
+  },
+  [KEYS.d_KEY]: {
+    action: actions.INCREMENT_PREDICTION_OPACITY,
+    modifiers: [],
+  },
+  [KEYS.f_KEY]: {
+    action: actions.SET_PREDICTION_OPACITY_100,
+    modifiers: [],
+  },
+  [KEYS.k_KEY]: {
+    action: actions.TOGGLE_SHORTCUTS_HELP,
+    modifiers: [],
+  },
+  [KEYS.l_KEY]: {
+    action: actions.TOGGLE_LAYER_TRAY,
+    modifiers: [],
+  },
+  [KEYS.i_KEY]: {
+    action: actions.TOGGLE_LEFT_PANEL,
+    modifiers: [],
+  },
+  [KEYS.o_KEY]: {
+    action: actions.TOGGLE_RIGHT_PANEL,
+    modifiers: [],
+  },
+  [KEYS.shift_KEY]: {
+    action: actions.OVERRIDE_BROWSE_MODE,
+    modifiers: [SHIFT],
+  },
 };
 
 export function listenForShortcuts(event, dispatch) {
-  if (event.metaKey || event.shiftKey || event.ctrlKey) {
-    return;
-  } else if (KEY_ACTIONS[event.keyCode]) {
-    dispatch({ type: KEY_ACTIONS[event.keyCode] });
+  if (KEY_ACTIONS[event.keyCode]) {
+    for (let m of MODIFIERS) {
+        console.log(KEY_ACTIONS[event.keyCode].modifiers.includes(m))
+      if (event[m] && !KEY_ACTIONS[event.keyCode].modifiers.includes(m)) {
+        return;
+      }
+    }
+    dispatch({ type: KEY_ACTIONS[event.keyCode].action });
   }
 }

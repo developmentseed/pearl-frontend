@@ -10,4 +10,6 @@ export const KEYS = {
 
   i_KEY: 73,
   o_KEY: 79,
+
+  shift_KEY: 16
 };
