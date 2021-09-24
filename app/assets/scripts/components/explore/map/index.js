@@ -9,7 +9,6 @@ import {
   Circle,
 } from 'react-leaflet';
 import L from 'leaflet';
-import GlobalContext from '../../../context/global';
 import {
   ExploreContext,
   useMapState,
@@ -41,7 +40,7 @@ import ModalMapEvent from './modal-events';
 import GeoJSONLayer from '../../common/map/geojson-layer';
 import TileLayerWithHeaders from '../../common/map/tile-layer';
 import { useAuth } from '../../../context/auth';
-import { useApiLimits } from '../../../context/global';
+import { useApiLimits, useMosaics } from '../../../context/global';
 import { useAoi, useAoiPatch, useAoiName } from '../../../context/aoi';
 import {
   actions as predictionActions,
@@ -120,12 +119,10 @@ function Map() {
   const { mapLayers, setMapLayers } = useMapLayers();
   const { userLayers, setUserLayers } = useUserLayers();
 
-  const { mosaicList } = useContext(GlobalContext);
+  const { mosaics } = useMosaics();
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
 
   const { shortcutState, dispatchShortcutState } = useShortcutState();
-
-  const { mosaics } = mosaicList.isReady() ? mosaicList.getData() : {};
 
   // Manage changes in map mode
   useEffect(() => {

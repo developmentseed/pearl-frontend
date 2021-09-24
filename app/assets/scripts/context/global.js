@@ -3,12 +3,9 @@ import React, {
   useContext,
   useEffect,
   useMemo,
-  useReducer,
   useState,
 } from 'react';
 import T from 'prop-types';
-import { initialApiRequestState } from './reducers/reduxeed';
-import { createQueryApiGetReducer, queryApiGet } from './reducers/api';
 import useFetch from '../utils/use-fetch';
 
 const GlobalContext = createContext({});
@@ -23,13 +20,9 @@ export function GlobalContextProvider(props) {
     },
   });
 
-  const [mosaicList, dispatchMosaicList] = useReducer(
-    createQueryApiGetReducer('mosaic'),
-    initialApiRequestState
-  );
+  const mosaicList = useFetch('mosaic', { mutator: (body) => body.mosaics });
 
   useEffect(() => {
-    queryApiGet({ endpoint: 'mosaic' })(dispatchMosaicList);
     const visited = localStorage.getItem('site-tour');
     if (visited !== null) {
       setTourStep(Number(visited));
@@ -42,7 +35,8 @@ export function GlobalContextProvider(props) {
         value={{
           apiLimits: apiLimits.isReady && !apiLimits.hasError && apiLimits.data,
 
-          mosaicList,
+          mosaics:
+            mosaicList.isReady && !mosaicList.hasError ? mosaicList.data : [],
 
           tourStep,
           setTourStep,
@@ -79,6 +73,17 @@ export const useApiLimits = () => {
       apiLimits,
     }),
     [apiLimits]
+  );
+};
+
+export const useMosaics = () => {
+  const { mosaics } = useGlobalContext('useMosaics');
+
+  return useMemo(
+    () => ({
+      mosaics,
+    }),
+    [mosaics]
   );
 };
 
