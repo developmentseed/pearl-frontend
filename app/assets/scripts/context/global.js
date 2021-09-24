@@ -33,7 +33,8 @@ export function GlobalContextProvider(props) {
     <>
       <GlobalContext.Provider
         value={{
-          apiLimits: apiLimits.isReady && !apiLimits.hasError && apiLimits.data,
+          apiLimits:
+            apiLimits.isReady && !apiLimits.hasError ? apiLimits.data : null,
 
           mosaics:
             mosaicList.isReady && !mosaicList.hasError ? mosaicList.data : [],
