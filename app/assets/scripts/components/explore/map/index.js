@@ -42,7 +42,7 @@ import ModalMapEvent from './modal-events';
 import GeoJSONLayer from '../../common/map/geojson-layer';
 import TileLayerWithHeaders from '../../common/map/tile-layer';
 import { useAuth } from '../../../context/auth';
-import { useApiMeta } from '../../../context/api-meta';
+import { useApiLimits } from '../../../context/global';
 import { useAoi, useAoiPatch, useAoiName } from '../../../context/aoi';
 import {
   actions as predictionActions,
@@ -99,7 +99,7 @@ function Map() {
 
   const { setSessionStatusMode } = useSessionStatus();
 
-  const { apiLimits } = useApiMeta();
+  const { apiLimits } = useApiLimits();
   const {
     aoiRef,
     setAoiRef,

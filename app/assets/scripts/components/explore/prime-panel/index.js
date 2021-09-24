@@ -12,7 +12,7 @@ import {
   useMapState,
   useShortcutState,
 } from '../../../context/explore';
-import { useModels } from '../../../context/global';
+import { useModel } from '../../../context/model';
 
 import { Heading } from '@devseed-ui/typography';
 import { Button } from '@devseed-ui/button';
@@ -33,7 +33,7 @@ import {
 import { useInstance } from '../../../context/instance';
 import { useAoi } from '../../../context/aoi';
 import { usePredictions } from '../../../context/predictions';
-import { useApiMeta } from '../../../context/api-meta';
+import { useApiLimits } from '../../../context/global';
 import ClearSamplesModal from './clear-samples-modal';
 import { actions as shortcutActions } from '../../../context/explore/shortcuts';
 
@@ -72,7 +72,7 @@ function PrimePanel() {
   const { isAuthenticated } = useAuth();
   const { mapState, mapModes, setMapMode } = useMapState();
   const { mapRef } = useMapRef();
-  const { apiLimits } = useApiMeta();
+  const { apiLimits } = useApiLimits();
   const { shortcutState, dispatchShortcutState } = useShortcutState();
 
   const {
@@ -95,7 +95,7 @@ function PrimePanel() {
 
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
 
-  const { models } = useModels();
+  const { models } = useModel();
 
   const { predictions } = usePredictions();
 
@@ -317,7 +317,7 @@ function PrimePanel() {
         onOverlayClick={() => {
           setShowSelectModelModal(false);
         }}
-        data={models.status === 'success' ? models.value : []}
+        data={models.isReady && !models.hasError ? models.data : []}
         renderHeader={() => (
           <ModalHeader>
             <Headline>

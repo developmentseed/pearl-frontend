@@ -33,7 +33,7 @@ import { useModel } from '../model';
 
 import { wrapLogReducer } from '../reducers/utils';
 import { featureCollection, feature } from '@turf/helpers';
-import { delay } from '../reducers/reduxeed';
+import { delay } from '../../utils/utils';
 import { actions as instanceActions, useInstanceReducer } from './reducer';
 
 const BATCH_REFRESH_INTERVAL = 4000;

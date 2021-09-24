@@ -1,6 +1,6 @@
 import './wdyr';
 import '@babel/polyfill';
-import { install as installResizeObersever } from 'resize-observer';
+import { install as installResizeObserver } from 'resize-observer';
 import React, { useEffect } from 'react';
 import { DevseedUiThemeProvider } from '@devseed-ui/theme-provider';
 
@@ -27,9 +27,8 @@ import GlobalLoadingProvider from './components/common/global-loading';
 import { ToastContainerCustom } from './components/common/toasts';
 import Project from './components/profile/project';
 import { AuthProvider } from './context/auth';
-import { ApiMetaProvider } from './context/api-meta';
 
-installResizeObersever();
+installResizeObserver();
 
 const ProtectedRoute = (
   { component, ...args } // eslint-disable-line react/prop-types
@@ -57,39 +56,33 @@ function Root() {
         <Router history={history}>
           <DevseedUiThemeProvider theme={theme.dark}>
             <GlobalLoadingProvider />
-            <ApiMetaProvider>
-              <GlobalContextProvider>
-                <CollecticonsGlobalStyle />
-                <GlobalStyles />
-                <Switch>
-                  <>
-                    <Route exact path='/' component={Home} />
-                    <Route path='/share/:uuid/map' component={ShareMap} />
-                    <ProtectedRoute
-                      path='/project/:projectId'
-                      component={Explore}
-                    />
-                    <ProtectedRoute
-                      exact
-                      path='/profile/maps'
-                      component={Maps}
-                    />
-                    <ProtectedRoute
-                      exact
-                      path='/profile/projects'
-                      component={Projects}
-                    />
-                    <Route
-                      path='/profile/projects/:projectId'
-                      component={Project}
-                    />
-                    <Route path='/about' component={About} />
-                  </>
-                  <Route path='*' component={UhOh} />
-                </Switch>
-                <ToastContainerCustom />
-              </GlobalContextProvider>
-            </ApiMetaProvider>
+            <GlobalContextProvider>
+              <CollecticonsGlobalStyle />
+              <GlobalStyles />
+              <Switch>
+                <>
+                  <Route exact path='/' component={Home} />
+                  <Route path='/share/:uuid/map' component={ShareMap} />
+                  <ProtectedRoute
+                    path='/project/:projectId'
+                    component={Explore}
+                  />
+                  <ProtectedRoute exact path='/profile/maps' component={Maps} />
+                  <ProtectedRoute
+                    exact
+                    path='/profile/projects'
+                    component={Projects}
+                  />
+                  <Route
+                    path='/profile/projects/:projectId'
+                    component={Project}
+                  />
+                  <Route path='/about' component={About} />
+                </>
+                <Route path='*' component={UhOh} />
+              </Switch>
+              <ToastContainerCustom />
+            </GlobalContextProvider>
           </DevseedUiThemeProvider>
         </Router>
       </ErrorBoundary>

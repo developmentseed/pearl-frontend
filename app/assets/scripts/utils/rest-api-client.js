@@ -1,7 +1,7 @@
 import get from 'lodash.get';
 import config from '../config';
-import { fetchJSON } from '../context/reducers/reduxeed';
 import logger from './logger';
+import { fetchJSON } from './utils';
 const { restApiEndpoint } = config;
 
 class RestApiClient {
@@ -98,10 +98,6 @@ class RestApiClient {
 
   getModel(id) {
     return this.get(`model/${id}`);
-  }
-
-  getModels() {
-    return this.get(`model`).then((body) => (body ? body.models : []));
   }
 
   getAOIs(projectId) {
