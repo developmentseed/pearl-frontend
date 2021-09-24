@@ -13,7 +13,7 @@ import { useAuth } from '../context/auth';
  * @returns {object}
  *
  */
-export const useFetch = (urlPath, options = {}) => {
+export default function useFetch(urlPath, options = {}) {
   const { authRequired, mutator } = options;
 
   const request = useRef();
@@ -59,4 +59,4 @@ export const useFetch = (urlPath, options = {}) => {
     hasError: status === 'error',
     error,
   };
-};
+}

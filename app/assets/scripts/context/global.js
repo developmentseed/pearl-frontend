@@ -12,7 +12,7 @@ import { createQueryApiGetReducer, queryApiGet } from './reducers/api';
 import { createQueryApiPostReducer } from './reducers/api';
 import { useAuth } from './auth';
 import useAsync from '../utils/use-async';
-import { useFetch } from '../utils/use-fetch';
+import useFetch from '../utils/use-fetch';
 
 const GlobalContext = createContext({});
 
