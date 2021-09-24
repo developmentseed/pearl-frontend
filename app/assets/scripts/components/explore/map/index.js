@@ -112,7 +112,7 @@ function Map() {
   const { aoiPatchList } = useAoiPatch();
 
   const { mapState, mapModes, setMapMode } = useMapState();
-  //const prevMapState = usePrevious(mapState);
+
   const { mapRef, setMapRef } = useMapRef();
   const [tileUrl, setTileUrl] = useState(null);
   const { dispatchPredictions } = usePredictions();
@@ -168,7 +168,6 @@ function Map() {
         mapRef._container.style.cursor = 'crosshair';
         break;
       case mapModes.EDIT_AOI_MODE:
-        //mapRef.aoi.control.draw.disable();
         mapRef.aoi.control.edit.enable(aoiRef);
         break;
       case mapModes.BROWSE_MODE:
