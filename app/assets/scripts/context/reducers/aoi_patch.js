@@ -1,4 +1,4 @@
-import { initialApiRequestState } from './utils';
+import { initialApiRequestState, wrapApiResult } from './utils';
 
 export const actions = {
   INIT: 'INIT',
@@ -9,21 +9,6 @@ export const actions = {
   FAILED_PATCH: 'FAILED_PATCH',
   CLEAR_PATCH: 'CLEAR_PATCH',
 };
-
-function wrapApiResult(stateData) {
-  const { fetched, fetching, data, error } = stateData;
-  const ready = fetched && !fetching;
-  return {
-    ...stateData,
-    raw: () => stateData,
-    isReady: () => {
-      return ready;
-    },
-    hasError: () => ready && !!error,
-    getData: (def = {}) => (ready ? data.results || data : def),
-    getMeta: (def = {}) => (ready ? data.meta : def),
-  };
-}
 
 export default function (state, action) {
   const { data } = action;
