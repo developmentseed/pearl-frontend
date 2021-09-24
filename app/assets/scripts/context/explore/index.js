@@ -154,9 +154,11 @@ export function ExploreProvider(props) {
       const wrappedFunc = (e) => listenForShortcuts(e, dispatchShortcutState);
 
       document.addEventListener('keydown', wrappedFunc);
+      document.addEventListener('keyup', wrappedFunc);
 
       return () => {
         document.removeEventListener('keydown', wrappedFunc);
+        document.removeEventListener('keyup', wrappedFunc);
       };
     }
   }, [isInitialized.current, dispatchShortcutState]);
@@ -355,6 +357,23 @@ export function ExploreProvider(props) {
       dispatchPredictions({ type: predictionActions.CLEAR_PREDICTION });
     }
   }, [mapState]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (!isInitialized.current) {
+      return;
+    }
+    if (shortcutState.overrideBrowseMode) {
+      dispatchMapState({
+        type: mapActionTypes.SET_MODE,
+        data: mapModes.BROWSE_MODE,
+      });
+    } else if (mapState.previousMode) {
+      dispatchMapState({
+        type: mapActionTypes.SET_MODE,
+        data: mapState.previousMode,
+      });
+    }
+  }, [isInitialized.current, shortcutState.overrideBrowseMode]);
 
   /*
    * Re-init aoi state variables

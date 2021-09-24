@@ -61,14 +61,14 @@ describe('Test keyboard shortcuts', () => {
     cy.get('#layer-control').click({ force: true });
 
     /* a  */
-    cy.get('body').trigger('keydown', { keyCode: 65 });
+    cy.get('body').trigger('keydown', { key: 'a' });
     cy.get('[data-cy="Prediction Results"]')
       .invoke('attr', 'data-opacity')
       .should('eq', '0');
     // prediction opacity should be 0
 
     /* f  */
-    cy.get('body').trigger('keydown', { keyCode: 70 });
+    cy.get('body').trigger('keydown', { key: 'f' });
     // prediction opacity should be 1
     cy.get('[data-cy="Prediction Results"]')
       .invoke('attr', 'data-opacity')
@@ -76,22 +76,22 @@ describe('Test keyboard shortcuts', () => {
     //
 
     /* s  */
-    cy.get('body').trigger('keydown', { keyCode: 83 });
-    cy.get('body').trigger('keydown', { keyCode: 83 });
-    cy.get('body').trigger('keydown', { keyCode: 83 });
-    cy.get('body').trigger('keydown', { keyCode: 83 });
-    cy.get('body').trigger('keydown', { keyCode: 83 });
+    cy.get('body').trigger('keydown', { key: 's' });
+    cy.get('body').trigger('keydown', { key: 's' });
+    cy.get('body').trigger('keydown', { key: 's' });
+    cy.get('body').trigger('keydown', { key: 's' });
+    cy.get('body').trigger('keydown', { key: 's' });
     cy.get('[data-cy="Prediction Results"]')
       .invoke('attr', 'data-opacity')
       .should('eq', '0.5');
     // prediction opacity should be 0.5
 
     /* d  */
-    cy.get('body').trigger('keydown', { keyCode: 68 });
-    cy.get('body').trigger('keydown', { keyCode: 68 });
-    cy.get('body').trigger('keydown', { keyCode: 68 });
-    cy.get('body').trigger('keydown', { keyCode: 68 });
-    cy.get('body').trigger('keydown', { keyCode: 68 });
+    cy.get('body').trigger('keydown', { key: 'd' });
+    cy.get('body').trigger('keydown', { key: 'd' });
+    cy.get('body').trigger('keydown', { key: 'd' });
+    cy.get('body').trigger('keydown', { key: 'd' });
+    cy.get('body').trigger('keydown', { key: 'd' });
     cy.get('[data-cy="Prediction Results"]')
       .invoke('attr', 'data-opacity')
       .should('eq', '1');
@@ -108,7 +108,7 @@ describe('Test keyboard shortcuts', () => {
     );
     cy.get('[data-cy=layers-panel]').should('not.be.visible');
 
-    cy.get('body').trigger('keydown', { keyCode: 76 });
+    cy.get('body').trigger('keydown', { key: 'l' });
     cy.get('[data-cy=layers-panel]').should('be.visible');
   });
   it('Hide and collapse panels', () => {
@@ -120,15 +120,15 @@ describe('Test keyboard shortcuts', () => {
     );
 
     /* i */
-    cy.get('body').trigger('keydown', { keyCode: 73 });
+    cy.get('body').trigger('keydown', { key: 'i' });
     cy.get('[data-cy=primary-panel]').should('not.be.visible');
-    cy.get('body').trigger('keydown', { keyCode: 73 });
+    cy.get('body').trigger('keydown', { key: 'i' });
     cy.get('[data-cy=primary-panel]').should('be.visible');
 
     /* o */
-    cy.get('body').trigger('keydown', { keyCode: 79 });
+    cy.get('body').trigger('keydown', { key: 'o' });
     cy.get('[data-cy=secondary-panel]').should('not.be.visible');
-    cy.get('body').trigger('keydown', { keyCode: 79 });
+    cy.get('body').trigger('keydown', { key: 'o' });
     cy.get('[data-cy=secondary-panel]').should('be.visible');
   });
 });

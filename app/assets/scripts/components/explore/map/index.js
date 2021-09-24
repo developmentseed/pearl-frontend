@@ -31,7 +31,6 @@ import AoiEditControl from './aoi-edit-control';
 import FreehandDrawControl from './freehand-draw-control';
 import config from '../../../config';
 import { inRange } from '../../../utils/utils';
-import usePrevious from '../../../utils/use-previous';
 import { areaFromBounds } from '../../../utils/map';
 import {
   useCheckpoint,
@@ -113,7 +112,7 @@ function Map() {
   const { aoiPatchList } = useAoiPatch();
 
   const { mapState, mapModes, setMapMode } = useMapState();
-  const prevMapState = usePrevious(mapState);
+
   const { mapRef, setMapRef } = useMapRef();
   const [tileUrl, setTileUrl] = useState(null);
   const { dispatchPredictions } = usePredictions();
@@ -131,11 +130,30 @@ function Map() {
   // Manage changes in map mode
   useEffect(() => {
     // Check if map mode changed and disable previous controls
-    if (prevMapState && mapState && mapState.mode !== prevMapState.mode) {
-      switch (prevMapState.mode) {
-        case mapModes.ADD_SAMPLE_POLYGON:
-          mapRef.polygonDraw.disable();
+    if (mapState?.previousMode) {
+      switch (mapState.previousMode) {
+        case mapModes.CREATE_AOI_MODE:
+          mapRef.aoi.control.draw.disable();
           break;
+        case mapModes.EDIT_AOI_MODE:
+          mapRef.aoi.control.edit.disable();
+          break;
+        case mapModes.ADD_SAMPLE_POLYGON:
+          if (shortcutState.overrideBrowseMode) {
+            mapRef.polygonDraw?.pause();
+          } else if (
+            !mapState.overrideBrowseMode &&
+            mapState.mode !== mapModes.BROWSE_MODE
+          ) {
+            // Keyboard shortcut SPACE will enter override mode when held down
+            // On KEYUP, we will dispatch an update to return to previousMode, but overrideBrowseMode
+            // will be set to false before the mode update can be dispatched
+            mapRef.polygonDraw.disable();
+          }
+          break;
+        case mapModes.ADD_SAMPLE_FREEHAND: {
+          mapRef.freehandDraw?.disable();
+        }
       }
     }
 
@@ -148,31 +166,20 @@ function Map() {
       case mapModes.CREATE_AOI_MODE:
         mapRef.aoi.control.draw.enable();
         mapRef._container.style.cursor = 'crosshair';
-        mapRef.freehandDraw.disable();
         break;
       case mapModes.EDIT_AOI_MODE:
-        mapRef.aoi.control.draw.disable();
         mapRef.aoi.control.edit.enable(aoiRef);
-        mapRef.freehandDraw.disable();
         break;
       case mapModes.BROWSE_MODE:
-        if (mapRef) {
-          mapRef.freehandDraw.disable();
-          if (aoiRef) {
-            // Only disable if something has been drawn
-            mapRef.aoi.control.draw.disable();
-            if (mapRef.aoi.control.edit._shape) {
-              mapRef.aoi.control.edit.disable();
-            }
-            if (
-              mapState.previousMode === mapModes.CREATE_AOI_MODE ||
-              mapState.previousMode === mapModes.EDIT_AOI_MODE
-            ) {
-              // On confirm, zoom to bounds
-              mapRef.fitBounds(aoiRef.getBounds(), { padding: BOUNDS_PADDING });
-              mapRef._container.style.cursor = 'grab';
-              setSessionStatusMode('set-aoi');
-            }
+        if (mapRef && aoiRef) {
+          if (
+            mapState.previousMode === mapModes.CREATE_AOI_MODE ||
+            mapState.previousMode === mapModes.EDIT_AOI_MODE
+          ) {
+            // On confirm, zoom to bounds
+            mapRef.fitBounds(aoiRef.getBounds(), { padding: BOUNDS_PADDING });
+            mapRef._container.style.cursor = 'grab';
+            setSessionStatusMode('set-aoi');
           }
         }
         break;
@@ -180,26 +187,24 @@ function Map() {
         mapRef._container.style.cursor = 'crosshair';
         break;
       case mapModes.ADD_SAMPLE_POLYGON:
-        if (currentCheckpoint && currentCheckpoint.activeItem) {
-          mapRef.freehandDraw.disable();
+        if (currentCheckpoint?.activeItem) {
           mapRef._container.style.cursor = 'crosshair';
           mapRef.polygonDraw.enable(currentCheckpoint.activeItem);
         }
         break;
       case mapModes.ADD_SAMPLE_FREEHAND:
-        if (currentCheckpoint && currentCheckpoint.activeItem) {
+        if (currentCheckpoint?.activeItem) {
           mapRef._container.style.cursor = 'crosshair';
           mapRef.freehandDraw.enableAdd(currentCheckpoint.activeItem);
         }
         break;
       case mapModes.DELETE_SAMPLES:
-        if (currentCheckpoint && currentCheckpoint.activeItem) {
+        if (currentCheckpoint?.activeItem) {
           mapRef._container.style.cursor = 'grab';
           mapRef.freehandDraw.enableSubtract(currentCheckpoint.activeItem);
         }
         break;
       default:
-        mapRef.freehandDraw.disable();
         mapRef._container.style.cursor = 'grab';
         break;
     }
@@ -207,6 +212,7 @@ function Map() {
     mapState.mode,
     aoiRef,
     currentCheckpoint && currentCheckpoint.activeItem,
+    shortcutState.overrideBrowseMode,
   ]);
 
   const classLength =
@@ -377,6 +383,7 @@ function Map() {
         center={center}
         zoom={zoom}
         maxZoom={osmTilesMaxZoom}
+        boxZoom={false}
         style={{ height: '100%' }}
         whenCreated={(m) => {
           const freehandDraw = new FreehandDrawControl(m, {

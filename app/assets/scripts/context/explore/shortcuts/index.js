@@ -13,6 +13,9 @@ export const actions = {
   TOGGLE_LAYER_TRAY: 'TOGGLE_LAYER_TRAY',
 
   TOGGLE_SHORTCUTS_HELP: 'TOGGLE_SHORTCUTS_HELP',
+  SET_OVERRIDE_BROWSE_MODE: 'SET_OVERRIDE_BROWSE_MODE',
+  UNSET_OVERRIDE_BROWSE_MODE: 'UNSET_OVERRIDE_BROWSE_MODE',
+
   UPDATE: 'UPDATE',
 };
 
@@ -22,6 +25,7 @@ const initialState = {
   rightPanel: true,
   layerTray: false,
   shortcutsHelp: false,
+  overrideBrowseMode: false,
 };
 
 export function shortcutReducer(state, action) {
@@ -75,6 +79,23 @@ export function shortcutReducer(state, action) {
         ...state,
         layerTray: !state.layerTray,
       };
+    case actions.SET_OVERRIDE_BROWSE_MODE:
+      // Keydown fires when holding,
+      // do nothing if already active
+      if (state.overrideBrowseMode) {
+        return state;
+      } else {
+        return {
+          ...state,
+          overrideBrowseMode: true,
+        };
+      }
+    case actions.UNSET_OVERRIDE_BROWSE_MODE:
+      return {
+        ...state,
+        overrideBrowseMode: false,
+      };
+
     // Generic value update
     case actions.UPDATE:
       return {
@@ -91,21 +112,69 @@ export function useShortcutReducer() {
   return useReducer(wrapLogReducer(shortcutReducer), initialState);
 }
 
+const ALT = 'altKey';
+const SHIFT = 'shiftKey';
+const META = 'metaKey';
+const CTRL = 'ctrlKey';
+const MODIFIERS = [SHIFT, META, CTRL, ALT];
+
 export const KEY_ACTIONS = {
-  [KEYS.a_KEY]: actions.SET_PREDICTION_OPACITY_0,
-  [KEYS.s_KEY]: actions.DECREMENT_PREDICTION_OPACITY,
-  [KEYS.d_KEY]: actions.INCREMENT_PREDICTION_OPACITY,
-  [KEYS.f_KEY]: actions.SET_PREDICTION_OPACITY_100,
-  [KEYS.k_KEY]: actions.TOGGLE_SHORTCUTS_HELP,
-  [KEYS.l_KEY]: actions.TOGGLE_LAYER_TRAY,
-  [KEYS.i_KEY]: actions.TOGGLE_LEFT_PANEL,
-  [KEYS.o_KEY]: actions.TOGGLE_RIGHT_PANEL,
+  [KEYS.a_KEY]: {
+    keyDownAction: actions.SET_PREDICTION_OPACITY_0,
+    modifiers: [],
+  },
+  [KEYS.s_KEY]: {
+    keyDownAction: actions.DECREMENT_PREDICTION_OPACITY,
+    modifiers: [],
+  },
+  [KEYS.d_KEY]: {
+    keyDownAction: actions.INCREMENT_PREDICTION_OPACITY,
+    modifiers: [],
+  },
+  [KEYS.f_KEY]: {
+    keyDownAction: actions.SET_PREDICTION_OPACITY_100,
+    modifiers: [],
+  },
+  [KEYS.k_KEY]: {
+    keyDownAction: actions.TOGGLE_SHORTCUTS_HELP,
+    modifiers: [],
+  },
+  [KEYS.l_KEY]: {
+    keyDownAction: actions.TOGGLE_LAYER_TRAY,
+    modifiers: [],
+  },
+  [KEYS.i_KEY]: {
+    keyDownAction: actions.TOGGLE_LEFT_PANEL,
+    modifiers: [],
+  },
+  [KEYS.o_KEY]: {
+    keyDownAction: actions.TOGGLE_RIGHT_PANEL,
+    modifiers: [],
+  },
+  [KEYS.space_KEY]: {
+    keyDownAction: actions.SET_OVERRIDE_BROWSE_MODE,
+    keyUpAction: actions.UNSET_OVERRIDE_BROWSE_MODE,
+    modifiers: [],
+  },
 };
 
 export function listenForShortcuts(event, dispatch) {
-  if (event.metaKey || event.shiftKey || event.ctrlKey) {
-    return;
-  } else if (KEY_ACTIONS[event.keyCode]) {
-    dispatch({ type: KEY_ACTIONS[event.keyCode] });
+  if (KEY_ACTIONS[event.key]) {
+    // If no key up action, don't do any checks
+    if (event.type === 'keyup' && !KEY_ACTIONS[event.key].keyUpAction) {
+      return;
+    }
+
+    for (let m of MODIFIERS) {
+      if (event[m] && !KEY_ACTIONS[event.key].modifiers.includes(m)) {
+        return;
+      }
+    }
+
+    if (event.type === 'keydown') {
+      dispatch({ type: KEY_ACTIONS[event.key].keyDownAction });
+    } else if (event.type === 'keyup') {
+      dispatch({ type: KEY_ACTIONS[event.key].keyUpAction });
+    }
   }
 }
