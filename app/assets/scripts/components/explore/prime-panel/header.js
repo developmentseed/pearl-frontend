@@ -199,22 +199,21 @@ function Header(props) {
   };
 
   const modelNotChangeable =
-    !isAuthenticated || models.status !== 'success' || checkpointList?.length;
+    !isAuthenticated ||
+    !models.isReady ||
+    models.hasError ||
+    checkpointList?.length;
 
   const renderModelLabel = () => {
     if (!isAuthenticated) {
       return 'Login to select model';
     }
 
-    if (['pending', 'idle'].includes(models.status)) {
+    if (!models.isReady) {
       return 'Loading...';
     }
 
-    if (
-      models.status === 'success' &&
-      models.value &&
-      models.value.length > 0
-    ) {
+    if (models.status === 'success' && models.data && models.data.length > 0) {
       return 'Select Model';
     }
 

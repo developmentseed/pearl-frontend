@@ -317,7 +317,7 @@ function PrimePanel() {
         onOverlayClick={() => {
           setShowSelectModelModal(false);
         }}
-        data={models.status === 'success' ? models.value : []}
+        data={models.isReady && !models.hasError ? models.data : []}
         renderHeader={() => (
           <ModalHeader>
             <Headline>
