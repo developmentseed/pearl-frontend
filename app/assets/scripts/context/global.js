@@ -9,7 +9,6 @@ import React, {
 import T from 'prop-types';
 import { initialApiRequestState } from './reducers/reduxeed';
 import { createQueryApiGetReducer, queryApiGet } from './reducers/api';
-import { createQueryApiPostReducer } from './reducers/api';
 import useFetch from '../utils/use-fetch';
 
 const GlobalContext = createContext({});
@@ -29,13 +28,6 @@ export function GlobalContextProvider(props) {
     initialApiRequestState
   );
 
-  const [currentProjectName, setCurrentProjectName] = useState(null);
-
-  const [currentProject, dispatchProject] = useReducer(
-    createQueryApiPostReducer('project'),
-    initialApiRequestState
-  );
-
   useEffect(() => {
     queryApiGet({ endpoint: 'mosaic' })(dispatchMosaicList);
     const visited = localStorage.getItem('site-tour');
@@ -51,12 +43,6 @@ export function GlobalContextProvider(props) {
           apiLimits: apiLimits.isReady && !apiLimits.hasError && apiLimits.data,
 
           mosaicList,
-
-          dispatchProject,
-          currentProject,
-
-          currentProjectName,
-          setCurrentProjectName,
 
           tourStep,
           setTourStep,
