@@ -55,7 +55,7 @@ export default function useFetch(urlPath, options = {}) {
     fetch,
     data,
     status,
-    isReady: status !== 'idle' || status !== 'loading',
+    isReady: status !== 'idle' && status !== 'loading',
     hasError: status === 'error',
     error,
   };
