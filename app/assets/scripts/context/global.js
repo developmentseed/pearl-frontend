@@ -24,10 +24,6 @@ export function GlobalContextProvider(props) {
     },
   });
 
-  const models = useFetch('model', {
-    mutator: (body) => (body ? body.models : []),
-  });
-
   const [mosaicList, dispatchMosaicList] = useReducer(
     createQueryApiGetReducer('mosaic'),
     initialApiRequestState
@@ -53,8 +49,6 @@ export function GlobalContextProvider(props) {
       <GlobalContext.Provider
         value={{
           apiLimits: apiLimits.isReady && !apiLimits.hasError && apiLimits.data,
-
-          models,
 
           mosaicList,
 
@@ -89,17 +83,6 @@ export const useGlobalContext = (fnName) => {
   }
 
   return context;
-};
-
-export const useModels = () => {
-  const { models } = useGlobalContext('useModels');
-
-  return useMemo(
-    () => ({
-      models,
-    }),
-    [models]
-  );
 };
 
 export const useApiLimits = () => {

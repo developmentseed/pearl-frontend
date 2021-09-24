@@ -1,12 +1,18 @@
 import React, { useContext, useMemo, createContext, useState } from 'react';
 import T from 'prop-types';
+import useFetch from '../utils/use-fetch';
 
 const ModelContext = createContext(null);
 
 export function ModelProvider(props) {
+  const models = useFetch('model', {
+    mutator: (body) => (body ? body.models : []),
+  });
+
   const [selectedModel, setSelectedModel] = useState(null);
 
   const value = {
+    models,
     selectedModel,
     setSelectedModel,
   };
@@ -36,13 +42,16 @@ const useModelContext = (fnName) => {
 };
 
 export const useModel = () => {
-  const { selectedModel, setSelectedModel } = useModelContext('useModel');
+  const { models, selectedModel, setSelectedModel } = useModelContext(
+    'useModel'
+  );
 
   return useMemo(
     () => ({
+      models,
       selectedModel,
       setSelectedModel,
     }),
-    [selectedModel]
+    [selectedModel, models]
   );
 };

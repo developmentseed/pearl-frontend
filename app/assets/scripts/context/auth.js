@@ -16,6 +16,7 @@ import {
   getLocalStorageItem,
   setLocalStorageItem,
 } from '../utils/local-storage';
+import { hideGlobalLoading } from '../components/common/global-loading';
 
 const AuthContext = createContext(null);
 
@@ -230,7 +231,11 @@ export const useAuth = () => {
   return useMemo(() => {
     const restApiClient = new RestApiClient({
       apiToken,
-      handleUnauthorized: () => logout(),
+      handleUnauthorized: () => {
+        hideGlobalLoading();
+        logout();
+        history.push('/');
+      },
     });
     return {
       restApiClient,

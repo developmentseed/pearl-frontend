@@ -24,7 +24,7 @@ import {
   DropdownFooter,
 } from '../../../styles/dropdown';
 import { AoiEditButtons } from './aoi-edit-buttons';
-import { useModels } from '../../../context/global';
+import { useModel } from '../../../context/model';
 import { useAuth } from '../../../context/auth';
 import { useAoi } from '../../../context/aoi';
 
@@ -136,7 +136,7 @@ function Header(props) {
   } = props;
 
   const [deleteAoi, setDeleteAoi] = useState();
-  const { models } = useModels();
+  const { models } = useModel();
   const { restApiClient } = useAuth();
   const { setAoiList } = useAoi();
 

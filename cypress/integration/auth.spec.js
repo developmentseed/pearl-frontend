@@ -18,7 +18,7 @@ describe('The app header', () => {
   it('when a 401 request happens, sign out the user and show the log in button', () => {
     cy.intercept(
       {
-        url: restApiEndpoint + '/api/model',
+        url: restApiEndpoint + '/api/*',
       },
       (req) => {
         req.reply(401, {
@@ -28,28 +28,15 @@ describe('The app header', () => {
         });
       }
     );
-    cy.visit('/');
+
+    cy.visit('/project/1');
+
+    cy.location().should((loc) => {
+      expect(loc.pathname).to.eq('/');
+    });
+
     cy.get('body');
     cy.get('[data-cy=account-button]').should('not.exist');
     cy.get('[data-cy=login-button]').should('exist');
-  });
-
-  it('when a 403 request happens, user continues logged in', () => {
-    cy.intercept(
-      {
-        url: restApiEndpoint + '/api/model',
-      },
-      (req) => {
-        req.reply(403, {
-          status: 403,
-          message: 'User not allowed to access resource',
-          messages: [],
-        });
-      }
-    );
-    cy.visit('/');
-    cy.get('body');
-    cy.get('[data-cy=account-button]').should('exist');
-    cy.get('[data-cy=login-button]').should('not.exist');
   });
 });
