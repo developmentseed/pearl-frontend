@@ -13,7 +13,7 @@ import { useAuth } from '../context/auth';
  * @returns {object}
  *
  */
-export const useFetch = (urlPath, options = {}) => {
+export default function useFetch(urlPath, options = {}) {
   const { authRequired, mutator } = options;
 
   const request = useRef();
@@ -55,8 +55,8 @@ export const useFetch = (urlPath, options = {}) => {
     fetch,
     data,
     status,
-    isReady: status !== 'idle' || status !== 'loading',
+    isReady: status !== 'idle' && status !== 'loading',
     hasError: status === 'error',
     error,
   };
-};
+}

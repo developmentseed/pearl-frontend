@@ -2,7 +2,6 @@ import React from 'react';
 import { Heading } from '@devseed-ui/typography';
 
 import T from 'prop-types';
-import { useFetchList } from '../../../utils/use-async';
 import Table, { TableRow, TableCell } from '../../common/table';
 import { formatDateTime } from '../../../utils/format';
 import { useState } from 'react';
@@ -16,6 +15,7 @@ import { useAuth } from '../../../context/auth';
 import { downloadGeotiff } from '../../../utils/map';
 import logger from '../../../utils/logger';
 import toasts from '../../common/toasts';
+import useFetch from '../../../utils/use-fetch';
 
 const TABLE_PAGE_SIZE = 5;
 const TABLE_HEADERS = ['Id', 'AOI Name', 'Status', 'Started', 'Download'];
@@ -72,20 +72,20 @@ function renderRow({
 
 function BatchList({ projectId }) {
   const [page, setPage] = useState(1);
-  const { result, status, error } = useFetchList(
+  const { isReady, data, hasError } = useFetch(
     `project/${projectId}/batch?page=${page - 1}&limit=${TABLE_PAGE_SIZE}`
   );
   const { restApiClient } = useAuth();
 
-  if (status === 'idle' || status === 'loading') {
+  if (!isReady) {
     return <Heading>Loading batch predictions...</Heading>;
   }
 
-  if (error) {
+  if (hasError) {
     return <Heading>Batch predictions could not be retrieved.</Heading>;
   }
 
-  if (result.batch && result.batch.length === 0) {
+  if (data && data.total === 0) {
     return <Heading>No batch predictions for this project.</Heading>;
   }
 
@@ -95,13 +95,13 @@ function BatchList({ projectId }) {
       <Table
         data-cy='batch-list-table'
         headers={TABLE_HEADERS}
-        data={result.batch}
+        data={data.batch}
         renderRow={(batch) => renderRow({ ...batch, projectId, restApiClient })}
       />
       <Paginator
         currentPage={page}
         gotoPage={setPage}
-        totalItems={result.total}
+        totalItems={data.total}
         itemsPerPage={TABLE_PAGE_SIZE}
       />
     </>

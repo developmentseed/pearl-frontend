@@ -12,7 +12,7 @@ import {
   useMapState,
   useShortcutState,
 } from '../../../context/explore';
-import { useModels } from '../../../context/global';
+import { useModel } from '../../../context/model';
 
 import { Heading } from '@devseed-ui/typography';
 import { Button } from '@devseed-ui/button';
@@ -95,7 +95,7 @@ function PrimePanel() {
 
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
 
-  const { models } = useModels();
+  const { models } = useModel();
 
   const { predictions } = usePredictions();
 
@@ -317,7 +317,7 @@ function PrimePanel() {
         onOverlayClick={() => {
           setShowSelectModelModal(false);
         }}
-        data={models.status === 'success' ? models.value : []}
+        data={models.isReady && !models.hasError ? models.data : []}
         renderHeader={() => (
           <ModalHeader>
             <Headline>
