@@ -113,7 +113,7 @@ export function wrapLogReducer(reducer) {
  * }
  *
  */
-export function wrapApiResult(stateData, hasKey) {
+function wrapApiResult(stateData, hasKey) {
   return hasKey
     ? Object.keys(stateData).reduce(
         (acc, k) => ({

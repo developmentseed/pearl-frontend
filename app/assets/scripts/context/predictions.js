@@ -2,11 +2,7 @@ import React, { useContext, useMemo, createContext, useReducer } from 'react';
 import T from 'prop-types';
 import logger from '../utils/logger';
 
-import {
-  initialApiRequestState,
-  wrapApiResult,
-  wrapLogReducer,
-} from './reducers/utils';
+import { initialApiRequestState, wrapLogReducer } from './reducers/utils';
 
 const PredictionsContext = createContext(null);
 
@@ -67,6 +63,21 @@ export const actions = {
   FAILED_PREDICTION: 'FAILED_PREDICTION',
   CLEAR_PREDICTION: 'CLEAR_PREDICTION',
 };
+
+function wrapApiResult(stateData) {
+  const { fetched, fetching, data, error } = stateData;
+  const ready = fetched && !fetching;
+  return {
+    ...stateData,
+    raw: () => stateData,
+    isReady: () => {
+      return ready;
+    },
+    hasError: () => ready && !!error,
+    getData: (def = {}) => (ready ? data.results || data : def),
+    getMeta: (def = {}) => (ready ? data.meta : def),
+  };
+}
 
 export function predictionsReducer(state, action) {
   const { data } = action;
