@@ -1,4 +1,4 @@
-import { initialApiRequestState } from './reduxeed';
+import { initialApiRequestState } from './utils';
 
 export const actions = {
   INIT: 'INIT',

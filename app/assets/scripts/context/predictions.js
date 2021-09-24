@@ -1,9 +1,8 @@
 import React, { useContext, useMemo, createContext, useReducer } from 'react';
 import T from 'prop-types';
-import { initialApiRequestState } from './reducers/reduxeed';
 import logger from '../utils/logger';
 
-import { wrapLogReducer } from './reducers/utils';
+import { initialApiRequestState, wrapLogReducer } from './reducers/utils';
 
 const PredictionsContext = createContext(null);
 

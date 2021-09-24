@@ -8,8 +8,7 @@ import React, {
 import T from 'prop-types';
 import logger from '../utils/logger';
 import aoiPatchReducer from './reducers/aoi_patch';
-import { wrapLogReducer } from './reducers/utils';
-import { initialApiRequestState } from './reducers/reduxeed';
+import { initialApiRequestState, wrapLogReducer } from './reducers/utils';
 import {
   showGlobalLoadingMessage,
   hideGlobalLoading,
