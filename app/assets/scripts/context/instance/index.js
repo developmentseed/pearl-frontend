@@ -371,11 +371,17 @@ export function InstanceProvider(props) {
       );
 
       if (batch.completed) {
-
         // Batch is complete
         setRunningBatch(false);
+
+        // Reload Aoi list when complete
+        restApiClient.get(`project/${currentProject.id}/aoi/`).then((aois) => {
+          setAoiList(aois.aois);
+          toasts.success(`${batch.name} inference is now available`);
+        });
       } else {
         setRunningBatch(batch);
+
         // Poll for batch progress if not complete
         setTimeout(() => {
           refreshRunningBatch(batchId, timeout);
