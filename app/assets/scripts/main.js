@@ -35,7 +35,9 @@ const ProtectedRoute = (
 ) => (
   <Route
     component={
-      window.Cypress ? component : withAuthenticationRequired(component)
+      window.Cypress && window.localStorage.getItem('useFakeLogin')
+        ? component
+        : withAuthenticationRequired(component)
     }
     {...args}
   />
@@ -73,7 +75,7 @@ function Root() {
                     path='/profile/projects'
                     component={Projects}
                   />
-                  <Route
+                  <ProtectedRoute
                     path='/profile/projects/:projectId'
                     component={Project}
                   />
