@@ -102,7 +102,7 @@ function SecPanel() {
                 )}
 
               {px_stats && currentCheckpoint.classes && (
-                <StyledBlockBody>
+                <StyledBlockBody data-cy='checkpoint_class_distro'>
                   <PanelBlockHeader>
                     <Subheading>Checkpoint Class Distribution</Subheading>
                   </PanelBlockHeader>
