@@ -266,7 +266,6 @@ PrimeButton.propTypes = {
 function Footer({
   dispatchCurrentCheckpoint,
   currentCheckpoint,
-  checkpointHasSamples,
   checkpointActions,
   updateCheckpointName,
   localCheckpointName,
@@ -289,8 +288,10 @@ function Footer({
         }}
         title='Clear all samples drawn since last retrain or save'
         id='reset-button-trigger'
-        disabled={!currentCheckpoint || !checkpointHasSamples}
-        visuallyDisabled={!currentCheckpoint || !checkpointHasSamples}
+        disabled={!currentCheckpoint || currentCheckpoint.sampleCount === 0}
+        visuallyDisabled={
+          !currentCheckpoint || currentCheckpoint.sampleCount === 0
+        }
         onClick={() => {
           dispatchCurrentCheckpoint({
             type: checkpointActions.CLEAR_SAMPLES,

@@ -1,10 +1,10 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import PageHeader from '../common/page-header';
 import toasts from '../common/toasts';
 import { PageBody } from '../../styles/page';
 import { MapContainer, TileLayer, FeatureGroup } from 'react-leaflet';
-import GlobalContext from '../../context/global';
+import { useMosaics } from '../../context/global';
 
 import { useParams } from 'react-router-dom';
 import App from '../common/app';
@@ -86,8 +86,7 @@ function ShareMap() {
   const [showLayersControl, setShowLayersControl] = useState(false);
   const [classes, setClasses] = useState([]);
   const [aoiInfo, setAoiInfo] = useState({ id: null, projectId: null });
-  const { mosaicList } = useContext(GlobalContext);
-  const mosaics = mosaicList.isReady() ? mosaicList.getData().mosaics : null;
+  const mosaics = useMosaics();
   const mosaic = mosaics && mosaics.length > 0 ? mosaics[0] : null;
 
   useEffect(() => {
