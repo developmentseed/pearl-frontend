@@ -81,7 +81,7 @@ export function InstanceProvider(props) {
   } = useCheckpoint();
   const { currentProject, setCurrentProject, projectName } = useProject();
   const { dispatchPredictions } = usePredictions();
-  const { currentAoi, aoiName, aoiRef } = useAoi();
+  const { currentAoi, aoiName, aoiRef, setAoiList } = useAoi();
   const { dispatchAoiPatch } = useAoiPatch();
   const { selectedModel } = useModel();
 
@@ -99,12 +99,6 @@ export function InstanceProvider(props) {
   };
 
   const [runningBatch, setRunningBatch] = useState(false);
-  const [runningBatchWatcher, setRunningBatchWatcher] = useState(null);
-
-  // Clear interval on page unmount
-  useEffect(() => {
-    return () => runningBatchWatcher && clearInterval(runningBatchWatcher);
-  }, []);
 
   // Create a message queue to wait for instance connection
   const [messageQueue, dispatchMessageQueue] = useReducer(
@@ -370,23 +364,26 @@ export function InstanceProvider(props) {
     });
   }
 
-  async function refreshRunningBatch(batchId) {
+  async function refreshRunningBatch(batchId, timeout) {
     try {
       const batch = await restApiClient.get(
         `project/${currentProject.id}/batch/${batchId}`
       );
+
       if (batch.completed) {
-        clearInterval(runningBatchWatcher);
+
+        // Batch is complete
         setRunningBatch(false);
       } else {
         setRunningBatch(batch);
+        // Poll for batch progress if not complete
+        setTimeout(() => {
+          refreshRunningBatch(batchId, timeout);
+        }, timeout);
       }
     } catch (error) {
       logger(error);
       setRunningBatch(false);
-      if (runningBatchWatcher) {
-        clearInterval(runningBatchWatcher);
-      }
     }
   }
 
@@ -398,12 +395,8 @@ export function InstanceProvider(props) {
         );
         if (batches.length > 0) {
           const { id: batchId } = batches[0];
-          setRunningBatchWatcher(
-            setInterval(
-              () => refreshRunningBatch(batchId),
-              BATCH_REFRESH_INTERVAL
-            )
-          );
+
+          refreshRunningBatch(batchId, BATCH_REFRESH_INTERVAL);
         } else {
           setRunningBatch(false);
         }
@@ -581,6 +574,8 @@ export function InstanceProvider(props) {
           );
           setRunningBatch(batch);
           getRunningBatch();
+
+          // Update aoi list with new batch area
         } catch (error) {
           logger(error);
           toasts.error(

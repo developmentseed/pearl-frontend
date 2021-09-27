@@ -244,12 +244,11 @@ function PrimeButton({
         // Allow retrain if sampleCount is nonzero
         return false;
       } else {
-        return true
+        return true;
       }
     }
   };
   const isDisabled = checkDisabledState();
-
 
   return (
     <InfoButton
