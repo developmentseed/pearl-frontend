@@ -449,7 +449,7 @@ function ExploreHeader(props) {
         revealed={!projectName && projectId && projectId === 'new'}
         size='small'
         closeButton={true}
-        onCloseClick={() => history.goBack()}
+        onCloseClick={() => history.push('/profile/projects')}
         content={
           <ModalForm onSubmit={handleSubmit}>
             <HeadingInput
