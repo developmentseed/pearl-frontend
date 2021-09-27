@@ -80,8 +80,8 @@ function Root() {
                     component={Project}
                   />
                   <Route path='/about' component={About} />
+                  <Route path='*' component={UhOh} />
                 </>
-                <Route path='*' component={UhOh} />
               </Switch>
               <ToastContainerCustom />
             </GlobalContextProvider>
