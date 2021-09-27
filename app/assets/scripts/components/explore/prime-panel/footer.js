@@ -227,13 +227,29 @@ function PrimeButton({
   const run = runTypes[runType];
 
   const { mode } = sessionStatus;
-  let isDisabled = !(
-    mode === 'prediction-ready' ||
-    (mode === 'retrain-ready' &&
-      currentCheckpoint &&
-      currentCheckpoint.sampleCount > 0) ||
-    (runningBatch && isBatchArea)
-  );
+
+  const checkDisabledState = () => {
+    if (mode === 'prediction-ready') {
+      // Only one batch prediction permitted at a time
+      if (runningBatch && isBatchArea) {
+        return true;
+      } else {
+        return false;
+      }
+    } else if (mode === 'retrain-ready') {
+      // No retrain permitted for batch area
+      if (isBatchArea) {
+        return true;
+      } else if (currentCheckpoint?.sampleCount > 0) {
+        // Allow retrain if sampleCount is nonzero
+        return false;
+      } else {
+        return true
+      }
+    }
+  };
+  const isDisabled = checkDisabledState();
+
 
   return (
     <InfoButton
