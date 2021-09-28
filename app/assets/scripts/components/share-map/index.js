@@ -99,7 +99,7 @@ function ShareMap() {
       })
       .catch((error) => {
         logger(error);
-        toasts.error('Could not load Shared AOI data');
+        toasts.error('There was an error loading AOI map tiles.');
       });
     restApiClient.getAOIFromUUID(uuid).then((aoiData) => {
       setClasses(aoiData.classes);
