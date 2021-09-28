@@ -25,6 +25,7 @@ const AuthContext = createContext(null);
  */
 function InnerAuthProvider(props) {
   const {
+    loginWithRedirect,
     isAuthenticated,
     error: auth0Error,
     user,
@@ -99,6 +100,7 @@ function InnerAuthProvider(props) {
     isLoading,
     authStateIsLoading: authState.isLoading,
     refreshAuth: fetchToken,
+    login: () => loginWithRedirect(),
     logout: () =>
       dispatchAuthState({
         type: actions.LOGOUT,
@@ -226,6 +228,7 @@ export const useAuth = () => {
     isLoading,
     authStateIsLoading,
     refreshAuth,
+    login,
   } = useCheckContext('useAuth');
 
   return useMemo(() => {
@@ -245,6 +248,13 @@ export const useAuth = () => {
       user,
       isAuthenticated,
       refreshAuth,
+      login,
     };
-  }, [apiToken, isLoading, authStateIsLoading, user, isAuthenticated]);
+  }, [
+    apiToken,
+    isLoading,
+    authStateIsLoading,
+    user && user.id,
+    isAuthenticated,
+  ]);
 };

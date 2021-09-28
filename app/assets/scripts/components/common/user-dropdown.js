@@ -26,8 +26,8 @@ const propsToFilter = [
 const StyledLink = filterComponentProps(Link, propsToFilter);
 
 function UserDropdown() {
-  const { loginWithRedirect, logout } = useAuth0();
-  const { isAuthenticated, user, authStateIsLoading } = useAuth();
+  const { logout } = useAuth0();
+  const { isAuthenticated, user, authStateIsLoading, login } = useAuth();
 
   const logoutWithRedirect = () =>
     logout({
@@ -54,7 +54,7 @@ function UserDropdown() {
           className='button-class'
           data-cy='login-button'
           title='log in button'
-          onClick={() => loginWithRedirect()}
+          onClick={() => login()}
         >
           Log in
         </Button>

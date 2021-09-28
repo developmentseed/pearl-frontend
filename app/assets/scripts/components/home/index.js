@@ -125,8 +125,7 @@ const StatusSection = styled.section`
 
 function Home() {
   const [apiHealth, setApiHealth] = useState('Loading...');
-  const { loginWithRedirect } = useAuth0();
-  const { isAuthenticated } = useAuth();
+  const { login, isAuthenticated } = useAuth();
 
   // Fetch API health message on mount
   useEffect(() => {
@@ -177,7 +176,7 @@ function Home() {
                 variation='primary-raised-dark'
                 className='button-class'
                 title='Log in to launch app'
-                onClick={() => loginWithRedirect()}
+                onClick={() => login()}
               >
                 Sign Up to Start Mapping
               </Button>
