@@ -12,6 +12,7 @@ import {
   MAX_BASE_MAP_ZOOM_LEVEL,
   BaseMapLayer,
 } from '../common/map/base-map-layer';
+import { BOUNDS_PADDING } from '../common/map/constants';
 import config from '../../config';
 import { useAuth } from '../../context/auth';
 import logger from '../../utils/logger';
@@ -90,26 +91,28 @@ function ShareMap() {
   const mosaic = mosaics && mosaics.length > 0 ? mosaics[0] : null;
 
   useEffect(() => {
-    async function fetchData() {
-      if (!mapRef) return;
-      try {
-        const tileJSON = await restApiClient.getTileJSONFromUUID(uuid);
+    if (!mapRef) return;
+    restApiClient
+      .getTileJSONFromUUID(uuid)
+      .then((tileJSON) => {
         setTileUrl(`${restApiEndpoint}${tileJSON.tiles[0]}`);
-        const bounds = [
-          [tileJSON.bounds[3], tileJSON.bounds[0]],
-          [tileJSON.bounds[1], tileJSON.bounds[2]],
-        ];
-        mapRef.fitBounds(bounds);
-        const aoiData = await restApiClient.getAOIFromUUID(uuid);
-        setClasses(aoiData.classes);
-        setAoiInfo({ id: aoiData.aoi_id, projectId: aoiData.project_id });
-      } catch (error) {
+      })
+      .catch((error) => {
         logger(error);
-        toasts.error('Could not load AOI map');
+        toasts.error('Could not load Shared AOI data');
+      });
+    restApiClient.getAOIFromUUID(uuid).then((aoiData) => {
+      setClasses(aoiData.classes);
+      setAoiInfo({ id: aoiData.aoi_id, projectId: aoiData.project_id });
+      if (aoiData.bounds && aoiData.bounds.coordinates) {
+        const bounds = [
+          aoiData.bounds.coordinates[0][0].reverse(),
+          aoiData.bounds.coordinates[0][2].reverse(),
+        ];
+        mapRef.fitBounds(bounds, { padding: BOUNDS_PADDING });
       }
-    }
-    fetchData();
-  }, [uuid, mapRef, tileUrl]);
+    });
+  }, [uuid, mapRef]);
 
   return (
     <App pageTitle='AOI Map'>
