@@ -10,7 +10,6 @@ import {
   DropdownTrigger,
 } from '../../styles/dropdown';
 import { Heading } from '@devseed-ui/typography';
-import { useAuth0 } from '@auth0/auth0-react';
 import { filterComponentProps } from '../../styles/utils/general';
 import { useAuth } from '../../context/auth';
 
@@ -26,13 +25,13 @@ const propsToFilter = [
 const StyledLink = filterComponentProps(Link, propsToFilter);
 
 function UserDropdown() {
-  const { logout } = useAuth0();
-  const { isAuthenticated, user, authStateIsLoading, login } = useAuth();
-
-  const logoutWithRedirect = () =>
-    logout({
-      returnTo: window.location.origin,
-    });
+  const {
+    isAuthenticated,
+    user,
+    authStateIsLoading,
+    login,
+    logout,
+  } = useAuth();
 
   if (authStateIsLoading) {
     return (
@@ -109,10 +108,7 @@ function UserDropdown() {
               </li>
             </DropdownBody>
             <DropdownFooter>
-              <DropdownItem
-                useIcon='logout'
-                onClick={() => logoutWithRedirect()}
-              >
+              <DropdownItem useIcon='logout' onClick={logout}>
                 Sign Out
               </DropdownItem>
             </DropdownFooter>

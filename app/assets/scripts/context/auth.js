@@ -11,7 +11,6 @@ import config from '../config';
 import logger from '../utils/logger';
 import history from '../history';
 import RestApiClient from '../utils/rest-api-client';
-import toasts from '../components/common/toasts';
 import {
   getLocalStorageItem,
   setLocalStorageItem,
@@ -31,6 +30,7 @@ function InnerAuthProvider(props) {
     user,
     isLoading,
     getAccessTokenSilently,
+    logout: logoutAuth0,
   } = useAuth0();
   const [authState, dispatchAuthState] = useReducer(authReducer, {});
 
@@ -101,10 +101,14 @@ function InnerAuthProvider(props) {
     authStateIsLoading: authState.isLoading,
     refreshAuth: fetchToken,
     login: () => loginWithRedirect(),
-    logout: () =>
+    logout: () => {
+      logoutAuth0({
+        returnTo: window.location.origin,
+      });
       dispatchAuthState({
         type: actions.LOGOUT,
-      }),
+      });
+    },
   };
 
   return (
@@ -183,7 +187,6 @@ const authReducer = function (state, action) {
         ...initialState,
         isAuthenticated: false,
       };
-      toasts.error('Authentication error. Log in and try again.');
       break;
     }
     default:
@@ -224,11 +227,11 @@ export const useAuth = () => {
     apiToken,
     user,
     isAuthenticated,
-    logout,
     isLoading,
     authStateIsLoading,
     refreshAuth,
     login,
+    logout,
   } = useCheckContext('useAuth');
 
   return useMemo(() => {
@@ -249,6 +252,7 @@ export const useAuth = () => {
       isAuthenticated,
       refreshAuth,
       login,
+      logout,
     };
   }, [
     apiToken,

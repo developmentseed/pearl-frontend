@@ -16,7 +16,6 @@ import { themeVal, media, glsp } from '@devseed-ui/theme-provider';
 import { StyledLink } from '../../styles/links';
 
 import { fetchJSON } from '../../utils/utils';
-import { useAuth0 } from '@auth0/auth0-react';
 import { useAuth } from '../../context/auth';
 
 import config from '../../config';
