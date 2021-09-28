@@ -87,7 +87,7 @@ function ShareMap() {
   const [showLayersControl, setShowLayersControl] = useState(false);
   const [classes, setClasses] = useState([]);
   const [aoiInfo, setAoiInfo] = useState({ id: null, projectId: null });
-  const mosaics = useMosaics();
+  const { mosaics } = useMosaics();
   const mosaic = mosaics && mosaics.length > 0 ? mosaics[0] : null;
 
   useEffect(() => {
@@ -109,7 +109,10 @@ function ShareMap() {
           aoiData.bounds.coordinates[0][0].reverse(),
           aoiData.bounds.coordinates[0][2].reverse(),
         ];
-        mapRef.fitBounds(bounds, { padding: BOUNDS_PADDING });
+        mapRef.fitBounds(bounds, {
+          padding: BOUNDS_PADDING,
+          maxZoom: MAX_BASE_MAP_ZOOM_LEVEL,
+        });
       }
     });
   }, [uuid, mapRef]);
