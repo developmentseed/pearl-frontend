@@ -185,7 +185,9 @@ describe('Create new project', () => {
           phase: 'Running',
         },
       }
-    );
+    ).as('fetchInstanceStatus');
+
+    cy.wait('@fetchInstanceStatus');
 
     cy.get('[data-cy=session-status]').should(
       'have.text',

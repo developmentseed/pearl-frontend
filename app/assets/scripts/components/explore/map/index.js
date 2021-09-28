@@ -21,6 +21,10 @@ import { useMapRef, useMapLayers, useUserLayers } from '../../../context/map';
 import GeoCoder from '../../common/map/geocoder';
 import GenericControl from '../../common/map/generic-control';
 import { BOUNDS_PADDING } from '../../common/map/constants';
+import {
+  MAX_BASE_MAP_ZOOM_LEVEL,
+  BaseMapLayer,
+} from '../../common/map/base-map-layer';
 import CenterMap from '../../common/map/center-map';
 
 import { themeVal, multiply } from '@devseed-ui/theme-provider';
@@ -52,7 +56,6 @@ import PolygonDrawControl from './polygon-draw-control';
 
 const center = [38.889805, -77.009056];
 const zoom = 12;
-const osmTilesMaxZoom = 19;
 
 const MAX = 3;
 const NO_LIVE = 2;
@@ -379,7 +382,7 @@ function Map() {
         tap={false}
         center={center}
         zoom={zoom}
-        maxZoom={osmTilesMaxZoom}
+        maxZoom={MAX_BASE_MAP_ZOOM_LEVEL}
         boxZoom={false}
         style={{ height: '100%' }}
         whenCreated={(m) => {
@@ -431,11 +434,7 @@ function Map() {
           />
         )}
 
-        <TileLayer
-          attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-          url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-          maxZoom={osmTilesMaxZoom}
-        />
+        <BaseMapLayer />
         {mosaics &&
           mosaics.map((layer) => (
             <TileLayer
