@@ -283,7 +283,7 @@ describe('Batch predictions', () => {
     cy.get('[data-cy=batch-progress-message').should('not.exist');
   });
 
-  it.only('Inference and retrain can happen during batch', () => {
+  it('Inference and retrain can happen during batch', () => {
     /**
      * GET /project/:id/instance/:id
      */
