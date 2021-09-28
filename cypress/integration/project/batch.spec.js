@@ -283,7 +283,7 @@ describe('Batch predictions', () => {
     cy.get('[data-cy=batch-progress-message').should('not.exist');
   });
 
-  it('Inference and retrain can happen during batch', () => {
+  it.only('Inference and retrain can happen during batch', () => {
     /**
      * GET /project/:id/instance/:id
      */
@@ -387,17 +387,8 @@ describe('Batch predictions', () => {
     );
 
     cy.get('[data-cy=aoi-selection-trigger]').click();
+    cy.get('[data-cy=add-aoi-button]').click();
 
-    // Should be able to run inference on non batch aoi
-
-    cy.get('.listed-aoi').contains('Rockville').click();
-    cy.get('[data-cy=run-button').should('have.attr', 'data-disabled', 'false');
-
-    cy.get('[data-cy=aoi-selection-trigger]').click();
-    cy.get('[data-cy=add-aoi-button]').click({ force: true });
-    cy.get('.leaflet-control-zoom-out').click({ force: true });
-    cy.get('.leaflet-control-zoom-out').click({ force: true });
-    cy.get('.leaflet-control-zoom-out').click({ force: true });
     cy.get('#map')
       .trigger('mousedown', 150, 150)
       .trigger('mousemove', 400, 400)
@@ -407,6 +398,12 @@ describe('Batch predictions', () => {
 
     // Only one batch operation allowed at a time
     cy.get('[data-cy=run-button').should('have.attr', 'data-disabled', 'true');
+
+    cy.get('[data-cy=aoi-selection-trigger]').click();
+
+    // Should be able to run inference on non batch aoi
+    cy.get('.listed-aoi').contains('Rockville').click();
+    cy.get('[data-cy=run-button').should('have.attr', 'data-disabled', 'false');
   });
 
   it('in project page, display completed and running batch jobs', () => {
