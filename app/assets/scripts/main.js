@@ -35,7 +35,9 @@ const ProtectedRoute = (
 ) => (
   <Route
     component={
-      window.Cypress ? component : withAuthenticationRequired(component)
+      window.Cypress && window.localStorage.getItem('useFakeLogin')
+        ? component
+        : withAuthenticationRequired(component)
     }
     {...args}
   />
@@ -60,25 +62,24 @@ function Root() {
               <CollecticonsGlobalStyle />
               <GlobalStyles />
               <Switch>
-                <>
-                  <Route exact path='/' component={Home} />
-                  <Route path='/share/:uuid/map' component={ShareMap} />
-                  <ProtectedRoute
-                    path='/project/:projectId'
-                    component={Explore}
-                  />
-                  <ProtectedRoute exact path='/profile/maps' component={Maps} />
-                  <ProtectedRoute
-                    exact
-                    path='/profile/projects'
-                    component={Projects}
-                  />
-                  <Route
-                    path='/profile/projects/:projectId'
-                    component={Project}
-                  />
-                  <Route path='/about' component={About} />
-                </>
+                <Route exact path='/' component={Home} />
+                <Route exact path='/share/:uuid/map' component={ShareMap} />
+                <ProtectedRoute
+                  path='/project/:projectId'
+                  component={Explore}
+                />
+                <ProtectedRoute exact path='/profile/maps' component={Maps} />
+                <ProtectedRoute
+                  exact
+                  path='/profile/projects'
+                  component={Projects}
+                />
+                <ProtectedRoute
+                  exact
+                  path='/profile/projects/:projectId'
+                  component={Project}
+                />
+                <Route exact path='/about' component={About} />
                 <Route path='*' component={UhOh} />
               </Switch>
               <ToastContainerCustom />

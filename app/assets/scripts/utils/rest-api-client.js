@@ -1,13 +1,11 @@
 import get from 'lodash.get';
 import config from '../config';
-import logger from './logger';
 import { fetchJSON } from './utils';
 const { restApiEndpoint } = config;
 
 class RestApiClient {
   constructor(props) {
     this.apiToken = props.apiToken;
-    this.handleUnauthorized = props.handleUnauthorized;
 
     this.defaultOptions = {
       headers: {
@@ -38,11 +36,7 @@ class RestApiClient {
     }
 
     // Fetch data and let errors to be handle by the caller
-    return fetchJSON(url, options)
-      .then((res) => res.body)
-      .catch((e) =>
-        e.statusCode === 401 ? this.handleUnauthorized() : logger(e)
-      );
+    return fetchJSON(url, options).then((res) => res.body);
   }
 
   get(path, format = 'json') {

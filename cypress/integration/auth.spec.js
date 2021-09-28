@@ -1,21 +1,57 @@
 const {
+  auth0Domain,
   restApiEndpoint,
 } = require('../../app/assets/scripts/config/testing').default;
 
 describe('The app header', () => {
   beforeEach(() => {
     cy.startServer();
-    cy.fakeLogin();
   });
 
   it('shows the account button when logged in', () => {
+    cy.fakeLogin();
     cy.visit('/');
     cy.get('body');
     cy.get('[data-cy=account-button]').should('exist');
     cy.get('[data-cy=login-button]').should('not.exist');
   });
 
-  it('when a 401 request happens, sign out the user and show the log in button', () => {
+  it('/project/new is protected', () => {
+    cy.visit('/project/new');
+    cy.location().should((loc) => {
+      expect(loc.host).to.include(auth0Domain);
+    });
+  });
+
+  it('/project/:id is protected', () => {
+    cy.visit('/project/1');
+    cy.location().should((loc) => {
+      expect(loc.host).to.include(auth0Domain);
+    });
+  });
+
+  it('/profile/maps is protected', () => {
+    cy.visit('/profile/maps');
+    cy.location().should((loc) => {
+      expect(loc.host).to.include(auth0Domain);
+    });
+  });
+
+  it('/profile/projects is protected', () => {
+    cy.visit('/profile/projects');
+    cy.location().should((loc) => {
+      expect(loc.host).to.include(auth0Domain);
+    });
+  });
+
+  it('/profile/projects/:id is protected', () => {
+    cy.visit('/profile/projects/:1');
+    cy.location().should((loc) => {
+      expect(loc.host).to.include(auth0Domain);
+    });
+  });
+
+  it('when a generic 401 status happens, redirect to login', () => {
     cy.intercept(
       {
         url: restApiEndpoint + '/api/*',
@@ -32,11 +68,7 @@ describe('The app header', () => {
     cy.visit('/project/1');
 
     cy.location().should((loc) => {
-      expect(loc.pathname).to.eq('/');
+      expect(loc.host).to.include(auth0Domain);
     });
-
-    cy.get('body');
-    cy.get('[data-cy=account-button]').should('not.exist');
-    cy.get('[data-cy=login-button]').should('exist');
   });
 });
