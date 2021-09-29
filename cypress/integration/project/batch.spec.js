@@ -6,6 +6,20 @@ const {
   restApiEndpoint,
 } = require('../../../app/assets/scripts/config/testing').default;
 
+const instance = {
+  id: 1,
+  project_id: 1,
+  aoi_id: 2088,
+  checkpoint_id: 2,
+  last_update: '2021-07-12T09:59:04.442Z',
+  created: '2021-07-12T09:58:57.459Z',
+  active: true,
+  token: 'app_client',
+  status: {
+    phase: 'Running',
+  },
+};
+
 describe('Batch predictions', () => {
   beforeEach(() => {
     cy.startServer();
@@ -225,6 +239,9 @@ describe('Batch predictions', () => {
       }
     );
 
+    // Concurrent batch runs are not allowed
+    cy.get('[data-cy=run-button').should('have.attr', 'data-disabled', 'true');
+
     cy.get('[data-cy=batch-progress-message')
       .should('include.text', 'Batch prediction in progress: 20%')
       .click();
@@ -264,6 +281,128 @@ describe('Batch predictions', () => {
     // New runs are allowed
     cy.get('[data-cy=run-button').should('have.attr', 'data-disabled', 'false');
     cy.get('[data-cy=batch-progress-message').should('not.exist');
+  });
+
+  it('Inference and retrain can happen during batch', () => {
+    /**
+     * GET /project/:id/instance/:id
+     */
+    cy.intercept(
+      {
+        url: restApiEndpoint + '/api/project/1/instance/1',
+      },
+      instance
+    );
+
+    cy.intercept(
+      {
+        url: restApiEndpoint + '/api/project/1/aoi',
+      },
+      {
+        fixture: 'aois-with-batch.json',
+      }
+    ).as('loadAoisWithBatch');
+    cy.intercept(
+      {
+        url: restApiEndpoint + '/api/project/1/aoi/2088',
+      },
+      {
+        fixture: 'aoi-2088.json',
+      }
+    ).as('batchAoi');
+
+    cy.fakeLogin();
+
+    cy.visit('/project/1');
+    cy.wait('@loadAoisWithBatch');
+    cy.wait(['@batchAoi', '@fetchCheckpoint2']);
+
+    // Edit AOI to treat as new one
+    cy.get('[data-cy=aoi-edit-button]').click();
+    cy.get('[data-cy=aoi-edit-confirm-button]').click();
+
+    cy.get('[data-cy=proceed-anyway-button]').should('exist').click();
+    cy.wait('@reverseGeocodeCity');
+
+    // Start batch
+    cy.get('[data-cy=run-button')
+      .should('have.text', 'Run Batch Prediction')
+      .click();
+    // Mock batch job at 0%
+    cy.intercept(
+      {
+        url: restApiEndpoint + `/api/project/1/batch?completed=false`,
+      },
+      {
+        total: 1,
+        batch: [
+          {
+            count: 1,
+            id: 1,
+            abort: false,
+            created: 1630056802895,
+            updated: 1630056976364,
+            aoi: 1,
+            name: 'Wesley Heights',
+            completed: false,
+            progress: 0,
+          },
+        ],
+      }
+    );
+
+    const batchJob = {
+      id: 1,
+      uid: 1,
+      project_id: 1,
+      created: 1630056802895,
+      updated: 1630056802895,
+      aoi: null,
+      name: 'Wesley Heights',
+      bounds: {
+        type: 'Polygon',
+        coordinates: [
+          [
+            [-77.13016844644744, 38.88544827129372],
+            [-77.04706107549731, 38.88544827129372],
+            [-77.04706107549731, 38.974905373957455],
+            [-77.13016844644744, 38.974905373957455],
+            [-77.13016844644744, 38.88544827129372],
+          ],
+        ],
+      },
+      abort: false,
+      completed: false,
+      progress: 0,
+      instance: 1,
+    };
+
+    cy.intercept(
+      {
+        url: restApiEndpoint + '/api/project/1/batch/1',
+        method: 'GET',
+      },
+      batchJob
+    );
+
+    cy.get('[data-cy=aoi-selection-trigger]').click();
+    cy.get('[data-cy=add-aoi-button]').click();
+
+    cy.get('#map')
+      .trigger('mousedown', 150, 150)
+      .trigger('mousemove', 400, 400)
+      .trigger('mouseup');
+    cy.get('[data-cy=proceed-anyway-button]').should('exist').click();
+    cy.wait('@reverseGeocodeCity');
+
+    // Only one batch operation allowed at a time
+    cy.get('[data-cy=run-button').should('have.attr', 'data-disabled', 'true');
+
+    cy.get('[data-cy=aoi-selection-trigger]').click();
+
+    // Should be able to run inference on non batch aoi
+    cy.get('.listed-aoi').contains('Rockville').click();
+    cy.get('[data-cy=run-button').should('have.attr', 'data-disabled', 'false');
   });
 
   it('in project page, display completed and running batch jobs', () => {

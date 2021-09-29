@@ -278,6 +278,7 @@ function Header(props) {
                 <li key={a.id}>
                   <DropdownItem
                     checked={a.name == aoiName}
+                    className='listed-aoi'
                     onClick={() => {
                       const relevantAoi = findCompatibleAoi(
                         a,
