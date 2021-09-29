@@ -312,7 +312,6 @@ describe('Batch predictions', () => {
     ).as('batchAoi');
 
     cy.fakeLogin();
-    //cy.setWebsocketWorkflow('retrain');
 
     cy.visit('/project/1');
     cy.wait('@loadAoisWithBatch');

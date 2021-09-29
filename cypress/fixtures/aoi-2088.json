@@ -1,1 +1,35 @@
-{"id":2088,"name":"Derwood","created":1632766179168,"storage":true,"bookmarked":false,"project_id":966,"checkpoint_id":2,"patches":[],"px_stats":{"0":0.016779691001297323,"1":0.6555917561033141,"2":0.14320232338719188,"3":0.18442622950819673},"classes":[{"name":"Water / Wetland","color":"#486DA2"},{"name":"Tree","color":"#6CA966"},{"name":"Low Vegetation / Barren","color":"#D0F3AB"},{"name":"Built Environment","color":"#BFB5B5"}],"bounds":{"type":"Polygon","coordinates":[[[-77.10290329,39.103477125],[-77.044200897,39.103477125],[-77.044200897,39.179923694],[-77.10290329,39.179923694],[-77.10290329,39.103477125]]]},"shares":[]}
+{
+  "id": 2088,
+  "name": "Derwood",
+  "created": 1632766179168,
+  "storage": true,
+  "bookmarked": false,
+  "project_id": 966,
+  "checkpoint_id": 2,
+  "patches": [],
+  "px_stats": {
+    "0": 0.016779691001297323,
+    "1": 0.6555917561033141,
+    "2": 0.14320232338719188,
+    "3": 0.18442622950819673
+  },
+  "classes": [
+    { "name": "Water / Wetland", "color": "#486DA2" },
+    { "name": "Tree", "color": "#6CA966" },
+    { "name": "Low Vegetation / Barren", "color": "#D0F3AB" },
+    { "name": "Built Environment", "color": "#BFB5B5" }
+  ],
+  "bounds": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [-77.10290329, 39.103477125],
+        [-77.044200897, 39.103477125],
+        [-77.044200897, 39.179923694],
+        [-77.10290329, 39.179923694],
+        [-77.10290329, 39.103477125]
+      ]
+    ]
+  },
+  "shares": []
+}

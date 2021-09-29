@@ -1,1 +1,210 @@
-{"total":6,"project_id":1,"aois":[{"id":2088,"name":"Derwood","bookmarked":false,"bounds":{"type":"Polygon","coordinates":[[[-77.18290329,39.103477125],[-77.044200897,39.103477125],[-77.044200897,39.179923694],[-77.18290329,39.179923694],[-77.18290329,39.103477125]]]},"px_stats":{"0":0.016779691001297323,"1":0.6555917561033141,"2":0.14320232338719188,"3":0.18442622950819673},"created":1632766179168,"storage":true,"checkpoint_id":2,"checkpoint_name":"West Potomac Park","classes":[{"name":"Water / Wetland","color":"#486DA2"},{"name":"Tree","color":"#6CA966"},{"name":"Low Vegetation / Barren","color":"#D0F3AB"},{"name":"Built Environment","color":"#BFB5B5"}],"shares":[]},{"id":2,"name":"Rockville","bookmarked":false,"bounds":{"type":"Polygon","coordinates":[[[-77.16643855,39.047404603],[-77.027736157,39.047404603],[-77.027736157,39.123851172],[-77.16643855,39.123851172],[-77.16643855,39.047404603]]]},"px_stats":{"0":0.022108262108262108,"1":0.6038924038924038,"2":0.1160913160913161,"3":0.25790801790801793},"created":1632765677944,"storage":true,"checkpoint_id":1,"checkpoint_name":"West Potomac Park","classes":[{"name":"Water / Wetland","color":"#486DA2"},{"name":"Tree","color":"#6CA966"},{"name":"Low Vegetation / Barren","color":"#D0F3AB"},{"name":"Built Environment","color":"#BFB5B5"}],"shares":[]},{"id":2086,"name":"Kensington","bookmarked":false,"bounds":{"type":"Polygon","coordinates":[[[-77.150816024,39.000644293],[-77.012113631,39.000644293],[-77.012113631,39.077090862],[-77.150816024,39.077090862],[-77.150816024,39.000644293]]]},"px_stats":{"0":0.02269993901083555,"1":0.6150771484430664,"2":0.08582514919545602,"3":0.2763977633506421},"created":1632763748843,"storage":true,"checkpoint_id":1,"checkpoint_name":"West Potomac Park","classes":[{"name":"Water / Wetland","color":"#486DA2"},{"name":"Tree","color":"#6CA966"},{"name":"Low Vegetation / Barren","color":"#D0F3AB"},{"name":"Built Environment","color":"#BFB5B5"}],"shares":[]},{"id":2084,"name":"Chevy Chase","bookmarked":false,"bounds":{"type":"Polygon","coordinates":[[[-77.136468888,38.919800614],[-76.997766495,38.919800614],[-76.997766495,38.996247183],[-77.136468888,38.996247183],[-77.136468888,38.919800614]]]},"px_stats":{"0":0.032728179906625327,"1":0.5939399123275955,"2":0.07080366370861399,"3":0.3025282440571653},"created":1632763185702,"storage":true,"checkpoint_id":1,"checkpoint_name":"West Potomac Park","classes":[{"name":"Water / Wetland","color":"#486DA2"},{"name":"Tree","color":"#6CA966"},{"name":"Low Vegetation / Barren","color":"#D0F3AB"},{"name":"Built Environment","color":"#BFB5B5"}],"shares":[]},{"id":2082,"name":"Southwest","bookmarked":false,"bounds":{"type":"Polygon","coordinates":[[[-77.084197998,38.833289357],[-76.945495605,38.833289357],[-76.945495605,38.909735926],[-77.084197998,38.909735926],[-77.084197998,38.833289357]]]},"px_stats":{"0":0.14885048929943295,"1":0.3046374839948784,"2":0.1282996273093104,"3":0.4182123993963783},"created":1632762794355,"storage":true,"checkpoint_id":1518,"checkpoint_name":"West Potomac Park","classes":[{"name":"Water / Wetland","color":"#486DA2"},{"name":"Tree","color":"#6CA966"},{"name":"Low Vegetation / Barren","color":"#D0F3AB"},{"name":"Built Environment","color":"#BFB5B5"}],"shares":[]},{"id":2081,"name":"West Potomac Park","bookmarked":false,"bounds":{"type":"Polygon","coordinates":[[[-77.069091797,38.882481198],[-77.036132813,38.882481198],[-77.036132813,38.895308255],[-77.069091797,38.895308255],[-77.069091797,38.882481198]]]},"px_stats":{"0":0.3081020615904337,"1":0.2929203440831348,"2":0.17539738469971028,"3":0.22358020962672126},"created":1632762752689,"storage":true,"checkpoint_id":1518,"checkpoint_name":"West Potomac Park","classes":[{"name":"Water / Wetland","color":"#486DA2"},{"name":"Tree","color":"#6CA966"},{"name":"Low Vegetation / Barren","color":"#D0F3AB"},{"name":"Built Environment","color":"#BFB5B5"}],"shares":[]}]}
+{
+  "total": 6,
+  "project_id": 1,
+  "aois": [
+    {
+      "id": 2088,
+      "name": "Derwood",
+      "bookmarked": false,
+      "bounds": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-77.18290329, 39.103477125],
+            [-77.044200897, 39.103477125],
+            [-77.044200897, 39.179923694],
+            [-77.18290329, 39.179923694],
+            [-77.18290329, 39.103477125]
+          ]
+        ]
+      },
+      "px_stats": {
+        "0": 0.016779691001297323,
+        "1": 0.6555917561033141,
+        "2": 0.14320232338719188,
+        "3": 0.18442622950819673
+      },
+      "created": 1632766179168,
+      "storage": true,
+      "checkpoint_id": 2,
+      "checkpoint_name": "West Potomac Park",
+      "classes": [
+        { "name": "Water / Wetland", "color": "#486DA2" },
+        { "name": "Tree", "color": "#6CA966" },
+        { "name": "Low Vegetation / Barren", "color": "#D0F3AB" },
+        { "name": "Built Environment", "color": "#BFB5B5" }
+      ],
+      "shares": []
+    },
+    {
+      "id": 2,
+      "name": "Rockville",
+      "bookmarked": false,
+      "bounds": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-77.16643855, 39.047404603],
+            [-77.027736157, 39.047404603],
+            [-77.027736157, 39.123851172],
+            [-77.16643855, 39.123851172],
+            [-77.16643855, 39.047404603]
+          ]
+        ]
+      },
+      "px_stats": {
+        "0": 0.022108262108262108,
+        "1": 0.6038924038924038,
+        "2": 0.1160913160913161,
+        "3": 0.25790801790801793
+      },
+      "created": 1632765677944,
+      "storage": true,
+      "checkpoint_id": 1,
+      "checkpoint_name": "West Potomac Park",
+      "classes": [
+        { "name": "Water / Wetland", "color": "#486DA2" },
+        { "name": "Tree", "color": "#6CA966" },
+        { "name": "Low Vegetation / Barren", "color": "#D0F3AB" },
+        { "name": "Built Environment", "color": "#BFB5B5" }
+      ],
+      "shares": []
+    },
+    {
+      "id": 2086,
+      "name": "Kensington",
+      "bookmarked": false,
+      "bounds": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-77.150816024, 39.000644293],
+            [-77.012113631, 39.000644293],
+            [-77.012113631, 39.077090862],
+            [-77.150816024, 39.077090862],
+            [-77.150816024, 39.000644293]
+          ]
+        ]
+      },
+      "px_stats": {
+        "0": 0.02269993901083555,
+        "1": 0.6150771484430664,
+        "2": 0.08582514919545602,
+        "3": 0.2763977633506421
+      },
+      "created": 1632763748843,
+      "storage": true,
+      "checkpoint_id": 1,
+      "checkpoint_name": "West Potomac Park",
+      "classes": [
+        { "name": "Water / Wetland", "color": "#486DA2" },
+        { "name": "Tree", "color": "#6CA966" },
+        { "name": "Low Vegetation / Barren", "color": "#D0F3AB" },
+        { "name": "Built Environment", "color": "#BFB5B5" }
+      ],
+      "shares": []
+    },
+    {
+      "id": 2084,
+      "name": "Chevy Chase",
+      "bookmarked": false,
+      "bounds": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-77.136468888, 38.919800614],
+            [-76.997766495, 38.919800614],
+            [-76.997766495, 38.996247183],
+            [-77.136468888, 38.996247183],
+            [-77.136468888, 38.919800614]
+          ]
+        ]
+      },
+      "px_stats": {
+        "0": 0.032728179906625327,
+        "1": 0.5939399123275955,
+        "2": 0.07080366370861399,
+        "3": 0.3025282440571653
+      },
+      "created": 1632763185702,
+      "storage": true,
+      "checkpoint_id": 1,
+      "checkpoint_name": "West Potomac Park",
+      "classes": [
+        { "name": "Water / Wetland", "color": "#486DA2" },
+        { "name": "Tree", "color": "#6CA966" },
+        { "name": "Low Vegetation / Barren", "color": "#D0F3AB" },
+        { "name": "Built Environment", "color": "#BFB5B5" }
+      ],
+      "shares": []
+    },
+    {
+      "id": 2082,
+      "name": "Southwest",
+      "bookmarked": false,
+      "bounds": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-77.084197998, 38.833289357],
+            [-76.945495605, 38.833289357],
+            [-76.945495605, 38.909735926],
+            [-77.084197998, 38.909735926],
+            [-77.084197998, 38.833289357]
+          ]
+        ]
+      },
+      "px_stats": {
+        "0": 0.14885048929943295,
+        "1": 0.3046374839948784,
+        "2": 0.1282996273093104,
+        "3": 0.4182123993963783
+      },
+      "created": 1632762794355,
+      "storage": true,
+      "checkpoint_id": 1518,
+      "checkpoint_name": "West Potomac Park",
+      "classes": [
+        { "name": "Water / Wetland", "color": "#486DA2" },
+        { "name": "Tree", "color": "#6CA966" },
+        { "name": "Low Vegetation / Barren", "color": "#D0F3AB" },
+        { "name": "Built Environment", "color": "#BFB5B5" }
+      ],
+      "shares": []
+    },
+    {
+      "id": 2081,
+      "name": "West Potomac Park",
+      "bookmarked": false,
+      "bounds": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-77.069091797, 38.882481198],
+            [-77.036132813, 38.882481198],
+            [-77.036132813, 38.895308255],
+            [-77.069091797, 38.895308255],
+            [-77.069091797, 38.882481198]
+          ]
+        ]
+      },
+      "px_stats": {
+        "0": 0.3081020615904337,
+        "1": 0.2929203440831348,
+        "2": 0.17539738469971028,
+        "3": 0.22358020962672126
+      },
+      "created": 1632762752689,
+      "storage": true,
+      "checkpoint_id": 1518,
+      "checkpoint_name": "West Potomac Park",
+      "classes": [
+        { "name": "Water / Wetland", "color": "#486DA2" },
+        { "name": "Tree", "color": "#6CA966" },
+        { "name": "Low Vegetation / Barren", "color": "#D0F3AB" },
+        { "name": "Built Environment", "color": "#BFB5B5" }
+      ],
+      "shares": []
+    }
+  ]
+}
