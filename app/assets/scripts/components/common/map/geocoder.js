@@ -19,6 +19,7 @@ function GeoCoder() {
         },
       }),
     });
+    search.searchElement.input.onkeydown = (e) => e.stopPropagation();
     map.addControl(search);
   }, [map]);
   return null;
