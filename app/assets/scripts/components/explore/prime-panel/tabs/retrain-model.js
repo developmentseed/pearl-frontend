@@ -264,6 +264,9 @@ function RetrainModel(props) {
                       onChangeComplete={(color) => {
                         setAddClassColor(color.hex);
                       }}
+                      onKeyDown={(e) => {
+                        e.stopPropagation();
+                      }}
                     />
                   </PickerDropdownItem>
                 </PickerDropdownBody>
