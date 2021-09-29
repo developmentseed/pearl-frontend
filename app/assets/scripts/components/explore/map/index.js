@@ -501,8 +501,9 @@ function Map() {
         {currentCheckpoint &&
           currentCheckpoint.retrain_geoms &&
           userLayers.retrainingSamples.active &&
-          currentCheckpoint.retrain_geoms.map((geoms, i) => {
-            return (
+          currentCheckpoint.retrain_geoms
+            .filter((geoms, i) => Object.values(currentCheckpoint.classes)[i])
+            .map((geoms, i) => (
               <GeoJSONLayer
                 key={Object.keys(currentCheckpoint.classes)[i]}
                 data={{
@@ -528,8 +529,7 @@ function Map() {
                   });
                 }}
               />
-            );
-          })}
+            ))}
 
         {tileUrl &&
           currentProject &&
