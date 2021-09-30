@@ -62,6 +62,7 @@ function Root() {
               <CollecticonsGlobalStyle />
               <GlobalStyles />
               <Switch>
+                <>
                 <Route exact path='/' component={Home} />
                 <Route exact path='/share/:uuid/map' component={ShareMap} />
                 <ProtectedRoute
@@ -81,6 +82,7 @@ function Root() {
                 />
                 <Route exact path='/about' component={About} />
                 <Route path='*' component={UhOh} />
+                </>
               </Switch>
               <ToastContainerCustom />
             </GlobalContextProvider>
