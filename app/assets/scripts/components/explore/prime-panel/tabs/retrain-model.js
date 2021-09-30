@@ -28,7 +28,7 @@ import {
   PickerDropdownItem,
   PickerDropdownFooter,
 } from './retrain-refine-styles';
-import { FormInput } from '@devseed-ui/form';
+import AutoFocusFormInput from '../../../common/auto-focus-form-input';
 import ImportSamplesModal from '../../map/import-sample-modal';
 import { Subheading } from '../../../../styles/type/heading';
 import { useAoi } from '../../../../context/aoi';
@@ -41,15 +41,11 @@ import { useApiLimits } from '../../../../context/global';
 
 function RetrainModel(props) {
   const { ready, className, placeholderMessage } = props;
-
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
-
   const { setMapMode, mapModes, mapState } = useMapState();
 
   const [addClassColor, setAddClassColor] = useState('#000000');
-
   const [addClassName, setAddClassName] = useState('');
-
   const [importSamplesModalRevealed, setImportSamplesModalRevealed] = useState(
     false
   );
@@ -243,15 +239,9 @@ function RetrainModel(props) {
                 <PickerDropdownBody>
                   <PickerDropdownItem nonhoverable as='div'>
                     <label htmlFor='addClassName'>Class Name</label>
-                    <FormInput
-                      id='addClassName'
+                    <AutoFocusFormInput
                       value={addClassName}
-                      onKeyDown={(e) => {
-                        e.stopPropagation();
-                      }}
-                      onChange={(e) => {
-                        setAddClassName(e.target.value);
-                      }}
+                      setValue={setAddClassName}
                     />
                   </PickerDropdownItem>
                   <PickerDropdownItem nonhoverable as='div'>
