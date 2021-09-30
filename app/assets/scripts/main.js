@@ -63,25 +63,25 @@ function Root() {
               <GlobalStyles />
               <Switch>
                 <>
-                <Route exact path='/' component={Home} />
-                <Route exact path='/share/:uuid/map' component={ShareMap} />
-                <ProtectedRoute
-                  path='/project/:projectId'
-                  component={Explore}
-                />
-                <ProtectedRoute exact path='/profile/maps' component={Maps} />
-                <ProtectedRoute
-                  exact
-                  path='/profile/projects'
-                  component={Projects}
-                />
-                <ProtectedRoute
-                  exact
-                  path='/profile/projects/:projectId'
-                  component={Project}
-                />
-                <Route exact path='/about' component={About} />
-                <Route path='*' component={UhOh} />
+                  <Route exact path='/' component={Home} />
+                  <Route exact path='/share/:uuid/map' component={ShareMap} />
+                  <ProtectedRoute
+                    path='/project/:projectId'
+                    component={Explore}
+                  />
+                  <ProtectedRoute exact path='/profile/maps' component={Maps} />
+                  <ProtectedRoute
+                    exact
+                    path='/profile/projects'
+                    component={Projects}
+                  />
+                  <ProtectedRoute
+                    exact
+                    path='/profile/projects/:projectId'
+                    component={Project}
+                  />
+                  <Route exact path='/about' component={About} />
+                  <Route path='*' component={UhOh} />
                 </>
               </Switch>
               <ToastContainerCustom />

@@ -246,6 +246,9 @@ function PrimeButton({
       } else {
         return true;
       }
+    } else {
+      // If any other mode, disabled is true
+      return true;
     }
   };
   const isDisabled = checkDisabledState();
