@@ -211,6 +211,7 @@ export function InstanceProvider(props) {
   }, [websocketClient]);
 
   async function initInstance(projectId, checkpointId, aoiId) {
+    console.log('init with', aoiId)
     // Close existing websocket
     if (websocketClient) {
       websocketClient.close();

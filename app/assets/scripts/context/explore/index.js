@@ -227,7 +227,7 @@ export function ExploreProvider(props) {
       const instance = await initInstance(
         project.id,
         checkpoint && checkpoint.id,
-        latestAoi && latestAoi.id
+        latestAoi &&  latestAoi.id
       );
 
       loadAoi(project, latestAoi, true, true);
@@ -444,6 +444,7 @@ export function ExploreProvider(props) {
     if (!aoiObject) {
       return;
     }
+
     showGlobalLoadingMessage('Loading AOI');
     const aoi = await restApiClient.get(
       `project/${project.id}/aoi/${aoiObject.id}`
@@ -488,8 +489,10 @@ export function ExploreProvider(props) {
       hideGlobalLoading();
     } else {
       setCurrentAoi(aoi);
+      console.log(aoiObject)
 
-      if (currentInstance && !noLoadOnInst) {
+      // Only load aoi on instance if storage is true
+      if (currentInstance && !noLoadOnInst && aoiObject.storage) {
         loadAoiOnInstance(aoi.id);
       } else {
         hideGlobalLoading();
