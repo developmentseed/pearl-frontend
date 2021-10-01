@@ -95,7 +95,9 @@ function Projects() {
       if (apiToken) {
         showGlobalLoadingMessage('Loading projects...');
         try {
-          const data = await restApiClient.getProjects(page, PROJECTS_PER_PAGE);
+          const data = await restApiClient.get(
+            `project/?page=${page - 1}&limit=${PROJECTS_PER_PAGE}`
+          );
           setTotal(data.total);
           setProjects(data.projects);
         } catch (err) {

@@ -81,11 +81,6 @@ class RestApiClient {
     return this.delete(`project/${id}`);
   }
 
-  getProjects(page, limit) {
-    const offset = (page - 1) * limit;
-    return this.get(`project/?page=${offset}&limit=${limit}`);
-  }
-
   createProject(data) {
     return this.post('project', data);
   }
@@ -100,13 +95,6 @@ class RestApiClient {
 
   deleteAoi(aoiId, projectId) {
     return this.delete(`project/${projectId}/aoi/${aoiId}`);
-  }
-
-  getBookmarkedAOIs(projectId, page, limit) {
-    const offset = (page - 1) * limit;
-    return this.get(
-      `project/${projectId}/aoi?bookmarked=true&page=${offset}&limit=${limit}`
-    );
   }
 
   getCheckpoint(projectId, checkpointId) {

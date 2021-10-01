@@ -233,9 +233,9 @@ function Project() {
         setIsAoisLoading(true);
         try {
           const aoisData = await restApiClient.getBookmarkedAOIs(
-            projectId,
-            page,
-            AOIS_PER_PAGE
+            `project/${projectId}/aoi?bookmarked=true&page=${
+              page - 1
+            }&limit=${AOIS_PER_PAGE}`
           );
           setTotal(aoisData.total);
           setAois(aoisData.aois);
