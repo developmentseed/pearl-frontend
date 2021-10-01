@@ -15,6 +15,7 @@ import {
   getLocalStorageItem,
   setLocalStorageItem,
 } from '../utils/local-storage';
+import toasts from '../components/common/toasts';
 
 const AuthContext = createContext(null);
 
@@ -294,3 +295,30 @@ export const useAuth = () => {
     isAuthenticated,
   ]);
 };
+
+/*
+ * HOC that requires user to be logged in to view a route
+ * Use this to wrap a component passed to a Route to create a
+ * Protected Route
+ *
+ * ex: <Route
+ *      component={withAuthenticationRequired(<Some Component>)
+ *      path={path}
+ *      />
+ */
+export function withAuthenticationRequired(WrapperComponent) {
+  /* eslint-disable react-hooks/rules-of-hooks */
+  const { isAuthenticated, authStateIsLoading, isLoading } = useAuth();
+
+  useEffect(() => {
+    if (!authStateIsLoading && !isLoading) {
+      if (!isAuthenticated) {
+        toasts.error('Please sign in to view this page.');
+        history.push('/');
+      }
+    }
+  }, [isAuthenticated, authStateIsLoading, isLoading]);
+
+  return WrapperComponent;
+  /* eslint-enable react-hooks/rules-of-hooks */
+}

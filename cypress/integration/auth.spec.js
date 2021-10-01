@@ -1,5 +1,4 @@
 const {
-  auth0Domain,
   restApiEndpoint,
 } = require('../../app/assets/scripts/config/testing').default;
 
@@ -14,6 +13,11 @@ describe('The app header', () => {
     cy.get('body');
     cy.get('[data-cy=account-button]').should('exist');
     cy.get('[data-cy=login-button]').should('not.exist');
+  });
+
+  it('invalid route displays uhoh page', () => {
+    cy.visit('/invalid-route');
+    cy.get('body').should('contain', 'Page not found.');
   });
 
   it('/project/new is protected', () => {
@@ -35,22 +39,25 @@ describe('The app header', () => {
   it('/profile/maps is protected', () => {
     cy.visit('/profile/maps');
     cy.location().should((loc) => {
-      expect(loc.host).to.include(auth0Domain);
+      expect(loc.pathname).to.eq('/');
     });
+    cy.get('#a-toast').should('contain', 'Please sign in to view this page.');
   });
 
   it('/profile/projects is protected', () => {
     cy.visit('/profile/projects');
     cy.location().should((loc) => {
-      expect(loc.host).to.include(auth0Domain);
+      expect(loc.pathname).to.eq('/');
     });
+    cy.get('#a-toast').should('contain', 'Please sign in to view this page.');
   });
 
   it('/profile/projects/:id is protected', () => {
     cy.visit('/profile/projects/:1');
     cy.location().should((loc) => {
-      expect(loc.host).to.include(auth0Domain);
+      expect(loc.pathname).to.eq('/');
     });
+    cy.get('#a-toast').should('contain', 'Please sign in to view this page.');
   });
 
   it('when a generic 401 status happens, redirect to login', () => {
