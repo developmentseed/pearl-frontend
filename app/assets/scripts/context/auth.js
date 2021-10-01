@@ -332,7 +332,7 @@ export function withAuthenticationRequired(WrapperComponent) {
     }
   }, [isAuthenticated, authStateIsLoading, isLoading, isLoggingOut]);
 
-  if (authStateIsLoading || isLoading) return;
+  if (authStateIsLoading || isLoading || !isAuthenticated) return;
 
   return WrapperComponent;
   /* eslint-enable react-hooks/rules-of-hooks */
