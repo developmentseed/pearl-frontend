@@ -364,7 +364,7 @@ export function InstanceProvider(props) {
     });
   }
 
-  async function refreshRunningBatch(batchId, timeout) {
+  async function refreshRunningBatch(batchId, timeout, isPoll) {
     try {
       const batch = await restApiClient.get(
         `project/${currentProject.id}/batch/${batchId}`
@@ -391,15 +391,17 @@ export function InstanceProvider(props) {
               });
           }
 
-          toasts.success(`${batch.name} inference is now available`);
-          console.log(batch)
+          // If this function is called from a timeout polling context, we can show a toast notification when finished.
+          if (isPoll) {
+            toasts.success(`${batch.name} inference is now available`);
+          }
         });
       } else {
         setRunningBatch(batch);
 
         // Poll for batch progress if not complete
         setTimeout(() => {
-          refreshRunningBatch(batchId, timeout);
+          refreshRunningBatch(batchId, timeout, true);
         }, timeout);
       }
     } catch (error) {
