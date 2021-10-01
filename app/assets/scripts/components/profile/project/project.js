@@ -232,10 +232,10 @@ function Project() {
       if (apiToken) {
         setIsAoisLoading(true);
         try {
-          const aoisData = await restApiClient.getBookmarkedAOIs(
-            projectId,
-            page,
-            AOIS_PER_PAGE
+          const aoisData = await restApiClient.get(
+            `project/${projectId}/aoi?bookmarked=true&page=${
+              page - 1
+            }&limit=${AOIS_PER_PAGE}`
           );
           setTotal(aoisData.total);
           setAois(aoisData.aois);
