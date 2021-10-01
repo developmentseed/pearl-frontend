@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import App from '../common/app';
 import ExploreComponent from './explore';
 import PageHeader from '../common/page-header';
@@ -15,12 +15,30 @@ import { InstanceProvider } from '../../context/instance';
 import { PredictionsProvider } from '../../context/predictions';
 import { ModelProvider } from '../../context/model';
 import Composer from '../../utils/compose-components';
+import { useAuth } from '../../context/auth';
+import history from '../../history';
+import toasts from '../../components/common/toasts';
+
 function Explore() {
   const [isMediumDown, setIsMediumDown] = useState(false);
+  const { isAuthenticated, authStateIsLoading, isLoading } = useAuth();
 
   const resizeListener = ({ width }) => {
     setIsMediumDown(width < theme.dark.mediaRanges.large[0]);
   };
+
+  useEffect(() => {
+    if (!authStateIsLoading && !isLoading) {
+      if (!isAuthenticated) {
+        toasts.error('Please sign in to view this page.');
+        history.push('/');
+      }
+    }
+  }, [isAuthenticated, authStateIsLoading, isLoading]);
+
+  if (authStateIsLoading || isLoading || !isAuthenticated) {
+    return <div />;
+  }
 
   return (
     <App pageTitle='Explore'>

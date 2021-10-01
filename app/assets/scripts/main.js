@@ -64,10 +64,7 @@ function Root() {
               <Switch>
                 <Route exact path='/' component={Home} />
                 <Route exact path='/share/:uuid/map' component={ShareMap} />
-                <ProtectedRoute
-                  path='/project/:projectId'
-                  component={Explore}
-                />
+                <Route path='/project/:projectId' component={Explore} />
                 <ProtectedRoute exact path='/profile/maps' component={Maps} />
                 <ProtectedRoute
                   exact

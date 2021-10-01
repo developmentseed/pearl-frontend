@@ -19,15 +19,17 @@ describe('The app header', () => {
   it('/project/new is protected', () => {
     cy.visit('/project/new');
     cy.location().should((loc) => {
-      expect(loc.host).to.include(auth0Domain);
+      expect(loc.pathname).to.eq('/');
     });
+    cy.get('#a-toast').should('contain', 'Please sign in to view this page.');
   });
 
   it('/project/:id is protected', () => {
     cy.visit('/project/1');
     cy.location().should((loc) => {
-      expect(loc.host).to.include(auth0Domain);
+      expect(loc.pathname).to.eq('/');
     });
+    cy.get('#a-toast').should('contain', 'Please sign in to view this page.');
   });
 
   it('/profile/maps is protected', () => {
@@ -68,7 +70,8 @@ describe('The app header', () => {
     cy.visit('/project/1');
 
     cy.location().should((loc) => {
-      expect(loc.host).to.include(auth0Domain);
+      expect(loc.pathname).to.eq('/');
     });
+    cy.get('#a-toast').should('contain', 'Please sign in to view this page.');
   });
 });
