@@ -392,6 +392,7 @@ export function InstanceProvider(props) {
           }
 
           toasts.success(`${batch.name} inference is now available`);
+          console.log(batch)
         });
       } else {
         setRunningBatch(batch);
