@@ -284,6 +284,7 @@ describe('Batch predictions', () => {
   });
 
   it('Inference and retrain can happen during batch', () => {
+    cy.startServer();
     /**
      * GET /project/:id/instance/:id
      */
