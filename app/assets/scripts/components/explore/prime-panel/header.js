@@ -288,7 +288,7 @@ function Header(props) {
                       loadAoi(
                         currentProject,
                         relevantAoi || a,
-                        relevantAoi || false, // @param aoiMatchesCheckpoint,
+                        relevantAoi || false // @param aoiMatchesCheckpoint,
                       ).then((bounds) =>
                         mapRef.fitBounds(bounds, {
                           padding: BOUNDS_PADDING,

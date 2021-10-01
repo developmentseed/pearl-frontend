@@ -227,7 +227,7 @@ export function ExploreProvider(props) {
       const instance = await initInstance(
         project.id,
         checkpoint && checkpoint.id,
-        latestAoi &&  latestAoi.id
+        latestAoi && latestAoi.id
       );
 
       loadAoi(project, latestAoi, true, true);
@@ -489,7 +489,6 @@ export function ExploreProvider(props) {
       hideGlobalLoading();
     } else {
       setCurrentAoi(aoi);
-      console.log(aoiObject)
 
       // Only load aoi on instance if storage is true
       if (currentInstance && !noLoadOnInst && aoiObject.storage) {

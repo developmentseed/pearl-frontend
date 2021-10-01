@@ -81,7 +81,7 @@ export function InstanceProvider(props) {
   } = useCheckpoint();
   const { currentProject, setCurrentProject, projectName } = useProject();
   const { dispatchPredictions } = usePredictions();
-  const { currentAoi, aoiName, aoiRef, setAoiList } = useAoi();
+  const { currentAoi, setCurrentAoi, aoiName, aoiRef, setAoiList } = useAoi();
   const { dispatchAoiPatch } = useAoiPatch();
   const { selectedModel } = useModel();
 
@@ -211,7 +211,6 @@ export function InstanceProvider(props) {
   }, [websocketClient]);
 
   async function initInstance(projectId, checkpointId, aoiId) {
-    console.log('init with', aoiId)
     // Close existing websocket
     if (websocketClient) {
       websocketClient.close();
@@ -378,6 +377,20 @@ export function InstanceProvider(props) {
         // Reload Aoi list when complete
         restApiClient.get(`project/${currentProject.id}/aoi/`).then((aois) => {
           setAoiList(aois.aois);
+          /*
+           * If the batch AOI is currently loaded in the frontend, we can update currentAoi with the update object which contains an accurate storage property of true.
+           * This will also update tiles on the map to show the batch results
+           *
+           * If currentAoi is null, that means that it has never been loaded from the api (was just drawn and submitted and user has been waiting for operation to finish). In this case we should load it and set currentAoi
+           */
+          if (!currentAoi) {
+            restApiClient
+              .get(`project/${currentProject.id}/aoi/${batch.aoi}`)
+              .then((aoi) => {
+                setCurrentAoi(aoi);
+              });
+          }
+
           toasts.success(`${batch.name} inference is now available`);
         });
       } else {

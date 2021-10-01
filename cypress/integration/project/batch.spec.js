@@ -116,7 +116,7 @@ describe('Batch predictions', () => {
     ).as('getBatchList');
   });
 
-  it('on new project, show different button large on large aoi', () => {
+  it.only('on new project, show different button large on large aoi', () => {
     cy.fakeLogin();
 
     cy.visit('/project/new');
@@ -273,6 +273,7 @@ describe('Batch predictions', () => {
       },
       {
         ...batchJob,
+        aoi: 1,
         progress: 100,
         completed: true,
       }
