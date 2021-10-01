@@ -140,11 +140,15 @@ function InnerAuthProvider(props) {
     refreshAuth: fetchToken,
     login: () => loginWithRedirect(),
     logout: () => {
-      logoutAuth0({
-        returnTo: window.location.origin,
-      });
       dispatchAuthState({
         type: actions.RESET_LOGIN,
+        data: {
+          isLoggingOut: true,
+        },
+      });
+
+      logoutAuth0({
+        returnTo: window.location.origin,
       });
     },
   };
@@ -224,6 +228,7 @@ const authReducer = function (state, action) {
       newState = {
         ...initialState,
         isAuthenticated: false,
+        ...action.data,
       };
       break;
     }
@@ -270,6 +275,7 @@ export const useAuth = () => {
     refreshAuth,
     login,
     logout,
+    isLoggingOut,
   } = useCheckContext('useAuth');
 
   return useMemo(() => {
@@ -286,6 +292,7 @@ export const useAuth = () => {
       refreshAuth,
       login,
       logout,
+      isLoggingOut,
     };
   }, [
     apiToken,
@@ -293,6 +300,7 @@ export const useAuth = () => {
     authStateIsLoading,
     user && user.id,
     isAuthenticated,
+    isLoggingOut,
   ]);
 };
 
@@ -308,16 +316,21 @@ export const useAuth = () => {
  */
 export function withAuthenticationRequired(WrapperComponent) {
   /* eslint-disable react-hooks/rules-of-hooks */
-  const { isAuthenticated, authStateIsLoading, isLoading } = useAuth();
+  const {
+    isAuthenticated,
+    authStateIsLoading,
+    isLoading,
+    isLoggingOut,
+  } = useAuth();
 
   useEffect(() => {
     if (!authStateIsLoading && !isLoading) {
-      if (!isAuthenticated) {
+      if (!isAuthenticated && !isLoggingOut) {
         toasts.error('Please sign in to view this page.');
         history.push('/');
       }
     }
-  }, [isAuthenticated, authStateIsLoading, isLoading]);
+  }, [isAuthenticated, authStateIsLoading, isLoading, isLoggingOut]);
 
   return WrapperComponent;
   /* eslint-enable react-hooks/rules-of-hooks */
