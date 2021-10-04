@@ -15,6 +15,7 @@ import {
   getLocalStorageItem,
   setLocalStorageItem,
 } from '../utils/local-storage';
+import toasts from '../components/common/toasts';
 
 const AuthContext = createContext(null);
 
@@ -139,11 +140,15 @@ function InnerAuthProvider(props) {
     refreshAuth: fetchToken,
     login: () => loginWithRedirect(),
     logout: () => {
-      logoutAuth0({
-        returnTo: window.location.origin,
-      });
       dispatchAuthState({
         type: actions.RESET_LOGIN,
+        data: {
+          isLoggingOut: true,
+        },
+      });
+
+      logoutAuth0({
+        returnTo: window.location.origin,
       });
     },
   };
@@ -223,6 +228,7 @@ const authReducer = function (state, action) {
       newState = {
         ...initialState,
         isAuthenticated: false,
+        ...action.data,
       };
       break;
     }
@@ -269,6 +275,7 @@ export const useAuth = () => {
     refreshAuth,
     login,
     logout,
+    isLoggingOut,
   } = useCheckContext('useAuth');
 
   return useMemo(() => {
@@ -285,6 +292,7 @@ export const useAuth = () => {
       refreshAuth,
       login,
       logout,
+      isLoggingOut,
     };
   }, [
     apiToken,
@@ -292,5 +300,40 @@ export const useAuth = () => {
     authStateIsLoading,
     user && user.id,
     isAuthenticated,
+    isLoggingOut,
   ]);
 };
+
+/*
+ * HOC that requires user to be logged in to view a route
+ * Use this to wrap a component passed to a Route to create a
+ * Protected Route
+ *
+ * ex: <Route
+ *      component={withAuthenticationRequired(<Some Component>)
+ *      path={path}
+ *      />
+ */
+export function withAuthenticationRequired(WrapperComponent) {
+  /* eslint-disable react-hooks/rules-of-hooks */
+  const {
+    isAuthenticated,
+    authStateIsLoading,
+    isLoading,
+    isLoggingOut,
+  } = useAuth();
+
+  useEffect(() => {
+    if (!authStateIsLoading && !isLoading) {
+      if (!isAuthenticated && !isLoggingOut) {
+        toasts.error('Please sign in to view this page.');
+        history.push('/');
+      }
+    }
+  }, [isAuthenticated, authStateIsLoading, isLoading, isLoggingOut]);
+
+  if (authStateIsLoading || isLoading || !isAuthenticated) return;
+
+  return WrapperComponent;
+  /* eslint-enable react-hooks/rules-of-hooks */
+}

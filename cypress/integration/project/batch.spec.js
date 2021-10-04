@@ -143,7 +143,7 @@ describe('Batch predictions', () => {
     cy.get('[data-cy=batch-progress-message').should('not.exist');
 
     // Request model run
-    cy.get('[data-cy=run-button')
+    cy.get('[data-cy=run-button]')
       .should('have.text', 'Run Batch Prediction')
       .click();
 
@@ -240,7 +240,7 @@ describe('Batch predictions', () => {
     );
 
     // Concurrent batch runs are not allowed
-    cy.get('[data-cy=run-button').should('have.attr', 'data-disabled', 'true');
+    cy.get('[data-cy=run-button]').should('have.attr', 'data-disabled', 'true');
 
     cy.get('[data-cy=batch-progress-message')
       .should('include.text', 'Batch prediction in progress: 20%')
@@ -279,7 +279,11 @@ describe('Batch predictions', () => {
     );
 
     // New runs are allowed
-    cy.get('[data-cy=run-button').should('have.attr', 'data-disabled', 'false');
+    cy.get('[data-cy=run-button]').should(
+      'have.attr',
+      'data-disabled',
+      'false'
+    );
     cy.get('[data-cy=batch-progress-message').should('not.exist');
   });
 
@@ -326,7 +330,7 @@ describe('Batch predictions', () => {
     cy.wait('@reverseGeocodeCity');
 
     // Start batch
-    cy.get('[data-cy=run-button')
+    cy.get('[data-cy=run-button]')
       .should('have.text', 'Run Batch Prediction')
       .click();
     // Mock batch job at 0%
@@ -397,13 +401,17 @@ describe('Batch predictions', () => {
     cy.wait('@reverseGeocodeCity');
 
     // Only one batch operation allowed at a time
-    cy.get('[data-cy=run-button').should('have.attr', 'data-disabled', 'true');
+    cy.get('[data-cy=run-button]').should('have.attr', 'data-disabled', 'true');
 
     cy.get('[data-cy=aoi-selection-trigger]').click();
 
     // Should be able to run inference on non batch aoi
     cy.get('.listed-aoi').contains('Rockville').click();
-    cy.get('[data-cy=run-button').should('have.attr', 'data-disabled', 'false');
+    cy.get('[data-cy=run-button]').should(
+      'have.attr',
+      'data-disabled',
+      'false'
+    );
   });
 
   it('in project page, display completed and running batch jobs', () => {
