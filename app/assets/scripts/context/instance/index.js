@@ -364,10 +364,10 @@ export function InstanceProvider(props) {
     });
   }
 
-  async function refreshRunningBatch(batchId, timeout, isPoll) {
+  async function refreshRunningBatch(projectId, batchId, timeout, isPoll) {
     try {
       const batch = await restApiClient.get(
-        `project/${currentProject.id}/batch/${batchId}`
+        `project/${projectId}/batch/${batchId}`
       );
 
       if (batch.completed) {
@@ -375,7 +375,7 @@ export function InstanceProvider(props) {
         setRunningBatch(false);
 
         // Reload Aoi list when complete
-        restApiClient.get(`project/${currentProject.id}/aoi/`).then((aois) => {
+        restApiClient.get(`project/${projectId}/aoi/`).then((aois) => {
           setAoiList(aois.aois);
           /*
            * If the batch AOI is currently loaded in the frontend, we can update currentAoi with the update object which contains an accurate storage property of true.
@@ -385,7 +385,7 @@ export function InstanceProvider(props) {
            */
           if (!currentAoi) {
             restApiClient
-              .get(`project/${currentProject.id}/aoi/${batch.aoi}`)
+              .get(`project/${projectId}/aoi/${batch.aoi}`)
               .then((aoi) => {
                 setCurrentAoi(aoi);
               });
@@ -401,7 +401,12 @@ export function InstanceProvider(props) {
 
         // Poll for batch progress if not complete
         setTimeout(() => {
-          refreshRunningBatch(batchId, timeout || BATCH_REFRESH_INTERVAL, true);
+          refreshRunningBatch(
+            projectId,
+            batchId,
+            timeout || BATCH_REFRESH_INTERVAL,
+            true
+          );
         }, timeout);
       }
     } catch (error) {
@@ -410,16 +415,20 @@ export function InstanceProvider(props) {
     }
   }
 
-  async function getRunningBatch() {
-    if (currentProject && restApiClient) {
+  /*
+   * @param project { object } - project object should be passed explicitly to avoid race condition that depends on the instantiation of currentProject state variable object, this occurs when a new project is created
+   */
+  async function getRunningBatch(project) {
+    if (project && restApiClient) {
       try {
         const { batch: batches } = await restApiClient.get(
-          `project/${currentProject.id}/batch?completed=false`
+          `project/${project.id}/batch?completed=false`
         );
+
         if (batches.length > 0) {
           const { id: batchId } = batches[0];
 
-          refreshRunningBatch(batchId, BATCH_REFRESH_INTERVAL);
+          refreshRunningBatch(project.id, batchId, BATCH_REFRESH_INTERVAL);
         } else {
           setRunningBatch(false);
         }
@@ -596,7 +605,9 @@ export function InstanceProvider(props) {
             options
           );
           setRunningBatch(batch);
-          getRunningBatch();
+
+          // Pass newly created project here. If getRunningBatch repends on the updated value in the context store, we cannot gaurantee that it will exist at time of execution
+          getRunningBatch(project);
 
           // Update aoi list with new batch area
         } catch (error) {
@@ -606,7 +617,6 @@ export function InstanceProvider(props) {
           );
           return; // abort
         }
-        getRunningBatch();
         hideGlobalLoading();
       }
     },

@@ -195,7 +195,7 @@ export function ExploreProvider(props) {
       project = await restApiClient.getProject(projectId);
       setCurrentProject(project);
       setProjectName(project.name);
-      getRunningBatch(projectId);
+      getRunningBatch(project);
     } catch (error) {
       hideGlobalLoading();
       logger(error);

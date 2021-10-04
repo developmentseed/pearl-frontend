@@ -146,7 +146,7 @@ function PrimePanel() {
   // Check if any job is running on project load
   useEffect(() => {
     if (currentProject && !runningBatch) {
-      getRunningBatch();
+      getRunningBatch(currentProject);
     }
   }, [currentProject, runningBatch]);
 
