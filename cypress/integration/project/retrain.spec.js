@@ -255,7 +255,7 @@ describe('Retrain existing project', () => {
     ).as('fetchAvailableInstancesCount');
 
     // Request model run
-    cy.get('[data-cy=run-button').click();
+    cy.get('[data-cy=run-button]').click();
 
     // Wait for outbound request
     cy.wait('@fetchAvailableInstancesCount');
@@ -296,7 +296,7 @@ describe('Retrain existing project', () => {
     );
 
     // Request model run
-    cy.get('[data-cy=run-button').click();
+    cy.get('[data-cy=run-button]').click();
 
     // Wait for outbound request
     cy.wait('@fetchAvailableInstancesCount');
@@ -339,7 +339,7 @@ describe('Retrain existing project', () => {
     );
 
     // Request model run
-    cy.get('[data-cy=run-button').click();
+    cy.get('[data-cy=run-button]').click();
 
     cy.get('[data-cy=session-status]').should(
       'have.text',
@@ -399,7 +399,7 @@ describe('Retrain existing project', () => {
     ).as('fetchAvailableInstancesCount');
 
     // Request model run
-    cy.get('[data-cy=run-button').click();
+    cy.get('[data-cy=run-button]').click();
 
     // Prediction is halted
     cy.get('[data-cy=session-status]').should(
@@ -424,7 +424,7 @@ describe('Retrain existing project', () => {
     cy.get('#app-container').click(...pointSample);
 
     // Request model run
-    cy.get('[data-cy=run-button').click();
+    cy.get('[data-cy=run-button]').click();
 
     // Prediction is halted
     cy.get('[data-cy=session-status]').should(
