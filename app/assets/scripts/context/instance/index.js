@@ -401,7 +401,7 @@ export function InstanceProvider(props) {
 
         // Poll for batch progress if not complete
         setTimeout(() => {
-          refreshRunningBatch(batchId, timeout, true);
+          refreshRunningBatch(batchId, timeout || BATCH_REFRESH_INTERVAL, true);
         }, timeout);
       }
     } catch (error) {
