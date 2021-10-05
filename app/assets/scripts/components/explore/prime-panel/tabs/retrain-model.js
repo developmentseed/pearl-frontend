@@ -1,18 +1,12 @@
 import React, { useState } from 'react';
 import T from 'prop-types';
 import get from 'lodash.get';
-import { Button } from '@devseed-ui/button';
-import { ChromePicker } from 'react-color';
+
 import InfoButton from '../../../common/info-button';
 import { PlaceholderMessage } from '../../../../styles/placeholder.js';
 import { actions, useCheckpoint } from '../../../../context/checkpoint.js';
 import { useMapState } from '../../../../context/explore';
-import {
-  Dropdown,
-  DropdownHeader,
-  DropdownItem,
-  DropdownTrigger,
-} from '../../../../styles/dropdown';
+import { Dropdown, DropdownTrigger } from '../../../../styles/dropdown';
 import {
   ToolsWrapper,
   ClassList,
@@ -23,16 +17,13 @@ import {
   ClassSamples,
   ToolBox as RetrainTools,
   AddClassButton,
-  PickerStyles,
-  PickerDropdownBody,
-  PickerDropdownItem,
-  PickerDropdownFooter,
 } from './retrain-refine-styles';
-import AutoFocusFormInput from '../../../common/auto-focus-form-input';
+
 import ImportSamplesModal from '../../map/import-sample-modal';
 import { Subheading } from '../../../../styles/type/heading';
 import { useAoi } from '../../../../context/aoi';
 import { useApiLimits } from '../../../../context/global';
+import EditClass from './edit-class';
 
 /*
  * Retrain Model
@@ -44,8 +35,6 @@ function RetrainModel(props) {
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
   const { setMapMode, mapModes, mapState } = useMapState();
 
-  const [addClassColor, setAddClassColor] = useState('#000000');
-  const [addClassName, setAddClassName] = useState('');
   const [importSamplesModalRevealed, setImportSamplesModalRevealed] = useState(
     false
   );
@@ -232,58 +221,7 @@ function RetrainModel(props) {
               )}
               className='add-class__dropdown'
             >
-              <>
-                <DropdownHeader>
-                  <p>New Class</p>
-                </DropdownHeader>
-                <PickerDropdownBody>
-                  <PickerDropdownItem nonhoverable as='div'>
-                    <label htmlFor='addClassName'>Class Name</label>
-                    <AutoFocusFormInput
-                      value={addClassName}
-                      setValue={setAddClassName}
-                    />
-                  </PickerDropdownItem>
-                  <PickerDropdownItem nonhoverable as='div'>
-                    <label>Label Color</label>
-                    <ChromePicker
-                      disableAlpha={true}
-                      color={addClassColor}
-                      width='100%'
-                      styles={PickerStyles}
-                      onChangeComplete={(color) => {
-                        setAddClassColor(color.hex);
-                      }}
-                      onKeyDown={(e) => {
-                        e.stopPropagation();
-                      }}
-                    />
-                  </PickerDropdownItem>
-                </PickerDropdownBody>
-                <PickerDropdownFooter>
-                  <DropdownItem nonhoverable data-dropdown='click.close'>
-                    Cancel
-                  </DropdownItem>
-                  <DropdownItem nonhoverable data-dropdown='click.close'>
-                    <Button
-                      variation='primary-plain'
-                      onClick={() => {
-                        dispatchCurrentCheckpoint({
-                          type: actions.ADD_CLASS,
-                          data: {
-                            name: addClassName,
-                            color: addClassColor,
-                          },
-                        });
-                        setAddClassName('');
-                        setAddClassColor('#1CE1CE');
-                      }}
-                    >
-                      Save
-                    </Button>
-                  </DropdownItem>
-                </PickerDropdownFooter>
-              </>
+              <EditClass />
             </Dropdown>
           </ClassList>
         </>
