@@ -166,42 +166,18 @@ function PrimePanel() {
         fitContent
         bodyContent={
           <StyledPanelBlock>
-            <PanelHeader
-              {...{
-                aoiRef,
-                setAoiRef,
-                setAoiBounds,
-                aoiBounds,
-                aoiArea,
-                aoiName,
-                aoiList,
-                loadAoi,
-                createNewAoi,
-
-                mapState,
-                mapModes,
-                mapRef,
-
-                currentCheckpoint,
-                checkpointModes,
-                checkpointList,
-                applyCheckpoint,
-
-                checkpointHasSamples,
-
-                setShowSelectModelModal,
-                selectedModel,
-
-                isAuthenticated,
-                currentProject,
-              }}
-            />
+            <div />
             <PanelBlockBody>
               <TabbedBlock activeTab={activeTab}>
                 <Predict
                   name='predict'
                   className='predict-model'
                   tabId='predict-tab-trigger'
+                  checkpointHasSamples={checkpointHasSamples}
+                  setShowSelectModelModal={setShowSelectModelModal}
+                  onTabClick={() => {
+                    setActiveTab(PREDICT_TAB_INDEX);
+                  }}
                 />
                 <RetrainModel
                   name='retrain model'

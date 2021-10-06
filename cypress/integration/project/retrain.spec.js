@@ -94,7 +94,7 @@ describe('Retrain existing project', () => {
     cy.setWebsocketWorkflow('retrain');
 
     cy.visit('/project/1');
-  })
+  });
 
   it('successfully loads', () => {
     cy.setWebsocketWorkflow('retrain');

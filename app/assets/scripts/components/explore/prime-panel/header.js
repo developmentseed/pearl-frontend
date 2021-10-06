@@ -27,6 +27,10 @@ import { AoiEditButtons } from './aoi-edit-buttons';
 import { useModel } from '../../../context/model';
 import { useAuth } from '../../../context/auth';
 import { useAoi } from '../../../context/aoi';
+import { useAoiMeta, useMapState } from '../../../context/explore';
+import { useInstance } from '../../../context/instance';
+import { useCheckpoint } from '../../../context/checkpoint';
+import { useProject } from '../../../context/project';
 
 import { Modal } from '@devseed-ui/modal';
 import { Button } from '@devseed-ui/button';
@@ -108,37 +112,27 @@ const PanelBlockHeader = styled(BasePanelBlockHeader)`
 `;
 
 function Header(props) {
+  const { checkpointHasSamples, setShowSelectModelModal } = props;
+
+  const { currentProject } = useProject();
+  const { applyCheckpoint } = useInstance();
+  const { currentCheckpoint, checkpointList } = useCheckpoint();
+
   const {
-    aoiRef,
-    setAoiRef,
     setAoiBounds,
     aoiBounds,
     aoiArea,
-    aoiName,
     aoiList,
     loadAoi,
     createNewAoi,
+  } = useAoiMeta();
 
-    mapState,
-    mapModes,
-    mapRef,
-
-    currentCheckpoint,
-    checkpointList,
-    applyCheckpoint,
-    checkpointHasSamples,
-
-    setShowSelectModelModal,
-    selectedModel,
-
-    isAuthenticated,
-    currentProject,
-  } = props;
+  const { mapState, mapModes, mapRef } = useMapState();
 
   const [deleteAoi, setDeleteAoi] = useState();
-  const { models } = useModel();
-  const { restApiClient } = useAuth();
-  const { setAoiList } = useAoi();
+  const { models, selectedModel } = useModel();
+  const { isAuthenticated, restApiClient } = useAuth();
+  const { setAoiList, aoiRef, setAoiRef, aoiName } = useAoi();
 
   const renderAoiHeader = (triggerProps) => {
     let header;
@@ -255,7 +249,7 @@ function Header(props) {
   };
 
   return (
-    <PanelBlockHeader>
+    <PanelBlockHeader id='header'>
       <HeadOption hasSubtitle>
         <HeadOptionHeadline>
           <Subheading>Selected Area </Subheading>

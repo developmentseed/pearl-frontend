@@ -84,7 +84,12 @@ export function ExploreProvider(props) {
   } = useAoi();
   const { predictions, dispatchPredictions } = usePredictions();
   const { selectedModel, setSelectedModel } = useModel();
-  const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
+  const {
+    currentCheckpoint,
+    dispatchCurrentCheckpoint,
+    checkpointList,
+    setCheckpointList,
+  } = useCheckpoint();
   const {
     aoiPatch,
     dispatchAoiPatch,
@@ -101,7 +106,6 @@ export function ExploreProvider(props) {
       mode: mapModes.BROWSE_MODE,
     }
   );
-  const [checkpointList, setCheckpointList] = useState(null);
   const [currentInstance, setCurrentInstance] = useState(null);
   const { initInstance, loadAoiOnInstance, getRunningBatch } = useInstance();
 
@@ -669,6 +673,30 @@ export const useExploreContext = (fnName) => {
   }
 
   return context;
+};
+
+export const useAoiMeta = () => {
+  const {
+    aoiBounds,
+    setAoiBounds,
+    aoiArea,
+    aoiList,
+    loadAoi,
+    createNewAoi,
+  } = useExploreContext('useAoiMeta');
+
+  return useMemo(
+    () => ({
+      aoiBounds,
+      setAoiBounds,
+      aoiArea,
+      aoiList,
+
+      loadAoi,
+      createNewAoi,
+    }),
+    [aoiBounds, aoiArea, aoiList, loadAoi, createNewAoi]
+  );
 };
 
 export const useSessionStatus = () => {

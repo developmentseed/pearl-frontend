@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useMemo, useReducer } from 'react';
+import React, {
+  useState,
+  createContext,
+  useContext,
+  useMemo,
+  useReducer,
+} from 'react';
 import uniqWith from 'lodash.uniqwith';
 import isEqual from 'lodash.isequal';
 import differenceWith from 'lodash.differencewith';
@@ -44,6 +50,8 @@ export function CheckpointProvider(props) {
 
   const { restApiClient } = useAuth();
 
+  const [checkpointList, setCheckpointList] = useState(null);
+
   /*
    * @param created - if new checkpoint was just created,don't to verify that aoi matches
    */
@@ -81,6 +89,8 @@ export function CheckpointProvider(props) {
     currentCheckpoint,
     dispatchCurrentCheckpoint,
     fetchCheckpoint,
+    checkpointList,
+    setCheckpointList,
   };
 
   return (
@@ -459,6 +469,8 @@ export const useCheckpoint = () => {
     currentCheckpoint,
     dispatchCurrentCheckpoint,
     fetchCheckpoint,
+    checkpointList,
+    setCheckpointList,
   } = useCheckContext('useCheckpoint');
 
   return useMemo(
@@ -466,7 +478,14 @@ export const useCheckpoint = () => {
       currentCheckpoint,
       dispatchCurrentCheckpoint,
       fetchCheckpoint,
+      checkpointList,
+      setCheckpointList,
     }),
-    [currentCheckpoint, dispatchCurrentCheckpoint, fetchCheckpoint]
+    [
+      currentCheckpoint,
+      dispatchCurrentCheckpoint,
+      fetchCheckpoint,
+      checkpointList,
+    ]
   );
 };
