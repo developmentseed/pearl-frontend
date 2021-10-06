@@ -287,7 +287,7 @@ describe('Batch predictions', () => {
     cy.get('[data-cy=batch-progress-message').should('not.exist');
   });
 
-  it('Inference and retrain can happen during batch', () => {
+  it.only('Inference and retrain can happen during batch', () => {
     cy.startServer();
     /**
      * GET /project/:id/instance/:id
@@ -323,8 +323,8 @@ describe('Batch predictions', () => {
     cy.wait(['@batchAoi', '@fetchCheckpoint2']);
 
     // Edit AOI to treat as new one
-    cy.get('[data-cy=aoi-edit-button]').click();
-    cy.get('[data-cy=aoi-edit-confirm-button]').click();
+    cy.get('[data-cy=aoi-edit-button]').should('exist').click();
+    cy.get('[data-cy=aoi-edit-confirm-button]').should('exist').click();
 
     cy.get('[data-cy=proceed-anyway-button]').should('exist').click();
     cy.wait('@reverseGeocodeCity');
@@ -390,8 +390,11 @@ describe('Batch predictions', () => {
       batchJob
     );
 
-    cy.get('[data-cy=aoi-selection-trigger]').click();
-    cy.get('[data-cy=add-aoi-button]').click();
+    // Only one batch operation allowed at a time
+    cy.get('[data-cy=run-button]').should('have.attr', 'data-disabled', 'true');
+
+    cy.get('[data-cy=aoi-selection-trigger]').should('exist').click();
+    cy.get('[data-cy=add-aoi-button]').should('exist').click();
 
     cy.get('#map')
       .trigger('mousedown', 150, 150)
@@ -400,10 +403,7 @@ describe('Batch predictions', () => {
     cy.get('[data-cy=proceed-anyway-button]').should('exist').click();
     cy.wait('@reverseGeocodeCity');
 
-    // Only one batch operation allowed at a time
-    cy.get('[data-cy=run-button]').should('have.attr', 'data-disabled', 'true');
-
-    cy.get('[data-cy=aoi-selection-trigger]').click();
+    cy.get('[data-cy=aoi-selection-trigger]').should('exist').click();
 
     // Should be able to run inference on non batch aoi
     cy.get('.listed-aoi').contains('Rockville').click();
