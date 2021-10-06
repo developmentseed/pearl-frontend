@@ -7,8 +7,7 @@ import { ExploreProvider } from '../../context/explore';
 import { MapProvider } from '../../context/map';
 import SizeAwareElement from '../common/size-aware-element';
 import theme from '../../styles/theme';
-import SessionTimeoutModal from '../common/timeout-modal';
-import SessionOutputControl from './session-output-control';
+import ExploreHeader from './explore-header';
 import { CheckpointProvider } from '../../context/checkpoint';
 import { AoiProvider } from '../../context/aoi';
 import { ProjectProvider } from '../../context/project';
@@ -16,6 +15,7 @@ import { InstanceProvider } from '../../context/instance';
 import { PredictionsProvider } from '../../context/predictions';
 import { ModelProvider } from '../../context/model';
 import Composer from '../../utils/compose-components';
+
 function Explore() {
   const [isMediumDown, setIsMediumDown] = useState(false);
 
@@ -43,13 +43,12 @@ function Explore() {
           onChange={resizeListener}
         >
           <PageHeader>
-            <SessionOutputControl isMediumDown={isMediumDown} />
+            <ExploreHeader isMediumDown={isMediumDown} />
           </PageHeader>
         </SizeAwareElement>
         <PageBody role='main'>
           <ExploreComponent />
         </PageBody>
-        <SessionTimeoutModal revealed={false} />
       </Composer>
     </App>
   );

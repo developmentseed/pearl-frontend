@@ -10,10 +10,13 @@ import logger from './logger';
 const theLocalStorage =
   window.localStorage || window.content.localStorage || null;
 
-export function getLocalStorageItem(key) {
+export function getLocalStorageItem(key, format) {
   let value;
   try {
     value = theLocalStorage.getItem(key);
+    if (format === 'json') {
+      value = JSON.parse(value);
+    }
   } catch (error) {
     logger('Could not load local storage key: ', key);
     if (error.name === 'NS_ERROR_FILE_CORRUPTED') {

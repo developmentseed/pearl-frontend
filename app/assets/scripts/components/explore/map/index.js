@@ -9,18 +9,22 @@ import {
   Circle,
 } from 'react-leaflet';
 import L from 'leaflet';
-import GlobalContext from '../../../context/global';
-import { ExploreContext, useMapState } from '../../../context/explore';
 import {
-  useMapRef,
-  useMapLayers,
-  useUserLayers,
-  useLayersPanel,
-} from '../../../context/map';
+  ExploreContext,
+  useMapState,
+  useSessionStatus,
+  useShortcutState,
+} from '../../../context/explore';
+import { actions as shortcutActions } from '../../../context/explore/shortcuts';
+import { useMapRef, useMapLayers, useUserLayers } from '../../../context/map';
 
 import GeoCoder from '../../common/map/geocoder';
 import GenericControl from '../../common/map/generic-control';
 import { BOUNDS_PADDING } from '../../common/map/constants';
+import {
+  MAX_BASE_MAP_ZOOM_LEVEL,
+  BaseMapLayer,
+} from '../../common/map/base-map-layer';
 import CenterMap from '../../common/map/center-map';
 
 import { themeVal, multiply } from '@devseed-ui/theme-provider';
@@ -30,7 +34,6 @@ import AoiEditControl from './aoi-edit-control';
 import FreehandDrawControl from './freehand-draw-control';
 import config from '../../../config';
 import { inRange } from '../../../utils/utils';
-import usePrevious from '../../../utils/use-previous';
 import { areaFromBounds } from '../../../utils/map';
 import {
   useCheckpoint,
@@ -41,7 +44,7 @@ import ModalMapEvent from './modal-events';
 import GeoJSONLayer from '../../common/map/geojson-layer';
 import TileLayerWithHeaders from '../../common/map/tile-layer';
 import { useAuth } from '../../../context/auth';
-import { useApiMeta } from '../../../context/api-meta';
+import { useApiLimits, useMosaics } from '../../../context/global';
 import { useAoi, useAoiPatch, useAoiName } from '../../../context/aoi';
 import {
   actions as predictionActions,
@@ -95,7 +98,9 @@ function Map() {
     currentProject,
   } = useContext(ExploreContext);
 
-  const { apiLimits } = useApiMeta();
+  const { setSessionStatusMode } = useSessionStatus();
+
+  const { apiLimits } = useApiLimits();
   const {
     aoiRef,
     setAoiRef,
@@ -109,28 +114,46 @@ function Map() {
   const { aoiPatchList } = useAoiPatch();
 
   const { mapState, mapModes, setMapMode } = useMapState();
-  const prevMapState = usePrevious(mapState);
+
   const { mapRef, setMapRef } = useMapRef();
   const [tileUrl, setTileUrl] = useState(null);
   const { dispatchPredictions } = usePredictions();
 
   const { mapLayers, setMapLayers } = useMapLayers();
   const { userLayers, setUserLayers } = useUserLayers();
-  const { setShowLayersPanel, showLayersPanel } = useLayersPanel();
 
-  const { mosaicList } = useContext(GlobalContext);
+  const { mosaics } = useMosaics();
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
 
-  const { mosaics } = mosaicList.isReady() ? mosaicList.getData() : {};
+  const { shortcutState, dispatchShortcutState } = useShortcutState();
 
   // Manage changes in map mode
   useEffect(() => {
     // Check if map mode changed and disable previous controls
-    if (prevMapState && mapState && mapState.mode !== prevMapState.mode) {
-      switch (prevMapState.mode) {
-        case mapModes.ADD_SAMPLE_POLYGON:
-          mapRef.polygonDraw.disable();
+    if (mapState?.previousMode) {
+      switch (mapState.previousMode) {
+        case mapModes.CREATE_AOI_MODE:
+          mapRef.aoi.control.draw.disable();
           break;
+        case mapModes.EDIT_AOI_MODE:
+          mapRef.aoi.control.edit.disable();
+          break;
+        case mapModes.ADD_SAMPLE_POLYGON:
+          if (shortcutState.overrideBrowseMode) {
+            mapRef.polygonDraw?.pause();
+          } else if (
+            !mapState.overrideBrowseMode &&
+            mapState.mode !== mapModes.BROWSE_MODE
+          ) {
+            // Keyboard shortcut SPACE will enter override mode when held down
+            // On KEYUP, we will dispatch an update to return to previousMode, but overrideBrowseMode
+            // will be set to false before the mode update can be dispatched
+            mapRef.polygonDraw.disable();
+          }
+          break;
+        case mapModes.ADD_SAMPLE_FREEHAND: {
+          mapRef.freehandDraw?.disable();
+        }
       }
     }
 
@@ -142,58 +165,54 @@ function Map() {
     switch (mapState.mode) {
       case mapModes.CREATE_AOI_MODE:
         mapRef.aoi.control.draw.enable();
-        mapRef.freehandDraw.disable();
+        mapRef._container.style.cursor = 'crosshair';
         break;
       case mapModes.EDIT_AOI_MODE:
-        mapRef.aoi.control.draw.disable();
         mapRef.aoi.control.edit.enable(aoiRef);
-        mapRef.freehandDraw.disable();
         break;
       case mapModes.BROWSE_MODE:
-        if (mapRef) {
-          mapRef.freehandDraw.disable();
-          if (aoiRef) {
-            // Only disable if something has been drawn
-            mapRef.aoi.control.draw.disable();
-            if (mapRef.aoi.control.edit._shape) {
-              mapRef.aoi.control.edit.disable();
-            }
-            if (
-              mapState.previousMode === mapModes.CREATE_AOI_MODE ||
-              mapState.previousMode === mapModes.EDIT_AOI_MODE
-            ) {
-              // On confirm, zoom to bounds
-              mapRef.fitBounds(aoiRef.getBounds(), { padding: BOUNDS_PADDING });
-            }
+        if (mapRef && aoiRef) {
+          if (
+            mapState.previousMode === mapModes.CREATE_AOI_MODE ||
+            mapState.previousMode === mapModes.EDIT_AOI_MODE
+          ) {
+            // On confirm, zoom to bounds
+            mapRef.fitBounds(aoiRef.getBounds(), { padding: BOUNDS_PADDING });
+            mapRef._container.style.cursor = 'grab';
+            setSessionStatusMode('set-aoi');
           }
         }
         break;
+      case mapModes.ADD_SAMPLE_POINT:
+        mapRef._container.style.cursor = 'crosshair';
+        break;
       case mapModes.ADD_SAMPLE_POLYGON:
-        if (currentCheckpoint && currentCheckpoint.activeItem) {
-          mapRef.freehandDraw.disable();
+        if (currentCheckpoint?.activeItem) {
+          mapRef._container.style.cursor = 'crosshair';
           mapRef.polygonDraw.enable(currentCheckpoint.activeItem);
         }
         break;
       case mapModes.ADD_SAMPLE_FREEHAND:
-        if (currentCheckpoint && currentCheckpoint.activeItem) {
+        if (currentCheckpoint?.activeItem) {
+          mapRef._container.style.cursor = 'crosshair';
           mapRef.freehandDraw.enableAdd(currentCheckpoint.activeItem);
         }
         break;
-
       case mapModes.DELETE_SAMPLES:
-        if (currentCheckpoint && currentCheckpoint.activeItem) {
+        if (currentCheckpoint?.activeItem) {
+          mapRef._container.style.cursor = 'grab';
           mapRef.freehandDraw.enableSubtract(currentCheckpoint.activeItem);
         }
         break;
-
       default:
-        mapRef.freehandDraw.disable();
+        mapRef._container.style.cursor = 'grab';
         break;
     }
   }, [
     mapState.mode,
     aoiRef,
     currentCheckpoint && currentCheckpoint.activeItem,
+    shortcutState.overrideBrowseMode,
   ]);
 
   const classLength =
@@ -360,8 +379,11 @@ function Map() {
   const displayMap = useMemo(() => {
     return (
       <MapContainer
+        tap={false}
         center={center}
         zoom={zoom}
+        maxZoom={MAX_BASE_MAP_ZOOM_LEVEL}
+        boxZoom={false}
         style={{ height: '100%' }}
         whenCreated={(m) => {
           const freehandDraw = new FreehandDrawControl(m, {
@@ -412,11 +434,7 @@ function Map() {
           />
         )}
 
-        <TileLayer
-          attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-          url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-          maxZoom={18}
-        />
+        <BaseMapLayer />
         {mosaics &&
           mosaics.map((layer) => (
             <TileLayer
@@ -434,6 +452,7 @@ function Map() {
                       layer: v.target,
                       active: true,
                       name: layer,
+                      opacity: 1,
                     },
                   });
                 },
@@ -451,7 +470,7 @@ function Map() {
               bounds={p.bounds}
               opacity={
                 userLayers.predictions.visible
-                  ? userLayers.predictions.opacity
+                  ? shortcutState.predictionLayerOpacity
                   : 0
               }
             />
@@ -482,8 +501,9 @@ function Map() {
         {currentCheckpoint &&
           currentCheckpoint.retrain_geoms &&
           userLayers.retrainingSamples.active &&
-          currentCheckpoint.retrain_geoms.map((geoms, i) => {
-            return (
+          currentCheckpoint.retrain_geoms
+            .filter((geoms, i) => Object.values(currentCheckpoint.classes)[i])
+            .map((geoms, i) => (
               <GeoJSONLayer
                 key={Object.keys(currentCheckpoint.classes)[i]}
                 data={{
@@ -509,8 +529,7 @@ function Map() {
                   });
                 }}
               />
-            );
-          })}
+            ))}
 
         {tileUrl &&
           currentProject &&
@@ -532,7 +551,7 @@ function Map() {
               }}
               opacity={
                 userLayers.predictions.visible
-                  ? userLayers.predictions.opacity
+                  ? shortcutState.predictionLayerOpacity
                   : 0
               }
               eventHandlers={{
@@ -605,7 +624,9 @@ function Map() {
             id='layer-control'
             onClick={(e) => {
               e.stopPropagation();
-              setShowLayersPanel(!showLayersPanel);
+              dispatchShortcutState({
+                type: shortcutActions.TOGGLE_LAYER_TRAY,
+              });
             }}
           />
           <GeoCoder />
@@ -629,8 +650,7 @@ function Map() {
     setMapRef,
     aoiPatchList,
     tileUrl,
-    showLayersPanel,
-    setShowLayersPanel,
+    shortcutState,
   ]);
 
   return (

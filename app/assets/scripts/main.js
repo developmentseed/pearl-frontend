@@ -1,10 +1,10 @@
 import './wdyr';
 import '@babel/polyfill';
+import { install as installResizeObserver } from 'resize-observer';
 import React, { useEffect } from 'react';
 import { DevseedUiThemeProvider } from '@devseed-ui/theme-provider';
 
 import { render } from 'react-dom';
-import { withAuthenticationRequired } from '@auth0/auth0-react';
 import GlobalStyles from './styles/global';
 import ErrorBoundary from './fatal-error-boundary';
 import { Router, Route, Switch } from 'react-router-dom';
@@ -25,15 +25,18 @@ import { CollecticonsGlobalStyle } from '@devseed-ui/collecticons';
 import GlobalLoadingProvider from './components/common/global-loading';
 import { ToastContainerCustom } from './components/common/toasts';
 import Project from './components/profile/project';
-import { AuthProvider } from './context/auth';
-import { ApiMetaProvider } from './context/api-meta';
+import { AuthProvider, withAuthenticationRequired } from './context/auth';
+
+installResizeObserver();
 
 const ProtectedRoute = (
   { component, ...args } // eslint-disable-line react/prop-types
 ) => (
   <Route
     component={
-      window.Cypress ? component : withAuthenticationRequired(component)
+      window.Cypress && window.localStorage.getItem('useFakeLogin')
+        ? component
+        : withAuthenticationRequired(component)
     }
     {...args}
   />
@@ -54,36 +57,32 @@ function Root() {
         <Router history={history}>
           <DevseedUiThemeProvider theme={theme.dark}>
             <GlobalLoadingProvider />
-            <ApiMetaProvider>
-              <GlobalContextProvider>
-                <CollecticonsGlobalStyle />
-                <GlobalStyles />
-                <Switch>
-                  <>
-                    <Route exact path='/' component={Home} />
-                    <Route path='/share/:uuid/map' component={ShareMap} />
-                    <Route path='/project/:projectId' component={Explore} />
-                    <ProtectedRoute
-                      exact
-                      path='/profile/maps'
-                      component={Maps}
-                    />
-                    <ProtectedRoute
-                      exact
-                      path='/profile/projects'
-                      component={Projects}
-                    />
-                    <Route
-                      path='/profile/projects/:projectId'
-                      component={Project}
-                    />
-                    <Route path='/about' component={About} />
-                  </>
-                  <Route path='*' component={UhOh} />
-                </Switch>
-                <ToastContainerCustom />
-              </GlobalContextProvider>
-            </ApiMetaProvider>
+            <GlobalContextProvider>
+              <CollecticonsGlobalStyle />
+              <GlobalStyles />
+              <Switch>
+                <Route exact path='/' component={Home} />
+                <Route exact path='/share/:uuid/map' component={ShareMap} />
+                <ProtectedRoute
+                  path='/project/:projectId'
+                  component={Explore}
+                />
+                <ProtectedRoute exact path='/profile/maps' component={Maps} />
+                <ProtectedRoute
+                  exact
+                  path='/profile/projects'
+                  component={Projects}
+                />
+                <ProtectedRoute
+                  exact
+                  path='/profile/projects/:projectId'
+                  component={Project}
+                />
+                <Route exact path='/about' component={About} />
+                <Route path='*' component={UhOh} />
+              </Switch>
+              <ToastContainerCustom />
+            </GlobalContextProvider>
           </DevseedUiThemeProvider>
         </Router>
       </ErrorBoundary>

@@ -7,14 +7,14 @@ on:
     - 'main'
 
 env:
-  STAGING_STORAGE_ACCOUNT_NAME: lulc
+  STAGING_STORAGE_ACCOUNT_NAME: lulcstagingfrontend
   STAGING_CDN_PROFILE_NAME: lulc
   STAGING_CDN_ENDPOINT: lulcstaging
-  STAGING_RESOURCE_GROUP: lulcStaging
-  PRODUCTION_STORAGE_ACCOUNT_NAME: lulcproductionfrontend
-  PRODUCTION_CDN_PROFILE_NAME: lulcproduction
-  PRODUCTION_CDN_ENDPOINT: lulcproduction
-  PRODUCTION_RESOURCE_GROUP: lulcProduction
+  STAGING_RESOURCE_GROUP: lulcterraformdev
+  PRODUCTION_STORAGE_ACCOUNT_NAME: lulctfproductionfrontend
+  PRODUCTION_CDN_PROFILE_NAME: lulctfproduction
+  PRODUCTION_CDN_ENDPOINT: lulctfproduction
+  PRODUCTION_RESOURCE_GROUP: lulc-production_rg
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -61,13 +61,13 @@ jobs:
         if: github.ref == 'refs/heads/develop'
         uses: azure/login@v1
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          creds: ${{ secrets.AZURE_CREDENTIALS_STAGING }}
 
       - name: Azure Login
         if: github.ref == 'refs/heads/main'
         uses: azure/login@v1
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS_PROD }}
+          creds: ${{ secrets.AZURE_CREDENTIALS_PRODUCTION }}
 
 
       - name: Upload to blob storage

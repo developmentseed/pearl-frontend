@@ -7,8 +7,12 @@ import { PanelBlock, PanelBlockBody } from '../../common/panel-block';
 import SelectModal from '../../common/select-modal';
 import ModelCard from './model-card';
 import { useMapRef } from '../../../context/map';
-import { ExploreContext, useMapState } from '../../../context/explore';
-import { useModels } from '../../../context/global';
+import {
+  ExploreContext,
+  useMapState,
+  useShortcutState,
+} from '../../../context/explore';
+import { useModel } from '../../../context/model';
 
 import { Heading } from '@devseed-ui/typography';
 import { Button } from '@devseed-ui/button';
@@ -29,7 +33,9 @@ import {
 import { useInstance } from '../../../context/instance';
 import { useAoi } from '../../../context/aoi';
 import { usePredictions } from '../../../context/predictions';
-import { useApiMeta } from '../../../context/api-meta';
+import { useApiLimits } from '../../../context/global';
+import ClearSamplesModal from './clear-samples-modal';
+import { actions as shortcutActions } from '../../../context/explore/shortcuts';
 
 const StyledPanelBlock = styled(PanelBlock)`
   ${media.largeUp`
@@ -59,12 +65,15 @@ const Headline = styled.div`
     align-self: center;
   }
 `;
+const TABS = [0, 1];
+const [RETRAIN_TAB_INDEX, REFINE_TAB_INDEX] = TABS;
 
 function PrimePanel() {
   const { isAuthenticated } = useAuth();
   const { mapState, mapModes, setMapMode } = useMapState();
   const { mapRef } = useMapRef();
-  const { apiLimits } = useApiMeta();
+  const { apiLimits } = useApiLimits();
+  const { shortcutState, dispatchShortcutState } = useShortcutState();
 
   const {
     currentProject,
@@ -86,11 +95,12 @@ function PrimePanel() {
 
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
 
-  const { models } = useModels();
+  const { models } = useModel();
 
   const { predictions } = usePredictions();
 
   const [showSelectModelModal, setShowSelectModelModal] = useState(false);
+  const [showClearSamplesModal, setShowClearSamplesModal] = useState(null);
 
   const [localCheckpointName, setLocalCheckpointName] = useState(
     (currentCheckpoint &&
@@ -99,22 +109,7 @@ function PrimePanel() {
       ''
   );
 
-  const [activeTab, setActiveTab] = useState(checkpointModes.RETRAIN);
-
-  // Check if AOI and selected model are defined, and if view mode is runnable
-  const allowInferenceRun =
-    [
-      mapModes.BROWSE_MODE,
-      mapModes.ADD_CLASS_SAMPLES,
-      mapModes.ADD_SAMPLE_POINT,
-      mapModes.ADD_SAMPLE_POLYGON,
-      mapModes.ADD_SAMPLE_FREEHAND,
-      mapModes.REMOVE_SAMPLE,
-    ].includes(mapState.mode) &&
-    typeof aoiRef !== 'undefined' &&
-    aoiArea > 0 &&
-    typeof selectedModel !== 'undefined' &&
-    selectedModel !== null;
+  const [activeTab, setActiveTab] = useState(0);
 
   // Retrain Panel Tab Empty State message
   const retrainPlaceHolderMessage = () => {
@@ -135,43 +130,8 @@ function PrimePanel() {
     }
   };
 
-  const checkpointHasSamples = () => {
-    if (currentCheckpoint) {
-      let sampleCount = Object.values(currentCheckpoint.classes || {}).reduce(
-        (count, c) => {
-          /**
-           * Check which format the point collection is following to get the feature count.
-           * This needs a refactor when possible. Feature initialization, map edit operations
-           * and retrain tasks should use the same format, which is not happening now.
-           */
-          const points =
-            c.points.type === 'Feature'
-              ? c.points.geometry.coordinates
-              : c.points.coordinates;
-
-          // Return the feature count
-          return count + points.length + c.polygons.length;
-        },
-        0
-      );
-
-      sampleCount += Object.values(
-        currentCheckpoint.checkpointBrushes || {}
-      ).reduce((count, c) => {
-        return count + c.polygons.length;
-      }, 0);
-
-      // There should be no polygon or point samples on the map
-      // User must submit or clear retrain samples before starting refine
-      if (sampleCount > 0) {
-        return true;
-      } else {
-        return false;
-      }
-    } else {
-      return false;
-    }
-  };
+  const checkpointHasSamples =
+    currentCheckpoint && currentCheckpoint.sampleCount > 0;
 
   useEffect(() => {
     if (currentCheckpoint && currentCheckpoint.name) {
@@ -195,6 +155,11 @@ function PrimePanel() {
       <Panel
         data-cy='primary-panel'
         collapsible
+        overrideControl
+        revealed={shortcutState.leftPanel}
+        onPanelChange={() => {
+          dispatchShortcutState({ type: shortcutActions.TOGGLE_LEFT_PANEL });
+        }}
         direction='left'
         initialState={true}
         fitContent
@@ -221,7 +186,7 @@ function PrimePanel() {
                 checkpointList,
                 applyCheckpoint,
 
-                checkpointHasSamples: checkpointHasSamples(),
+                checkpointHasSamples,
 
                 setShowSelectModelModal,
                 selectedModel,
@@ -231,7 +196,7 @@ function PrimePanel() {
               }}
             />
             <PanelBlockBody>
-              <TabbedBlock>
+              <TabbedBlock activeTab={activeTab}>
                 <RetrainModel
                   name='retrain model'
                   className='retrain-model'
@@ -249,17 +214,18 @@ function PrimePanel() {
                     mapState.mode === mapModes.EDIT_AOI_MODE
                   }
                   onTabClick={() => {
-                    setActiveTab(checkpointModes.RETRAIN);
-                    if (currentCheckpoint && currentAoi) {
-                      setMapMode(mapModes.BROWSE_MODE);
-                      dispatchCurrentCheckpoint({
-                        type: checkpointActions.SET_ACTIVE_CLASS,
-                        data: undefined,
-                      });
-                      if (currentCheckpoint.mode != checkpointModes.RETRAIN) {
-                        // If current checkpoint has not been set,
-                        // mode does not need to be set
-                        if (!checkpointHasSamples()) {
+                    function onContinue() {
+                      setActiveTab(RETRAIN_TAB_INDEX);
+                      if (currentCheckpoint && currentAoi) {
+                        setMapMode(mapModes.BROWSE_MODE);
+                        dispatchCurrentCheckpoint({
+                          type: checkpointActions.SET_ACTIVE_CLASS,
+                          data: Object.values(currentCheckpoint.classes)[0]
+                            .name,
+                        });
+                        if (currentCheckpoint.mode != checkpointModes.RETRAIN) {
+                          // If current checkpoint has not been set,
+                          // mode does not need to be set
                           dispatchCurrentCheckpoint({
                             type: checkpointActions.SET_CHECKPOINT_MODE,
                             data: {
@@ -268,6 +234,11 @@ function PrimePanel() {
                           });
                         }
                       }
+                    }
+                    if (checkpointHasSamples) {
+                      setShowClearSamplesModal(() => onContinue);
+                    } else {
+                      onContinue();
                     }
                   }}
                 />
@@ -286,17 +257,18 @@ function PrimePanel() {
                   }
                   tabTooltip='Refine is not available until model has been run or retrained.'
                   onTabClick={() => {
-                    setActiveTab(checkpointModes.REFINE);
-                    if (currentCheckpoint) {
-                      setMapMode(mapModes.BROWSE_MODE);
-                      dispatchCurrentCheckpoint({
-                        type: checkpointActions.SET_ACTIVE_CLASS,
-                        data: undefined,
-                      });
-                      if (currentCheckpoint.mode !== checkpointModes.REFINE) {
-                        // If current checkpoint has not been set,
-                        // mode does not need to be set
-                        if (!checkpointHasSamples()) {
+                    function onContinue() {
+                      setActiveTab(REFINE_TAB_INDEX);
+                      if (currentCheckpoint) {
+                        setMapMode(mapModes.BROWSE_MODE);
+                        dispatchCurrentCheckpoint({
+                          type: checkpointActions.SET_ACTIVE_CLASS,
+                          data: Object.values(currentCheckpoint.classes)[0]
+                            .name,
+                        });
+                        if (currentCheckpoint.mode !== checkpointModes.REFINE) {
+                          // If current checkpoint has not been set,
+                          // mode does not need to be set
                           dispatchCurrentCheckpoint({
                             type: checkpointActions.SET_CHECKPOINT_MODE,
                             data: {
@@ -306,34 +278,36 @@ function PrimePanel() {
                         }
                       }
                     }
+
+                    if (checkpointHasSamples) {
+                      setShowClearSamplesModal(() => onContinue);
+                    } else {
+                      onContinue();
+                    }
                   }}
                 />
               </TabbedBlock>
             </PanelBlockBody>
-            {activeTab !== 'LAYERS' && (
-              <PanelFooter
-                {...{
-                  dispatchCurrentCheckpoint,
-                  currentCheckpoint,
-                  checkpointActions,
+            <PanelFooter
+              {...{
+                dispatchCurrentCheckpoint,
+                currentCheckpoint,
+                checkpointActions,
 
-                  updateCheckpointName,
-                  localCheckpointName,
-                  setLocalCheckpointName,
+                updateCheckpointName,
+                localCheckpointName,
+                setLocalCheckpointName,
 
-                  mapRef,
+                mapRef,
 
-                  disabled:
-                    mapState.mode === mapModes.EDIT_AOI_MODE ||
-                    (currentCheckpoint &&
-                      (currentCheckpoint.mode === checkpointModes.RETRAIN ||
-                        currentCheckpoint.mode === checkpointModes.REFINE) &&
-                      !checkpointHasSamples()),
+                setAoiBounds,
 
-                  allowInferenceRun,
-                }}
-              />
-            )}
+                disabled:
+                  currentCheckpoint &&
+                  (currentCheckpoint.mode === checkpointModes.RETRAIN ||
+                    currentCheckpoint.mode === checkpointModes.REFINE),
+              }}
+            />
           </StyledPanelBlock>
         }
       />
@@ -343,7 +317,7 @@ function PrimePanel() {
         onOverlayClick={() => {
           setShowSelectModelModal(false);
         }}
-        data={models.status === 'success' ? models.value : []}
+        data={models.isReady && !models.hasError ? models.data : []}
         renderHeader={() => (
           <ModalHeader>
             <Headline>
@@ -375,6 +349,21 @@ function PrimePanel() {
           />
         )}
         nonScrolling
+      />
+      <ClearSamplesModal
+        revealed={showClearSamplesModal !== null}
+        onClear={() => {
+          dispatchCurrentCheckpoint({
+            type: checkpointActions.CLEAR_SAMPLES,
+          });
+          mapRef.freehandDraw.clearLayers();
+          let clearAndContinue = showClearSamplesModal;
+          clearAndContinue();
+          setShowClearSamplesModal(null);
+        }}
+        onCancel={() => {
+          setShowClearSamplesModal(null);
+        }}
       />
     </>
   );

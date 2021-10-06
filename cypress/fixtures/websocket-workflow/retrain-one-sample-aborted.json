@@ -1,7 +1,26 @@
 [
   {
     "type": "server",
-    "payload": { "message": "info#disconnected" }
+    "payload": { "message": "info#connected" }
+  },
+  {
+    "type": "client",
+    "payload": { "action": "model#status" }
+  },
+  {
+    "type": "server",
+    "payload": {
+      "message": "model#status",
+      "data": {
+        "is_aborting": false,
+        "processing": false,
+        "aoi": 2,
+        "checkpoint": 2
+      }
+    }
+  },
+  {
+    "type": "reconnect"
   },
   {
     "type": "server",
@@ -18,29 +37,96 @@
       "data": {
         "is_aborting": false,
         "processing": false,
-        "aoi": false,
-        "checkpoint": false
+        "aoi": 2,
+        "checkpoint": 2
       }
     }
   },
   {
     "type": "client",
     "payload": {
-      "action": "model#prediction",
+      "action": "model#retrain",
       "data": {
-        "name": "Judiciary Square",
-        "polygon": {
-          "type": "Polygon",
-          "coordinates": [
-            [
-              [-77.0632553100586, 38.91694866167228],
-              [-77.0460891723633, 38.91694866167228],
-              [-77.0460891723633, 38.93030364446068],
-              [-77.0632553100586, 38.93030364446068],
-              [-77.0632553100586, 38.91694866167228]
-            ]
-          ]
-        }
+        "name": "Seneca Rocks #1",
+        "classes": [
+          {
+            "name": "Water / Wetland",
+            "color": "#486DA2",
+            "geometry": { "type": "FeatureCollection", "features": [] }
+          },
+          {
+            "name": "Emergent Wetlands",
+            "color": "#00A884",
+            "geometry": { "type": "FeatureCollection", "features": [] }
+          },
+          {
+            "name": "Tree",
+            "color": "#6CA966",
+            "geometry": { "type": "FeatureCollection", "features": [] }
+          },
+          {
+            "name": "Shrubland",
+            "color": "#ABC964",
+            "geometry": { "type": "FeatureCollection", "features": [] }
+          },
+          {
+            "name": "Low Vegetation",
+            "color": "#D0F3AB",
+            "geometry": { "type": "FeatureCollection", "features": [] }
+          },
+          {
+            "name": "Barren",
+            "color": "#D2AD74",
+            "geometry": {
+              "type": "FeatureCollection",
+              "features": [
+                {
+                  "type": "Feature",
+                  "properties": {},
+                  "geometry": {
+                    "type": "MultiPoint",
+                    "coordinates": [[-79.3850612640381, 38.84067698741475]]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "Structure",
+            "color": "#F10100",
+            "geometry": { "type": "FeatureCollection", "features": [] }
+          },
+          {
+            "name": "Impervious Surface",
+            "color": "#BFB5B5",
+            "geometry": { "type": "FeatureCollection", "features": [] }
+          },
+          {
+            "name": "Impervious Road",
+            "color": "#320000",
+            "geometry": { "type": "FeatureCollection", "features": [] }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "server",
+    "payload": { "message": "model#retrain#complete" }
+  },
+  {
+    "type": "client",
+    "payload": { "action": "model#status" }
+  },
+  {
+    "type": "server",
+    "payload": {
+      "message": "model#status",
+      "data": {
+        "is_aborting": false,
+        "processing": true,
+        "aoi": 2,
+        "checkpoint": 2
       }
     }
   },
@@ -48,7 +134,7 @@
     "type": "server",
     "payload": {
       "message": "model#checkpoint",
-      "data": { "name": "Judiciary Square", "id": 1 }
+      "data": { "name": "Seneca Rocks", "id": 3 }
     }
   },
   {
@@ -60,17 +146,17 @@
     "payload": {
       "message": "model#aoi",
       "data": {
-        "id": 1,
+        "id": 3,
         "live": true,
-        "name": "Judiciary Square",
-        "checkpoint_id": 1,
+        "name": "Area #1",
+        "checkpoint_id": 3,
         "bounds": [
-          -77.06085205078125,
-          38.87606680031535,
-          -77.03338623046875,
-          38.89317057287494
+          -79.38995361328125,
+          38.833289356866885,
+          -79.37347412109375,
+          38.85040342169188
         ],
-        "total": 10
+        "total": 6
       }
     }
   },
@@ -81,8 +167,8 @@
       "data": {
         "is_aborting": false,
         "processing": true,
-        "aoi": 1,
-        "checkpoint": 1
+        "aoi": 3,
+        "checkpoint": 3
       }
     }
   },
@@ -91,7 +177,7 @@
     "payload": {
       "message": "model#prediction",
       "data": {
-        "aoi": 1,
+        "aoi": 3,
         "bounds": [
           -77.047119140625,
           38.901720914997945,
@@ -112,7 +198,7 @@
     "payload": {
       "message": "model#prediction",
       "data": {
-        "aoi": 1,
+        "aoi": 3,
         "bounds": [
           -77.047119140625,
           38.89958342598271,
@@ -134,7 +220,7 @@
     "payload": {
       "message": "model#prediction",
       "data": {
-        "aoi": 1,
+        "aoi": 3,
         "bounds": [
           -77.04437255859375,
           38.901720914997945,
@@ -156,7 +242,7 @@
     "payload": {
       "message": "model#prediction",
       "data": {
-        "aoi": 1,
+        "aoi": 3,
         "bounds": [
           -77.04437255859375,
           38.89958342598271,
@@ -173,54 +259,7 @@
     }
   },
   {
-    "type": "server",
-    "payload": {
-      "message": "model#prediction",
-      "data": {
-        "aoi": 1,
-        "bounds": [
-          -77.0416259765625,
-          38.901720914997945,
-          -77.03887939453125,
-          38.903858339667764
-        ],
-        "x": 37486,
-        "y": 50138,
-        "z": 17,
-        "image": "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",
-        "total": 6,
-        "processed": 4
-      }
-    }
-  },
-  {
-    "type": "server",
-    "payload": {
-      "message": "model#prediction",
-      "data": {
-        "aoi": 1,
-        "bounds": [
-          -77.0416259765625,
-          38.89958342598271,
-          -77.03887939453125,
-          38.901720914997945
-        ],
-        "x": 37486,
-        "y": 50139,
-        "z": 17,
-        "image": "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",
-        "total": 6,
-        "processed": 5
-      }
-    }
-  },
-
-  {
-    "type": "server",
-    "payload": { "message": "model#prediction#complete", "data": { "aoi": 1 } }
-  },
-  {
     "type": "client",
-    "payload": { "action": "model#status" }
+    "payload": { "action": "instance#terminate" }
   }
 ]

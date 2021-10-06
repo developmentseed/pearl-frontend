@@ -6,7 +6,7 @@ import { ChromePicker } from 'react-color';
 import InfoButton from '../../../common/info-button';
 import { PlaceholderMessage } from '../../../../styles/placeholder.js';
 import { actions, useCheckpoint } from '../../../../context/checkpoint.js';
-import { useMapState } from '../../../../context/explore.js';
+import { useMapState } from '../../../../context/explore';
 import {
   Dropdown,
   DropdownHeader,
@@ -28,11 +28,11 @@ import {
   PickerDropdownItem,
   PickerDropdownFooter,
 } from './retrain-refine-styles';
-import { FormInput } from '@devseed-ui/form';
+import AutoFocusFormInput from '../../../common/auto-focus-form-input';
 import ImportSamplesModal from '../../map/import-sample-modal';
 import { Subheading } from '../../../../styles/type/heading';
 import { useAoi } from '../../../../context/aoi';
-import { useApiMeta } from '../../../../context/api-meta';
+import { useApiLimits } from '../../../../context/global';
 
 /*
  * Retrain Model
@@ -41,21 +41,17 @@ import { useApiMeta } from '../../../../context/api-meta';
 
 function RetrainModel(props) {
   const { ready, className, placeholderMessage } = props;
-
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
-
   const { setMapMode, mapModes, mapState } = useMapState();
 
   const [addClassColor, setAddClassColor] = useState('#000000');
-
   const [addClassName, setAddClassName] = useState('');
-
   const [importSamplesModalRevealed, setImportSamplesModalRevealed] = useState(
     false
   );
 
   const { aoiArea } = useAoi();
-  const { apiLimits } = useApiMeta();
+  const { apiLimits } = useApiLimits();
 
   const isBatchArea =
     aoiArea && apiLimits && aoiArea > apiLimits['live_inference'];
@@ -243,12 +239,9 @@ function RetrainModel(props) {
                 <PickerDropdownBody>
                   <PickerDropdownItem nonhoverable as='div'>
                     <label htmlFor='addClassName'>Class Name</label>
-                    <FormInput
-                      id='addClassName'
+                    <AutoFocusFormInput
                       value={addClassName}
-                      onChange={(e) => {
-                        setAddClassName(e.target.value);
-                      }}
+                      setValue={setAddClassName}
                     />
                   </PickerDropdownItem>
                   <PickerDropdownItem nonhoverable as='div'>
@@ -260,6 +253,9 @@ function RetrainModel(props) {
                       styles={PickerStyles}
                       onChangeComplete={(color) => {
                         setAddClassColor(color.hex);
+                      }}
+                      onKeyDown={(e) => {
+                        e.stopPropagation();
                       }}
                     />
                   </PickerDropdownItem>

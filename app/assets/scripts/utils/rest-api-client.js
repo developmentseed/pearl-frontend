@@ -1,11 +1,11 @@
+import get from 'lodash.get';
 import config from '../config';
-import { fetchJSON } from '../context/reducers/reduxeed';
+import { fetchJSON } from './utils';
 const { restApiEndpoint } = config;
 
 class RestApiClient {
   constructor(props) {
     this.apiToken = props.apiToken;
-    this.handleUnauthorized = props.handleUnauthorized;
 
     this.defaultOptions = {
       headers: {
@@ -36,8 +36,7 @@ class RestApiClient {
     }
 
     // Fetch data and let errors to be handle by the caller
-    const res = await fetchJSON(url, options);
-    return res.body;
+    return fetchJSON(url, options).then((res) => res.body);
   }
 
   get(path, format = 'json') {
@@ -57,7 +56,21 @@ class RestApiClient {
   }
 
   getApiMeta() {
-    return this.get('');
+    return this.get('').then((apiMeta) => {
+      // Calculate available slots
+      const totalGpus = get(apiMeta, 'limits.total_gpus');
+      const activeGpus = get(apiMeta, 'limits.active_gpus') || 0;
+
+      const availableGpus =
+        Number.isInteger(totalGpus) &&
+        Number.isInteger(activeGpus) &&
+        Math.max(totalGpus - activeGpus, 0);
+
+      return {
+        ...apiMeta,
+        availableGpus,
+      };
+    });
   }
 
   getProject(id) {
@@ -68,11 +81,6 @@ class RestApiClient {
     return this.delete(`project/${id}`);
   }
 
-  getProjects(page, limit) {
-    const offset = (page - 1) * limit;
-    return this.get(`project/?page=${offset}&limit=${limit}`);
-  }
-
   createProject(data) {
     return this.post('project', data);
   }
@@ -81,23 +89,12 @@ class RestApiClient {
     return this.get(`model/${id}`);
   }
 
-  getModels() {
-    return this.get(`model`).then((body) => (body ? body.models : []));
-  }
-
   getAOIs(projectId) {
     return this.get(`project/${projectId}/aoi`);
   }
 
   deleteAoi(aoiId, projectId) {
     return this.delete(`project/${projectId}/aoi/${aoiId}`);
-  }
-
-  getBookmarkedAOIs(projectId, page, limit) {
-    const offset = (page - 1) * limit;
-    return this.get(
-      `project/${projectId}/aoi?bookmarked=true&page=${offset}&limit=${limit}`
-    );
   }
 
   getCheckpoint(projectId, checkpointId) {

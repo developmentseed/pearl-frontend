@@ -15,6 +15,7 @@ import {
   getLocalStorageItem,
   setLocalStorageItem,
 } from '../utils/local-storage';
+import toasts from '../components/common/toasts';
 
 const AuthContext = createContext(null);
 
@@ -23,30 +24,69 @@ const AuthContext = createContext(null);
  */
 function InnerAuthProvider(props) {
   const {
-    isAuthenticated,
+    loginWithRedirect,
+    isAuthenticated: isAuthenticatedAuth0,
     error: auth0Error,
     user,
     isLoading,
     getAccessTokenSilently,
+    logout: logoutAuth0,
   } = useAuth0();
   const [authState, dispatchAuthState] = useReducer(authReducer, {});
 
+  function resetLogin() {
+    dispatchAuthState({
+      type: actions.RESET_LOGIN,
+    });
+  }
+
   useEffect(() => {
     // Read auth state from local storage, logout on error
-    const lsAuthStateString = getLocalStorageItem('authState');
-    if (lsAuthStateString) {
-      try {
+    const localStorageAuthState = getLocalStorageItem('authState', 'json');
+
+    // If no auth state is found, reset login
+    if (
+      !localStorageAuthState ||
+      (localStorageAuthState && !localStorageAuthState.apiToken)
+    ) {
+      resetLogin();
+      return;
+    }
+
+    // When running Cypress load auth state and bypass API token check
+    if (window.Cypress) {
+      dispatchAuthState({
+        type: actions.LOAD_AUTH_STATE,
+        data: localStorageAuthState,
+      });
+      return;
+    }
+
+    // Create new API client to validate API token
+    const client = new RestApiClient({
+      apiToken: localStorageAuthState.apiToken,
+    });
+
+    // Check API token is still valid
+    client
+      .get('user/me')
+      .then(() => {
+        // On success finish loading auth data to state
         dispatchAuthState({
           type: actions.LOAD_AUTH_STATE,
-          data: JSON.parse(lsAuthStateString),
+          data: localStorageAuthState,
         });
-      } catch (error) {
-        dispatchAuthState({
-          type: actions.LOGOUT,
-        });
-        logger(error);
-      }
-    }
+      })
+      .catch((err) => {
+        logger(err);
+
+        // If still authenticated to Auth0, try to refresh token
+        if (isAuthenticatedAuth0) {
+          fetchToken();
+        } else {
+          resetLogin();
+        }
+      });
   }, []);
 
   const fetchToken = async () => {
@@ -64,7 +104,7 @@ function InnerAuthProvider(props) {
     } catch (error) {
       logger(error);
       dispatchAuthState({
-        type: actions.LOGOUT,
+        type: actions.RESET_LOGIN,
       });
     }
   };
@@ -77,19 +117,20 @@ function InnerAuthProvider(props) {
     useEffect(() => {
       if (isLoading) return;
 
-      if (isAuthenticated !== authState.isAuthenticated) {
-        if (isAuthenticated) {
+      if (isAuthenticatedAuth0 !== authState.isAuthenticated) {
+        if (isAuthenticatedAuth0) {
           dispatchAuthState({
             type: actions.REQUEST_LOGIN,
           });
           fetchToken();
         } else {
+          history.push('/');
           dispatchAuthState({
-            type: actions.LOGOUT,
+            type: actions.RESET_LOGIN,
           });
         }
       }
-    }, [isLoading, isAuthenticated, auth0Error]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [isLoading, isAuthenticatedAuth0, auth0Error]); // eslint-disable-line react-hooks/exhaustive-deps
   }
 
   const value = {
@@ -97,10 +138,19 @@ function InnerAuthProvider(props) {
     isLoading,
     authStateIsLoading: authState.isLoading,
     refreshAuth: fetchToken,
-    logout: () =>
+    login: () => loginWithRedirect(),
+    logout: () => {
       dispatchAuthState({
-        type: actions.LOGOUT,
-      }),
+        type: actions.RESET_LOGIN,
+        data: {
+          isLoggingOut: true,
+        },
+      });
+
+      logoutAuth0({
+        returnTo: window.location.origin,
+      });
+    },
   };
 
   return (
@@ -174,10 +224,11 @@ const authReducer = function (state, action) {
       };
       break;
     }
-    case actions.LOGOUT: {
+    case actions.RESET_LOGIN: {
       newState = {
         ...initialState,
         isAuthenticated: false,
+        ...action.data,
       };
       break;
     }
@@ -219,16 +270,17 @@ export const useAuth = () => {
     apiToken,
     user,
     isAuthenticated,
-    logout,
     isLoading,
     authStateIsLoading,
     refreshAuth,
+    login,
+    logout,
+    isLoggingOut,
   } = useCheckContext('useAuth');
 
   return useMemo(() => {
     const restApiClient = new RestApiClient({
       apiToken,
-      handleUnauthorized: () => logout(),
     });
     return {
       restApiClient,
@@ -238,6 +290,50 @@ export const useAuth = () => {
       user,
       isAuthenticated,
       refreshAuth,
+      login,
+      logout,
+      isLoggingOut,
     };
-  }, [apiToken, isLoading, authStateIsLoading, user, isAuthenticated]);
+  }, [
+    apiToken,
+    isLoading,
+    authStateIsLoading,
+    user && user.id,
+    isAuthenticated,
+    isLoggingOut,
+  ]);
 };
+
+/*
+ * HOC that requires user to be logged in to view a route
+ * Use this to wrap a component passed to a Route to create a
+ * Protected Route
+ *
+ * ex: <Route
+ *      component={withAuthenticationRequired(<Some Component>)
+ *      path={path}
+ *      />
+ */
+export function withAuthenticationRequired(WrapperComponent) {
+  /* eslint-disable react-hooks/rules-of-hooks */
+  const {
+    isAuthenticated,
+    authStateIsLoading,
+    isLoading,
+    isLoggingOut,
+  } = useAuth();
+
+  useEffect(() => {
+    if (!authStateIsLoading && !isLoading) {
+      if (!isAuthenticated && !isLoggingOut) {
+        toasts.error('Please sign in to view this page.');
+        history.push('/');
+      }
+    }
+  }, [isAuthenticated, authStateIsLoading, isLoading, isLoggingOut]);
+
+  if (authStateIsLoading || isLoading || !isAuthenticated) return;
+
+  return WrapperComponent;
+  /* eslint-enable react-hooks/rules-of-hooks */
+}

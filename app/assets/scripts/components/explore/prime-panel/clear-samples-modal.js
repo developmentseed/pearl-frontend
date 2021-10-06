@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { Modal } from '@devseed-ui/modal';
 import { Button } from '@devseed-ui/button';
 import { Heading } from '@devseed-ui/typography';
-import Prose from '../../styles/type/prose';
+import Prose from '../../../styles/type/prose';
 
 const Wrapper = styled.div`
   display: grid;
@@ -17,40 +17,44 @@ const Wrapper = styled.div`
   }
   grid-gap: 1rem;
 `;
-function SessionTimeoutModal({ revealed }) {
+function ClearSamplesModal({ revealed, onClear, onCancel }) {
   return (
     <Modal
-      id='session-timeout-modal'
+      id='clear-samples-modal'
+      data-cy='clear-samples-modal'
       size='small'
       revealed={revealed}
       renderHeader={() => null}
       closeButton={false}
       content={
         <Wrapper>
-          <Heading>Are you still working?</Heading>
+          <Heading>Your map contains input geometry.</Heading>
           <Prose className='prose'>
-            Your session will expire in 5 minutes. Extend it to keep working, or
-            end it to save and exit
+            Please submit or clear your input data before changing tabs.
           </Prose>
           <Button
-            variation='danger-raised-light'
+            variation='primary-plain'
             size='medium'
-            useIcon='xmark--small'
+            useIcon='xmark'
             style={{
               gridColumn: '1 / 2',
             }}
+            data-cy='cancel-return'
+            onClick={onCancel}
           >
-            End Session
+            Cancel
           </Button>
           <Button
-            variation='primary-raised-light'
+            variation='danger-raised-dark'
             size='medium'
-            useIcon='arrow-semi-spin-cw'
+            useIcon='trash-bin'
             style={{
               gridColumn: '2 / -1',
             }}
+            data-cy='clear-continue'
+            onClick={onClear}
           >
-            Extend Session
+            Clear Samples
           </Button>
         </Wrapper>
       }
@@ -58,7 +62,9 @@ function SessionTimeoutModal({ revealed }) {
   );
 }
 
-SessionTimeoutModal.propTypes = {
+ClearSamplesModal.propTypes = {
   revealed: T.bool,
+  onClear: T.func,
+  onCancel: T.func,
 };
-export default SessionTimeoutModal;
+export default ClearSamplesModal;

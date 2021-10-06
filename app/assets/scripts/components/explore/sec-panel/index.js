@@ -16,6 +16,8 @@ import { glsp } from '@devseed-ui/theme-provider';
 import { useCheckpoint } from '../../../context/checkpoint';
 import { useAoi } from '../../../context/aoi';
 import { round } from '../../../utils/format';
+import { useShortcutState } from '../../../context/explore';
+import { actions as shortcutActions } from '../../../context/explore/shortcuts';
 
 const StyledBlockBody = styled(PanelBlockBody)`
   justify-content: flex-start;
@@ -47,6 +49,7 @@ const CountList = styled.div`
 function SecPanel() {
   const { currentCheckpoint } = useCheckpoint();
   const { currentAoi } = useAoi();
+  const { shortcutState, dispatchShortcutState } = useShortcutState();
 
   if (!currentCheckpoint || !currentAoi) return null;
 
@@ -60,7 +63,12 @@ function SecPanel() {
     <Panel
       collapsible
       direction='right'
-      initialState={currentCheckpoint.classes}
+      overrideControl
+      revealed={shortcutState.rightPanel}
+      onPanelChange={() => {
+        dispatchShortcutState({ type: shortcutActions.TOGGLE_RIGHT_PANEL });
+      }}
+      initialState={currentCheckpoint.classes ? true : false}
       bodyContent={
         <PanelBlock>
           <PanelBlockHeader>
@@ -94,23 +102,27 @@ function SecPanel() {
                 )}
 
               {px_stats && currentCheckpoint.classes && (
-                <StyledBlockBody>
+                <StyledBlockBody data-cy='checkpoint_class_distro'>
                   <PanelBlockHeader>
                     <Subheading>Checkpoint Class Distribution</Subheading>
                   </PanelBlockHeader>
-                  <ClassAnalyticsChart
-                    checkpoint={{
-                      ...currentCheckpoint,
-                      analytics: Object.keys(currentCheckpoint.classes).map(
-                        (_, ind) => ({
-                          px_stat: px_stats[ind],
-                        })
-                      ),
-                    }}
-                    label='Retraining Sample Distribution'
-                    metric='px_stat'
-                    formatter={(v) => `${round(v, 2) * 100}%`}
-                  />
+                  {Object.keys(px_stats).length ? (
+                    <ClassAnalyticsChart
+                      checkpoint={{
+                        ...currentCheckpoint,
+                        analytics: Object.keys(currentCheckpoint.classes).map(
+                          (_, ind) => ({
+                            px_stat: px_stats[ind],
+                          })
+                        ),
+                      }}
+                      label='Retraining Sample Distribution'
+                      metric='px_stat'
+                      formatter={(v) => `${round(v * 100, 0)}%`}
+                    />
+                  ) : (
+                    <Prose>Class distribution metrics are not available</Prose>
+                  )}
                 </StyledBlockBody>
               )}
               {currentCheckpoint.input_geoms &&

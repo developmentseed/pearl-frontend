@@ -1,4 +1,4 @@
-import config from '../../app/assets/scripts/config/testing';
+import config from '../../../app/assets/scripts/config/testing';
 const { restApiEndpoint } = config.default;
 describe('Loads AOIs', () => {
   let map;
@@ -105,6 +105,10 @@ describe('Loads AOIs', () => {
       '81.11  km2'
     );
 
+    cy.get('[data-cy=panel-aoi-confirm]')
+      .should('exist')
+      .should('not.be.disabled');
+
     // Set AOI
     cy.get('[data-cy=aoi-edit-confirm-button').click();
 
@@ -132,6 +136,10 @@ describe('Loads AOIs', () => {
       'include.text',
       '6.56  km2'
     );
+
+    cy.get('[data-cy=panel-aoi-confirm]')
+      .should('exist')
+      .should('not.be.disabled');
 
     // Set AOI
     cy.get('[data-cy=aoi-edit-confirm-button').click();
@@ -187,5 +195,53 @@ describe('Can delete AOIs', () => {
     ).as('loadAois1');
     cy.get('.aoi-delete-button').first().click();
     cy.get('[data-cy=confirm-aoi-delete]').should('exist').click();
+  });
+
+  it('Can delete frontend only aoi', () => {
+    cy.fakeLogin();
+    cy.setWebsocketWorkflow('retrain');
+
+    cy.visit('/project/1');
+    cy.wait('@loadAois');
+
+    cy.intercept(
+      {
+        url: restApiEndpoint + '/api/project/1/aoi/*',
+        method: 'DELETE',
+      },
+      {
+        statusCode: 200,
+        body: {},
+      }
+    ).as('deleteAnyAoi');
+
+    cy.intercept(
+      {
+        url: restApiEndpoint + '/api/project/1/aoi',
+      },
+      {
+        fixture: 'aois.1.json',
+      }
+    ).as('loadAois1');
+
+    cy.get('[data-cy=aoi-selection-trigger]').click();
+    cy.get('[data-cy=add-aoi-button]').click();
+
+    // Draw AOI
+    cy.get('#map')
+      .trigger('mousedown', 150, 150)
+      .trigger('mousemove', 200, 200)
+      .trigger('mouseup');
+    cy.wait('@reverseGeocodeCity');
+
+    cy.get('[data-cy=delete-current-aoi-button]');
+    cy.get('[data-cy=delete-current-aoi-button]').click();
+
+    cy.get('[data-cy=confirm-delete-aoi-modal]').should('not.exist');
+    cy.get('@deleteAnyAoi').should('not.exist');
+    cy.get('[data-cy=aoi-selection-trigger]').should(
+      'contain',
+      'None selected'
+    );
   });
 });

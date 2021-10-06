@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import T from 'prop-types';
 import styled, { css } from 'styled-components';
 import { glsp, disabled as disabledStyles } from '@devseed-ui/theme-provider';
@@ -10,14 +10,26 @@ import { LocalButton } from '../../../styles/local-button';
 
 import InfoButton from '../../common/info-button';
 import { PanelBlockFooter } from '../../common/panel-block';
-import { checkpointModes } from '../../../context/checkpoint';
+import {
+  checkpointModes,
+  actions as checkpointActions,
+} from '../../../context/checkpoint';
 import { useInstance } from '../../../context/instance';
 import { Subheading } from '../../../styles/type/heading';
-import { useAoi } from '../../../context/aoi';
-import { useApiMeta } from '../../../context/api-meta';
+import { useAoi, useAoiName } from '../../../context/aoi';
+import { useApiLimits } from '../../../context/global';
+import { useMapState } from '../../../context/explore';
+import { mapModes } from '../../../context/reducers/map';
+
 import { Spinner } from '../../common/global-loading/styles';
 import BatchPredictionProgressModal from './batch-progress-modal';
-import { useState } from 'react';
+import { useSessionStatus } from '../../../context/explore';
+import logger from '../../../utils/logger';
+import {
+  hideGlobalLoading,
+  showGlobalLoadingMessage,
+} from '../../common/global-loading';
+import toasts from '../../common/toasts';
 
 const PanelControls = styled(PanelBlockFooter)`
   display: grid;
@@ -44,16 +56,60 @@ const ProgressButtonWrapper = styled.div`
   }
 `;
 
-function PrimeButton({ currentCheckpoint, allowInferenceRun, mapRef }) {
+function PrimeButton({
+  currentCheckpoint,
+  dispatchCurrentCheckpoint,
+  mapRef,
+  setAoiBounds,
+}) {
+  const { sessionStatus, setSessionStatusMode } = useSessionStatus();
   const {
-    runInference,
+    runPrediction,
     runBatchPrediction,
     runningBatch,
     retrain,
     refine,
   } = useInstance();
-  const { aoiArea } = useAoi();
-  const { apiLimits } = useApiMeta();
+  const { aoiArea, setActiveModal, aoiRef, setCurrentAoi } = useAoi();
+  const { updateAoiName } = useAoiName();
+  const { apiLimits } = useApiLimits();
+  const { mapState, setMapMode } = useMapState();
+
+  const applyAoi = () => {
+    setMapMode(mapModes.BROWSE_MODE);
+    let bounds = aoiRef.getBounds();
+    setAoiBounds(bounds);
+    updateAoiName(bounds);
+
+    // When AOI is edited -> we go to run mode
+    dispatchCurrentCheckpoint({
+      type: checkpointActions.SET_CHECKPOINT_MODE,
+      data: {
+        mode: checkpointModes.RUN,
+      },
+    });
+
+    //Current aoi should only be set after aoi has been sent to the api
+    setCurrentAoi(null);
+  };
+
+  const confirmAoi = () => {
+    if (!apiLimits || apiLimits.live_inference > aoiArea) {
+      applyAoi();
+    } else if (apiLimits.max_inference > aoiArea) {
+      setActiveModal('batch-inference');
+    } else {
+      setActiveModal('area-too-large');
+    }
+  };
+  const cancelAoi = () => {
+    setMapMode(mapModes.BROWSE_MODE);
+    mapRef.aoi.control.draw.disable();
+    //Edit mode is enabled as soon as draw is done
+    if (mapRef.aoi.control.edit._shape) {
+      mapRef.aoi.control.edit.disable();
+    }
+  };
 
   // If in refine mode, this button save refinements
   if (currentCheckpoint && currentCheckpoint.mode === checkpointModes.REFINE) {
@@ -76,6 +132,27 @@ function PrimeButton({ currentCheckpoint, allowInferenceRun, mapRef }) {
       </InfoButton>
     );
   }
+  // In AOI EDIT MODE, this button will confirm the aoi
+  else if (
+    mapState.mode === mapModes.CREATE_AOI_MODE ||
+    mapState.mode === mapModes.EDIT_AOI_MODE
+  ) {
+    return (
+      <InfoButton
+        data-cy='panel-aoi-confirm'
+        variation='primary-raised-dark'
+        size='medium'
+        useIcon='tick--small'
+        style={{
+          gridColumn: '1 / -1',
+        }}
+        onClick={aoiRef ? confirmAoi : cancelAoi}
+        id='panel-aoi-confirm'
+      >
+        {aoiRef ? 'Confirm Area Draw' : 'Cancel Area Draw'}
+      </InfoButton>
+    );
+  }
 
   const isBatchArea =
     aoiArea && apiLimits && aoiArea > apiLimits['live_inference'];
@@ -89,11 +166,57 @@ function PrimeButton({ currentCheckpoint, allowInferenceRun, mapRef }) {
   const runTypes = {
     retrain: {
       label: 'Retrain',
-      action: retrain,
+      action: async () => {
+        try {
+          showGlobalLoadingMessage('Starting retraining...');
+          await retrain({
+            onAbort: () => {
+              setSessionStatusMode('retrain-ready');
+            },
+          });
+        } catch (error) {
+          logger(error);
+          if (error.message === 'No instances available') {
+            toasts.error('No instances available, please try again later.', {
+              autoClose: false,
+              toastId: 'no-instance-available-error',
+            });
+          } else if (error.message === 'Instance creation failed') {
+            toasts.error(
+              'Could not start instance at the moment, please try again later.'
+            );
+          } else {
+            toasts.error('Unexpected error, please try again later.');
+          }
+          hideGlobalLoading();
+          return;
+        }
+      },
     },
     'live-prediction': {
-      label: 'Run Model',
-      action: runInference,
+      label: 'Ready for prediction run',
+      action: async () => {
+        try {
+          setSessionStatusMode('running-prediction');
+          await runPrediction({
+            onAbort: () => {
+              setSessionStatusMode('prediction-ready');
+            },
+          });
+        } catch (error) {
+          logger(error);
+
+          hideGlobalLoading();
+          if (error.message === 'Instance creation failed') {
+            toasts.error(
+              'Could not start instance at the moment, please try again later.'
+            );
+          } else {
+            toasts.error('Unexpected error, please try again later');
+          }
+          setSessionStatusMode('prediction-ready');
+        }
+      },
     },
     'batch-prediction': {
       label: 'Run Batch Prediction',
@@ -103,7 +226,32 @@ function PrimeButton({ currentCheckpoint, allowInferenceRun, mapRef }) {
 
   const run = runTypes[runType];
 
-  const isDisabled = !allowInferenceRun || (runningBatch && isBatchArea);
+  const { mode } = sessionStatus;
+
+  const checkDisabledState = () => {
+    if (mode === 'prediction-ready') {
+      // Only one batch prediction permitted at a time
+      if (runningBatch && isBatchArea) {
+        return true;
+      } else {
+        return false;
+      }
+    } else if (mode === 'retrain-ready') {
+      // No retrain permitted for batch area
+      if (isBatchArea) {
+        return true;
+      } else if (currentCheckpoint?.sampleCount > 0) {
+        // Allow retrain if sampleCount is nonzero
+        return false;
+      } else {
+        return true;
+      }
+    } else {
+      // If any other mode, disabled is true
+      return true;
+    }
+  };
+  const isDisabled = checkDisabledState();
 
   return (
     <InfoButton
@@ -115,7 +263,9 @@ function PrimeButton({ currentCheckpoint, allowInferenceRun, mapRef }) {
       style={{
         gridColumn: '1 / -1',
       }}
-      onClick={run.action}
+      onClick={() => {
+        !isDisabled && run.action();
+      }}
       visuallyDisabled={isDisabled}
       id='apply-button-trigger'
     >
@@ -126,8 +276,9 @@ function PrimeButton({ currentCheckpoint, allowInferenceRun, mapRef }) {
 
 PrimeButton.propTypes = {
   currentCheckpoint: T.object,
-  allowInferenceRun: T.bool.isRequired,
   mapRef: T.object,
+  setAoiBounds: T.func,
+  dispatchCurrentCheckpoint: T.func,
 };
 
 function Footer({
@@ -138,17 +289,14 @@ function Footer({
   localCheckpointName,
   setLocalCheckpointName,
   mapRef,
-  allowInferenceRun,
   disabled,
+  setAoiBounds,
 }) {
   const [displayBatchProgress, setDisplayBatchProgress] = useState(false);
   const { runningBatch } = useInstance();
+
   return (
-    <PanelControls
-      data-cy='footer-panel-controls'
-      data-disabled={disabled}
-      disabled={disabled}
-    >
+    <PanelControls data-cy='footer-panel-controls' data-disabled={disabled}>
       <Button
         variation='base-plain'
         size='medium'
@@ -158,8 +306,10 @@ function Footer({
         }}
         title='Clear all samples drawn since last retrain or save'
         id='reset-button-trigger'
-        disabled={!currentCheckpoint}
-        visuallyDisabled={!currentCheckpoint}
+        disabled={!currentCheckpoint || currentCheckpoint.sampleCount === 0}
+        visuallyDisabled={
+          !currentCheckpoint || currentCheckpoint.sampleCount === 0
+        }
         onClick={() => {
           dispatchCurrentCheckpoint({
             type: checkpointActions.CLEAR_SAMPLES,
@@ -197,8 +347,9 @@ function Footer({
 
       <PrimeButton
         currentCheckpoint={currentCheckpoint}
-        allowInferenceRun={allowInferenceRun}
+        dispatchCurrentCheckpoint={dispatchCurrentCheckpoint}
         mapRef={mapRef}
+        setAoiBounds={setAoiBounds}
       />
       {currentCheckpoint && currentCheckpoint.parent && (
         <Dropdown
@@ -206,6 +357,7 @@ function Footer({
           direction='up'
           triggerElement={(triggerProps) => (
             <InfoButton
+              data-cy='save-checkpoint-button'
               variation='primary-plain'
               size='medium'
               useIcon='save-disk'
@@ -215,7 +367,6 @@ function Footer({
               }}
               id='rename-button-trigger'
               {...triggerProps}
-              disabled={!currentCheckpoint}
             >
               Save Checkpoint
             </InfoButton>
@@ -234,6 +385,9 @@ function Footer({
                 name='checkpointName'
                 placeholder='Set Checkpoint Name'
                 value={localCheckpointName}
+                onKeyDown={(e) => {
+                  e.stopPropagation();
+                }}
                 onChange={(e) => setLocalCheckpointName(e.target.value)}
                 autoFocus
               />
@@ -280,6 +434,7 @@ function Footer({
 Footer.propTypes = {
   dispatchCurrentCheckpoint: T.func,
   currentCheckpoint: T.object,
+  checkpointHasSamples: T.bool,
   checkpointActions: T.object,
   checkpointModes: T.object,
   updateCheckpointName: T.func,
@@ -289,11 +444,12 @@ Footer.propTypes = {
   mapRef: T.object,
 
   instance: T.object,
-  allowInferenceRun: T.bool.isRequired,
-  runInference: T.func,
+  runPrediction: T.func,
   retrain: T.func,
   refine: T.func,
 
   disabled: T.bool,
+
+  setAoiBounds: T.func,
 };
 export default Footer;

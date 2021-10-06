@@ -5,31 +5,39 @@ import React, {
   useReducer,
   useContext,
   useMemo,
+  useRef,
 } from 'react';
 import T from 'prop-types';
-import { useAuth } from './auth';
+import { useAuth } from '../auth';
 import {
   showGlobalLoadingMessage,
   hideGlobalLoading,
-} from '../components/common/global-loading';
-import toasts from '../components/common/toasts';
+} from '../../components/common/global-loading';
+import { areaFromBounds } from '../../utils/map';
+import toasts from '../../components/common/toasts';
 import { useHistory, useParams } from 'react-router-dom';
-import { actions as predictionActions, usePredictions } from './predictions';
-import { mapStateReducer, mapModes, mapActionTypes } from './reducers/map';
+import { actions as predictionActions, usePredictions } from '../predictions';
+import { mapStateReducer, mapModes, mapActionTypes } from '../reducers/map';
 import tBbox from '@turf/bbox';
 
 import {
   actions as checkpointActions,
   checkpointModes,
   useCheckpoint,
-} from './checkpoint';
-import { wrapLogReducer } from './reducers/utils';
-import { useAoi, useAoiPatch } from './aoi';
-import { actions as aoiPatchActions } from './reducers/aoi_patch';
-import { useProject } from './project';
-import { useModel } from './model';
-import { useInstance } from './instance';
-import logger from '../utils/logger';
+} from '../checkpoint';
+import { useAoi, useAoiPatch } from '../aoi';
+import { actions as aoiPatchActions } from '../reducers/aoi_patch';
+import { useProject } from '../project';
+import { useModel } from '../model';
+import { useInstance } from '../instance';
+import logger from '../../utils/logger';
+import { wrapLogReducer } from '../reducers/utils';
+import {
+  actions as sessionActions,
+  useSessionStatusReducer,
+} from './session-status';
+
+import { useShortcutReducer, listenForShortcuts } from './shortcuts';
 
 /**
  * Context & Provider
@@ -39,6 +47,8 @@ export const ExploreContext = createContext(null);
 export function ExploreProvider(props) {
   const history = useHistory();
   let { projectId } = useParams();
+
+  const isInitialized = useRef(false);
 
   const [tourStep, setTourStep] = useState(
     localStorage.getItem('site-tour')
@@ -93,19 +103,88 @@ export function ExploreProvider(props) {
   );
   const [checkpointList, setCheckpointList] = useState(null);
   const [currentInstance, setCurrentInstance] = useState(null);
-  const {
-    setInstanceStatusMessage,
-    initInstance,
-    loadAoiOnInstance,
-    getRunningBatch,
-  } = useInstance();
+  const { initInstance, loadAoiOnInstance, getRunningBatch } = useInstance();
+
+  /**
+   * Session status
+   */
+  const [sessionStatus, dispatchSessionStatus] = useSessionStatusReducer();
+
+  /*
+   * Keyboard shortcuts
+   */
+  const [shortcutState, dispatchShortcutState] = useShortcutReducer();
+
+  // Action handlers
+  const setSessionStatusMessage = (message) =>
+    dispatchSessionStatus({
+      type: sessionActions.SET_MESSAGE,
+      data: message,
+    });
+  const setSessionStatusMode = (mode) =>
+    dispatchSessionStatus({
+      type: sessionActions.SET_MODE,
+      data: mode,
+    });
+
+  // Handle session mode updates
+  useEffect(() => {
+    const { mode } = sessionStatus;
+    if (mode === 'set-project-name' && projectName) {
+      isInitialized.current = true;
+      setSessionStatusMode('set-aoi');
+    } else if (mode === 'set-aoi' && aoiRef) {
+      setSessionStatusMode('select-model');
+    } else if (mode === 'select-model' && selectedModel) {
+      setSessionStatusMode('prediction-ready');
+    } else if (mode === 'loading-project' && aoiRef && currentCheckpoint) {
+      isInitialized.current = true;
+      setSessionStatusMode('retrain-ready');
+    }
+  }, [
+    sessionStatus.mode,
+    projectName,
+    aoiRef,
+    selectedModel,
+    currentCheckpoint,
+  ]);
+
+  useEffect(() => {
+    if (isInitialized.current) {
+      const wrappedFunc = (e) => listenForShortcuts(e, dispatchShortcutState);
+
+      document.addEventListener('keydown', wrappedFunc);
+      document.addEventListener('keyup', wrappedFunc);
+
+      return () => {
+        document.removeEventListener('keydown', wrappedFunc);
+        document.removeEventListener('keyup', wrappedFunc);
+      };
+    }
+  }, [isInitialized.current, dispatchShortcutState]);
 
   async function loadInitialData() {
     showGlobalLoadingMessage('Loading configuration...');
 
-    // Bypass loading project when new
+    // Update session status
     if (projectId === 'new') {
+      setSessionStatusMode('set-project-name');
       hideGlobalLoading();
+      return; // Bypass loading project when new
+    } else {
+      setSessionStatusMode('loading-project');
+    }
+
+    const { availableGpus } = await restApiClient.getApiMeta('');
+
+    // Do not run when no instances are available
+    if (!availableGpus) {
+      hideGlobalLoading();
+      toasts.error('No instances available, please try again later.', {
+        autoClose: false,
+        toastId: 'no-instance-available-error',
+      });
+      history.push(`/profile/projects/${projectId}`);
       return;
     }
 
@@ -188,11 +267,9 @@ export function ExploreProvider(props) {
     if (predictions.fetching) {
       const { processed, total } = predictions;
       if (!total) {
-        setInstanceStatusMessage(`Waiting for predictions...`);
+        setSessionStatusMessage(`Waiting for predictions...`);
       } else {
-        setInstanceStatusMessage(
-          `Receiving images ${processed} of ${total}...`
-        );
+        setSessionStatusMessage(`Received image ${processed} of ${total}...`);
       }
     } else if (predictions.isReady()) {
       // Update aoi List with newest aoi
@@ -217,6 +294,8 @@ export function ExploreProvider(props) {
           .then((aoi) => {
             setCurrentAoi(aoi);
           });
+
+        setSessionStatusMode('retrain-ready');
       }
 
       if (predictions.error) {
@@ -278,6 +357,23 @@ export function ExploreProvider(props) {
       dispatchPredictions({ type: predictionActions.CLEAR_PREDICTION });
     }
   }, [mapState]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (!isInitialized.current) {
+      return;
+    }
+    if (shortcutState.overrideBrowseMode) {
+      dispatchMapState({
+        type: mapActionTypes.SET_MODE,
+        data: mapModes.BROWSE_MODE,
+      });
+    } else if (mapState.previousMode) {
+      dispatchMapState({
+        type: mapActionTypes.SET_MODE,
+        data: mapState.previousMode,
+      });
+    }
+  }, [isInitialized.current, shortcutState.overrideBrowseMode]);
 
   /*
    * Re-init aoi state variables
@@ -373,6 +469,8 @@ export function ExploreProvider(props) {
       setAoiInitializer(bounds);
       setAoiName(aoiObject.name);
     }
+
+    setAoiArea(areaFromBounds(tBbox(aoi.bounds)));
 
     if (!aoiMatchesCheckpoint) {
       toasts.error(
@@ -543,6 +641,12 @@ export function ExploreProvider(props) {
         updateCheckpointName,
 
         dispatchAoiPatch,
+
+        sessionStatus,
+        setSessionStatusMode,
+
+        shortcutState,
+        dispatchShortcutState,
       }}
     >
       {props.children}
@@ -565,6 +669,30 @@ export const useExploreContext = (fnName) => {
   }
 
   return context;
+};
+
+export const useSessionStatus = () => {
+  const { sessionStatus, setSessionStatusMode } = useExploreContext(
+    'useSessionStatus'
+  );
+
+  return useMemo(() => ({ sessionStatus, setSessionStatusMode }), [
+    sessionStatus,
+  ]);
+};
+
+export const useShortcutState = () => {
+  const { shortcutState, dispatchShortcutState } = useExploreContext(
+    'useSessionStatus'
+  );
+
+  return useMemo(
+    () => ({
+      shortcutState,
+      dispatchShortcutState,
+    }),
+    [shortcutState, dispatchShortcutState]
+  );
 };
 
 export const useMapState = () => {

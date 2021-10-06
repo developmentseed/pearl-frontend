@@ -8,16 +8,13 @@ import { themeVal, glsp } from '@devseed-ui/theme-provider';
 import InputRange from 'react-input-range';
 import { Accordion, AccordionFold as BaseFold } from '@devseed-ui/accordion';
 import throttle from 'lodash.throttle';
-import {
-  useMapLayers,
-  useUserLayers,
-  useLayersPanel,
-  useMapRef,
-} from '../../context/map';
-import { useMapState } from '../../context/explore';
+import { useMapLayers, useUserLayers, useMapRef } from '../../context/map';
+import { useMapState, useShortcutState } from '../../context/explore';
+import { actions as shortcutActions } from '../../context/explore/shortcuts';
 import { useCheckpoint } from '../../context/checkpoint';
+import { round } from '../../utils/format';
 
-const LayersPanelInner = styled.div`
+export const LayersPanelInner = styled.div`
   opacity: ${({ show }) => (show ? 1 : 0)};
   display: ${({ show }) => !show && 'none'};
   min-width: 16rem;
@@ -29,7 +26,7 @@ const LayersPanelInner = styled.div`
   position: fixed;
   background: ${themeVal('color.surface')};
   box-shadow: ${themeVal('boxShadow.elevationB')};
-  z-index: 1;
+  z-index: 400;
 `;
 const LayersWrapper = styled.div`
   display: grid;
@@ -85,11 +82,24 @@ const AccordionFold = styled(BaseFold)`
   }
 `;
 
-function Layer({ layer, onSliderChange, onVisibilityToggle, info, name }) {
+export function Layer({
+  layer,
+  onSliderChange,
+  onVisibilityToggle,
+  info,
+  name,
+}) {
   const [value, setValue] = useState(layer.opacity || 1);
   const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    if (layer.opacity !== value) {
+      setValue(layer.opacity);
+    }
+  }, [layer.opacity]);
+
   return (
-    <LayerWrapper data-cy={name}>
+    <LayerWrapper data-cy={name} data-opacity={round(value, 2)}>
       <SliderWrapper>
         <Heading as='h4' size='xsmall'>
           {name}
@@ -98,6 +108,7 @@ function Layer({ layer, onSliderChange, onVisibilityToggle, info, name }) {
           onChange={throttle((v) => {
             setValue(v);
             onSliderChange(layer, v);
+            if (v > 0) setVisible(true);
           }, 500)}
           value={value}
           formatLabel={() => null}
@@ -142,7 +153,7 @@ Layer.propTypes = {
   name: T.string,
 };
 
-function Category({
+export function Category({
   checkExpanded,
   setExpanded,
   category,
@@ -195,8 +206,17 @@ function LayersPanel(props) {
   const { mapState, mapModes } = useMapState();
   const disabled = mapState.mode === mapModes.EDIT_AOI_MODE;
 
-  const { userLayers, setUserLayers } = useUserLayers();
-  const { showLayersPanel } = useLayersPanel();
+  const { userLayers: baseUserLayers, setUserLayers } = useUserLayers();
+  const { shortcutState, dispatchShortcutState } = useShortcutState();
+
+  const userLayers = {
+    ...baseUserLayers,
+    predictions: {
+      ...baseUserLayers.predictions,
+      opacity: shortcutState.predictionLayerOpacity,
+    },
+  };
+
   const { mapLayers } = useMapLayers();
   const { mapRef } = useMapRef();
   const { currentCheckpoint } = useCheckpoint();
@@ -220,7 +240,7 @@ function LayersPanel(props) {
     });
   }, [currentCheckpoint && currentCheckpoint.retrain_geoms]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     function updatePosition() {
       if (parentNode.current) {
         setPosition(parentNode.current.getBoundingClientRect());
@@ -241,7 +261,7 @@ function LayersPanel(props) {
   return (
     <LayersPanelInner
       className={className}
-      show={!disabled && showLayersPanel}
+      show={!disabled && shortcutState.layerTray}
       style={{
         top: position.top || 0,
         left: position.right || 0,
@@ -268,8 +288,18 @@ function LayersPanel(props) {
                     [layer.id]: {
                       ...layer,
                       opacity: value,
+                      visible: value > 0,
                     },
                   });
+
+                  if (layer.id === 'predictions') {
+                    dispatchShortcutState({
+                      type: shortcutActions.UPDATE,
+                      data: {
+                        predictionLayerOpacity: value,
+                      },
+                    });
+                  }
                 }}
                 onVisibilityToggle={(layer) => {
                   setUserLayers({

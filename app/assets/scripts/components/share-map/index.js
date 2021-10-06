@@ -1,17 +1,21 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import PageHeader from '../common/page-header';
 import toasts from '../common/toasts';
 import { PageBody } from '../../styles/page';
-import { MapContainer, TileLayer } from 'react-leaflet';
-import GlobalContext from '../../context/global';
+import { MapContainer, TileLayer, FeatureGroup } from 'react-leaflet';
+import { useMosaics } from '../../context/global';
 
 import { useParams } from 'react-router-dom';
 import App from '../common/app';
+import {
+  MAX_BASE_MAP_ZOOM_LEVEL,
+  BaseMapLayer,
+} from '../common/map/base-map-layer';
+import { BOUNDS_PADDING } from '../common/map/constants';
 import config from '../../config';
 import { useAuth } from '../../context/auth';
 import logger from '../../utils/logger';
-import { panelSkin } from '../../styles/skins';
 import {
   ClassList,
   Class,
@@ -21,17 +25,20 @@ import {
 import { themeVal, glsp } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
 import { Subheading } from '../../styles/type/heading';
+import { DownloadAoiButton } from '../profile/project/batch-list';
+import LayersPanel from './layers-control';
+import GenericControl from '../common/map/generic-control';
 
 const { restApiEndpoint, tileUrlTemplate } = config;
 
 const ClassLegend = styled(ClassList)`
-  ${panelSkin};
+  background: ${themeVal('color.surface')};
   position: absolute;
-  bottom: ${glsp(4)};
-  right: ${glsp(4)};
-  padding: ${glsp(2)} ${glsp(2.5)} ${glsp(2)} ${glsp(1.5)};
+  bottom: ${glsp(2)};
+  right: ${glsp(2)};
+  padding: ${glsp(1.5)};
   grid-gap: ${glsp()};
-  z-index: 99997;
+  z-index: 401;
   width: 16rem;
   overflow: hidden;
 
@@ -54,66 +61,122 @@ const ClassLegend = styled(ClassList)`
   }
 `;
 
+const INITIAL_MAP_LAYERS = {
+  mosaic: {
+    id: 'mosaic',
+    name: 'naip.latest',
+    opacity: 1,
+    visible: true,
+    active: true,
+  },
+  predictions: {
+    id: 'predictions',
+    name: 'Prediction Results',
+    opacity: 1,
+    visible: true,
+    active: true,
+  },
+};
+
 function ShareMap() {
   const { uuid } = useParams();
   const [mapRef, setMapRef] = useState(null);
   const { restApiClient } = useAuth();
   const [tileUrl, setTileUrl] = useState(null);
+  const [mapLayers, setMapLayers] = useState(INITIAL_MAP_LAYERS);
+  const [showLayersControl, setShowLayersControl] = useState(false);
   const [classes, setClasses] = useState([]);
-  const { mosaicList } = useContext(GlobalContext);
-  const mosaics = mosaicList.isReady() ? mosaicList.getData().mosaics : null;
+  const [aoiInfo, setAoiInfo] = useState({ id: null, projectId: null });
+  const { mosaics } = useMosaics();
   const mosaic = mosaics && mosaics.length > 0 ? mosaics[0] : null;
 
   useEffect(() => {
-    async function fetchData() {
-      if (!mapRef) return;
-      try {
-        const tileJSON = await restApiClient.getTileJSONFromUUID(uuid);
+    if (!mapRef) return;
+    restApiClient
+      .getTileJSONFromUUID(uuid)
+      .then((tileJSON) => {
         setTileUrl(`${restApiEndpoint}${tileJSON.tiles[0]}`);
-        const bounds = [
-          [tileJSON.bounds[3], tileJSON.bounds[0]],
-          [tileJSON.bounds[1], tileJSON.bounds[2]],
-        ];
-        mapRef.fitBounds(bounds);
-        const aoiData = await restApiClient.getAOIFromUUID(uuid);
-        setClasses(aoiData.classes);
-      } catch (error) {
+      })
+      .catch((error) => {
         logger(error);
-        toasts.error('Could not load AOI map');
+        toasts.error('There was an error loading AOI map tiles.');
+      });
+    restApiClient.getAOIFromUUID(uuid).then((aoiData) => {
+      setClasses(aoiData.classes);
+      setAoiInfo({ id: aoiData.aoi_id, projectId: aoiData.project_id });
+      if (aoiData.bounds && aoiData.bounds.coordinates) {
+        const bounds = [
+          aoiData.bounds.coordinates[0][0].reverse(),
+          aoiData.bounds.coordinates[0][2].reverse(),
+        ];
+        mapRef.fitBounds(bounds, {
+          padding: BOUNDS_PADDING,
+          maxZoom: MAX_BASE_MAP_ZOOM_LEVEL,
+        });
       }
-    }
-    fetchData();
-  }, [uuid, mapRef, tileUrl]);
-
-  let leafletLayer;
-  if (tileUrl) {
-    leafletLayer = <TileLayer url={tileUrl} />;
-  } else {
-    leafletLayer = null;
-  }
-
-  let mosaicLayer;
-  if (mosaic) {
-    mosaicLayer = (
-      <TileLayer url={tileUrlTemplate.replace('{LAYER_NAME}', mosaic)} />
-    );
-  } else {
-    mosaicLayer = null;
-  }
+    });
+  }, [uuid, mapRef]);
 
   return (
     <App pageTitle='AOI Map'>
-      <PageHeader />
+      <PageHeader>
+        <DownloadAoiButton
+          aoi={aoiInfo.id}
+          projectId={aoiInfo.projectId}
+          uuid={uuid}
+          variation='primary-raised-dark'
+        >
+          Download map
+        </DownloadAoiButton>
+      </PageHeader>
       <PageBody role='main'>
         <MapContainer
           style={{ height: '100%' }}
-          whenCreated={(m) => {
-            setMapRef(m);
-          }}
+          maxZoom={MAX_BASE_MAP_ZOOM_LEVEL}
+          whenCreated={(m) => setMapRef(m)}
         >
-          {mosaicLayer}
-          {leafletLayer}
+          <BaseMapLayer />
+          {mosaic && (
+            <TileLayer
+              url={tileUrlTemplate.replace('{LAYER_NAME}', mosaic)}
+              attribution='&copy; NAIP'
+              minZoom={12}
+              maxZoom={20}
+              zIndex={2}
+              opacity={mapLayers.mosaic.visible ? mapLayers.mosaic.opacity : 0}
+            />
+          )}
+          {tileUrl && (
+            <TileLayer
+              url={tileUrl}
+              minZoom={12}
+              maxZoom={20}
+              zIndex={3}
+              opacity={
+                mapLayers.predictions.visible
+                  ? mapLayers.predictions.opacity
+                  : 0
+              }
+            />
+          )}
+          <FeatureGroup>
+            <GenericControl
+              id='layer-control'
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowLayersControl(!showLayersControl);
+              }}
+            />
+          </FeatureGroup>
         </MapContainer>
+        <LayersPanel
+          mapRef={mapRef}
+          parentId='layer-control'
+          className='padded'
+          active={showLayersControl}
+          mapLayers={mapLayers}
+          setMapLayers={setMapLayers}
+        />
         <ClassLegend>
           <Subheading>LULC Classes</Subheading>
           {classes.length > 1

@@ -3,68 +3,41 @@ import React, {
   useContext,
   useEffect,
   useMemo,
-  useReducer,
   useState,
 } from 'react';
 import T from 'prop-types';
-import { initialApiRequestState } from './reducers/reduxeed';
-import { createQueryApiGetReducer, queryApiGet } from './reducers/api';
-import { createQueryApiPostReducer } from './reducers/api';
-import { useAuth } from './auth';
-import useAsync from '../utils/use-async';
+import useFetch from '../utils/use-fetch';
 
 const GlobalContext = createContext({});
+
 export function GlobalContextProvider(props) {
-  const { apiToken, restApiClient } = useAuth();
   const [tourStep, setTourStep] = useState(0);
 
-  const models = useAsync(() => restApiClient.getModels(), false);
+  const apiLimits = useFetch('', {
+    authRequired: false,
+    mutator: (body) => {
+      return body && body.limits;
+    },
+  });
 
-  const [mosaicList, dispatchMosaicList] = useReducer(
-    createQueryApiGetReducer('mosaic'),
-    initialApiRequestState
-  );
-
-  const [currentProjectName, setCurrentProjectName] = useState(null);
-
-  const [currentProject, dispatchProject] = useReducer(
-    createQueryApiPostReducer('project'),
-    initialApiRequestState
-  );
+  const mosaicList = useFetch('mosaic', { mutator: (body) => body.mosaics });
 
   useEffect(() => {
-    queryApiGet({ endpoint: 'mosaic' })(dispatchMosaicList);
     const visited = localStorage.getItem('site-tour');
     if (visited !== null) {
       setTourStep(Number(visited));
     }
   }, []);
 
-  useEffect(() => {
-    /*
-     * Request user data when api token is available
-     */
-    if (!apiToken) {
-      return;
-    }
-
-    // fetch models when apiToken is available
-    models.execute();
-  }, [apiToken]);
-
   return (
     <>
       <GlobalContext.Provider
         value={{
-          models,
+          apiLimits:
+            apiLimits.isReady && !apiLimits.hasError ? apiLimits.data : null,
 
-          mosaicList,
-
-          dispatchProject,
-          currentProject,
-
-          currentProjectName,
-          setCurrentProjectName,
+          mosaics:
+            mosaicList.isReady && !mosaicList.hasError ? mosaicList.data : [],
 
           tourStep,
           setTourStep,
@@ -93,14 +66,25 @@ export const useGlobalContext = (fnName) => {
   return context;
 };
 
-export const useModels = () => {
-  const { models } = useGlobalContext('useModels');
+export const useApiLimits = () => {
+  const { apiLimits } = useGlobalContext('useApiLimits');
 
   return useMemo(
     () => ({
-      models,
+      apiLimits,
     }),
-    [models]
+    [apiLimits]
+  );
+};
+
+export const useMosaics = () => {
+  const { mosaics } = useGlobalContext('useMosaics');
+
+  return useMemo(
+    () => ({
+      mosaics,
+    }),
+    [mosaics]
   );
 };
 

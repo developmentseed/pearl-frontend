@@ -24,7 +24,7 @@ import {
   DropdownFooter,
 } from '../../../styles/dropdown';
 import { AoiEditButtons } from './aoi-edit-buttons';
-import { useModels } from '../../../context/global';
+import { useModel } from '../../../context/model';
 import { useAuth } from '../../../context/auth';
 import { useAoi } from '../../../context/aoi';
 
@@ -136,7 +136,7 @@ function Header(props) {
   } = props;
 
   const [deleteAoi, setDeleteAoi] = useState();
-  const { models } = useModels();
+  const { models } = useModel();
   const { restApiClient } = useAuth();
   const { setAoiList } = useAoi();
 
@@ -199,22 +199,21 @@ function Header(props) {
   };
 
   const modelNotChangeable =
-    !isAuthenticated || models.status !== 'success' || checkpointList?.length;
+    !isAuthenticated ||
+    !models.isReady ||
+    models.hasError ||
+    checkpointList?.length;
 
   const renderModelLabel = () => {
     if (!isAuthenticated) {
       return 'Login to select model';
     }
 
-    if (['pending', 'idle'].includes(models.status)) {
+    if (!models.isReady) {
       return 'Loading...';
     }
 
-    if (
-      models.status === 'success' &&
-      models.value &&
-      models.value.length > 0
-    ) {
+    if (models.status === 'success' && models.data && models.data.length > 0) {
       return 'Select Model';
     }
 
@@ -279,6 +278,7 @@ function Header(props) {
                 <li key={a.id}>
                   <DropdownItem
                     checked={a.name == aoiName}
+                    className='listed-aoi'
                     onClick={() => {
                       const relevantAoi = findCompatibleAoi(
                         a,

@@ -2,29 +2,121 @@ const {
   restApiEndpoint,
 } = require('../../../app/assets/scripts/config/testing').default;
 
+const instance = {
+  id: 1,
+  project_id: 1,
+  aoi_id: 2,
+  checkpoint_id: 2,
+  last_update: '2021-07-12T09:59:04.442Z',
+  created: '2021-07-12T09:58:57.459Z',
+  active: true,
+  token: 'app_client',
+  status: {
+    phase: 'Running',
+  },
+};
+
 describe('Retrain existing project', () => {
   beforeEach(() => {
     cy.startServer();
+    cy.fakeLogin();
+
+    /**
+     * GET /project/:id/instance/:id
+     */
+    cy.intercept(
+      {
+        url: restApiEndpoint + '/api/project/1/instance/1',
+      },
+      instance
+    );
+  });
+
+  it('fail to load existing project if no instances are available', () => {
+    // No instances available
+    cy.intercept(
+      {
+        url: restApiEndpoint + '/api',
+      },
+      {
+        version: '1.0.0',
+        limits: {
+          live_inference: 10000000,
+          max_inference: 100000000,
+          instance_window: 600,
+          total_gpus: 15,
+          active_gpus: 15,
+        },
+      }
+    );
+
+    cy.visit('/project/1');
+
+    // Should display modal
+    cy.get('#no-instance-available-error')
+      .should('contain', 'No instances available, please try again later.')
+      .click();
+
+    cy.location().should((loc) => {
+      expect(loc.pathname).to.eq('/profile/projects/1');
+    });
+
+    cy.visit('/project/1');
+
+    // Malformed object
+    cy.intercept(
+      {
+        url: restApiEndpoint + '/api',
+      },
+      {
+        version: '1.0.0',
+        limits: {
+          live_inference: 10000000,
+          max_inference: 100000000,
+          instance_window: 600,
+          total_gpus: 15,
+          active_gpus: 20,
+        },
+      }
+    );
+
+    // Should display modal
+    cy.get('#no-instance-available-error')
+      .should('contain', 'No instances available, please try again later.')
+      .click();
+
+    cy.location().should((loc) => {
+      expect(loc.pathname).to.eq('/profile/projects/1');
+    });
   });
 
   it('successfully loads', () => {
-    cy.fakeLogin();
-
     cy.setWebsocketWorkflow('retrain');
 
     cy.visit('/project/1');
+
+    // Check initial status
     cy.get('[data-cy=session-status]').should(
       'have.text',
-      'Session Status: Ready to go'
+      'Session Status: Loading project...'
     );
+
+    // Wait for data loading
+    cy.wait(['@fetchAoi2', '@fetchCheckpoint2']);
+
+    // Check ready for retrain status
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Ready for retrain run'
+    );
+
     cy.get('[data-cy=global-loading]').should('not.exist');
 
-    // Check if retrain button panel is disabled
-    cy.get('[data-cy=footer-panel-controls]').should(
-      'have.attr',
-      'data-disabled',
-      'true'
-    );
+    // Check if retrain button panel is disabled (no samples added yet)
+    cy.get('[data-cy=run-button]').should('have.attr', 'data-disabled', 'true');
+
+    // Save checkpoint is enabled
+    cy.get('[data-cy=save-checkpoint-button]').should('not.be.disabled');
 
     // Base feature to perform map edit actions
     const baseFeature = [
@@ -53,7 +145,7 @@ describe('Retrain existing project', () => {
       .trigger('mouseup', ...feature1[3]);
 
     // Check if retrain button panel is enabled after a sampled is added
-    cy.get('[data-cy=footer-panel-controls]').should(
+    cy.get('[data-cy=run-button]').should(
       'have.attr',
       'data-disabled',
       'false'
@@ -163,20 +255,17 @@ describe('Retrain existing project', () => {
     ).as('fetchAvailableInstancesCount');
 
     // Request model run
-    cy.get('[data-cy=run-button').click();
+    cy.get('[data-cy=run-button]').click();
 
     // Wait for outbound request
     cy.wait('@fetchAvailableInstancesCount');
 
     // Should display modal
     cy.get('#no-instance-available-error')
-      .should(
-        'contain',
-        'No instance available to run the model, please try again later.'
-      )
+      .should('contain', 'No instances available, please try again later.')
       .click();
 
-    // Set no instances available
+    // Make instances available
     cy.intercept(
       {
         url: restApiEndpoint + '/api',
@@ -193,13 +282,211 @@ describe('Retrain existing project', () => {
       }
     ).as('fetchAvailableInstancesCount');
 
+    // Instance pending
+    cy.intercept(
+      {
+        url: restApiEndpoint + '/api/project/1/instance/1',
+      },
+      {
+        ...instance,
+        status: {
+          phase: 'Pending',
+        },
+      }
+    );
+
     // Request model run
-    cy.get('[data-cy=run-button').click();
+    cy.get('[data-cy=run-button]').click();
 
     // Wait for outbound request
     cy.wait('@fetchAvailableInstancesCount');
 
     // Should display modal
     cy.get('#no-instance-available-error').should('not.exist');
+
+    // Instance is failed
+    cy.intercept(
+      {
+        url: restApiEndpoint + '/api/project/1/instance/1',
+      },
+      {
+        ...instance,
+        status: {
+          phase: 'Failed',
+        },
+      }
+    );
+
+    // Show toast
+    cy.get('#a-toast').should(
+      'contain',
+      'Could not start instance at the moment, please try again later.'
+    );
+    cy.get('[data-cy=toast-close-button]').click();
+    cy.get('[data-cy=toast-close-button]').should('not.exist');
+
+    // Instance is running
+    cy.intercept(
+      {
+        url: restApiEndpoint + '/api/project/1/instance/1',
+      },
+      {
+        ...instance,
+        status: {
+          phase: 'Running',
+        },
+      }
+    );
+
+    // Request model run
+    cy.get('[data-cy=run-button]').click();
+
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Ready for retrain run'
+    );
+
+    // Save checkpoint is enabled
+    cy.get('[data-cy=save-checkpoint-button]').should('not.be.disabled');
+
+    // Go to home page to avoid spilling state to next test
+    cy.visit('/');
+    cy.location().should((loc) => {
+      expect(loc.pathname).to.eq('/');
+    });
+  });
+
+  it('abort retrain', () => {
+    cy.setWebsocketWorkflow('retrain-one-sample-aborted');
+
+    cy.visit('/project/1');
+
+    // Check initial status
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Loading project...'
+    );
+
+    // Wait for data loading
+    cy.wait(['@fetchAoi2', '@fetchCheckpoint2']);
+
+    // Check ready for retrain status
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Ready for retrain run'
+    );
+
+    const pointSample = [470, 250];
+    cy.get('[data-cy="Barren-class-button"').click();
+    cy.get('[data-cy=add-point-sample-button').click();
+    cy.get('#app-container').click(...pointSample);
+
+    // Set 1 instance available
+    cy.intercept(
+      {
+        url: restApiEndpoint + '/api',
+      },
+      {
+        version: '1.0.0',
+        limits: {
+          live_inference: 10000000,
+          max_inference: 100000000,
+          instance_window: 600,
+          total_gpus: 1,
+          active_gpus: 0,
+        },
+      }
+    ).as('fetchAvailableInstancesCount');
+
+    // Request model run
+    cy.get('[data-cy=run-button]').click();
+
+    // Prediction is halted
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Received image 3 of 6...'
+    );
+
+    // Abort
+    cy.get('[data-cy=abort-run-button]').should('exist').click();
+
+    // Reset WS workflow
+    cy.setWebsocketWorkflow('retrain-one-sample-aborted');
+
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Ready for retrain run'
+    );
+
+    // Retrain again
+    cy.get('[data-cy="Barren-class-button"').click();
+    cy.get('[data-cy=add-point-sample-button').click();
+    cy.get('#app-container').click(...pointSample);
+
+    // Request model run
+    cy.get('[data-cy=run-button]').click();
+
+    // Prediction is halted
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Received image 3 of 6...'
+    );
+
+    // Set no instances available
+    cy.intercept(
+      {
+        url: restApiEndpoint + '/api',
+      },
+      {
+        version: '1.0.0',
+        limits: {
+          live_inference: 10000000,
+          max_inference: 100000000,
+          instance_window: 600,
+          total_gpus: 1,
+          active_gpus: 1,
+        },
+      }
+    ).as('fetchAvailableInstancesCount');
+
+    // Abort
+    cy.get('[data-cy=abort-run-button]').should('exist').click();
+
+    cy.location().should((loc) => {
+      expect(loc.pathname).to.eq('/profile/projects/1');
+    });
+  });
+
+  it('load existing checkpoint, can predict new AOI', () => {
+    cy.visit('/project/1');
+
+    // Check initial status
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Loading project...'
+    );
+
+    // Wait for data loading
+    cy.wait(['@fetchAoi2', '@fetchCheckpoint2']);
+
+    // Check ready for retrain status
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Ready for retrain run'
+    );
+
+    cy.get('[data-cy=aoi-selection-trigger]').click();
+
+    cy.get('[data-cy=add-aoi-button]').click();
+
+    // Draw AOI
+    cy.get('#map')
+      .trigger('mousedown', 150, 150)
+      .trigger('mousemove', 300, 300)
+      .trigger('mouseup');
+    cy.wait('@reverseGeocodeCity');
+    cy.get('[data-cy=aoi-selection-trigger]').contains('Judiciary Square');
+
+    cy.get('[data-cy=run-button]').should('be.enabled');
   });
 });
