@@ -11,6 +11,7 @@ import {
   ExploreContext,
   useMapState,
   useShortcutState,
+  useAoiMeta,
 } from '../../../context/explore';
 import { useModel } from '../../../context/model';
 
@@ -22,10 +23,8 @@ import Predict from './tabs/predict';
 import RetrainModel from './tabs/retrain-model';
 import RefineResults from './tabs/refine-results';
 
-import PanelHeader from './header';
 import PanelFooter from './footer';
-
-import { useAuth } from '../../../context/auth';
+import { useProject } from '../../../context/project';
 import {
   useCheckpoint,
   actions as checkpointActions,
@@ -70,33 +69,23 @@ const TABS = [0, 1, 2];
 const [PREDICT_TAB_INDEX, RETRAIN_TAB_INDEX, REFINE_TAB_INDEX] = TABS;
 
 function PrimePanel() {
-  const { isAuthenticated } = useAuth();
   const { mapState, mapModes, setMapMode } = useMapState();
   const { mapRef } = useMapRef();
   const { apiLimits } = useApiLimits();
   const { shortcutState, dispatchShortcutState } = useShortcutState();
 
-  const {
-    currentProject,
-    checkpointList,
-    selectedModel,
-    setSelectedModel,
-    aoiArea,
-    createNewAoi,
-    loadAoi,
-    aoiList,
-    aoiBounds,
-    setAoiBounds,
-    updateCheckpointName,
-  } = useContext(ExploreContext);
+  const { updateCheckpointName } = useContext(ExploreContext);
 
-  const { aoiRef, setAoiRef, aoiName, currentAoi } = useAoi();
+  const { currentProject } = useProject();
+  const { setAoiBounds, aoiArea } = useAoiMeta();
 
-  const { applyCheckpoint, runningBatch, getRunningBatch } = useInstance();
+  const { aoiRef, currentAoi } = useAoi();
+
+  const { runningBatch, getRunningBatch } = useInstance();
 
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
 
-  const { models } = useModel();
+  const { models, selectedModel, setSelectedModel } = useModel();
 
   const { predictions } = usePredictions();
 
