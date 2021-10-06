@@ -18,6 +18,7 @@ import { Heading } from '@devseed-ui/typography';
 import { Button } from '@devseed-ui/button';
 
 import TabbedBlock from '../../common/tabbed-block-body';
+import Predict from './tabs/predict';
 import RetrainModel from './tabs/retrain-model';
 import RefineResults from './tabs/refine-results';
 
@@ -65,8 +66,8 @@ const Headline = styled.div`
     align-self: center;
   }
 `;
-const TABS = [0, 1];
-const [RETRAIN_TAB_INDEX, REFINE_TAB_INDEX] = TABS;
+const TABS = [0, 1, 2];
+const [PREDICT_TAB_INDEX, RETRAIN_TAB_INDEX, REFINE_TAB_INDEX] = TABS;
 
 function PrimePanel() {
   const { isAuthenticated } = useAuth();
@@ -197,6 +198,11 @@ function PrimePanel() {
             />
             <PanelBlockBody>
               <TabbedBlock activeTab={activeTab}>
+                <Predict
+                  name='predict'
+                  className='predict-model'
+                  tabId='predict-tab-trigger'
+                />
                 <RetrainModel
                   name='retrain model'
                   className='retrain-model'
