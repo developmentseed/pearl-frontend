@@ -371,9 +371,9 @@ export function InstanceProvider(props) {
         `project/${projectId}/batch/${batchId}`
       );
 
-      if (batch.completed) {
-        // Batch is complete
-        setRunningBatch(false);
+      if (batch.completed) { 
+          // Batch is complete
+          setRunningBatch(false);
 
         // Reload Aoi list when complete
         const aois = await restApiClient.get(`project/${projectId}/aoi/`);
@@ -398,7 +398,8 @@ export function InstanceProvider(props) {
         }
 
         // If this function is called from a timeout polling context, we can show a toast notification when finished.
-        if (isPoll) {
+        if (isPoll) { 
+          console.log(batch)
           toasts.success(`${batch.name} inference is now available`);
         }
       } else {
@@ -410,7 +411,7 @@ export function InstanceProvider(props) {
             projectId,
             batchId,
             timeout || BATCH_REFRESH_INTERVAL,
-            true
+            true,
           );
         }, timeout);
       }

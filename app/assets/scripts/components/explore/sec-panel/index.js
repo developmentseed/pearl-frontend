@@ -54,7 +54,6 @@ function SecPanel() {
 
 
   if (!currentCheckpoint || !currentAoi) return null;
-  console.log(currentAoi)
 
   const { px_stats } = currentAoi;
 
