@@ -26,7 +26,7 @@
     "lint:css": "stylelint 'app/assets/styles/**/**' 'app/assets/scripts/**/*.js'",
     "test": "echo \"No tests\" && exit 0",
     "cy:open": "cypress open",
-    "cy:run": "cypress run --spec cypress/integration/project/batch.spec.js"
+    "cy:run": "cypress run"
   },
   "engines": {
     "node": "14.x"
