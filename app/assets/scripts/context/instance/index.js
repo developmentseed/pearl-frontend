@@ -78,6 +78,7 @@ export function InstanceProvider(props) {
     currentCheckpoint,
     dispatchCurrentCheckpoint,
     fetchCheckpoint,
+    loadCheckpointList,
   } = useCheckpoint();
   const { currentProject, setCurrentProject, projectName } = useProject();
   const { dispatchPredictions } = usePredictions();
@@ -375,27 +376,31 @@ export function InstanceProvider(props) {
         setRunningBatch(false);
 
         // Reload Aoi list when complete
-        restApiClient.get(`project/${projectId}/aoi/`).then((aois) => {
-          setAoiList(aois.aois);
-          /*
-           * If the batch AOI is currently loaded in the frontend, we can update currentAoi with the update object which contains an accurate storage property of true.
-           * This will also update tiles on the map to show the batch results
-           *
-           * If currentAoi is null, that means that it has never been loaded from the api (was just drawn and submitted and user has been waiting for operation to finish). In this case we should load it and set currentAoi
-           */
-          if (!currentAoi) {
-            restApiClient
-              .get(`project/${projectId}/aoi/${batch.aoi}`)
-              .then((aoi) => {
-                setCurrentAoi(aoi);
-              });
-          }
+        const aois = await restApiClient.get(`project/${projectId}/aoi/`);
+        setAoiList(aois.aois);
+        /*
+         * If the batch AOI is currently loaded in the frontend, we can update currentAoi with the update object which contains an accurate storage property of true.
+         * This will also update tiles on the map to show the batch results
+         *
+         * If currentAoi is null, that means that it has never been loaded from the api (was just drawn and submitted and user has been waiting for operation to finish). In this case we should load it and set currentAoi
+         */
+        if (!currentAoi) {
+          restApiClient
+            .get(`project/${projectId}/aoi/${batch.aoi}`)
+            .then((aoi) => {
+              setCurrentAoi(aoi);
+            });
+          const list = await loadCheckpointList(projectId);
+          // Find base checkpoint which has no parent
+          const base = list.checkpoints.find(c => c.parent === null);
+          // New aoi, base checkpoint, do not need to verify if the aoi matches the checkpointk
+          fetchCheckpoint(projectId, base.id, null, true);
+        }
 
-          // If this function is called from a timeout polling context, we can show a toast notification when finished.
-          if (isPoll) {
-            toasts.success(`${batch.name} inference is now available`);
-          }
-        });
+        // If this function is called from a timeout polling context, we can show a toast notification when finished.
+        if (isPoll) {
+          toasts.success(`${batch.name} inference is now available`);
+        }
       } else {
         setRunningBatch(batch);
 

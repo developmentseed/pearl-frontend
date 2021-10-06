@@ -84,7 +84,12 @@ export function ExploreProvider(props) {
   } = useAoi();
   const { predictions, dispatchPredictions } = usePredictions();
   const { selectedModel, setSelectedModel } = useModel();
-  const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
+  const {
+    currentCheckpoint,
+    dispatchCurrentCheckpoint,
+    checkpointList,
+    loadCheckpointList,
+  } = useCheckpoint();
   const {
     aoiPatch,
     dispatchAoiPatch,
@@ -101,7 +106,6 @@ export function ExploreProvider(props) {
       mode: mapModes.BROWSE_MODE,
     }
   );
-  const [checkpointList, setCheckpointList] = useState(null);
   const [currentInstance, setCurrentInstance] = useState(null);
   const { initInstance, loadAoiOnInstance, getRunningBatch } = useInstance();
 
@@ -237,23 +241,6 @@ export function ExploreProvider(props) {
       logger(error);
       toasts.error('Error loading project, please try again later.');
     }
-  }
-
-  async function loadCheckpointList(projectId) {
-    const checkpointsMeta = await restApiClient.getCheckpoints(projectId);
-    if (checkpointsMeta.total > 0) {
-      // Save checkpoints if any exist, else leave as null
-      // Only keep book marked and root checkpoints
-      const list = checkpointsMeta.checkpoints.filter(
-        (ckpt) => !ckpt.parent || ckpt.bookmarked
-      );
-
-      setCheckpointList(list);
-      return {
-        checkpoints: list,
-      };
-    }
-    return checkpointsMeta;
   }
 
   // Load project meta on load and api client ready
