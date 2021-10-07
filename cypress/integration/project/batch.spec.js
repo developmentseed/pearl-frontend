@@ -116,7 +116,7 @@ describe('Batch predictions', () => {
     ).as('getBatchList');
   });
 
-  it('on new project, show different button large on large aoi', () => {
+  it.only('on new project, show different button large on large aoi', () => {
     cy.fakeLogin();
 
     cy.visit('/project/new');
@@ -285,10 +285,16 @@ describe('Batch predictions', () => {
       'data-disabled',
       'false'
     );
+
+    // Check if sec panel is mounted with a pixel distro chart
+    cy.get('[data-cy=checkpoint_class_distro]').should('exist');
     cy.get('[data-cy=batch-progress-message').should('not.exist');
+    cy.get('[data-cy=aoi-selection-trigger]').should('exist').click();
+    cy.get('[data-cy=add-aoi-button]').should('exist').click();
+    cy.get('[data-cy=checkpoint_class_distro]').should('not.exist');
   });
 
-  it.only('Inference and retrain can happen during batch', () => {
+  it('Inference and retrain can happen during batch', () => {
     cy.startServer();
     /**
      * GET /project/:id/instance/:id
