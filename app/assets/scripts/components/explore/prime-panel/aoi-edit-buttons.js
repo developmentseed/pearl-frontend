@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { Button } from '@devseed-ui/button';
 import { glsp, themeVal } from '@devseed-ui/theme-provider';
 import { EditButton } from '../../../styles/button';
-import { useMapState } from '../../../context/explore';
+import { useMapState , useAoiMeta } from '../../../context/explore';
 import Prose from '../../../styles/type/prose';
 import T from 'prop-types';
 import { formatThousands } from '../../../utils/format';
@@ -219,6 +219,11 @@ UploadAoiModal.propTypes = {
 };
 
 export function AoiEditButtons(props) {
+
+  const {
+    deleteAoi,
+  } = props;
+
   const { mapState, setMapMode, mapModes } = useMapState();
   const [showUploadAoiModal, setShowUploadAoiModal] = useState(false);
   // updateAoiName applies geocoding
@@ -232,21 +237,18 @@ export function AoiEditButtons(props) {
 
     // Set aoiname sets a string directly
     setAoiName,
+    aoiRef, setAoiRef
   } = useAoi();
+
+  const {
+    aoiArea, aoiBounds, setAoiBounds,
+  } = useAoiMeta()
   const { mapRef } = useMapRef();
 
   const { dispatchCurrentCheckpoint } = useCheckpoint();
 
   const { apiLimits } = useApiLimits();
 
-  const {
-    aoiRef,
-    aoiArea,
-    aoiBounds,
-    setAoiBounds,
-    setAoiRef,
-    deleteAoi,
-  } = props;
 
   // Confirm AOI, used in finish edit button and "confirm batch inference" modal
   function applyAoi() {

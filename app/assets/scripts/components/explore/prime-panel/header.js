@@ -32,6 +32,7 @@ import { useAoiMeta, useMapState } from '../../../context/explore';
 import { useInstance } from '../../../context/instance';
 import { useCheckpoint } from '../../../context/checkpoint';
 import { useProject } from '../../../context/project';
+import AoiSelection from './tabs/aoi-selection.js';
 
 import { Modal } from '@devseed-ui/modal';
 import { Button } from '@devseed-ui/button';
@@ -254,97 +255,99 @@ function Header(props) {
   };
 
   return (
-    <PanelBlockHeader id='header'>
-      <HeadOption hasSubtitle>
-        <HeadOptionHeadline>
-          <Subheading>Selected Area </Subheading>
-        </HeadOptionHeadline>
+    <PanelBlockHeader id='header'> 
+          <AoiSelection />
 
-        <Dropdown
-          alignment='left'
-          direction='down'
-          triggerElement={
-            (triggerProps) => renderAoiHeader(triggerProps)
-            /* eslint-disable-next-line */
+      {false && (
+        <HeadOption hasSubtitle>
+          <AoiSelection />
+          <Dropdown
+            alignment='left'
+            direction='down'
+            triggerElement={
+              (triggerProps) => renderAoiHeader(triggerProps)
+              /* eslint-disable-next-line */
           }
-        >
-          <>
-            <DropdownHeader unshaded>
-              <Subheading>Available Areas of Interest</Subheading>
-            </DropdownHeader>
-            <DropdownBody>
-              {filterAoiList(aoiList).map((a) => (
-                <li key={a.id}>
-                  <DropdownItem
-                    checked={a.name == aoiName}
-                    className='listed-aoi'
-                    onClick={() => {
-                      const relevantAoi = findCompatibleAoi(
-                        a,
-                        aoiList,
-                        currentCheckpoint
-                      );
-                      loadAoi(
-                        currentProject,
-                        relevantAoi || a,
-                        relevantAoi || false
-                      ).then((bounds) =>
-                        mapRef.fitBounds(bounds, {
-                          padding: BOUNDS_PADDING,
-                        })
-                      );
-                    }}
-                  >
-                    <div data-dropdown='click.close'>{`${a.name}`}</div>
-                    <EditButton
-                      useIcon='trash-bin'
-                      className='aoi-delete-button'
-                      hideText
-                      onClick={(e) => {
-                        e.stopPropagation();
-
-                        e.preventDefault();
-
-                        setDeleteAoi(a);
+          >
+            <>
+              <DropdownHeader unshaded>
+                <Subheading>Available Areas of Interest</Subheading>
+              </DropdownHeader>
+              <DropdownBody>
+                {filterAoiList(aoiList).map((a) => (
+                  <li key={a.id}>
+                    <DropdownItem
+                      checked={a.name == aoiName}
+                      className='listed-aoi'
+                      onClick={() => {
+                        const relevantAoi = findCompatibleAoi(
+                          a,
+                          aoiList,
+                          currentCheckpoint
+                        );
+                        loadAoi(
+                          currentProject,
+                          relevantAoi || a,
+                          relevantAoi || false
+                        ).then((bounds) =>
+                          mapRef.fitBounds(bounds, {
+                            padding: BOUNDS_PADDING,
+                          })
+                        );
                       }}
                     >
-                      Delete AOI
-                    </EditButton>
-                  </DropdownItem>
-                </li>
-              ))}
-            </DropdownBody>
-            {(currentCheckpoint || aoiList?.length > 0) && (
-              <DropdownFooter>
-                <DropdownItem
-                  useIcon='plus'
-                  onClick={() => {
-                    createNewAoi();
-                    mapRef.aoi.control.draw.disable();
-                    //Layer must be removed from the map
-                    mapRef.aoi.control.draw.clear();
-                  }}
-                  data-cy='add-aoi-button'
-                  data-dropdown='click.close'
-                >
-                  Add AOI
-                </DropdownItem>
-              </DropdownFooter>
-            )}
-          </>
-        </Dropdown>
+                      <div data-dropdown='click.close'>{`${a.name}`}</div>
+                      <EditButton
+                        useIcon='trash-bin'
+                        className='aoi-delete-button'
+                        hideText
+                        onClick={(e) => {
+                          e.stopPropagation();
 
-        <HeadOptionToolbar>
-          <AoiEditButtons
-            aoiRef={aoiRef}
-            setAoiRef={setAoiRef}
-            aoiArea={aoiArea}
-            setAoiBounds={setAoiBounds}
-            aoiBounds={aoiBounds}
-            deleteAoi={(aoi) => setDeleteAoi(aoi)}
-          />
-        </HeadOptionToolbar>
-      </HeadOption>
+                          e.preventDefault();
+
+                          setDeleteAoi(a);
+                        }}
+                      >
+                        Delete AOI
+                      </EditButton>
+                    </DropdownItem>
+                  </li>
+                ))}
+              </DropdownBody>
+              {(currentCheckpoint || aoiList?.length > 0) && (
+                <DropdownFooter>
+                  <DropdownItem
+                    useIcon='plus'
+                    onClick={() => {
+                      createNewAoi();
+                      mapRef.aoi.control.draw.disable();
+                      //Layer must be removed from the map
+                      mapRef.aoi.control.draw.clear();
+                    }}
+                    data-cy='add-aoi-button'
+                    data-dropdown='click.close'
+                  >
+                    Add AOI
+                  </DropdownItem>
+                </DropdownFooter>
+              )}
+            </>
+          </Dropdown>
+
+          <HeadOptionToolbar>
+            <AoiEditButtons
+              aoiRef={aoiRef}
+              setAoiRef={setAoiRef}
+              aoiArea={aoiArea}
+              setAoiBounds={setAoiBounds}
+              aoiBounds={aoiBounds}
+              deleteAoi={(aoi) => setDeleteAoi(aoi)}
+            />
+          </HeadOptionToolbar>
+        </HeadOption>
+      )}
+
       <Modal
         id='confirm-delete-aoi-modal'
         data-cy='confirm-delete-aoi-modal'
