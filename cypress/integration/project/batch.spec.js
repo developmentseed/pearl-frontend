@@ -288,7 +288,7 @@ describe('Batch predictions', () => {
     cy.get('[data-cy=batch-progress-message').should('not.exist');
   });
 
-  it('Inference and retrain can happen during batch', () => {
+  it.only('Inference and retrain can happen during batch', () => {
     cy.startServer();
     /**
      * GET /project/:id/instance/:id
@@ -331,9 +331,9 @@ describe('Batch predictions', () => {
     cy.wait('@reverseGeocodeCity');
 
     // Start batch
-    cy.get('[data-cy=run-button]')
-      .should('have.text', 'Run Batch Prediction')
-      .click();
+    cy.get('[data-cy=run-button]').should('have.text', 'Run Batch Prediction');
+    cy.get('[data-cy=run-button]').click();
+    cy.wait('@postBatch');
     // Mock batch job at 0%
     cy.intercept(
       {
@@ -355,7 +355,7 @@ describe('Batch predictions', () => {
           },
         ],
       }
-    );
+    ).as('batchList1');
 
     const batchJob = {
       id: 1,
@@ -389,7 +389,9 @@ describe('Batch predictions', () => {
         method: 'GET',
       },
       batchJob
-    );
+    ).as('batch0');
+
+    //cy.get('[data-cy=batch-progress-message').should('exist');
 
     // Only one batch operation allowed at a time
     cy.get('[data-cy=run-button]').should('have.attr', 'data-disabled', 'true');
