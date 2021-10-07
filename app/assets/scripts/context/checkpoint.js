@@ -12,6 +12,7 @@ import T from 'prop-types';
 import { useAuth } from './auth';
 import toasts from '../components/common/toasts';
 import logger from '../utils/logger';
+import { filterObject } from '../utils/utils';
 
 import { wrapLogReducer } from './reducers/utils';
 
@@ -25,6 +26,7 @@ export const checkpointModes = {
 
 export const actions = {
   ADD_CLASS: 'ADD_CLASS',
+  EDIT_CLASS: 'EDIT_CLASS',
   RECEIVE_CHECKPOINT: 'RECEIVE_CHECKPOINT',
   SET_CHECKPOINT_NAME: 'SET_CHECKPOINT_NAME',
   SET_CHECKPOINT_MODE: 'SET_CHECKPOINT_MODE',
@@ -189,6 +191,22 @@ function checkpointReducer(state, action) {
             ...state.classes,
             [newClass.name]: newClass,
           },
+        };
+      }
+      break;
+    case actions.EDIT_CLASS:
+      {
+        const newClass = state.classes[action.data.oldName];
+        newClass.name = action.data.name;
+        newClass.color = action.data.color;
+        const classes = filterObject(
+          state.classes,
+          (k) => k !== action.data.oldName
+        );
+        classes[newClass.name] = newClass;
+        nextState = {
+          ...state,
+          classes: classes,
         };
       }
       break;

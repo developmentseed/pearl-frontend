@@ -87,5 +87,12 @@ describe('Panel functions', () => {
 
     // Should have switched to refine
     cy.get('[data-cy=primary-panel]').should('contain', 'Refinement Tools');
+    cy.get('[data-cy=primary-panel]').should('contain', 'Barren');
+    cy.get('[data-cy=edit-class-Barren]').click();
+    cy.get('.add-class__dropdown').should('contain', 'Edit Class');
+    cy.get('#addClassName').clear().type('Shadow');
+    cy.get('.add-class__dropdown').should('contain', 'Cancel');
+    cy.get('[data-cy=edit-class-save-button]').click();
+    cy.get('[data-cy=primary-panel]').should('contain', 'Shadow');
   });
 });
