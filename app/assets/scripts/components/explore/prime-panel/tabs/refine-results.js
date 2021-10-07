@@ -28,8 +28,10 @@ import {
   DropdownHeader,
   DropdownBody,
   DropdownItem,
+  DropdownTrigger,
 } from '../../../../styles/dropdown';
 import { Subheading } from '../../../../styles/type/heading';
+import EditClass from './edit-class';
 
 const CheckpointSection = styled(ItemList)`
   max-height: ${glsp(7.5)};
@@ -224,9 +226,28 @@ function RefineModel(props) {
                     </ClassSamples>
                   </ClassInfoWrapper>
 
-                  <Button useIcon='cog' hideText variation='base-plain'>
-                    Options
-                  </Button>
+                  <Dropdown
+                    alignment='center'
+                    direction='up'
+                    triggerElement={(props) => (
+                      <Button
+                        data-cy={`edit-class-${c.name}`}
+                        useIcon='cog'
+                        hideText
+                        variation='base-plain'
+                        as={DropdownTrigger}
+                        {...props}
+                      >
+                        Options
+                      </Button>
+                    )}
+                    className='add-class__dropdown'
+                  >
+                    <EditClass
+                      currentClassName={c.name}
+                      currentColor={c.color}
+                    />
+                  </Dropdown>
                 </Item>
               );
             })}
