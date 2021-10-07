@@ -371,9 +371,9 @@ export function InstanceProvider(props) {
         `project/${projectId}/batch/${batchId}`
       );
 
-      if (batch.completed) { 
-          // Batch is complete
-          setRunningBatch(false);
+      if (batch.completed) {
+        // Batch is complete
+        setRunningBatch(false);
 
         // Reload Aoi list when complete
         const aois = await restApiClient.get(`project/${projectId}/aoi/`);
@@ -392,14 +392,14 @@ export function InstanceProvider(props) {
             });
           const list = await loadCheckpointList(projectId);
           // Find base checkpoint which has no parent
-          const base = list.checkpoints.find(c => c.parent === null);
+          const base = list.checkpoints.find((c) => c.parent === null);
           // New aoi, base checkpoint, do not need to verify if the aoi matches the checkpointk
           fetchCheckpoint(projectId, base.id, null, true);
         }
 
         // If this function is called from a timeout polling context, we can show a toast notification when finished.
-        if (isPoll) { 
-          console.log(batch)
+        if (isPoll) {
+          console.log(batch);
           toasts.success(`${batch.name} inference is now available`);
         }
       } else {
@@ -411,7 +411,7 @@ export function InstanceProvider(props) {
             projectId,
             batchId,
             timeout || BATCH_REFRESH_INTERVAL,
-            true,
+            true
           );
         }, timeout);
       }

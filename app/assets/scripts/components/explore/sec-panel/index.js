@@ -51,8 +51,6 @@ function SecPanel() {
   const { currentAoi } = useAoi();
   const { shortcutState, dispatchShortcutState } = useShortcutState();
 
-
-
   if (!currentCheckpoint || !currentAoi) return null;
 
   const { px_stats } = currentAoi;

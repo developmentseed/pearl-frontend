@@ -100,7 +100,7 @@ function findCompatibleAoi(aoi, aoiList, ckpt) {
     .filter((a) => a.name === aoi.name)
     .find((a) => Number(a.checkpoint_id) === ckpt.id);
 
-  console.log(foundAoi, aoi, ckpt)
+  console.log(foundAoi, aoi, ckpt);
   return foundAoi;
 }
 

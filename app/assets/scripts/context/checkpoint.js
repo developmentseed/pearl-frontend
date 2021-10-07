@@ -1,4 +1,10 @@
-import React, { useState, createContext, useContext, useMemo, useReducer } from 'react';
+import React, {
+  useState,
+  createContext,
+  useContext,
+  useMemo,
+  useReducer,
+} from 'react';
 import uniqWith from 'lodash.uniqwith';
 import isEqual from 'lodash.isequal';
 import differenceWith from 'lodash.differencewith';
@@ -99,8 +105,9 @@ export function CheckpointProvider(props) {
     currentCheckpoint,
     dispatchCurrentCheckpoint,
     fetchCheckpoint,
-    checkpointList, setCheckpointList,
-    loadCheckpointList
+    checkpointList,
+    setCheckpointList,
+    loadCheckpointList,
   };
 
   return (
@@ -480,7 +487,7 @@ export const useCheckpoint = () => {
     dispatchCurrentCheckpoint,
     fetchCheckpoint,
     checkpointList,
-    loadCheckpointList
+    loadCheckpointList,
   } = useCheckContext('useCheckpoint');
 
   return useMemo(
@@ -489,8 +496,14 @@ export const useCheckpoint = () => {
       dispatchCurrentCheckpoint,
       fetchCheckpoint,
       checkpointList,
-      loadCheckpointList
+      loadCheckpointList,
     }),
-    [currentCheckpoint, dispatchCurrentCheckpoint, fetchCheckpoint, checkpointList, loadCheckpointList]
+    [
+      currentCheckpoint,
+      dispatchCurrentCheckpoint,
+      fetchCheckpoint,
+      checkpointList,
+      loadCheckpointList,
+    ]
   );
 };

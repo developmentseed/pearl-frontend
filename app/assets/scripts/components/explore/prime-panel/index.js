@@ -143,8 +143,6 @@ function PrimePanel() {
     }
   }, [currentCheckpoint]);
 
- 
-
   return (
     <>
       <Panel
