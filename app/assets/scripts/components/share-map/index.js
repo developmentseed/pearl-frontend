@@ -142,6 +142,7 @@ function ShareMap() {
               attribution='&copy; NAIP'
               minZoom={12}
               maxZoom={20}
+              zIndex={2}
               opacity={mapLayers.mosaic.visible ? mapLayers.mosaic.opacity : 0}
             />
           )}
@@ -150,6 +151,7 @@ function ShareMap() {
               url={tileUrl}
               minZoom={12}
               maxZoom={20}
+              zIndex={3}
               opacity={
                 mapLayers.predictions.visible
                   ? mapLayers.predictions.opacity

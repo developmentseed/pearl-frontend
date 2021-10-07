@@ -116,7 +116,7 @@ describe('Create new project', () => {
     );
 
     // Run
-    cy.get('[data-cy=run-button').click();
+    cy.get('[data-cy=run-button]').click();
 
     // Check session status message
     cy.get('[data-cy=session-status]').should(
@@ -166,7 +166,7 @@ describe('Create new project', () => {
     );
 
     // Run
-    cy.get('[data-cy=run-button').should('exist').click();
+    cy.get('[data-cy=run-button]').should('exist').click();
 
     // Check session status message
     cy.get('[data-cy=session-status]').should(

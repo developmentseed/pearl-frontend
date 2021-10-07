@@ -5,7 +5,6 @@ import React, { useEffect } from 'react';
 import { DevseedUiThemeProvider } from '@devseed-ui/theme-provider';
 
 import { render } from 'react-dom';
-import { withAuthenticationRequired } from '@auth0/auth0-react';
 import GlobalStyles from './styles/global';
 import ErrorBoundary from './fatal-error-boundary';
 import { Router, Route, Switch } from 'react-router-dom';
@@ -26,7 +25,7 @@ import { CollecticonsGlobalStyle } from '@devseed-ui/collecticons';
 import GlobalLoadingProvider from './components/common/global-loading';
 import { ToastContainerCustom } from './components/common/toasts';
 import Project from './components/profile/project';
-import { AuthProvider } from './context/auth';
+import { AuthProvider, withAuthenticationRequired } from './context/auth';
 
 installResizeObserver();
 
@@ -64,7 +63,10 @@ function Root() {
               <Switch>
                 <Route exact path='/' component={Home} />
                 <Route exact path='/share/:uuid/map' component={ShareMap} />
-                <Route path='/project/:projectId' component={Explore} />
+                <ProtectedRoute
+                  path='/project/:projectId'
+                  component={Explore}
+                />
                 <ProtectedRoute exact path='/profile/maps' component={Maps} />
                 <ProtectedRoute
                   exact
