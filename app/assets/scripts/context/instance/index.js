@@ -78,10 +78,11 @@ export function InstanceProvider(props) {
     currentCheckpoint,
     dispatchCurrentCheckpoint,
     fetchCheckpoint,
+    loadCheckpointList,
   } = useCheckpoint();
   const { currentProject, setCurrentProject, projectName } = useProject();
   const { dispatchPredictions } = usePredictions();
-  const { currentAoi, aoiName, aoiRef, setAoiList } = useAoi();
+  const { currentAoi, setCurrentAoi, aoiName, aoiRef, setAoiList } = useAoi();
   const { dispatchAoiPatch } = useAoiPatch();
   const { selectedModel } = useModel();
 
@@ -98,7 +99,11 @@ export function InstanceProvider(props) {
     });
   };
 
+  // Variable that tracks an in progress batch
   const [runningBatch, setRunningBatch] = useState(false);
+  // We need another variable to track the completition state of a batch operation
+  // Should be set to false on batchPrediction start, and to true on completion
+  const [batchReady, setBatchReady] = useState(false);
 
   // Create a message queue to wait for instance connection
   const [messageQueue, dispatchMessageQueue] = useReducer(
@@ -209,6 +214,31 @@ export function InstanceProvider(props) {
       }
     };
   }, [websocketClient]);
+
+  /* Watch for running batch to be completed, at which point runningBatch is set to false
+   * and batchReady is set to the just completed batch
+   * If currentAoi is not defined, this means the returning batch is a new AOI, so we can setCurrentAoi
+   * If currentAoi is defined, a different aoi is loaded, and runningBatch has completed in the background. we should not update currentAoi
+   */
+
+  useEffect(() => {
+    if (batchReady && !currentAoi) {
+      restApiClient
+        .get(`project/${currentProject.id}/aoi/${batchReady.aoi}`)
+        .then((aoi) => {
+          setCurrentAoi(aoi);
+        });
+      loadCheckpointList(currentProject.id).then((list) => {
+        // Find base checkpoint which has no parent
+        const base = list.checkpoints.find((c) => c.parent === null);
+        // New aoi, base checkpoint, do not need to verify if the aoi matches the checkpointk
+        fetchCheckpoint(currentProject.id, base.id, null, true);
+      });
+
+      // Completed batch has n been procesesd, this block should not run again for this batch
+      setBatchReady(false);
+    }
+  }, [batchReady, currentAoi, currentProject]);
 
   async function initInstance(projectId, checkpointId, aoiId) {
     // Close existing websocket
@@ -364,27 +394,36 @@ export function InstanceProvider(props) {
     });
   }
 
-  async function refreshRunningBatch(batchId, timeout) {
+  async function refreshRunningBatch(projectId, batchId, timeout, isPoll) {
     try {
       const batch = await restApiClient.get(
-        `project/${currentProject.id}/batch/${batchId}`
+        `project/${projectId}/batch/${batchId}`
       );
 
       if (batch.completed) {
         // Batch is complete
         setRunningBatch(false);
+        setBatchReady(batch);
 
         // Reload Aoi list when complete
-        restApiClient.get(`project/${currentProject.id}/aoi/`).then((aois) => {
-          setAoiList(aois.aois);
+        const aois = await restApiClient.get(`project/${projectId}/aoi/`);
+        setAoiList(aois.aois);
+
+        // If this function is called from a timeout polling context, we can show a toast notification when finished.
+        if (isPoll) {
           toasts.success(`${batch.name} inference is now available`);
-        });
+        }
       } else {
         setRunningBatch(batch);
 
         // Poll for batch progress if not complete
         setTimeout(() => {
-          refreshRunningBatch(batchId, timeout);
+          refreshRunningBatch(
+            projectId,
+            batchId,
+            timeout || BATCH_REFRESH_INTERVAL,
+            true
+          );
         }, timeout);
       }
     } catch (error) {
@@ -393,16 +432,20 @@ export function InstanceProvider(props) {
     }
   }
 
-  async function getRunningBatch() {
-    if (currentProject && restApiClient) {
+  /*
+   * @param project { object } - project object should be passed explicitly to avoid race condition that depends on the instantiation of currentProject state variable object, this occurs when a new project is created
+   */
+  async function getRunningBatch(project) {
+    if (project && restApiClient) {
       try {
         const { batch: batches } = await restApiClient.get(
-          `project/${currentProject.id}/batch?completed=false`
+          `project/${project.id}/batch?completed=false`
         );
+
         if (batches.length > 0) {
           const { id: batchId } = batches[0];
 
-          refreshRunningBatch(batchId, BATCH_REFRESH_INTERVAL);
+          refreshRunningBatch(project.id, batchId, BATCH_REFRESH_INTERVAL);
         } else {
           setRunningBatch(false);
         }
@@ -543,6 +586,7 @@ export function InstanceProvider(props) {
     runBatchPrediction: async function () {
       if (restApiClient) {
         let project = currentProject;
+        setBatchReady(false);
 
         // Create project if new
         if (!project) {
@@ -579,7 +623,9 @@ export function InstanceProvider(props) {
             options
           );
           setRunningBatch(batch);
-          getRunningBatch();
+
+          // Pass newly created project here. If getRunningBatch repends on the updated value in the context store, we cannot gaurantee that it will exist at time of execution
+          getRunningBatch(project);
 
           // Update aoi list with new batch area
         } catch (error) {
@@ -589,7 +635,6 @@ export function InstanceProvider(props) {
           );
           return; // abort
         }
-        getRunningBatch();
         hideGlobalLoading();
       }
     },

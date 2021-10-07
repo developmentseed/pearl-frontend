@@ -91,7 +91,7 @@ function PrimePanel() {
 
   const { aoiRef, setAoiRef, aoiName, currentAoi } = useAoi();
 
-  const { applyCheckpoint, runningBatch, getRunningBatch } = useInstance();
+  const { applyCheckpoint } = useInstance();
 
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
 
@@ -142,13 +142,6 @@ function PrimePanel() {
       }
     }
   }, [currentCheckpoint]);
-
-  // Check if any job is running on project load
-  useEffect(() => {
-    if (currentProject && !runningBatch) {
-      getRunningBatch();
-    }
-  }, [currentProject, runningBatch]);
 
   return (
     <>

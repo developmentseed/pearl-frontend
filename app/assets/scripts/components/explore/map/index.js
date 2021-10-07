@@ -335,6 +335,11 @@ function Map() {
     async function updateTileUrl() {
       if (mapRef && currentProject && currentAoi && aoiRef) {
         mapRef.fitBounds(aoiRef.getBounds(), { padding: BOUNDS_PADDING });
+        if (!currentAoi.storage) {
+          // Do not load tiles when storage is false
+          setTileUrl(null);
+          return;
+        }
         try {
           const tileJSON = await restApiClient.getTileJSON(
             currentProject.id,
