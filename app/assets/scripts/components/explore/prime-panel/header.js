@@ -25,6 +25,7 @@ import {
 } from '../../../styles/dropdown';
 import { AoiEditButtons } from './aoi-edit-buttons';
 import { useModel } from '../../../context/model';
+import { useMapRef } from '../../../context/map';
 import { useAuth } from '../../../context/auth';
 import { useAoi } from '../../../context/aoi';
 import { useAoiMeta, useMapState } from '../../../context/explore';
@@ -109,6 +110,8 @@ function findCompatibleAoi(aoi, aoiList, ckpt) {
 const PanelBlockHeader = styled(BasePanelBlockHeader)`
   display: grid;
   grid-gap: ${glsp(0.75)};
+  padding: ${glsp()};
+  margin: unset;
 `;
 
 function Header(props) {
@@ -127,7 +130,9 @@ function Header(props) {
     createNewAoi,
   } = useAoiMeta();
 
-  const { mapState, mapModes, mapRef } = useMapState();
+  const { mapRef } = useMapRef();
+
+  const { mapState, mapModes } = useMapState();
 
   const [deleteAoi, setDeleteAoi] = useState();
   const { models, selectedModel } = useModel();
