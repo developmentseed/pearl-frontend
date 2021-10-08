@@ -173,7 +173,7 @@ export function AuthProvider(props) {
   return (
     <Auth0Provider
       domain={config.auth0Domain}
-      clientId={config.clientId}
+      clientId={config.auth0ClientId}
       audience={config.restApiEndpoint}
       redirectUri={window.location.origin}
       onRedirectCallback={onRedirectCallback}
