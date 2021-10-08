@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { Button } from '@devseed-ui/button';
 import { glsp, themeVal } from '@devseed-ui/theme-provider';
 import { EditButton } from '../../../styles/button';
-import { useMapState , useAoiMeta } from '../../../context/explore';
+import { useMapState, useAoiMeta } from '../../../context/explore';
 import Prose from '../../../styles/type/prose';
 import T from 'prop-types';
 import { formatThousands } from '../../../utils/format';
@@ -219,10 +219,7 @@ UploadAoiModal.propTypes = {
 };
 
 export function AoiEditButtons(props) {
-
-  const {
-    deleteAoi,
-  } = props;
+  const { deleteAoi } = props;
 
   const { mapState, setMapMode, mapModes } = useMapState();
   const [showUploadAoiModal, setShowUploadAoiModal] = useState(false);
@@ -237,18 +234,16 @@ export function AoiEditButtons(props) {
 
     // Set aoiname sets a string directly
     setAoiName,
-    aoiRef, setAoiRef
+    aoiRef,
+    setAoiRef,
   } = useAoi();
 
-  const {
-    aoiArea, aoiBounds, setAoiBounds,
-  } = useAoiMeta()
+  const { aoiArea, aoiBounds, setAoiBounds, createNewAoi } = useAoiMeta();
   const { mapRef } = useMapRef();
 
   const { dispatchCurrentCheckpoint } = useCheckpoint();
 
   const { apiLimits } = useApiLimits();
-
 
   // Confirm AOI, used in finish edit button and "confirm batch inference" modal
   function applyAoi() {
@@ -397,6 +392,36 @@ export function AoiEditButtons(props) {
 
   return (
     <>
+      {
+        // Only show add n button if at least one AOI exists
+        currentAoi && (
+          <EditButton
+            useIcon='plus'
+            onClick={() => {
+              createNewAoi();
+              mapRef.aoi.control.draw.disable();
+              //Layer must be removed from the map
+              mapRef.aoi.control.draw.clear();
+            }}
+            data-cy='add-aoi-button'
+            data-dropdown='click.close'
+          >
+            Add AOI
+          </EditButton>
+        )
+      }
+      <EditButton
+        title='Upload AOI GeoJSON'
+        data-cy='upload-aoi-modal-button'
+        id='upload-aoi-modal-button'
+        useIcon='upload'
+        onClick={() => setShowUploadAoiModal(true)}
+      >
+        Upload AOI
+      </EditButton>
+
+      <div>|</div>
+
       {currentAoi ? (
         /*  If currentAoi, aoi has been submitted to api
          *  on delete, delete it via the api
@@ -479,15 +504,6 @@ export function AoiEditButtons(props) {
         data-cy='aoi-edit-button'
       >
         Select AOI
-      </EditButton>
-      <EditButton
-        title='Upload AOI GeoJSON'
-        data-cy='upload-aoi-modal-button'
-        id='upload-aoi-modal-button'
-        useIcon='upload'
-        onClick={() => setShowUploadAoiModal(true)}
-      >
-        Upload AOI
       </EditButton>
     </>
   );

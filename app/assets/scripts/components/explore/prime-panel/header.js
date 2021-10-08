@@ -35,20 +35,8 @@ import { useProject } from '../../../context/project';
 import AoiSelection from './tabs/aoi-selection.js';
 
 import { Modal } from '@devseed-ui/modal';
-import { Button } from '@devseed-ui/button';
 
 import toasts from '../../common/toasts';
-const ModalWrapper = styled.div`
-  display: grid;
-  grid-template-areas:
-    'a a'
-    'b c';
-  grid-gap: ${glsp(1)};
-  padding: ${glsp()};
-  div {
-    grid-area: a;
-  }
-`;
 const SelectAoiTrigger = styled.div`
   cursor: pointer;
 `;
@@ -135,7 +123,7 @@ function Header(props) {
 
   const { mapState, mapModes } = useMapState();
 
-  const [deleteAoi, setDeleteAoi] = useState();
+  //const [deleteAoi, setDeleteAoi] = useState();
   const { models, selectedModel } = useModel();
   const { isAuthenticated, restApiClient } = useAuth();
   const { setAoiList, aoiRef, setAoiRef, aoiName } = useAoi();
@@ -220,39 +208,6 @@ function Header(props) {
     return 'No models available';
   };
 
-  const deleteAoiFunc = async (targetAoi) => {
-    try {
-      const deleteReqs = aoiList.map((aoi) => {
-        if (aoi.name === targetAoi.name) {
-          return restApiClient.deleteAoi(aoi.id, currentProject.id);
-        } else {
-          return null;
-        }
-      });
-
-      await Promise.all(deleteReqs);
-      const aoiReq = await restApiClient.getAOIs(currentProject.id);
-      setAoiList(aoiReq.aois);
-
-      if (aoiReq.aois.length) {
-        const { aois } = aoiReq;
-        loadAoi(
-          currentProject,
-          aois[aois.length - 1],
-          aois[aois.length - 1].checkpoint_id === currentCheckpoint?.id
-        ).then((bounds) =>
-          mapRef.fitBounds(bounds, {
-            padding: BOUNDS_PADDING,
-          })
-        );
-      } else {
-        mapRef.aoi.control.draw.clear();
-        createNewAoi();
-      }
-    } catch (err) {
-      toasts.error(err.message);
-    }
-  };
 
   return (
     <PanelBlockHeader id='header'> 
@@ -348,44 +303,6 @@ function Header(props) {
         </HeadOption>
       )}
 
-      <Modal
-        id='confirm-delete-aoi-modal'
-        data-cy='confirm-delete-aoi-modal'
-        revealed={deleteAoi}
-        onOverlayClick={() => setDeleteAoi(null)}
-        onCloseClick={() => setDeleteAoi(null)}
-        title='Delete AOI'
-        size='small'
-        content={
-          <ModalWrapper>
-            <div>Are you sure you want to delete this AOI?</div>
-            <Button
-              data-cy='cancel-aoi-delete'
-              variation='primary-plain'
-              size='medium'
-              useIcon='xmark'
-              onClick={() => {
-                setDeleteAoi(null);
-              }}
-            >
-              Cancel
-            </Button>
-            <Button
-              data-cy='confirm-aoi-delete'
-              variation='danger-raised-dark'
-              size='medium'
-              useIcon='tick'
-              onClick={() => {
-                deleteAoiFunc(deleteAoi);
-
-                setDeleteAoi(null);
-              }}
-            >
-              Delete AOI
-            </Button>
-          </ModalWrapper>
-        }
-      />
 
       <HeadOption>
         <HeadOptionHeadline>
