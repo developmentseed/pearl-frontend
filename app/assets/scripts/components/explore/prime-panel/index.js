@@ -24,13 +24,11 @@ import RetrainModel from './tabs/retrain-model';
 import RefineResults from './tabs/refine-results';
 
 import PanelFooter from './footer';
-import { useProject } from '../../../context/project';
 import {
   useCheckpoint,
   actions as checkpointActions,
   checkpointModes,
 } from '../../../context/checkpoint';
-import { useInstance } from '../../../context/instance';
 import { useAoi } from '../../../context/aoi';
 import { usePredictions } from '../../../context/predictions';
 import { useApiLimits } from '../../../context/global';
