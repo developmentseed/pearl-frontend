@@ -121,11 +121,17 @@ function PrimePanel() {
     currentCheckpoint && currentCheckpoint.sampleCount > 0;
 
   useEffect(() => {
-    if (currentCheckpoint && currentCheckpoint.name) {
-      if (currentCheckpoint.bookmarked) {
-        setLocalCheckpointName(currentCheckpoint.name);
-      } else {
-        setLocalCheckpointName('');
+    if (currentCheckpoint) {
+      if (currentCheckpoint.name) {
+        if (currentCheckpoint.bookmarked) {
+          setLocalCheckpointName(currentCheckpoint.name);
+        } else {
+          setLocalCheckpointName('');
+        }
+      }
+
+      if (currentCheckpoint.mode === checkpointModes.RETRAIN) {
+        setActiveTab(RETRAIN_TAB_INDEX);
       }
     }
   }, [currentCheckpoint]);
