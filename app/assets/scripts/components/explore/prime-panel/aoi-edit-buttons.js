@@ -510,10 +510,5 @@ export function AoiEditButtons(props) {
 }
 
 AoiEditButtons.propTypes = {
-  aoiRef: T.object,
-  setAoiRef: T.func,
-  aoiBounds: T.object,
-  setAoiBounds: T.func,
-  aoiArea: T.oneOfType([T.bool, T.number]),
   deleteAoi: T.func,
 };

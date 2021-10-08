@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import T from 'prop-types';
 import styled, { css } from 'styled-components';
 
 import { themeVal, glsp, truncated } from '@devseed-ui/theme-provider';
 
-import { BOUNDS_PADDING } from '../../common/map/constants';
 import {
   HeadOption,
   HeadOptionHeadline,
@@ -14,32 +13,20 @@ import { EditButton } from '../../../styles/button';
 import { Subheading } from '../../../styles/type/heading';
 import collecticon from '@devseed-ui/collecticons';
 import { PanelBlockHeader as BasePanelBlockHeader } from '../../common/panel-block';
-import { formatThousands } from '../../../utils/format';
 
 import {
   Dropdown,
   DropdownHeader,
   DropdownBody,
   DropdownItem,
-  DropdownFooter,
 } from '../../../styles/dropdown';
-import { AoiEditButtons } from './aoi-edit-buttons';
 import { useModel } from '../../../context/model';
-import { useMapRef } from '../../../context/map';
 import { useAuth } from '../../../context/auth';
-import { useAoi } from '../../../context/aoi';
-import { useAoiMeta, useMapState } from '../../../context/explore';
+import { useMapState } from '../../../context/explore';
 import { useInstance } from '../../../context/instance';
 import { useCheckpoint } from '../../../context/checkpoint';
 import { useProject } from '../../../context/project';
 import AoiSelection from './tabs/aoi-selection.js';
-
-import { Modal } from '@devseed-ui/modal';
-
-import toasts from '../../common/toasts';
-const SelectAoiTrigger = styled.div`
-  cursor: pointer;
-`;
 
 const SubheadingStrong = styled.h3`
   color: ${themeVal('color.base')};
@@ -75,27 +62,6 @@ const SubheadingStrong = styled.h3`
     `}
 `;
 
-function filterAoiList(aoiList) {
-  const aois = new Map();
-  aoiList.forEach((a) => {
-    if (aois.has(a.name)) {
-      if (aois.get(a.name).created > a.created) {
-        aois.set(a.name, a);
-      }
-    } else {
-      aois.set(a.name, a);
-    }
-  });
-  return Array.from(aois.values());
-}
-
-function findCompatibleAoi(aoi, aoiList, ckpt) {
-  const foundAoi = aoiList
-    .filter((a) => a.name === aoi.name)
-    .find((a) => Number(a.checkpoint_id) === ckpt.id);
-  return foundAoi;
-}
-
 const PanelBlockHeader = styled(BasePanelBlockHeader)`
   display: grid;
   grid-gap: ${glsp(0.75)};
@@ -110,23 +76,11 @@ function Header(props) {
   const { applyCheckpoint } = useInstance();
   const { currentCheckpoint, checkpointList } = useCheckpoint();
 
-  const {
-    setAoiBounds,
-    aoiBounds,
-    aoiArea,
-    aoiList,
-    loadAoi,
-    createNewAoi,
-  } = useAoiMeta();
-
-  const { mapRef } = useMapRef();
-
   const { mapState, mapModes } = useMapState();
 
   //const [deleteAoi, setDeleteAoi] = useState();
   const { models, selectedModel } = useModel();
   const { isAuthenticated } = useAuth();
-  const { aoiRef, setAoiRef, aoiName } = useAoi();
 
   const renderCheckpointSelectionHeader = () => {
     if (currentCheckpoint && currentCheckpoint.id) {

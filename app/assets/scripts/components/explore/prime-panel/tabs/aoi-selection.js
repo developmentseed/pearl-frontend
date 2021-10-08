@@ -96,6 +96,28 @@ const HeadOption = styled(BaseHeadOption)`
     grid-column: auto;
   }
 `;
+
+function filterAoiList(aoiList, currentAoi) {
+  const aois = new Map();
+  aoiList.forEach((a) => {
+    if (currentAoi?.name === a.name) {
+      // Do not include currentAoi in the list
+      return;
+    }
+
+    // Treat AOIs with the same name as the same geometry
+    // Use the latest one
+    if (aois.has(a.name)) {
+      if (aois.get(a.name).created > a.created) {
+        aois.set(a.name, a);
+      }
+    } else {
+      aois.set(a.name, a);
+    }
+  });
+  return Array.from(aois.values());
+}
+
 function findCompatibleAoi(aoi, aoiList, ckpt) {
   const foundAoi = aoiList
     .filter((a) => a.name === aoi.name)
@@ -108,17 +130,10 @@ function findCompatibleAoi(aoi, aoiList, ckpt) {
  *
  * @param setDeleteAoi - { func } parent
  */
-function AoiSelection({}) {
+function AoiSelection() {
   const { currentAoi, aoiList, aoiName, setAoiList } = useAoi();
   const [deleteAoi, setDeleteAoi] = useState();
-  const {
-    //setAoiBounds,
-    //aoiBounds,
-    aoiArea,
-    //aoiName
-    loadAoi,
-    createNewAoi,
-  } = useAoiMeta();
+  const { aoiArea, loadAoi, createNewAoi } = useAoiMeta();
   const { restApiClient } = useAuth();
 
   const { mapRef } = useMapRef();
@@ -132,7 +147,6 @@ function AoiSelection({}) {
   const renderSelectedAoi = () => {
     let header;
     let area;
-    let disabled;
     if (aoiArea && aoiArea > 0 && mapState.mode === mapModes.EDIT_AOI_MODE) {
       header = `${formatThousands(aoiArea / 1e6)} km2`;
     } else if (aoiName) {
@@ -198,51 +212,47 @@ function AoiSelection({}) {
         </HeadOptionHeadline>
         {
           // Current or new aoi
-          //
           renderSelectedAoi()
         }
         {
-          // remainder of list
-          //
-          aoiList
-            .filter((a) => a.id !== currentAoi?.id)
-            .map((aoi) => {
-              return (
-                <AoiOption
-                  key={aoi.id}
-                  onClick={() => {
-                    const relevantAoi = findCompatibleAoi(
-                      aoi,
-                      aoiList,
-                      currentCheckpoint
-                    );
-                    loadAoi(
-                      currentProject,
-                      relevantAoi || aoi,
-                      relevantAoi || false
-                    ).then((bounds) =>
-                      mapRef.fitBounds(bounds, {
-                        padding: BOUNDS_PADDING,
-                      })
-                    );
+          // Remainder of list
+          filterAoiList(aoiList, currentAoi).map((aoi) => {
+            return (
+              <AoiOption
+                key={aoi.id}
+                onClick={() => {
+                  const relevantAoi = findCompatibleAoi(
+                    aoi,
+                    aoiList,
+                    currentCheckpoint
+                  );
+                  loadAoi(
+                    currentProject,
+                    relevantAoi || aoi,
+                    relevantAoi || false
+                  ).then((bounds) =>
+                    mapRef.fitBounds(bounds, {
+                      padding: BOUNDS_PADDING,
+                    })
+                  );
+                }}
+              >
+                <Heading size='xsmall'>{aoi.name}</Heading>
+                <EditButton
+                  useIcon='trash-bin'
+                  className='aoi-delete-button'
+                  hideText
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    setDeleteAoi(aoi);
                   }}
                 >
-                  <Heading size='xsmall'>{aoi.name}</Heading>
-                  <EditButton
-                    useIcon='trash-bin'
-                    className='aoi-delete-button'
-                    hideText
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      e.preventDefault();
-                      setDeleteAoi(aoi);
-                    }}
-                  >
-                    Delete AOI
-                  </EditButton>
-                </AoiOption>
-              );
-            })
+                  Delete AOI
+                </EditButton>
+              </AoiOption>
+            );
+          })
         }
         <HeadOptionToolbar>
           <AoiEditButtons deleteAoi={(aoi) => setDeleteAoi(aoi)} />
