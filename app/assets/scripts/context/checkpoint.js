@@ -51,8 +51,24 @@ export function CheckpointProvider(props) {
   );
 
   const { restApiClient } = useAuth();
-
   const [checkpointList, setCheckpointList] = useState(null);
+
+  async function loadCheckpointList(projectId) {
+    const checkpointsMeta = await restApiClient.getCheckpoints(projectId);
+    if (checkpointsMeta.total > 0) {
+      // Save checkpoints if any exist, else leave as null
+      // Only keep book marked and root checkpoints
+      const list = checkpointsMeta.checkpoints.filter(
+        (ckpt) => !ckpt.parent || ckpt.bookmarked
+      );
+
+      setCheckpointList(list);
+      return {
+        checkpoints: list,
+      };
+    }
+    return checkpointsMeta;
+  }
 
   /*
    * @param created - if new checkpoint was just created,don't to verify that aoi matches
@@ -93,6 +109,7 @@ export function CheckpointProvider(props) {
     fetchCheckpoint,
     checkpointList,
     setCheckpointList,
+    loadCheckpointList,
   };
 
   return (
@@ -489,6 +506,7 @@ export const useCheckpoint = () => {
     fetchCheckpoint,
     checkpointList,
     setCheckpointList,
+    loadCheckpointList,
   } = useCheckContext('useCheckpoint');
 
   return useMemo(
@@ -498,12 +516,14 @@ export const useCheckpoint = () => {
       fetchCheckpoint,
       checkpointList,
       setCheckpointList,
+      loadCheckpointList,
     }),
     [
       currentCheckpoint,
       dispatchCurrentCheckpoint,
       fetchCheckpoint,
       checkpointList,
+      loadCheckpointList,
     ]
   );
 };

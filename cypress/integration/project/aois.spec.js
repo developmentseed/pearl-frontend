@@ -178,6 +178,7 @@ describe('Can delete AOIs', () => {
       }
     ).as('loadAois1');
 
+    cy.get('[data-cy=predict-tab]').click();
     cy.get('[data-cy=delete-current-aoi-button]');
     cy.get('[data-cy=delete-current-aoi-button]').click();
     cy.get('[data-cy=confirm-delete-aoi-modal]').should('exist');
@@ -224,6 +225,7 @@ describe('Can delete AOIs', () => {
       }
     ).as('loadAois1');
 
+    cy.get('[data-cy=predict-tab]').click();
     cy.get('[data-cy=aoi-selection-trigger]').click();
     cy.get('[data-cy=add-aoi-button]').click();
 

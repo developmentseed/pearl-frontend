@@ -24,13 +24,11 @@ import RetrainModel from './tabs/retrain-model';
 import RefineResults from './tabs/refine-results';
 
 import PanelFooter from './footer';
-import { useProject } from '../../../context/project';
 import {
   useCheckpoint,
   actions as checkpointActions,
   checkpointModes,
 } from '../../../context/checkpoint';
-import { useInstance } from '../../../context/instance';
 import { useAoi } from '../../../context/aoi';
 import { usePredictions } from '../../../context/predictions';
 import { useApiLimits } from '../../../context/global';
@@ -76,12 +74,9 @@ function PrimePanel() {
 
   const { updateCheckpointName } = useContext(ExploreContext);
 
-  const { currentProject } = useProject();
   const { setAoiBounds, aoiArea } = useAoiMeta();
 
   const { aoiRef, currentAoi } = useAoi();
-
-  const { runningBatch, getRunningBatch } = useInstance();
 
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
 
@@ -124,21 +119,20 @@ function PrimePanel() {
     currentCheckpoint && currentCheckpoint.sampleCount > 0;
 
   useEffect(() => {
-    if (currentCheckpoint && currentCheckpoint.name) {
-      if (currentCheckpoint.bookmarked) {
-        setLocalCheckpointName(currentCheckpoint.name);
-      } else {
-        setLocalCheckpointName('');
+    if (currentCheckpoint) {
+      if (currentCheckpoint.name) {
+        if (currentCheckpoint.bookmarked) {
+          setLocalCheckpointName(currentCheckpoint.name);
+        } else {
+          setLocalCheckpointName('');
+        }
+      }
+
+      if (currentCheckpoint.mode === checkpointModes.RETRAIN) {
+        setActiveTab(RETRAIN_TAB_INDEX);
       }
     }
   }, [currentCheckpoint]);
-
-  // Check if any job is running on project load
-  useEffect(() => {
-    if (currentProject && !runningBatch) {
-      getRunningBatch();
-    }
-  }, [currentProject, runningBatch]);
 
   return (
     <>

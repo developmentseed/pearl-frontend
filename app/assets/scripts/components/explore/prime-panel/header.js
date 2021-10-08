@@ -125,7 +125,6 @@ function Header(props) {
   return (
     <PanelBlockHeader id='header'>
       <AoiSelection />
-
       <HeadOption>
         <HeadOptionHeadline usePadding>
           <Subheading>Selected Model</Subheading>
