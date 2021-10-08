@@ -88,7 +88,7 @@ export function ExploreProvider(props) {
     currentCheckpoint,
     dispatchCurrentCheckpoint,
     checkpointList,
-    setCheckpointList,
+    loadCheckpointList,
   } = useCheckpoint();
   const {
     aoiPatch,
@@ -199,7 +199,7 @@ export function ExploreProvider(props) {
       project = await restApiClient.getProject(projectId);
       setCurrentProject(project);
       setProjectName(project.name);
-      getRunningBatch(projectId);
+      getRunningBatch(project);
     } catch (error) {
       hideGlobalLoading();
       logger(error);
@@ -241,23 +241,6 @@ export function ExploreProvider(props) {
       logger(error);
       toasts.error('Error loading project, please try again later.');
     }
-  }
-
-  async function loadCheckpointList(projectId) {
-    const checkpointsMeta = await restApiClient.getCheckpoints(projectId);
-    if (checkpointsMeta.total > 0) {
-      // Save checkpoints if any exist, else leave as null
-      // Only keep book marked and root checkpoints
-      const list = checkpointsMeta.checkpoints.filter(
-        (ckpt) => !ckpt.parent || ckpt.bookmarked
-      );
-
-      setCheckpointList(list);
-      return {
-        checkpoints: list,
-      };
-    }
-    return checkpointsMeta;
   }
 
   // Load project meta on load and api client ready
@@ -448,6 +431,7 @@ export function ExploreProvider(props) {
     if (!aoiObject) {
       return;
     }
+
     showGlobalLoadingMessage('Loading AOI');
     const aoi = await restApiClient.get(
       `project/${project.id}/aoi/${aoiObject.id}`
@@ -493,7 +477,8 @@ export function ExploreProvider(props) {
     } else {
       setCurrentAoi(aoi);
 
-      if (currentInstance && !noLoadOnInst) {
+      // Only load aoi on instance if storage is true
+      if (currentInstance && !noLoadOnInst && aoiObject.storage) {
         loadAoiOnInstance(aoi.id);
       } else {
         hideGlobalLoading();

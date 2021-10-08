@@ -116,7 +116,7 @@ describe('Batch predictions', () => {
     ).as('getBatchList');
   });
 
-  it('on new project, show different button large on large aoi', () => {
+  it.only('on new project, show different button large on large aoi', () => {
     cy.fakeLogin();
 
     cy.visit('/project/new');
@@ -273,6 +273,7 @@ describe('Batch predictions', () => {
       },
       {
         ...batchJob,
+        aoi: 1,
         progress: 100,
         completed: true,
       }
@@ -284,7 +285,13 @@ describe('Batch predictions', () => {
       'data-disabled',
       'false'
     );
+
+    // Check if sec panel is mounted with a pixel distro chart
+    cy.get('[data-cy=checkpoint_class_distro]').should('exist');
     cy.get('[data-cy=batch-progress-message').should('not.exist');
+    cy.get('[data-cy=aoi-selection-trigger]').should('exist').click();
+    cy.get('[data-cy=add-aoi-button]').should('exist').click();
+    cy.get('[data-cy=checkpoint_class_distro]').should('not.exist');
   });
 
   it('Inference and retrain can happen during batch', () => {
@@ -330,9 +337,9 @@ describe('Batch predictions', () => {
     cy.wait('@reverseGeocodeCity');
 
     // Start batch
-    cy.get('[data-cy=run-button]')
-      .should('have.text', 'Run Batch Prediction')
-      .click();
+    cy.get('[data-cy=run-button]').should('have.text', 'Run Batch Prediction');
+    cy.get('[data-cy=run-button]').click();
+    cy.wait('@postBatch');
     // Mock batch job at 0%
     cy.intercept(
       {
@@ -354,7 +361,7 @@ describe('Batch predictions', () => {
           },
         ],
       }
-    );
+    ).as('batchList1');
 
     const batchJob = {
       id: 1,
@@ -388,7 +395,9 @@ describe('Batch predictions', () => {
         method: 'GET',
       },
       batchJob
-    );
+    ).as('batch0');
+
+    //cy.get('[data-cy=batch-progress-message').should('exist');
 
     // Only one batch operation allowed at a time
     cy.get('[data-cy=run-button]').should('have.attr', 'data-disabled', 'true');
