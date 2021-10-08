@@ -3,6 +3,11 @@ import { themeVal, glsp } from '@devseed-ui/theme-provider';
 
 export const HeadOptionHeadline = styled.div`
   grid-column: 1 / -1;
+  ${({ usePadding }) =>
+    usePadding &&
+    css`
+      padding: ${glsp()};
+    `}
 `;
 
 export const HeadOptionToolbar = styled.div`

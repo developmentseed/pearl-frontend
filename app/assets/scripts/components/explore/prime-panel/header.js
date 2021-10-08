@@ -99,8 +99,8 @@ function findCompatibleAoi(aoi, aoiList, ckpt) {
 const PanelBlockHeader = styled(BasePanelBlockHeader)`
   display: grid;
   grid-gap: ${glsp(0.75)};
-  padding: ${glsp()};
   margin: unset;
+  padding: unset;
 `;
 
 function Header(props) {
@@ -125,47 +125,8 @@ function Header(props) {
 
   //const [deleteAoi, setDeleteAoi] = useState();
   const { models, selectedModel } = useModel();
-  const { isAuthenticated, restApiClient } = useAuth();
-  const { setAoiList, aoiRef, setAoiRef, aoiName } = useAoi();
-
-  const renderAoiHeader = (triggerProps) => {
-    let header;
-    let area;
-    let disabled;
-    if (aoiArea && aoiArea > 0 && mapState.mode === mapModes.EDIT_AOI_MODE) {
-      header = `${formatThousands(aoiArea / 1e6)} km2`;
-    } else if (aoiName) {
-      header = aoiName;
-      area = `${formatThousands(aoiArea / 1e6)} km2`;
-    } else if (mapState.mode === mapModes.CREATE_AOI_MODE) {
-      header = 'Drag on map to select';
-    } else {
-      header = 'None selected - Draw area on map';
-    }
-
-    const disabledProps = {
-      onClick: () => null,
-      useIcon: null,
-    };
-
-    if (mapState.mode === mapModes.EDIT_AOI_MODE || aoiList?.length === 0) {
-      disabled = true;
-    }
-
-    return (
-      <SelectAoiTrigger>
-        <SubheadingStrong
-          data-cy='aoi-selection-trigger'
-          {...triggerProps}
-          useIcon='chevron-down--small'
-          {...(disabled ? disabledProps : {})}
-        >
-          {header}
-        </SubheadingStrong>
-        {area && <Subheading className='subtitle'>{area}</Subheading>}
-      </SelectAoiTrigger>
-    );
-  };
+  const { isAuthenticated } = useAuth();
+  const { aoiRef, setAoiRef, aoiName } = useAoi();
 
   const renderCheckpointSelectionHeader = () => {
     if (currentCheckpoint && currentCheckpoint.id) {
@@ -208,104 +169,12 @@ function Header(props) {
     return 'No models available';
   };
 
-
   return (
-    <PanelBlockHeader id='header'> 
-          <AoiSelection />
-
-      {false && (
-        <HeadOption hasSubtitle>
-          <AoiSelection />
-          <Dropdown
-            alignment='left'
-            direction='down'
-            triggerElement={
-              (triggerProps) => renderAoiHeader(triggerProps)
-              /* eslint-disable-next-line */
-          }
-          >
-            <>
-              <DropdownHeader unshaded>
-                <Subheading>Available Areas of Interest</Subheading>
-              </DropdownHeader>
-              <DropdownBody>
-                {filterAoiList(aoiList).map((a) => (
-                  <li key={a.id}>
-                    <DropdownItem
-                      checked={a.name == aoiName}
-                      className='listed-aoi'
-                      onClick={() => {
-                        const relevantAoi = findCompatibleAoi(
-                          a,
-                          aoiList,
-                          currentCheckpoint
-                        );
-                        loadAoi(
-                          currentProject,
-                          relevantAoi || a,
-                          relevantAoi || false
-                        ).then((bounds) =>
-                          mapRef.fitBounds(bounds, {
-                            padding: BOUNDS_PADDING,
-                          })
-                        );
-                      }}
-                    >
-                      <div data-dropdown='click.close'>{`${a.name}`}</div>
-                      <EditButton
-                        useIcon='trash-bin'
-                        className='aoi-delete-button'
-                        hideText
-                        onClick={(e) => {
-                          e.stopPropagation();
-
-                          e.preventDefault();
-
-                          setDeleteAoi(a);
-                        }}
-                      >
-                        Delete AOI
-                      </EditButton>
-                    </DropdownItem>
-                  </li>
-                ))}
-              </DropdownBody>
-              {(currentCheckpoint || aoiList?.length > 0) && (
-                <DropdownFooter>
-                  <DropdownItem
-                    useIcon='plus'
-                    onClick={() => {
-                      createNewAoi();
-                      mapRef.aoi.control.draw.disable();
-                      //Layer must be removed from the map
-                      mapRef.aoi.control.draw.clear();
-                    }}
-                    data-cy='add-aoi-button'
-                    data-dropdown='click.close'
-                  >
-                    Add AOI
-                  </DropdownItem>
-                </DropdownFooter>
-              )}
-            </>
-          </Dropdown>
-
-          <HeadOptionToolbar>
-            <AoiEditButtons
-              aoiRef={aoiRef}
-              setAoiRef={setAoiRef}
-              aoiArea={aoiArea}
-              setAoiBounds={setAoiBounds}
-              aoiBounds={aoiBounds}
-              deleteAoi={(aoi) => setDeleteAoi(aoi)}
-            />
-          </HeadOptionToolbar>
-        </HeadOption>
-      )}
-
+    <PanelBlockHeader id='header'>
+      <AoiSelection />
 
       <HeadOption>
-        <HeadOptionHeadline>
+        <HeadOptionHeadline usePadding>
           <Subheading>Selected Model</Subheading>
         </HeadOptionHeadline>
         <SubheadingStrong
@@ -339,7 +208,7 @@ function Header(props) {
       </HeadOption>
 
       <HeadOption>
-        <HeadOptionHeadline>
+        <HeadOptionHeadline usePadding>
           <Subheading>Checkpoint</Subheading>
         </HeadOptionHeadline>
         <Dropdown

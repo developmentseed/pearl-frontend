@@ -39,13 +39,18 @@ const AoiOption = styled.div`
   display: grid;
   grid-template-columns: auto min-content;
   cursor: pointer;
+  background: ${themeVal('color.baseDark')};
+  padding: ${glsp(0.5)} 0;
+
+  h1 {
+    margin: 0;
+    padding-left: ${glsp()};
+  }
 
   ${({ hasSubtitle }) =>
     hasSubtitle &&
     css`
-      grid-template-rows: auto auto;
       .subtitle {
-        grid-row: 2;
         margin: 0;
       }
     `}
@@ -54,10 +59,16 @@ const AoiOption = styled.div`
     css`
       h1 {
         color: ${themeVal('color.primary')};
-        background: ${themeVal('color.primaryAlphaA')};
-        border-left: 2px solid ${themeVal('color.primary')};
-        padding-left: ${glsp()};
+        border-left: ${glsp(0.25)} solid ${themeVal('color.primary')};
+        padding-left: ${glsp(0.75)};
       }
+      background: ${themeVal('color.primaryAlphaA')};
+
+      grid-template-columns: auto auto;
+      align-items: center;
+      justify-content: start;
+      cursor: unset;
+      grid-gap: 1rem;
     `}
 
 
@@ -69,11 +80,17 @@ const AoiOption = styled.div`
     .aoi-delete-button {
       visibility: visible;
     }
-    background: ${themeVal('color.primaryAlphaB')};
+
+    ${({ selected }) =>
+      !selected &&
+      css`
+        background: ${themeVal('color.primaryAlphaB')};
+      `}
   }
 `;
 const HeadOption = styled(BaseHeadOption)`
   grid-template-columns: auto;
+  grid-gap: 0;
   ${HeadOptionToolbar} {
     grid-row: auto;
     grid-column: auto;
@@ -91,7 +108,7 @@ function findCompatibleAoi(aoi, aoiList, ckpt) {
  *
  * @param setDeleteAoi - { func } parent
  */
-function AoiSelection({ }) {
+function AoiSelection({}) {
   const { currentAoi, aoiList, aoiName, setAoiList } = useAoi();
   const [deleteAoi, setDeleteAoi] = useState();
   const {
@@ -176,7 +193,7 @@ function AoiSelection({ }) {
   return (
     <>
       <HeadOption hasSubtitle>
-        <HeadOptionHeadline>
+        <HeadOptionHeadline usePadding>
           <Subheading>Areas of Interest</Subheading>
         </HeadOptionHeadline>
         {
