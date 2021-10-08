@@ -78,7 +78,6 @@ function Header(props) {
 
   const { mapState, mapModes } = useMapState();
 
-  //const [deleteAoi, setDeleteAoi] = useState();
   const { models, selectedModel } = useModel();
   const { isAuthenticated } = useAuth();
 
@@ -247,32 +246,8 @@ function Header(props) {
 }
 
 Header.propTypes = {
-  aoiRef: T.object,
-  setAoiRef: T.func,
-  setAoiBounds: T.func,
-  aoiBounds: T.object,
-  aoiArea: T.number,
-  aoiName: T.string,
-  aoiList: T.array,
-  loadAoi: T.func,
-  createNewAoi: T.func,
-
-  mapState: T.object,
-  mapModes: T.object,
-  mapRef: T.object,
-
-  currentCheckpoint: T.object,
-  checkpointList: T.array,
-  applyCheckpoint: T.func,
-
   checkpointHasSamples: T.bool,
-
   setShowSelectModelModal: T.func,
-  selectedModel: T.object,
-  models: T.array,
-
-  isAuthenticated: T.bool,
-  currentProject: T.object,
 };
 
 export default Header;
