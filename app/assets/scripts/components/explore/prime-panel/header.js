@@ -304,9 +304,7 @@ function Header(props) {
                       hideText
                       onClick={(e) => {
                         e.stopPropagation();
-
                         e.preventDefault();
-
                         setDeleteAoi(a);
                       }}
                     >
