@@ -132,7 +132,7 @@ function PrimePanel() {
         setActiveTab(RETRAIN_TAB_INDEX);
       }
     }
-  }, [currentCheckpoint]);
+  }, [currentCheckpoint?.id, currentCheckpoint?.mode]);
 
   return (
     <>
@@ -159,7 +159,14 @@ function PrimePanel() {
                   checkpointHasSamples={checkpointHasSamples}
                   setShowSelectModelModal={setShowSelectModelModal}
                   onTabClick={() => {
-                    setActiveTab(PREDICT_TAB_INDEX);
+                    function onContinue() {
+                      setActiveTab(PREDICT_TAB_INDEX);
+                    }
+                    if (checkpointHasSamples) {
+                      setShowClearSamplesModal(() => onContinue);
+                    } else {
+                      onContinue();
+                    }
                   }}
                 />
                 <RetrainModel
