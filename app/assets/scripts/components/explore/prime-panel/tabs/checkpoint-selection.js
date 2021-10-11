@@ -4,9 +4,7 @@ import styled, { css } from 'styled-components';
 import { Heading } from '@devseed-ui/typography';
 import { themeVal } from '@devseed-ui/theme-provider';
 
-import {
-  HeadOptionHeadline,
-} from '../../../../styles/panel';
+import { HeadOptionHeadline } from '../../../../styles/panel';
 import ShadowScrollbar from '../../../common/shadow-scrollbar';
 import { Option, HeadOption } from './selection-styles';
 import { Subheading } from '../../../../styles/type/heading';
@@ -106,7 +104,7 @@ function CheckpointSelection({ checkpointHasSamples }) {
 }
 
 CheckpointSelection.propTypes = {
-  checkpointHasSamples: T.bool
-}
+  checkpointHasSamples: T.bool,
+};
 
 export default CheckpointSelection;
