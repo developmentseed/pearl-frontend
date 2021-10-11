@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 import {
-  HeadOption as BaseHeadOption,
   HeadOptionHeadline,
   HeadOptionToolbar,
 } from '../../../../styles/panel';
@@ -24,6 +23,8 @@ import { Modal } from '@devseed-ui/modal';
 import { Button } from '@devseed-ui/button';
 import toasts from '../../../common/toasts';
 
+import { Option, HeadOption } from './selection-styles';
+
 const ModalWrapper = styled.div`
   display: grid;
   grid-template-areas:
@@ -36,17 +37,9 @@ const ModalWrapper = styled.div`
   }
 `;
 
-const AoiOption = styled.div`
-  display: grid;
+const AoiOption = styled(Option)`
   grid-template-columns: auto min-content;
-  cursor: pointer;
-  background: ${themeVal('color.baseDark')};
-  padding: ${glsp(0.5)} 0;
-
-  h1 {
-    margin: 0;
-    padding-left: ${glsp()};
-  }
+  padding-right: ${glsp(0.5)};
 
   ${({ hasSubtitle }) =>
     hasSubtitle &&
@@ -55,22 +48,17 @@ const AoiOption = styled.div`
         margin: 0;
       }
     `}
+
   ${({ selected }) =>
     selected &&
     css`
-      h1 {
-        color: ${themeVal('color.primary')};
-        border-left: ${glsp(0.25)} solid ${themeVal('color.primary')};
-        padding-left: ${glsp(0.75)};
-      }
-      background: ${themeVal('color.primaryAlphaA')};
-
       grid-template-columns: auto auto;
       align-items: center;
       justify-content: start;
       cursor: unset;
       grid-gap: 1rem;
     `}
+
 
 
   .aoi-delete-button {
@@ -81,20 +69,6 @@ const AoiOption = styled.div`
     .aoi-delete-button {
       visibility: visible;
     }
-
-    ${({ selected }) =>
-      !selected &&
-      css`
-        background: ${themeVal('color.primaryAlphaB')};
-      `}
-  }
-`;
-const HeadOption = styled(BaseHeadOption)`
-  grid-template-columns: auto;
-  grid-gap: 0;
-  ${HeadOptionToolbar} {
-    grid-row: auto;
-    grid-column: auto;
   }
 `;
 
