@@ -6,6 +6,7 @@ import InfoButton from '../../../common/info-button';
 import { PlaceholderMessage } from '../../../../styles/placeholder.js';
 import { actions, useCheckpoint } from '../../../../context/checkpoint.js';
 import { useMapState } from '../../../../context/explore';
+import { useSessionStatusReducer } from '../../../../context/explore/session-status';
 import { Dropdown, DropdownTrigger } from '../../../../styles/dropdown';
 import {
   ToolsWrapper,
@@ -34,6 +35,9 @@ function RetrainModel(props) {
   const { ready, className, placeholderMessage } = props;
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
   const { setMapMode, mapModes, mapState } = useMapState();
+  const [sessionStatus] = useSessionStatusReducer();
+  const loadingStatus =
+    sessionStatus.mode === 'loading-project' || (!ready && currentCheckpoint);
 
   const [importSamplesModalRevealed, setImportSamplesModalRevealed] = useState(
     false
@@ -227,30 +231,25 @@ function RetrainModel(props) {
         </>
       )}
 
-      {(!currentCheckpoint || isBatchArea || (!ready && currentCheckpoint)) &&
-        placeholderMessage && (
-          <ClassList>
-            {currentCheckpoint && !isBatchArea ? (
-              [1, 2, 3].map((i) => (
-                // +true workaround
-                // Styled components will try to pass true to the DOM element
-                // assing a + casts it to int which is logically equivalent
-                // but does not cause the DOM error
-                <Class
-                  key={i}
-                  placeholder={+true}
-                  className='placeholder-class'
-                >
-                  <ClassThumbnail />
-                  <ClassHeading size='xsmall' placeholder={+true} />
-                </Class>
-              ))
-            ) : (
-              <></>
-            )}
-            <PlaceholderMessage>{placeholderMessage}</PlaceholderMessage>
-          </ClassList>
-        )}
+      {(loadingStatus || placeholderMessage) && (
+        <ClassList>
+          {loadingStatus && !isBatchArea ? (
+            [1, 2, 3].map((i) => (
+              // +true workaround
+              // Styled components will try to pass true to the DOM element
+              // assing a + casts it to int which is logically equivalent
+              // but does not cause the DOM error
+              <Class key={i} placeholder={+true} className='placeholder-class'>
+                <ClassThumbnail />
+                <ClassHeading size='xsmall' placeholder={+true} />
+              </Class>
+            ))
+          ) : (
+            <></>
+          )}
+          <PlaceholderMessage>{placeholderMessage}</PlaceholderMessage>
+        </ClassList>
+      )}
     </ToolsWrapper>
   );
 }
