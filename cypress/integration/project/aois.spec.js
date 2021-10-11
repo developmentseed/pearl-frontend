@@ -224,7 +224,6 @@ describe('Can delete AOIs', () => {
     ).as('loadAois1');
 
     cy.get('[data-cy=predict-tab]').click();
-    //cy.get('[data-cy=aoi-selection-trigger]').click();
     cy.get('[data-cy=add-aoi-button]').click();
 
     // Draw AOI

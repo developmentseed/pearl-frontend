@@ -474,8 +474,7 @@ describe('Retrain existing project', () => {
       'have.text',
       'Session Status: Ready for retrain run'
     );
-
-    cy.get('[data-cy=aoi-selection-trigger]').click();
+    cy.get('[data-cy=predict-tab]').click();
 
     cy.get('[data-cy=add-aoi-button]').click();
 
@@ -485,7 +484,7 @@ describe('Retrain existing project', () => {
       .trigger('mousemove', 300, 300)
       .trigger('mouseup');
     cy.wait('@reverseGeocodeCity');
-    cy.get('[data-cy=aoi-selection-trigger]').contains('Judiciary Square');
+    cy.get('[data-cy=selected-aoi-header]').contains('Judiciary Square');
 
     cy.get('[data-cy=run-button]').should('be.enabled');
   });
