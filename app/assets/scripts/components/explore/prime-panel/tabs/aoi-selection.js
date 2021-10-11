@@ -5,7 +5,7 @@ import {
   HeadOptionToolbar,
 } from '../../../../styles/panel';
 import ShadowScrollbar from '../../../common/shadow-scrollbar';
-import { themeVal, glsp } from '@devseed-ui/theme-provider';
+import { glsp } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
 import { Subheading } from '../../../../styles/type/heading';
 import { BOUNDS_PADDING } from '../../../common/map/constants';
