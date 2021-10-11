@@ -5,6 +5,7 @@ import {
   HeadOptionHeadline,
   HeadOptionToolbar,
 } from '../../../../styles/panel';
+import ShadowScrollbar from '../../../common/shadow-scrollbar';
 import { themeVal, glsp } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
 import { Subheading } from '../../../../styles/type/heading';
@@ -159,7 +160,7 @@ function AoiSelection() {
     }
 
     return (
-      <AoiOption hasSubtitle selected>
+      <AoiOption hasSubtitle selected data-cy='selected-aoi-header'>
         <Heading size='xsmall'>{header}</Heading>
         {area && (
           <Subheading size='xsmall' className='subtitle'>
@@ -210,50 +211,58 @@ function AoiSelection() {
         <HeadOptionHeadline usePadding>
           <Subheading>Areas of Interest</Subheading>
         </HeadOptionHeadline>
-        {
-          // Current or new aoi
-          renderSelectedAoi()
-        }
-        {
-          // Remainder of list
-          filterAoiList(aoiList, currentAoi).map((aoi) => {
-            return (
-              <AoiOption
-                key={aoi.id}
-                onClick={() => {
-                  const relevantAoi = findCompatibleAoi(
-                    aoi,
-                    aoiList,
-                    currentCheckpoint
-                  );
-                  loadAoi(
-                    currentProject,
-                    relevantAoi || aoi,
-                    relevantAoi || false
-                  ).then((bounds) =>
-                    mapRef.fitBounds(bounds, {
-                      padding: BOUNDS_PADDING,
-                    })
-                  );
-                }}
-              >
-                <Heading size='xsmall'>{aoi.name}</Heading>
-                <EditButton
-                  useIcon='trash-bin'
-                  className='aoi-delete-button'
-                  hideText
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    e.preventDefault();
-                    setDeleteAoi(aoi);
+        <ShadowScrollbar
+          style={{
+            minHeight: '4rem',
+            maxHeight: '6rem',
+          }}
+        >
+          {
+            // Current or new aoi
+            renderSelectedAoi()
+          }
+          {
+            // Remainder of list
+            filterAoiList(aoiList, currentAoi).map((aoi) => {
+              return (
+                <AoiOption
+                  key={aoi.id}
+                  className='listed-aoi'
+                  onClick={() => {
+                    const relevantAoi = findCompatibleAoi(
+                      aoi,
+                      aoiList,
+                      currentCheckpoint
+                    );
+                    loadAoi(
+                      currentProject,
+                      relevantAoi || aoi,
+                      relevantAoi || false
+                    ).then((bounds) =>
+                      mapRef.fitBounds(bounds, {
+                        padding: BOUNDS_PADDING,
+                      })
+                    );
                   }}
                 >
-                  Delete AOI
-                </EditButton>
-              </AoiOption>
-            );
-          })
-        }
+                  <Heading size='xsmall'>{aoi.name}</Heading>
+                  <EditButton
+                    useIcon='trash-bin'
+                    className='aoi-delete-button'
+                    hideText
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      e.preventDefault();
+                      setDeleteAoi(aoi);
+                    }}
+                  >
+                    Delete AOI
+                  </EditButton>
+                </AoiOption>
+              );
+            })
+          }
+        </ShadowScrollbar>
         <HeadOptionToolbar>
           <AoiEditButtons deleteAoi={(aoi) => setDeleteAoi(aoi)} />
         </HeadOptionToolbar>

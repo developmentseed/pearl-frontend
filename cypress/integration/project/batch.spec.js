@@ -116,7 +116,7 @@ describe('Batch predictions', () => {
     ).as('getBatchList');
   });
 
-  it.only('on new project, show different button large on large aoi', () => {
+  it('on new project, show different button large on large aoi', () => {
     cy.fakeLogin();
 
     cy.visit('/project/new');
@@ -289,7 +289,6 @@ describe('Batch predictions', () => {
     // Check if sec panel is mounted with a pixel distro chart
     cy.get('[data-cy=checkpoint_class_distro]').should('exist');
     cy.get('[data-cy=batch-progress-message').should('not.exist');
-    cy.get('[data-cy=aoi-selection-trigger]').should('exist').click();
     cy.get('[data-cy=add-aoi-button]').should('exist').click();
     cy.get('[data-cy=checkpoint_class_distro]').should('not.exist');
   });
@@ -329,6 +328,7 @@ describe('Batch predictions', () => {
     cy.wait('@loadAoisWithBatch');
     cy.wait(['@batchAoi', '@fetchCheckpoint2']);
 
+    cy.get('[data-cy=predict-tab]').click();
     // Edit AOI to treat as new one
     cy.get('[data-cy=aoi-edit-button]').should('exist').click();
     cy.get('[data-cy=aoi-edit-confirm-button]').should('exist').click();
@@ -397,12 +397,9 @@ describe('Batch predictions', () => {
       batchJob
     ).as('batch0');
 
-    //cy.get('[data-cy=batch-progress-message').should('exist');
-
     // Only one batch operation allowed at a time
     cy.get('[data-cy=run-button]').should('have.attr', 'data-disabled', 'true');
 
-    cy.get('[data-cy=aoi-selection-trigger]').should('exist').click();
     cy.get('[data-cy=add-aoi-button]').should('exist').click();
 
     cy.get('#map')
@@ -411,8 +408,6 @@ describe('Batch predictions', () => {
       .trigger('mouseup');
     cy.get('[data-cy=proceed-anyway-button]').should('exist').click();
     cy.wait('@reverseGeocodeCity');
-
-    cy.get('[data-cy=aoi-selection-trigger]').should('exist').click();
 
     // Should be able to run inference on non batch aoi
     cy.get('.listed-aoi').contains('Rockville').click();

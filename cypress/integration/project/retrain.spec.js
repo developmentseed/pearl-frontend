@@ -90,12 +90,6 @@ describe('Retrain existing project', () => {
     });
   });
 
-  it.only('test', () => {
-    cy.setWebsocketWorkflow('retrain');
-
-    cy.visit('/project/1');
-  });
-
   it('successfully loads', () => {
     cy.setWebsocketWorkflow('retrain');
 

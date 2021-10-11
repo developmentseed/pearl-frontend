@@ -17,6 +17,7 @@ import {
 } from '@devseed-ui/modal';
 import { useMapRef } from '../../../context/map';
 import { useApiLimits } from '../../../context/global';
+import { useInstance } from '../../../context/instance';
 import { useAoi, useAoiName } from '../../../context/aoi';
 import {
   useCheckpoint,
@@ -221,6 +222,8 @@ UploadAoiModal.propTypes = {
 export function AoiEditButtons(props) {
   const { deleteAoi } = props;
 
+  const { runningBatch } = useInstance();
+  console.log(runningBatch);
   const { mapState, setMapMode, mapModes } = useMapState();
   const [showUploadAoiModal, setShowUploadAoiModal] = useState(false);
   // updateAoiName applies geocoding
@@ -394,7 +397,7 @@ export function AoiEditButtons(props) {
     <>
       {
         // Only show add n button if at least one AOI exists
-        currentAoi && (
+        (currentAoi || runningBatch) && (
           <EditButton
             useIcon='plus'
             onClick={() => {
