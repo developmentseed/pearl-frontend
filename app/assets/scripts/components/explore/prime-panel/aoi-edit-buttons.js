@@ -223,7 +223,6 @@ export function AoiEditButtons(props) {
   const { deleteAoi } = props;
 
   const { runningBatch } = useInstance();
-  console.log(runningBatch);
   const { mapState, setMapMode, mapModes } = useMapState();
   const [showUploadAoiModal, setShowUploadAoiModal] = useState(false);
   // updateAoiName applies geocoding
