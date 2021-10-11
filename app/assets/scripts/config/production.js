@@ -11,8 +11,8 @@ module.exports = {
     restApiEndpoint: 'https://api.lulc.ds.io',
     websocketEndpoint: 'wss://socket.lulc.ds.io',
     websocketPingPongInterval: 3000,
-    auth0Domain: 'dev-y5qeoqlh.us.auth0.com',
-    clientId: 'cnTAr7SyMGYu4qDLaw5rEGy4G0sn4Htn',
+    auth0Domain: 'pearl-landcover.us.auth0.com',
+    auth0ClientId: 'OQtYR72fGdgrogeokjr9CBl4vg1P6SYP',
     minSampleCount: 1,
     bingApiKey:
       'ArLmu8JG2PHK_-_zo7yS1WbvDz7PgsoVEgcqFTg8uaH-lsXLcjADCAtnyQB054uq',
