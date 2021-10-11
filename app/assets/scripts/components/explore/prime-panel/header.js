@@ -27,6 +27,7 @@ import { useInstance } from '../../../context/instance';
 import { useCheckpoint } from '../../../context/checkpoint';
 import { useProject } from '../../../context/project';
 import AoiSelection from './tabs/aoi-selection.js';
+import CheckpointSelection from './tabs/checkpoint-selection';
 
 const SubheadingStrong = styled.h3`
   color: ${themeVal('color.base')};
@@ -159,87 +160,91 @@ function Header(props) {
         )}
       </HeadOption>
 
-      <HeadOption>
-        <HeadOptionHeadline usePadding>
-          <Subheading>Checkpoint</Subheading>
-        </HeadOptionHeadline>
-        <Dropdown
-          alignment='right'
-          direction='down'
-          triggerElement={(props) => {
-            const disabled =
-              checkpointHasSamples ||
-              !checkpointList ||
-              mapState.mode === mapModes.EDIT_AOI_MODE;
-            return (
-              <>
-                <SubheadingStrong
-                  {...props}
+      <CheckpointSelection checkpointHasSamples={checkpointHasSamples} />
+
+      {false && (
+        <HeadOption>
+          <HeadOptionHeadline usePadding>
+            <Subheading>Checkpoint</Subheading>
+          </HeadOptionHeadline>
+          <Dropdown
+            alignment='right'
+            direction='down'
+            triggerElement={(props) => {
+              const disabled =
+                checkpointHasSamples ||
+                !checkpointList ||
+                mapState.mode === mapModes.EDIT_AOI_MODE;
+              return (
+                <>
+                  <SubheadingStrong
+                    {...props}
                   onClick={(e) => !disabled && props.onClick(e)} // eslint-disable-line
-                  title={
-                    checkpointList
-                      ? 'Change checkpoint'
-                      : 'Run and retrain model to create first checkpoint'
-                  }
-                  disabled={disabled}
-                >
-                  {renderCheckpointSelectionHeader()}
-                </SubheadingStrong>
-                <HeadOptionToolbar>
-                  <EditButton
-                    data-cy='show-select-checkpoint-button'
-                    useIcon='swap-horizontal'
                     title={
                       checkpointList
                         ? 'Change checkpoint'
-                        : 'Run model to create first checkpoint'
+                        : 'Run and retrain model to create first checkpoint'
                     }
-                    id='checkpoint-list-trigger'
-                    info={
-                      checkpointHasSamples
-                        ? 'Submit or clear samples to change checkpoint'
-                        : !checkpointList
-                        ? 'No checkpoints available'
-                        : null
-                    }
-                    {...props}
+                    disabled={disabled}
+                  >
+                    {renderCheckpointSelectionHeader()}
+                  </SubheadingStrong>
+                  <HeadOptionToolbar>
+                    <EditButton
+                      data-cy='show-select-checkpoint-button'
+                      useIcon='swap-horizontal'
+                      title={
+                        checkpointList
+                          ? 'Change checkpoint'
+                          : 'Run model to create first checkpoint'
+                      }
+                      id='checkpoint-list-trigger'
+                      info={
+                        checkpointHasSamples
+                          ? 'Submit or clear samples to change checkpoint'
+                          : !checkpointList
+                          ? 'No checkpoints available'
+                          : null
+                      }
+                      {...props}
                     onClick={(e) => !disabled && props.onClick(e)} // eslint-disable-line
-                    visuallyDisabled={disabled}
-                  >
-                    Edit Checkpoint Selection
-                  </EditButton>
-                </HeadOptionToolbar>
-              </>
-            );
-          }}
-          className='global__dropdown'
-        >
-          <>
-            <DropdownHeader unshaded>
-              <p>Checkpoints</p>
-            </DropdownHeader>
-            <DropdownBody selectable>
-              {checkpointList?.length &&
-                checkpointList.map((ckpt) => (
-                  <DropdownItem
-                    key={ckpt.id}
-                    data-dropdown='click.close'
-                    checked={
-                      ckpt.id == (currentCheckpoint && currentCheckpoint.id)
-                    }
-                    onClick={async () => {
-                      await applyCheckpoint(currentProject.id, ckpt.id);
-                    }}
-                  >
-                    {ckpt.parent
-                      ? `${ckpt.name} (${ckpt.id})`
-                      : `${selectedModel.name} (Base Model)`}
-                  </DropdownItem>
-                ))}
-            </DropdownBody>
-          </>
-        </Dropdown>
-      </HeadOption>
+                      visuallyDisabled={disabled}
+                    >
+                      Edit Checkpoint Selection
+                    </EditButton>
+                  </HeadOptionToolbar>
+                </>
+              );
+            }}
+            className='global__dropdown'
+          >
+            <>
+              <DropdownHeader unshaded>
+                <p>Checkpoints</p>
+              </DropdownHeader>
+              <DropdownBody selectable>
+                {checkpointList?.length &&
+                  checkpointList.map((ckpt) => (
+                    <DropdownItem
+                      key={ckpt.id}
+                      data-dropdown='click.close'
+                      checked={
+                        ckpt.id == (currentCheckpoint && currentCheckpoint.id)
+                      }
+                      onClick={async () => {
+                        await applyCheckpoint(currentProject.id, ckpt.id);
+                      }}
+                    >
+                      {ckpt.parent
+                        ? `${ckpt.name} (${ckpt.id})`
+                        : `${selectedModel.name} (Base Model)`}
+                    </DropdownItem>
+                  ))}
+              </DropdownBody>
+            </>
+          </Dropdown>
+        </HeadOption>
+      )}
     </PanelBlockHeader>
   );
 }
