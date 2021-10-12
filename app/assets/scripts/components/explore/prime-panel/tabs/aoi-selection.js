@@ -213,8 +213,8 @@ function AoiSelection() {
         </HeadOptionHeadline>
         <ShadowScrollbar
           style={{
-            minHeight: '4rem',
-            maxHeight: '6rem',
+            minHeight: '6rem',
+            maxHeight: '12rem',
           }}
         >
           {
