@@ -25,6 +25,7 @@ const StyledBlockBody = styled(PanelBlockBody)`
   margin-top: auto;
   ${PanelBlockHeader} {
     margin-bottom: ${glsp(0.5)};
+    padding: 0;
     background: none;
   }
 `;
@@ -38,7 +39,6 @@ const ScrollBodyWrapper = styled.div`
 
 const PanelBlockScrollPadded = styled(PanelBlockScroll)`
   padding: 0 1.5rem;
-  margin: 0 -1.5rem;
 `;
 const CountList = styled.div`
   display: grid;

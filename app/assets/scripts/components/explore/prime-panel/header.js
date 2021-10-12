@@ -111,8 +111,9 @@ function findCompatibleAoi(aoi, aoiList, ckpt) {
 const PanelBlockHeader = styled(BasePanelBlockHeader)`
   display: grid;
   grid-gap: ${glsp(0.75)};
-  padding: ${glsp()};
+  padding: 0 ${glsp(1.5)};
   margin: unset;
+  background: none;
 `;
 
 function Header(props) {
