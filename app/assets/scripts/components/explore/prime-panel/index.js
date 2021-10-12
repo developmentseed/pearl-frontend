@@ -149,7 +149,6 @@ function PrimePanel() {
         fitContent
         bodyContent={
           <StyledPanelBlock>
-            <div />
             <PanelBlockBody>
               <TabbedBlock activeTab={activeTab}>
                 <Predict

@@ -56,8 +56,9 @@ const SubheadingStrong = styled.h3`
 const PanelBlockHeader = styled(BasePanelBlockHeader)`
   display: grid;
   grid-gap: ${glsp(0.75)};
+  padding: 0 ${glsp(1.5)};
   margin: unset;
-  padding: unset;
+  background: none;
 `;
 
 function Header(props) {

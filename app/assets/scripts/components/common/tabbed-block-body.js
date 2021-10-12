@@ -23,7 +23,7 @@ const Tab = styled(InfoButton)`
   user-select: none;
   position: relative;
   transition: color 0.16s ease-in-out 0s;
-  padding: ${glsp(0.25)} 0;
+  padding: ${glsp(0.5)} 0;
   color: ${themeVal('color.base')};
   ${headingAlt()};
   opacity: 1;
@@ -73,14 +73,16 @@ const Tab = styled(InfoButton)`
 `;
 
 const TabbedBlockHeader = styled(PanelBlockHeader)`
-  margin: 0.5rem -1.5rem 0;
-  padding: 0.5rem 1.5rem;
+  margin-bottom: 0;
+  padding: ${glsp(0.5)} 0;
   background: ${_rgba(themeVal('color.surface'), 0.64)};
   ul {
     ${listReset}
     display: flex;
     flex-flow: row nowrap;
     justify-content: space-between;
+    padding: 0 ${glsp(1.5)};
+    box-shadow: inset 0 -1px 0 0 ${themeVal('color.baseAlphaB')};
   }
   /* PanelBlockHeader sets z-index. This causes
    * issues for TabbedBlockHeader so
@@ -97,7 +99,6 @@ const PanelBlockScroll = styled(ScrollableBody)`
     ${disabled()}
   }
   padding-bottom: ${glsp(0.5)};
-  margin: 0 -1.5rem;
 
   & > .scroll-area > div > .padded {
     padding-left: 1.5rem;
