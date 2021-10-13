@@ -3734,6 +3734,14 @@ cypress-file-upload@^5.0.8:
   resolved "https://registry.yarnpkg.com/cypress-file-upload/-/cypress-file-upload-5.0.8.tgz#d8824cbeaab798e44be8009769f9a6c9daa1b4a1"
   integrity sha512-+8VzNabRk3zG6x8f8BWArF/xA/W0VK4IZNx3MV0jFWrJS/qKn8eHfa5nU73P9fOQAgwHFJx7zjg4lwOnljMO8g==
 
+cypress-websocket-server@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/cypress-websocket-server/-/cypress-websocket-server-0.1.0.tgz#b02ad0e72706938f4cb96edfe711140a0717eef1"
+  integrity sha512-+vQj2p90aQq44SleIh3Dwh1LtXXS9m84aX/VFXC5pZk6E31Hj0ZGI4TOJpCxth7tu5AwUNqjwfch2vNg2qXsXA==
+  dependencies:
+    lodash.isequal "^4.5.0"
+    ws "^8.2.3"
+
 cypress@^8.4.1:
   version "8.4.1"
   resolved "https://registry.yarnpkg.com/cypress/-/cypress-8.4.1.tgz#8b5898bf49359cadc28f02ba05d51f63b8e3a717"
@@ -11781,6 +11789,11 @@ ws@^7.5.2:
   version "7.5.2"
   resolved "https://registry.yarnpkg.com/ws/-/ws-7.5.2.tgz#09cc8fea3bec1bc5ed44ef51b42f945be36900f6"
   integrity sha512-lkF7AWRicoB9mAgjeKbGqVUekLnSNO4VjKVnuPHpQeOxZOErX6BPXwJk70nFslRCEEA8EVW7ZjKwXaP9N+1sKQ==
+
+ws@^8.2.3:
+  version "8.2.3"
+  resolved "https://registry.yarnpkg.com/ws/-/ws-8.2.3.tgz#63a56456db1b04367d0b721a0b80cae6d8becbba"
+  integrity sha512-wBuoj1BDpC6ZQ1B7DWQBYVLphPWkm8i9Y0/3YdHjHKHiohOJ1ws+3OccDWtH+PoC9DZD5WOTrJvNbWvjS6JWaA==
 
 ws@~7.4.2:
   version "7.4.3"

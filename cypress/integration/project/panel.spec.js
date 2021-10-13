@@ -20,7 +20,7 @@ describe('Panel functions', () => {
   beforeEach(() => {
     cy.startServer();
     cy.fakeLogin();
-    cy.setWebsocketWorkflow('retrain');
+    cy.setWebsocketWorkflow('websocket-workflow/retrain.json');
 
     /**
      * GET /project/:id/instance/:id

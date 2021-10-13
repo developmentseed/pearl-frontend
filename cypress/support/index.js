@@ -15,8 +15,8 @@
 
 import 'cypress-file-upload';
 
-import { setup } from '../plugins/cypress-mock-websocket-server';
-setup();
+import { addCommand } from 'cypress-websocket-server';
+addCommand();
 
 require('./commands/fake-login');
 require('./commands/fake-rest');

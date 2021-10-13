@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 
-const { startMockWsServer } = require('./cypress-mock-websocket-server');
+const { startMockWsServer } = require('cypress-websocket-server');
 
 /**
  * @type {Cypress.PluginConfig}
