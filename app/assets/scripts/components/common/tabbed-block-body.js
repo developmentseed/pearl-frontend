@@ -101,7 +101,6 @@ const PanelBlockScroll = styled(ScrollableBody)`
 
   padding: ${glsp(0.5)} 0;
 
-
   & > .scroll-area > div > .padded {
     padding-left: 1.5rem;
     padding-right: 1.5rem;
