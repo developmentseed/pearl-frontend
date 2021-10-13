@@ -8,16 +8,16 @@ import {
   HeadOption,
   HeadOptionHeadline,
   HeadOptionToolbar,
-} from '../../../styles/panel';
-import { EditButton } from '../../../styles/button';
-import { Subheading } from '../../../styles/type/heading';
+} from '../../../../../styles/panel';
+import { EditButton } from '../../../../../styles/button';
+import { Subheading } from '../../../../../styles/type/heading';
 import collecticon from '@devseed-ui/collecticons';
-import { PanelBlockHeader as BasePanelBlockHeader } from '../../common/panel-block';
-import { useModel } from '../../../context/model';
-import { useAuth } from '../../../context/auth';
-import { useCheckpoint } from '../../../context/checkpoint';
-import AoiSelection from './tabs/aoi-selection.js';
-import CheckpointSelection from './tabs/checkpoint-selection';
+import { PanelBlockHeader as BasePanelBlockHeader } from '../../../../common/panel-block';
+import { useModel } from '../../../../../context/model';
+import { useAuth } from '../../../../../context/auth';
+import { useCheckpoint } from '../../../../../context/checkpoint';
+import AoiSelection from './aoi-selection.js';
+import CheckpointSelection from './checkpoint-selection';
 
 const SubheadingStrong = styled.h3`
   color: ${themeVal('color.base')};

@@ -3,27 +3,27 @@ import styled, { css } from 'styled-components';
 import {
   HeadOptionHeadline,
   HeadOptionToolbar,
-} from '../../../../styles/panel';
-import ShadowScrollbar from '../../../common/shadow-scrollbar';
+} from '../../../../../styles/panel';
+import ShadowScrollbar from '../../../../common/shadow-scrollbar';
 import { glsp } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
-import { Subheading } from '../../../../styles/type/heading';
-import { BOUNDS_PADDING } from '../../../common/map/constants';
-import { formatThousands } from '../../../../utils/format';
-import { useAoiMeta, useMapState } from '../../../../context/explore';
-import { useMapRef } from '../../../../context/map';
-import { useAoi } from '../../../../context/aoi';
-import { useAuth } from '../../../../context/auth';
+import { Subheading } from '../../../../../styles/type/heading';
+import { BOUNDS_PADDING } from '../../../../common/map/constants';
+import { formatThousands } from '../../../../../utils/format';
+import { useAoiMeta, useMapState } from '../../../../../context/explore';
+import { useMapRef } from '../../../../../context/map';
+import { useAoi } from '../../../../../context/aoi';
+import { useAuth } from '../../../../../context/auth';
 
-import { useCheckpoint } from '../../../../context/checkpoint';
-import { useProject } from '../../../../context/project';
-import { AoiEditButtons } from '../aoi-edit-buttons';
-import { EditButton } from '../../../../styles/button';
+import { useCheckpoint } from '../../../../../context/checkpoint';
+import { useProject } from '../../../../../context/project';
+import { AoiEditButtons } from '../../aoi-edit-buttons';
+import { EditButton } from '../../../../../styles/button';
 import { Modal } from '@devseed-ui/modal';
 import { Button } from '@devseed-ui/button';
-import toasts from '../../../common/toasts';
+import toasts from '../../../../common/toasts';
 
-import { Option, HeadOption } from './selection-styles';
+import { Option, HeadOption } from '../selection-styles';
 
 const ModalWrapper = styled.div`
   display: grid;

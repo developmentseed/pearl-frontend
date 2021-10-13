@@ -294,59 +294,64 @@ function Footer({
   mapRef,
   disabled,
   setAoiBounds,
+  useSampleControls,
 }) {
   const [displayBatchProgress, setDisplayBatchProgress] = useState(false);
   const { runningBatch } = useInstance();
 
   return (
     <PanelControls data-cy='footer-panel-controls' data-disabled={disabled}>
-      <Button
-        variation='base-plain'
-        size='medium'
-        useIcon='arrow-loop'
-        style={{
-          gridColumn: '1 / 2',
-        }}
-        title='Clear all samples drawn since last retrain or save'
-        id='reset-button-trigger'
-        disabled={!currentCheckpoint || currentCheckpoint.sampleCount === 0}
-        visuallyDisabled={
-          !currentCheckpoint || currentCheckpoint.sampleCount === 0
-        }
-        onClick={() => {
-          dispatchCurrentCheckpoint({
-            type: checkpointActions.CLEAR_SAMPLES,
-          });
-          mapRef.freehandDraw.clearLayers();
-        }}
-      >
-        Clear
-      </Button>
-      <Button
-        variation='base-plain'
-        size='medium'
-        useIcon='arrow-semi-spin-ccw'
-        style={{
-          gridColumn: '2 / -1',
-        }}
-        title='Undo last performed action'
-        onClick={() => {
-          dispatchCurrentCheckpoint({
-            type: checkpointActions.INPUT_UNDO,
-          });
+      {useSampleControls && (
+        <>
+          <Button
+            variation='base-plain'
+            size='medium'
+            useIcon='arrow-loop'
+            style={{
+              gridColumn: '1 / 2',
+            }}
+            title='Clear all samples drawn since last retrain or save'
+            id='reset-button-trigger'
+            disabled={!currentCheckpoint || currentCheckpoint.sampleCount === 0}
+            visuallyDisabled={
+              !currentCheckpoint || currentCheckpoint.sampleCount === 0
+            }
+            onClick={() => {
+              dispatchCurrentCheckpoint({
+                type: checkpointActions.CLEAR_SAMPLES,
+              });
+              mapRef.freehandDraw.clearLayers();
+            }}
+          >
+            Clear
+          </Button>
+          <Button
+            variation='base-plain'
+            size='medium'
+            useIcon='arrow-semi-spin-ccw'
+            style={{
+              gridColumn: '2 / -1',
+            }}
+            title='Undo last performed action'
+            onClick={() => {
+              dispatchCurrentCheckpoint({
+                type: checkpointActions.INPUT_UNDO,
+              });
 
-          const latest =
-            currentCheckpoint.history[currentCheckpoint.history.length - 1];
-          mapRef.freehandDraw.setLayerPolygons({
-            ...latest.classes,
-            ...latest.checkpointBrushes,
-          });
-        }}
-        disabled={!(currentCheckpoint && currentCheckpoint.history?.length)}
-        id='undo-button-trigger'
-      >
-        Undo
-      </Button>
+              const latest =
+                currentCheckpoint.history[currentCheckpoint.history.length - 1];
+              mapRef.freehandDraw.setLayerPolygons({
+                ...latest.classes,
+                ...latest.checkpointBrushes,
+              });
+            }}
+            disabled={!(currentCheckpoint && currentCheckpoint.history?.length)}
+            id='undo-button-trigger'
+          >
+            Undo
+          </Button>
+        </>
+      )}
 
       <PrimeButton
         currentCheckpoint={currentCheckpoint}
@@ -454,5 +459,7 @@ Footer.propTypes = {
   disabled: T.bool,
 
   setAoiBounds: T.func,
+
+  useSampleControls: T.bool
 };
 export default Footer;

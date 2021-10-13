@@ -160,6 +160,12 @@ function PrimePanel() {
                   onTabClick={() => {
                     function onContinue() {
                       setActiveTab(PREDICT_TAB_INDEX);
+                      dispatchCurrentCheckpoint({
+                        type: checkpointActions.SET_CHECKPOINT_MODE,
+                        data: {
+                          mode: checkpointModes.RUN,
+                        },
+                      });
                     }
                     if (checkpointHasSamples) {
                       setShowClearSamplesModal(() => onContinue);
@@ -274,6 +280,7 @@ function PrimePanel() {
                 mapRef,
 
                 setAoiBounds,
+                useSampleControls: activeTab > PREDICT_TAB_INDEX,
 
                 disabled:
                   currentCheckpoint &&

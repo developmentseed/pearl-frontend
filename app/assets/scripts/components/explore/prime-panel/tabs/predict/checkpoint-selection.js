@@ -4,16 +4,16 @@ import styled, { css } from 'styled-components';
 import { Heading } from '@devseed-ui/typography';
 import { themeVal } from '@devseed-ui/theme-provider';
 
-import { HeadOptionHeadline } from '../../../../styles/panel';
-import ShadowScrollbar from '../../../common/shadow-scrollbar';
-import { Option, HeadOption } from './selection-styles';
-import { Subheading } from '../../../../styles/type/heading';
-import { useCheckpoint } from '../../../../context/checkpoint';
-import { useInstance } from '../../../../context/instance';
+import { HeadOptionHeadline } from '../../../../../styles/panel';
+import ShadowScrollbar from '../../../../common/shadow-scrollbar';
+import { Option, HeadOption } from '../selection-styles';
+import { Subheading } from '../../../../../styles/type/heading';
+import { useCheckpoint } from '../../../../../context/checkpoint';
+import { useInstance } from '../../../../../context/instance';
 
-import { useModel } from '../../../../context/model';
-import { useProject } from '../../../../context/project';
-import { useMapState } from '../../../../context/explore';
+import { useModel } from '../../../../../context/model';
+import { useProject } from '../../../../../context/project';
+import { useMapState } from '../../../../../context/explore';
 
 const CheckpointOption = styled(Option)`
   ${({ disabled }) =>

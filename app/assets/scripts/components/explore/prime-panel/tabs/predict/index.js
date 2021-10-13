@@ -1,7 +1,7 @@
 import React from 'react';
 import T from 'prop-types';
-import { ToolsWrapper } from './retrain-refine-styles';
-import Header from '../header';
+import { ToolsWrapper } from '..//retrain-refine-styles';
+import Header from './header';
 
 function Predict({ className, checkpointHasSamples, setShowSelectModelModal }) {
   return (
