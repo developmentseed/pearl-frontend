@@ -3734,10 +3734,10 @@ cypress-file-upload@^5.0.8:
   resolved "https://registry.yarnpkg.com/cypress-file-upload/-/cypress-file-upload-5.0.8.tgz#d8824cbeaab798e44be8009769f9a6c9daa1b4a1"
   integrity sha512-+8VzNabRk3zG6x8f8BWArF/xA/W0VK4IZNx3MV0jFWrJS/qKn8eHfa5nU73P9fOQAgwHFJx7zjg4lwOnljMO8g==
 
-cypress-websocket-server@^0.1.0:
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/cypress-websocket-server/-/cypress-websocket-server-0.1.0.tgz#b02ad0e72706938f4cb96edfe711140a0717eef1"
-  integrity sha512-+vQj2p90aQq44SleIh3Dwh1LtXXS9m84aX/VFXC5pZk6E31Hj0ZGI4TOJpCxth7tu5AwUNqjwfch2vNg2qXsXA==
+cypress-websocket-server@^0.1.2:
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/cypress-websocket-server/-/cypress-websocket-server-0.1.2.tgz#4b1eba631ef8be3b783f8bb81bea4cc18e6f621c"
+  integrity sha512-B5YAv1v9sMcwjoEBsqqz/uP37Mc6+GubMq1f3Mp/CmnG97LST3OboOap3JAxes9wFdraeZzXulf+PkPZqjMXFQ==
   dependencies:
     lodash.isequal "^4.5.0"
     ws "^8.2.3"
