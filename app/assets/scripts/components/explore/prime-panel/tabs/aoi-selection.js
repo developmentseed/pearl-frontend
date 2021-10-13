@@ -31,7 +31,6 @@ const ModalWrapper = styled.div`
     'a a'
     'b c';
   grid-gap: ${glsp(1)};
-  padding: ${glsp()};
   div {
     grid-area: a;
   }
@@ -130,7 +129,7 @@ function AoiSelection() {
     } else if (mapState.mode === mapModes.CREATE_AOI_MODE) {
       header = 'Drag on map to select';
     } else {
-      header = 'None selected - Draw area on map';
+      header = 'None selected - Draw area on map or upload AOI ';
     }
 
     return (

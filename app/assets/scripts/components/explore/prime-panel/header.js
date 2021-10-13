@@ -22,7 +22,7 @@ import CheckpointSelection from './tabs/checkpoint-selection';
 const SubheadingStrong = styled.h3`
   color: ${themeVal('color.base')};
   font-weight: ${themeVal('type.heading.weight')};
-  font-size: 1.125rem;
+  font-size: ${themeVal('type.base.size')};
   line-height: 1.5rem;
   padding-left: ${glsp(1.5)};
   ${truncated}
