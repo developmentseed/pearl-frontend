@@ -94,11 +94,9 @@ function Header(props) {
 
   return (
     <PanelBlockHeader id='header'>
-      <AoiSelection />
-
       <HeadOption>
         <HeadOptionHeadline usePadding>
-          <Subheading>Selected Model</Subheading>
+          <Subheading>Base Model</Subheading>
         </HeadOptionHeadline>
         <SubheadingStrong
           data-cy='select-model-label'
@@ -129,7 +127,7 @@ function Header(props) {
           </HeadOptionToolbar>
         )}
       </HeadOption>
-
+      <AoiSelection />
       <CheckpointSelection checkpointHasSamples={checkpointHasSamples} />
     </PanelBlockHeader>
   );
