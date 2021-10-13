@@ -460,6 +460,6 @@ Footer.propTypes = {
 
   setAoiBounds: T.func,
 
-  useSampleControls: T.bool
+  useSampleControls: T.bool,
 };
 export default Footer;
