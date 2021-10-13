@@ -24,6 +24,7 @@ const SubheadingStrong = styled.h3`
   font-weight: ${themeVal('type.heading.weight')};
   font-size: 1.125rem;
   line-height: 1.5rem;
+  padding-left: ${glsp(1.5)};
   ${truncated}
 
   ${({ useIcon }) =>
@@ -56,7 +57,7 @@ const SubheadingStrong = styled.h3`
 const PanelBlockHeader = styled(BasePanelBlockHeader)`
   display: grid;
   grid-gap: ${glsp(0.75)};
-  padding: 0 ${glsp(1.5)};
+  padding: 0;
   margin: unset;
   background: none;
 `;

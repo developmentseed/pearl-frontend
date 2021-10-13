@@ -71,8 +71,12 @@ function CheckpointSelection({ checkpointHasSamples }) {
         </HeadOptionHeadline>
         <ShadowScrollbar
           style={{
-            minHeight: '8rem',
-            maxHeight: '12rem',
+            minHeight: '6rem',
+            maxHeight: '10rem',
+            backgroundColor: '#121826',
+            padding: '0.25rem 0',
+            margin: '0.75rem 0',
+            boxShadow: 'inset 0 -1px 0 0 rgba(240, 244, 255, 0.16)',
           }}
         >
           {renderSelectedCheckpoint()}

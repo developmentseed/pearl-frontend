@@ -98,7 +98,7 @@ const PanelBlockScroll = styled(ScrollableBody)`
   .disabled {
     ${disabled()}
   }
-  padding-bottom: ${glsp(0.5)};
+  padding: ${glsp(0.5)} 0;
 
   & > .scroll-area > div > .padded {
     padding-left: 1.5rem;

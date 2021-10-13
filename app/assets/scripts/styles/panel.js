@@ -6,7 +6,7 @@ export const HeadOptionHeadline = styled.div`
   ${({ usePadding }) =>
     usePadding &&
     css`
-      padding: ${glsp()};
+      padding: ${glsp(0)} ${glsp(1.5)};
     `}
 `;
 
@@ -18,15 +18,17 @@ export const HeadOptionToolbar = styled.div`
   grid-auto-flow: column;
   justify-items: center;
   align-self: flex-start;
-  padding: ${glsp(0.5)};
+  padding-right: ${glsp(1.5)};
 `;
 
 export const HeadOption = styled.div`
   display: grid;
   grid-template-columns: minmax(0, 1fr) min-content;
-  box-shadow: 0px 1px 0px 0px ${themeVal('color.baseAlphaC')};
   gap: 0.5rem;
-
+  &:not(:last-of-type) {
+    box-shadow: 0px 1px 0px 0px ${themeVal('color.baseAlphaC')};
+    padding-bottom: 0.75rem;
+  }
   ${({ hasSubtitle }) =>
     hasSubtitle &&
     css`

@@ -39,7 +39,7 @@ const ModalWrapper = styled.div`
 
 const AoiOption = styled(Option)`
   grid-template-columns: auto min-content;
-  padding-right: ${glsp(0.5)};
+  padding-right: ${glsp(1.5)};
 
   ${({ hasSubtitle }) =>
     hasSubtitle &&
@@ -187,8 +187,12 @@ function AoiSelection() {
         </HeadOptionHeadline>
         <ShadowScrollbar
           style={{
-            minHeight: '4rem',
-            maxHeight: '6rem',
+            minHeight: '6rem',
+            maxHeight: '10rem',
+            backgroundColor: '#121826',
+            padding: '0.25rem 0',
+            margin: '0.75rem 0',
+            boxShadow: 'inset 0 -1px 0 0 rgba(240, 244, 255, 0.16)',
           }}
         >
           {
