@@ -124,8 +124,18 @@ function Map() {
 
   const { mosaics } = useMosaics();
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
+  const [mostRecentClass, setMostRecentClass] = useState(null);
 
   const { shortcutState, dispatchShortcutState } = useShortcutState();
+
+  useEffect(() => {
+    if (currentCheckpoint && currentCheckpoint.classes) {
+      const classList = Object.keys(currentCheckpoint.classes);
+      if (classList.length) {
+        setMostRecentClass(classList[classList.length - 1]);
+      }
+    }
+  }, [currentCheckpoint]);
 
   // Manage changes in map mode
   useEffect(() => {
@@ -174,7 +184,8 @@ function Map() {
         if (mapRef && aoiRef) {
           if (
             mapState.previousMode === mapModes.CREATE_AOI_MODE ||
-            mapState.previousMode === mapModes.EDIT_AOI_MODE
+            mapState.previousMode === mapModes.EDIT_AOI_MODE ||
+            mapState.previousMode === mapModes.ADD_SAMPLE_FREEHAND
           ) {
             // On confirm, zoom to bounds
             mapRef.fitBounds(aoiRef.getBounds(), { padding: BOUNDS_PADDING });
@@ -224,14 +235,13 @@ function Map() {
   // Add polygon layers to be drawn when checkpoint has changed
   useEffect(() => {
     if (!mapRef || !mapRef.freehandDraw) return;
-
     mapRef.freehandDraw.clearLayers();
 
     if (currentCheckpoint && currentCheckpoint.classes) {
       mapRef.freehandDraw.setLayers(currentCheckpoint.classes);
       mapRef.freehandDraw.setLayerPolygons(currentCheckpoint.classes);
     }
-  }, [mapRef, id, classLength]);
+  }, [mapRef, id, classLength, mostRecentClass]);
 
   /**
    * Add/update AOI controls on API metadata change.
@@ -325,6 +335,11 @@ function Map() {
     async function updateTileUrl() {
       if (mapRef && currentProject && currentAoi && aoiRef) {
         mapRef.fitBounds(aoiRef.getBounds(), { padding: BOUNDS_PADDING });
+        if (!currentAoi.storage) {
+          // Do not load tiles when storage is false
+          setTileUrl(null);
+          return;
+        }
         try {
           const tileJSON = await restApiClient.getTileJSON(
             currentProject.id,

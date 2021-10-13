@@ -220,7 +220,10 @@ function PrimeButton({
     },
     'batch-prediction': {
       label: 'Run Batch Prediction',
-      action: runBatchPrediction,
+      action: () => {
+        setSessionStatusMode('running-prediction');
+        runBatchPrediction();
+      },
     },
   };
 

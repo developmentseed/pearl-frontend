@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useMemo, useReducer } from 'react';
+import React, {
+  useState,
+  createContext,
+  useContext,
+  useMemo,
+  useReducer,
+} from 'react';
 import uniqWith from 'lodash.uniqwith';
 import isEqual from 'lodash.isequal';
 import differenceWith from 'lodash.differencewith';
@@ -6,6 +12,7 @@ import T from 'prop-types';
 import { useAuth } from './auth';
 import toasts from '../components/common/toasts';
 import logger from '../utils/logger';
+import { filterObject } from '../utils/utils';
 
 import { wrapLogReducer } from './reducers/utils';
 
@@ -19,6 +26,7 @@ export const checkpointModes = {
 
 export const actions = {
   ADD_CLASS: 'ADD_CLASS',
+  EDIT_CLASS: 'EDIT_CLASS',
   RECEIVE_CHECKPOINT: 'RECEIVE_CHECKPOINT',
   SET_CHECKPOINT_NAME: 'SET_CHECKPOINT_NAME',
   SET_CHECKPOINT_MODE: 'SET_CHECKPOINT_MODE',
@@ -43,6 +51,24 @@ export function CheckpointProvider(props) {
   );
 
   const { restApiClient } = useAuth();
+  const [checkpointList, setCheckpointList] = useState(null);
+
+  async function loadCheckpointList(projectId) {
+    const checkpointsMeta = await restApiClient.getCheckpoints(projectId);
+    if (checkpointsMeta.total > 0) {
+      // Save checkpoints if any exist, else leave as null
+      // Only keep book marked and root checkpoints
+      const list = checkpointsMeta.checkpoints.filter(
+        (ckpt) => !ckpt.parent || ckpt.bookmarked
+      );
+
+      setCheckpointList(list);
+      return {
+        checkpoints: list,
+      };
+    }
+    return checkpointsMeta;
+  }
 
   /*
    * @param created - if new checkpoint was just created,don't to verify that aoi matches
@@ -81,6 +107,9 @@ export function CheckpointProvider(props) {
     currentCheckpoint,
     dispatchCurrentCheckpoint,
     fetchCheckpoint,
+    checkpointList,
+    setCheckpointList,
+    loadCheckpointList,
   };
 
   return (
@@ -179,6 +208,22 @@ function checkpointReducer(state, action) {
             ...state.classes,
             [newClass.name]: newClass,
           },
+        };
+      }
+      break;
+    case actions.EDIT_CLASS:
+      {
+        const newClass = state.classes[action.data.oldName];
+        newClass.name = action.data.name;
+        newClass.color = action.data.color;
+        const classes = filterObject(
+          state.classes,
+          (k) => k !== action.data.oldName
+        );
+        classes[newClass.name] = newClass;
+        nextState = {
+          ...state,
+          classes: classes,
         };
       }
       break;
@@ -459,6 +504,8 @@ export const useCheckpoint = () => {
     currentCheckpoint,
     dispatchCurrentCheckpoint,
     fetchCheckpoint,
+    checkpointList,
+    loadCheckpointList,
   } = useCheckContext('useCheckpoint');
 
   return useMemo(
@@ -466,7 +513,15 @@ export const useCheckpoint = () => {
       currentCheckpoint,
       dispatchCurrentCheckpoint,
       fetchCheckpoint,
+      checkpointList,
+      loadCheckpointList,
     }),
-    [currentCheckpoint, dispatchCurrentCheckpoint, fetchCheckpoint]
+    [
+      currentCheckpoint,
+      dispatchCurrentCheckpoint,
+      fetchCheckpoint,
+      checkpointList,
+      loadCheckpointList,
+    ]
   );
 };

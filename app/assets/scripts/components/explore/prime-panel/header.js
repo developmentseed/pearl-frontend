@@ -99,6 +99,7 @@ function findCompatibleAoi(aoi, aoiList, ckpt) {
   const foundAoi = aoiList
     .filter((a) => a.name === aoi.name)
     .find((a) => Number(a.checkpoint_id) === ckpt.id);
+
   return foundAoi;
 }
 
@@ -288,7 +289,7 @@ function Header(props) {
                       loadAoi(
                         currentProject,
                         relevantAoi || a,
-                        relevantAoi || false
+                        relevantAoi || false // @param aoiMatchesCheckpoint,
                       ).then((bounds) =>
                         mapRef.fitBounds(bounds, {
                           padding: BOUNDS_PADDING,

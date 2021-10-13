@@ -50,3 +50,9 @@ export async function fetchJSON(url, options) {
     throw error;
   }
 }
+
+export function filterObject(obj, callback) {
+  return Object.fromEntries(
+    Object.entries(obj).filter(([key, val]) => callback(key, val))
+  );
+}
