@@ -47,11 +47,6 @@ const SubheadingStrong = styled.h3`
         opacity: 0.64;
       }
     `}
-  ${({ disabled }) =>
-    disabled &&
-    css`
-      opacity: 0.64;
-    `}
 `;
 
 const PanelBlockHeader = styled(BasePanelBlockHeader)`
@@ -108,6 +103,7 @@ function Header(props) {
               ? 'Select Model'
               : 'Models can not be changed after running inference'
           }
+          disabled={modelNotChangeable}
         >
           {(selectedModel && selectedModel.name) || renderModelLabel()}
         </SubheadingStrong>
