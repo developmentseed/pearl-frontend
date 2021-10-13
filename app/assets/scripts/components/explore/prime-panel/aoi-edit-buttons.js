@@ -56,6 +56,10 @@ const Wrapper = styled.div`
   grid-gap: 1rem;
 `;
 
+const Seperator = styled.span`
+  color: ${themeVal('color.baseAlphaD')};
+`;
+
 function UploadAoiModal({ revealed, setRevealed, onImport, apiLimits }) {
   const [file, setFile] = useState(null);
   const [warning, setWarning] = useState(null);
@@ -407,6 +411,7 @@ export function AoiEditButtons(props) {
             }}
             data-cy='add-aoi-button'
             data-dropdown='click.close'
+            title='Draw new AOI'
           >
             Add AOI
           </EditButton>
@@ -422,7 +427,7 @@ export function AoiEditButtons(props) {
         Upload AOI
       </EditButton>
 
-      <div>|</div>
+      <Seperator>|</Seperator>
 
       {currentAoi ? (
         /*  If currentAoi, aoi has been submitted to api
@@ -430,12 +435,12 @@ export function AoiEditButtons(props) {
          */
         <EditButton
           onClick={() => deleteAoi(currentAoi)}
-          title='Delete current aoi'
+          title='Delete Current AOI'
           id='delete-aoi'
           useIcon='trash-bin'
           data-cy='delete-current-aoi-button'
         >
-          Delete current Aoi
+          Delete Current AOI
         </EditButton>
       ) : (
         /* If not currentAoi but aoiRef exists, aoi has not been submitted to aoi
@@ -500,7 +505,7 @@ export function AoiEditButtons(props) {
             !aoiRef ? mapModes.CREATE_AOI_MODE : mapModes.EDIT_AOI_MODE
           );
         }}
-        title='Draw Area of Interest'
+        title={!aoiRef ? 'Draw Area of Interest' : 'Edit Current AOI'}
         id='edit-aoi-trigger'
         useIcon='pencil'
         data-cy='aoi-edit-button'

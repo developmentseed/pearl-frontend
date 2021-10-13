@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 import {
-  HeadOption as BaseHeadOption,
   HeadOptionHeadline,
   HeadOptionToolbar,
 } from '../../../../styles/panel';
 import ShadowScrollbar from '../../../common/shadow-scrollbar';
-import { themeVal, glsp } from '@devseed-ui/theme-provider';
+import { glsp } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
 import { Subheading } from '../../../../styles/type/heading';
 import { BOUNDS_PADDING } from '../../../common/map/constants';
@@ -24,6 +23,8 @@ import { Modal } from '@devseed-ui/modal';
 import { Button } from '@devseed-ui/button';
 import toasts from '../../../common/toasts';
 
+import { Option, HeadOption } from './selection-styles';
+
 const ModalWrapper = styled.div`
   display: grid;
   grid-template-areas:
@@ -36,17 +37,9 @@ const ModalWrapper = styled.div`
   }
 `;
 
-const AoiOption = styled.div`
-  display: grid;
+const AoiOption = styled(Option)`
   grid-template-columns: auto min-content;
-  cursor: pointer;
-  background: ${themeVal('color.baseDark')};
-  padding: ${glsp(0.5)} 0;
-
-  h1 {
-    margin: 0;
-    padding-left: ${glsp()};
-  }
+  padding-right: ${glsp(1.5)};
 
   ${({ hasSubtitle }) =>
     hasSubtitle &&
@@ -55,22 +48,17 @@ const AoiOption = styled.div`
         margin: 0;
       }
     `}
+
   ${({ selected }) =>
     selected &&
     css`
-      h1 {
-        color: ${themeVal('color.primary')};
-        border-left: ${glsp(0.25)} solid ${themeVal('color.primary')};
-        padding-left: ${glsp(0.75)};
-      }
-      background: ${themeVal('color.primaryAlphaA')};
-
       grid-template-columns: auto auto;
       align-items: center;
       justify-content: start;
       cursor: unset;
       grid-gap: 1rem;
     `}
+
 
 
   .aoi-delete-button {
@@ -81,20 +69,6 @@ const AoiOption = styled.div`
     .aoi-delete-button {
       visibility: visible;
     }
-
-    ${({ selected }) =>
-      !selected &&
-      css`
-        background: ${themeVal('color.primaryAlphaB')};
-      `}
-  }
-`;
-const HeadOption = styled(BaseHeadOption)`
-  grid-template-columns: auto;
-  grid-gap: 0;
-  ${HeadOptionToolbar} {
-    grid-row: auto;
-    grid-column: auto;
   }
 `;
 
@@ -214,7 +188,11 @@ function AoiSelection() {
         <ShadowScrollbar
           style={{
             minHeight: '6rem',
-            maxHeight: '12rem',
+            maxHeight: '10rem',
+            backgroundColor: '#121826',
+            padding: '0.25rem 0',
+            margin: '0.75rem 0',
+            boxShadow: 'inset 0 -1px 0 0 rgba(240, 244, 255, 0.16)',
           }}
         >
           {
