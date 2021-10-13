@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { Button } from '@devseed-ui/button';
 import { glsp, themeVal } from '@devseed-ui/theme-provider';
 import { EditButton } from '../../../styles/button';
-import { useMapState } from '../../../context/explore';
+import { useMapState, useAoiMeta } from '../../../context/explore';
 import Prose from '../../../styles/type/prose';
 import T from 'prop-types';
 import { formatThousands } from '../../../utils/format';
@@ -17,6 +17,7 @@ import {
 } from '@devseed-ui/modal';
 import { useMapRef } from '../../../context/map';
 import { useApiLimits } from '../../../context/global';
+import { useInstance } from '../../../context/instance';
 import { useAoi, useAoiName } from '../../../context/aoi';
 import {
   useCheckpoint,
@@ -53,6 +54,10 @@ const Wrapper = styled.div`
     color: ${themeVal('color.danger')};
   }
   grid-gap: 1rem;
+`;
+
+const Seperator = styled.span`
+  color: ${themeVal('color.baseAlphaD')};
 `;
 
 function UploadAoiModal({ revealed, setRevealed, onImport, apiLimits }) {
@@ -219,6 +224,9 @@ UploadAoiModal.propTypes = {
 };
 
 export function AoiEditButtons(props) {
+  const { deleteAoi } = props;
+
+  const { runningBatch } = useInstance();
   const { mapState, setMapMode, mapModes } = useMapState();
   const [showUploadAoiModal, setShowUploadAoiModal] = useState(false);
   // updateAoiName applies geocoding
@@ -232,21 +240,16 @@ export function AoiEditButtons(props) {
 
     // Set aoiname sets a string directly
     setAoiName,
+    aoiRef,
+    setAoiRef,
   } = useAoi();
+
+  const { aoiArea, aoiBounds, setAoiBounds, createNewAoi } = useAoiMeta();
   const { mapRef } = useMapRef();
 
   const { dispatchCurrentCheckpoint } = useCheckpoint();
 
   const { apiLimits } = useApiLimits();
-
-  const {
-    aoiRef,
-    aoiArea,
-    aoiBounds,
-    setAoiBounds,
-    setAoiRef,
-    deleteAoi,
-  } = props;
 
   // Confirm AOI, used in finish edit button and "confirm batch inference" modal
   function applyAoi() {
@@ -395,18 +398,49 @@ export function AoiEditButtons(props) {
 
   return (
     <>
+      {
+        // Only show add n button if at least one AOI exists
+        (currentAoi || runningBatch) && (
+          <EditButton
+            useIcon='plus'
+            onClick={() => {
+              createNewAoi();
+              mapRef.aoi.control.draw.disable();
+              //Layer must be removed from the map
+              mapRef.aoi.control.draw.clear();
+            }}
+            data-cy='add-aoi-button'
+            data-dropdown='click.close'
+            title='Draw new AOI'
+          >
+            Add AOI
+          </EditButton>
+        )
+      }
+      <EditButton
+        title='Upload AOI GeoJSON'
+        data-cy='upload-aoi-modal-button'
+        id='upload-aoi-modal-button'
+        useIcon='upload'
+        onClick={() => setShowUploadAoiModal(true)}
+      >
+        Upload AOI
+      </EditButton>
+
+      <Seperator>|</Seperator>
+
       {currentAoi ? (
         /*  If currentAoi, aoi has been submitted to api
          *  on delete, delete it via the api
          */
         <EditButton
           onClick={() => deleteAoi(currentAoi)}
-          title='Delete current aoi'
+          title='Delete Current AOI'
           id='delete-aoi'
           useIcon='trash-bin'
           data-cy='delete-current-aoi-button'
         >
-          Delete current Aoi
+          Delete Current AOI
         </EditButton>
       ) : (
         /* If not currentAoi but aoiRef exists, aoi has not been submitted to aoi
@@ -471,31 +505,17 @@ export function AoiEditButtons(props) {
             !aoiRef ? mapModes.CREATE_AOI_MODE : mapModes.EDIT_AOI_MODE
           );
         }}
-        title='Draw Area of Interest'
+        title={!aoiRef ? 'Draw Area of Interest' : 'Edit Current AOI'}
         id='edit-aoi-trigger'
         useIcon='pencil'
         data-cy='aoi-edit-button'
       >
         Select AOI
       </EditButton>
-      <EditButton
-        title='Upload AOI GeoJSON'
-        data-cy='upload-aoi-modal-button'
-        id='upload-aoi-modal-button'
-        useIcon='upload'
-        onClick={() => setShowUploadAoiModal(true)}
-      >
-        Upload AOI
-      </EditButton>
     </>
   );
 }
 
 AoiEditButtons.propTypes = {
-  aoiRef: T.object,
-  setAoiRef: T.func,
-  aoiBounds: T.object,
-  setAoiBounds: T.func,
-  aoiArea: T.oneOfType([T.bool, T.number]),
   deleteAoi: T.func,
 };

@@ -3,6 +3,11 @@ import { themeVal, glsp } from '@devseed-ui/theme-provider';
 
 export const HeadOptionHeadline = styled.div`
   grid-column: 1 / -1;
+  ${({ usePadding }) =>
+    usePadding &&
+    css`
+      padding: ${glsp(0)} ${glsp(1.5)};
+    `}
 `;
 
 export const HeadOptionToolbar = styled.div`
@@ -13,15 +18,17 @@ export const HeadOptionToolbar = styled.div`
   grid-auto-flow: column;
   justify-items: center;
   align-self: flex-start;
+  padding-right: ${glsp(1.5)};
 `;
 
 export const HeadOption = styled.div`
   display: grid;
   grid-template-columns: minmax(0, 1fr) min-content;
-  box-shadow: 0px 1px 0px 0px ${themeVal('color.baseAlphaC')};
   gap: 0.5rem;
-  padding-bottom: ${glsp(0.5)};
-
+  &:not(:last-of-type) {
+    box-shadow: 0px 1px 0px 0px ${themeVal('color.baseAlphaC')};
+    padding-bottom: 0.75rem;
+  }
   ${({ hasSubtitle }) =>
     hasSubtitle &&
     css`
