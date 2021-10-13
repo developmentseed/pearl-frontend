@@ -173,9 +173,11 @@ function PrimePanel() {
                     currentCheckpoint.classes !== undefined &&
                     currentAoi
                   }
+                  tabTooltip='Retrain is not availble until model has been run over AOI.'
                   disabled={
                     !currentCheckpoint ||
-                    mapState.mode === mapModes.EDIT_AOI_MODE
+                    mapState.mode === mapModes.EDIT_AOI_MODE ||
+                    !currentAoi
                   }
                   onTabClick={() => {
                     function onContinue() {
