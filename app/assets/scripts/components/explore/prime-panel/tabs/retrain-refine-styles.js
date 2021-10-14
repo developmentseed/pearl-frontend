@@ -144,18 +144,38 @@ export const Thumbnail = styled.div`
 
 export const ToolBox = styled.section`
   padding: 0 1.5rem;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(6rem, 1fr));
-  grid-gap: 0.5rem;
+  display: flex;
+  flex-flow: row wrap;
   ${Heading},
   ${Subheading} {
-    grid-column: 1 / -1;
     padding: 0;
+    flex-basis: 100%;
+    margin-bottom: ${glsp(0.25)};
   }
   ${Button} {
-    padding: 0.25rem 0.75rem 0.25rem 0.5rem;
+    padding: ${glsp(0.25)} ${glsp(0.375)};
     box-shadow: none;
     border: 2px solid ${themeVal('color.primaryAlphaB')};
+    span {
+      max-width: 0;
+      overflow: hidden;
+      transition: all 0.24s ease-out;
+    }
+    &:before {
+      margin-right: 0;
+      transition: all 0.24s ease-out;
+    }
+    &:hover {
+      span {
+        max-width: 5rem;
+      }
+      &:before {
+        margin-right: ${glsp(0.375)};
+      }
+    }
+    & ~ ${Button} {
+      margin-left: ${glsp(0.5)};
+    }
   }
 `;
 
