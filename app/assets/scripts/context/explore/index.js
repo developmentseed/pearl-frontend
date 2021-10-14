@@ -660,6 +660,30 @@ export const useExploreContext = (fnName) => {
   return context;
 };
 
+export const useAoiMeta = () => {
+  const {
+    aoiBounds,
+    setAoiBounds,
+    aoiArea,
+    aoiList,
+    loadAoi,
+    createNewAoi,
+  } = useExploreContext('useAoiMeta');
+
+  return useMemo(
+    () => ({
+      aoiBounds,
+      setAoiBounds,
+      aoiArea,
+      aoiList,
+
+      loadAoi,
+      createNewAoi,
+    }),
+    [aoiBounds, aoiArea, aoiList, loadAoi, createNewAoi]
+  );
+};
+
 export const useSessionStatus = () => {
   const { sessionStatus, setSessionStatusMode } = useExploreContext(
     'useSessionStatus'

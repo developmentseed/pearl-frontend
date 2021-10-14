@@ -505,6 +505,7 @@ export const useCheckpoint = () => {
     dispatchCurrentCheckpoint,
     fetchCheckpoint,
     checkpointList,
+    setCheckpointList,
     loadCheckpointList,
   } = useCheckContext('useCheckpoint');
 
@@ -514,6 +515,7 @@ export const useCheckpoint = () => {
       dispatchCurrentCheckpoint,
       fetchCheckpoint,
       checkpointList,
+      setCheckpointList,
       loadCheckpointList,
     }),
     [

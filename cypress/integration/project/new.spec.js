@@ -286,7 +286,7 @@ describe('Create new project', () => {
 
     // Run a prediction to the end
     cy.setWebsocketWorkflow('websocket-workflow/base-model-prediction.json');
-    cy.get('[data-cy=run-button]').click();
+    cy.get('[data-cy=run-button]').should('exist').click();
     cy.get('[data-cy=session-status]').should(
       'have.text',
       'Session Status: Ready for retrain run'

@@ -116,7 +116,7 @@ describe('Batch predictions', () => {
     ).as('getBatchList');
   });
 
-  it.only('on new project, show different button large on large aoi', () => {
+  it('on new project, show different button large on large aoi', () => {
     cy.fakeLogin();
 
     cy.visit('/project/new');
@@ -289,7 +289,6 @@ describe('Batch predictions', () => {
     // Check if sec panel is mounted with a pixel distro chart
     cy.get('[data-cy=checkpoint_class_distro]').should('exist');
     cy.get('[data-cy=batch-progress-message').should('not.exist');
-    cy.get('[data-cy=aoi-selection-trigger]').should('exist').click();
     cy.get('[data-cy=add-aoi-button]').should('exist').click();
     cy.get('[data-cy=checkpoint_class_distro]').should('not.exist');
   });
@@ -329,6 +328,7 @@ describe('Batch predictions', () => {
     cy.wait('@loadAoisWithBatch');
     cy.wait(['@batchAoi', '@fetchCheckpoint2']);
 
+    cy.get('[data-cy=predict-tab]').click();
     // Edit AOI to treat as new one
     cy.get('[data-cy=aoi-edit-button]').should('exist').click();
     cy.get('[data-cy=aoi-edit-confirm-button]').should('exist').click();
@@ -338,12 +338,10 @@ describe('Batch predictions', () => {
 
     // Start batch
     cy.get('[data-cy=run-button]').should('have.text', 'Run Batch Prediction');
-    cy.get('[data-cy=run-button]').click();
-    cy.wait('@postBatch');
-    // Mock batch job at 0%
     cy.intercept(
       {
-        url: restApiEndpoint + `/api/project/1/batch?completed=false`,
+        url: restApiEndpoint + '/api/project/1/batch*',
+        method: 'GET',
       },
       {
         total: 1,
@@ -362,6 +360,12 @@ describe('Batch predictions', () => {
         ],
       }
     ).as('batchList1');
+
+    cy.get('[data-cy=run-button]').click();
+    cy.wait('@postBatch');
+    // Mock batch job at 0%
+
+    cy.wait('@batchList1');
 
     const batchJob = {
       id: 1,
@@ -396,13 +400,22 @@ describe('Batch predictions', () => {
       },
       batchJob
     ).as('batch0');
-
-    //cy.get('[data-cy=batch-progress-message').should('exist');
+    cy.wait('@batch0');
+    cy.intercept(
+      {
+        url: restApiEndpoint + '/api/project/1/batch/1',
+        method: 'GET',
+      },
+      {
+        ...batchJob,
+        progress: 10,
+      }
+    ).as('batch10');
+    cy.wait('@batch10');
 
     // Only one batch operation allowed at a time
     cy.get('[data-cy=run-button]').should('have.attr', 'data-disabled', 'true');
 
-    cy.get('[data-cy=aoi-selection-trigger]').should('exist').click();
     cy.get('[data-cy=add-aoi-button]').should('exist').click();
 
     cy.get('#map')
@@ -411,8 +424,6 @@ describe('Batch predictions', () => {
       .trigger('mouseup');
     cy.get('[data-cy=proceed-anyway-button]').should('exist').click();
     cy.wait('@reverseGeocodeCity');
-
-    cy.get('[data-cy=aoi-selection-trigger]').should('exist').click();
 
     // Should be able to run inference on non batch aoi
     cy.get('.listed-aoi').contains('Rockville').click();

@@ -11,6 +11,7 @@ import {
   ExploreContext,
   useMapState,
   useShortcutState,
+  useAoiMeta,
 } from '../../../context/explore';
 import { useModel } from '../../../context/model';
 
@@ -18,19 +19,16 @@ import { Heading } from '@devseed-ui/typography';
 import { Button } from '@devseed-ui/button';
 
 import TabbedBlock from '../../common/tabbed-block-body';
+import Predict from './tabs/predict';
 import RetrainModel from './tabs/retrain-model';
 import RefineResults from './tabs/refine-results';
 
-import PanelHeader from './header';
 import PanelFooter from './footer';
-
-import { useAuth } from '../../../context/auth';
 import {
   useCheckpoint,
   actions as checkpointActions,
   checkpointModes,
 } from '../../../context/checkpoint';
-import { useInstance } from '../../../context/instance';
 import { useAoi } from '../../../context/aoi';
 import { usePredictions } from '../../../context/predictions';
 import { useApiLimits } from '../../../context/global';
@@ -65,37 +63,24 @@ const Headline = styled.div`
     align-self: center;
   }
 `;
-const TABS = [0, 1];
-const [RETRAIN_TAB_INDEX, REFINE_TAB_INDEX] = TABS;
+const TABS = [0, 1, 2];
+const [PREDICT_TAB_INDEX, RETRAIN_TAB_INDEX, REFINE_TAB_INDEX] = TABS;
 
 function PrimePanel() {
-  const { isAuthenticated } = useAuth();
   const { mapState, mapModes, setMapMode } = useMapState();
   const { mapRef } = useMapRef();
   const { apiLimits } = useApiLimits();
   const { shortcutState, dispatchShortcutState } = useShortcutState();
 
-  const {
-    currentProject,
-    checkpointList,
-    selectedModel,
-    setSelectedModel,
-    aoiArea,
-    createNewAoi,
-    loadAoi,
-    aoiList,
-    aoiBounds,
-    setAoiBounds,
-    updateCheckpointName,
-  } = useContext(ExploreContext);
+  const { updateCheckpointName } = useContext(ExploreContext);
 
-  const { aoiRef, setAoiRef, aoiName, currentAoi } = useAoi();
+  const { setAoiBounds, aoiArea } = useAoiMeta();
 
-  const { applyCheckpoint } = useInstance();
+  const { aoiRef, currentAoi } = useAoi();
 
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
 
-  const { models } = useModel();
+  const { models, selectedModel, setSelectedModel } = useModel();
 
   const { predictions } = usePredictions();
 
@@ -134,14 +119,20 @@ function PrimePanel() {
     currentCheckpoint && currentCheckpoint.sampleCount > 0;
 
   useEffect(() => {
-    if (currentCheckpoint && currentCheckpoint.name) {
-      if (currentCheckpoint.bookmarked) {
-        setLocalCheckpointName(currentCheckpoint.name);
-      } else {
-        setLocalCheckpointName('');
+    if (currentCheckpoint) {
+      if (currentCheckpoint.name) {
+        if (currentCheckpoint.bookmarked) {
+          setLocalCheckpointName(currentCheckpoint.name);
+        } else {
+          setLocalCheckpointName('');
+        }
+      }
+
+      if (currentCheckpoint.mode === checkpointModes.RETRAIN) {
+        setActiveTab(RETRAIN_TAB_INDEX);
       }
     }
-  }, [currentCheckpoint]);
+  }, [currentCheckpoint?.id, currentCheckpoint?.mode]);
 
   return (
     <>
@@ -158,38 +149,31 @@ function PrimePanel() {
         fitContent
         bodyContent={
           <StyledPanelBlock>
-            <PanelHeader
-              {...{
-                aoiRef,
-                setAoiRef,
-                setAoiBounds,
-                aoiBounds,
-                aoiArea,
-                aoiName,
-                aoiList,
-                loadAoi,
-                createNewAoi,
-
-                mapState,
-                mapModes,
-                mapRef,
-
-                currentCheckpoint,
-                checkpointModes,
-                checkpointList,
-                applyCheckpoint,
-
-                checkpointHasSamples,
-
-                setShowSelectModelModal,
-                selectedModel,
-
-                isAuthenticated,
-                currentProject,
-              }}
-            />
             <PanelBlockBody>
               <TabbedBlock activeTab={activeTab}>
+                <Predict
+                  name='predict'
+                  className='predict-model'
+                  tabId='predict-tab-trigger'
+                  checkpointHasSamples={checkpointHasSamples}
+                  setShowSelectModelModal={setShowSelectModelModal}
+                  onTabClick={() => {
+                    function onContinue() {
+                      setActiveTab(PREDICT_TAB_INDEX);
+                      dispatchCurrentCheckpoint({
+                        type: checkpointActions.SET_CHECKPOINT_MODE,
+                        data: {
+                          mode: checkpointModes.RUN,
+                        },
+                      });
+                    }
+                    if (checkpointHasSamples) {
+                      setShowClearSamplesModal(() => onContinue);
+                    } else {
+                      onContinue();
+                    }
+                  }}
+                />
                 <RetrainModel
                   name='retrain model'
                   className='retrain-model'
@@ -202,9 +186,11 @@ function PrimePanel() {
                     currentCheckpoint.classes !== undefined &&
                     currentAoi
                   }
+                  tabTooltip='Retrain is not availble until model has been run over AOI.'
                   disabled={
                     !currentCheckpoint ||
-                    mapState.mode === mapModes.EDIT_AOI_MODE
+                    mapState.mode === mapModes.EDIT_AOI_MODE ||
+                    !currentAoi
                   }
                   onTabClick={() => {
                     function onContinue() {
@@ -294,6 +280,7 @@ function PrimePanel() {
                 mapRef,
 
                 setAoiBounds,
+                useSampleControls: activeTab > PREDICT_TAB_INDEX,
 
                 disabled:
                   currentCheckpoint &&
