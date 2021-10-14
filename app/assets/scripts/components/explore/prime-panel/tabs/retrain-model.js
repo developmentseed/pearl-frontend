@@ -75,6 +75,9 @@ function RetrainModel(props) {
                   setMapMode(mapModes.ADD_SAMPLE_POLYGON);
                 }
               }}
+              className={
+                mapState.mode == mapModes.ADD_SAMPLE_POLYGON && 'active'
+              }
             >
               Polygon
             </InfoButton>
@@ -95,6 +98,9 @@ function RetrainModel(props) {
                   setMapMode(mapModes.ADD_SAMPLE_FREEHAND);
                 }
               }}
+              className={
+                mapState.mode == mapModes.ADD_SAMPLE_FREEHAND && 'active'
+              }
             >
               Free Hand
             </InfoButton>
@@ -115,6 +121,7 @@ function RetrainModel(props) {
                   setMapMode(mapModes.ADD_SAMPLE_POINT);
                 }
               }}
+              className={mapState.mode == mapModes.ADD_SAMPLE_POINT && 'active'}
             >
               Point
             </InfoButton>
@@ -142,6 +149,7 @@ function RetrainModel(props) {
                   setMapMode(mapModes.DELETE_SAMPLES);
                 }
               }}
+              className={mapState.mode == mapModes.DELETE_SAMPLES && 'active'}
             >
               Erase
             </InfoButton>
@@ -160,6 +168,7 @@ function RetrainModel(props) {
               visuallyDisabled={!currentCheckpoint.activeItem}
               info='Upload samples as GeoJSON'
               onClick={() => setImportSamplesModalRevealed(true)}
+              className={importSamplesModalRevealed && 'active'}
             >
               Upload
             </InfoButton>

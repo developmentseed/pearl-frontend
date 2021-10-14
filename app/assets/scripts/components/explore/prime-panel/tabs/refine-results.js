@@ -87,6 +87,9 @@ function RefineModel(props) {
                   setMapMode(mapModes.ADD_SAMPLE_FREEHAND);
                 }
               }}
+              className={
+                mapState.mode === mapModes.ADD_SAMPLE_FREEHAND && 'active'
+              }
             >
               Draw
             </InfoButton>
@@ -113,6 +116,7 @@ function RefineModel(props) {
                   setMapMode(mapModes.DELETE_SAMPLES);
                 }
               }}
+              className={mapState.mode === mapModes.DELETE_SAMPLES && 'active'}
             >
               Erase
             </InfoButton>

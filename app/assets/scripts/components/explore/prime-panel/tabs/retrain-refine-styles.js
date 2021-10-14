@@ -165,7 +165,9 @@ export const ToolBox = styled.section`
       margin-right: 0;
       transition: all 0.24s ease-out;
     }
-    &:hover {
+    &:hover,
+    &:active,
+    &.active {
       span {
         max-width: 5rem;
       }
