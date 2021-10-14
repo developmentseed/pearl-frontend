@@ -150,7 +150,7 @@ describe('Can delete AOIs', () => {
 
   it('Displays delete button on header', () => {
     cy.fakeLogin();
-    cy.setWebsocketWorkflow('retrain');
+    cy.setWebsocketWorkflow('websocket-workflow/retrain.json');
 
     cy.visit('/project/1');
     cy.wait('@loadAois');
@@ -198,7 +198,7 @@ describe('Can delete AOIs', () => {
 
   it('Can delete frontend only aoi', () => {
     cy.fakeLogin();
-    cy.setWebsocketWorkflow('retrain');
+    cy.setWebsocketWorkflow('websocket-workflow/retrain.json');
 
     cy.visit('/project/1');
     cy.wait('@loadAois');

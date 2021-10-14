@@ -91,7 +91,7 @@ describe('Retrain existing project', () => {
   });
 
   it('successfully loads', () => {
-    cy.setWebsocketWorkflow('retrain');
+    cy.setWebsocketWorkflow('websocket-workflow/retrain.json');
 
     cy.visit('/project/1');
 
@@ -357,7 +357,9 @@ describe('Retrain existing project', () => {
   });
 
   it('abort retrain', () => {
-    cy.setWebsocketWorkflow('retrain-one-sample-aborted');
+    cy.setWebsocketWorkflow(
+      'websocket-workflow/retrain-one-sample-aborted.json'
+    );
 
     cy.visit('/project/1');
 
@@ -411,7 +413,9 @@ describe('Retrain existing project', () => {
     cy.get('[data-cy=abort-run-button]').should('exist').click();
 
     // Reset WS workflow
-    cy.setWebsocketWorkflow('retrain-one-sample-aborted');
+    cy.setWebsocketWorkflow(
+      'websocket-workflow/retrain-one-sample-aborted.json'
+    );
 
     cy.get('[data-cy=session-status]').should(
       'have.text',

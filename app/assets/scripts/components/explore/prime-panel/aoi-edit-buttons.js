@@ -247,7 +247,7 @@ export function AoiEditButtons(props) {
   const { aoiArea, aoiBounds, setAoiBounds, createNewAoi } = useAoiMeta();
   const { mapRef } = useMapRef();
 
-  const { dispatchCurrentCheckpoint } = useCheckpoint();
+  const { dispatchCurrentCheckpoint, currentCheckpoint } = useCheckpoint();
 
   const { apiLimits } = useApiLimits();
 
@@ -259,12 +259,14 @@ export function AoiEditButtons(props) {
     updateAoiName(bounds);
 
     // When AOI is edited -> we go to run mode
-    dispatchCurrentCheckpoint({
-      type: checkpointActions.SET_CHECKPOINT_MODE,
-      data: {
-        mode: checkpointModes.RUN,
-      },
-    });
+    if (currentCheckpoint) {
+      dispatchCurrentCheckpoint({
+        type: checkpointActions.SET_CHECKPOINT_MODE,
+        data: {
+          mode: checkpointModes.RUN,
+        },
+      });
+    }
 
     //Current aoi should only be set after aoi has been sent to the api
     setCurrentAoi(null);
