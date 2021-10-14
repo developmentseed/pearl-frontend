@@ -10,7 +10,11 @@ import { Heading } from '@devseed-ui/typography';
 import { Subheading } from '../../../../../styles/type/heading';
 import { BOUNDS_PADDING } from '../../../../common/map/constants';
 import { formatThousands } from '../../../../../utils/format';
-import { useAoiMeta, useMapState } from '../../../../../context/explore';
+import {
+  useAoiMeta,
+  useMapState,
+  useSessionStatus,
+} from '../../../../../context/explore';
 import { useMapRef } from '../../../../../context/map';
 import { useAoi } from '../../../../../context/aoi';
 import { useAuth } from '../../../../../context/auth';
@@ -118,6 +122,8 @@ function AoiSelection() {
 
   const { mapState, mapModes } = useMapState();
 
+  const { sessionStatus } = useSessionStatus();
+
   const renderSelectedAoi = () => {
     let header;
     let area;
@@ -128,6 +134,8 @@ function AoiSelection() {
       area = `${formatThousands(aoiArea / 1e6)} km2`;
     } else if (mapState.mode === mapModes.CREATE_AOI_MODE) {
       header = 'Drag on map to select';
+    } else if (sessionStatus.mode === 'loading-project') {
+      header = 'Loading...';
     } else {
       header = 'None selected - Draw area on map or upload AOI ';
     }
