@@ -44,7 +44,7 @@ describe('Create new project', () => {
 
   it('Run new project', () => {
     // Set mock WS workflow in case creation succeeds (it shouldn't here)
-    cy.setWebsocketWorkflow('base-model-prediction');
+    cy.setWebsocketWorkflow('websocket-workflow/base-model-prediction.json');
 
     // Visit page
     cy.visit('/project/new');
@@ -196,7 +196,7 @@ describe('Create new project', () => {
   });
 
   it('Abort new project', () => {
-    cy.setWebsocketWorkflow('run-prediction-aborted');
+    cy.setWebsocketWorkflow('websocket-workflow/run-prediction-aborted.json');
 
     // Visit page
     cy.visit('/project/new');
@@ -285,7 +285,7 @@ describe('Create new project', () => {
     );
 
     // Run a prediction to the end
-    cy.setWebsocketWorkflow('base-model-prediction');
+    cy.setWebsocketWorkflow('websocket-workflow/base-model-prediction.json');
     cy.get('[data-cy=run-button]').click();
     cy.get('[data-cy=session-status]').should(
       'have.text',
