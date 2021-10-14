@@ -285,7 +285,7 @@ describe('Create new project', () => {
     );
 
     // Run a prediction to the end
-    cy.setWebsocketWorkflow('base-model-prediction');
+    cy.setWebsocketWorkflow('websocket-workflow/base-model-prediction.json');
     cy.get('[data-cy=run-button]').should('exist').click();
     cy.get('[data-cy=session-status]').should(
       'have.text',
