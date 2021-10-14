@@ -169,6 +169,7 @@ function PrimeButton({
       action: async () => {
         try {
           showGlobalLoadingMessage('Starting retraining...');
+          setSessionStatusMode('retraining');
           await retrain({
             onAbort: () => {
               setSessionStatusMode('retrain-ready');
@@ -189,6 +190,7 @@ function PrimeButton({
             toasts.error('Unexpected error, please try again later.');
           }
           hideGlobalLoading();
+          setSessionStatusMode('retrain-ready');
           return;
         }
       },
