@@ -7,50 +7,62 @@ export const actions = {
   SET_MESSAGE: 'SET_MESSAGE',
 };
 
+export const sessionModes = {
+  LOADING: 'LOADING',
+  SET_PROJECT_NAME: 'SET_PROJECT_NAME',
+  SET_AOI: 'SET_AOI',
+  SELECT_MODEL: 'SELECT_MODEL',
+  PREDICTION_READY: 'PREDICTION_READY',
+  RUNNING_PREDICTION: 'RUNNING_PREDICTION',
+  LOADING_PROJECT: 'LOADING_PROJECT',
+  RETRAINING: 'RETRAINING',
+  RETRAIN_READY: 'RETRAIN_READY',
+};
+
 export const initialState = {
-  mode: 'loading',
+  mode: 'LOADING',
   level: 'info',
   message: 'Loading...',
 };
 
 const modes = [
   {
-    mode: 'set-project-name',
+    mode: 'SET_PROJECT_NAME',
     level: 'info',
     message: 'Set Project Name',
   },
   {
-    mode: 'set-aoi',
+    mode: 'SET_AOI',
     level: 'info',
     message: 'Set AOI',
   },
   {
-    mode: 'select-model',
+    mode: 'SELECT_MODEL',
     level: 'info',
     message: 'Select Model',
   },
   {
-    mode: 'prediction-ready',
+    mode: 'PREDICTION_READY',
     level: 'info',
     message: 'Ready for prediction run',
   },
   {
-    mode: 'running-prediction',
+    mode: 'RUNNING_PREDICTION',
     level: 'info',
     message: 'Running prediction',
   },
   {
-    mode: 'loading-project',
+    mode: 'LOADING_PROJECT',
     level: 'info',
     message: 'Loading project...',
   },
   {
-    mode: 'retraining',
+    mode: 'RETRAINING',
     level: 'info',
     message: 'Retraining...',
   },
   {
-    mode: 'retrain-ready',
+    mode: 'RETRAIN_READY',
     level: 'info',
     message: 'Ready for retrain run',
   },

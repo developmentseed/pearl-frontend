@@ -18,7 +18,7 @@ import { useInstance } from '../../../context/instance';
 import { Subheading } from '../../../styles/type/heading';
 import { useAoi, useAoiName } from '../../../context/aoi';
 import { useApiLimits } from '../../../context/global';
-import { useMapState } from '../../../context/explore';
+import { useMapState, sessionModes } from '../../../context/explore';
 import { mapModes } from '../../../context/reducers/map';
 
 import { Spinner } from '../../common/global-loading/styles';
@@ -169,10 +169,10 @@ function PrimeButton({
       action: async () => {
         try {
           showGlobalLoadingMessage('Starting retraining...');
-          setSessionStatusMode('retraining');
+          setSessionStatusMode(sessionModes.RETRAINING);
           await retrain({
             onAbort: () => {
-              setSessionStatusMode('retrain-ready');
+              setSessionStatusMode(sessionModes.RETRAIN_READY);
             },
           });
         } catch (error) {
@@ -190,7 +190,7 @@ function PrimeButton({
             toasts.error('Unexpected error, please try again later.');
           }
           hideGlobalLoading();
-          setSessionStatusMode('retrain-ready');
+          setSessionStatusMode(sessionModes.RETRAIN_READY);
           return;
         }
       },
@@ -199,10 +199,10 @@ function PrimeButton({
       label: 'Ready for prediction run',
       action: async () => {
         try {
-          setSessionStatusMode('running-prediction');
+          setSessionStatusMode(sessionModes.RUNNING_PREDICTION);
           await runPrediction({
             onAbort: () => {
-              setSessionStatusMode('prediction-ready');
+              setSessionStatusMode(sessionModes.PREDICTION_READY);
             },
           });
         } catch (error) {
@@ -216,14 +216,14 @@ function PrimeButton({
           } else {
             toasts.error('Unexpected error, please try again later');
           }
-          setSessionStatusMode('prediction-ready');
+          setSessionStatusMode(sessionModes.PREDICTION_READY);
         }
       },
     },
     'batch-prediction': {
       label: 'Run Batch Prediction',
       action: () => {
-        setSessionStatusMode('running-prediction');
+        setSessionStatusMode(sessionModes.RUNNING_PREDICTION);
         runBatchPrediction();
       },
     },
@@ -234,14 +234,14 @@ function PrimeButton({
   const { mode } = sessionStatus;
 
   const checkDisabledState = () => {
-    if (mode === 'prediction-ready') {
+    if (mode === sessionModes.PREDICTION_READY) {
       // Only one batch prediction permitted at a time
       if (runningBatch && isBatchArea) {
         return true;
       } else {
         return false;
       }
-    } else if (mode === 'retrain-ready') {
+    } else if (mode === sessionModes.RETRAIN_READY) {
       // No retrain permitted for batch area
       if (isBatchArea) {
         return true;
