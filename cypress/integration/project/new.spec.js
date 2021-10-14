@@ -195,7 +195,7 @@ describe('Create new project', () => {
     );
   });
 
-  it('Abort new project', () => {
+  it.only('Abort new project', () => {
     cy.setWebsocketWorkflow('run-prediction-aborted');
 
     // Visit page
@@ -286,7 +286,7 @@ describe('Create new project', () => {
 
     // Run a prediction to the end
     cy.setWebsocketWorkflow('base-model-prediction');
-    cy.get('[data-cy=run-button]').click();
+    cy.get('[data-cy=run-button]').should('exist').click();
     cy.get('[data-cy=session-status]').should(
       'have.text',
       'Session Status: Ready for retrain run'
