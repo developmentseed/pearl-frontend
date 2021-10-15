@@ -19,11 +19,33 @@ import {
   AddClassButton,
 } from './retrain-refine-styles';
 
-import ImportSamplesModal from '../../map/import-sample-modal';
 import { Subheading } from '../../../../styles/type/heading';
 import { useAoi } from '../../../../context/aoi';
 import { useApiLimits } from '../../../../context/global';
 import EditClass from './edit-class';
+import ImportGeojson from './retrain/import-geojson';
+import Prose from '../../../../styles/type/prose';
+
+import { Modal } from '@devseed-ui/modal';
+import { Button } from '@devseed-ui/button';
+import styled from 'styled-components';
+import { themeVal } from '@devseed-ui/theme-provider';
+import ImportOSMQA from './retrain/import-osm-qa';
+
+const Wrapper = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  h1 {
+    grid-column: 1 / -1;
+  }
+  div.prose {
+    grid-column: 1 / -1;
+  }
+  .warning {
+    color: ${themeVal('color.danger')};
+  }
+  grid-gap: 1rem;
+`;
 
 /*
  * Retrain Model
@@ -38,6 +60,7 @@ function RetrainModel(props) {
   const [importSamplesModalRevealed, setImportSamplesModalRevealed] = useState(
     false
   );
+  const [importSource, setImportSource] = useState(null);
 
   const { aoiArea } = useAoi();
   const { apiLimits } = useApiLimits();
@@ -50,10 +73,49 @@ function RetrainModel(props) {
       {!isBatchArea && ready && currentCheckpoint.classes && (
         <>
           <RetrainTools>
-            <ImportSamplesModal
-              setRevealed={setImportSamplesModalRevealed}
+            <Modal
+              id='import-samples-modal'
+              size='small'
               revealed={importSamplesModalRevealed}
+              title='Import Retraining Samples'
+              onCloseClick={() => {
+                setImportSamplesModalRevealed(false);
+              }}
+              content={
+                importSource === 'geojson' ? (
+                  <ImportGeojson />
+                ) : importSource === 'osmqa' ? (
+                  <ImportOSMQA />
+                ) : (
+                  <Wrapper>
+                    <Prose className='prose'>Select import type:</Prose>
+                    <Button
+                      data-cy='import-geojson-samples-button'
+                      variation='primary-raised-dark'
+                      size='medium'
+                      style={{
+                        gridColumn: '1 / -1',
+                      }}
+                      onClick={() => setImportSource('geojson')}
+                    >
+                      GeoJSON file
+                    </Button>
+                    <Button
+                      data-cy='import-osm-samples-button'
+                      variation='primary-raised-dark'
+                      size='medium'
+                      style={{
+                        gridColumn: '1 / -1',
+                      }}
+                      onClick={() => setImportSource('osmqa')}
+                    >
+                      OpenStreetMap
+                    </Button>
+                  </Wrapper>
+                )
+              }
             />
+
             <Subheading>Sample Selection Tools</Subheading>
             <InfoButton
               data-cy='retrain-draw-polygon'
@@ -159,7 +221,10 @@ function RetrainModel(props) {
               useIcon='upload'
               visuallyDisabled={!currentCheckpoint.activeItem}
               info='Upload samples as GeoJSON'
-              onClick={() => setImportSamplesModalRevealed(true)}
+              onClick={() => {
+                setImportSource(null);
+                setImportSamplesModalRevealed(true);
+              }}
             >
               Upload
             </InfoButton>

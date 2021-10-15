@@ -1,17 +1,16 @@
 import React, { useState } from 'react';
 import T from 'prop-types';
 import styled from 'styled-components';
-import { Modal } from '@devseed-ui/modal';
 import { Button } from '@devseed-ui/button';
 import { themeVal } from '@devseed-ui/theme-provider';
-import Prose from '../../../styles/type/prose';
-import { FauxFileDialog } from '../../common/faux-file-dialog';
-import toasts from '../../common/toasts';
+import Prose from '../../../../../styles/type/prose';
+import { FauxFileDialog } from '../../../../common/faux-file-dialog';
+import toasts from '../../../../common/toasts';
 import {
   actions as checkpointActions,
   useCheckpoint,
-} from '../../../context/checkpoint';
-import { useMapRef } from '../../../context/map';
+} from '../../../../../context/checkpoint';
+import { useMapRef } from '../../../../../context/map';
 
 const Wrapper = styled.div`
   display: grid;
@@ -28,7 +27,7 @@ const Wrapper = styled.div`
   grid-gap: 1rem;
 `;
 
-function ImportSamplesModal({ revealed, setRevealed }) {
+function ImportGeojson() {
   const [warning, setWarning] = useState(null);
   const [file, setFile] = useState(null);
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
@@ -112,78 +111,66 @@ function ImportSamplesModal({ revealed, setRevealed }) {
   };
 
   return (
-    <Modal
-      id='import-sample-modal'
-      size='small'
-      revealed={revealed}
-      title='Upload Retraining Samples'
-      onCloseClick={() => setRevealed(false)}
-      content={
-        <Wrapper>
-          <Prose className='prose'>
-            Upload training sample data in .geojson format.
-          </Prose>
-          <Prose className='prose'>
-            Select a GeoJSON file with FeatureCollection of Points and Polygons.
-            Once imported, these can be submitted to the model to retrain.
-          </Prose>
-          <div className='prose'>
-            Importing to class: <strong>{currentCheckpoint.activeItem}</strong>
-          </div>
-          <FauxFileDialog
-            name='image-file'
-            data-cy='samples-upload-input'
-            onFileSelect={onFileSelect}
-          >
-            {(fieProps) =>
-              !file && (
-                <Button
-                  data-cy='select-samples-file-button'
-                  variation='primary-raised-light'
-                  size='medium'
-                  useIcon='upload'
-                  style={{
-                    gridColumn: '2 / 1',
-                  }}
-                  {...fieProps}
-                >
-                  Select file to upload
-                </Button>
-              )
-            }
-          </FauxFileDialog>
-          {file && (
-            <div className='prose'>
-              <strong>Selected: </strong>
-              {file.name}
-            </div>
-          )}
-          {warning && <div className='prose warning'>{warning}</div>}
-          <Button
-            data-cy='import-samples-button'
-            variation='primary-raised-dark'
-            size='medium'
-            useIcon='tick'
-            visuallyDisabled={!file}
-            disabled={!file}
-            style={{
-              gridColumn: '1 / -1',
-            }}
-            onClick={() => {
-              importFile();
-              setRevealed(false);
-            }}
-          >
-            Import
-          </Button>
-        </Wrapper>
-      }
-    />
+    <Wrapper>
+      <Prose className='prose'>
+        Upload training sample data in .geojson format.
+      </Prose>
+      <Prose className='prose'>
+        Select a GeoJSON file with FeatureCollection of Points and Polygons.
+        Once imported, these can be submitted to the model to retrain.
+      </Prose>
+      <div className='prose'>
+        Importing to class: <strong>{currentCheckpoint.activeItem}</strong>
+      </div>
+      <FauxFileDialog
+        name='image-file'
+        data-cy='samples-upload-input'
+        onFileSelect={onFileSelect}
+      >
+        {(fieProps) =>
+          !file && (
+            <Button
+              data-cy='select-samples-file-button'
+              variation='primary-raised-light'
+              size='medium'
+              useIcon='upload'
+              style={{
+                gridColumn: '2 / 1',
+              }}
+              {...fieProps}
+            >
+              Select file to upload
+            </Button>
+          )
+        }
+      </FauxFileDialog>
+      {file && (
+        <div className='prose'>
+          <strong>Selected: </strong>
+          {file.name}
+        </div>
+      )}
+      {warning && <div className='prose warning'>{warning}</div>}
+      <Button
+        data-cy='import-samples-button'
+        variation='primary-raised-dark'
+        size='medium'
+        useIcon='tick'
+        visuallyDisabled={!file}
+        disabled={!file}
+        style={{
+          gridColumn: '1 / -1',
+        }}
+        onClick={() => {
+          importFile();
+          setRevealed(false);
+        }}
+      >
+        Import
+      </Button>
+    </Wrapper>
   );
 }
 
-ImportSamplesModal.propTypes = {
-  revealed: T.bool,
-  setRevealed: T.func,
-};
-export default ImportSamplesModal;
+ImportGeojson.propTypes = {};
+export default ImportGeojson;
