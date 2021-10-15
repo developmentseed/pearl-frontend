@@ -405,7 +405,7 @@ export function InstanceProvider(props) {
         setRunningBatch(false);
         setBatchReady(batch);
 
-        // Reload Aoi list when complete
+        // Reload AOI list when complete
         const aois = await restApiClient.get(`project/${projectId}/aoi/`);
         setAoiList(aois.aois);
 

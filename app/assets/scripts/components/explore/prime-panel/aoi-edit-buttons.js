@@ -458,7 +458,7 @@ export function AoiEditButtons(props) {
               setAoiArea(null);
               setAoiName(null);
             }}
-            title='Delete current aoi'
+            title='Delete current AOI'
             id='delete-aoi'
             useIcon='trash-bin'
             data-cy='delete-current-aoi-button'
