@@ -218,7 +218,7 @@ export function InstanceProvider(props) {
   /* Watch for running batch to be completed, at which point runningBatch is set to false
    * and batchReady is set to the just completed batch
    * If currentAoi is not defined, this means the returning batch is a new AOI, so we can setCurrentAoi
-   * If currentAoi is defined, a different aoi is loaded, and runningBatch has completed in the background. we should not update currentAoi
+   * If currentAoi is defined, a different AOI is loaded, and runningBatch has completed in the background. We should not update currentAoi
    */
 
   useEffect(() => {
@@ -231,7 +231,7 @@ export function InstanceProvider(props) {
       loadCheckpointList(currentProject.id).then((list) => {
         // Find base checkpoint which has no parent
         const base = list.checkpoints.find((c) => c.parent === null);
-        // New aoi, base checkpoint, do not need to verify if the aoi matches the checkpointk
+        // New AOI, base checkpoint, do not need to verify if the AOI matches the checkpointk
         fetchCheckpoint(currentProject.id, base.id, null, true);
       });
 
@@ -627,7 +627,7 @@ export function InstanceProvider(props) {
           // Pass newly created project here. If getRunningBatch repends on the updated value in the context store, we cannot gaurantee that it will exist at time of execution
           getRunningBatch(project);
 
-          // Update aoi list with new batch area
+          // Update AOI list with new batch area
         } catch (error) {
           logger(error);
           toasts.error(

@@ -283,7 +283,7 @@ function Map() {
             updateAoiName(bounds);
 
             setAoiRef(shape);
-            //Current aoi should only be set after aoi has been sent to the api
+            //Current AOI should only be set after AOI has been sent to the api
             setCurrentAoi(null);
           } else if (apiLimits.max_inference > area) {
             setActiveModal('batch-inference');

@@ -268,7 +268,7 @@ export function AoiEditButtons(props) {
       });
     }
 
-    //Current aoi should only be set after aoi has been sent to the api
+    //Current AOI should only be set after AOI has been sent to the api
     setCurrentAoi(null);
   }
 
@@ -432,7 +432,7 @@ export function AoiEditButtons(props) {
       <Seperator>|</Seperator>
 
       {currentAoi ? (
-        /*  If currentAoi, aoi has been submitted to api
+        /*  If currentAoi, AOI has been submitted to api
          *  on delete, delete it via the api
          */
         <EditButton
@@ -445,9 +445,9 @@ export function AoiEditButtons(props) {
           Delete Current AOI
         </EditButton>
       ) : (
-        /* If not currentAoi but aoiRef exists, aoi has not been submitted to aoi
+        /* If not currentAoi but aoiRef exists, AOI has not been submitted to AOI
          * just clear it from the map and return to create
-         * new aoi state
+         * new AOI state
          */
         aoiRef && (
           <EditButton
@@ -463,7 +463,7 @@ export function AoiEditButtons(props) {
             useIcon='trash-bin'
             data-cy='delete-current-aoi-button'
           >
-            Delete current Aoi
+            Delete current AOI
           </EditButton>
         )
       )}
