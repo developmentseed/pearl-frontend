@@ -259,7 +259,7 @@ export function ExploreProvider(props) {
         setSessionStatusMessage(`Received image ${processed} of ${total}...`);
       }
     } else if (predictions.isReady()) {
-      // Update aoi List with newest aoi
+      // Update AOI List with newest AOI
       // If predictions is ready, restApiClient must be ready
 
       if (predictions.fetched && predictions.data.predictions?.length > 0) {
@@ -314,7 +314,7 @@ export function ExploreProvider(props) {
         );
         dispatchAoiPatch({ type: aoiPatchActions.CLEAR_PATCH });
       } else if (aoiPatch.error) {
-        toasts.error('An error ocurred while requesting aoi patch.');
+        toasts.error('An error ocurred while requesting AOI patch.');
         logger(aoiPatch.error);
       }
     }
@@ -416,10 +416,10 @@ export function ExploreProvider(props) {
   /*
    * Utility function to load AOI
    * @param project - current project object
-   * @param aoiObject - object containing aoi id and name
+   * @param aoiObject - object containing AOI id and name
    *                  Objects of this format are returned by
    * @param aoiMatchesCheckpoint - bool
-   *                  aoi listing endpoint
+   *                  AOI listing endpoint
    */
 
   async function loadAoi(
@@ -444,7 +444,7 @@ export function ExploreProvider(props) {
     ];
 
     if (aoiRef) {
-      // Load existing aoi that was returned by the api
+      // Load existing AOI that was returned by the api
       aoiRef.setBounds(bounds);
       setAoiBounds(aoiRef.getBounds());
       setAoiName(aoiObject.name);
@@ -453,7 +453,7 @@ export function ExploreProvider(props) {
         dispatchPredictions({ type: predictionActions.CLEAR_PREDICTION });
       }
     } else {
-      // initializing map with first aoi
+      // initializing map with first AOI
       setAoiInitializer(bounds);
       setAoiName(aoiObject.name);
     }
@@ -462,7 +462,7 @@ export function ExploreProvider(props) {
 
     if (!aoiMatchesCheckpoint) {
       toasts.error(
-        'Tiles do not exist for this aoi and this checkpoint. Treating as geometry only'
+        'Tiles do not exist for this AOI and this checkpoint. Treating as geometry only'
       );
       if (currentCheckpoint) {
         dispatchCurrentCheckpoint({
@@ -477,7 +477,7 @@ export function ExploreProvider(props) {
     } else {
       setCurrentAoi(aoi);
 
-      // Only load aoi on instance if storage is true
+      // Only load AOI   on instance if storage is true
       if (currentInstance && !noLoadOnInst && aoiObject.storage) {
         loadAoiOnInstance(aoi.id);
       } else {

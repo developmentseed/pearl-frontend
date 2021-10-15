@@ -89,7 +89,7 @@ function PrimeButton({
       },
     });
 
-    //Current aoi should only be set after aoi has been sent to the api
+    //Current AOI should only be set after AOI has been sent to the api
     setCurrentAoi(null);
   };
 
@@ -132,7 +132,7 @@ function PrimeButton({
       </InfoButton>
     );
   }
-  // In AOI EDIT MODE, this button will confirm the aoi
+  // In AOI EDIT MODE, this button will confirm the AOI
   else if (
     mapState.mode === mapModes.CREATE_AOI_MODE ||
     mapState.mode === mapModes.EDIT_AOI_MODE
