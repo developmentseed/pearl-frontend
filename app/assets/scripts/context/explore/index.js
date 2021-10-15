@@ -34,11 +34,13 @@ import logger from '../../utils/logger';
 import { wrapLogReducer } from '../reducers/utils';
 import {
   actions as sessionActions,
+  sessionModes,
   useSessionStatusReducer,
 } from './session-status';
 
 import { useShortcutReducer, listenForShortcuts } from './shortcuts';
 
+export { sessionModes };
 /**
  * Context & Provider
  */
@@ -134,16 +136,20 @@ export function ExploreProvider(props) {
   // Handle session mode updates
   useEffect(() => {
     const { mode } = sessionStatus;
-    if (mode === 'set-project-name' && projectName) {
+    if (mode === sessionModes.SET_PROJECT_NAME && projectName) {
       isInitialized.current = true;
-      setSessionStatusMode('set-aoi');
-    } else if (mode === 'set-aoi' && aoiRef) {
-      setSessionStatusMode('select-model');
-    } else if (mode === 'select-model' && selectedModel) {
-      setSessionStatusMode('prediction-ready');
-    } else if (mode === 'loading-project' && aoiRef && currentCheckpoint) {
+      setSessionStatusMode(sessionModes.SET_AOI);
+    } else if (mode === sessionModes.SET_AOI && aoiRef) {
+      setSessionStatusMode(sessionModes.SELECT_MODEL);
+    } else if (mode === sessionModes.SELECT_MODEL && selectedModel) {
+      setSessionStatusMode(sessionModes.PREDICTION_READY);
+    } else if (
+      mode === sessionModes.LOADING_PROJECT &&
+      aoiRef &&
+      currentCheckpoint
+    ) {
       isInitialized.current = true;
-      setSessionStatusMode('retrain-ready');
+      setSessionStatusMode(sessionModes.RETRAIN_READY);
     }
   }, [
     sessionStatus.mode,
@@ -172,11 +178,11 @@ export function ExploreProvider(props) {
 
     // Update session status
     if (projectId === 'new') {
-      setSessionStatusMode('set-project-name');
+      setSessionStatusMode(sessionModes.SET_PROJECT_NAME);
       hideGlobalLoading();
       return; // Bypass loading project when new
     } else {
-      setSessionStatusMode('loading-project');
+      setSessionStatusMode(sessionModes.LOADING_PROJECT);
     }
 
     const { availableGpus } = await restApiClient.getApiMeta('');
@@ -282,7 +288,7 @@ export function ExploreProvider(props) {
             setCurrentAoi(aoi);
           });
 
-        setSessionStatusMode('retrain-ready');
+        setSessionStatusMode(sessionModes.RETRAIN_READY);
       }
 
       if (predictions.error) {

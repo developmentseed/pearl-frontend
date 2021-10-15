@@ -14,6 +14,7 @@ import {
   useMapState,
   useSessionStatus,
   useShortcutState,
+  sessionModes,
 } from '../../../context/explore';
 import { actions as shortcutActions } from '../../../context/explore/shortcuts';
 import { useMapRef, useMapLayers, useUserLayers } from '../../../context/map';
@@ -190,7 +191,7 @@ function Map() {
             // On confirm, zoom to bounds
             mapRef.fitBounds(aoiRef.getBounds(), { padding: BOUNDS_PADDING });
             mapRef._container.style.cursor = 'grab';
-            setSessionStatusMode('set-aoi');
+            setSessionStatusMode(sessionModes.SET_AOI);
           }
         }
         break;
