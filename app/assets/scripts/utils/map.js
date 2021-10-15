@@ -1,5 +1,6 @@
 import tArea from '@turf/area';
 import tBboxPolygon from '@turf/bbox-polygon';
+import booleanIntersects from '@turf/boolean-intersects';
 import { saveAs } from 'file-saver';
 
 /**
@@ -17,4 +18,20 @@ export function downloadGeotiff(arrayBuffer, filename) {
     type: 'application/x-geotiff',
   });
   saveAs(blob, filename);
+}
+
+/**
+ * Verify if a bbox intersects a mapBounds
+ *
+ * @param {array} bbox extent in minX, minY, maxX, maxY order
+ * @param {function} mapBounds Leaflet map bounds
+ */
+export function bboxIntersectsMapBounds(bbox, mapBounds) {
+  const mapBoundsPolygon = tBboxPolygon(
+    mapBounds
+      .toBBoxString()
+      .split(',')
+      .map((i) => Number(i))
+  );
+  return booleanIntersects(tBboxPolygon(bbox), mapBoundsPolygon);
 }

@@ -196,16 +196,17 @@ function CardList({
   nonScrolling,
   style,
 }) {
+  const cards = data.filter(filterCard);
   return (
     <CardListWrapper style={style} nonScrolling={nonScrolling}>
       {nonScrolling ? (
         <CardListContainer numColumns={numColumns} className='list-container'>
-          {data.filter(filterCard).map(renderCard)}
+          {cards.length ? cards.map(renderCard) : 'No results found'}
         </CardListContainer>
       ) : (
         <CardListScroll>
           <CardListContainer numColumns={numColumns} className='list-container'>
-            {data.filter(filterCard).map(renderCard)}
+            {cards.length ? cards.map(renderCard) : 'No results found'}
           </CardListContainer>
         </CardListScroll>
       )}

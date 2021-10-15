@@ -92,8 +92,15 @@ describe('Create new project', () => {
       'Session Status: Select Model'
     );
 
-    // Select model
+    // Open the Model selection modal
     cy.get('[data-cy=select-model-label]').should('exist').click();
+    // Filter a model and get no results
+    cy.get('#modelsFilter').should('exist').clear().type('test123');
+    cy.get('[data-cy=select-model-1-card]').should('not.exist');
+    cy.get('.list-container').should('have.text', 'No results found');
+    // Filter again and get 2 results
+    cy.get('#modelsFilter').should('exist').clear().type('class');
+    cy.get('[data-cy=select-model-2-card]').should('exist');
     cy.get('[data-cy=select-model-1-card]').should('exist').click();
 
     // Check session status message
@@ -291,5 +298,58 @@ describe('Create new project', () => {
       'have.text',
       'Session Status: Ready for retrain run'
     );
+  });
+
+  it('Check model filter based on location', () => {
+    // Set mock WS workflow in case creation succeeds (it shouldn't here)
+    cy.setWebsocketWorkflow('websocket-workflow/base-model-prediction.json');
+
+    // Visit page
+    cy.visit('/project/new');
+
+    // Check session status message
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Set Project Name'
+    );
+
+    // Set project name
+    cy.get('[data-cy=modal-project-input]')
+      .should('exist')
+      .clear()
+      .type('Project name');
+    cy.get('[data-cy=create-project-button]').should('exist').click();
+
+    // Check session status message
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Set AOI'
+    );
+
+    // Open import modal
+    cy.get('[data-cy=upload-aoi-modal-button]').click();
+    // Open select file dialog
+    cy.get('[data-cy=select-aoi-file-button').click();
+    // Apply valid file to input
+    cy.get('[data-cy=aoi-upload-input]').attachFile(
+      'aoi-upload/aoi-outside-usa.geojson'
+    );
+    // No warning is displayed
+    cy.get('[data-cy=import-aoi-warning-text').should('not.exist');
+    // Proceed importing
+    cy.get('[data-cy=import-aoi-button').should('be.enabled').click();
+
+    // Check session status message
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Select Model'
+    );
+
+    // Open the Model selection modal
+    cy.get('[data-cy=select-model-label]').should('exist').click();
+    // Check that no models are available to the uploaded AOI location
+    cy.get('[data-cy=select-model-2-card]').should('not.exist');
+    cy.get('[data-cy=select-model-1-card]').should('not.exist');
+    cy.get('.list-container').should('have.text', 'No results found');
   });
 });

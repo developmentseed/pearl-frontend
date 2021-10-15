@@ -5,6 +5,7 @@ import { media, glsp } from '@devseed-ui/theme-provider';
 import Panel from '../../common/panel';
 import { PanelBlock, PanelBlockBody } from '../../common/panel-block';
 import SelectModal from '../../common/select-modal';
+import AutoFocusFormInput from '../../common/auto-focus-form-input';
 import ModelCard from './model-card';
 import { useMapRef } from '../../../context/map';
 import {
@@ -34,6 +35,7 @@ import { usePredictions } from '../../../context/predictions';
 import { useApiLimits } from '../../../context/global';
 import ClearSamplesModal from './clear-samples-modal';
 import { actions as shortcutActions } from '../../../context/explore/shortcuts';
+import { bboxIntersectsMapBounds } from '../../../utils/map';
 
 const StyledPanelBlock = styled(PanelBlock)`
   ${media.largeUp`
@@ -63,6 +65,11 @@ const Headline = styled.div`
     align-self: center;
   }
 `;
+
+const FilterSection = styled.div`
+  padding-bottom: ${glsp(1)};
+`;
+
 const TABS = [0, 1, 2];
 const [PREDICT_TAB_INDEX, RETRAIN_TAB_INDEX, REFINE_TAB_INDEX] = TABS;
 
@@ -86,6 +93,7 @@ function PrimePanel() {
 
   const [showSelectModelModal, setShowSelectModelModal] = useState(false);
   const [showClearSamplesModal, setShowClearSamplesModal] = useState(null);
+  const [modelFilter, setModelFilter] = useState('');
 
   const [localCheckpointName, setLocalCheckpointName] = useState(
     (currentCheckpoint &&
@@ -313,10 +321,21 @@ function PrimePanel() {
                 Close modal
               </Button>
             </Headline>
+            <FilterSection>
+              <AutoFocusFormInput
+                inputId='modelsFilter'
+                value={modelFilter}
+                setValue={setModelFilter}
+                placeholder='Type to filter the models'
+              />
+            </FilterSection>
           </ModalHeader>
         )}
         filterCard={(card) => {
-          return card.name.includes('');
+          return (
+            card.name.toLowerCase().includes(modelFilter.toLowerCase()) &&
+            bboxIntersectsMapBounds(card.bounds, mapRef.getBounds())
+          );
         }}
         renderCard={(model) => (
           <ModelCard
