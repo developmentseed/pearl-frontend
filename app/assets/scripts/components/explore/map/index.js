@@ -14,6 +14,7 @@ import {
   useMapState,
   useSessionStatus,
   useShortcutState,
+  sessionModes,
 } from '../../../context/explore';
 import { actions as shortcutActions } from '../../../context/explore/shortcuts';
 import { useMapRef, useMapLayers, useUserLayers } from '../../../context/map';
@@ -195,7 +196,7 @@ function Map() {
           ) {
             // On confirm, zoom to bounds
             mapRef.fitBounds(aoiRef.getBounds(), { padding: BOUNDS_PADDING });
-            setSessionStatusMode('set-aoi');
+            setSessionStatusMode(sessionModes.SET_AOI);
           }
           mapRef._container.style.cursor = 'grab';
         }
@@ -289,7 +290,7 @@ function Map() {
             updateAoiName(bounds);
 
             setAoiRef(shape);
-            //Current aoi should only be set after aoi has been sent to the api
+            //Current AOI should only be set after AOI has been sent to the api
             setCurrentAoi(null);
           } else if (apiLimits.max_inference > area) {
             setActiveModal('batch-inference');

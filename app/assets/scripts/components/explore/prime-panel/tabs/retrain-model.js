@@ -6,6 +6,7 @@ import InfoButton from '../../../common/info-button';
 import { PlaceholderMessage } from '../../../../styles/placeholder.js';
 import { actions, useCheckpoint } from '../../../../context/checkpoint.js';
 import { useMapState } from '../../../../context/explore';
+import { useSessionStatus } from '../../../../context/explore';
 import { Dropdown, DropdownTrigger } from '../../../../styles/dropdown';
 import {
   ToolsWrapper,
@@ -31,9 +32,13 @@ import EditClass from './edit-class';
  */
 
 function RetrainModel(props) {
-  const { ready, className, placeholderMessage } = props;
+  const { className, placeholderMessage } = props;
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
   const { setMapMode, mapModes, mapState } = useMapState();
+  const { sessionStatus } = useSessionStatus();
+  const isLoading = ['loading-project', 'retraining'].includes(
+    sessionStatus.mode
+  );
 
   const [importSamplesModalRevealed, setImportSamplesModalRevealed] = useState(
     false
@@ -47,219 +52,232 @@ function RetrainModel(props) {
 
   return (
     <ToolsWrapper className={className}>
-      {!isBatchArea && ready && currentCheckpoint.classes && (
-        <>
-          <RetrainTools>
-            <ImportSamplesModal
-              setRevealed={setImportSamplesModalRevealed}
-              revealed={importSamplesModalRevealed}
-            />
-            <Subheading>Sample Selection Tools</Subheading>
-            <InfoButton
-              data-cy='retrain-draw-polygon'
-              variation={
-                mapState.mode === mapModes.ADD_SAMPLE_POLYGON
-                  ? 'primary-raised-dark'
-                  : 'primary-plain'
-              }
-              size='small'
-              radius='ellipsoid'
-              useIcon='pencil'
-              visuallyDisabled={!currentCheckpoint.activeItem}
-              info={!currentCheckpoint.activeItem && 'No active item selected'}
-              onClick={() => {
-                if (
-                  currentCheckpoint.activeItem &&
-                  mapState.mode !== mapModes.ADD_SAMPLE_POLYGON
-                ) {
-                  setMapMode(mapModes.ADD_SAMPLE_POLYGON);
-                } else if (
-                  mapState.mode === mapModes.ADD_SAMPLE_POLYGON &&
-                  currentCheckpoint.activeItem
-                ) {
-                  setMapMode(mapModes.BROWSE_MODE);
+      {!isBatchArea &&
+        !isLoading &&
+        currentCheckpoint &&
+        currentCheckpoint.classes && (
+          <>
+            <RetrainTools>
+              <ImportSamplesModal
+                setRevealed={setImportSamplesModalRevealed}
+                revealed={importSamplesModalRevealed}
+              />
+              <Subheading>Sample Selection Tools</Subheading>
+              <InfoButton
+                data-cy='retrain-draw-polygon'
+                variation={
+                  mapState.mode === mapModes.ADD_SAMPLE_POLYGON
+                    ? 'primary-raised-dark'
+                    : 'primary-plain'
                 }
-              }}
-              className={
-                mapState.mode == mapModes.ADD_SAMPLE_POLYGON && 'active'
-              }
-            >
-              Polygon
-            </InfoButton>
-            <InfoButton
-              data-cy='retrain-draw-freehand'
-              variation={
-                mapState.mode === mapModes.ADD_SAMPLE_FREEHAND
-                  ? 'primary-raised-dark'
-                  : 'primary-plain'
-              }
-              size='small'
-              radius='ellipsoid'
-              useIcon='pencil'
-              visuallyDisabled={!currentCheckpoint.activeItem}
-              info={!currentCheckpoint.activeItem && 'No active item selected'}
-              onClick={() => {
-                if (
-                  currentCheckpoint.activeItem &&
-                  mapState.mode !== mapModes.ADD_SAMPLE_FREEHAND
-                ) {
-                  setMapMode(mapModes.ADD_SAMPLE_FREEHAND);
-                } else if (mapState.mode === mapModes.ADD_SAMPLE_FREEHAND) {
-                  setMapMode(mapModes.BROWSE_MODE);
+                size='small'
+                radius='ellipsoid'
+                useIcon='pencil'
+                visuallyDisabled={!currentCheckpoint.activeItem}
+                info={
+                  !currentCheckpoint.activeItem && 'No active item selected'
                 }
-              }}
-              className={
-                mapState.mode == mapModes.ADD_SAMPLE_FREEHAND && 'active'
-              }
-            >
-              Free Hand
-            </InfoButton>
-            <InfoButton
-              data-cy='add-point-sample-button'
-              variation={
-                mapState.mode === mapModes.ADD_SAMPLE_POINT
-                  ? 'primary-raised-dark'
-                  : 'primary-plain'
-              }
-              size='small'
-              radius='ellipsoid'
-              useIcon='crosshair'
-              visuallyDisabled={!currentCheckpoint.activeItem}
-              info={!currentCheckpoint.activeItem && 'No active item selected'}
-              onClick={() => {
-                if (
-                  currentCheckpoint.activeItem &&
-                  mapState.mode !== mapModes.ADD_SAMPLE_POINT
-                ) {
-                  setMapMode(mapModes.ADD_SAMPLE_POINT);
-                } else if (mapState.mode === mapModes.ADD_SAMPLE_POINT) {
-                  setMapMode(mapModes.BROWSE_MODE);
+                onClick={() => {
+                  if (
+                    currentCheckpoint.activeItem &&
+                    mapState.mode !== mapModes.ADD_SAMPLE_POLYGON
+                  ) {
+                    setMapMode(mapModes.ADD_SAMPLE_POLYGON);
+                  } else if (
+                    mapState.mode === mapModes.ADD_SAMPLE_POLYGON &&
+                    currentCheckpoint.activeItem
+                  ) {
+                    setMapMode(mapModes.BROWSE_MODE);
+                  }
+                }}
+                className={
+                  mapState.mode == mapModes.ADD_SAMPLE_POLYGON && 'active'
                 }
-              }}
-              className={mapState.mode == mapModes.ADD_SAMPLE_POINT && 'active'}
-            >
-              Point
-            </InfoButton>
+              >
+                Polygon
+              </InfoButton>
+              <InfoButton
+                data-cy='retrain-draw-freehand'
+                variation={
+                  mapState.mode === mapModes.ADD_SAMPLE_FREEHAND
+                    ? 'primary-raised-dark'
+                    : 'primary-plain'
+                }
+                size='small'
+                radius='ellipsoid'
+                useIcon='pencil'
+                visuallyDisabled={!currentCheckpoint.activeItem}
+                info={
+                  !currentCheckpoint.activeItem && 'No active item selected'
+                }
+                onClick={() => {
+                  if (
+                    currentCheckpoint.activeItem &&
+                    mapState.mode !== mapModes.ADD_SAMPLE_FREEHAND
+                  ) {
+                    setMapMode(mapModes.ADD_SAMPLE_FREEHAND);
+                  } else if (mapState.mode === mapModes.ADD_SAMPLE_FREEHAND) {
+                    setMapMode(mapModes.BROWSE_MODE);
+                  }
+                }}
+                className={
+                  mapState.mode == mapModes.ADD_SAMPLE_FREEHAND && 'active'
+                }
+              >
+                Free Hand
+              </InfoButton>
+              <InfoButton
+                data-cy='add-point-sample-button'
+                variation={
+                  mapState.mode === mapModes.ADD_SAMPLE_POINT
+                    ? 'primary-raised-dark'
+                    : 'primary-plain'
+                }
+                size='small'
+                radius='ellipsoid'
+                useIcon='crosshair'
+                visuallyDisabled={!currentCheckpoint.activeItem}
+                info={
+                  !currentCheckpoint.activeItem && 'No active item selected'
+                }
+                onClick={() => {
+                  if (
+                    currentCheckpoint.activeItem &&
+                    mapState.mode !== mapModes.ADD_SAMPLE_POINT
+                  ) {
+                    setMapMode(mapModes.ADD_SAMPLE_POINT);
+                  } else if (mapState.mode === mapModes.ADD_SAMPLE_POINT) {
+                    setMapMode(mapModes.BROWSE_MODE);
+                  }
+                }}
+                className={
+                  mapState.mode == mapModes.ADD_SAMPLE_POINT && 'active'
+                }
+              >
+                Point
+              </InfoButton>
 
-            <InfoButton
-              data-cy='eraser-button'
-              variation={
-                mapState.mode === mapModes.DELETE_SAMPLES
-                  ? 'primary-raised-dark'
-                  : 'primary-plain'
-              }
-              size='small'
-              radius='ellipsoid'
-              useLocalButton
-              useIcon='eraser'
-              id='eraser-button'
-              visuallyDisabled={!currentCheckpoint.activeItem}
-              info={
-                !currentCheckpoint.activeItem
-                  ? 'No active item selected'
-                  : 'Draw to erase, click to delete'
-              }
-              onClick={() => {
-                if (
-                  currentCheckpoint.activeItem &&
-                  mapState.mode !== mapModes.DELETE_SAMPLES
-                ) {
-                  setMapMode(mapModes.DELETE_SAMPLES);
-                } else if (mapState.mode === mapModes.DELETE_SAMPLES) {
-                  setMapMode(mapModes.BROWSE_MODE);
+              <InfoButton
+                data-cy='eraser-button'
+                variation={
+                  mapState.mode === mapModes.DELETE_SAMPLES
+                    ? 'primary-raised-dark'
+                    : 'primary-plain'
                 }
-              }}
-              className={mapState.mode === mapModes.DELETE_SAMPLES && 'active'}
-            >
-              Erase
-            </InfoButton>
-            <InfoButton
-              id='open-upload-samples-modal-button'
-              data-cy='open-upload-samples-modal-button'
-              variation={
-                importSamplesModalRevealed
-                  ? 'primary-raised-dark'
-                  : 'primary-plain'
-              }
-              size='small'
-              radius='ellipsoid'
-              useLocalButton
-              useIcon='upload'
-              visuallyDisabled={!currentCheckpoint.activeItem}
-              info='Upload samples as GeoJSON'
-              onClick={() => setImportSamplesModalRevealed(true)}
-              className={importSamplesModalRevealed && 'active'}
-            >
-              Upload
-            </InfoButton>
-          </RetrainTools>
-          <ClassList>
-            <Subheading>Classes</Subheading>
-            {Object.values(currentCheckpoint.classes).map((c) => {
-              let polygons = get(c, 'polygons.length');
-              let points = get(c, 'points.coordinates.length');
-              return (
-                <Class
-                  key={c.name}
-                  data-cy={`${c.name}-class-button`}
-                  onClick={() => {
-                    dispatchCurrentCheckpoint({
-                      type: actions.SET_ACTIVE_CLASS,
-                      data: c.name,
-                    });
-                  }}
-                  selected={currentCheckpoint.activeItem === c.name}
-                >
-                  <ClassThumbnail color={c.color} />
-                  <ClassInfoWrapper>
-                    <ClassHeading size='xsmall'>{c.name}</ClassHeading>
-                    <ClassSamples>
-                      {polygons > 0 && (
-                        <strong>
-                          {polygons} {polygons > 1 ? 'polygons' : 'polygon'}
-                        </strong>
-                      )}
-                      {points > 0 && polygons > 0 && ` | `}
-                      {points > 0 && (
-                        <strong>
-                          {points} {points > 1 ? 'points' : 'point'}
-                        </strong>
-                      )}{' '}
-                      {(polygons > 0 || points > 0) &&
-                        `selected since last retrain`}
-                    </ClassSamples>
-                  </ClassInfoWrapper>
-                </Class>
-              );
-            })}
-            <Dropdown
-              alignment='center'
-              direction='up'
-              triggerElement={(props) => (
-                <AddClassButton
-                  as={DropdownTrigger}
-                  variation='primary-plain'
-                  useIcon='plus--small'
-                  title='Open dropdown'
-                  className='add__class'
-                  size='medium'
-                  {...props}
-                >
-                  Add Class
-                </AddClassButton>
-              )}
-              className='add-class__dropdown'
-            >
-              <EditClass />
-            </Dropdown>
-          </ClassList>
-        </>
-      )}
+                size='small'
+                radius='ellipsoid'
+                useLocalButton
+                useIcon='eraser'
+                id='eraser-button'
+                visuallyDisabled={!currentCheckpoint.activeItem}
+                info={
+                  !currentCheckpoint.activeItem
+                    ? 'No active item selected'
+                    : 'Draw to erase, click to delete'
+                }
+                onClick={() => {
+                  if (
+                    currentCheckpoint.activeItem &&
+                    mapState.mode !== mapModes.DELETE_SAMPLES
+                  ) {
+                    setMapMode(mapModes.DELETE_SAMPLES);
+                  } else if (mapState.mode === mapModes.DELETE_SAMPLES) {
+                    setMapMode(mapModes.BROWSE_MODE);
+                  }
+                }}
+                className={
+                  mapState.mode === mapModes.DELETE_SAMPLES && 'active'
+                }
+              >
+                Erase
+              </InfoButton>
+              <InfoButton
+                id='open-upload-samples-modal-button'
+                data-cy='open-upload-samples-modal-button'
+                variation={
+                  importSamplesModalRevealed
+                    ? 'primary-raised-dark'
+                    : 'primary-plain'
+                }
+                size='small'
+                radius='ellipsoid'
+                useLocalButton
+                useIcon='upload'
+                visuallyDisabled={!currentCheckpoint.activeItem}
+                info='Upload samples as GeoJSON'
+                onClick={() => setImportSamplesModalRevealed(true)}
+                className={importSamplesModalRevealed && 'active'}
+              >
+                Upload
+              </InfoButton>
+            </RetrainTools>
+            <ClassList>
+              <Subheading>Classes</Subheading>
+              {Object.values(currentCheckpoint.classes).map((c) => {
+                let polygons = get(c, 'polygons.length');
+                let points = get(c, 'points.coordinates.length');
+                return (
+                  <Class
+                    key={c.name}
+                    data-cy={`${c.name}-class-button`}
+                    onClick={() => {
+                      dispatchCurrentCheckpoint({
+                        type: actions.SET_ACTIVE_CLASS,
+                        data: c.name,
+                      });
+                    }}
+                    selected={currentCheckpoint.activeItem === c.name}
+                  >
+                    <ClassThumbnail color={c.color} />
+                    <ClassInfoWrapper>
+                      <ClassHeading size='xsmall'>{c.name}</ClassHeading>
+                      <ClassSamples>
+                        {polygons > 0 && (
+                          <strong>
+                            {polygons} {polygons > 1 ? 'polygons' : 'polygon'}
+                          </strong>
+                        )}
+                        {points > 0 && polygons > 0 && ` | `}
+                        {points > 0 && (
+                          <strong>
+                            {points} {points > 1 ? 'points' : 'point'}
+                          </strong>
+                        )}{' '}
+                        {(polygons > 0 || points > 0) &&
+                          `selected since last retrain`}
+                      </ClassSamples>
+                    </ClassInfoWrapper>
+                  </Class>
+                );
+              })}
+              <Dropdown
+                alignment='center'
+                direction='up'
+                triggerElement={(props) => (
+                  <AddClassButton
+                    as={DropdownTrigger}
+                    variation='primary-plain'
+                    useIcon='plus--small'
+                    title='Open dropdown'
+                    className='add__class'
+                    size='medium'
+                    {...props}
+                  >
+                    Add Class
+                  </AddClassButton>
+                )}
+                className='add-class__dropdown'
+              >
+                <EditClass />
+              </Dropdown>
+            </ClassList>
+          </>
+        )}
 
-      {(!currentCheckpoint || isBatchArea || (!ready && currentCheckpoint)) &&
-        placeholderMessage && (
-          <ClassList>
-            {[1, 2, 3].map((i) => (
+      {(isLoading || placeholderMessage) && (
+        <ClassList>
+          {isLoading && !isBatchArea ? (
+            [1, 2, 3].map((i) => (
               // +true workaround
               // Styled components will try to pass true to the DOM element
               // assing a + casts it to int which is logically equivalent
@@ -268,10 +286,13 @@ function RetrainModel(props) {
                 <ClassThumbnail />
                 <ClassHeading size='xsmall' placeholder={+true} />
               </Class>
-            ))}
-            <PlaceholderMessage>{placeholderMessage}</PlaceholderMessage>
-          </ClassList>
-        )}
+            ))
+          ) : (
+            <></>
+          )}
+          <PlaceholderMessage>{placeholderMessage}</PlaceholderMessage>
+        </ClassList>
+      )}
     </ToolsWrapper>
   );
 }
