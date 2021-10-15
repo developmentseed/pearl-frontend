@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import styled from 'styled-components';
+import throttle from 'lodash.throttle';
 import { media, glsp } from '@devseed-ui/theme-provider';
 
 import Panel from '../../common/panel';
@@ -331,12 +332,12 @@ function PrimePanel() {
             </FilterSection>
           </ModalHeader>
         )}
-        filterCard={(card) => {
+        filterCard={throttle((card) => {
           return (
             card.name.toLowerCase().includes(modelFilter.toLowerCase()) &&
             bboxIntersectsMapBounds(card.bounds, mapRef.getBounds())
           );
-        }}
+        }, 500)}
         renderCard={(model) => (
           <ModelCard
             key={model.name}
