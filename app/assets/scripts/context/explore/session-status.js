@@ -20,49 +20,49 @@ export const sessionModes = {
 };
 
 export const initialState = {
-  mode: 'LOADING',
+  mode: sessionModes.LOADING,
   level: 'info',
   message: 'Loading...',
 };
 
-const modes = [
+const modesMeta = [
   {
-    mode: 'SET_PROJECT_NAME',
+    mode: sessionModes.SET_PROJECT_NAME,
     level: 'info',
     message: 'Set Project Name',
   },
   {
-    mode: 'SET_AOI',
+    mode: sessionModes.SET_AOI,
     level: 'info',
     message: 'Set AOI',
   },
   {
-    mode: 'SELECT_MODEL',
+    mode: sessionModes.SELECT_MODEL,
     level: 'info',
     message: 'Select Model',
   },
   {
-    mode: 'PREDICTION_READY',
+    mode: sessionModes.PREDICTION_READY,
     level: 'info',
     message: 'Ready for prediction run',
   },
   {
-    mode: 'RUNNING_PREDICTION',
+    mode: sessionModes.RUNNING_PREDICTION,
     level: 'info',
     message: 'Running prediction',
   },
   {
-    mode: 'LOADING_PROJECT',
+    mode: sessionModes.LOADING_PROJECT,
     level: 'info',
     message: 'Loading project...',
   },
   {
-    mode: 'RETRAINING',
+    mode: sessionModes.RETRAINING,
     level: 'info',
     message: 'Retraining...',
   },
   {
-    mode: 'RETRAIN_READY',
+    mode: sessionModes.RETRAIN_READY,
     level: 'info',
     message: 'Ready for retrain run',
   },
@@ -76,7 +76,7 @@ export default function sessionStatusReducer(state, action) {
     case actions.SET_MODE: {
       newState = {
         ...state,
-        ...modes.find(({ mode }) => mode === data),
+        ...modesMeta.find(({ mode }) => mode === data),
       };
       break;
     }
