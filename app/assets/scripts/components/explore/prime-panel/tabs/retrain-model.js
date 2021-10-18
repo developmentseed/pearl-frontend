@@ -84,13 +84,13 @@ function RetrainModel(props) {
               content={
                 importSource === 'geojson' ? (
                   <ImportGeojson />
-                ) : importSource === 'osmqa' ? (
+                ) : importSource === 'osm-qa' ? (
                   <ImportOSMQA />
                 ) : (
                   <Wrapper>
-                    <Prose className='prose'>Select import type:</Prose>
+                    <Prose className='prose'>Select source:</Prose>
                     <Button
-                      data-cy='import-geojson-samples-button'
+                      data-cy='select-geojson-import-button'
                       variation='primary-raised-dark'
                       size='medium'
                       style={{
@@ -101,15 +101,15 @@ function RetrainModel(props) {
                       GeoJSON file
                     </Button>
                     <Button
-                      data-cy='import-osm-samples-button'
+                      data-cy='select-osm-qa-import-button'
                       variation='primary-raised-dark'
                       size='medium'
                       style={{
                         gridColumn: '1 / -1',
                       }}
-                      onClick={() => setImportSource('osmqa')}
+                      onClick={() => setImportSource('osm-qa')}
                     >
-                      OpenStreetMap
+                      OpenStreetMap QA Tiles
                     </Button>
                   </Wrapper>
                 )
@@ -208,8 +208,8 @@ function RetrainModel(props) {
               Erase
             </InfoButton>
             <InfoButton
-              id='open-upload-samples-modal-button'
-              data-cy='open-upload-samples-modal-button'
+              id='open-import-samples-modal-button'
+              data-cy='open-import-samples-modal-button'
               variation={
                 importSamplesModalRevealed
                   ? 'primary-raised-dark'

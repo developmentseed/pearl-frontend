@@ -226,7 +226,7 @@ describe('Retrain existing project', () => {
     cy.get('[data-cy=Structure-class-button').click();
 
     // Open import modal
-    cy.get('[data-cy=open-upload-samples-modal-button').click();
+    cy.get('[data-cy=open-import-samples-modal-button').click();
 
     // Open select file dialog
     cy.get('[data-cy=select-samples-file-button').click();
@@ -514,5 +514,9 @@ describe('Retrain existing project', () => {
     );
 
     cy.get('[data-cy=global-loading]').should('not.exist');
+
+    cy.get('[data-cy=open-import-samples-modal-button').should('exist').click();
+
+    cy.get('[data-cy=select-osm-qa-import-button').should('exist').click();
   });
 });

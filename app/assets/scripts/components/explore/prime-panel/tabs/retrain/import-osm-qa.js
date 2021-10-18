@@ -23,7 +23,17 @@ const Wrapper = styled.div`
 function ImportOSMQA() {
   return (
     <Wrapper>
-      <Prose className='prose'>Import description</Prose>
+      <Prose className='prose'>
+        By proceeding the current AOI will be populated with samples from{' '}
+        <a
+          href='https://osmlab.github.io/osm-qa-tiles'
+          target='_blank'
+          rel='noreferrer'
+        >
+          OSM QA Tiles
+        </a>
+        .
+      </Prose>
       <Button
         data-cy='import-geojson-samples-button'
         variation='primary-raised-dark'
@@ -35,7 +45,7 @@ function ImportOSMQA() {
         Cancel
       </Button>
       <Button
-        data-cy='import-osm-samples-button'
+        data-cy='import-osm-qa-samples-button'
         variation='primary-raised-dark'
         size='medium'
         style={{
