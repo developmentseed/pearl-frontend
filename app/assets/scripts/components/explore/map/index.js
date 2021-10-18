@@ -453,7 +453,7 @@ function Map() {
         <BaseMapLayer />
         <OsmQaLayer />
 
-        {mosaics &&
+        {/* {mosaics &&
           mosaics.map((layer) => (
             <TileLayer
               key={layer}
@@ -476,7 +476,7 @@ function Map() {
                 },
               }}
             />
-          ))}
+          ))} */}
 
         {predictions &&
           predictions.data &&
