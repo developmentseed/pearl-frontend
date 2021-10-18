@@ -53,9 +53,10 @@ import {
 import toasts from '../../common/toasts';
 import logger from '../../../utils/logger';
 import PolygonDrawControl from './polygon-draw-control';
+import OsmQaLayer from '../../common/map/osm-qa-layer';
 
 const center = [38.889805, -77.009056];
-const zoom = 12;
+const zoom = 17;
 
 const MAX = 3;
 const NO_LIVE = 2;
@@ -450,6 +451,8 @@ function Map() {
         )}
 
         <BaseMapLayer />
+        <OsmQaLayer />
+
         {mosaics &&
           mosaics.map((layer) => (
             <TileLayer
@@ -634,6 +637,7 @@ function Map() {
                 />
               ))
           )}
+
         <FeatureGroup>
           <GenericControl
             id='layer-control'

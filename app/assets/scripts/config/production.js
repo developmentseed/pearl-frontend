@@ -18,6 +18,8 @@ module.exports = {
       'ArLmu8JG2PHK_-_zo7yS1WbvDz7PgsoVEgcqFTg8uaH-lsXLcjADCAtnyQB054uq',
     bingSearchUrl: 'https://dev.virtualearth.net/REST/v1',
     reverseGeocodeRadius: 1,
+    osmQaPbfTilesUrl:
+      'https://qa-tiles-server-dev.ds.io/services/z17/tiles/{z}/{x}/{y}.pbf',
     tileUrlTemplate:
       'https://tiles.lulc.ds.io/mosaic/{LAYER_NAME}/tiles/{z}/{x}/{y}?bidx=1%2C2%2C3',
     appInsightsKey: '0291f153-9634-463e-8aa0-34700141d37c',
