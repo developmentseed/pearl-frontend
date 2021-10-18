@@ -200,9 +200,28 @@ const sampleClasses = [
   },
 ];
 
+function getFeatureClass(props) {
+  let featureClass;
+
+  for (let i = 0; i < sampleClasses.length; i++) {
+    const sampleClass = sampleClasses[i];
+
+    for (let j = 0; j < sampleClass.tagmap.length; j++) {
+      const { k, v } = sampleClass.tagmap[j];
+
+      // Match wildcards or exact match
+      if ((v === '.*' && props[k]) || props[k] === v) {
+        featureClass = sampleClass;
+        break;
+      }
+    }
+  }
+
+  return featureClass;
+}
+
 function OsmQaLayer() {
   const map = useMap();
-  // const [layer, setLayer] = useState(null);
 
   useEffect(() => {
     const l = L.vectorGrid
@@ -210,44 +229,26 @@ function OsmQaLayer() {
         interactive: true,
         vectorTileLayerStyles: {
           osm: (props) => {
-            let color;
+            const featureClass = getFeatureClass(props);
 
-            for (let i = 0; i < sampleClasses.length; i++) {
-              const sampleClass = sampleClasses[i];
-
-              for (let j = 0; j < sampleClass.tagmap.length; j++) {
-                const { k, v } = sampleClass.tagmap[j];
-
-                // Match wildcards or exact match
-                if ((v === '.*' && props[k]) || props[k] === v) {
-                  color = sampleClass.color;
-                  break;
+            return featureClass
+              ? {
+                  fillColor: featureClass.color,
+                  color: featureClass.color,
+                  fill: true,
                 }
-              }
-            }
-
-            // Do not show feature if color wasn't found
-            if (!color) {
-              return { weight: 0 };
-            }
-
-            // Apply color and fill feature if a polygon
-            return {
-              fillColor: color,
-              color,
-              fill: true,
-            };
+              : { weight: 0 };
           },
         },
       })
       .on('click', function (e) {
-        console.log(e);
+        const feature = e.layer.properties;
+        const featureClass = getFeatureClass(feature);
+        if (featureClass) {
+          alert(featureClass.name);
+        }
         L.DomEvent.stop(e);
       });
-
-    l.on('add', () => {
-      // setLayer(l);
-    });
 
     l.addTo(map);
 
