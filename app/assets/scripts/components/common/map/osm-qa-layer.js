@@ -2,7 +2,8 @@ import { useEffect } from 'react';
 import { useMap } from 'react-leaflet';
 import L from 'leaflet';
 import {} from 'leaflet.vectorgrid';
-import { osmQaPbfTilesUrl } from '../../../config';
+import config from '../../../config';
+const { osmQaPbfTilesUrl } = config;
 
 function OsmQaLayer() {
   const map = useMap();
