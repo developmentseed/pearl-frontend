@@ -160,8 +160,14 @@ function Map() {
             // On KEYUP, we will dispatch an update to return to previousMode, but overrideBrowseMode
             // will be set to false before the mode update can be dispatched
             mapRef.polygonDraw.disable();
+          } else if (mapState.mode === mapModes.BROWSE_MODE) {
+            mapRef.polygonDraw.disable();
           }
           break;
+        case mapModes.DELETE_SAMPLES: {
+          mapRef.freehandDraw?.disable();
+          break;
+        }
         case mapModes.ADD_SAMPLE_FREEHAND: {
           mapRef.freehandDraw?.disable();
         }
@@ -190,9 +196,9 @@ function Map() {
           ) {
             // On confirm, zoom to bounds
             mapRef.fitBounds(aoiRef.getBounds(), { padding: BOUNDS_PADDING });
-            mapRef._container.style.cursor = 'grab';
             setSessionStatusMode(sessionModes.SET_AOI);
           }
+          mapRef._container.style.cursor = 'grab';
         }
         break;
       case mapModes.ADD_SAMPLE_POINT:

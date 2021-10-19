@@ -83,8 +83,16 @@ function RetrainModel(props) {
                     mapState.mode !== mapModes.ADD_SAMPLE_POLYGON
                   ) {
                     setMapMode(mapModes.ADD_SAMPLE_POLYGON);
+                  } else if (
+                    mapState.mode === mapModes.ADD_SAMPLE_POLYGON &&
+                    currentCheckpoint.activeItem
+                  ) {
+                    setMapMode(mapModes.BROWSE_MODE);
                   }
                 }}
+                className={
+                  mapState.mode == mapModes.ADD_SAMPLE_POLYGON && 'active'
+                }
               >
                 Polygon
               </InfoButton>
@@ -103,10 +111,18 @@ function RetrainModel(props) {
                   !currentCheckpoint.activeItem && 'No active item selected'
                 }
                 onClick={() => {
-                  if (currentCheckpoint.activeItem) {
+                  if (
+                    currentCheckpoint.activeItem &&
+                    mapState.mode !== mapModes.ADD_SAMPLE_FREEHAND
+                  ) {
                     setMapMode(mapModes.ADD_SAMPLE_FREEHAND);
+                  } else if (mapState.mode === mapModes.ADD_SAMPLE_FREEHAND) {
+                    setMapMode(mapModes.BROWSE_MODE);
                   }
                 }}
+                className={
+                  mapState.mode == mapModes.ADD_SAMPLE_FREEHAND && 'active'
+                }
               >
                 Free Hand
               </InfoButton>
@@ -125,10 +141,18 @@ function RetrainModel(props) {
                   !currentCheckpoint.activeItem && 'No active item selected'
                 }
                 onClick={() => {
-                  if (currentCheckpoint.activeItem) {
+                  if (
+                    currentCheckpoint.activeItem &&
+                    mapState.mode !== mapModes.ADD_SAMPLE_POINT
+                  ) {
                     setMapMode(mapModes.ADD_SAMPLE_POINT);
+                  } else if (mapState.mode === mapModes.ADD_SAMPLE_POINT) {
+                    setMapMode(mapModes.BROWSE_MODE);
                   }
                 }}
+                className={
+                  mapState.mode == mapModes.ADD_SAMPLE_POINT && 'active'
+                }
               >
                 Point
               </InfoButton>
@@ -152,10 +176,18 @@ function RetrainModel(props) {
                     : 'Draw to erase, click to delete'
                 }
                 onClick={() => {
-                  if (currentCheckpoint.activeItem) {
+                  if (
+                    currentCheckpoint.activeItem &&
+                    mapState.mode !== mapModes.DELETE_SAMPLES
+                  ) {
                     setMapMode(mapModes.DELETE_SAMPLES);
+                  } else if (mapState.mode === mapModes.DELETE_SAMPLES) {
+                    setMapMode(mapModes.BROWSE_MODE);
                   }
                 }}
+                className={
+                  mapState.mode === mapModes.DELETE_SAMPLES && 'active'
+                }
               >
                 Erase
               </InfoButton>
@@ -174,6 +206,7 @@ function RetrainModel(props) {
                 visuallyDisabled={!currentCheckpoint.activeItem}
                 info='Upload samples as GeoJSON'
                 onClick={() => setImportSamplesModalRevealed(true)}
+                className={importSamplesModalRevealed && 'active'}
               >
                 Upload
               </InfoButton>

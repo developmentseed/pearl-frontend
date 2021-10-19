@@ -167,6 +167,9 @@ function PrimeButton({
     retrain: {
       label: 'Retrain',
       action: async () => {
+        // Reset map mode
+        setMapMode(mapModes.BROWSE_MODE);
+
         try {
           showGlobalLoadingMessage('Starting retraining...');
           setSessionStatusMode(sessionModes.RETRAINING);
@@ -198,6 +201,9 @@ function PrimeButton({
     'live-prediction': {
       label: 'Ready for prediction run',
       action: async () => {
+        // Reset map mode
+        setMapMode(mapModes.BROWSE_MODE);
+
         try {
           setSessionStatusMode(sessionModes.RUNNING_PREDICTION);
           await runPrediction({

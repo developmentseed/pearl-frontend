@@ -338,9 +338,6 @@ describe('Retrain existing project', () => {
       }
     );
 
-    // Request model run
-    cy.get('[data-cy=run-button]').click();
-
     cy.get('[data-cy=session-status]').should(
       'have.text',
       'Session Status: Ready for retrain run'
@@ -348,12 +345,6 @@ describe('Retrain existing project', () => {
 
     // Save checkpoint is enabled
     cy.get('[data-cy=save-checkpoint-button]').should('not.be.disabled');
-
-    // Go to home page to avoid spilling state to next test
-    cy.visit('/');
-    cy.location().should((loc) => {
-      expect(loc.pathname).to.eq('/');
-    });
   });
 
   it('abort retrain', () => {
