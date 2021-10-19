@@ -167,13 +167,15 @@ function PrimeButton({
     retrain: {
       label: 'Retrain',
       action: async () => {
+        // Reset map mode
+        setMapMode(mapModes.BROWSE_MODE);
+
         try {
           showGlobalLoadingMessage('Starting retraining...');
           setSessionStatusMode(sessionModes.RETRAINING);
           await retrain({
             onAbort: () => {
               setSessionStatusMode(sessionModes.RETRAIN_READY);
-              setMapMode(mapModes.BROWSE_MODE);
             },
           });
         } catch (error) {
@@ -199,12 +201,14 @@ function PrimeButton({
     'live-prediction': {
       label: 'Ready for prediction run',
       action: async () => {
+        // Reset map mode
+        setMapMode(mapModes.BROWSE_MODE);
+
         try {
           setSessionStatusMode(sessionModes.RUNNING_PREDICTION);
           await runPrediction({
             onAbort: () => {
               setSessionStatusMode(sessionModes.PREDICTION_READY);
-              setMapMode(mapModes.BROWSE_MODE);
             },
           });
         } catch (error) {
