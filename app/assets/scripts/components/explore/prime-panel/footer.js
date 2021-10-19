@@ -173,6 +173,7 @@ function PrimeButton({
           await retrain({
             onAbort: () => {
               setSessionStatusMode(sessionModes.RETRAIN_READY);
+              setMapMode(mapModes.BROWSE_MODE);
             },
           });
         } catch (error) {
@@ -203,6 +204,7 @@ function PrimeButton({
           await runPrediction({
             onAbort: () => {
               setSessionStatusMode(sessionModes.PREDICTION_READY);
+              setMapMode(mapModes.BROWSE_MODE);
             },
           });
         } catch (error) {
