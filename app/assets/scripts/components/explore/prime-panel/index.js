@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import styled from 'styled-components';
-import throttle from 'lodash.throttle';
+import { Heading } from '@devseed-ui/typography';
+import { Button } from '@devseed-ui/button';
 import { media, glsp } from '@devseed-ui/theme-provider';
 
 import Panel from '../../common/panel';
@@ -16,9 +17,6 @@ import {
   useAoiMeta,
 } from '../../../context/explore';
 import { useModel } from '../../../context/model';
-
-import { Heading } from '@devseed-ui/typography';
-import { Button } from '@devseed-ui/button';
 
 import TabbedBlock from '../../common/tabbed-block-body';
 import Predict from './tabs/predict';
@@ -48,7 +46,7 @@ const StyledPanelBlock = styled(PanelBlock)`
 `;
 
 const ModalHeader = styled.header`
-  padding: ${glsp(2)};
+  padding: ${glsp(2)} ${glsp(2)} 0;
 `;
 
 const Headline = styled.div`
@@ -82,7 +80,7 @@ function PrimePanel() {
 
   const { updateCheckpointName } = useContext(ExploreContext);
 
-  const { setAoiBounds, aoiArea } = useAoiMeta();
+  const { aoiBounds, setAoiBounds, aoiArea } = useAoiMeta();
 
   const { aoiRef, currentAoi } = useAoi();
 
@@ -303,10 +301,18 @@ function PrimePanel() {
       <SelectModal
         id='select-model-modal'
         revealed={showSelectModelModal}
-        onOverlayClick={() => {
-          setShowSelectModelModal(false);
-        }}
-        data={models.isReady && !models.hasError ? models.data : []}
+        onOverlayClick={() => setShowSelectModelModal(false)}
+        data={
+          models.isReady && !models.hasError
+            ? models.data.map((model) => {
+                model.overlapsAoi = bboxIntersectsMapBounds(
+                  model.bounds,
+                  aoiBounds
+                );
+                return model;
+              })
+            : []
+        }
         renderHeader={() => (
           <ModalHeader>
             <Headline>
@@ -317,7 +323,10 @@ function PrimePanel() {
                 variation='base-plain'
                 size='small'
                 useIcon='xmark'
-                onClick={() => setShowSelectModelModal(false)}
+                onClick={() => {
+                  setShowSelectModelModal(false);
+                  setModelFilter('');
+                }}
               >
                 Close modal
               </Button>
@@ -332,12 +341,9 @@ function PrimePanel() {
             </FilterSection>
           </ModalHeader>
         )}
-        filterCard={throttle((card) => {
-          return (
-            card.name.toLowerCase().includes(modelFilter.toLowerCase()) &&
-            bboxIntersectsMapBounds(card.bounds, mapRef.getBounds())
-          );
-        }, 500)}
+        filterCard={(card) =>
+          card.name.toLowerCase().includes(modelFilter.toLowerCase())
+        }
         renderCard={(model) => (
           <ModelCard
             key={model.name}
@@ -361,9 +367,7 @@ function PrimePanel() {
           clearAndContinue();
           setShowClearSamplesModal(null);
         }}
-        onCancel={() => {
-          setShowClearSamplesModal(null);
-        }}
+        onCancel={() => setShowClearSamplesModal(null)}
       />
     </>
   );

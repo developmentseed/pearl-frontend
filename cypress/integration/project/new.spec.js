@@ -100,7 +100,14 @@ describe('Create new project', () => {
     cy.get('.list-container').should('have.text', 'No results found');
     // Filter again and get 2 results
     cy.get('#modelsFilter').should('exist').clear().type('class');
-    cy.get('[data-cy=select-model-2-card]').should('exist');
+    // Check that the 2 models are recommended
+    cy.get('[data-cy=recommended-models-list]').should('exist');
+    cy.get('[data-cy=recommended-models-list]').within(() => {
+      cy.get('.list-container').children().should('have.length', 2);
+    });
+    // There are not other models for that aoi region
+    cy.get('[data-cy=all-models-list]').should('not.exist');
+    // Finally select a model
     cy.get('[data-cy=select-model-1-card]').should('exist').click();
 
     // Check session status message
@@ -347,9 +354,12 @@ describe('Create new project', () => {
 
     // Open the Model selection modal
     cy.get('[data-cy=select-model-label]').should('exist').click();
-    // Check that no models are available to the uploaded AOI location
-    cy.get('[data-cy=select-model-2-card]').should('not.exist');
-    cy.get('[data-cy=select-model-1-card]').should('not.exist');
-    cy.get('.list-container').should('have.text', 'No results found');
+    // There are not recommended models for that aoi region
+    cy.get('[data-cy=recommended-models-list]').should('not.exist');
+    // Check that the 3 models are available
+    cy.get('[data-cy=all-models-list]').should('exist');
+    cy.get('[data-cy=all-models-list]').within(() => {
+      cy.get('.list-container').children().should('have.length', 2);
+    });
   });
 });

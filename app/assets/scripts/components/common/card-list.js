@@ -1,12 +1,12 @@
 import React from 'react';
+import T from 'prop-types';
 import styled, { css } from 'styled-components';
+import { Heading as CardSubtitle } from '@devseed-ui/typography';
+import { truncated, themeVal, glsp } from '@devseed-ui/theme-provider';
+
 import ShadowScrollbar from '../common/shadow-scrollbar';
 import { PanelBlockBody } from '../common/panel-block';
 import DetailsList from './details-list';
-import { Heading as CardSubtitle } from '@devseed-ui/typography';
-import T from 'prop-types';
-
-import { truncated, themeVal, glsp } from '@devseed-ui/theme-provider';
 
 const CardMedia = styled.figure`
   display: flex;
@@ -50,7 +50,7 @@ export const CardWrapper = styled.article`
       `;
     } else if (cardMedia) {
       return css`
-        grid-template-columns: 1fr 4fr;
+        grid-template-columns: 2fr;
         grid-template-rows: auto 4fr;
         ${CardMedia} {
           grid-row: 1 / -1;
@@ -172,7 +172,7 @@ const CardListContainer = styled.ol`
       return css`repeat(auto-fit, minmax(16rem, 1fr))`;
     }
   }};
-  gap: 2rem;
+  gap: 1rem;
 `;
 const CardListScroll = styled(ShadowScrollbar)`
   flex: 1;

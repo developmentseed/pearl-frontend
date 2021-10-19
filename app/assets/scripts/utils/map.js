@@ -27,11 +27,14 @@ export function downloadGeotiff(arrayBuffer, filename) {
  * @param {function} mapBounds Leaflet map bounds
  */
 export function bboxIntersectsMapBounds(bbox, mapBounds) {
-  const mapBoundsPolygon = tBboxPolygon(
-    mapBounds
-      .toBBoxString()
-      .split(',')
-      .map((i) => Number(i))
-  );
-  return booleanIntersects(tBboxPolygon(bbox), mapBoundsPolygon);
+  if (mapBounds) {
+    const mapBoundsPolygon = tBboxPolygon(
+      mapBounds
+        .toBBoxString()
+        .split(',')
+        .map((i) => Number(i))
+    );
+    return booleanIntersects(tBboxPolygon(bbox), mapBoundsPolygon);
+  }
+  return false;
 }
