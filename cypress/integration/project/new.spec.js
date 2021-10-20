@@ -254,7 +254,7 @@ describe('Create new project', () => {
       'Session Status: Ready for prediction run'
     );
 
-    // Instance pending
+    // Instance is running
     cy.intercept(
       {
         url: restApiEndpoint + '/api/project/1/instance/1',
@@ -265,9 +265,13 @@ describe('Create new project', () => {
           phase: 'Running',
         },
       }
-    );
+    ).as('fetchInstanceStatus');
 
+    // Request prediction
     cy.get('[data-cy=run-button]').click();
+
+    // Wait for instance status request
+    cy.wait('@fetchInstanceStatus');
 
     // Prediction is halted
     cy.get('[data-cy=session-status]').should(
@@ -286,7 +290,14 @@ describe('Create new project', () => {
 
     // Run a prediction to the end
     cy.setWebsocketWorkflow('websocket-workflow/base-model-prediction.json');
+
+    // Request prediction
     cy.get('[data-cy=run-button]').should('exist').click();
+
+    // Wait for instance status request
+    cy.wait('@fetchInstanceStatus');
+
+    // Prediction should be finished successfully
     cy.get('[data-cy=session-status]').should(
       'have.text',
       'Session Status: Ready for retrain run'
