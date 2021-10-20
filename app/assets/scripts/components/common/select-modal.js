@@ -70,7 +70,7 @@ function SelectModal(props) {
           {recommendedModels.length > 0 && (
             <ListSection data-cy='recommended-models-list'>
               <Heading size='small' as='h4'>
-                Recommended models for your AOI
+                Recommended models for your Area of Interest
               </Heading>
               <CardList
                 numColumns={2}
