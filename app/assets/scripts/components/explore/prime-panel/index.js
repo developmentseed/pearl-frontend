@@ -336,7 +336,7 @@ function PrimePanel() {
                 inputId='modelsFilter'
                 value={modelFilter}
                 setValue={setModelFilter}
-                placeholder='Type to filter the models'
+                placeholder='Search models by name'
               />
             </FilterSection>
           </ModalHeader>
