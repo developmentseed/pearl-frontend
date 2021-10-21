@@ -95,12 +95,6 @@ describe('Retrain existing project', () => {
 
     cy.visit('/project/1');
 
-    // Check initial status
-    cy.get('[data-cy=session-status]').should(
-      'have.text',
-      'Session Status: Loading project...'
-    );
-
     // Wait for data loading
     cy.wait(['@fetchAoi2', '@fetchCheckpoint2']);
 
@@ -354,12 +348,6 @@ describe('Retrain existing project', () => {
 
     cy.visit('/project/1');
 
-    // Check initial status
-    cy.get('[data-cy=session-status]').should(
-      'have.text',
-      'Session Status: Loading project...'
-    );
-
     // Wait for data loading
     cy.wait(['@fetchAoi2', '@fetchCheckpoint2']);
 
@@ -454,12 +442,6 @@ describe('Retrain existing project', () => {
 
   it('load existing checkpoint, can predict new AOI', () => {
     cy.visit('/project/1');
-
-    // Check initial status
-    cy.get('[data-cy=session-status]').should(
-      'have.text',
-      'Session Status: Loading project...'
-    );
 
     // Wait for data loading
     cy.wait(['@fetchAoi2', '@fetchCheckpoint2']);
