@@ -15,6 +15,7 @@ import {
   useMapState,
   useSessionStatus,
 } from '../../../../../context/explore';
+import { sessionModes } from '../../../../../context/explore/session-status';
 import { useMapRef } from '../../../../../context/map';
 import { useAoi } from '../../../../../context/aoi';
 import { useAuth } from '../../../../../context/auth';
@@ -127,8 +128,15 @@ function AoiSelection() {
   const renderSelectedAoi = () => {
     let header;
     let area;
-    if (aoiArea && aoiArea > 0 && mapState.mode === mapModes.EDIT_AOI_MODE) {
-      header = `${formatThousands(aoiArea / 1e6)} km2`;
+    if (sessionStatus.mode === sessionModes.LOADING_PROJECT) {
+      header = 'Loading...';
+    } else if (
+      aoiArea &&
+      aoiArea > 0 &&
+      mapState.mode === mapModes.EDIT_AOI_MODE
+    ) {
+      header = aoiName;
+      area = `${formatThousands(aoiArea / 1e6)} km2`;
     } else if (aoiName) {
       header = aoiName;
       area = `${formatThousands(aoiArea / 1e6)} km2`;
@@ -139,8 +147,6 @@ function AoiSelection() {
       } else {
         header = 'Drag on map to select';
       }
-    } else if (sessionStatus.mode === 'loading-project') {
-      header = 'Loading...';
     } else {
       header = 'None selected - Draw area on map or upload AOI ';
     }
