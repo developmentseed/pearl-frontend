@@ -133,7 +133,12 @@ function AoiSelection() {
       header = aoiName;
       area = `${formatThousands(aoiArea / 1e6)} km2`;
     } else if (mapState.mode === mapModes.CREATE_AOI_MODE) {
-      header = 'Drag on map to select';
+      if (aoiArea) {
+        header = 'New AOI';
+        area = `${formatThousands(aoiArea / 1e6)} km2`;
+      } else {
+        header = 'Drag on map to select';
+      }
     } else if (sessionStatus.mode === 'loading-project') {
       header = 'Loading...';
     } else {
