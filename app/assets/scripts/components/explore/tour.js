@@ -3,8 +3,8 @@ export const tourSteps = [
     title: 'Welcome to PEARL',
     target: '#welcome-trigger',
     content:
-      'PEARL allows you to make a landcover map in minutes. Select an area of interest, choose a machine learning model, and click "Run" to get predictions. You can then retrain models to suit your needs. Click "Show me more" to view guidance, or "Skip" if you want to skip the introduction and jump right in.',
-    media: '/assets/graphics/content/guide-analysis.png',
+      'PEARL allows you to make a landcover map in minutes. Select an area of interest, choose a machine learning model, and click "Run" to get predictions. You can then retrain models to suit your needs. Click "Next" to view the walkthrough, or "Close" if you want to skip the introduction and jump right in.',
+    media: '/assets/graphics/content/pearl_prediction_op.gif',
     disableBeacon: true,
     placement: 'center',
     spotlightClicks: true,

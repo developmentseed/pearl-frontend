@@ -34,6 +34,7 @@ const Header = styled.div`
 
 const TourMedia = styled.img`
   max-width: 100%;
+  margin: 0 auto;
 `;
 
 const Footer = styled.div`
