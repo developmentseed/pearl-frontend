@@ -7,6 +7,8 @@ import config from '../../../config';
 const { restApiEndpoint } = config;
 const osmQaPbfTilesUrl = `${restApiEndpoint}/api/tiles/qa-latest/{z}/{x}/{y}.mvt`;
 
+const hiddenStyle = { weight: 0 };
+
 const sampleClasses = [
   {
     name: 'Water',
@@ -202,6 +204,10 @@ const sampleClasses = [
   },
 ];
 
+function getFeatureId(props) {
+  return props && props['@id'];
+}
+
 function getFeatureClass(props) {
   let featureClass;
 
@@ -226,49 +232,49 @@ function OsmQaLayer() {
   const map = useMap();
 
   useEffect(() => {
-    const l = L.vectorGrid
-      .protobuf(osmQaPbfTilesUrl, {
-        interactive: true,
-        vectorTileLayerStyles: {
-          osm: (props) => {
-            const hiddenStyle = { weight: 0 };
-            const featureType = props['@ftype'];
+    const l = L.vectorGrid.protobuf(osmQaPbfTilesUrl, {
+      interactive: true,
+      getFeatureId,
+      vectorTileLayerStyles: {
+        osm: (props) => {
+          const featureType = props['@ftype'];
 
-            // Discard non-closed ways
-            if (featureType === 'LineString') {
-              return hiddenStyle;
-            }
+          // Discard non-closed ways
+          if (featureType === 'LineString') {
+            return hiddenStyle;
+          }
 
-            // Get class
-            const featureClass = getFeatureClass(props);
+          // Get class
+          const featureClass = getFeatureClass(props);
 
-            // Hide if doesn't belong to a class
-            if (!featureClass) {
-              return hiddenStyle;
-            }
+          // Hide if doesn't belong to a class
+          if (!featureClass) {
+            return hiddenStyle;
+          }
 
-            // Get color
-            const { color } = featureClass;
+          // Get color
+          const { color } = featureClass;
 
-            // Return style
-            return featureType !== 'Point'
-              ? {
-                  color,
-                  fillColor: color,
-                  fill: true,
-                }
-              : { radius: 2, color, 'circle-color': color };
-          },
+          // Return style
+          return featureType !== 'Point'
+            ? {
+                color,
+                fillColor: color,
+                fill: true,
+              }
+            : { radius: 2, color, 'circle-color': color };
         },
-      })
-      .on('click', function (e) {
-        const feature = e.layer.properties;
-        const featureClass = getFeatureClass(feature);
-        if (featureClass) {
-          alert(featureClass.name);
-        }
-        L.DomEvent.stop(e);
-      });
+      },
+    });
+
+    l.on('click', function (e) {
+      const feature = e.layer.properties;
+      const featureClass = getFeatureClass(feature);
+      if (featureClass) {
+        l.setFeatureStyle(getFeatureId(feature), hiddenStyle);
+      }
+      L.DomEvent.stop(e);
+    });
 
     l.addTo(map);
 
