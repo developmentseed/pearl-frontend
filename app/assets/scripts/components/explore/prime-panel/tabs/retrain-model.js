@@ -72,7 +72,8 @@ function RetrainModel(props) {
                 }
                 size='small'
                 radius='ellipsoid'
-                useIcon='pencil'
+                useLocalButton
+                useIcon='polygon'
                 visuallyDisabled={!currentCheckpoint.activeItem}
                 info={
                   !currentCheckpoint.activeItem && 'No active item selected'
