@@ -231,15 +231,33 @@ function OsmQaLayer() {
         interactive: true,
         vectorTileLayerStyles: {
           osm: (props) => {
+            const hiddenStyle = { weight: 0 };
+            const featureType = props['@ftype'];
+
+            // Discard non-closed ways
+            if (featureType === 'LineString') {
+              return hiddenStyle;
+            }
+
+            // Get class
             const featureClass = getFeatureClass(props);
 
-            return featureClass
+            // Hide if doesn't belong to a class
+            if (!featureClass) {
+              return hiddenStyle;
+            }
+
+            // Get color
+            const { color } = featureClass;
+
+            // Return style
+            return featureType !== 'Point'
               ? {
-                  fillColor: featureClass.color,
-                  color: featureClass.color,
+                  color,
+                  fillColor: color,
                   fill: true,
                 }
-              : { weight: 0 };
+              : { radius: 2, color, 'circle-color': color };
           },
         },
       })
