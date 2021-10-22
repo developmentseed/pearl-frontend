@@ -3,7 +3,9 @@ import { useMap } from 'react-leaflet';
 import L from 'leaflet';
 import {} from 'leaflet.vectorgrid';
 import config from '../../../config';
-const { osmQaPbfTilesUrl } = config;
+
+const { restApiEndpoint } = config;
+const osmQaPbfTilesUrl = `${restApiEndpoint}/api/tiles/qa-latest/{z}/{x}/{y}.mvt`;
 
 const sampleClasses = [
   {
