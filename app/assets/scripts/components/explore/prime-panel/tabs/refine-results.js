@@ -96,7 +96,7 @@ function RefineModel(props) {
                 mapState.mode === mapModes.ADD_SAMPLE_FREEHAND && 'active'
               }
             >
-              Draw
+              Freehand
             </InfoButton>
 
             <InfoButton
