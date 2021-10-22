@@ -15,17 +15,24 @@ const Inner = styled.div`
   width: 20rem;
   padding: 1rem;
   display: grid;
-  grid-template-rows: 1fr 3fr auto;
+  grid-template-rows: ${({ media }) =>
+    media ? 'auto 1fr 1fr auto' : '1fr 3fr auto'};
+  grid-gap: 1rem;
 `;
 
 const Header = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  align-items: baseline;
 
   ${Heading} {
     margin: 0;
   }
+`;
+
+const TourMedia = styled.img`
+  max-width: 100%;
 `;
 
 const Footer = styled.div`
@@ -51,13 +58,14 @@ const TourTooltip = ({
   tooltipProps,
 }) => {
   return (
-    <Inner {...tooltipProps}>
+    <Inner {...tooltipProps} media={step.media}>
       <Header>
         <Heading size='small'>{step.title}</Heading>
         <Subheading id='tour-progress'>
           {index + 1} / {size}
         </Subheading>
       </Header>
+      {step.media && <TourMedia src={step.media} />}
       <Prose>{step.content}</Prose>
       <Footer>
         <Button {...closeProps} size='small' useIcon={['xmark', 'after']}>
@@ -114,7 +122,7 @@ function Tour(props) {
         showProgress={true}
         tooltipComponent={TourTooltip}
         floaterProps={{ disableAnimation: true }}
-        disableOverlay
+        // disableOverlay
         callback={(state) => {
           const { action, index, type, status } = state;
           if (tourStep >= 0) {
