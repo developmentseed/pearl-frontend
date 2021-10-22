@@ -18,10 +18,24 @@ const ModalContent = styled.div`
   display: block;
 `;
 
-const ListSection = styled.div`
-  padding: 0.5rem 0;
-  > ${Heading} {
-    padding-bottom: 0.5rem;
+const HeadingWrapper = styled.div`
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+  align-items: baseline;
+`;
+
+const LabeledSpan = styled.span`
+  position: relative;
+  &:after {
+    content: ' ';
+    position: absolute;
+    height: 16px;
+    width: 16px;
+    background: #07b598;
+    left: -24px;
+    bottom: 4px;
+    border-radius: 0.125rem;
   }
 `;
 
@@ -53,7 +67,6 @@ function SelectModal(props) {
     nonScrolling,
   } = props;
   const recommendedModels = data.filter((model) => model.overlapsAoi);
-  const otherModels = data.filter((model) => !model.overlapsAoi);
 
   return (
     <Modal
@@ -67,34 +80,24 @@ function SelectModal(props) {
       filterCard={filterCard}
       content={
         <ModalContent>
-          {recommendedModels.length > 0 && (
-            <ListSection data-cy='recommended-models-list'>
-              <Heading size='small' as='h4'>
-                Recommended models for your AOI
-              </Heading>
-              <CardList
-                numColumns={2}
-                data={recommendedModels}
-                renderCard={renderCard}
-                filterCard={filterCard}
-                nonScrolling={nonScrolling}
-              />
-            </ListSection>
-          )}
-          {otherModels.length > 0 && (
-            <ListSection data-cy='all-models-list'>
-              <Heading size='small' as='h4'>
-                All available models
-              </Heading>
-              <CardList
-                numColumns={2}
-                data={otherModels}
-                renderCard={renderCard}
-                filterCard={filterCard}
-                nonScrolling={nonScrolling}
-              />
-            </ListSection>
-          )}
+          <HeadingWrapper>
+            <Heading size='small' as='h4'>
+              Available Models
+            </Heading>
+            {recommendedModels.length > 0 && (
+              <LabeledSpan data-cy='recommended-models-label'>
+                Recommended based on your selected AOI
+              </LabeledSpan>
+            )}
+          </HeadingWrapper>
+          <CardList
+            data-cy='models-list'
+            numColumns={2}
+            data={data}
+            renderCard={renderCard}
+            filterCard={filterCard}
+            nonScrolling={nonScrolling}
+          />
         </ModalContent>
       }
     />

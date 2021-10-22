@@ -352,6 +352,7 @@ function PrimePanel() {
               setShowSelectModelModal(false);
               setSelectedModel(model);
             }}
+            selected={model.overlapsAoi}
           />
         )}
         nonScrolling

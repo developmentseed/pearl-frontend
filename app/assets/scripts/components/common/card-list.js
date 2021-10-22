@@ -84,6 +84,7 @@ export const CardWrapper = styled.article`
 
   padding: 1rem;
   border: 1px solid ${themeVal('color.baseAlphaC')};
+  border-color: ${({ selected }) => selected && themeVal('color.primary')};
   border-radius: ${themeVal('shape.rounded')};
 
   box-shadow: 0 0 16px 2px ${themeVal('color.baseDarkAlphaA')},
@@ -122,6 +123,7 @@ export const Card = (props) => {
     details,
     expanded,
     hoverTransform,
+    selected,
   } = props;
   return (
     <CardWrapper
@@ -132,6 +134,7 @@ export const Card = (props) => {
       expanded={expanded}
       cardMedia={cardMedia}
       hoverTransform={hoverTransform}
+      selected={selected}
     >
       {cardMedia && (
         <CardMedia borderlessMedia={borderlessMedia}>{cardMedia}</CardMedia>
@@ -161,6 +164,7 @@ Card.propTypes = {
   details: T.object,
   expanded: T.bool,
   hoverTransform: T.bool,
+  selected: T.bool,
 };
 
 const CardListContainer = styled.ol`
