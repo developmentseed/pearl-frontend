@@ -12,11 +12,12 @@ import { useTour } from '../../context/explore';
 const Inner = styled.div`
   background: ${themeVal('color.surface')};
   color: ${themeVal('color.base')};
-  width: 20rem;
+  width: ${({ media }) => (media ? '50vw' : '20rem')};
+  max-width: 60rem;
   padding: 1rem;
   display: grid;
   grid-template-rows: ${({ media }) =>
-    media ? 'auto 1fr 1fr auto' : '1fr 3fr auto'};
+    media ? 'auto max-content max-content auto' : '1fr 3fr auto'};
   grid-gap: 1rem;
 `;
 
@@ -68,14 +69,13 @@ const TourTooltip = ({
       {step.media && <TourMedia src={step.media} />}
       <Prose>{step.content}</Prose>
       <Footer>
-        <Button {...closeProps} size='small' useIcon={['xmark', 'after']}>
+        <Button {...closeProps} useIcon={['xmark', 'after']}>
           Close
         </Button>
         <Controls columns={index > 0 ? 2 : 1}>
           {index > 0 && (
             <Button
               {...backProps}
-              size='small'
               variation='base-plain'
               useIcon={['arrow-left', 'after']}
               id='tour-back-btn'
@@ -85,7 +85,6 @@ const TourTooltip = ({
           )}
           <Button
             {...primaryProps}
-            size='small'
             variation='primary-raised-dark'
             useIcon={index < size - 1 ? ['arrow-right', 'after'] : null}
             id='tour-next-btn'
