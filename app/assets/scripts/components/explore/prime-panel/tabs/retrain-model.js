@@ -72,7 +72,8 @@ function RetrainModel(props) {
                 }
                 size='small'
                 radius='ellipsoid'
-                useIcon='pencil'
+                useLocalButton
+                useIcon='polygon'
                 visuallyDisabled={!currentCheckpoint.activeItem}
                 info={
                   !currentCheckpoint.activeItem && 'No active item selected'
@@ -124,7 +125,7 @@ function RetrainModel(props) {
                   mapState.mode == mapModes.ADD_SAMPLE_FREEHAND && 'active'
                 }
               >
-                Free Hand
+                Freehand
               </InfoButton>
               <InfoButton
                 data-cy='add-point-sample-button'
