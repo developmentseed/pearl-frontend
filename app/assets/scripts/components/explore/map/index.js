@@ -100,7 +100,7 @@ function Map() {
     currentProject,
   } = useContext(ExploreContext);
 
-  const { setSessionStatusMode } = useSessionStatus();
+  const { sessionStatus, setSessionStatusMode } = useSessionStatus();
 
   const { apiLimits } = useApiLimits();
   const {
@@ -458,7 +458,6 @@ function Map() {
         )}
 
         <BaseMapLayer />
-        {!window.Cypress && <OsmQaLayer />}
 
         {mosaics &&
           mosaics.map((layer) => (
@@ -643,6 +642,12 @@ function Map() {
                   radius={10}
                 />
               ))
+          )}
+
+        {!window.Cypress &&
+          sessionStatus?.mode === sessionModes.RETRAIN_READY &&
+          currentCheckpoint && (
+            <OsmQaLayer classes={currentCheckpoint.classes} />
           )}
 
         <FeatureGroup>
