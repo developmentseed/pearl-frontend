@@ -4,6 +4,11 @@ import styled from 'styled-components';
 import { Button } from '@devseed-ui/button';
 import { themeVal } from '@devseed-ui/theme-provider';
 import Prose from '../../../../../styles/type/prose';
+import {
+  useCheckpoint,
+  actions as checkpointActions,
+} from '../../../../../context/checkpoint';
+import { defaultClassTagmaps } from '../../../../common/map/osm-qa-layer';
 
 const Wrapper = styled.div`
   display: grid;
@@ -20,7 +25,9 @@ const Wrapper = styled.div`
   grid-gap: 1rem;
 `;
 
-function ImportOSMQA() {
+function ImportOSMQA({ setModalRevealed }) {
+  const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
+  const activeClass = currentCheckpoint && currentCheckpoint.activeItem;
   return (
     <Wrapper>
       <Prose className='prose'>
@@ -41,6 +48,9 @@ function ImportOSMQA() {
         style={{
           gridColumn: '1 / -1',
         }}
+        onClick={() => {
+          setModalRevealed(false);
+        }}
       >
         Cancel
       </Button>
@@ -51,6 +61,18 @@ function ImportOSMQA() {
         style={{
           gridColumn: '1 / -1',
         }}
+        onClick={() => {
+          dispatchCurrentCheckpoint({
+            type: checkpointActions.SET_OSM_TAGMAP,
+            data: {
+              name: activeClass,
+              tagmap:
+                defaultClassTagmaps.find((c) => c.name === activeClass)
+                  ?.tagmap || [],
+            },
+          });
+          setModalRevealed(false);
+        }}
       >
         Proceed
       </Button>
@@ -58,6 +80,8 @@ function ImportOSMQA() {
   );
 }
 
-ImportOSMQA.propTypes = {};
+ImportOSMQA.propTypes = {
+  setModalRevealed: T.func,
+};
 
 export default ImportOSMQA;

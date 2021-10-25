@@ -93,7 +93,9 @@ function RetrainModel(props) {
                   importSource === 'geojson' ? (
                     <ImportGeojson />
                   ) : importSource === 'osm-qa' ? (
-                    <ImportOSMQA />
+                    <ImportOSMQA
+                      setModalRevealed={setImportSamplesModalRevealed}
+                    />
                   ) : (
                     <Wrapper>
                       <Prose className='prose'>Select source:</Prose>

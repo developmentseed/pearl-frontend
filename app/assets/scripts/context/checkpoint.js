@@ -38,6 +38,7 @@ export const actions = {
   ADD_POINT_SAMPLES: 'ADD_POINT_SAMPLES',
   REMOVE_POINT_SAMPLE: 'REMOVE_POINT_SAMPLE',
   CLEAR_SAMPLES: 'CLEAR_SAMPLES',
+  SET_OSM_TAGMAP: 'SET_OSM_TAGMAP',
   RESET_CHECKPOINT: 'RESET_CHECKPOINT',
   UPDATE_POLYGONS: 'UPDATE_POLYGONS',
   ADD_CLASS_SAMPLES: 'ADD_CLASS_SAMPLES',
@@ -436,7 +437,24 @@ function checkpointReducer(state, action) {
       };
       break;
     }
+    case actions.SET_OSM_TAGMAP: {
+      const currentClass = state.classes[state.activeItem];
 
+      const updatedClass = {
+        ...currentClass,
+        tagmap: action.data.tagmap,
+      };
+
+      nextState = {
+        ...state,
+        classes: {
+          ...state.classes,
+          [state.activeItem]: updatedClass,
+        },
+      };
+      console.log(nextState);
+      break;
+    }
     case actions.INPUT_UNDO: {
       // Pop history and set input from element
       const latest = state.history[state.history.length - 1];
