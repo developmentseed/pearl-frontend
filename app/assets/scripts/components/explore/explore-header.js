@@ -400,8 +400,9 @@ function ExploreHeader(props) {
               <DropdownItem
                 useIcon='circle-play'
                 onClick={() => setTourStep(0)}
+                data-dropdown='click.close'
               >
-                View Tour
+                View Walkthrough
               </DropdownItem>
             </li>
             <li>
@@ -430,7 +431,7 @@ function ExploreHeader(props) {
           <DropdownTrigger
             variation='primary-raised-dark'
             title='Export map'
-            className='user-options-trigger'
+            id='export-options-trigger'
             size='medium'
             useIcon='share'
             {...props}
@@ -495,6 +496,7 @@ function ExploreHeader(props) {
         onCloseClick={() => history.push('/profile/projects')}
         content={
           <ModalForm onSubmit={handleSubmit}>
+            <p>Enter a project name to get started</p>
             <HeadingInput
               name='projectName'
               placeholder='Set Project Name'

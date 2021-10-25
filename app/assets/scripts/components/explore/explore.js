@@ -55,7 +55,7 @@ function Explore() {
         </InpageHeader>
         <ExploreBody>
           <PrimePanel />
-          <ExploreCarto>
+          <ExploreCarto id='welcome-trigger'>
             <Map />
           </ExploreCarto>
           <LayersPanel parentId='layer-control' className='padded' />

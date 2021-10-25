@@ -12,20 +12,29 @@ import { useTour } from '../../context/explore';
 const Inner = styled.div`
   background: ${themeVal('color.surface')};
   color: ${themeVal('color.base')};
-  width: 20rem;
+  width: ${({ media }) => (media ? '50vw' : '20rem')};
+  max-width: 60rem;
   padding: 1rem;
   display: grid;
-  grid-template-rows: 1fr 3fr auto;
+  grid-template-rows: ${({ media }) =>
+    media ? 'auto max-content max-content auto' : '1fr 3fr auto'};
+  grid-gap: 1rem;
 `;
 
 const Header = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  align-items: baseline;
 
   ${Heading} {
     margin: 0;
   }
+`;
+
+const TourMedia = styled.img`
+  max-width: 100%;
+  margin: 0 auto;
 `;
 
 const Footer = styled.div`
@@ -51,23 +60,23 @@ const TourTooltip = ({
   tooltipProps,
 }) => {
   return (
-    <Inner {...tooltipProps}>
+    <Inner {...tooltipProps} media={step.media}>
       <Header>
         <Heading size='small'>{step.title}</Heading>
         <Subheading id='tour-progress'>
           {index + 1} / {size}
         </Subheading>
       </Header>
+      {step.media && <TourMedia src={step.media} />}
       <Prose>{step.content}</Prose>
       <Footer>
-        <Button {...closeProps} size='small' useIcon={['xmark', 'after']}>
+        <Button {...closeProps} useIcon={['xmark', 'after']}>
           Close
         </Button>
         <Controls columns={index > 0 ? 2 : 1}>
           {index > 0 && (
             <Button
               {...backProps}
-              size='small'
               variation='base-plain'
               useIcon={['arrow-left', 'after']}
               id='tour-back-btn'
@@ -77,7 +86,6 @@ const TourTooltip = ({
           )}
           <Button
             {...primaryProps}
-            size='small'
             variation='primary-raised-dark'
             useIcon={index < size - 1 ? ['arrow-right', 'after'] : null}
             id='tour-next-btn'
@@ -114,7 +122,6 @@ function Tour(props) {
         showProgress={true}
         tooltipComponent={TourTooltip}
         floaterProps={{ disableAnimation: true }}
-        disableOverlay
         callback={(state) => {
           const { action, index, type, status } = state;
           if (tourStep >= 0) {
