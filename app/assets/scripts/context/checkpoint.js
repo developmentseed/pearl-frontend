@@ -452,7 +452,6 @@ function checkpointReducer(state, action) {
           [state.activeItem]: updatedClass,
         },
       };
-      console.log(nextState);
       break;
     }
     case actions.INPUT_UNDO: {

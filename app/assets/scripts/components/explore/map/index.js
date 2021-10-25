@@ -458,7 +458,7 @@ function Map() {
         )}
 
         <BaseMapLayer />
-        {/* <OsmQaLayer /> */}
+        {!window.Cypress && <OsmQaLayer />}
 
         {mosaics &&
           mosaics.map((layer) => (
