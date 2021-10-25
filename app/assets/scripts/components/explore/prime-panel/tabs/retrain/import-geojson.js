@@ -27,7 +27,7 @@ const Wrapper = styled.div`
   grid-gap: 1rem;
 `;
 
-function ImportGeojson() {
+function ImportGeojson({ setModalRevealed }) {
   const [warning, setWarning] = useState(null);
   const [file, setFile] = useState(null);
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
@@ -113,15 +113,15 @@ function ImportGeojson() {
   return (
     <Wrapper>
       <Prose className='prose'>
+        Target class: <strong>{currentCheckpoint.activeItem}</strong>
+      </Prose>
+      <Prose className='prose'>
         Upload training sample data in .geojson format.
       </Prose>
       <Prose className='prose'>
         Select a GeoJSON file with FeatureCollection of Points and Polygons.
         Once imported, these can be submitted to the model to retrain.
       </Prose>
-      <div className='prose'>
-        Importing to class: <strong>{currentCheckpoint.activeItem}</strong>
-      </div>
       <FauxFileDialog
         name='image-file'
         data-cy='samples-upload-input'
@@ -163,7 +163,7 @@ function ImportGeojson() {
         }}
         onClick={() => {
           importFile();
-          setRevealed(false);
+          setModalRevealed(false);
         }}
       >
         Import
@@ -172,5 +172,7 @@ function ImportGeojson() {
   );
 }
 
-ImportGeojson.propTypes = {};
+ImportGeojson.propTypes = {
+  setModalRevealed: T.func,
+};
 export default ImportGeojson;

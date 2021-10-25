@@ -31,6 +31,9 @@ function ImportOSMQA({ setModalRevealed }) {
   return (
     <Wrapper>
       <Prose className='prose'>
+        Target class: <strong>{activeClass}</strong>
+      </Prose>
+      <Prose className='prose'>
         By proceeding the current AOI will be populated with samples from{' '}
         <a
           href='https://osmlab.github.io/osm-qa-tiles'
