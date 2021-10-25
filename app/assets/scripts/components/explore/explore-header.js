@@ -400,6 +400,7 @@ function ExploreHeader(props) {
               <DropdownItem
                 useIcon='circle-play'
                 onClick={() => setTourStep(0)}
+                data-dropdown='click.close'
               >
                 View Walkthrough
               </DropdownItem>
