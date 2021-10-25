@@ -122,7 +122,6 @@ function Tour(props) {
         showProgress={true}
         tooltipComponent={TourTooltip}
         floaterProps={{ disableAnimation: true }}
-        // disableOverlay
         callback={(state) => {
           const { action, index, type, status } = state;
           if (tourStep >= 0) {
