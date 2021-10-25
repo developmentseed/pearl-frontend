@@ -14,6 +14,7 @@ import {
   useMapState,
   useSessionStatus,
   useShortcutState,
+  sessionModes,
 } from '../../../context/explore';
 import { actions as shortcutActions } from '../../../context/explore/shortcuts';
 import { useMapRef, useMapLayers, useUserLayers } from '../../../context/map';
@@ -160,8 +161,14 @@ function Map() {
             // On KEYUP, we will dispatch an update to return to previousMode, but overrideBrowseMode
             // will be set to false before the mode update can be dispatched
             mapRef.polygonDraw.disable();
+          } else if (mapState.mode === mapModes.BROWSE_MODE) {
+            mapRef.polygonDraw.disable();
           }
           break;
+        case mapModes.DELETE_SAMPLES: {
+          mapRef.freehandDraw?.disable();
+          break;
+        }
         case mapModes.ADD_SAMPLE_FREEHAND: {
           mapRef.freehandDraw?.disable();
         }
@@ -190,9 +197,9 @@ function Map() {
           ) {
             // On confirm, zoom to bounds
             mapRef.fitBounds(aoiRef.getBounds(), { padding: BOUNDS_PADDING });
-            mapRef._container.style.cursor = 'grab';
-            setSessionStatusMode('set-aoi');
+            setSessionStatusMode(sessionModes.SET_AOI);
           }
+          mapRef._container.style.cursor = 'grab';
         }
         break;
       case mapModes.ADD_SAMPLE_POINT:
@@ -284,7 +291,7 @@ function Map() {
             updateAoiName(bounds);
 
             setAoiRef(shape);
-            //Current aoi should only be set after aoi has been sent to the api
+            //Current AOI should only be set after AOI has been sent to the api
             setCurrentAoi(null);
           } else if (apiLimits.max_inference > area) {
             setActiveModal('batch-inference');
@@ -451,9 +458,9 @@ function Map() {
         )}
 
         <BaseMapLayer />
-        <OsmQaLayer />
+        {/* <OsmQaLayer /> */}
 
-        {/* {mosaics &&
+        {mosaics &&
           mosaics.map((layer) => (
             <TileLayer
               key={layer}
@@ -476,7 +483,7 @@ function Map() {
                 },
               }}
             />
-          ))} */}
+          ))}
 
         {predictions &&
           predictions.data &&

@@ -95,12 +95,6 @@ describe('Retrain existing project', () => {
 
     cy.visit('/project/1');
 
-    // Check initial status
-    cy.get('[data-cy=session-status]').should(
-      'have.text',
-      'Session Status: Loading project...'
-    );
-
     // Wait for data loading
     cy.wait(['@fetchAoi2', '@fetchCheckpoint2']);
 
@@ -338,9 +332,6 @@ describe('Retrain existing project', () => {
       }
     );
 
-    // Request model run
-    cy.get('[data-cy=run-button]').click();
-
     cy.get('[data-cy=session-status]').should(
       'have.text',
       'Session Status: Ready for retrain run'
@@ -348,12 +339,6 @@ describe('Retrain existing project', () => {
 
     // Save checkpoint is enabled
     cy.get('[data-cy=save-checkpoint-button]').should('not.be.disabled');
-
-    // Go to home page to avoid spilling state to next test
-    cy.visit('/');
-    cy.location().should((loc) => {
-      expect(loc.pathname).to.eq('/');
-    });
   });
 
   it('abort retrain', () => {
@@ -362,12 +347,6 @@ describe('Retrain existing project', () => {
     );
 
     cy.visit('/project/1');
-
-    // Check initial status
-    cy.get('[data-cy=session-status]').should(
-      'have.text',
-      'Session Status: Loading project...'
-    );
 
     // Wait for data loading
     cy.wait(['@fetchAoi2', '@fetchCheckpoint2']);
@@ -464,12 +443,6 @@ describe('Retrain existing project', () => {
   it('load existing checkpoint, can predict new AOI', () => {
     cy.visit('/project/1');
 
-    // Check initial status
-    cy.get('[data-cy=session-status]').should(
-      'have.text',
-      'Session Status: Loading project...'
-    );
-
     // Wait for data loading
     cy.wait(['@fetchAoi2', '@fetchCheckpoint2']);
 
@@ -493,30 +466,30 @@ describe('Retrain existing project', () => {
     cy.get('[data-cy=run-button]').should('be.enabled');
   });
 
-  it.only('Import samples from OSM', () => {
-    cy.setWebsocketWorkflow('websocket-workflow/retrain.json');
+  // it.only('Import samples from OSM', () => {
+  //   cy.setWebsocketWorkflow('websocket-workflow/retrain.json');
 
-    cy.visit('/project/1');
+  //   cy.visit('/project/1');
 
-    // Check initial status
-    cy.get('[data-cy=session-status]').should(
-      'have.text',
-      'Session Status: Loading project...'
-    );
+  //   // Check initial status
+  //   cy.get('[data-cy=session-status]').should(
+  //     'have.text',
+  //     'Session Status: Loading project...'
+  //   );
 
-    // Wait for data loading
-    cy.wait(['@fetchAoi2', '@fetchCheckpoint2']);
+  //   // Wait for data loading
+  //   cy.wait(['@fetchAoi2', '@fetchCheckpoint2']);
 
-    // Check ready for retrain status
-    cy.get('[data-cy=session-status]').should(
-      'have.text',
-      'Session Status: Ready for retrain run'
-    );
+  //   // Check ready for retrain status
+  //   cy.get('[data-cy=session-status]').should(
+  //     'have.text',
+  //     'Session Status: Ready for retrain run'
+  //   );
 
-    cy.get('[data-cy=global-loading]').should('not.exist');
+  //   cy.get('[data-cy=global-loading]').should('not.exist');
 
-    cy.get('[data-cy=open-import-samples-modal-button').should('exist').click();
+  //   cy.get('[data-cy=open-import-samples-modal-button').should('exist').click();
 
-    cy.get('[data-cy=select-osm-qa-import-button').should('exist').click();
-  });
+  //   cy.get('[data-cy=select-osm-qa-import-button').should('exist').click();
+  // });
 });

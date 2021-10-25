@@ -46,7 +46,7 @@ describe('Loads AOIs', () => {
     // Open select file dialog
     cy.get('[data-cy=select-aoi-file-button').click();
 
-    // Apply large aoi file to input
+    // Apply large AOI file to input
     cy.get('[data-cy=aoi-upload-input]').attachFile(
       'aoi-upload/really-large-area.geojson'
     );

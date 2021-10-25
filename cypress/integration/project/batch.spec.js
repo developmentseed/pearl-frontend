@@ -116,7 +116,7 @@ describe('Batch predictions', () => {
     ).as('getBatchList');
   });
 
-  it('on new project, show different button large on large aoi', () => {
+  it('on new project, show different button large on large AOI', () => {
     cy.fakeLogin();
 
     cy.visit('/project/new');
@@ -425,7 +425,7 @@ describe('Batch predictions', () => {
     cy.get('[data-cy=proceed-anyway-button]').should('exist').click();
     cy.wait('@reverseGeocodeCity');
 
-    // Should be able to run inference on non batch aoi
+    // Should be able to run inference on non batch AOI
     cy.get('.listed-aoi').contains('Rockville').click();
     cy.get('[data-cy=run-button]').should(
       'have.attr',

@@ -34,6 +34,7 @@ import { downloadGeotiff as downloadGeotiffUtil } from '../../utils/map';
 import { useTour } from '../../context/explore';
 
 import { Modal } from '@devseed-ui/modal';
+import { StyledLink } from '../../styles/links';
 
 const Wrapper = styled.div`
   flex: 1;
@@ -366,14 +367,56 @@ function ExploreHeader(props) {
           </ShortcutsWrapper>
         }
       />
-      <Button
-        variation='primary-plain'
-        useIcon='circle-question'
-        onClick={() => setTourStep(0)}
-        hideText={isMediumDown}
+      <Dropdown
+        alignment='right'
+        direction='down'
+        onChange={(isOpen) => {
+          // when dropdown closes, clear share URL value
+          if (!isOpen) {
+            setExportShareURL(null);
+          }
+        }}
+        triggerElement={(props) => (
+          <DropdownTrigger
+            variation='primary-plain'
+            useIcon='circle-question'
+            {...props}
+            hideText={isMediumDown}
+            title='View Help Options'
+            className='help-trigger'
+            size='medium'
+          >
+            Help
+          </DropdownTrigger>
+        )}
+        className='global__dropdown'
       >
-        Help
-      </Button>
+        <>
+          <DropdownHeader>
+            <p>User help</p>
+          </DropdownHeader>
+          <DropdownBody>
+            <li>
+              <DropdownItem
+                useIcon='circle-play'
+                onClick={() => setTourStep(0)}
+              >
+                View Tour
+              </DropdownItem>
+            </li>
+            <li>
+              <DropdownItem
+                as={StyledLink}
+                to='/about'
+                target='_blank'
+                useIcon='circle-information'
+              >
+                User Guide
+              </DropdownItem>
+            </li>
+          </DropdownBody>
+        </>
+      </Dropdown>
       <Dropdown
         alignment='right'
         direction='down'

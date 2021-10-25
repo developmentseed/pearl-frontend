@@ -39,9 +39,6 @@ const StyledPanelBlock = styled(PanelBlock)`
   ${media.largeUp`
     width: ${glsp(24)};
   `}
-  ${media.xlargeUp`
-    width: ${glsp(28)};
-  `}
 `;
 
 const ModalHeader = styled.header`

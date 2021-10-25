@@ -34,11 +34,13 @@ import logger from '../../utils/logger';
 import { wrapLogReducer } from '../reducers/utils';
 import {
   actions as sessionActions,
+  sessionModes,
   useSessionStatusReducer,
 } from './session-status';
 
 import { useShortcutReducer, listenForShortcuts } from './shortcuts';
 
+export { sessionModes };
 /**
  * Context & Provider
  */
@@ -134,16 +136,20 @@ export function ExploreProvider(props) {
   // Handle session mode updates
   useEffect(() => {
     const { mode } = sessionStatus;
-    if (mode === 'set-project-name' && projectName) {
+    if (mode === sessionModes.SET_PROJECT_NAME && projectName) {
       isInitialized.current = true;
-      setSessionStatusMode('set-aoi');
-    } else if (mode === 'set-aoi' && aoiRef) {
-      setSessionStatusMode('select-model');
-    } else if (mode === 'select-model' && selectedModel) {
-      setSessionStatusMode('prediction-ready');
-    } else if (mode === 'loading-project' && aoiRef && currentCheckpoint) {
+      setSessionStatusMode(sessionModes.SET_AOI);
+    } else if (mode === sessionModes.SET_AOI && aoiRef) {
+      setSessionStatusMode(sessionModes.SELECT_MODEL);
+    } else if (mode === sessionModes.SELECT_MODEL && selectedModel) {
+      setSessionStatusMode(sessionModes.PREDICTION_READY);
+    } else if (
+      mode === sessionModes.LOADING_PROJECT &&
+      aoiRef &&
+      currentCheckpoint
+    ) {
       isInitialized.current = true;
-      setSessionStatusMode('retrain-ready');
+      setSessionStatusMode(sessionModes.RETRAIN_READY);
     }
   }, [
     sessionStatus.mode,
@@ -172,11 +178,11 @@ export function ExploreProvider(props) {
 
     // Update session status
     if (projectId === 'new') {
-      setSessionStatusMode('set-project-name');
+      setSessionStatusMode(sessionModes.SET_PROJECT_NAME);
       hideGlobalLoading();
       return; // Bypass loading project when new
     } else {
-      setSessionStatusMode('loading-project');
+      setSessionStatusMode(sessionModes.LOADING_PROJECT);
     }
 
     const { availableGpus } = await restApiClient.getApiMeta('');
@@ -259,7 +265,7 @@ export function ExploreProvider(props) {
         setSessionStatusMessage(`Received image ${processed} of ${total}...`);
       }
     } else if (predictions.isReady()) {
-      // Update aoi List with newest aoi
+      // Update AOI List with newest AOI
       // If predictions is ready, restApiClient must be ready
 
       if (predictions.fetched && predictions.data.predictions?.length > 0) {
@@ -282,7 +288,7 @@ export function ExploreProvider(props) {
             setCurrentAoi(aoi);
           });
 
-        setSessionStatusMode('retrain-ready');
+        setSessionStatusMode(sessionModes.RETRAIN_READY);
       }
 
       if (predictions.error) {
@@ -314,7 +320,7 @@ export function ExploreProvider(props) {
         );
         dispatchAoiPatch({ type: aoiPatchActions.CLEAR_PATCH });
       } else if (aoiPatch.error) {
-        toasts.error('An error ocurred while requesting aoi patch.');
+        toasts.error('An error ocurred while requesting AOI patch.');
         logger(aoiPatch.error);
       }
     }
@@ -416,10 +422,10 @@ export function ExploreProvider(props) {
   /*
    * Utility function to load AOI
    * @param project - current project object
-   * @param aoiObject - object containing aoi id and name
+   * @param aoiObject - object containing AOI id and name
    *                  Objects of this format are returned by
    * @param aoiMatchesCheckpoint - bool
-   *                  aoi listing endpoint
+   *                  AOI listing endpoint
    */
 
   async function loadAoi(
@@ -444,7 +450,7 @@ export function ExploreProvider(props) {
     ];
 
     if (aoiRef) {
-      // Load existing aoi that was returned by the api
+      // Load existing AOI that was returned by the api
       aoiRef.setBounds(bounds);
       setAoiBounds(aoiRef.getBounds());
       setAoiName(aoiObject.name);
@@ -453,7 +459,7 @@ export function ExploreProvider(props) {
         dispatchPredictions({ type: predictionActions.CLEAR_PREDICTION });
       }
     } else {
-      // initializing map with first aoi
+      // initializing map with first AOI
       setAoiInitializer(bounds);
       setAoiName(aoiObject.name);
     }
@@ -462,7 +468,7 @@ export function ExploreProvider(props) {
 
     if (!aoiMatchesCheckpoint) {
       toasts.error(
-        'Tiles do not exist for this aoi and this checkpoint. Treating as geometry only'
+        'Tiles do not exist for this AOI and this checkpoint. Treating as geometry only'
       );
       if (currentCheckpoint) {
         dispatchCurrentCheckpoint({
@@ -477,7 +483,7 @@ export function ExploreProvider(props) {
     } else {
       setCurrentAoi(aoi);
 
-      // Only load aoi on instance if storage is true
+      // Only load AOI   on instance if storage is true
       if (currentInstance && !noLoadOnInst && aoiObject.storage) {
         loadAoiOnInstance(aoi.id);
       } else {

@@ -59,7 +59,7 @@ export function AoiProvider(props) {
     const refBounds = _aoiBounds || aoiBounds;
 
     if (!refBounds) {
-      logger(new Error('Aoi bounds not defined', aoiBounds));
+      logger(new Error('AOI bounds not defined', aoiBounds));
     }
 
     const bounds = [
