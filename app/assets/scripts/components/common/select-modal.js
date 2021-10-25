@@ -91,9 +91,8 @@ function SelectModal(props) {
             )}
           </HeadingWrapper>
           <CardList
-            data-cy='models-list'
             numColumns={2}
-            data={data}
+            data={data.sort((a, b) => b.overlapsAoi - a.overlapsAoi)}
             renderCard={renderCard}
             filterCard={filterCard}
             nonScrolling={nonScrolling}
