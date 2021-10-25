@@ -204,8 +204,8 @@ const sampleClasses = [
   },
 ];
 
-function getFeatureId(props) {
-  return props && props['@id'];
+function getFeatureId(feature) {
+  return feature.properties && feature.properties['@id'];
 }
 
 function getFeatureClass(props) {
@@ -268,8 +268,8 @@ function OsmQaLayer() {
     });
 
     l.on('click', function (e) {
-      const feature = e.layer.properties;
-      const featureClass = getFeatureClass(feature);
+      const feature = e.layer;
+      const featureClass = getFeatureClass(feature.properties);
       if (featureClass) {
         l.setFeatureStyle(getFeatureId(feature), hiddenStyle);
       }
