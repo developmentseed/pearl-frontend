@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useMap } from 'react-leaflet';
 import L from 'leaflet';
 import {} from 'leaflet.vectorgrid';
@@ -155,7 +155,7 @@ export const defaultClassTagmaps = [
     ],
   },
   {
-    name: 'Tree Canopy',
+    name: 'Tree',
     color: '#80FF80',
     tagmap: [
       { key: 'natural', value: 'tree' },
@@ -208,30 +208,43 @@ function getFeatureId(feature) {
   return feature.properties && feature.properties['@id'];
 }
 
-function getFeatureClass(props) {
-  let featureClass;
-
-  for (let i = 0; i < defaultClassTagmaps.length; i++) {
-    const sampleClass = defaultClassTagmaps[i];
-
-    for (let j = 0; j < sampleClass.tagmap.length; j++) {
-      const { k, v } = sampleClass.tagmap[j];
-
-      // Match wildcards or exact match
-      if ((v === '.*' && props[k]) || props[k] === v) {
-        featureClass = sampleClass;
-        break;
-      }
-    }
-  }
-
-  return featureClass;
-}
-
-function OsmQaLayer() {
+function OsmQaLayer(props) {
   const map = useMap();
 
+  const [layer, setLayer] = useState(null);
+
   useEffect(() => {
+    if (layer) {
+      layer.remove();
+    }
+
+    const classes = Object.keys(props.classes).map((name) => {
+      return {
+        ...props.classes[name],
+        tagmap: defaultClassTagmaps.find((c) => c.name === name)?.tagmap || [],
+      };
+    });
+
+    function getFeatureClass(feature) {
+      let featureClass;
+
+      for (let i = 0; i < classes.length; i++) {
+        const sampleClass = classes[i];
+
+        for (let j = 0; j < sampleClass.tagmap.length; j++) {
+          const { key, value } = sampleClass.tagmap[j];
+
+          // Match wildcards or exact match
+          if ((value === '.*' && feature[key]) || feature[key] === value) {
+            featureClass = sampleClass;
+            break;
+          }
+        }
+      }
+
+      return featureClass;
+    }
+
     const l = L.vectorGrid.protobuf(osmQaPbfTilesUrl, {
       interactive: true,
       getFeatureId,
@@ -248,7 +261,7 @@ function OsmQaLayer() {
           const featureClass = getFeatureClass(props);
 
           // Hide if doesn't belong to a class
-          if (!featureClass) {
+          if (typeof featureClass === 'undefined') {
             return hiddenStyle;
           }
 
@@ -278,10 +291,12 @@ function OsmQaLayer() {
 
     l.addTo(map);
 
+    setLayer(l);
+
     return () => {
       l.remove();
     };
-  }, []);
+  }, [props.classes]);
 
   return null;
 }
