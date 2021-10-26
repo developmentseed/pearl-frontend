@@ -438,20 +438,23 @@ function checkpointReducer(state, action) {
       break;
     }
     case actions.SET_OSM_TAGMAP: {
-      const currentClass = state.classes[state.activeItem];
+      const { name, tagmap } = action.data;
+
+      const targetClass = state.classes[name];
 
       const updatedClass = {
-        ...currentClass,
-        tagmap: action.data.tagmap,
+        ...targetClass,
+        tagmap,
       };
 
       nextState = {
         ...state,
         classes: {
           ...state.classes,
-          [state.activeItem]: updatedClass,
+          [name]: updatedClass,
         },
       };
+
       break;
     }
     case actions.INPUT_UNDO: {
