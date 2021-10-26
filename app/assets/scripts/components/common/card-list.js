@@ -1,12 +1,12 @@
 import React from 'react';
+import T from 'prop-types';
 import styled, { css } from 'styled-components';
+import { Heading as CardSubtitle } from '@devseed-ui/typography';
+import { truncated, themeVal, glsp } from '@devseed-ui/theme-provider';
+
 import ShadowScrollbar from '../common/shadow-scrollbar';
 import { PanelBlockBody } from '../common/panel-block';
 import DetailsList from './details-list';
-import { Heading as CardSubtitle } from '@devseed-ui/typography';
-import T from 'prop-types';
-
-import { truncated, themeVal, glsp } from '@devseed-ui/theme-provider';
 
 const CardMedia = styled.figure`
   display: flex;
@@ -50,7 +50,7 @@ export const CardWrapper = styled.article`
       `;
     } else if (cardMedia) {
       return css`
-        grid-template-columns: 1fr 4fr;
+        grid-template-columns: 2fr;
         grid-template-rows: auto 4fr;
         ${CardMedia} {
           grid-row: 1 / -1;
@@ -84,6 +84,7 @@ export const CardWrapper = styled.article`
 
   padding: 1rem;
   border: 1px solid ${themeVal('color.baseAlphaC')};
+  border-color: ${({ selected }) => selected && themeVal('color.primary')};
   border-radius: ${themeVal('shape.rounded')};
 
   box-shadow: 0 0 16px 2px ${themeVal('color.baseDarkAlphaA')},
@@ -122,6 +123,7 @@ export const Card = (props) => {
     details,
     expanded,
     hoverTransform,
+    selected,
   } = props;
   return (
     <CardWrapper
@@ -132,6 +134,7 @@ export const Card = (props) => {
       expanded={expanded}
       cardMedia={cardMedia}
       hoverTransform={hoverTransform}
+      selected={selected}
     >
       {cardMedia && (
         <CardMedia borderlessMedia={borderlessMedia}>{cardMedia}</CardMedia>
@@ -161,6 +164,7 @@ Card.propTypes = {
   details: T.object,
   expanded: T.bool,
   hoverTransform: T.bool,
+  selected: T.bool,
 };
 
 const CardListContainer = styled.ol`
@@ -172,7 +176,7 @@ const CardListContainer = styled.ol`
       return css`repeat(auto-fit, minmax(16rem, 1fr))`;
     }
   }};
-  gap: 2rem;
+  gap: 1rem;
 `;
 const CardListScroll = styled(ShadowScrollbar)`
   flex: 1;
@@ -196,16 +200,17 @@ function CardList({
   nonScrolling,
   style,
 }) {
+  const cards = data.filter(filterCard);
   return (
     <CardListWrapper style={style} nonScrolling={nonScrolling}>
       {nonScrolling ? (
         <CardListContainer numColumns={numColumns} className='list-container'>
-          {data.filter(filterCard).map(renderCard)}
+          {cards.length ? cards.map(renderCard) : 'No results found'}
         </CardListContainer>
       ) : (
         <CardListScroll>
           <CardListContainer numColumns={numColumns} className='list-container'>
-            {data.filter(filterCard).map(renderCard)}
+            {cards.length ? cards.map(renderCard) : 'No results found'}
           </CardListContainer>
         </CardListScroll>
       )}
