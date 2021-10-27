@@ -269,13 +269,13 @@ function RetrainModel(props) {
                 useLocalButton
                 useIcon='upload'
                 visuallyDisabled={!currentCheckpoint.activeItem}
-                info='Upload samples as GeoJSON'
+                info='Import samples'
                 onClick={() => {
                   setImportSource(null);
                   setImportSamplesModalRevealed(true);
                 }}
               >
-                Upload
+                Import
               </InfoButton>
             </RetrainTools>
             <ClassList>
