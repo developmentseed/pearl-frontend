@@ -143,8 +143,9 @@ const Shortcut = styled.dt`
   border: 1px solid ${themeVal('color.primaryAlphaB')};
   font-weight: ${themeVal('type.heading.weight')};
   text-align: center;
-  height: ${glsp(1.75)};
-  width: ${glsp(1.75)};
+  min-width: ${glsp(1.75)};
+  justify-self: flex-start;
+  padding: ${glsp(0.125)} ${glsp(0.5)};
 `;
 
 function ExploreHeader(props) {
@@ -362,6 +363,8 @@ function ExploreHeader(props) {
             <dd>Increase prediction layer opacity by 1%</dd>
             <Shortcut>f</Shortcut>
             <dd>Set prediction layer opacity to 100%</dd>
+            <Shortcut>Space</Shortcut>
+            <dd>Pan map</dd>
             <Shortcut>k</Shortcut>
             <dd>Open shortcuts help</dd>
           </ShortcutsWrapper>
