@@ -68,6 +68,16 @@ function aoiBoundsToPolygon(bounds) {
   };
 }
 
+function aoiBoundsToArray(bounds) {
+  // Get bbox polygon from AOI
+  const {
+    _southWest: { lng: minX, lat: minY },
+    _northEast: { lng: maxX, lat: maxY },
+  } = bounds;
+
+  return [minX, minY, maxX, maxY];
+}
+
 const InstanceContext = createContext(null);
 
 export function InstanceProvider(props) {
@@ -730,6 +740,7 @@ export function InstanceProvider(props) {
           action: hasOsmLayers ? 'model#osm' : 'model#retrain',
           data: {
             name: aoiName,
+            bounds: aoiBoundsToArray(aoiRef.getBounds()),
             classes: classes.map((c) => {
               // sometimes there are only points or polygons
               // convert MultiPoint to Feature
