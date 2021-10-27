@@ -155,15 +155,19 @@ export const KEY_ACTIONS = {
     keyDownAction: actions.SET_OVERRIDE_BROWSE_MODE,
     keyUpAction: actions.UNSET_OVERRIDE_BROWSE_MODE,
     modifiers: [],
+    preventDefault: true,
   },
 };
 
 export function listenForShortcuts(event, dispatch) {
   if (KEY_ACTIONS[event.key]) {
-    event.preventDefault();
     // If no key up action, don't do any checks
     if (event.type === 'keyup' && !KEY_ACTIONS[event.key].keyUpAction) {
       return;
+    }
+
+    if (KEY_ACTIONS[event.key].preventDefault) {
+      event.preventDefault();
     }
 
     for (let m of MODIFIERS) {
