@@ -400,7 +400,7 @@ export function InstanceProvider(props) {
         `project/${projectId}/batch/${batchId}`
       );
 
-      if (batch.completed) {
+      if (batch.completed || batch.abort) {
         // Batch is complete
         setRunningBatch(false);
         setBatchReady(batch);
@@ -410,8 +410,11 @@ export function InstanceProvider(props) {
         setAoiList(aois.aois);
 
         // If this function is called from a timeout polling context, we can show a toast notification when finished.
-        if (isPoll) {
+        if (isPoll && batch.abort === false) {
           toasts.success(`${batch.name} inference is now available`);
+        }
+        if (isPoll && batch.abort) {
+          toasts.error(`${batch.name} inference was aborted`);
         }
       } else {
         setRunningBatch(batch);

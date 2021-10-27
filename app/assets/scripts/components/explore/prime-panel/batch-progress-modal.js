@@ -1,18 +1,24 @@
 import React from 'react';
 import T from 'prop-types';
+import bbox from '@turf/bbox';
 import styled from 'styled-components';
 import { Modal } from '@devseed-ui/modal';
 import Prose from '../../../styles/type/prose';
 import { useInstance } from '../../../context/instance';
 import { areaFromBounds } from '../../../utils/map';
-import bbox from '@turf/bbox';
 import logger from '../../../utils/logger';
 import { formatDateTime, formatThousands } from '../../../utils/format';
 import DetailsList from '../../common/details-list';
+import { AbortBatchJobButton } from '../../common/abort-batch-button';
 
 const Wrapper = styled.div`
   display: grid;
   grid-gap: 1rem;
+`;
+
+const Block = styled.div`
+  display: block;
+  padding-top: 1rem;
 `;
 
 function BatchPredictionProgressModal({ revealed, onCloseClick }) {
@@ -50,6 +56,13 @@ function BatchPredictionProgressModal({ revealed, onCloseClick }) {
               'AOI Size': `${batchAoiArea} km²` || 'Unknown',
             }}
           />
+          <Block>
+            <AbortBatchJobButton
+              projectId={runningBatch.project_id}
+              batchId={runningBatch.id}
+              afterOnClickFn={onCloseClick}
+            />
+          </Block>
         </Wrapper>
       }
     />

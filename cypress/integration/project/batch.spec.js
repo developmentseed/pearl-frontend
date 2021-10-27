@@ -38,7 +38,7 @@ describe('Batch predictions', () => {
           updated: new Date(Date.parse('2001-02-01')).setUTCDate(i + 1),
           aoi: i,
           name: `AOI ${i}`,
-          aborted: false,
+          abort: false,
           completed: i !== 1,
           progress: i === 1 ? 60 : 100,
           instance: 1,
@@ -156,13 +156,12 @@ describe('Batch predictions', () => {
         total: 1,
         batch: [
           {
-            count: 1,
             id: 1,
-            abort: false,
             created: 1630056802895,
             updated: 1630056976364,
             aoi: 1,
             name: 'Wesley Heights',
+            abort: false,
             completed: false,
             progress: 0,
           },
@@ -253,7 +252,8 @@ describe('Batch predictions', () => {
         `${format(batchJob.created, 'dd/MM/yyyy kk:mm:ss')}`
       )
       .should('include.text', '71.67')
-      .should('include.text', 'Wesley Heights');
+      .should('include.text', 'Wesley Heights')
+      .should('include.text', 'Abort job');
 
     // Close modal
     cy.get('#batch-prediction-progress-modal')
@@ -347,13 +347,12 @@ describe('Batch predictions', () => {
         total: 1,
         batch: [
           {
-            count: 1,
             id: 1,
-            abort: false,
             created: 1630056802895,
             updated: 1630056976364,
             aoi: 1,
             name: 'Wesley Heights',
+            abort: false,
             completed: false,
             progress: 0,
           },
@@ -465,5 +464,170 @@ describe('Batch predictions', () => {
     cy.get('[data-cy=page-4-button').click();
     cy.get('tbody').find('tr').should('have.length', 5);
     cy.get('tbody tr:nth-child(3) td').should('include.text', 'AOI 18');
+  });
+
+  it('project profile page lists different statuses', () => {
+    cy.fakeLogin();
+
+    cy.intercept(
+      {
+        url: restApiEndpoint + '/api/project/1/batch*',
+        method: 'GET',
+      },
+      {
+        total: 3,
+        batch: [
+          {
+            id: 1,
+            created: 1630056802895,
+            updated: 1630056976364,
+            aoi: 1,
+            name: 'Wesley Heights',
+            abort: false,
+            completed: false,
+            progress: 8,
+          },
+          {
+            id: 2,
+            created: 1630056802895,
+            updated: 1630056976364,
+            aoi: 1,
+            name: 'Wesley Heights',
+            abort: true,
+            completed: false,
+            progress: 0,
+          },
+          {
+            id: 3,
+            created: 1630056802895,
+            updated: 1630056976364,
+            aoi: 1,
+            name: 'Wesley Heights',
+            abort: false,
+            completed: true,
+            progress: 100,
+          },
+        ],
+      }
+    ).as('batchList2');
+
+    cy.visit('/profile/projects/1');
+    cy.wait('@batchList2');
+    cy.get('tbody').find('tr').should('have.length', 3);
+    // check statuses
+    cy.get('tbody tr:nth-child(1) td').should('include.text', 'In Progress');
+    cy.get('tbody tr:nth-child(2) td').should('include.text', 'Aborted');
+    cy.get('tbody tr:nth-child(3) td').should('include.text', 'Completed');
+    // abort job
+    cy.get('[data-cy=abort-batch-job-btn]').should('exist').click();
+    // check if the status is updated
+    cy.get('tbody tr:nth-child(1) td').should('include.text', 'Aborted');
+  });
+
+  it('Abort batch job from the project page', () => {
+    cy.fakeLogin();
+
+    cy.visit('/project/new');
+
+    cy.get('[data-cy=project-name-modal]').should('be.visible');
+    cy.get('[data-cy=modal-project-input]').clear().type('Project name');
+    cy.get('[data-cy=create-project-button]').click();
+
+    // Set AOI
+    cy.get('[data-cy=aoi-edit-button]').click();
+    cy.get('#map')
+      .trigger('mousedown', 150, 150)
+      .trigger('mousemove', 400, 400)
+      .trigger('mouseup');
+
+    cy.get('[data-cy=proceed-anyway-button]').should('exist').click();
+    cy.wait('@reverseGeocodeCity');
+
+    // Set model
+    cy.get('[data-cy=select-model-label]').should('exist').click();
+    cy.get('[data-cy=select-model-1-card]').should('exist').click();
+
+    // No batch message should be displayed
+    cy.get('[data-cy=batch-progress-message').should('not.exist');
+
+    // Request model run
+    cy.get('[data-cy=run-button]')
+      .should('have.text', 'Run Batch Prediction')
+      .click();
+
+    // Mock batch job at 0%
+    cy.intercept(
+      {
+        url: restApiEndpoint + `/api/project/1/batch?completed=false`,
+      },
+      {
+        total: 1,
+        batch: [
+          {
+            id: 1,
+            created: 1630056802895,
+            updated: 1630056976364,
+            aoi: 1,
+            name: 'Wesley Heights',
+            abort: false,
+            completed: false,
+            progress: 0,
+          },
+        ],
+      }
+    );
+
+    const batchJob = {
+      id: 1,
+      uid: 1,
+      project_id: 1,
+      created: 1630056802895,
+      updated: 1630056802895,
+      aoi: null,
+      name: 'Wesley Heights',
+      bounds: {
+        type: 'Polygon',
+        coordinates: [
+          [
+            [-77.13016844644744, 38.88544827129372],
+            [-77.04706107549731, 38.88544827129372],
+            [-77.04706107549731, 38.974905373957455],
+            [-77.13016844644744, 38.974905373957455],
+            [-77.13016844644744, 38.88544827129372],
+          ],
+        ],
+      },
+      abort: false,
+      completed: false,
+      progress: 0,
+      instance: 1,
+    };
+
+    cy.intercept(
+      {
+        url: restApiEndpoint + '/api/project/1/batch/1',
+        method: 'GET',
+      },
+      batchJob
+    );
+
+    // Open progress modal and click in the abort job button
+    cy.get('[data-cy=batch-progress-message')
+      .should('include.text', 'Batch prediction in progress: 0%')
+      .click();
+    cy.get('[data-cy=abort-batch-job-btn]').should('exist').click();
+
+    cy.intercept(
+      {
+        url: restApiEndpoint + '/api/project/1/batch/1',
+        method: 'GET',
+      },
+      { ...batchJob, abort: true }
+    );
+
+    // Confirm modal is closed
+    cy.get('[data-cy=batch-progress-modal-content]').should('not.exist');
+    // confirm progress message is hidden
+    cy.get('[data-cy=batch-progress-message').should('not.exist');
   });
 });
