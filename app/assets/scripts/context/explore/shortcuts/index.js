@@ -160,6 +160,7 @@ export const KEY_ACTIONS = {
 
 export function listenForShortcuts(event, dispatch) {
   if (KEY_ACTIONS[event.key]) {
+    event.preventDefault();
     // If no key up action, don't do any checks
     if (event.type === 'keyup' && !KEY_ACTIONS[event.key].keyUpAction) {
       return;
