@@ -153,13 +153,13 @@ function Map() {
           if (shortcutState.overrideBrowseMode) {
             mapRef.polygonDraw?.pause();
           } else if (
-            !mapState.overrideBrowseMode &&
-            mapState.mode !== mapModes.BROWSE_MODE
+            !shortcutState.overrideBrowseMode &&
+            mapState.mode === mapModes.BROWSE_MODE
           ) {
             // Keyboard shortcut SPACE will enter override mode when held down
             // On KEYUP, we will dispatch an update to return to previousMode, but overrideBrowseMode
             // will be set to false before the mode update can be dispatched
-            mapRef.polygonDraw.disable();
+            // Do nothing
           } else if (mapState.mode === mapModes.BROWSE_MODE) {
             mapRef.polygonDraw.disable();
           }
@@ -191,10 +191,8 @@ function Map() {
         if (mapRef && aoiRef) {
           if (
             mapState.previousMode === mapModes.CREATE_AOI_MODE ||
-            mapState.previousMode === mapModes.EDIT_AOI_MODE ||
-            mapState.previousMode === mapModes.ADD_SAMPLE_FREEHAND
+            mapState.previousMode === mapModes.EDIT_AOI_MODE
           ) {
-            // On confirm, zoom to bounds
             mapRef.fitBounds(aoiRef.getBounds(), { padding: BOUNDS_PADDING });
             setSessionStatusMode(sessionModes.SET_AOI);
           }
