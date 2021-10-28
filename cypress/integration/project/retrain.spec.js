@@ -384,7 +384,7 @@ describe('Retrain existing project', () => {
     ).as('fetchAvailableInstancesCount');
 
     // Request model run
-    cy.get('[data-cy=run-button]').click();
+    cy.get('[data-cy=run-button]').should('exist').click();
 
     // Prediction is halted
     cy.get('[data-cy=session-status]').should(
