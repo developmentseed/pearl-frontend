@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useMap } from 'react-leaflet';
 import L from 'leaflet';
+import T from 'prop-types';
 import {} from 'leaflet.vectorgrid';
 import config from '../../../config';
 
@@ -13,7 +14,7 @@ function getFeatureId(feature) {
   return feature.properties && feature.properties['@id'];
 }
 
-function OsmQaLayer(props) {
+function OsmQaLayer({ modelClasses }) {
   const map = useMap();
 
   const [layer, setLayer] = useState(null);
@@ -23,10 +24,10 @@ function OsmQaLayer(props) {
       layer.remove();
     }
 
-    const classes = Object.keys(props.classes)
+    const classes = Object.keys(modelClasses)
       .map((name) => {
         return {
-          ...props.classes[name],
+          ...modelClasses[name],
         };
       })
       .filter((c) => c.tagmap && c.tagmap.length > 0);
@@ -95,9 +96,13 @@ function OsmQaLayer(props) {
     return () => {
       l.remove();
     };
-  }, [props.classes]);
+  }, [modelClasses]);
 
   return null;
 }
+
+OsmQaLayer.propTypes = {
+  modelClasses: T.object,
+};
 
 export default OsmQaLayer;

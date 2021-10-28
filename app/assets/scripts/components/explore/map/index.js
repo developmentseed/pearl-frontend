@@ -647,7 +647,7 @@ function Map() {
         {!window.Cypress &&
           sessionStatus?.mode === sessionModes.RETRAIN_READY &&
           currentCheckpoint && (
-            <OsmQaLayer classes={currentCheckpoint.classes} />
+            <OsmQaLayer modelClasses={currentCheckpoint.classes} />
           )}
 
         <FeatureGroup>
