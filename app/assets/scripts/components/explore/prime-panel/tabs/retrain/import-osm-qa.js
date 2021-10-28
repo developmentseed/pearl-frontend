@@ -238,19 +238,6 @@ function ImportOSMQA({ setModalRevealed }) {
         .
       </Prose>
       <Button
-        data-cy='import-geojson-samples-button'
-        variation='primary-raised-dark'
-        size='medium'
-        style={{
-          gridColumn: '1 / -1',
-        }}
-        onClick={() => {
-          setModalRevealed(false);
-        }}
-      >
-        Cancel
-      </Button>
-      <Button
         data-cy='import-osm-qa-samples-button'
         variation='primary-raised-dark'
         size='medium'
@@ -271,6 +258,19 @@ function ImportOSMQA({ setModalRevealed }) {
         }}
       >
         Proceed
+      </Button>
+      <Button
+        data-cy='import-geojson-samples-button'
+        variation='danger-raised-dark'
+        size='medium'
+        style={{
+          gridColumn: '1 / -1',
+        }}
+        onClick={() => {
+          setModalRevealed(false);
+        }}
+      >
+        Cancel
       </Button>
     </Wrapper>
   );
