@@ -660,7 +660,7 @@ export function InstanceProvider(props) {
       }
 
       if (
-        sampleCount < config.minSampleCount &&
+        sampleCount < config.minSampleCount ||
         !currentCheckpoint.hasOsmLayers
       ) {
         toasts.error(

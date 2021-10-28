@@ -130,7 +130,7 @@ function ImportGeojson({ setModalRevealed }) {
         {(fieProps) =>
           !file && (
             <Button
-              data-cy='select-samples-file-button'
+              data-cy='select-samples-geojson-button'
               variation='primary-raised-light'
               size='medium'
               useIcon='upload'
@@ -152,7 +152,7 @@ function ImportGeojson({ setModalRevealed }) {
       )}
       {warning && <div className='prose warning'>{warning}</div>}
       <Button
-        data-cy='import-samples-button'
+        data-cy='import-samples-geojson-button'
         variation='primary-raised-dark'
         size='medium'
         useIcon='tick'

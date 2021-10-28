@@ -221,15 +221,19 @@ describe('Retrain existing project', () => {
 
     // Open import modal
     cy.get('[data-cy=open-import-samples-modal-button').click();
+    cy.get('#import-samples-modal').should('exist');
+
+    // Select GeoJSON
+    cy.get('[data-cy=select-geojson-import-button]').should('exist').click();
 
     // Open select file dialog
-    cy.get('[data-cy=select-samples-file-button').click();
+    cy.get('[data-cy=select-samples-geojson-button]').should('exist').click();
 
     // Apply file to input
     cy.get('[data-cy=samples-upload-input]').attachFile('samples.geojson');
 
     // Proceed importing
-    cy.get('[data-cy=import-samples-button').click();
+    cy.get('[data-cy=import-samples-geojson-button').click();
 
     // Set no instances available
     cy.intercept(
