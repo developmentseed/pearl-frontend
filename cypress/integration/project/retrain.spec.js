@@ -469,31 +469,4 @@ describe('Retrain existing project', () => {
 
     cy.get('[data-cy=run-button]').should('be.enabled');
   });
-
-  // it.only('Import samples from OSM', () => {
-  //   cy.setWebsocketWorkflow('websocket-workflow/retrain.json');
-
-  //   cy.visit('/project/1');
-
-  //   // Check initial status
-  //   cy.get('[data-cy=session-status]').should(
-  //     'have.text',
-  //     'Session Status: Loading project...'
-  //   );
-
-  //   // Wait for data loading
-  //   cy.wait(['@fetchAoi2', '@fetchCheckpoint2']);
-
-  //   // Check ready for retrain status
-  //   cy.get('[data-cy=session-status]').should(
-  //     'have.text',
-  //     'Session Status: Ready for retrain run'
-  //   );
-
-  //   cy.get('[data-cy=global-loading]').should('not.exist');
-
-  //   cy.get('[data-cy=open-import-samples-modal-button').should('exist').click();
-
-  //   cy.get('[data-cy=select-osm-qa-import-button').should('exist').click();
-  // });
 });
