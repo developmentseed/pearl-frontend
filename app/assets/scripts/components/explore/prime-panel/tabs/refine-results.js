@@ -83,12 +83,20 @@ function RefineModel(props) {
               visuallyDisabled={!currentCheckpoint.activeItem}
               info={!currentCheckpoint.activeItem && 'No active item selected'}
               onClick={() => {
-                if (currentCheckpoint.activeItem) {
+                if (
+                  currentCheckpoint.activeItem &&
+                  mapState.mode !== mapModes.ADD_SAMPLE_FREEHAND
+                ) {
                   setMapMode(mapModes.ADD_SAMPLE_FREEHAND);
+                } else if (mapState.mode === mapModes.ADD_SAMPLE_FREEHAND) {
+                  setMapMode(mapModes.BROWSE_MODE);
                 }
               }}
+              className={
+                mapState.mode === mapModes.ADD_SAMPLE_FREEHAND && 'active'
+              }
             >
-              Draw
+              Freehand
             </InfoButton>
 
             <InfoButton
@@ -109,10 +117,16 @@ function RefineModel(props) {
                   : 'Draw to erase, click to delete'
               }
               onClick={() => {
-                if (currentCheckpoint.activeItem) {
+                if (
+                  currentCheckpoint.activeItem &&
+                  mapState.mode !== mapModes.DELETE_SAMPLES
+                ) {
                   setMapMode(mapModes.DELETE_SAMPLES);
+                } else if (mapState.mode === mapModes.DELETE_SAMPLES) {
+                  setMapMode(mapModes.BROWSE_MODE);
                 }
               }}
+              className={mapState.mode === mapModes.DELETE_SAMPLES && 'active'}
             >
               Erase
             </InfoButton>

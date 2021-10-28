@@ -20,16 +20,15 @@ import defaultsDeep from 'lodash.defaultsdeep';
  */
 
 var configurations = require('./config/*.js', { mode: 'hash' });
-var config = configurations.production || {};
+var config = configurations.base || {};
 
-if (process.env.NODE_ENV === 'testing') {
+if (process.env.NODE_ENV === 'production') {
+  config = defaultsDeep(configurations.production || {}, config);
+} else if (process.env.NODE_ENV === 'testing') {
   config = defaultsDeep(configurations.testing || {}, config);
-}
-
-if (process.env.NODE_ENV === 'staging') {
+} else if (process.env.NODE_ENV === 'staging') {
   config = defaultsDeep(configurations.staging, config);
-}
-if (process.env.NODE_ENV === 'development') {
+} else if (process.env.NODE_ENV === 'development') {
   config = defaultsDeep(configurations.local || {}, config);
 }
 

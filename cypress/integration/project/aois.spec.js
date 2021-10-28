@@ -22,7 +22,7 @@ describe('Loads AOIs', () => {
       .trigger('mousemove', 300, 300)
       .trigger('mouseup');
     cy.wait('@reverseGeocodeCity');
-    cy.get('[data-cy=aoi-selection-trigger]').contains('Judiciary Square');
+    cy.get('[data-cy=selected-aoi-header]').contains('Judiciary Square');
   });
 
   it('Can geocode a rural non addressable area', () => {
@@ -36,7 +36,7 @@ describe('Loads AOIs', () => {
       .trigger('mousemove', 300, 300)
       .trigger('mouseup');
     cy.wait('@reverseGeocodeRural');
-    cy.get('[data-cy=aoi-selection-trigger]').contains('Huntingdon County');
+    cy.get('[data-cy=selected-aoi-header]').contains('Huntingdon County');
   });
 
   it('Can upload an AOI', () => {
@@ -46,7 +46,7 @@ describe('Loads AOIs', () => {
     // Open select file dialog
     cy.get('[data-cy=select-aoi-file-button').click();
 
-    // Apply large aoi file to input
+    // Apply large AOI file to input
     cy.get('[data-cy=aoi-upload-input]').attachFile(
       'aoi-upload/really-large-area.geojson'
     );
@@ -100,7 +100,7 @@ describe('Loads AOIs', () => {
     cy.get('[data-cy=import-aoi-button').should('be.enabled').click();
 
     // Check if area is ok
-    cy.get('[data-cy=aoi-selection-trigger]').should(
+    cy.get('[data-cy=selected-aoi-header]').should(
       'include.text',
       '81.11  km2'
     );
@@ -132,10 +132,7 @@ describe('Loads AOIs', () => {
     // Proceed importing
     cy.get('[data-cy=import-aoi-button').should('be.enabled').click();
 
-    cy.get('[data-cy=aoi-selection-trigger]').should(
-      'include.text',
-      '6.56  km2'
-    );
+    cy.get('[data-cy=selected-aoi-header]').should('include.text', '6.56  km2');
 
     cy.get('[data-cy=panel-aoi-confirm]')
       .should('exist')
@@ -153,7 +150,7 @@ describe('Can delete AOIs', () => {
 
   it('Displays delete button on header', () => {
     cy.fakeLogin();
-    cy.setWebsocketWorkflow('retrain');
+    cy.setWebsocketWorkflow('websocket-workflow/retrain.json');
 
     cy.visit('/project/1');
     cy.wait('@loadAois');
@@ -178,12 +175,13 @@ describe('Can delete AOIs', () => {
       }
     ).as('loadAois1');
 
+    cy.get('[data-cy=predict-tab]').click();
     cy.get('[data-cy=delete-current-aoi-button]');
     cy.get('[data-cy=delete-current-aoi-button]').click();
     cy.get('[data-cy=confirm-delete-aoi-modal]').should('exist');
     cy.get('[data-cy=confirm-aoi-delete]').should('exist').click();
     cy.get('[data-cy=confirm-delete-aoi-modal]').should('not.exist');
-    cy.get('[data-cy=aoi-selection-trigger]').click();
+    //cy.get('[data-cy=aoi-selection-trigger]').click();
     cy.get('.aoi-delete-button').should('have.length', 1);
     cy.intercept(
       {
@@ -193,13 +191,14 @@ describe('Can delete AOIs', () => {
         fixture: 'aois.0.json',
       }
     ).as('loadAois1');
-    cy.get('.aoi-delete-button').first().click();
+    // Delete buttons are hidden, so cypress requires a force true
+    cy.get('.aoi-delete-button').first().click({ force: true });
     cy.get('[data-cy=confirm-aoi-delete]').should('exist').click();
   });
 
   it('Can delete frontend only aoi', () => {
     cy.fakeLogin();
-    cy.setWebsocketWorkflow('retrain');
+    cy.setWebsocketWorkflow('websocket-workflow/retrain.json');
 
     cy.visit('/project/1');
     cy.wait('@loadAois');
@@ -224,7 +223,7 @@ describe('Can delete AOIs', () => {
       }
     ).as('loadAois1');
 
-    cy.get('[data-cy=aoi-selection-trigger]').click();
+    cy.get('[data-cy=predict-tab]').click();
     cy.get('[data-cy=add-aoi-button]').click();
 
     // Draw AOI
@@ -234,14 +233,10 @@ describe('Can delete AOIs', () => {
       .trigger('mouseup');
     cy.wait('@reverseGeocodeCity');
 
-    cy.get('[data-cy=delete-current-aoi-button]');
     cy.get('[data-cy=delete-current-aoi-button]').click();
 
     cy.get('[data-cy=confirm-delete-aoi-modal]').should('not.exist');
     cy.get('@deleteAnyAoi').should('not.exist');
-    cy.get('[data-cy=aoi-selection-trigger]').should(
-      'contain',
-      'None selected'
-    );
+    cy.get('[data-cy=selected-aoi-header]').should('contain', 'None selected');
   });
 });

@@ -7,45 +7,62 @@ export const actions = {
   SET_MESSAGE: 'SET_MESSAGE',
 };
 
+export const sessionModes = {
+  LOADING: 'LOADING',
+  SET_PROJECT_NAME: 'SET_PROJECT_NAME',
+  SET_AOI: 'SET_AOI',
+  SELECT_MODEL: 'SELECT_MODEL',
+  PREDICTION_READY: 'PREDICTION_READY',
+  RUNNING_PREDICTION: 'RUNNING_PREDICTION',
+  LOADING_PROJECT: 'LOADING_PROJECT',
+  RETRAINING: 'RETRAINING',
+  RETRAIN_READY: 'RETRAIN_READY',
+};
+
 export const initialState = {
-  mode: 'loading',
+  mode: sessionModes.LOADING,
   level: 'info',
   message: 'Loading...',
 };
 
-const modes = [
+const modesMeta = [
   {
-    mode: 'set-project-name',
+    mode: sessionModes.SET_PROJECT_NAME,
     level: 'info',
     message: 'Set Project Name',
   },
   {
-    mode: 'set-aoi',
+    mode: sessionModes.SET_AOI,
     level: 'info',
     message: 'Set AOI',
   },
   {
-    mode: 'select-model',
+    mode: sessionModes.SELECT_MODEL,
     level: 'info',
     message: 'Select Model',
   },
   {
-    mode: 'prediction-ready',
+    mode: sessionModes.PREDICTION_READY,
     level: 'info',
     message: 'Ready for prediction run',
   },
   {
-    mode: 'running-prediction',
+    mode: sessionModes.RUNNING_PREDICTION,
     level: 'info',
     message: 'Running prediction',
   },
   {
-    mode: 'loading-project',
+    mode: sessionModes.LOADING_PROJECT,
     level: 'info',
     message: 'Loading project...',
   },
   {
-    mode: 'retrain-ready',
+    mode: sessionModes.RETRAINING,
+    level: 'info',
+    message: 'Retraining...',
+  },
+  {
+    mode: sessionModes.RETRAIN_READY,
     level: 'info',
     message: 'Ready for retrain run',
   },
@@ -59,7 +76,7 @@ export default function sessionStatusReducer(state, action) {
     case actions.SET_MODE: {
       newState = {
         ...state,
-        ...modes.find(({ mode }) => mode === data),
+        ...modesMeta.find(({ mode }) => mode === data),
       };
       break;
     }

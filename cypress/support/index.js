@@ -14,6 +14,9 @@
 // ***********************************************************
 
 import 'cypress-file-upload';
-require('./commands/set-websocket-workflow');
+
+import { addCommand } from 'cypress-websocket-server';
+addCommand();
+
 require('./commands/fake-login');
 require('./commands/fake-rest');

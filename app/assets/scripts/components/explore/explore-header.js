@@ -34,6 +34,7 @@ import { downloadGeotiff as downloadGeotiffUtil } from '../../utils/map';
 import { useTour } from '../../context/explore';
 
 import { Modal } from '@devseed-ui/modal';
+import { StyledLink } from '../../styles/links';
 
 const Wrapper = styled.div`
   flex: 1;
@@ -142,8 +143,9 @@ const Shortcut = styled.dt`
   border: 1px solid ${themeVal('color.primaryAlphaB')};
   font-weight: ${themeVal('type.heading.weight')};
   text-align: center;
-  height: ${glsp(1.75)};
-  width: ${glsp(1.75)};
+  min-width: ${glsp(1.75)};
+  justify-self: flex-start;
+  padding: ${glsp(0.125)} ${glsp(0.5)};
 `;
 
 function ExploreHeader(props) {
@@ -361,19 +363,64 @@ function ExploreHeader(props) {
             <dd>Increase prediction layer opacity by 1%</dd>
             <Shortcut>f</Shortcut>
             <dd>Set prediction layer opacity to 100%</dd>
+            <Shortcut>Space</Shortcut>
+            <dd>Pan map</dd>
             <Shortcut>k</Shortcut>
             <dd>Open shortcuts help</dd>
           </ShortcutsWrapper>
         }
       />
-      <Button
-        variation='primary-plain'
-        useIcon='circle-question'
-        onClick={() => setTourStep(0)}
-        hideText={isMediumDown}
+      <Dropdown
+        alignment='right'
+        direction='down'
+        onChange={(isOpen) => {
+          // when dropdown closes, clear share URL value
+          if (!isOpen) {
+            setExportShareURL(null);
+          }
+        }}
+        triggerElement={(props) => (
+          <DropdownTrigger
+            variation='primary-plain'
+            useIcon='circle-question'
+            {...props}
+            hideText={isMediumDown}
+            title='View Help Options'
+            className='help-trigger'
+            size='medium'
+          >
+            Help
+          </DropdownTrigger>
+        )}
+        className='global__dropdown'
       >
-        Help
-      </Button>
+        <>
+          <DropdownHeader>
+            <p>User help</p>
+          </DropdownHeader>
+          <DropdownBody>
+            <li>
+              <DropdownItem
+                useIcon='circle-play'
+                onClick={() => setTourStep(0)}
+                data-dropdown='click.close'
+              >
+                View Walkthrough
+              </DropdownItem>
+            </li>
+            <li>
+              <DropdownItem
+                as={StyledLink}
+                to='/about'
+                target='_blank'
+                useIcon='circle-information'
+              >
+                User Guide
+              </DropdownItem>
+            </li>
+          </DropdownBody>
+        </>
+      </Dropdown>
       <Dropdown
         alignment='right'
         direction='down'
@@ -387,7 +434,7 @@ function ExploreHeader(props) {
           <DropdownTrigger
             variation='primary-raised-dark'
             title='Export map'
-            className='user-options-trigger'
+            id='export-options-trigger'
             size='medium'
             useIcon='share'
             {...props}
@@ -452,6 +499,7 @@ function ExploreHeader(props) {
         onCloseClick={() => history.push('/profile/projects')}
         content={
           <ModalForm onSubmit={handleSubmit}>
+            <p>Enter a project name to get started</p>
             <HeadingInput
               name='projectName'
               placeholder='Set Project Name'

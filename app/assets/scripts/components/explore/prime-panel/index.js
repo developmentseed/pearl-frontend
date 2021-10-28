@@ -1,53 +1,49 @@
 import React, { useEffect, useState, useContext } from 'react';
 import styled from 'styled-components';
+import { Heading } from '@devseed-ui/typography';
+import { Button } from '@devseed-ui/button';
 import { media, glsp } from '@devseed-ui/theme-provider';
 
 import Panel from '../../common/panel';
 import { PanelBlock, PanelBlockBody } from '../../common/panel-block';
 import SelectModal from '../../common/select-modal';
+import AutoFocusFormInput from '../../common/auto-focus-form-input';
 import ModelCard from './model-card';
 import { useMapRef } from '../../../context/map';
 import {
   ExploreContext,
   useMapState,
   useShortcutState,
+  useAoiMeta,
 } from '../../../context/explore';
 import { useModel } from '../../../context/model';
 
-import { Heading } from '@devseed-ui/typography';
-import { Button } from '@devseed-ui/button';
-
 import TabbedBlock from '../../common/tabbed-block-body';
+import Predict from './tabs/predict';
 import RetrainModel from './tabs/retrain-model';
 import RefineResults from './tabs/refine-results';
 
-import PanelHeader from './header';
 import PanelFooter from './footer';
-
-import { useAuth } from '../../../context/auth';
 import {
   useCheckpoint,
   actions as checkpointActions,
   checkpointModes,
 } from '../../../context/checkpoint';
-import { useInstance } from '../../../context/instance';
 import { useAoi } from '../../../context/aoi';
 import { usePredictions } from '../../../context/predictions';
 import { useApiLimits } from '../../../context/global';
 import ClearSamplesModal from './clear-samples-modal';
 import { actions as shortcutActions } from '../../../context/explore/shortcuts';
+import { bboxIntersectsMapBounds } from '../../../utils/map';
 
 const StyledPanelBlock = styled(PanelBlock)`
   ${media.largeUp`
     width: ${glsp(24)};
   `}
-  ${media.xlargeUp`
-    width: ${glsp(28)};
-  `}
 `;
 
 const ModalHeader = styled.header`
-  padding: ${glsp(2)};
+  padding: ${glsp(2)} ${glsp(2)} 0;
 `;
 
 const Headline = styled.div`
@@ -65,42 +61,35 @@ const Headline = styled.div`
     align-self: center;
   }
 `;
-const TABS = [0, 1];
-const [RETRAIN_TAB_INDEX, REFINE_TAB_INDEX] = TABS;
+
+const FilterSection = styled.div`
+  padding-bottom: ${glsp(1)};
+`;
+
+const TABS = [0, 1, 2];
+const [PREDICT_TAB_INDEX, RETRAIN_TAB_INDEX, REFINE_TAB_INDEX] = TABS;
 
 function PrimePanel() {
-  const { isAuthenticated } = useAuth();
   const { mapState, mapModes, setMapMode } = useMapState();
   const { mapRef } = useMapRef();
   const { apiLimits } = useApiLimits();
   const { shortcutState, dispatchShortcutState } = useShortcutState();
 
-  const {
-    currentProject,
-    checkpointList,
-    selectedModel,
-    setSelectedModel,
-    aoiArea,
-    createNewAoi,
-    loadAoi,
-    aoiList,
-    aoiBounds,
-    setAoiBounds,
-    updateCheckpointName,
-  } = useContext(ExploreContext);
+  const { updateCheckpointName } = useContext(ExploreContext);
 
-  const { aoiRef, setAoiRef, aoiName, currentAoi } = useAoi();
+  const { aoiBounds, setAoiBounds, aoiArea } = useAoiMeta();
 
-  const { applyCheckpoint } = useInstance();
+  const { aoiRef, currentAoi } = useAoi();
 
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
 
-  const { models } = useModel();
+  const { models, selectedModel, setSelectedModel } = useModel();
 
   const { predictions } = usePredictions();
 
   const [showSelectModelModal, setShowSelectModelModal] = useState(false);
   const [showClearSamplesModal, setShowClearSamplesModal] = useState(null);
+  const [modelFilter, setModelFilter] = useState('');
 
   const [localCheckpointName, setLocalCheckpointName] = useState(
     (currentCheckpoint &&
@@ -134,14 +123,20 @@ function PrimePanel() {
     currentCheckpoint && currentCheckpoint.sampleCount > 0;
 
   useEffect(() => {
-    if (currentCheckpoint && currentCheckpoint.name) {
-      if (currentCheckpoint.bookmarked) {
-        setLocalCheckpointName(currentCheckpoint.name);
-      } else {
-        setLocalCheckpointName('');
+    if (currentCheckpoint) {
+      if (currentCheckpoint.name) {
+        if (currentCheckpoint.bookmarked) {
+          setLocalCheckpointName(currentCheckpoint.name);
+        } else {
+          setLocalCheckpointName('');
+        }
+      }
+
+      if (currentCheckpoint.mode === checkpointModes.RETRAIN) {
+        setActiveTab(RETRAIN_TAB_INDEX);
       }
     }
-  }, [currentCheckpoint]);
+  }, [currentCheckpoint?.id, currentCheckpoint?.mode]);
 
   return (
     <>
@@ -158,38 +153,31 @@ function PrimePanel() {
         fitContent
         bodyContent={
           <StyledPanelBlock>
-            <PanelHeader
-              {...{
-                aoiRef,
-                setAoiRef,
-                setAoiBounds,
-                aoiBounds,
-                aoiArea,
-                aoiName,
-                aoiList,
-                loadAoi,
-                createNewAoi,
-
-                mapState,
-                mapModes,
-                mapRef,
-
-                currentCheckpoint,
-                checkpointModes,
-                checkpointList,
-                applyCheckpoint,
-
-                checkpointHasSamples,
-
-                setShowSelectModelModal,
-                selectedModel,
-
-                isAuthenticated,
-                currentProject,
-              }}
-            />
             <PanelBlockBody>
               <TabbedBlock activeTab={activeTab}>
+                <Predict
+                  name='predict'
+                  className='predict-model'
+                  tabId='predict-tab-trigger'
+                  checkpointHasSamples={checkpointHasSamples}
+                  setShowSelectModelModal={setShowSelectModelModal}
+                  onTabClick={() => {
+                    function onContinue() {
+                      setActiveTab(PREDICT_TAB_INDEX);
+                      dispatchCurrentCheckpoint({
+                        type: checkpointActions.SET_CHECKPOINT_MODE,
+                        data: {
+                          mode: checkpointModes.RUN,
+                        },
+                      });
+                    }
+                    if (checkpointHasSamples) {
+                      setShowClearSamplesModal(() => onContinue);
+                    } else {
+                      onContinue();
+                    }
+                  }}
+                />
                 <RetrainModel
                   name='retrain model'
                   className='retrain-model'
@@ -202,9 +190,11 @@ function PrimePanel() {
                     currentCheckpoint.classes !== undefined &&
                     currentAoi
                   }
+                  tabTooltip='Retrain is not availble until model has been run over AOI.'
                   disabled={
                     !currentCheckpoint ||
-                    mapState.mode === mapModes.EDIT_AOI_MODE
+                    mapState.mode === mapModes.EDIT_AOI_MODE ||
+                    !currentAoi
                   }
                   onTabClick={() => {
                     function onContinue() {
@@ -294,6 +284,7 @@ function PrimePanel() {
                 mapRef,
 
                 setAoiBounds,
+                useSampleControls: activeTab > PREDICT_TAB_INDEX,
 
                 disabled:
                   currentCheckpoint &&
@@ -307,10 +298,18 @@ function PrimePanel() {
       <SelectModal
         id='select-model-modal'
         revealed={showSelectModelModal}
-        onOverlayClick={() => {
-          setShowSelectModelModal(false);
-        }}
-        data={models.isReady && !models.hasError ? models.data : []}
+        onOverlayClick={() => setShowSelectModelModal(false)}
+        data={
+          models.isReady && !models.hasError
+            ? models.data.map((model) => {
+                model.overlapsAoi = bboxIntersectsMapBounds(
+                  model.bounds,
+                  aoiBounds
+                );
+                return model;
+              })
+            : []
+        }
         renderHeader={() => (
           <ModalHeader>
             <Headline>
@@ -321,16 +320,27 @@ function PrimePanel() {
                 variation='base-plain'
                 size='small'
                 useIcon='xmark'
-                onClick={() => setShowSelectModelModal(false)}
+                onClick={() => {
+                  setShowSelectModelModal(false);
+                  setModelFilter('');
+                }}
               >
                 Close modal
               </Button>
             </Headline>
+            <FilterSection>
+              <AutoFocusFormInput
+                inputId='modelsFilter'
+                value={modelFilter}
+                setValue={setModelFilter}
+                placeholder='Search models by name'
+              />
+            </FilterSection>
           </ModalHeader>
         )}
-        filterCard={(card) => {
-          return card.name.includes('');
-        }}
+        filterCard={(card) =>
+          card.name.toLowerCase().includes(modelFilter.toLowerCase())
+        }
         renderCard={(model) => (
           <ModelCard
             key={model.name}
@@ -339,6 +349,7 @@ function PrimePanel() {
               setShowSelectModelModal(false);
               setSelectedModel(model);
             }}
+            selected={model.overlapsAoi}
           />
         )}
         nonScrolling
@@ -354,9 +365,7 @@ function PrimePanel() {
           clearAndContinue();
           setShowClearSamplesModal(null);
         }}
-        onCancel={() => {
-          setShowClearSamplesModal(null);
-        }}
+        onCancel={() => setShowClearSamplesModal(null)}
       />
     </>
   );

@@ -91,15 +91,9 @@ describe('Retrain existing project', () => {
   });
 
   it('successfully loads', () => {
-    cy.setWebsocketWorkflow('retrain');
+    cy.setWebsocketWorkflow('websocket-workflow/retrain.json');
 
     cy.visit('/project/1');
-
-    // Check initial status
-    cy.get('[data-cy=session-status]').should(
-      'have.text',
-      'Session Status: Loading project...'
-    );
 
     // Wait for data loading
     cy.wait(['@fetchAoi2', '@fetchCheckpoint2']);
@@ -338,9 +332,6 @@ describe('Retrain existing project', () => {
       }
     );
 
-    // Request model run
-    cy.get('[data-cy=run-button]').click();
-
     cy.get('[data-cy=session-status]').should(
       'have.text',
       'Session Status: Ready for retrain run'
@@ -348,24 +339,14 @@ describe('Retrain existing project', () => {
 
     // Save checkpoint is enabled
     cy.get('[data-cy=save-checkpoint-button]').should('not.be.disabled');
-
-    // Go to home page to avoid spilling state to next test
-    cy.visit('/');
-    cy.location().should((loc) => {
-      expect(loc.pathname).to.eq('/');
-    });
   });
 
   it('abort retrain', () => {
-    cy.setWebsocketWorkflow('retrain-one-sample-aborted');
+    cy.setWebsocketWorkflow(
+      'websocket-workflow/retrain-one-sample-aborted.json'
+    );
 
     cy.visit('/project/1');
-
-    // Check initial status
-    cy.get('[data-cy=session-status]').should(
-      'have.text',
-      'Session Status: Loading project...'
-    );
 
     // Wait for data loading
     cy.wait(['@fetchAoi2', '@fetchCheckpoint2']);
@@ -411,7 +392,9 @@ describe('Retrain existing project', () => {
     cy.get('[data-cy=abort-run-button]').should('exist').click();
 
     // Reset WS workflow
-    cy.setWebsocketWorkflow('retrain-one-sample-aborted');
+    cy.setWebsocketWorkflow(
+      'websocket-workflow/retrain-one-sample-aborted.json'
+    );
 
     cy.get('[data-cy=session-status]').should(
       'have.text',
@@ -460,12 +443,6 @@ describe('Retrain existing project', () => {
   it('load existing checkpoint, can predict new AOI', () => {
     cy.visit('/project/1');
 
-    // Check initial status
-    cy.get('[data-cy=session-status]').should(
-      'have.text',
-      'Session Status: Loading project...'
-    );
-
     // Wait for data loading
     cy.wait(['@fetchAoi2', '@fetchCheckpoint2']);
 
@@ -474,8 +451,7 @@ describe('Retrain existing project', () => {
       'have.text',
       'Session Status: Ready for retrain run'
     );
-
-    cy.get('[data-cy=aoi-selection-trigger]').click();
+    cy.get('[data-cy=predict-tab]').click();
 
     cy.get('[data-cy=add-aoi-button]').click();
 
@@ -485,7 +461,7 @@ describe('Retrain existing project', () => {
       .trigger('mousemove', 300, 300)
       .trigger('mouseup');
     cy.wait('@reverseGeocodeCity');
-    cy.get('[data-cy=aoi-selection-trigger]').contains('Judiciary Square');
+    cy.get('[data-cy=selected-aoi-header]').contains('Judiciary Square');
 
     cy.get('[data-cy=run-button]').should('be.enabled');
   });

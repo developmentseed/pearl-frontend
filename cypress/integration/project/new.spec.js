@@ -44,7 +44,7 @@ describe('Create new project', () => {
 
   it('Run new project', () => {
     // Set mock WS workflow in case creation succeeds (it shouldn't here)
-    cy.setWebsocketWorkflow('base-model-prediction');
+    cy.setWebsocketWorkflow('websocket-workflow/base-model-prediction.json');
 
     // Visit page
     cy.visit('/project/new');
@@ -92,8 +92,18 @@ describe('Create new project', () => {
       'Session Status: Select Model'
     );
 
-    // Select model
+    // Open the Model selection modal
     cy.get('[data-cy=select-model-label]').should('exist').click();
+    // Filter a model and get no results
+    cy.get('#modelsFilter').should('exist').clear().type('test123');
+    cy.get('[data-cy=select-model-1-card]').should('not.exist');
+    cy.get('.list-container').should('have.text', 'No results found');
+    // Filter again and get 2 results
+    cy.get('#modelsFilter').should('exist').clear().type('class');
+    // Check that the 2 models are recommended
+    cy.get('[data-cy=recommended-models-label]').should('exist');
+    cy.get('.list-container').children().should('have.length', 2);
+    // Finally select a model
     cy.get('[data-cy=select-model-1-card]').should('exist').click();
 
     // Check session status message
@@ -196,7 +206,7 @@ describe('Create new project', () => {
   });
 
   it('Abort new project', () => {
-    cy.setWebsocketWorkflow('run-prediction-aborted');
+    cy.setWebsocketWorkflow('websocket-workflow/run-prediction-aborted.json');
 
     // Visit page
     cy.visit('/project/new');
@@ -254,7 +264,7 @@ describe('Create new project', () => {
       'Session Status: Ready for prediction run'
     );
 
-    // Instance pending
+    // Instance is running
     cy.intercept(
       {
         url: restApiEndpoint + '/api/project/1/instance/1',
@@ -265,9 +275,13 @@ describe('Create new project', () => {
           phase: 'Running',
         },
       }
-    );
+    ).as('fetchInstanceStatus');
 
+    // Request prediction
     cy.get('[data-cy=run-button]').click();
+
+    // Wait for instance status request
+    cy.wait('@fetchInstanceStatus');
 
     // Prediction is halted
     cy.get('[data-cy=session-status]').should(
@@ -285,11 +299,71 @@ describe('Create new project', () => {
     );
 
     // Run a prediction to the end
-    cy.setWebsocketWorkflow('base-model-prediction');
-    cy.get('[data-cy=run-button]').click();
+    cy.setWebsocketWorkflow('websocket-workflow/base-model-prediction.json');
+
+    // Request prediction
+    cy.get('[data-cy=run-button]').should('exist').click();
+
+    // Wait for instance status request
+    cy.wait('@fetchInstanceStatus');
+
+    // Prediction should be finished successfully
     cy.get('[data-cy=session-status]').should(
       'have.text',
       'Session Status: Ready for retrain run'
     );
+  });
+
+  it('Check model filter based on location', () => {
+    // Set mock WS workflow in case creation succeeds (it shouldn't here)
+    cy.setWebsocketWorkflow('websocket-workflow/base-model-prediction.json');
+
+    // Visit page
+    cy.visit('/project/new');
+
+    // Check session status message
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Set Project Name'
+    );
+
+    // Set project name
+    cy.get('[data-cy=modal-project-input]')
+      .should('exist')
+      .clear()
+      .type('Project name');
+    cy.get('[data-cy=create-project-button]').should('exist').click();
+
+    // Check session status message
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Set AOI'
+    );
+
+    // Open import modal
+    cy.get('[data-cy=upload-aoi-modal-button]').click();
+    // Open select file dialog
+    cy.get('[data-cy=select-aoi-file-button').click();
+    // Apply valid file to input
+    cy.get('[data-cy=aoi-upload-input]').attachFile(
+      'aoi-upload/aoi-outside-usa.geojson'
+    );
+    // No warning is displayed
+    cy.get('[data-cy=import-aoi-warning-text').should('not.exist');
+    // Proceed importing
+    cy.get('[data-cy=import-aoi-button').should('be.enabled').click();
+
+    // Check session status message
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Select Model'
+    );
+
+    // Open the Model selection modal
+    cy.get('[data-cy=select-model-label]').should('exist').click();
+    // There are not recommended models for that aoi region
+    cy.get('[data-cy=recommended-models-label]').should('not.exist');
+    // Check that the 2 models are available
+    cy.get('.list-container').children().should('have.length', 2);
   });
 });

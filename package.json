@@ -24,7 +24,6 @@
     "stage": "NODE_ENV=staging gulp",
     "lint": "eslint app/assets/scripts/ cypress/ --ext .js",
     "lint:css": "stylelint 'app/assets/styles/**/**' 'app/assets/scripts/**/*.js'",
-    "test": "echo \"No tests\" && exit 0",
     "cy:open": "cypress open",
     "cy:run": "cypress run"
   },
@@ -64,6 +63,7 @@
     "collecticons-processor": "^4.1.0",
     "cypress": "^8.4.1",
     "cypress-file-upload": "^5.0.8",
+    "cypress-websocket-server": "^0.1.2",
     "del": "^6.0.0",
     "envify": "^4.1.0",
     "errorify": "^0.3.1",
@@ -118,6 +118,7 @@
     "@turf/area": "^6.3.0",
     "@turf/bbox": "^6.3.0",
     "@turf/bbox-polygon": "^6.3.0",
+    "@turf/boolean-intersects": "^6.5.0",
     "@turf/centroid": "^6.3.0",
     "@turf/helpers": "^6.5.0",
     "@welldone-software/why-did-you-render": "^6.1.1",

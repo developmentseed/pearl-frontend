@@ -50,7 +50,11 @@ const EditClass = ({ currentClassName, currentColor = '#000000' }) => {
       <PickerDropdownBody>
         <PickerDropdownItem nonhoverable as='div'>
           <label htmlFor='addClassName'>Class Name</label>
-          <AutoFocusFormInput value={addClassName} setValue={setAddClassName} />
+          <AutoFocusFormInput
+            inputId='addClassName'
+            value={addClassName}
+            setValue={setAddClassName}
+          />
         </PickerDropdownItem>
         <PickerDropdownItem nonhoverable as='div'>
           <label>Label Color</label>

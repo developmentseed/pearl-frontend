@@ -71,7 +71,7 @@ export function CheckpointProvider(props) {
   }
 
   /*
-   * @param created - if new checkpoint was just created,don't to verify that aoi matches
+   * @param created - if new checkpoint was just created,don't to verify that AOI matches
    */
   async function fetchCheckpoint(projectId, checkpointId, mode, noCheck) {
     try {
@@ -505,6 +505,7 @@ export const useCheckpoint = () => {
     dispatchCurrentCheckpoint,
     fetchCheckpoint,
     checkpointList,
+    setCheckpointList,
     loadCheckpointList,
   } = useCheckContext('useCheckpoint');
 
@@ -514,6 +515,7 @@ export const useCheckpoint = () => {
       dispatchCurrentCheckpoint,
       fetchCheckpoint,
       checkpointList,
+      setCheckpointList,
       loadCheckpointList,
     }),
     [
