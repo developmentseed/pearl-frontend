@@ -449,6 +449,7 @@ function checkpointReducer(state, action) {
 
       nextState = {
         ...state,
+        hasOsmLayers: true,
         classes: {
           ...state.classes,
           [name]: updatedClass,

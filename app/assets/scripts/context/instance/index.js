@@ -652,17 +652,17 @@ export function InstanceProvider(props) {
       // Check if all classes have the minimum number of samples
       const classes = Object.values(currentCheckpoint.classes);
       let sampleCount = 0;
-      let hasOsmLayers = false;
       for (let i = 0; i < classes.length; i++) {
         const aClass = classes[i];
         sampleCount +=
           get(aClass, 'points.coordinates.length', 0) +
           get(aClass, 'polygons.length', 0);
-
-        hasOsmLayers = hasOsmLayers || aClass.tagmap?.length > 0;
       }
 
-      if (sampleCount < config.minSampleCount) {
+      if (
+        sampleCount < config.minSampleCount &&
+        !currentCheckpoint.hasOsmLayers
+      ) {
         toasts.error(
           `At least ${config.minSampleCount} sample${
             config.minSampleCount === 1 ? '' : 's'
@@ -737,7 +737,9 @@ export function InstanceProvider(props) {
       dispatchMessageQueue({
         type: messageQueueActionTypes.ADD,
         data: {
-          action: hasOsmLayers ? 'model#osm' : 'model#retrain',
+          action: currentCheckpoint.hasOsmLayers
+            ? 'model#osm'
+            : 'model#retrain',
           data: {
             name: aoiName,
             bounds: aoiBoundsToArray(aoiRef.getBounds()),
@@ -763,7 +765,7 @@ export function InstanceProvider(props) {
                 geometry: featureCollection(features),
               };
 
-              if (hasOsmLayers) {
+              if (currentCheckpoint.hasOsmLayers) {
                 retrainClass.tagmap = c.tagmap || [];
               }
 
