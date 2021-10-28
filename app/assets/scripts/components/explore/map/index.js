@@ -57,7 +57,7 @@ import PolygonDrawControl from './polygon-draw-control';
 import OsmQaLayer from '../../common/map/osm-qa-layer';
 
 const center = [38.889805, -77.009056];
-const zoom = 17;
+const zoom = 12;
 
 const MAX = 3;
 const NO_LIVE = 2;
