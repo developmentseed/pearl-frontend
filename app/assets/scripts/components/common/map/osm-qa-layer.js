@@ -87,15 +87,6 @@ function OsmQaLayer(props) {
       },
     });
 
-    l.on('click', function (e) {
-      const feature = e.layer;
-      const featureClass = getFeatureClass(feature.properties);
-      if (featureClass) {
-        l.setFeatureStyle(getFeatureId(feature), hiddenStyle);
-      }
-      L.DomEvent.stop(e);
-    });
-
     l.addTo(map);
 
     setLayer(l);
