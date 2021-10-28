@@ -331,7 +331,7 @@ function Footer({
               mapRef.freehandDraw.clearLayers();
             }}
           >
-            Clear
+            Clear All
           </Button>
           <Button
             variation='base-plain'
