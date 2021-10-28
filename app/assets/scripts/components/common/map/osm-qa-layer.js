@@ -53,6 +53,7 @@ function OsmQaLayer(props) {
 
     const l = L.vectorGrid.protobuf(osmQaPbfTilesUrl, {
       pane: 'markerPane',
+      maxNativeZoom: 17,
       interactive: true,
       getFeatureId,
       vectorTileLayerStyles: {
