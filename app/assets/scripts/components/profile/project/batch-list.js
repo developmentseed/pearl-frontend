@@ -92,6 +92,7 @@ const BatchRow = ({ batch, projectId }) => {
               projectId={projectId}
               batchId={id}
               compact
+              disabled={progress === 0}
               afterOnClickFn={() => setStatus('Aborted')}
             />
           </>
@@ -143,7 +144,13 @@ function BatchList({ projectId }) {
         data-cy='batch-list-table'
         headers={TABLE_HEADERS}
         data={data.batch}
-        renderRow={(batch) => <BatchRow projectId={projectId} batch={batch} />}
+        renderRow={(batch) => (
+          <BatchRow
+            key={batch.id}
+            projectId={Number(projectId)}
+            batch={batch}
+          />
+        )}
       />
       <Paginator
         currentPage={page}

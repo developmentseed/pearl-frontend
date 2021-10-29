@@ -611,11 +611,27 @@ describe('Batch predictions', () => {
       batchJob
     );
 
-    // Open progress modal and click in the abort job button
+    // Open progress modal
     cy.get('[data-cy=batch-progress-message')
       .should('include.text', 'Batch prediction in progress: 0%')
       .click();
-    cy.get('[data-cy=abort-batch-job-btn]').should('exist').click();
+    // abort btn is disabled as the progress is 0% yet
+    cy.get('[data-cy=abort-batch-job-btn]')
+      .should('exist')
+      .should('be.disabled');
+    // update progress to 1%
+    cy.intercept(
+      {
+        url: restApiEndpoint + '/api/project/1/batch/1',
+        method: 'GET',
+      },
+      { ...batchJob, progress: 1 }
+    );
+    // click in the abort job button
+    cy.get('[data-cy=abort-batch-job-btn]')
+      .should('exist')
+      .should('not.be.disabled')
+      .click();
 
     cy.intercept(
       {
@@ -629,5 +645,13 @@ describe('Batch predictions', () => {
     cy.get('[data-cy=batch-progress-modal-content]').should('not.exist');
     // confirm progress message is hidden
     cy.get('[data-cy=batch-progress-message').should('not.exist');
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Ready for prediction run'
+    );
+    cy.get('[data-cy=run-button]')
+      .should('exist')
+      .should('not.be.disabled')
+      .should('have.text', 'Run Batch Prediction');
   });
 });

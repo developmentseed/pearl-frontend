@@ -11,6 +11,7 @@ export const AbortBatchJobButton = ({
   projectId,
   batchId,
   compact = false,
+  disabled = false,
   afterOnClickFn = () => {},
 }) => {
   const { restApiClient } = useAuth();
@@ -20,6 +21,7 @@ export const AbortBatchJobButton = ({
       data-cy='abort-batch-job-btn'
       variation='danger-raised-dark'
       useIcon='xmark'
+      disabled={disabled}
       hideText={compact}
       title='Abort batch job'
       onClick={async () => {
@@ -49,5 +51,6 @@ AbortBatchJobButton.propTypes = {
   projectId: T.number,
   batchId: T.number,
   compact: T.bool,
+  disabled: T.bool,
   afterOnClickFn: T.func,
 };

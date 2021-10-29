@@ -424,6 +424,7 @@ function Footer({
         <>
           <BatchPredictionProgressModal
             revealed={displayBatchProgress}
+            disableAbortBtn={runningBatch.progress === 0}
             onCloseClick={() => setDisplayBatchProgress(false)}
           />
           <ProgressButtonWrapper>

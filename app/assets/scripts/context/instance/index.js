@@ -222,7 +222,7 @@ export function InstanceProvider(props) {
    */
 
   useEffect(() => {
-    if (batchReady && !currentAoi) {
+    if (batchReady?.aoi && !currentAoi) {
       restApiClient
         .get(`project/${currentProject.id}/aoi/${batchReady.aoi}`)
         .then((aoi) => {
@@ -405,12 +405,11 @@ export function InstanceProvider(props) {
         setRunningBatch(false);
         setBatchReady(batch);
 
-        // Reload AOI list when complete
-        const aois = await restApiClient.get(`project/${projectId}/aoi/`);
-        setAoiList(aois.aois);
-
-        // If this function is called from a timeout polling context, we can show a toast notification when finished.
+        // If this function is called from a timeout polling context,
+        // we can refresh the AOI list and show a toast notification when finished.
         if (isPoll && batch.abort === false) {
+          const aois = await restApiClient.get(`project/${projectId}/aoi/`);
+          setAoiList(aois.aois);
           toasts.success(`${batch.name} inference is now available`);
         }
         if (isPoll && batch.abort) {
@@ -436,7 +435,9 @@ export function InstanceProvider(props) {
   }
 
   /*
-   * @param project { object } - project object should be passed explicitly to avoid race condition that depends on the instantiation of currentProject state variable object, this occurs when a new project is created
+   * @param project { object } - project object should be passed explicitly to avoid
+   * race condition that depends on the instantiation of currentProject state variable object,
+   * this occurs when a new project is created
    */
   async function getRunningBatch(project) {
     if (project && restApiClient) {

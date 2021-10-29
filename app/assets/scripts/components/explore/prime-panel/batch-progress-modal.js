@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import { Modal } from '@devseed-ui/modal';
 import Prose from '../../../styles/type/prose';
 import { useInstance } from '../../../context/instance';
+import { useSessionStatus, sessionModes } from '../../../context/explore';
 import { areaFromBounds } from '../../../utils/map';
 import logger from '../../../utils/logger';
 import { formatDateTime, formatThousands } from '../../../utils/format';
@@ -21,8 +22,13 @@ const Block = styled.div`
   padding-top: 1rem;
 `;
 
-function BatchPredictionProgressModal({ revealed, onCloseClick }) {
+function BatchPredictionProgressModal({
+  revealed,
+  disableAbortBtn,
+  onCloseClick,
+}) {
   const { runningBatch } = useInstance();
+  const { setSessionStatusMode } = useSessionStatus();
 
   // Calculate AOI Area
   let batchAoiArea;
@@ -60,7 +66,11 @@ function BatchPredictionProgressModal({ revealed, onCloseClick }) {
             <AbortBatchJobButton
               projectId={runningBatch.project_id}
               batchId={runningBatch.id}
-              afterOnClickFn={onCloseClick}
+              disabled={disableAbortBtn}
+              afterOnClickFn={() => {
+                setSessionStatusMode(sessionModes.PREDICTION_READY);
+                onCloseClick();
+              }}
             />
           </Block>
         </Wrapper>
@@ -71,6 +81,7 @@ function BatchPredictionProgressModal({ revealed, onCloseClick }) {
 
 BatchPredictionProgressModal.propTypes = {
   revealed: T.bool,
+  disableAbortBtn: T.bool,
   onCloseClick: T.func,
 };
 
