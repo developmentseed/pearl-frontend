@@ -635,7 +635,7 @@ function Map() {
                     },
                   }}
                   center={[lng, lat]}
-                  radius={10}
+                  radius={6}
                 />
               ))
           )}
