@@ -128,7 +128,10 @@ function AoiSelection() {
   const renderSelectedAoi = () => {
     let header;
     let area;
-    if (sessionStatus.mode === sessionModes.LOADING_PROJECT) {
+    if (
+      sessionStatus.mode === sessionModes.LOADING_PROJECT &&
+      aoiList?.length === 0
+    ) {
       header = 'Loading...';
     } else if (
       aoiArea &&
@@ -147,8 +150,10 @@ function AoiSelection() {
       } else {
         header = 'Drag on map to select';
       }
+    } else if (!aoiList || aoiList?.length === 0) {
+      header = 'Draw area on map or upload an AOI geometry';
     } else {
-      header = 'None selected - Draw area on map or upload AOI ';
+      return null;
     }
 
     return (
