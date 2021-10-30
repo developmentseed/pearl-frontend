@@ -75,7 +75,7 @@ const HomeHeading = styled(Heading)`
 
 const HomeCTA = styled.article`
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
   flex-flow: column nowrap;
   ${media.smallUp`
     flex-flow: row nowrap;
@@ -85,7 +85,7 @@ const HomeCTA = styled.article`
     margin-bottom: ${glsp(2)};
     ${media.smallUp`
       min-width: 14rem;
-      margin-left: ${glsp(2)};
+      margin-right: ${glsp(2)};
     `}
   }
 `;
@@ -119,6 +119,20 @@ const StatusSection = styled.section`
   margin: ${glsp(1.5)} ${glsp()};
   > * {
     margin-right: ${glsp()};
+  }
+`;
+const PartnerLogos = styled.ul`
+  display: flex;
+  flex-flow: row nowrap;
+  li {
+    list-style: none;
+    padding-top: ${glsp(4)};
+    padding-right: ${glsp(6)};
+
+    img {
+      max-width: 100%;
+      height: 2.25rem;
+    }
   }
 `;
 
@@ -192,6 +206,14 @@ function Home() {
               </Button>
             )}
           </HomeCTA>
+          <PartnerLogos>
+            <li>
+              <img src='../assets/graphics/content/logo_microsoft.svg' />
+            </li>
+            <li>
+              <img src='../assets/graphics/content/logo_devseed.svg' />
+            </li>
+          </PartnerLogos>
         </HomeIntro>
         <HomeTout>
           <ul>
