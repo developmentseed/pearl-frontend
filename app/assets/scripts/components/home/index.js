@@ -121,9 +121,12 @@ const StatusSection = styled.section`
     margin-right: ${glsp()};
   }
 `;
-const PartnerLogos = styled.ul`
+export const PartnerLogos = styled.ul`
   display: flex;
-  flex-flow: row nowrap;
+  flex-flow: row wrap;
+  p {
+    flex-basis: 100%;
+  }
   li {
     list-style: none;
     padding-top: ${glsp(4)};

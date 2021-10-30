@@ -15,6 +15,7 @@ import { Heading } from '@devseed-ui/typography';
 import { glsp, media } from '@devseed-ui/theme-provider';
 
 import App from '../common/app';
+import { PartnerLogos } from '../home';
 import { Subheading } from '../../styles/type/heading';
 
 const AboutBody = styled(InpageBody)`
@@ -51,6 +52,7 @@ const InpageNav = styled.nav`
     line-height: 2;
   }
 `;
+
 class About extends React.Component {
   render() {
     return (
@@ -301,6 +303,17 @@ class About extends React.Component {
                     instance.
                   </li>
                 </ul>
+                <PartnerLogos>
+                  <Heading useAlt as='p'>
+                    In Partnership With
+                  </Heading>
+                  <li>
+                    <img src='../assets/graphics/content/logo_microsoft.svg' />
+                  </li>
+                  <li>
+                    <img src='../assets/graphics/content/logo_devseed.svg' />
+                  </li>
+                </PartnerLogos>
               </Prose>
               <InpageNav>
                 <ul>
