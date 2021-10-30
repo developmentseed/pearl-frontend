@@ -48,7 +48,7 @@ const HomeIntro = styled(InpageBodyInner)`
   margin: 0;
   margin-top: 12vw;
   ${media.xlargeUp`
-    margin: 12vw 12vw 0;
+    margin: 6vh 6vh 0;
   `};
 `;
 
@@ -94,7 +94,8 @@ const HomeTout = styled(InpageBodyInner)`
   flex-basis: 100%;
   margin: ${glsp(2)} 0;
   ${media.xlargeUp`
-    margin: 0 12vw;
+    margin: 0 6vh;
+    padding: 6vh 4rem;
   `};
   ul {
     display: grid;
