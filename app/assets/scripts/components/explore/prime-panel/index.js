@@ -99,6 +99,8 @@ function PrimePanel() {
   );
 
   const [activeTab, setActiveTab] = useState(0);
+  const isBatchArea =
+    currentAoi && apiLimits && currentAoi.area > apiLimits['live_inference'];
 
   // Retrain Panel Tab Empty State message
   const retrainPlaceHolderMessage = () => {
@@ -132,11 +134,13 @@ function PrimePanel() {
         }
       }
 
-      if (currentCheckpoint.mode === checkpointModes.RETRAIN) {
+      if (currentCheckpoint.mode === checkpointModes.RETRAIN && !isBatchArea) {
         setActiveTab(RETRAIN_TAB_INDEX);
+      } else if (isBatchArea) {
+        setActiveTab(PREDICT_TAB_INDEX);
       }
     }
-  }, [currentCheckpoint?.id, currentCheckpoint?.mode]);
+  }, [currentCheckpoint?.id, currentCheckpoint?.mode, isBatchArea]);
 
   return (
     <>
@@ -190,8 +194,13 @@ function PrimePanel() {
                     currentCheckpoint.classes !== undefined &&
                     currentAoi
                   }
-                  tabTooltip='Retrain is not availble until model has been run over AOI.'
+                  tabTooltip={
+                    isBatchArea
+                      ? 'Retrain is not available for batch areas'
+                      : 'Retrain is not availble until model has been run over AOI.'
+                  }
                   disabled={
+                    isBatchArea ||
                     !currentCheckpoint ||
                     mapState.mode === mapModes.EDIT_AOI_MODE ||
                     !currentAoi
@@ -230,6 +239,7 @@ function PrimePanel() {
                   tabId='refine-tab-trigger'
                   className='refine-model'
                   disabled={
+                    isBatchArea ||
                     !currentCheckpoint ||
                     !currentAoi ||
                     mapState.mode === mapModes.EDIT_AOI_MODE
@@ -238,7 +248,11 @@ function PrimePanel() {
                     currentCheckpoint &&
                     currentCheckpoint.mode === checkpointModes.REFINE
                   }
-                  tabTooltip='Refine is not available until model has been run or retrained.'
+                  tabTooltip={
+                    isBatchArea
+                      ? 'Refine is not available for batch areas'
+                      : 'Refine is not availble until model has been run over AOI.'
+                  }
                   onTabClick={() => {
                     function onContinue() {
                       setActiveTab(REFINE_TAB_INDEX);
