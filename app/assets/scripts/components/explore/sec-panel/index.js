@@ -1,6 +1,6 @@
 import React from 'react';
-import ClassAnalyticsChart from './class-analytics-chart';
 import styled from 'styled-components';
+import ClassAnalyticsChart from './class-analytics-chart';
 import Panel from '../../common/panel';
 import {
   PanelBlock,
@@ -18,6 +18,7 @@ import { useAoi } from '../../../context/aoi';
 import { round } from '../../../utils/format';
 import { useShortcutState } from '../../../context/explore';
 import { actions as shortcutActions } from '../../../context/explore/shortcuts';
+import InfoButton from '../../common/info-button';
 
 const StyledBlockBody = styled(PanelBlockBody)`
   justify-content: flex-start;
@@ -44,6 +45,11 @@ const CountList = styled.div`
   display: grid;
   grid-template-columns: auto auto;
   justify-content: space-between;
+`;
+const DefinedTerm = styled.span`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 `;
 
 function SecPanel() {
@@ -104,7 +110,15 @@ function SecPanel() {
               {px_stats && currentCheckpoint.classes && (
                 <StyledBlockBody data-cy='checkpoint_class_distro'>
                   <PanelBlockHeader>
-                    <Subheading>Checkpoint Class Distribution</Subheading>
+                    <DefinedTerm>
+                      <Subheading>Checkpoint Class Distribution</Subheading>
+                      <InfoButton
+                        size='small'
+                        hideText
+                        id='class-dist-info'
+                        info='Pixel distribution per class for the current AOI, at the currently loaded checkpoint.'
+                      />
+                    </DefinedTerm>
                   </PanelBlockHeader>
                   {Object.keys(px_stats).length ? (
                     <ClassAnalyticsChart
@@ -116,7 +130,7 @@ function SecPanel() {
                           })
                         ),
                       }}
-                      label='Retraining Sample Distribution'
+                      label='Checkpoint Class Distribution'
                       metric='px_stat'
                       formatter={(v) => `${round(v * 100, 0)}%`}
                     />
@@ -130,7 +144,15 @@ function SecPanel() {
                 currentCheckpoint.analytics && (
                   <StyledBlockBody>
                     <PanelBlockHeader>
-                      <Subheading>Class F1 Scores</Subheading>
+                      <DefinedTerm>
+                        <Subheading>Class F1 Scores</Subheading>
+                        <InfoButton
+                          size='small'
+                          hideText
+                          id='class-f1-info'
+                          info='Class F1 score shows the harmonic mean of precision and recall per class.'
+                        />
+                      </DefinedTerm>
                     </PanelBlockHeader>
                     <ClassAnalyticsChart
                       checkpoint={currentCheckpoint}

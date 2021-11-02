@@ -237,6 +237,6 @@ describe('Can delete AOIs', () => {
 
     cy.get('[data-cy=confirm-delete-aoi-modal]').should('not.exist');
     cy.get('@deleteAnyAoi').should('not.exist');
-    cy.get('[data-cy=selected-aoi-header]').should('contain', 'None selected');
+    cy.get('@loadAois1').should('not.exist');
   });
 });

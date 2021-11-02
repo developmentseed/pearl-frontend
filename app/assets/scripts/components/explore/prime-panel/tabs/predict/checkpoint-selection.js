@@ -13,7 +13,8 @@ import { useInstance } from '../../../../../context/instance';
 
 import { useModel } from '../../../../../context/model';
 import { useProject } from '../../../../../context/project';
-import { useMapState } from '../../../../../context/explore';
+import { useMapState, useSessionStatus } from '../../../../../context/explore';
+import { sessionModes } from '../../../../../context/explore/session-status';
 
 const CheckpointOption = styled(Option)`
   ${({ disabled }) =>
@@ -32,6 +33,7 @@ function CheckpointSelection({ checkpointHasSamples }) {
   const { applyCheckpoint } = useInstance();
   const { currentProject } = useProject();
   const { mapState, mapModes } = useMapState();
+  const { sessionStatus } = useSessionStatus();
 
   const disabled =
     checkpointHasSamples ||
@@ -40,7 +42,12 @@ function CheckpointSelection({ checkpointHasSamples }) {
 
   const renderSelectedCheckpoint = () => {
     let name;
-    if (currentCheckpoint && currentCheckpoint.id) {
+    if (
+      !checkpointList &&
+      sessionStatus.mode === sessionModes.LOADING_PROJECT
+    ) {
+      name = `Loading...`;
+    } else if (currentCheckpoint && currentCheckpoint.id) {
       let realname = `${currentCheckpoint.name} (${currentCheckpoint.id})`;
       if (currentCheckpoint.bookmarked) {
         name = realname;
@@ -49,13 +56,12 @@ function CheckpointSelection({ checkpointHasSamples }) {
           ? 'Current checkpoint (Unsaved)'
           : `${selectedModel.name} (Base Model)`;
       }
-    } else if (checkpointList?.length) {
-      name = `${checkpointList.length} checkpoint${
-        checkpointList.length > 1 ? 's' : ''
-      } available`;
-    } else {
+    } else if (!checkpointList || checkpointList?.length === 0) {
       name = 'Run model to create first checkpoint';
+    } else {
+      return null;
     }
+
     return (
       <CheckpointOption selected data-cy='selected-checkpoint-header'>
         <Heading size='xsmall'>{name}</Heading>

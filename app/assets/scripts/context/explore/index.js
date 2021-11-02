@@ -448,6 +448,7 @@ export function ExploreProvider(props) {
       [latMin, lonMin],
       [latMax, lonMax],
     ];
+    let area;
 
     if (aoiRef) {
       // Load existing AOI that was returned by the api
@@ -464,7 +465,8 @@ export function ExploreProvider(props) {
       setAoiName(aoiObject.name);
     }
 
-    setAoiArea(areaFromBounds(tBbox(aoi.bounds)));
+    area = areaFromBounds(tBbox(aoi.bounds));
+    setAoiArea(area);
 
     if (!aoiMatchesCheckpoint) {
       toasts.error(

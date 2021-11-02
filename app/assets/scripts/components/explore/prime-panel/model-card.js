@@ -4,7 +4,7 @@ import { Bar } from 'react-chartjs-2';
 import { Card } from '../../common/card-list';
 import { round } from '../../../utils/format';
 
-function ModelCard({ model, onClick }) {
+function ModelCard({ model, onClick, selected }) {
   const details = {
     Imagery: model.meta.imagery,
     'Imagery Resolution': model.meta.imagery_resolution,
@@ -92,6 +92,7 @@ function ModelCard({ model, onClick }) {
       details={details}
       expanded
       borderlessMedia
+      selected={selected}
       cardMedia={
         <Bar
           data={{
@@ -120,6 +121,7 @@ function ModelCard({ model, onClick }) {
 ModelCard.propTypes = {
   model: T.object,
   onClick: T.func,
+  selected: T.bool,
 };
 
 export default ModelCard;
