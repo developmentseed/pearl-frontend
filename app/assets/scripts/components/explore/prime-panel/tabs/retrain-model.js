@@ -25,28 +25,7 @@ import { useAoi } from '../../../../context/aoi';
 import { useApiLimits } from '../../../../context/global';
 import EditClass from './edit-class';
 import ImportGeojson from './retrain/import-geojson';
-import Prose from '../../../../styles/type/prose';
-
-import { Modal } from '@devseed-ui/modal';
-import { Button } from '@devseed-ui/button';
-import styled from 'styled-components';
-import { themeVal } from '@devseed-ui/theme-provider';
 import ImportOSMQA from './retrain/import-osm-qa';
-
-const Wrapper = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  h1 {
-    grid-column: 1 / -1;
-  }
-  div.prose {
-    grid-column: 1 / -1;
-  }
-  .warning {
-    color: ${themeVal('color.danger')};
-  }
-  grid-gap: 1rem;
-`;
 
 /*
  * Retrain Model
@@ -65,8 +44,7 @@ function RetrainModel(props) {
   const [importSamplesModalRevealed, setImportSamplesModalRevealed] = useState(
     false
   );
-  const [importSource, setImportSource] = useState(null);
-
+  const [OSMModalRevealed, setOSMModalRevealed] = useState(false);
   const { aoiArea } = useAoi();
   const { apiLimits } = useApiLimits();
 
@@ -81,51 +59,13 @@ function RetrainModel(props) {
         currentCheckpoint.classes && (
           <>
             <RetrainTools>
-              <Modal
-                id='import-samples-modal'
-                size='small'
+              <ImportGeojson
+                setRevealed={setImportSamplesModalRevealed}
                 revealed={importSamplesModalRevealed}
-                title='Import Retraining Samples'
-                onCloseClick={() => {
-                  setImportSamplesModalRevealed(false);
-                }}
-                content={
-                  importSource === 'geojson' ? (
-                    <ImportGeojson
-                      setModalRevealed={setImportSamplesModalRevealed}
-                    />
-                  ) : importSource === 'osm-qa' ? (
-                    <ImportOSMQA
-                      setModalRevealed={setImportSamplesModalRevealed}
-                    />
-                  ) : (
-                    <Wrapper>
-                      <Prose className='prose'>Select source:</Prose>
-                      <Button
-                        data-cy='select-geojson-import-button'
-                        variation='primary-raised-dark'
-                        size='medium'
-                        style={{
-                          gridColumn: '1 / -1',
-                        }}
-                        onClick={() => setImportSource('geojson')}
-                      >
-                        GeoJSON file
-                      </Button>
-                      <Button
-                        data-cy='select-osm-qa-import-button'
-                        variation='primary-raised-dark'
-                        size='medium'
-                        style={{
-                          gridColumn: '1 / -1',
-                        }}
-                        onClick={() => setImportSource('osm-qa')}
-                      >
-                        OpenStreetMap QA Tiles
-                      </Button>
-                    </Wrapper>
-                  )
-                }
+              />
+              <ImportOSMQA
+                setRevealed={setOSMModalRevealed}
+                revealed={OSMModalRevealed}
               />
               <Subheading>Sample Selection Tools</Subheading>
               <InfoButton
@@ -271,11 +211,28 @@ function RetrainModel(props) {
                 visuallyDisabled={!currentCheckpoint.activeItem}
                 info='Import samples'
                 onClick={() => {
-                  setImportSource(null);
                   setImportSamplesModalRevealed(true);
                 }}
               >
                 Import
+              </InfoButton>
+              <InfoButton
+                id='open-osm-modal-button'
+                data-cy='open-osm-modal-button'
+                variation={
+                  OSMModalRevealed ? 'primary-raised-dark' : 'primary-plain'
+                }
+                size='small'
+                radius='ellipsoid'
+                useLocalButton
+                useIcon='brand-osm'
+                visuallyDisabled={!currentCheckpoint.activeItem}
+                info='Use OSM data'
+                onClick={() => {
+                  setOSMModalRevealed(true);
+                }}
+              >
+                Use OSM
               </InfoButton>
             </RetrainTools>
             <ClassList>
