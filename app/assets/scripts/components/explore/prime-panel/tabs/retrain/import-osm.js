@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import T from 'prop-types';
 import styled from 'styled-components';
 import { Button } from '@devseed-ui/button';
@@ -9,6 +9,13 @@ import {
   actions as checkpointActions,
 } from '../../../../../context/checkpoint';
 import { Modal } from '@devseed-ui/modal';
+import { useModel } from '../../../../../context/model';
+import {
+  Dropdown,
+  DropdownBody,
+  DropdownItem,
+  DropdownTrigger,
+} from '../../../../../styles/dropdown';
 
 export const defaultClassTagmaps = [
   {
@@ -222,6 +229,11 @@ const Wrapper = styled.div`
 function ImportOsm({ revealed, setRevealed }) {
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
   const activeClass = currentCheckpoint && currentCheckpoint.activeItem;
+
+  const [selectedClass, setSelectedClass] = useState(
+    currentCheckpoint.activeItem
+  );
+
   return (
     <Modal
       id='import-osm-modal'
@@ -232,7 +244,32 @@ function ImportOsm({ revealed, setRevealed }) {
       content={
         <Wrapper>
           <Prose className='prose'>
-            Target class: <strong>{activeClass}</strong>
+            Target class:
+            <Dropdown
+              selectable
+              triggerElement={() => (
+                <DropdownTrigger
+                  title='View Help Options'
+                  className='help-trigger'
+                  size='medium'
+                >
+                  {selectedClass}
+                </DropdownTrigger>
+              )}
+            >
+              <DropdownBody>
+                {Object.values(currentCheckpoint.classes).map(({ name }) => (
+                  <DropdownItem
+                    key={name}
+                    data-dropdown='click.close'
+                    active={name === activeClass}
+                    onClick={() => setSelectedClass(name)}
+                  >
+                    {name}
+                  </DropdownItem>
+                ))}
+              </DropdownBody>
+            </Dropdown>
           </Prose>
           <Prose className='prose'>
             By proceeding the current AOI will be populated with samples from{' '}
@@ -287,7 +324,7 @@ function ImportOsm({ revealed, setRevealed }) {
 }
 
 ImportOsm.propTypes = {
-  revealed: T.func,
+  revealed: T.bool,
   setRevealed: T.func,
 };
 
