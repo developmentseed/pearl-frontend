@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import SizeAwareElement from '../../common/size-aware-element';
 import {
   MapContainer,
+  ScaleControl,
   TileLayer,
   FeatureGroup,
   ImageOverlay,
@@ -652,6 +653,7 @@ function Map() {
           <GeoCoder />
           {aoiRef && <CenterMap aoiRef={aoiRef} />}
         </FeatureGroup>
+        <ScaleControl />
       </MapContainer>
     );
   }, [

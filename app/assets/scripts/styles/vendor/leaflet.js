@@ -88,4 +88,7 @@ export default () => css`
     border-radius: unset;
     border: unset;
   }
+  .leaflet-control-scale-line {
+    background: rgba(255, 255, 255, 0.75);
+  }
 `;
