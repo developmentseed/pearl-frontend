@@ -38,3 +38,13 @@ export function bboxIntersectsMapBounds(bbox, mapBounds) {
   }
   return false;
 }
+
+export function aoiBoundsToArray(bounds) {
+  // Get bbox polygon from AOI
+  const {
+    _southWest: { lng: minX, lat: minY },
+    _northEast: { lng: maxX, lat: maxY },
+  } = bounds;
+
+  return [minX, minY, maxX, maxY];
+}

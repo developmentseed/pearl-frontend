@@ -35,6 +35,7 @@ import { wrapLogReducer } from '../reducers/utils';
 import { featureCollection, feature } from '@turf/helpers';
 import { delay } from '../../utils/utils';
 import { actions as instanceActions, useInstanceReducer } from './reducer';
+import { aoiBoundsToArray } from '../../utils/map';
 
 const BATCH_REFRESH_INTERVAL = 4000;
 
@@ -66,16 +67,6 @@ function aoiBoundsToPolygon(bounds) {
       ],
     ],
   };
-}
-
-function aoiBoundsToArray(bounds) {
-  // Get bbox polygon from AOI
-  const {
-    _southWest: { lng: minX, lat: minY },
-    _northEast: { lng: maxX, lat: maxY },
-  } = bounds;
-
-  return [minX, minY, maxX, maxY];
 }
 
 const InstanceContext = createContext(null);
