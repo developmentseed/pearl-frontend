@@ -6,7 +6,7 @@ import {
   TileLayer,
   FeatureGroup,
   ImageOverlay,
-  Circle,
+  CircleMarker,
 } from 'react-leaflet';
 import L from 'leaflet';
 import {
@@ -615,7 +615,7 @@ function Map() {
               sampleClass.points &&
               sampleClass.points.coordinates &&
               sampleClass.points.coordinates.map(([lat, lng]) => (
-                <Circle
+                <CircleMarker
                   key={JSON.stringify([lat, lng])}
                   pathOptions={{
                     color: sampleClass.color,
@@ -635,7 +635,7 @@ function Map() {
                     },
                   }}
                   center={[lng, lat]}
-                  radius={10}
+                  radius={6}
                 />
               ))
           )}
