@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { Button } from '@devseed-ui/button';
 import { themeVal } from '@devseed-ui/theme-provider';
 import Prose from '../../../../../styles/type/prose';
+import { Modal } from '@devseed-ui/modal';
 import { FauxFileDialog } from '../../../../common/faux-file-dialog';
 import toasts from '../../../../common/toasts';
 import {
@@ -27,7 +28,7 @@ const Wrapper = styled.div`
   grid-gap: 1rem;
 `;
 
-function ImportGeojson({ setModalRevealed }) {
+function ImportGeojson({ revealed, setRevealed }) {
   const [warning, setWarning] = useState(null);
   const [file, setFile] = useState(null);
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
@@ -111,68 +112,78 @@ function ImportGeojson({ setModalRevealed }) {
   };
 
   return (
-    <Wrapper>
-      <Prose className='prose'>
-        Target class: <strong>{currentCheckpoint.activeItem}</strong>
-      </Prose>
-      <Prose className='prose'>
-        Upload training sample data in .geojson format.
-      </Prose>
-      <Prose className='prose'>
-        Select a GeoJSON file with FeatureCollection of Points and Polygons.
-        Once imported, these can be submitted to the model to retrain.
-      </Prose>
-      <FauxFileDialog
-        name='image-file'
-        data-cy='samples-upload-input'
-        onFileSelect={onFileSelect}
-      >
-        {(fieProps) =>
-          !file && (
-            <Button
-              data-cy='select-samples-geojson-button'
-              variation='primary-raised-light'
-              size='medium'
-              useIcon='upload'
-              style={{
-                gridColumn: '2 / 1',
-              }}
-              {...fieProps}
-            >
-              Select file to upload
-            </Button>
-          )
-        }
-      </FauxFileDialog>
-      {file && (
-        <div className='prose'>
-          <strong>Selected: </strong>
-          {file.name}
-        </div>
-      )}
-      {warning && <div className='prose warning'>{warning}</div>}
-      <Button
-        data-cy='import-samples-geojson-button'
-        variation='primary-raised-dark'
-        size='medium'
-        useIcon='tick'
-        visuallyDisabled={!file}
-        disabled={!file}
-        style={{
-          gridColumn: '1 / -1',
-        }}
-        onClick={() => {
-          importFile();
-          setModalRevealed(false);
-        }}
-      >
-        Import
-      </Button>
-    </Wrapper>
+    <Modal
+      id='import-sample-modal'
+      size='small'
+      revealed={revealed}
+      title='Upload Retraining Samples'
+      onCloseClick={() => setRevealed(false)}
+      content={
+        <Wrapper>
+          <Prose className='prose'>
+            Target class: <strong>{currentCheckpoint.activeItem}</strong>
+          </Prose>
+          <Prose className='prose'>
+            Upload training sample data in .geojson format.
+          </Prose>
+          <Prose className='prose'>
+            Select a GeoJSON file with FeatureCollection of Points and Polygons.
+            Once imported, these can be submitted to the model to retrain.
+          </Prose>
+          <FauxFileDialog
+            name='image-file'
+            data-cy='samples-upload-input'
+            onFileSelect={onFileSelect}
+          >
+            {(fieProps) =>
+              !file && (
+                <Button
+                  data-cy='select-samples-geojson-button'
+                  variation='primary-raised-light'
+                  size='medium'
+                  useIcon='upload'
+                  style={{
+                    gridColumn: '2 / 1',
+                  }}
+                  {...fieProps}
+                >
+                  Select file to upload
+                </Button>
+              )
+            }
+          </FauxFileDialog>
+          {file && (
+            <div className='prose'>
+              <strong>Selected: </strong>
+              {file.name}
+            </div>
+          )}
+          {warning && <div className='prose warning'>{warning}</div>}
+          <Button
+            data-cy='import-samples-geojson-button'
+            variation='primary-raised-dark'
+            size='medium'
+            useIcon='tick'
+            visuallyDisabled={!file}
+            disabled={!file}
+            style={{
+              gridColumn: '1 / -1',
+            }}
+            onClick={() => {
+              importFile();
+              setRevealed(false);
+            }}
+          >
+            Import
+          </Button>
+        </Wrapper>
+      }
+    />
   );
 }
 
 ImportGeojson.propTypes = {
-  setModalRevealed: T.func,
+  revealed: T.bool,
+  setRevealed: T.func,
 };
 export default ImportGeojson;
