@@ -443,7 +443,7 @@ export function InstanceProvider(props) {
     if (project && restApiClient) {
       try {
         const { batch: batches } = await restApiClient.get(
-          `project/${project.id}/batch?completed=false`
+          `project/${project.id}/batch?completed=false&order=desc`
         );
 
         if (batches.length > 0) {
