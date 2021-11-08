@@ -9,7 +9,6 @@ import {
   actions as checkpointActions,
 } from '../../../../../context/checkpoint';
 import { Modal } from '@devseed-ui/modal';
-import { useModel } from '../../../../../context/model';
 import {
   Dropdown,
   DropdownBody,
@@ -247,11 +246,12 @@ function ImportOsm({ revealed, setRevealed }) {
             Target class:
             <Dropdown
               selectable
-              triggerElement={() => (
+              triggerElement={(triggerProps) => (
                 <DropdownTrigger
                   title='View Help Options'
                   className='help-trigger'
                   size='medium'
+                  {...triggerProps}
                 >
                   {selectedClass}
                 </DropdownTrigger>
@@ -293,7 +293,7 @@ function ImportOsm({ revealed, setRevealed }) {
               dispatchCurrentCheckpoint({
                 type: checkpointActions.SET_OSM_TAGMAP,
                 data: {
-                  name: activeClass,
+                  name: selectedClass,
                   tagmap:
                     defaultClassTagmaps.find((c) => c.name === activeClass)
                       ?.tagmap || [],
