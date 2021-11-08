@@ -113,7 +113,7 @@ function ImportGeojson({ revealed, setRevealed }) {
 
   return (
     <Modal
-      id='import-sample-modal'
+      id='import-samples-modal'
       size='small'
       revealed={revealed}
       title='Upload Retraining Samples'
