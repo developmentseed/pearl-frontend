@@ -25,7 +25,7 @@ import { useAoi } from '../../../../context/aoi';
 import { useApiLimits } from '../../../../context/global';
 import EditClass from './edit-class';
 import ImportGeojson from './retrain/import-geojson';
-import ImportOSMQA from './retrain/import-osm-qa';
+import ImportOsm from './retrain/import-osm';
 
 /*
  * Retrain Model
@@ -44,7 +44,7 @@ function RetrainModel(props) {
   const [importSamplesModalRevealed, setImportSamplesModalRevealed] = useState(
     false
   );
-  const [OSMModalRevealed, setOSMModalRevealed] = useState(false);
+  const [osmModalRevealed, setOsmModalRevealed] = useState(false);
   const { aoiArea } = useAoi();
   const { apiLimits } = useApiLimits();
 
@@ -63,9 +63,9 @@ function RetrainModel(props) {
                 setRevealed={setImportSamplesModalRevealed}
                 revealed={importSamplesModalRevealed}
               />
-              <ImportOSMQA
-                setRevealed={setOSMModalRevealed}
-                revealed={OSMModalRevealed}
+              <ImportOsm
+                setRevealed={setOsmModalRevealed}
+                revealed={osmModalRevealed}
               />
               <Subheading>Sample Selection Tools</Subheading>
               <InfoButton
@@ -210,30 +210,30 @@ function RetrainModel(props) {
                 useLocalButton
                 useIcon='upload'
                 visuallyDisabled={!currentCheckpoint.activeItem}
-                info='Import samples'
+                info='Import samples from GeoJSON file'
                 onClick={() => {
                   setImportSamplesModalRevealed(true);
                 }}
               >
-                Import
+                Import GeoJSON
               </InfoButton>
               <InfoButton
                 id='open-osm-modal-button'
                 data-cy='open-osm-modal-button'
                 variation={
-                  OSMModalRevealed ? 'primary-raised-dark' : 'primary-plain'
+                  osmModalRevealed ? 'primary-raised-dark' : 'primary-plain'
                 }
                 size='small'
                 radius='ellipsoid'
                 useLocalButton
                 useIcon='brand-osm'
                 visuallyDisabled={!currentCheckpoint.activeItem}
-                info='Use OSM data'
+                info='Apply OpenStreetMap features as samples'
                 onClick={() => {
-                  setOSMModalRevealed(true);
+                  setOsmModalRevealed(true);
                 }}
               >
-                Use OSM
+                Apply OpenStreetMap
               </InfoButton>
             </RetrainTools>
             <ClassList>

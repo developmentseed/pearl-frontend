@@ -219,7 +219,7 @@ const Wrapper = styled.div`
   grid-gap: 1rem;
 `;
 
-function ImportOSMQA({ revealed, setRevealed }) {
+function ImportOsm({ revealed, setRevealed }) {
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
   const activeClass = currentCheckpoint && currentCheckpoint.activeItem;
   return (
@@ -227,7 +227,7 @@ function ImportOSMQA({ revealed, setRevealed }) {
       id='import-osm-modal'
       size='small'
       revealed={revealed}
-      title='Apply Open Street Map Data'
+      title='Apply OpenStreetMap Data'
       onCloseClick={() => setRevealed(false)}
       content={
         <Wrapper>
@@ -246,7 +246,7 @@ function ImportOSMQA({ revealed, setRevealed }) {
             .
           </Prose>
           <Button
-            data-cy='import-osm-qa-samples-button'
+            data-cy='import-osm-samples-button'
             variation='primary-raised-dark'
             size='medium'
             style={{
@@ -286,9 +286,9 @@ function ImportOSMQA({ revealed, setRevealed }) {
   );
 }
 
-ImportOSMQA.propTypes = {
+ImportOsm.propTypes = {
   revealed: T.func,
   setRevealed: T.func,
 };
 
-export default ImportOSMQA;
+export default ImportOsm;
