@@ -28,7 +28,7 @@ const Wrapper = styled.div`
   grid-gap: 1rem;
 `;
 
-function ImportGeojson({ revealed, setRevealed }) {
+function ImportGeojsonModal({ revealed, setRevealed }) {
   const [warning, setWarning] = useState(null);
   const [file, setFile] = useState(null);
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
@@ -182,8 +182,8 @@ function ImportGeojson({ revealed, setRevealed }) {
   );
 }
 
-ImportGeojson.propTypes = {
+ImportGeojsonModal.propTypes = {
   revealed: T.bool,
   setRevealed: T.func,
 };
-export default ImportGeojson;
+export default ImportGeojsonModal;

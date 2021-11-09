@@ -267,7 +267,7 @@ const Wrapper = styled.div`
   grid-gap: 1rem;
 `;
 
-function ImportOsm({ revealed, setRevealed }) {
+function ApplyOsmModal({ revealed, setRevealed }) {
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
   const activeClass = currentCheckpoint && currentCheckpoint.activeItem;
 
@@ -275,7 +275,7 @@ function ImportOsm({ revealed, setRevealed }) {
 
   return (
     <Modal
-      id='import-osm-modal'
+      id='apply-osm-modal'
       size='small'
       revealed={revealed}
       title='Apply OpenStreetMap Data'
@@ -323,7 +323,7 @@ function ImportOsm({ revealed, setRevealed }) {
             .
           </Prose>
           <Button
-            data-cy='import-osm-samples-button'
+            data-cy='apply-osm-button'
             variation='primary-raised-dark'
             size='medium'
             style={{
@@ -346,7 +346,6 @@ function ImportOsm({ revealed, setRevealed }) {
             Proceed
           </Button>
           <Button
-            data-cy='import-geojson-samples-button'
             variation='danger-raised-dark'
             size='medium'
             style={{
@@ -364,9 +363,9 @@ function ImportOsm({ revealed, setRevealed }) {
   );
 }
 
-ImportOsm.propTypes = {
+ApplyOsmModal.propTypes = {
   revealed: T.bool,
   setRevealed: T.func,
 };
 
-export default ImportOsm;
+export default ApplyOsmModal;

@@ -24,8 +24,8 @@ import { Subheading } from '../../../../styles/type/heading';
 import { useAoi } from '../../../../context/aoi';
 import { useApiLimits } from '../../../../context/global';
 import EditClass from './edit-class';
-import ImportGeojson from './retrain/import-geojson';
-import ImportOsm from './retrain/import-osm';
+import ImportGeojsonModal from './retrain/import-geojson-modal';
+import ApplyOsmModal from './retrain/apply-osm-modal';
 
 /*
  * Retrain Model
@@ -59,11 +59,11 @@ function RetrainModel(props) {
         currentCheckpoint.classes && (
           <>
             <RetrainTools>
-              <ImportGeojson
+              <ImportGeojsonModal
                 setRevealed={setImportSamplesModalRevealed}
                 revealed={importSamplesModalRevealed}
               />
-              <ImportOsm
+              <ApplyOsmModal
                 setRevealed={setOsmModalRevealed}
                 revealed={osmModalRevealed}
               />
