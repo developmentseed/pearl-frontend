@@ -161,6 +161,48 @@ export const defaultClassTagmaps = [
     ],
   },
   {
+    name: 'Built Environment',
+    color: '#ffb703',
+    tagmap: [
+      { key: 'building', value: '.*' },
+      { key: 'amenity', value: 'bar' },
+      { key: 'amenity', value: 'hospital' },
+      { key: 'amenity', value: 'pub' },
+      { key: 'amenity', value: 'restaurant' },
+      { key: 'amenity', value: 'school' },
+      { key: 'amenity', value: 'university' },
+      { key: 'amenity', value: 'animal_shelter' },
+      { key: 'amenity', value: 'arts_centre' },
+      { key: 'amenity', value: 'bank' },
+      { key: 'amenity', value: 'bar' },
+      { key: 'amenity', value: 'brothel' },
+      { key: 'amenity', value: 'cafe' },
+      { key: 'amenity', value: 'car_rental' },
+      { key: 'amenity', value: 'car_wash' },
+      { key: 'amenity', value: 'casino' },
+      { key: 'amenity', value: 'cinema' },
+      { key: 'amenity', value: 'clinic' },
+      { key: 'amenity', value: 'college' },
+      { key: 'amenity', value: 'community_centre' },
+      { key: 'amenity', value: 'courthouse' },
+      { key: 'amenity', value: 'crematorium' },
+      { key: 'amenity', value: 'crypt' },
+      { key: 'amenity', value: 'dentist' },
+      { key: 'amenity', value: 'dive_centre' },
+      { key: 'amenity', value: 'driving_school' },
+      { key: 'amenity', value: 'embassy' },
+      { key: 'amenity', value: 'fast_food' },
+      { key: 'amenity', value: 'ferry_terminal' },
+      { key: 'amenity', value: 'fire_station' },
+      { key: 'amenity', value: 'food_court' },
+      { key: 'amenity', value: 'fuel' },
+      { key: 'amenity', value: 'grave_yard' },
+      { key: 'amenity', value: 'gym' },
+      { key: 'amenity', value: 'hospital' },
+      { key: 'amenity', value: 'internet_cafe' },
+    ],
+  },
+  {
     name: 'Tree',
     color: '#80FF80',
     tagmap: [
@@ -229,9 +271,7 @@ function ImportOsm({ revealed, setRevealed }) {
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
   const activeClass = currentCheckpoint && currentCheckpoint.activeItem;
 
-  const [selectedClass, setSelectedClass] = useState(
-    currentCheckpoint.activeItem
-  );
+  const [selectedClass, setSelectedClass] = useState(null);
 
   return (
     <Modal
@@ -253,7 +293,7 @@ function ImportOsm({ revealed, setRevealed }) {
                   size='medium'
                   {...triggerProps}
                 >
-                  {selectedClass}
+                  {selectedClass || activeClass}
                 </DropdownTrigger>
               )}
             >
@@ -265,7 +305,7 @@ function ImportOsm({ revealed, setRevealed }) {
                     active={name === activeClass}
                     onClick={() => setSelectedClass(name)}
                   >
-                    {name}
+                    {selectedClass}
                   </DropdownItem>
                 ))}
               </DropdownBody>
@@ -293,12 +333,13 @@ function ImportOsm({ revealed, setRevealed }) {
               dispatchCurrentCheckpoint({
                 type: checkpointActions.SET_OSM_TAGMAP,
                 data: {
-                  name: selectedClass,
+                  name: selectedClass || activeClass,
                   tagmap:
                     defaultClassTagmaps.find((c) => c.name === activeClass)
                       ?.tagmap || [],
                 },
               });
+              setSelectedClass(null);
               setRevealed(false);
             }}
           >
