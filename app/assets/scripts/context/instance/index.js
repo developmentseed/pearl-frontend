@@ -413,7 +413,7 @@ export function InstanceProvider(props) {
           toasts.success(`${batch.name} inference is now available`);
         }
         if (isPoll && batch.abort) {
-          toasts.error(`${batch.name} inference was aborted`);
+          toasts.success(`${batch.name} inference was aborted`);
         }
       } else {
         setRunningBatch(batch);
