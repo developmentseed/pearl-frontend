@@ -3,8 +3,8 @@
    "project_id":1,
    "aois":[
       {
-         "id":2,
-         "name":"Seneca Rocks #1",
+         "id":1,
+         "name":"Seneca Rocks",
          "bookmarked":true,
          "bounds":{
             "type":"Polygon",
@@ -33,9 +33,9 @@
                ]
             ]
          },
-         "created":"2021-04-30T18:05:26.309Z",
-         "storage":true,
-         "checkpoint_id":"2",
+         "created":"2021-04-30T18:11:51.705Z",
+         "storage":false,
+         "checkpoint_id":2,
          "checkpoint_name":"Seneca Rocks",
          "classes":[
             {
