@@ -16,9 +16,8 @@ const { compile: collecticonsCompile } = require('collecticons-processor');
 
 const {
   appTitle,
-  appLongTitle,
   appDescription,
-} = require('./app/assets/scripts/config/production').default;
+} = require('./app/assets/scripts/config/base').default;
 
 // /////////////////////////////////////////////////////////////////////////////
 // --------------------------- Variables -------------------------------------//
@@ -79,7 +78,7 @@ function serve() {
         match: /{{baseurl}}/g,
         replace: ''
       },
-      { match: /{{appTitle}}/g, replace: appTitle },
+      { match: /{{appTitle}}/g, replace: appTitle},
       { match: /{{appDescription}}/g, replace: appDescription }
     ]
   });
