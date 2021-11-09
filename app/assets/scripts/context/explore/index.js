@@ -472,6 +472,7 @@ export function ExploreProvider(props) {
       toasts.error(
         'Tiles do not exist for this AOI and this checkpoint. Treating as geometry only'
       );
+      setAoiName(aoiObject.name);
       if (currentCheckpoint) {
         dispatchCurrentCheckpoint({
           type: checkpointActions.SET_CHECKPOINT_MODE,
@@ -479,6 +480,7 @@ export function ExploreProvider(props) {
             mode: checkpointModes.RUN,
           },
         });
+        setSessionStatusMode(sessionModes.PREDICTION_READY);
       }
       setCurrentAoi(null);
       hideGlobalLoading();
