@@ -9,6 +9,7 @@ import { Dropdown, DropdownBody } from '../../../styles/dropdown';
 import { LocalButton } from '../../../styles/local-button';
 
 import InfoButton from '../../common/info-button';
+import { StyledTooltip } from '../../common/tooltip';
 import { PanelBlockFooter } from '../../common/panel-block';
 import {
   checkpointModes,
@@ -431,16 +432,24 @@ function Footer({
             <Spinner />
             <Button
               data-cy='batch-progress-message'
+              data-tip
+              data-for='batch-starting'
               variation='primary-plain'
               size='small'
-              title='Status of running prediction'
               onClick={() => {
                 setDisplayBatchProgress(true);
               }}
               id='batch-progress-message'
             >
-              Batch prediction in progress: {runningBatch.progress}%
+              {runningBatch.progress === 0
+                ? 'Starting batch prediction...'
+                : `Batch prediction in progress: ${runningBatch.progress}%}`}
             </Button>
+            {runningBatch.progress === 0 && (
+              <StyledTooltip id='batch-starting'>
+                It will be possible to abort the job when it starts running
+              </StyledTooltip>
+            )}
           </ProgressButtonWrapper>
         </>
       )}

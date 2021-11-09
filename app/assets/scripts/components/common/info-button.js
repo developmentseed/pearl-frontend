@@ -1,17 +1,8 @@
 import React from 'react';
 import T from 'prop-types';
-import ReactTooltip from 'react-tooltip';
 import { Button } from '@devseed-ui/button';
 import { LocalButton } from '../../styles/local-button';
-import styled from 'styled-components';
-const StyledTooltip = styled(ReactTooltip)`
-  &.__react_component_tooltip {
-    width: ${({ width }) => width || 'auto'};
-    /* Z index set to 1000 to go over shadow scroll bar
-   * which has z-index 1000 */
-    z-index: 1001;
-  }
-`;
+import { StyledTooltip } from './tooltip';
 
 export const InfoButton = React.forwardRef((props, ref) => {
   const { info, id, useIcon, width, useLocalButton } = props;

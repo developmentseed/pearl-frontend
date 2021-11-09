@@ -206,7 +206,7 @@ describe('Batch predictions', () => {
     // Batch message should be displayed
     cy.get('[data-cy=batch-progress-message').should(
       'include.text',
-      'Batch prediction in progress: 0%'
+      'Starting batch prediction...'
     );
 
     // Make batch job at 10%
@@ -613,7 +613,7 @@ describe('Batch predictions', () => {
 
     // Open progress modal
     cy.get('[data-cy=batch-progress-message')
-      .should('include.text', 'Batch prediction in progress: 0%')
+      .should('include.text', 'Starting batch prediction...')
       .click();
     // abort btn is disabled as the progress is 0% yet
     cy.get('[data-cy=abort-batch-job-btn]')
