@@ -78,7 +78,7 @@ function serve() {
         match: /{{baseurl}}/g,
         replace: ''
       },
-      { match: /{{appTitle}}/g, replace: appTitle},
+      { match: /{{appTitle}}/g, replace: appTitle },
       { match: /{{appDescription}}/g, replace: appDescription }
     ]
   });
