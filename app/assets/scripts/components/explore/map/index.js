@@ -107,6 +107,7 @@ function Map() {
     aoiRef,
     setAoiRef,
     currentAoi,
+    aoiBounds,
     setActiveModal,
     setCurrentAoi,
   } = useAoi();
@@ -644,8 +645,12 @@ function Map() {
 
         {!window.Cypress &&
           sessionStatus?.mode === sessionModes.RETRAIN_READY &&
-          currentCheckpoint && (
-            <OsmQaLayer modelClasses={currentCheckpoint.classes} />
+          currentCheckpoint &&
+          aoiRef && (
+            <OsmQaLayer
+              modelClasses={currentCheckpoint.classes}
+              aoiRef={aoiRef}
+            />
           )}
 
         <FeatureGroup>

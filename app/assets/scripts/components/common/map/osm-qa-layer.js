@@ -14,6 +14,18 @@ function getFeatureId(feature) {
   return feature.properties && feature.properties['@id'];
 }
 
+/**
+ * Custom renderer to avoid drawing LineStrings
+ */
+const customRenderer = L.SVG.Tile.extend({
+  _addPath: function (layer) {
+    if (layer.properties['@ftype'] === 'LineString') {
+      return;
+    }
+    L.SVG.Tile.prototype._addPath.call(this, layer);
+  },
+});
+
 function OsmQaLayer({ modelClasses }) {
   const map = useMap();
 
@@ -53,6 +65,9 @@ function OsmQaLayer({ modelClasses }) {
     }
 
     const l = L.vectorGrid.protobuf(osmQaPbfTilesUrl, {
+      rendererFactory: function (tileCoord, tileSize, opts) {
+        return new customRenderer(tileCoord, tileSize, opts);
+      },
       pane: 'markerPane',
       maxNativeZoom: 17,
       interactive: true,
@@ -60,11 +75,6 @@ function OsmQaLayer({ modelClasses }) {
       vectorTileLayerStyles: {
         osm: (props) => {
           const featureType = props['@ftype'];
-
-          // Discard non-closed ways
-          if (featureType === 'LineString') {
-            return hiddenStyle;
-          }
 
           // Get class
           const featureClass = getFeatureClass(props);
