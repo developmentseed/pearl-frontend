@@ -16,9 +16,8 @@ const { compile: collecticonsCompile } = require('collecticons-processor');
 
 const {
   appTitle,
-  appLongTitle,
   appDescription,
-} = require('./app/assets/scripts/config/production').default;
+} = require('./app/assets/scripts/config/base').default;
 
 // /////////////////////////////////////////////////////////////////////////////
 // --------------------------- Variables -------------------------------------//
