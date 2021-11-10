@@ -27,6 +27,13 @@ const Wrapper = styled.div`
   div.prose {
     grid-column: 1 / -1;
   }
+  div.selection {
+    display: flex;
+    align-items: baseline;
+    & > * ~ * {
+      margin-left: 1rem;
+    }
+  }
   .warning {
     color: ${themeVal('color.danger')};
   }
@@ -53,8 +60,8 @@ function ApplyOsmModal({ revealed, setRevealed }) {
       onCloseClick={() => setRevealed(false)}
       content={
         <Wrapper>
-          <Prose className='prose'>
-            Target class:{'  '}
+          <Prose className='prose selection'>
+            <p>Target class:</p>
             <Dropdown
               selectable
               triggerElement={(triggerProps) => (
@@ -64,6 +71,8 @@ function ApplyOsmModal({ revealed, setRevealed }) {
                   size='medium'
                   variation='primary-plain'
                   useIcon={['chevron-down--small', 'after']}
+                  useLocalButton
+                  outlined
                   {...triggerProps}
                 >
                   {selectedClass}

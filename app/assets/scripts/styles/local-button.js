@@ -1,7 +1,6 @@
 import styled, { css } from 'styled-components';
 import { Button } from '@devseed-ui/button';
 import localCollecticon from './collecticons/';
-
 /*
  * Library button will use library collecticons by default
  * In order to use a local collection, use this component
@@ -23,4 +22,9 @@ export const LocalButton = styled(Button)`
       }
     `;
   }}
+  ${({ outlined }) =>
+    outlined &&
+    css`
+      border: 1px solid;
+    `}
 `;
