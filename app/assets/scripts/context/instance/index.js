@@ -414,6 +414,7 @@ export function InstanceProvider(props) {
         }
         if (isPoll && batch.abort) {
           toasts.success(`${batch.name} inference was successfully aborted`);
+          hideGlobalLoading();
         }
       } else {
         setRunningBatch(batch);

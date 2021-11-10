@@ -37,8 +37,8 @@ export const AbortBatchJobButton = ({
         } catch (err) {
           logger('Failed to abort job', err);
           toasts.error('Failed to abort job');
+          hideGlobalLoading();
         }
-        hideGlobalLoading();
         afterOnClickFn();
       }}
     >
