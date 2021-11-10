@@ -107,7 +107,6 @@ function Map() {
     aoiRef,
     setAoiRef,
     currentAoi,
-    aoiBounds,
     setActiveModal,
     setCurrentAoi,
   } = useAoi();
