@@ -307,7 +307,7 @@ function ApplyOsmModal({ revealed, setRevealed }) {
                     active={name === activeClass}
                     onClick={() => setSelectedClass(name)}
                   >
-                    {selectedClass}
+                    {name}
                   </DropdownItem>
                 ))}
               </DropdownBody>
