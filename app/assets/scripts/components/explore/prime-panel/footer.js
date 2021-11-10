@@ -443,7 +443,7 @@ function Footer({
             >
               {runningBatch.progress === 0
                 ? 'Starting batch prediction...'
-                : `Batch prediction in progress: ${runningBatch.progress}%}`}
+                : `Batch prediction in progress: ${runningBatch.progress}%`}
             </Button>
             {runningBatch.progress === 0 && (
               <StyledTooltip id='batch-starting'>
