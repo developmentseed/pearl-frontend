@@ -283,14 +283,16 @@ function ApplyOsmModal({ revealed, setRevealed }) {
       content={
         <Wrapper>
           <Prose className='prose'>
-            Target class:
+            Target class:{'  '}
             <Dropdown
               selectable
               triggerElement={(triggerProps) => (
                 <DropdownTrigger
-                  title='View Help Options'
+                  title='List OSM Tag options'
                   className='help-trigger'
                   size='medium'
+                  variation='primary-plain'
+                  useIcon={['chevron-down--small', 'after']}
                   {...triggerProps}
                 >
                   {selectedClass || activeClass}

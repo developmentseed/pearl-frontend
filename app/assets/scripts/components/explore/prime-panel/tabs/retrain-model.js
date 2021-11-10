@@ -215,7 +215,7 @@ function RetrainModel(props) {
                   setImportSamplesModalRevealed(true);
                 }}
               >
-                Import GeoJSON
+                Import
               </InfoButton>
               <InfoButton
                 id='open-osm-modal-button'
@@ -233,7 +233,7 @@ function RetrainModel(props) {
                   setOsmModalRevealed(true);
                 }}
               >
-                Apply OpenStreetMap
+                Use OSM
               </InfoButton>
             </RetrainTools>
             <ClassList>
