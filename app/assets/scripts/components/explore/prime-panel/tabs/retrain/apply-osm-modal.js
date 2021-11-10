@@ -71,7 +71,7 @@ function ApplyOsmModal({ revealed, setRevealed }) {
               )}
             >
               <DropdownBody>
-                {selectedModel.osmtag.map(({ name }) => (
+                {selectedModel?.osmtag?.map(({ name }) => (
                   <DropdownItem
                     key={name}
                     data-dropdown='click.close'
