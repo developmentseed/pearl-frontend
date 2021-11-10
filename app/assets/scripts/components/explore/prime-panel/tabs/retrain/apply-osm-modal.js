@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import T from 'prop-types';
 import styled from 'styled-components';
 import { Button } from '@devseed-ui/button';
@@ -38,7 +38,11 @@ function ApplyOsmModal({ revealed, setRevealed }) {
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
   const activeClass = currentCheckpoint && currentCheckpoint.activeItem;
 
-  const [selectedClass, setSelectedClass] = useState(null);
+  const [selectedClass, setSelectedClass] = useState(activeClass);
+
+  useEffect(() => {
+    setSelectedClass(activeClass);
+  }, [activeClass]);
 
   return (
     <Modal
@@ -62,7 +66,7 @@ function ApplyOsmModal({ revealed, setRevealed }) {
                   useIcon={['chevron-down--small', 'after']}
                   {...triggerProps}
                 >
-                  {selectedClass || activeClass}
+                  {selectedClass}
                 </DropdownTrigger>
               )}
             >
@@ -71,7 +75,7 @@ function ApplyOsmModal({ revealed, setRevealed }) {
                   <DropdownItem
                     key={name}
                     data-dropdown='click.close'
-                    active={name === activeClass}
+                    active={name === selectedClass}
                     onClick={() => setSelectedClass(name)}
                   >
                     {name}
@@ -99,17 +103,16 @@ function ApplyOsmModal({ revealed, setRevealed }) {
               gridColumn: '1 / -1',
             }}
             onClick={() => {
+              const selectedTagmap = selectedModel.osmtag.find(
+                (c) => c.name === selectedClass
+              );
               dispatchCurrentCheckpoint({
                 type: checkpointActions.SET_OSM_TAGMAP,
                 data: {
-                  name: selectedClass || activeClass,
-                  tagmap:
-                    selectedModel.osmtag.find(
-                      (c) => c.name === selectedClass || c.name === activeClass
-                    )?.tags || [],
+                  name: selectedClass,
+                  tagmap: selectedTagmap.tags || [],
                 },
               });
-              setSelectedClass(null);
               setRevealed(false);
             }}
           >
