@@ -128,7 +128,10 @@ function UploadAoiModal({ revealed, setRevealed, onImport, apiLimits }) {
       size='small'
       revealed={revealed}
       title='Upload an AOI'
-      onCloseClick={() => setRevealed(false)}
+      onCloseClick={() => {
+        setRevealed(false);
+        setWarning(null);
+      }}
       content={
         <Wrapper>
           {!file && (
