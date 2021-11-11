@@ -3,6 +3,7 @@ import T from 'prop-types';
 import bbox from '@turf/bbox';
 import styled from 'styled-components';
 import { Modal } from '@devseed-ui/modal';
+
 import Prose from '../../../styles/type/prose';
 import { useInstance } from '../../../context/instance';
 import { useSessionStatus, sessionModes } from '../../../context/explore';
@@ -11,6 +12,7 @@ import logger from '../../../utils/logger';
 import { formatDateTime, formatThousands } from '../../../utils/format';
 import DetailsList from '../../common/details-list';
 import { AbortBatchJobButton } from '../../common/abort-batch-button';
+import { StyledTooltip } from '../../common/tooltip';
 
 const Wrapper = styled.div`
   display: grid;
@@ -62,7 +64,7 @@ function BatchPredictionProgressModal({
               'AOI Size': `${batchAoiArea} km²` || 'Unknown',
             }}
           />
-          <Block>
+          <Block data-tip data-for='batch-starting-tooltip'>
             <AbortBatchJobButton
               projectId={runningBatch.project_id}
               batchId={runningBatch.id}
@@ -72,6 +74,11 @@ function BatchPredictionProgressModal({
                 onCloseClick();
               }}
             />
+            {disableAbortBtn && (
+              <StyledTooltip id='batch-starting-tooltip'>
+                It will be possible to abort the job when it starts running
+              </StyledTooltip>
+            )}
           </Block>
         </Wrapper>
       }
