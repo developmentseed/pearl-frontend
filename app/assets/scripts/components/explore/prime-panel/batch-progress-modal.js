@@ -1,22 +1,36 @@
 import React from 'react';
 import T from 'prop-types';
+import bbox from '@turf/bbox';
 import styled from 'styled-components';
 import { Modal } from '@devseed-ui/modal';
+
 import Prose from '../../../styles/type/prose';
 import { useInstance } from '../../../context/instance';
+import { useSessionStatus, sessionModes } from '../../../context/explore';
 import { areaFromBounds } from '../../../utils/map';
-import bbox from '@turf/bbox';
 import logger from '../../../utils/logger';
 import { formatDateTime, formatThousands } from '../../../utils/format';
 import DetailsList from '../../common/details-list';
+import { AbortBatchJobButton } from '../../common/abort-batch-button';
+import { StyledTooltip } from '../../common/tooltip';
 
 const Wrapper = styled.div`
   display: grid;
   grid-gap: 1rem;
 `;
 
-function BatchPredictionProgressModal({ revealed, onCloseClick }) {
+const Block = styled.div`
+  display: block;
+  padding-top: 1rem;
+`;
+
+function BatchPredictionProgressModal({
+  revealed,
+  disableAbortBtn,
+  onCloseClick,
+}) {
   const { runningBatch } = useInstance();
+  const { setSessionStatusMode } = useSessionStatus();
 
   // Calculate AOI Area
   let batchAoiArea;
@@ -50,6 +64,22 @@ function BatchPredictionProgressModal({ revealed, onCloseClick }) {
               'AOI Size': `${batchAoiArea} km²` || 'Unknown',
             }}
           />
+          <Block data-tip data-for='batch-starting-tooltip'>
+            <AbortBatchJobButton
+              projectId={runningBatch.project_id}
+              batchId={runningBatch.id}
+              disabled={disableAbortBtn}
+              afterOnClickFn={() => {
+                setSessionStatusMode(sessionModes.PREDICTION_READY);
+                onCloseClick();
+              }}
+            />
+            {disableAbortBtn && (
+              <StyledTooltip id='batch-starting-tooltip'>
+                It will be possible to abort the job when it starts running
+              </StyledTooltip>
+            )}
+          </Block>
         </Wrapper>
       }
     />
@@ -58,6 +88,7 @@ function BatchPredictionProgressModal({ revealed, onCloseClick }) {
 
 BatchPredictionProgressModal.propTypes = {
   revealed: T.bool,
+  disableAbortBtn: T.bool,
   onCloseClick: T.func,
 };
 

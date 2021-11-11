@@ -3,10 +3,11 @@ import styled from 'styled-components';
 import SizeAwareElement from '../../common/size-aware-element';
 import {
   MapContainer,
+  ScaleControl,
   TileLayer,
   FeatureGroup,
   ImageOverlay,
-  Circle,
+  CircleMarker,
 } from 'react-leaflet';
 import L from 'leaflet';
 import {
@@ -54,6 +55,7 @@ import {
 import toasts from '../../common/toasts';
 import logger from '../../../utils/logger';
 import PolygonDrawControl from './polygon-draw-control';
+import OsmQaLayer from '../../common/map/osm-qa-layer';
 
 const center = [38.889805, -77.009056];
 const zoom = 12;
@@ -99,7 +101,7 @@ function Map() {
     currentProject,
   } = useContext(ExploreContext);
 
-  const { setSessionStatusMode } = useSessionStatus();
+  const { sessionStatus, setSessionStatusMode } = useSessionStatus();
 
   const { apiLimits } = useApiLimits();
   const {
@@ -153,13 +155,13 @@ function Map() {
           if (shortcutState.overrideBrowseMode) {
             mapRef.polygonDraw?.pause();
           } else if (
-            !mapState.overrideBrowseMode &&
-            mapState.mode !== mapModes.BROWSE_MODE
+            !shortcutState.overrideBrowseMode &&
+            mapState.mode === mapModes.BROWSE_MODE
           ) {
             // Keyboard shortcut SPACE will enter override mode when held down
             // On KEYUP, we will dispatch an update to return to previousMode, but overrideBrowseMode
             // will be set to false before the mode update can be dispatched
-            mapRef.polygonDraw.disable();
+            // do nothing
           } else if (mapState.mode === mapModes.BROWSE_MODE) {
             mapRef.polygonDraw.disable();
           }
@@ -191,10 +193,8 @@ function Map() {
         if (mapRef && aoiRef) {
           if (
             mapState.previousMode === mapModes.CREATE_AOI_MODE ||
-            mapState.previousMode === mapModes.EDIT_AOI_MODE ||
-            mapState.previousMode === mapModes.ADD_SAMPLE_FREEHAND
+            mapState.previousMode === mapModes.EDIT_AOI_MODE
           ) {
-            // On confirm, zoom to bounds
             mapRef.fitBounds(aoiRef.getBounds(), { padding: BOUNDS_PADDING });
             setSessionStatusMode(sessionModes.SET_AOI);
           }
@@ -457,6 +457,7 @@ function Map() {
         )}
 
         <BaseMapLayer />
+
         {mosaics &&
           mosaics.map((layer) => (
             <TileLayer
@@ -617,7 +618,7 @@ function Map() {
               sampleClass.points &&
               sampleClass.points.coordinates &&
               sampleClass.points.coordinates.map(([lat, lng]) => (
-                <Circle
+                <CircleMarker
                   key={JSON.stringify([lat, lng])}
                   pathOptions={{
                     color: sampleClass.color,
@@ -637,10 +638,21 @@ function Map() {
                     },
                   }}
                   center={[lng, lat]}
-                  radius={10}
+                  radius={6}
                 />
               ))
           )}
+
+        {!window.Cypress &&
+          sessionStatus?.mode === sessionModes.RETRAIN_READY &&
+          currentCheckpoint &&
+          aoiRef && (
+            <OsmQaLayer
+              modelClasses={currentCheckpoint.classes}
+              aoiRef={aoiRef}
+            />
+          )}
+
         <FeatureGroup>
           <GenericControl
             id='layer-control'
@@ -654,6 +666,7 @@ function Map() {
           <GeoCoder />
           {aoiRef && <CenterMap aoiRef={aoiRef} />}
         </FeatureGroup>
+        <ScaleControl />
       </MapContainer>
     );
   }, [

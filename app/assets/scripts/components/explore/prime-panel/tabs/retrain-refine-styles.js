@@ -144,21 +144,25 @@ export const Thumbnail = styled.div`
 
 export const ToolBox = styled.section`
   padding: 0 1.5rem;
-  display: flex;
-  flex-flow: row wrap;
+  display: grid;
+  grid-template-rows: max-content max-content;
+  justify-content: space-between;
   ${Heading},
   ${Subheading} {
     padding: 0;
-    flex-basis: 100%;
+    grid-column: span 6;
     margin-bottom: ${glsp(0.25)};
   }
   ${Button} {
     padding: ${glsp(0.25)} ${glsp(0.375)};
     box-shadow: none;
     border: 2px solid ${themeVal('color.primaryAlphaB')};
+    grid-row: 2;
+    transition: all 0.24s ease-out;
     span {
       max-width: 0;
       overflow: hidden;
+      opacity: 0;
       transition: all 0.24s ease-out;
     }
     &:before {
@@ -170,6 +174,7 @@ export const ToolBox = styled.section`
     &.active {
       span {
         max-width: 5rem;
+        opacity: 1;
       }
       &:before {
         margin-right: ${glsp(0.375)};

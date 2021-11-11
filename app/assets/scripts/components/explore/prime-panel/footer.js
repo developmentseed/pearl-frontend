@@ -251,7 +251,10 @@ function PrimeButton({
       // No retrain permitted for batch area
       if (isBatchArea) {
         return true;
-      } else if (currentCheckpoint?.sampleCount > 0) {
+      } else if (
+        currentCheckpoint?.sampleCount > 0 ||
+        currentCheckpoint.hasOsmLayers
+      ) {
         // Allow retrain if sampleCount is nonzero
         return false;
       } else {
@@ -331,7 +334,7 @@ function Footer({
               mapRef.freehandDraw.clearLayers();
             }}
           >
-            Clear
+            Clear All
           </Button>
           <Button
             variation='base-plain'
@@ -424,6 +427,7 @@ function Footer({
         <>
           <BatchPredictionProgressModal
             revealed={displayBatchProgress}
+            disableAbortBtn={runningBatch.progress === 0}
             onCloseClick={() => setDisplayBatchProgress(false)}
           />
           <ProgressButtonWrapper>
@@ -432,13 +436,14 @@ function Footer({
               data-cy='batch-progress-message'
               variation='primary-plain'
               size='small'
-              title='Status of running prediction'
               onClick={() => {
                 setDisplayBatchProgress(true);
               }}
               id='batch-progress-message'
             >
-              Batch prediction in progress: {runningBatch.progress}%
+              {runningBatch.progress === 0
+                ? 'Starting batch prediction...'
+                : `Batch prediction in progress: ${runningBatch.progress}%`}
             </Button>
           </ProgressButtonWrapper>
         </>

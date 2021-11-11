@@ -20,11 +20,12 @@ import {
   AddClassButton,
 } from './retrain-refine-styles';
 
-import ImportSamplesModal from '../../map/import-sample-modal';
 import { Subheading } from '../../../../styles/type/heading';
 import { useAoi } from '../../../../context/aoi';
 import { useApiLimits } from '../../../../context/global';
 import EditClass from './edit-class';
+import ImportGeojsonModal from './retrain/import-geojson-modal';
+import ApplyOsmModal from './retrain/apply-osm-modal';
 
 /*
  * Retrain Model
@@ -43,7 +44,7 @@ function RetrainModel(props) {
   const [importSamplesModalRevealed, setImportSamplesModalRevealed] = useState(
     false
   );
-
+  const [osmModalRevealed, setOsmModalRevealed] = useState(false);
   const { aoiArea } = useAoi();
   const { apiLimits } = useApiLimits();
 
@@ -58,9 +59,13 @@ function RetrainModel(props) {
         currentCheckpoint.classes && (
           <>
             <RetrainTools>
-              <ImportSamplesModal
+              <ImportGeojsonModal
                 setRevealed={setImportSamplesModalRevealed}
                 revealed={importSamplesModalRevealed}
+              />
+              <ApplyOsmModal
+                setRevealed={setOsmModalRevealed}
+                revealed={osmModalRevealed}
               />
               <Subheading>Sample Selection Tools</Subheading>
               <InfoButton
@@ -193,8 +198,8 @@ function RetrainModel(props) {
                 Erase
               </InfoButton>
               <InfoButton
-                id='open-upload-samples-modal-button'
-                data-cy='open-upload-samples-modal-button'
+                id='open-import-samples-modal-button'
+                data-cy='open-import-samples-modal-button'
                 variation={
                   importSamplesModalRevealed
                     ? 'primary-raised-dark'
@@ -205,11 +210,30 @@ function RetrainModel(props) {
                 useLocalButton
                 useIcon='upload'
                 visuallyDisabled={!currentCheckpoint.activeItem}
-                info='Upload samples as GeoJSON'
-                onClick={() => setImportSamplesModalRevealed(true)}
-                className={importSamplesModalRevealed && 'active'}
+                info='Import samples from GeoJSON file'
+                onClick={() => {
+                  setImportSamplesModalRevealed(true);
+                }}
               >
-                Upload
+                Import
+              </InfoButton>
+              <InfoButton
+                id='open-osm-modal-button'
+                data-cy='open-osm-modal-button'
+                variation={
+                  osmModalRevealed ? 'primary-raised-dark' : 'primary-plain'
+                }
+                size='small'
+                radius='ellipsoid'
+                useLocalButton
+                useIcon='brand-osm'
+                visuallyDisabled={!currentCheckpoint.activeItem}
+                info='Apply OpenStreetMap features as samples'
+                onClick={() => {
+                  setOsmModalRevealed(true);
+                }}
+              >
+                Use OSM
               </InfoButton>
             </RetrainTools>
             <ClassList>

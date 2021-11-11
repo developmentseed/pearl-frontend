@@ -24,4 +24,8 @@ export default createGlobalStyle`
   ${reactToastStyles()};
   ${inputRangeStyles()};
   ${joyrideStyles()};
+
+  .tether-element {
+    z-index: 9999;
+  }
 `;

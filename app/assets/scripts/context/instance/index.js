@@ -35,6 +35,7 @@ import { wrapLogReducer } from '../reducers/utils';
 import { featureCollection, feature } from '@turf/helpers';
 import { delay } from '../../utils/utils';
 import { actions as instanceActions, useInstanceReducer } from './reducer';
+import { aoiBoundsToArray } from '../../utils/map';
 
 const BATCH_REFRESH_INTERVAL = 4000;
 
@@ -222,7 +223,7 @@ export function InstanceProvider(props) {
    */
 
   useEffect(() => {
-    if (batchReady && !currentAoi) {
+    if (batchReady?.aoi && !currentAoi) {
       restApiClient
         .get(`project/${currentProject.id}/aoi/${batchReady.aoi}`)
         .then((aoi) => {
@@ -400,18 +401,21 @@ export function InstanceProvider(props) {
         `project/${projectId}/batch/${batchId}`
       );
 
-      if (batch.completed) {
+      if (batch.completed || batch.abort) {
         // Batch is complete
         setRunningBatch(false);
         setBatchReady(batch);
 
-        // Reload AOI list when complete
-        const aois = await restApiClient.get(`project/${projectId}/aoi/`);
-        setAoiList(aois.aois);
-
-        // If this function is called from a timeout polling context, we can show a toast notification when finished.
-        if (isPoll) {
+        // If this function is called from a timeout polling context,
+        // we can refresh the AOI list and show a toast notification when finished.
+        if (isPoll && batch.abort === false) {
+          const aois = await restApiClient.get(`project/${projectId}/aoi/`);
+          setAoiList(aois.aois);
           toasts.success(`${batch.name} inference is now available`);
+        }
+        if (isPoll && batch.abort) {
+          toasts.success(`${batch.name} inference was successfully aborted`);
+          hideGlobalLoading();
         }
       } else {
         setRunningBatch(batch);
@@ -433,13 +437,15 @@ export function InstanceProvider(props) {
   }
 
   /*
-   * @param project { object } - project object should be passed explicitly to avoid race condition that depends on the instantiation of currentProject state variable object, this occurs when a new project is created
+   * @param project { object } - project object should be passed explicitly to avoid
+   * race condition that depends on the instantiation of currentProject state variable object,
+   * this occurs when a new project is created
    */
   async function getRunningBatch(project) {
     if (project && restApiClient) {
       try {
         const { batch: batches } = await restApiClient.get(
-          `project/${project.id}/batch?completed=false`
+          `project/${project.id}/batch?completed=false&order=desc`
         );
 
         if (batches.length > 0) {
@@ -648,7 +654,11 @@ export function InstanceProvider(props) {
           get(aClass, 'points.coordinates.length', 0) +
           get(aClass, 'polygons.length', 0);
       }
-      if (sampleCount < config.minSampleCount) {
+
+      if (
+        sampleCount < config.minSampleCount &&
+        !currentCheckpoint.hasOsmLayers
+      ) {
         toasts.error(
           `At least ${config.minSampleCount} sample${
             config.minSampleCount === 1 ? '' : 's'
@@ -720,35 +730,52 @@ export function InstanceProvider(props) {
         },
       });
 
+      // When retraining with OSM data the retrain websocket message
+      // is slightly different.
+      const retrainMessage = {
+        name: aoiName,
+        classes: classes.map((c) => {
+          // sometimes there are only points or polygons
+          // convert MultiPoint to Feature
+          let features = [];
+          if (c.points.coordinates.length) {
+            c.points = feature(c.points);
+            features = features.concat(c.points);
+          }
+          if (c.polygons.length) {
+            // convert Polygons to Feature
+            c.polygons = c.polygons.map((p) => {
+              return feature(p);
+            });
+            features = features.concat(c.polygons);
+          }
+
+          const retrainClass = {
+            name: c.name,
+            color: c.color,
+            geometry: featureCollection(features),
+          };
+
+          if (currentCheckpoint.hasOsmLayers) {
+            retrainClass.tagmap = c.tagmap || [];
+          }
+
+          return retrainClass;
+        }),
+      };
+
+      // Apply bounds on OSM retrain
+      if (currentCheckpoint.hasOsmLayers) {
+        retrainMessage.bounds = aoiBoundsToArray(aoiRef.getBounds());
+      }
+
       dispatchMessageQueue({
         type: messageQueueActionTypes.ADD,
         data: {
-          action: 'model#retrain',
-          data: {
-            name: aoiName,
-            classes: classes.map((c) => {
-              // sometimes there are only points or polygons
-              // convert MultiPoint to Feature
-              let features = [];
-              if (c.points.coordinates.length) {
-                c.points = feature(c.points);
-                features = features.concat(c.points);
-              }
-              if (c.polygons.length) {
-                // convert Polygons to Feature
-                c.polygons = c.polygons.map((p) => {
-                  return feature(p);
-                });
-                features = features.concat(c.polygons);
-              }
-
-              return {
-                name: c.name,
-                color: c.color,
-                geometry: featureCollection(features),
-              };
-            }),
-          },
+          action: currentCheckpoint.hasOsmLayers
+            ? 'model#osm'
+            : 'model#retrain',
+          data: retrainMessage,
         },
       });
       dispatchCurrentCheckpoint({
