@@ -1,20 +1,21 @@
-import React from 'react';
+import React, { useState } from 'react';
+import T from 'prop-types';
 import L from 'leaflet';
+import bbox from '@turf/bbox';
 import styled from 'styled-components';
 import { Button } from '@devseed-ui/button';
 import { glsp, themeVal } from '@devseed-ui/theme-provider';
-import { EditButton } from '../../../styles/button';
-import { useMapState, useAoiMeta } from '../../../context/explore';
-import Prose from '../../../styles/type/prose';
-import T from 'prop-types';
-import { formatThousands } from '../../../utils/format';
-import { FauxFileDialog } from '../../common/faux-file-dialog';
-
 import {
   Modal,
   ModalHeadline,
   ModalFooter as BaseModalFooter,
 } from '@devseed-ui/modal';
+
+import { EditButton } from '../../../styles/button';
+import Prose from '../../../styles/type/prose';
+import { FauxFileDialog } from '../../common/faux-file-dialog';
+import { BOUNDS_PADDING } from '../../common/map/constants';
+import { useMapState, useAoiMeta } from '../../../context/explore';
 import { useMapRef } from '../../../context/map';
 import { useApiLimits } from '../../../context/global';
 import { useInstance } from '../../../context/instance';
@@ -24,11 +25,9 @@ import {
   actions as checkpointActions,
   checkpointModes,
 } from '../../../context/checkpoint';
+import { formatThousands } from '../../../utils/format';
 import { areaFromBounds } from '../../../utils/map';
-import { useState } from 'react';
-import bbox from '@turf/bbox';
 import logger from '../../../utils/logger';
-import { BOUNDS_PADDING } from '../../common/map/constants';
 import { inRange } from '../../../utils/utils';
 
 const ModalFooter = styled(BaseModalFooter)`
@@ -56,7 +55,7 @@ const Wrapper = styled.div`
   grid-gap: 1rem;
 `;
 
-const Seperator = styled.span`
+const Separator = styled.span`
   color: ${themeVal('color.baseAlphaD')};
 `;
 
@@ -109,11 +108,7 @@ function UploadAoiModal({ revealed, setRevealed, onImport, apiLimits }) {
       }
 
       // File is ok, allow importing
-      setFile({
-        name: filename,
-        bounds,
-        totalArea,
-      });
+      setFile({ name: filename, bounds, totalArea });
     } catch (error) {
       logger(error);
       setWarning(
@@ -198,9 +193,7 @@ function UploadAoiModal({ revealed, setRevealed, onImport, apiLimits }) {
             useIcon='tick'
             visuallyDisabled={!file}
             disabled={!file}
-            style={{
-              gridColumn: '1 / -1',
-            }}
+            style={{ gridColumn: '1 / -1' }}
             onClick={() => {
               if (onImport(file)) {
                 setRevealed(false);
@@ -404,7 +397,7 @@ export function AoiEditButtons(props) {
   return (
     <>
       {
-        // Only show add n button if at least one AOI exists
+        // Only show Add AOI button if at least one AOI exists
         (currentAoi || runningBatch) && (
           <EditButton
             useIcon='plus'
@@ -432,7 +425,7 @@ export function AoiEditButtons(props) {
         Upload AOI
       </EditButton>
 
-      <Seperator>|</Seperator>
+      <Separator>|</Separator>
 
       {currentAoi ? (
         /*  If currentAoi, AOI has been submitted to api
