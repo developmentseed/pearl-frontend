@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import T from 'prop-types';
-
+import styled from 'styled-components';
 import { Button } from '@devseed-ui/button';
 import { Heading } from '@devseed-ui/typography';
+
 import Table, { TableRow, TableCell } from '../../common/table';
 import Paginator from '../../common/paginator';
 import {
@@ -10,6 +11,7 @@ import {
   showGlobalLoadingMessage,
 } from '../../common/global-loading';
 import toasts from '../../common/toasts';
+import { AbortBatchJobButton } from '../../common/abort-batch-button';
 import { useAuth } from '../../../context/auth';
 import { formatDateTime } from '../../../utils/format';
 import { downloadGeotiff } from '../../../utils/map';
@@ -18,6 +20,10 @@ import useFetch from '../../../utils/use-fetch';
 
 const TABLE_PAGE_SIZE = 5;
 const TABLE_HEADERS = ['Id', 'AOI Name', 'Status', 'Started', 'Download'];
+
+const ProgressText = styled.span`
+  padding-right: 0.5rem;
+`;
 
 export function DownloadAoiButton({
   disabled = false,
@@ -64,13 +70,35 @@ DownloadAoiButton.propTypes = {
   children: T.node,
 };
 
-function renderRow({ id, aoi, name, completed, progress, created, projectId }) {
+function getStatus(completed, abort) {
+  if (!completed && abort) return 'Aborted';
+  if (completed) return 'Completed';
+  return 'Processing';
+}
+
+const BatchRow = ({ batch, projectId }) => {
+  const { id, aoi, name, completed, abort, progress, created } = batch;
+  const [status, setStatus] = useState(getStatus(completed, abort));
+
   return (
     <TableRow key={id}>
       <TableCell>{id}</TableCell>
       <TableCell>{name}</TableCell>
       <TableCell>
-        {completed ? 'Completed' : `In Progress (${progress}%)`}
+        {status === 'Processing' ? (
+          <>
+            <ProgressText>In Progress ({progress}%)</ProgressText>
+            <AbortBatchJobButton
+              projectId={projectId}
+              batchId={id}
+              compact
+              disabled={progress === 0}
+              afterOnClickFn={() => setStatus('Aborted')}
+            />
+          </>
+        ) : (
+          status
+        )}
       </TableCell>
       <TableCell>{formatDateTime(created)}</TableCell>
       <TableCell>
@@ -82,12 +110,19 @@ function renderRow({ id, aoi, name, completed, progress, created, projectId }) {
       </TableCell>
     </TableRow>
   );
-}
+};
+
+BatchRow.propTypes = {
+  batch: T.object,
+  projectId: T.number,
+};
 
 function BatchList({ projectId }) {
   const [page, setPage] = useState(1);
   const { isReady, data, hasError } = useFetch(
-    `project/${projectId}/batch?page=${page - 1}&limit=${TABLE_PAGE_SIZE}`
+    `project/${projectId}/batch?page=${
+      page - 1
+    }&limit=${TABLE_PAGE_SIZE}&order=desc`
   );
 
   if (!isReady) {
@@ -109,7 +144,13 @@ function BatchList({ projectId }) {
         data-cy='batch-list-table'
         headers={TABLE_HEADERS}
         data={data.batch}
-        renderRow={(batch) => renderRow({ ...batch, projectId })}
+        renderRow={(batch) => (
+          <BatchRow
+            key={batch.id}
+            projectId={Number(projectId)}
+            batch={batch}
+          />
+        )}
       />
       <Paginator
         currentPage={page}

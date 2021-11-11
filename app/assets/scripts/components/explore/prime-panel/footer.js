@@ -427,6 +427,7 @@ function Footer({
         <>
           <BatchPredictionProgressModal
             revealed={displayBatchProgress}
+            disableAbortBtn={runningBatch.progress === 0}
             onCloseClick={() => setDisplayBatchProgress(false)}
           />
           <ProgressButtonWrapper>
@@ -435,13 +436,14 @@ function Footer({
               data-cy='batch-progress-message'
               variation='primary-plain'
               size='small'
-              title='Status of running prediction'
               onClick={() => {
                 setDisplayBatchProgress(true);
               }}
               id='batch-progress-message'
             >
-              Batch prediction in progress: {runningBatch.progress}%
+              {runningBatch.progress === 0
+                ? 'Starting batch prediction...'
+                : `Batch prediction in progress: ${runningBatch.progress}%`}
             </Button>
           </ProgressButtonWrapper>
         </>
