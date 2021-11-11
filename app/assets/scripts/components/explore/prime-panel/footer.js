@@ -251,7 +251,10 @@ function PrimeButton({
       // No retrain permitted for batch area
       if (isBatchArea) {
         return true;
-      } else if (currentCheckpoint?.sampleCount > 0) {
+      } else if (
+        currentCheckpoint?.sampleCount > 0 ||
+        currentCheckpoint.hasOsmLayers
+      ) {
         // Allow retrain if sampleCount is nonzero
         return false;
       } else {

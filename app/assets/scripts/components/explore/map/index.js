@@ -55,6 +55,7 @@ import {
 import toasts from '../../common/toasts';
 import logger from '../../../utils/logger';
 import PolygonDrawControl from './polygon-draw-control';
+import OsmQaLayer from '../../common/map/osm-qa-layer';
 
 const center = [38.889805, -77.009056];
 const zoom = 12;
@@ -100,7 +101,7 @@ function Map() {
     currentProject,
   } = useContext(ExploreContext);
 
-  const { setSessionStatusMode } = useSessionStatus();
+  const { sessionStatus, setSessionStatusMode } = useSessionStatus();
 
   const { apiLimits } = useApiLimits();
   const {
@@ -456,6 +457,7 @@ function Map() {
         )}
 
         <BaseMapLayer />
+
         {mosaics &&
           mosaics.map((layer) => (
             <TileLayer
@@ -640,6 +642,17 @@ function Map() {
                 />
               ))
           )}
+
+        {!window.Cypress &&
+          sessionStatus?.mode === sessionModes.RETRAIN_READY &&
+          currentCheckpoint &&
+          aoiRef && (
+            <OsmQaLayer
+              modelClasses={currentCheckpoint.classes}
+              aoiRef={aoiRef}
+            />
+          )}
+
         <FeatureGroup>
           <GenericControl
             id='layer-control'

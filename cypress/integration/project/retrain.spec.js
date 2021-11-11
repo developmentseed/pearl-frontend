@@ -220,16 +220,17 @@ describe('Retrain existing project', () => {
     cy.get('[data-cy=Structure-class-button').click();
 
     // Open import modal
-    cy.get('[data-cy=open-upload-samples-modal-button').click();
+    cy.get('[data-cy=open-import-samples-modal-button').click();
+    cy.get('#import-samples-modal').should('exist');
 
     // Open select file dialog
-    cy.get('[data-cy=select-samples-file-button').click();
+    cy.get('[data-cy=select-samples-geojson-button]').should('exist').click();
 
     // Apply file to input
     cy.get('[data-cy=samples-upload-input]').attachFile('samples.geojson');
 
     // Proceed importing
-    cy.get('[data-cy=import-samples-button').click();
+    cy.get('[data-cy=import-samples-geojson-button').click();
 
     // Set no instances available
     cy.intercept(
@@ -380,7 +381,7 @@ describe('Retrain existing project', () => {
     ).as('fetchAvailableInstancesCount');
 
     // Request model run
-    cy.get('[data-cy=run-button]').click();
+    cy.get('[data-cy=run-button]').should('exist').click();
 
     // Prediction is halted
     cy.get('[data-cy=session-status]').should(
