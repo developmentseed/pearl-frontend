@@ -74,7 +74,6 @@ jobs:
         if: github.ref == 'refs/heads/develop'
         uses: azure/CLI@v1
         with:
-          azcliversion: 2.0.72
           inlineScript: |
               az storage blob upload-batch --account-name $STAGING_STORAGE_ACCOUNT_NAME -d '$web' -s ./dist
 
@@ -82,7 +81,6 @@ jobs:
         if: github.ref == 'refs/heads/main'
         uses: azure/CLI@v1
         with:
-          azcliversion: 2.0.72
           inlineScript: |
               az storage blob upload-batch --account-name $PRODUCTION_STORAGE_ACCOUNT_NAME -d '$web' -s ./dist
 
@@ -91,7 +89,6 @@ jobs:
         if: github.ref == 'refs/heads/develop'
         uses: azure/CLI@v1
         with:
-          azcliversion: 2.0.72
           inlineScript: |
             az cdn endpoint purge --content-paths  "/*" --profile-name $STAGING_CDN_PROFILE_NAME --name $STAGING_CDN_ENDPOINT --resource-group $STAGING_RESOURCE_GROUP
 
@@ -99,7 +96,6 @@ jobs:
         if: github.ref == 'refs/heads/main'
         uses: azure/CLI@v1
         with:
-          azcliversion: 2.0.72
           inlineScript: |
             az cdn endpoint purge --content-paths  "/*" --profile-name $PRODUCTION_CDN_PROFILE_NAME --name $PRODUCTION_CDN_ENDPOINT --resource-group $PRODUCTION_RESOURCE_GROUP
 
