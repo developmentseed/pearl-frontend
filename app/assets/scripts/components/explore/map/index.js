@@ -161,7 +161,7 @@ function Map() {
             // Keyboard shortcut SPACE will enter override mode when held down
             // On KEYUP, we will dispatch an update to return to previousMode, but overrideBrowseMode
             // will be set to false before the mode update can be dispatched
-            // Do nothing
+            // do nothing
           } else if (mapState.mode === mapModes.BROWSE_MODE) {
             mapRef.polygonDraw.disable();
           }

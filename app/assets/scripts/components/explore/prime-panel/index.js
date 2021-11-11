@@ -168,6 +168,10 @@ function PrimePanel() {
                   onTabClick={() => {
                     function onContinue() {
                       setActiveTab(PREDICT_TAB_INDEX);
+                      setMapMode(mapModes.BROWSE_MODE);
+
+                      mapRef.polygonDraw.disable();
+
                       dispatchCurrentCheckpoint({
                         type: checkpointActions.SET_CHECKPOINT_MODE,
                         data: {
