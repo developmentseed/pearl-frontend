@@ -426,6 +426,7 @@ describe('Batch predictions', () => {
 
     // Should be able to run inference on non batch AOI
     cy.get('.listed-aoi').contains('Rockville').click();
+    cy.get('[data-cy=confirm-clear-aoi]').should('exist').click();
     cy.get('[data-cy=run-button]').should(
       'have.attr',
       'data-disabled',

@@ -1,13 +1,20 @@
 import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
+import { glsp } from '@devseed-ui/theme-provider';
+import { Heading } from '@devseed-ui/typography';
+import { Modal } from '@devseed-ui/modal';
+import { Button } from '@devseed-ui/button';
+
+import { AoiEditButtons } from '../../aoi-edit-buttons';
+import { Option, HeadOption } from '../selection-styles';
 import {
   HeadOptionHeadline,
   HeadOptionToolbar,
 } from '../../../../../styles/panel';
-import ShadowScrollbar from '../../../../common/shadow-scrollbar';
-import { glsp } from '@devseed-ui/theme-provider';
-import { Heading } from '@devseed-ui/typography';
 import { Subheading } from '../../../../../styles/type/heading';
+import { EditButton } from '../../../../../styles/button';
+import ShadowScrollbar from '../../../../common/shadow-scrollbar';
+import toasts from '../../../../common/toasts';
 import { BOUNDS_PADDING } from '../../../../common/map/constants';
 import { formatThousands } from '../../../../../utils/format';
 import {
@@ -19,16 +26,8 @@ import { sessionModes } from '../../../../../context/explore/session-status';
 import { useMapRef } from '../../../../../context/map';
 import { useAoi } from '../../../../../context/aoi';
 import { useAuth } from '../../../../../context/auth';
-
 import { useCheckpoint } from '../../../../../context/checkpoint';
 import { useProject } from '../../../../../context/project';
-import { AoiEditButtons } from '../../aoi-edit-buttons';
-import { EditButton } from '../../../../../styles/button';
-import { Modal } from '@devseed-ui/modal';
-import { Button } from '@devseed-ui/button';
-import toasts from '../../../../common/toasts';
-
-import { Option, HeadOption } from '../selection-styles';
 
 const ModalWrapper = styled.div`
   display: grid;
@@ -112,6 +111,7 @@ function findCompatibleAoi(aoi, aoiList, ckpt) {
 function AoiSelection() {
   const { currentAoi, aoiList, aoiName, setAoiList } = useAoi();
   const [deleteAoi, setDeleteAoi] = useState();
+  const [aoiToSwitch, setAoiToSwitch] = useState();
   const { aoiArea, loadAoi, createNewAoi } = useAoiMeta();
   const { restApiClient } = useAuth();
 
@@ -217,6 +217,7 @@ function AoiSelection() {
             margin: '0.75rem 0',
             boxShadow: 'inset 0 -1px 0 0 rgba(240, 244, 255, 0.16)',
           }}
+          data-cy='aoi-list'
         >
           {
             // Current or new aoi
@@ -230,6 +231,10 @@ function AoiSelection() {
                   key={aoi.id}
                   className='listed-aoi'
                   onClick={() => {
+                    if (currentAoi === null && aoiArea > 0) {
+                      setAoiToSwitch(aoi);
+                      return;
+                    }
                     const relevantAoi = findCompatibleAoi(
                       aoi,
                       aoiList,
@@ -303,6 +308,60 @@ function AoiSelection() {
               }}
             >
               Delete AOI
+            </Button>
+          </ModalWrapper>
+        }
+      />
+
+      <Modal
+        id='confirm-clear-aoi-modal'
+        data-cy='confirm-clear-aoi-modal'
+        revealed={aoiToSwitch}
+        onOverlayClick={() => setAoiToSwitch(null)}
+        onCloseClick={() => setAoiToSwitch(null)}
+        title='Unsaved AOI'
+        size='small'
+        content={
+          <ModalWrapper>
+            <div>
+              You have not submitted the drawn AOI for predictions. Switching to
+              a new AOI will remove this unsaved AOI.
+            </div>
+            <Button
+              data-cy='cancel-clear-aoi'
+              variation='primary-plain'
+              size='medium'
+              useIcon='xmark'
+              onClick={() => {
+                setAoiToSwitch(null);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              data-cy='confirm-clear-aoi'
+              variation='danger-raised-dark'
+              size='medium'
+              useIcon='trash-bin'
+              onClick={() => {
+                const relevantAoi = findCompatibleAoi(
+                  aoiToSwitch,
+                  aoiList,
+                  currentCheckpoint
+                );
+                loadAoi(
+                  currentProject,
+                  relevantAoi || aoiToSwitch,
+                  relevantAoi || false
+                ).then((bounds) =>
+                  mapRef.fitBounds(bounds, {
+                    padding: BOUNDS_PADDING,
+                  })
+                );
+                setAoiToSwitch(null);
+              }}
+            >
+              Clear AOI
             </Button>
           </ModalWrapper>
         }

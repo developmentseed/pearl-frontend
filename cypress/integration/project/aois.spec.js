@@ -1,5 +1,6 @@
 import config from '../../../app/assets/scripts/config/testing';
 const { restApiEndpoint } = config.default;
+
 describe('Loads AOIs', () => {
   let map;
 
@@ -140,6 +141,49 @@ describe('Loads AOIs', () => {
 
     // Set AOI
     cy.get('[data-cy=aoi-edit-confirm-button').click();
+  });
+});
+
+describe('Load AOIs and draw a third one', () => {
+  beforeEach(() => {
+    cy.startServer();
+  });
+
+  it('Should show the confirmation modal if switching to another AOI before running prediction', () => {
+    cy.fakeLogin();
+    cy.setWebsocketWorkflow('websocket-workflow/load-aoi.json');
+
+    cy.visit('/project/1');
+    cy.wait('@loadAois');
+    // go to the Predict tab
+    cy.get('[data-cy=predict-tab]').click();
+    // add new AOI
+    cy.get('[data-cy=add-aoi-button]').click();
+    cy.get('#map')
+      .trigger('mousedown', 150, 150)
+      .trigger('mousemove', 300, 300)
+      .trigger('mouseup');
+    // check that we have 2 AOIs besides the one we are creating
+    cy.get('.listed-aoi').should('have.length', 2);
+    // try to switch to the first AOI and check if the confirmation modal is shown
+    cy.get('.listed-aoi').eq(1).contains('Seneca Rocks #1').click();
+    cy.get('[data-cy=confirm-clear-aoi-modal]').should('exist');
+    // cancel the AOI switch
+    cy.get('[data-cy=cancel-clear-aoi]').should('exist').click();
+    // check if the AOIs were not changed
+    cy.get('.listed-aoi').should('have.length', 2);
+    cy.get('[data-cy=confirm-clear-aoi-modal]').should('not.exist');
+
+    // try to switch again
+    cy.get('.listed-aoi').eq(1).contains('Seneca Rocks #1').click();
+    cy.get('[data-cy=confirm-clear-aoi-modal]').should('exist');
+    // confirm that we are clearing the third AOI
+    cy.get('[data-cy=confirm-clear-aoi]').should('exist').click();
+    cy.wait('@fetchAoi2');
+    cy.get('[data-cy=global-loading]').should('not.exist');
+    cy.get('[data-cy=predict-tab]').click();
+    cy.get('.listed-aoi').should('have.length', 1);
+    cy.get('[data-cy=confirm-clear-aoi-modal]').should('not.exist');
   });
 });
 
