@@ -109,19 +109,19 @@ function findCompatibleAoi(aoi, aoiList, ckpt) {
  * @param setDeleteAoi - { func } parent
  */
 function AoiSelection() {
-  const { currentAoi, aoiList, aoiName, setAoiList } = useAoi();
   const [deleteAoi, setDeleteAoi] = useState();
   const [aoiToSwitch, setAoiToSwitch] = useState();
+
+  const { currentAoi, aoiList, aoiName, setAoiList } = useAoi();
   const { aoiArea, loadAoi, createNewAoi } = useAoiMeta();
+
   const { restApiClient } = useAuth();
 
   const { mapRef } = useMapRef();
+  const { mapState, mapModes } = useMapState();
 
   const { currentProject } = useProject();
-
   const { currentCheckpoint } = useCheckpoint();
-
-  const { mapState, mapModes } = useMapState();
 
   const { sessionStatus } = useSessionStatus();
 
@@ -203,7 +203,7 @@ function AoiSelection() {
   };
 
   const aoiSwitch = (aoi) => {
-    if (!currentAoi && aoiArea > 0) {
+    if ((currentAoi === undefined || currentAoi === null) && aoiArea > 0) {
       setAoiToSwitch(aoi);
       return;
     }
@@ -238,29 +238,27 @@ function AoiSelection() {
           }
           {
             // Remainder of list
-            filterAoiList(aoiList, currentAoi).map((aoi) => {
-              return (
-                <AoiOption
-                  key={aoi.id}
-                  className='listed-aoi'
-                  onClick={() => aoiSwitch(aoi)}
+            filterAoiList(aoiList, currentAoi).map((aoi) => (
+              <AoiOption
+                key={aoi.id}
+                className='listed-aoi'
+                onClick={() => aoiSwitch(aoi)}
+              >
+                <Heading size='xsmall'>{aoi.name}</Heading>
+                <EditButton
+                  useIcon='trash-bin'
+                  className='aoi-delete-button'
+                  hideText
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    setDeleteAoi(aoi);
+                  }}
                 >
-                  <Heading size='xsmall'>{aoi.name}</Heading>
-                  <EditButton
-                    useIcon='trash-bin'
-                    className='aoi-delete-button'
-                    hideText
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      e.preventDefault();
-                      setDeleteAoi(aoi);
-                    }}
-                  >
-                    Delete AOI
-                  </EditButton>
-                </AoiOption>
-              );
-            })
+                  Delete AOI
+                </EditButton>
+              </AoiOption>
+            ))
           }
         </ShadowScrollbar>
         <HeadOptionToolbar>
