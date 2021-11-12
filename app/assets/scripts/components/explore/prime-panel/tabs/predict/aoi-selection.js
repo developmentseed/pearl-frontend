@@ -238,7 +238,7 @@ function AoiSelection() {
           }
           {
             // Remainder of list
-            filterAoiList(aoiList, currentAoi).map((aoi) => (
+            filterAoiList(aoiList, aoiName).map((aoi) => (
               <AoiOption
                 key={aoi.id}
                 className='listed-aoi'
