@@ -398,6 +398,16 @@ function Map() {
     mapRef.polygonDraw.setCheckpoint(currentCheckpoint);
   }, [mapRef, currentCheckpoint, activeClass]);
 
+  useEffect(() => {
+    if (
+      shortcutState.escapePressed &&
+      mapRef?.polygonDraw &&
+      mapState.mode === mapModes.ADD_SAMPLE_POLYGON
+    ) {
+      mapRef.polygonDraw._clear();
+    }
+  }, [mapState.mode, shortcutState.escapePressed, mapRef?.polygonDraw]);
+
   const displayMap = useMemo(() => {
     return (
       <MapContainer
