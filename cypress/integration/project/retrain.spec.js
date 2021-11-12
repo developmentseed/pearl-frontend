@@ -228,9 +228,26 @@ describe('Retrain existing project', () => {
 
     // Apply file to input
     cy.get('[data-cy=samples-upload-input]').attachFile('samples.geojson');
+    cy.get('#import-samples-modal').within(() => {
+      cy.contains('Selected:').should('exist');
+      cy.contains('samples.geojson').should('exist');
+    });
 
     // Proceed importing
     cy.get('[data-cy=import-samples-geojson-button').click();
+    cy.get('#import-samples-modal').should('not.exist');
+
+    // Import another file
+    cy.get('[data-cy=open-import-samples-modal-button').click();
+    cy.get('#import-samples-modal').within(() => {
+      cy.contains('Selected:').should('not.exist');
+      cy.contains('samples.geojson').should('not.exist');
+    });
+    cy.get('[data-cy=samples-upload-input]').attachFile(
+      'aoi-upload/aoi-outside-usa.geojson'
+    );
+    cy.get('[data-cy=import-samples-geojson-button').click();
+    cy.get('#import-samples-modal').should('not.exist');
 
     // Set no instances available
     cy.intercept(
