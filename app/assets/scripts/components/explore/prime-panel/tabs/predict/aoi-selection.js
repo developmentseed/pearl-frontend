@@ -76,11 +76,11 @@ const AoiOption = styled(Option)`
   }
 `;
 
-function filterAoiList(aoiList, currentAoi) {
+function filterAoiList(aoiList, currentAoiName) {
   const aois = new Map();
   aoiList.forEach((a) => {
-    if (currentAoi?.name === a.name) {
-      // Do not include currentAoi in the list
+    if (currentAoiName === a.name) {
+      // Do not include aois with currentAoiName in the list
       return;
     }
 
@@ -110,7 +110,7 @@ function findCompatibleAoi(aoi, aoiList, ckpt) {
  * @param setDeleteAoi - { func } parent
  */
 function AoiSelection() {
-  const { currentAoi, aoiList, aoiName, setAoiList } = useAoi();
+  const { aoiList, aoiName, setAoiList } = useAoi();
   const [deleteAoi, setDeleteAoi] = useState();
   const { aoiArea, loadAoi, createNewAoi } = useAoiMeta();
   const { restApiClient } = useAuth();
@@ -224,7 +224,7 @@ function AoiSelection() {
           }
           {
             // Remainder of list
-            filterAoiList(aoiList, currentAoi).map((aoi) => {
+            filterAoiList(aoiList, aoiName).map((aoi) => {
               return (
                 <AoiOption
                   key={aoi.id}
