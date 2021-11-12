@@ -90,9 +90,17 @@ describe('Panel functions', () => {
     cy.get('[data-cy=primary-panel]').should('contain', 'Barren');
     cy.get('[data-cy=edit-class-Barren]').click();
     cy.get('.add-class__dropdown').should('contain', 'Edit Class');
+    cy.get('[data-cy=edit-class-save-button]').should('not.be.disabled');
+    // Check if the Save button is disabled when the name is empty
+    cy.get('#addClassName').clear();
+    cy.get('[data-cy=edit-class-save-button]').should('be.disabled');
+
+    // Set a new name and save
     cy.get('#addClassName').clear().type('Shadow');
     cy.get('.add-class__dropdown').should('contain', 'Cancel');
-    cy.get('[data-cy=edit-class-save-button]').click();
+    cy.get('[data-cy=edit-class-save-button]')
+      .should('not.be.disabled')
+      .click();
     cy.get('[data-cy=primary-panel]').should('contain', 'Shadow');
   });
 });
