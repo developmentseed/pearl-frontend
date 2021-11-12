@@ -76,10 +76,14 @@ const EditClass = ({ currentClassName, currentColor = '#000000' }) => {
         <DropdownItem nonhoverable data-dropdown='click.close'>
           Cancel
         </DropdownItem>
-        <DropdownItem nonhoverable data-dropdown='click.close'>
+        <DropdownItem
+          nonhoverable
+          data-dropdown={!addClassName ? '' : 'click.close'}
+        >
           <Button
             data-cy='edit-class-save-button'
             variation='primary-plain'
+            disabled={!addClassName}
             onClick={() => {
               saveClass();
               setAddClassName('');

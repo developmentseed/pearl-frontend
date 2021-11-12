@@ -75,11 +75,11 @@ const AoiOption = styled(Option)`
   }
 `;
 
-function filterAoiList(aoiList, currentAoi) {
+function filterAoiList(aoiList, currentAoiName) {
   const aois = new Map();
   aoiList.forEach((a) => {
-    if (currentAoi?.name === a.name) {
-      // Do not include currentAoi in the list
+    if (currentAoiName === a.name) {
+      // Do not include aois with currentAoiName in the list
       return;
     }
 
