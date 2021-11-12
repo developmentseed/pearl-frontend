@@ -231,7 +231,7 @@ function AoiSelection() {
                   key={aoi.id}
                   className='listed-aoi'
                   onClick={() => {
-                    if (currentAoi === null && aoiArea > 0) {
+                    if (!currentAoi && aoiArea > 0) {
                       setAoiToSwitch(aoi);
                       return;
                     }
