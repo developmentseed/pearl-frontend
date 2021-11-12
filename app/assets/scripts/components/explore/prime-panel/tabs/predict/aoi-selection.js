@@ -202,6 +202,19 @@ function AoiSelection() {
     }
   };
 
+  const aoiSwitch = (aoi) => {
+    if (!currentAoi && aoiArea > 0) {
+      setAoiToSwitch(aoi);
+      return;
+    }
+    const relevantAoi = findCompatibleAoi(aoi, aoiList, currentCheckpoint);
+    loadAoi(
+      currentProject,
+      relevantAoi || aoi,
+      relevantAoi || false
+    ).then((bounds) => mapRef.fitBounds(bounds, { padding: BOUNDS_PADDING }));
+  };
+
   return (
     <>
       <HeadOption hasSubtitle>
@@ -230,26 +243,7 @@ function AoiSelection() {
                 <AoiOption
                   key={aoi.id}
                   className='listed-aoi'
-                  onClick={() => {
-                    if (!currentAoi && aoiArea > 0) {
-                      setAoiToSwitch(aoi);
-                      return;
-                    }
-                    const relevantAoi = findCompatibleAoi(
-                      aoi,
-                      aoiList,
-                      currentCheckpoint
-                    );
-                    loadAoi(
-                      currentProject,
-                      relevantAoi || aoi,
-                      relevantAoi || false
-                    ).then((bounds) =>
-                      mapRef.fitBounds(bounds, {
-                        padding: BOUNDS_PADDING,
-                      })
-                    );
-                  }}
+                  onClick={() => aoiSwitch(aoi)}
                 >
                   <Heading size='xsmall'>{aoi.name}</Heading>
                   <EditButton
