@@ -38,7 +38,11 @@ import {
   useSessionStatusReducer,
 } from './session-status';
 
-import { useShortcutReducer, listenForShortcuts } from './shortcuts';
+import {
+  useShortcutReducer,
+  listenForShortcuts,
+  actions as shortcutActions,
+} from './shortcuts';
 
 export { sessionModes };
 /**
@@ -289,6 +293,9 @@ export function ExploreProvider(props) {
           });
 
         setSessionStatusMode(sessionModes.RETRAIN_READY);
+        dispatchShortcutState({
+          type: shortcutActions.SET_PREDICTION_OPACITY_100,
+        });
       }
 
       if (predictions.error) {
