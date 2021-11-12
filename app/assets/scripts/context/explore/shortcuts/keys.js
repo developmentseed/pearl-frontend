@@ -12,5 +12,5 @@ export const KEYS = {
   o_KEY: 'o',
 
   space_KEY: ' ',
-  esacape_KEY: 'Escape'
+  esacape_KEY: 'Escape',
 };
