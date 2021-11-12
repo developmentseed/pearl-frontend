@@ -363,6 +363,8 @@ function ExploreHeader(props) {
             <dd>Increase prediction layer opacity by 1%</dd>
             <Shortcut>f</Shortcut>
             <dd>Set prediction layer opacity to 100%</dd>
+            <Shortcut>Esc</Shortcut>
+            <dd>Cancel polygons in progress when drawing</dd>
             <Shortcut>Space</Shortcut>
             <dd>Pan map</dd>
             <Shortcut>k</Shortcut>
