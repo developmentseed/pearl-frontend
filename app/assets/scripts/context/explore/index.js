@@ -216,8 +216,7 @@ export function ExploreProvider(props) {
 
     try {
       showGlobalLoadingMessage('Fetching model...');
-      const model = await restApiClient.getModel(project.model_id);
-      setSelectedModel(model);
+      await setSelectedModel(project.model_id);
 
       showGlobalLoadingMessage('Fetching areas of interest...');
       const aoiReq = await restApiClient.get(`project/${project.id}/aoi`);
