@@ -3,10 +3,13 @@ import T from 'prop-types';
 import get from 'lodash.get';
 
 import InfoButton from '../../../common/info-button';
+import { Button } from '@devseed-ui/button';
 import { PlaceholderMessage } from '../../../../styles/placeholder.js';
 import { actions, useCheckpoint } from '../../../../context/checkpoint.js';
 import { useMapState } from '../../../../context/explore';
 import { useSessionStatus } from '../../../../context/explore';
+import { useMapRef } from '../../../../context/map';
+
 import { Dropdown, DropdownTrigger } from '../../../../styles/dropdown';
 import {
   ToolsWrapper,
@@ -37,6 +40,7 @@ function RetrainModel(props) {
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
   const { setMapMode, mapModes, mapState } = useMapState();
   const { sessionStatus } = useSessionStatus();
+  const { mapRef } = useMapRef();
   const isLoading = ['loading-project', 'retraining'].includes(
     sessionStatus.mode
   );
@@ -272,6 +276,26 @@ function RetrainModel(props) {
                           `selected since last retrain`}
                       </ClassSamples>
                     </ClassInfoWrapper>
+                    <Button
+                      variation='base-plain'
+                      size='medium'
+                      useIcon='arrow-loop'
+                      title='Clear all samples drawn since last retrain or save'
+                      id='reset-button-trigger'
+                      disabled={currentCheckpoint.activeItem !== c.name}
+                      visuallyDisabled={currentCheckpoint.activeItem !== c.name}
+                      onClick={() => {
+                        dispatchCurrentCheckpoint({
+                          type: actions.CLEAR_CLASS_SAMPLES,
+                          data: {
+                            className: c.name,
+                          },
+                        });
+                        mapRef.freehandDraw.clearLayer(c.name);
+                      }}
+                    >
+                      Clear
+                    </Button>
                   </Class>
                 );
               })}

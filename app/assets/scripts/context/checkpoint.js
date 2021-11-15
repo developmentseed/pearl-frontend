@@ -38,6 +38,7 @@ export const actions = {
   ADD_POINT_SAMPLES: 'ADD_POINT_SAMPLES',
   REMOVE_POINT_SAMPLE: 'REMOVE_POINT_SAMPLE',
   CLEAR_SAMPLES: 'CLEAR_SAMPLES',
+  CLEAR_CLASS_SAMPLES: 'CLEAR_CLASS_SAMPLES',
   SET_OSM_TAGMAP: 'SET_OSM_TAGMAP',
   RESET_CHECKPOINT: 'RESET_CHECKPOINT',
   UPDATE_POLYGONS: 'UPDATE_POLYGONS',
@@ -437,6 +438,37 @@ function checkpointReducer(state, action) {
       };
       break;
     }
+    case actions.CLEAR_CLASS_SAMPLES: {
+      nextState = {
+        ...state,
+        checkpointBrushes: {},
+        history: [
+          ...state.history,
+          {
+            classes: state.classes,
+            checkpointBrushes: state.checkpointBrushes,
+          },
+        ],
+        classes: Object.values(state.classes).reduce((accum, c) => {
+          return {
+            ...accum,
+            [c.name]:
+              c.name === action.data.className
+                ? {
+                    ...c,
+                    points: {
+                      type: 'MultiPoint',
+                      coordinates: [],
+                    },
+                    polygons: [],
+                  }
+                : c,
+          };
+        }, {}),
+      };
+      break;
+    }
+
     case actions.SET_OSM_TAGMAP: {
       const { name, tagmap } = action.data;
 

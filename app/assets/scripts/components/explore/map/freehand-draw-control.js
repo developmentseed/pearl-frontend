@@ -22,6 +22,14 @@ class FreehandDrawControl {
     });
   }
 
+  clearLayer(category) {
+    this._group.eachLayer(function (layer) {
+      if (layer.category === category) {
+        layer.clearLayers();
+      }
+    });
+  }
+
   /*
    * Create free hand shapes for each layer
    * Layers are only added if they do not currently exist in polygon draw

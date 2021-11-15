@@ -30,7 +30,7 @@ export const ClassList = styled.section`
 
 export const Class = styled.div`
   display: grid;
-  grid-template-columns: ${glsp(1.5)} minmax(10px, 1fr) ${glsp(2)};
+  grid-template-columns: ${glsp(1.5)} minmax(10px, 1fr) auto auto;
   grid-gap: 0 ${glsp(1)};
   padding: ${({ placeholder }) =>
     placeholder ? '0 1.5rem 1rem' : '0.5rem 1.5rem'};
