@@ -91,4 +91,9 @@ export default () => css`
   .leaflet-control-scale-line {
     background: rgba(255, 255, 255, 0.75);
   }
+
+  .leaflet-div-icon.leaflet-editing-icon.leaflet-edit-move.leaflet-interactive,
+  .leaflet-div-icon.leaflet-editing-icon.leaflet-edit-resize.leaflet-interactive {
+    cursor: crosshair;
+  }
 `;
