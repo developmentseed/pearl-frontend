@@ -17,6 +17,9 @@ export const actions = {
   UNSET_OVERRIDE_BROWSE_MODE: 'UNSET_OVERRIDE_BROWSE_MODE',
 
   UPDATE: 'UPDATE',
+
+  SET_ESCAPE_PRESSED: 'SET_ESCAPE_PRESSED',
+  SET_ESCAPE_NOT_PRESSED: 'SET_ESCAPE_NOT_PRESSED',
 };
 
 const initialState = {
@@ -26,6 +29,7 @@ const initialState = {
   layerTray: false,
   shortcutsHelp: false,
   overrideBrowseMode: false,
+  escapePressed: false,
 };
 
 export function shortcutReducer(state, action) {
@@ -96,6 +100,17 @@ export function shortcutReducer(state, action) {
         overrideBrowseMode: false,
       };
 
+    case actions.SET_ESCAPE_PRESSED:
+      return {
+        ...state,
+        escapePressed: true,
+      };
+    case actions.SET_ESCAPE_NOT_PRESSED:
+      return {
+        ...state,
+        escapePressed: false,
+      };
+
     // Generic value update
     case actions.UPDATE:
       return {
@@ -156,6 +171,12 @@ export const KEY_ACTIONS = {
     keyUpAction: actions.UNSET_OVERRIDE_BROWSE_MODE,
     modifiers: [],
     preventDefault: true,
+  },
+
+  [KEYS.esacape_KEY]: {
+    keyDownAction: actions.SET_ESCAPE_PRESSED,
+    keyUpAction: actions.SET_ESCAPE_NOT_PRESSED,
+    modifiers: [],
   },
 };
 
