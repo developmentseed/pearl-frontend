@@ -276,26 +276,32 @@ function RetrainModel(props) {
                           `selected since last retrain`}
                       </ClassSamples>
                     </ClassInfoWrapper>
-                    <Button
-                      variation='base-plain'
-                      size='medium'
-                      useIcon='arrow-loop'
-                      title='Clear all samples drawn since last retrain or save'
-                      id='reset-button-trigger'
-                      disabled={currentCheckpoint.activeItem !== c.name}
-                      visuallyDisabled={currentCheckpoint.activeItem !== c.name}
-                      onClick={() => {
-                        dispatchCurrentCheckpoint({
-                          type: actions.CLEAR_CLASS_SAMPLES,
-                          data: {
-                            className: c.name,
-                          },
-                        });
-                        mapRef.freehandDraw.clearLayer(c.name);
-                      }}
-                    >
-                      Clear
-                    </Button>
+                    {(points + polygons > 0 ) && (
+                      <InfoButton
+                        variation='base-plain'
+                        size='medium'
+                        useIcon='arrow-loop'
+                        title='Clear class samples drawn since last retrain or save'
+                        info='Clear class samples drawn since last retrain or save'
+                        id='reset-button-trigger'
+                        hideText
+                        disabled={currentCheckpoint.activeItem !== c.name}
+                        visuallyDisabled={
+                          currentCheckpoint.activeItem !== c.name
+                        }
+                        onClick={() => {
+                          dispatchCurrentCheckpoint({
+                            type: actions.CLEAR_CLASS_SAMPLES,
+                            data: {
+                              className: c.name,
+                            },
+                          });
+                          mapRef.freehandDraw.clearLayer(c.name);
+                        }}
+                      >
+                        Clear
+                      </InfoButton>
+                    )}
                   </Class>
                 );
               })}

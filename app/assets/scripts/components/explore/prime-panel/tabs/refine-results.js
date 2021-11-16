@@ -262,25 +262,29 @@ function RefineModel(props) {
                       currentColor={c.color}
                     />
                   </Dropdown>
-                  <Button
-                    variation='base-plain'
-                    size='medium'
-                    useIcon='arrow-loop'
-                    title='Clear class samples'
-                    disabled={currentCheckpoint.activeItem !== c.name}
-                    visuallyDisabled={currentCheckpoint.activeItem !== c.name}
-                    onClick={() => {
-                      dispatchCurrentCheckpoint({
-                        type: checkpointActions.CLEAR_CLASS_SAMPLES,
-                        data: {
-                          className: c.name,
-                        },
-                      });
-                      mapRef.freehandDraw.clearLayer(c.name);
-                    }}
-                  >
-                    Clear
-                  </Button>
+                  {polygons > 0 && (
+                    <InfoButton
+                      variation='base-plain'
+                      size='medium'
+                      useIcon='arrow-loop'
+                      title='Clear class samples'
+                      info='Clear class samples'
+                      hideText
+                      disabled={currentCheckpoint.activeItem !== c.name}
+                      visuallyDisabled={currentCheckpoint.activeItem !== c.name}
+                      onClick={() => {
+                        dispatchCurrentCheckpoint({
+                          type: checkpointActions.CLEAR_CLASS_SAMPLES,
+                          data: {
+                            className: c.name,
+                          },
+                        });
+                        mapRef.freehandDraw.clearLayer(c.name);
+                      }}
+                    >
+                      Clear
+                    </InfoButton>
+                  )}
                 </Item>
               );
             })}
