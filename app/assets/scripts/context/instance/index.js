@@ -36,6 +36,7 @@ import { featureCollection, feature } from '@turf/helpers';
 import { delay } from '../../utils/utils';
 import { actions as instanceActions, useInstanceReducer } from './reducer';
 import { aoiBoundsToArray } from '../../utils/map';
+import { round } from '../../utils/format';
 
 const BATCH_REFRESH_INTERVAL = 4000;
 
@@ -1106,13 +1107,23 @@ export class WebsocketClient extends ReconnectingWebsocket {
             showGlobalLoadingMessage('Loading checkpoint...');
             break;
           case 'model#checkpoint#complete':
-            fetchCheckpoint(
-              data.id || data.checkpoint
-              //checkpointModes.RETRAIN
-            );
+            fetchCheckpoint(data.id || data.checkpoint);
             hideGlobalLoading();
             this.sendMessage({ action: 'model#status' });
             break;
+
+          case 'model#retrain#progress': {
+            try {
+              dispatchPredictions({
+                type: predictionsActions.RECEIVE_RETRAIN_PROGRESS,
+                data: round((data.processed / data.total) * 100, 0),
+              });
+            } catch (error) {
+              // Bypass invalid error progress, print error
+              logger(error);
+            }
+            break;
+          }
           case 'model#retrain#complete':
             if (data && (data.id || data.checkpoint)) {
               fetchCheckpoint(

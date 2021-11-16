@@ -261,11 +261,13 @@ export function ExploreProvider(props) {
 
   useEffect(() => {
     if (predictions.fetching) {
-      const { processed, total } = predictions;
-      if (!total) {
-        setSessionStatusMessage(`Waiting for predictions...`);
-      } else {
+      const { processed, total, retrainProgress } = predictions;
+      if (total) {
         setSessionStatusMessage(`Received image ${processed} of ${total}...`);
+      } else if (retrainProgress >= 100) {
+        setSessionStatusMessage(`Retrain finished...`);
+      } else if (retrainProgress > 0) {
+        setSessionStatusMessage(`${retrainProgress}% retrained...`);
       }
     } else if (predictions.isReady()) {
       // Update AOI List with newest AOI
