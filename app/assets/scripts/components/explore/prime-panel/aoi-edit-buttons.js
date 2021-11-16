@@ -279,22 +279,24 @@ export function AoiEditButtons(props) {
   ) {
     return (
       <>
-        <EditButton
-          onClick={function () {
-            if (!apiLimits || apiLimits.live_inference > aoiArea) {
-              applyAoi();
-            } else if (apiLimits.max_inference > aoiArea) {
-              setActiveModal('batch-inference');
-            } else {
-              setActiveModal('area-too-large');
-            }
-          }}
-          title='Set Area of Interest'
-          useIcon='tick'
-          data-cy='aoi-edit-confirm-button'
-        >
-          Select AOI
-        </EditButton>
+        {aoiArea > 0 && (
+          <EditButton
+            onClick={function () {
+              if (!apiLimits || apiLimits.live_inference > aoiArea) {
+                applyAoi();
+              } else if (apiLimits.max_inference > aoiArea) {
+                setActiveModal('batch-inference');
+              } else {
+                setActiveModal('area-too-large');
+              }
+            }}
+            title='Set Area of Interest'
+            useIcon='tick'
+            data-cy='aoi-edit-confirm-button'
+          >
+            Select AOI
+          </EditButton>
+        )}
         <EditButton
           onClick={() => {
             setMapMode(mapModes.BROWSE_MODE);
