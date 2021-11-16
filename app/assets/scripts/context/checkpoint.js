@@ -39,6 +39,7 @@ export const actions = {
   REMOVE_POINT_SAMPLE: 'REMOVE_POINT_SAMPLE',
   CLEAR_SAMPLES: 'CLEAR_SAMPLES',
   CLEAR_CLASS_SAMPLES: 'CLEAR_CLASS_SAMPLES',
+  CLEAR_CHECKPOINT_BRUSHES: 'CLEAR_CHECKPOINT_BRUSHES',
   SET_OSM_TAGMAP: 'SET_OSM_TAGMAP',
   RESET_CHECKPOINT: 'RESET_CHECKPOINT',
   UPDATE_POLYGONS: 'UPDATE_POLYGONS',
@@ -441,7 +442,6 @@ function checkpointReducer(state, action) {
     case actions.CLEAR_CLASS_SAMPLES: {
       nextState = {
         ...state,
-        checkpointBrushes: {},
         history: [
           ...state.history,
           {
@@ -465,6 +465,26 @@ function checkpointReducer(state, action) {
                 : c,
           };
         }, {}),
+      };
+      break;
+    }
+    case actions.CLEAR_CHECKPOINT_BRUSHES: {
+      nextState = {
+        ...state,
+        history: [
+          ...state.history,
+          {
+            classes: state.classes,
+            checkpointBrushes: state.checkpointBrushes,
+          },
+        ],
+        checkpointBrushes: {
+          ...state.checkpointBrushes,
+          [action.data.id]: {
+            ...state.checkpointBrushes[action.data.id],
+            polygons: [],
+          },
+        },
       };
       break;
     }

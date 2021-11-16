@@ -3,7 +3,6 @@ import T from 'prop-types';
 import get from 'lodash.get';
 
 import InfoButton from '../../../common/info-button';
-import { Button } from '@devseed-ui/button';
 import { PlaceholderMessage } from '../../../../styles/placeholder.js';
 import { actions, useCheckpoint } from '../../../../context/checkpoint.js';
 import { useMapState } from '../../../../context/explore';
@@ -276,7 +275,7 @@ function RetrainModel(props) {
                           `selected since last retrain`}
                       </ClassSamples>
                     </ClassInfoWrapper>
-                    {(points + polygons > 0 ) && (
+                    {points + polygons > 0 && (
                       <InfoButton
                         variation='base-plain'
                         size='medium'
