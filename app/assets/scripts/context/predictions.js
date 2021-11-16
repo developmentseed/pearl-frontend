@@ -57,6 +57,7 @@ export const usePredictions = () => {
 
 export const actions = {
   START_PREDICTION: 'START_PREDICTION',
+  RECEIVE_RETRAIN_PROGRESS: 'RECEIVE_RETRAIN_PROGRESS',
   RECEIVE_PREDICTION: 'RECEIVE_PREDICTION',
   RECEIVE_AOI_META: 'RECEIVE_AOI_META',
   COMPLETE_PREDICTION: 'COMPLETE_PREDICTION',
@@ -88,6 +89,7 @@ export function predictionsReducer(state, action) {
         ...initialApiRequestState,
         fetching: true,
         processed: 0,
+        retrainProgress: 0,
         receivedAt: Date.now(),
         data: {
           predictions: [],
@@ -104,6 +106,12 @@ export function predictionsReducer(state, action) {
           aoiId: data.id,
         },
       });
+
+    case actions.RECEIVE_RETRAIN_PROGRESS:
+      return {
+        ...state,
+        retrainProgress: data,
+      };
 
     case actions.RECEIVE_PREDICTION: {
       // Get bounds
