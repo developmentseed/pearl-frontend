@@ -168,6 +168,31 @@ function RefineModel(props) {
                       <Heading size='xsmall'>
                         {c.name} ({c.id})
                       </Heading>
+
+                      {currentCheckpoint.checkpointBrushes[id]?.polygons
+                        .length > 0 && (
+                        <InfoButton
+                          variation='base-plain'
+                          size='medium'
+                          useIcon='arrow-loop'
+                          title='Clear checkpoint brushes'
+                          info='Clear checkpoint brushes'
+                          hideText
+                          disabled={currentCheckpoint.activeItem !== id}
+                          visuallyDisabled={currentCheckpoint.activeItem !== id}
+                          onClick={() => {
+                            dispatchCurrentCheckpoint({
+                              type: checkpointActions.CLEAR_CHECKPOINT_BRUSHES,
+                              data: {
+                                id,
+                              },
+                            });
+                            mapRef.freehandDraw.clearLayer(id);
+                          }}
+                        >
+                          Clear
+                        </InfoButton>
+                      )}
                     </Item>
                   );
                 })}
@@ -262,6 +287,29 @@ function RefineModel(props) {
                       currentColor={c.color}
                     />
                   </Dropdown>
+                  {polygons > 0 && (
+                    <InfoButton
+                      variation='base-plain'
+                      size='medium'
+                      useIcon='arrow-loop'
+                      title='Clear class samples'
+                      info='Clear class samples'
+                      hideText
+                      disabled={currentCheckpoint.activeItem !== c.name}
+                      visuallyDisabled={currentCheckpoint.activeItem !== c.name}
+                      onClick={() => {
+                        dispatchCurrentCheckpoint({
+                          type: checkpointActions.CLEAR_CLASS_SAMPLES,
+                          data: {
+                            className: c.name,
+                          },
+                        });
+                        mapRef.freehandDraw.clearLayer(c.name);
+                      }}
+                    >
+                      Clear
+                    </InfoButton>
+                  )}
                 </Item>
               );
             })}
