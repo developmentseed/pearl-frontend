@@ -112,6 +112,7 @@ export const ClassSamples = styled.p`
   grid-row: 2;
   grid-column: 2;
   font-size: 0.75rem;
+  white-space: nowrap;
 `;
 
 export const ClassOptions = styled(Button)`
