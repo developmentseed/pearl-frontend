@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import T from 'prop-types';
 import L from 'leaflet';
-import bbox from '@turf/bbox';
 import styled from 'styled-components';
 import { Button } from '@devseed-ui/button';
 import { glsp, themeVal } from '@devseed-ui/theme-provider';
@@ -12,8 +11,6 @@ import {
 } from '@devseed-ui/modal';
 
 import { EditButton } from '../../../styles/button';
-import Prose from '../../../styles/type/prose';
-import { FauxFileDialog } from '../../common/faux-file-dialog';
 import { BOUNDS_PADDING } from '../../common/map/constants';
 import { useMapState, useAoiMeta } from '../../../context/explore';
 import { useMapRef } from '../../../context/map';
@@ -28,7 +25,8 @@ import {
 import { formatThousands } from '../../../utils/format';
 import { areaFromBounds } from '../../../utils/map';
 import logger from '../../../utils/logger';
-import { inRange } from '../../../utils/utils';
+import config from '../../../config';
+import { UploadAoiModal } from './upload-aoi-modal';
 
 const ModalFooter = styled(BaseModalFooter)`
   padding: ${glsp(2)} 0 0 0;
@@ -40,183 +38,49 @@ const ModalFooter = styled(BaseModalFooter)`
   }
 `;
 
-const Wrapper = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  h1 {
-    grid-column: 1 / -1;
-  }
-  div.prose {
-    grid-column: 1 / -1;
-  }
-  .warning {
-    color: ${themeVal('color.danger')};
-  }
-  grid-gap: 1rem;
-`;
-
 const Separator = styled.span`
   color: ${themeVal('color.baseAlphaD')};
 `;
 
-function UploadAoiModal({ revealed, setRevealed, onImport, apiLimits }) {
-  const [file, setFile] = useState(null);
-  const [warning, setWarning] = useState(null);
-  const onFileSelect = async (uploadedFile) => {
-    try {
-      // Check if file extension
-      const filename = uploadedFile.name;
-      if (!filename.endsWith('.json') && !filename.endsWith('.geojson')) {
-        setWarning(`Invalid file extension, please upload a valid file.`);
-        return;
-      }
-
-      // Parse JSON
-      const geojson = JSON.parse(await uploadedFile.text());
-
-      // Check for a FeatureCollection
-      if (geojson.type !== 'FeatureCollection') {
-        setWarning(
-          'GeoJSON must be of FeatureCollection type, please upload a valid file.'
-        );
-        return;
-      }
-
-      const bounds = bbox(geojson);
-      const totalArea = areaFromBounds(bounds);
-
-      if (isNaN(totalArea) || totalArea === 0) {
-        // Area should be bigger than zero, abort import
-        setWarning(
-          'File is empty or does not conform a valid area, please upload another file.'
-        );
-        setFile(null);
-        return;
-      } else if (totalArea > apiLimits.max_inference) {
-        // Area should be lower than max_inference, abort import
-        setWarning('Area is too large, please upload another file.');
-        setFile(null);
-        return;
-      } else if (
-        inRange(totalArea, apiLimits.live_inference, apiLimits.max_inference)
-      ) {
-        // If area is bigger than apiLimits.live_inference, show warning and proceed import
-        setWarning('Due to area size live inference will not be available.');
-      } else {
-        // Area is ok, clear warning
-        setWarning(null);
-      }
-
-      // File is ok, allow importing
-      setFile({ name: filename, bounds, totalArea });
-    } catch (error) {
-      logger(error);
-      setWarning(
-        'An unexpected error occurred, please upload a valid GeoJSON file or try again later.'
-      );
-    }
+const ActiveModalHeadline = ({ activeModal }) => {
+  const messages = {
+    'batch-inference': 'Save Area For Batch Prediction',
+    'area-too-large': 'Area is too large',
+    'area-too-tiny': 'Area is too tiny',
   };
 
   return (
-    <Modal
-      id='import-aoi-modal'
-      size='small'
-      revealed={revealed}
-      title='Upload an AOI'
-      onCloseClick={() => {
-        setRevealed(false);
-        setWarning(null);
-      }}
-      content={
-        <Wrapper>
-          {!file && (
-            <Prose className='prose'>
-              Once imported, the bounding box containing all features in the
-              file will be set as an AOI.
-            </Prose>
-          )}
-          <FauxFileDialog
-            name='image-file'
-            data-cy='aoi-upload-input'
-            onFileSelect={onFileSelect}
-          >
-            {(fieProps) =>
-              !file && (
-                <Button
-                  data-cy='select-aoi-file-button'
-                  variation='primary-raised-light'
-                  size='medium'
-                  useIcon='upload'
-                  style={{
-                    gridColumn: '2 / 1',
-                  }}
-                  {...fieProps}
-                >
-                  Select GeoJSON file
-                </Button>
-              )
-            }
-          </FauxFileDialog>
-          {file && (
-            <>
-              <div className='prose'>
-                <strong>Selected file: </strong>
-                {file.name}
-              </div>
-              <div className='prose'>
-                <strong>MinX: </strong>
-                {file.bounds[0]}
-              </div>
-              <div className='prose'>
-                <strong>MinY: </strong>
-                {file.bounds[1]}
-              </div>
-              <div className='prose'>
-                <strong>MaxX: </strong>
-                {file.bounds[2]}
-              </div>
-              <div className='prose'>
-                <strong>MaxY: </strong>
-                {file.bounds[3]}
-              </div>
-            </>
-          )}
-          {warning && (
-            <div data-cy='import-aoi-warning-text' className='prose warning'>
-              {warning}
-            </div>
-          )}
-          <Button
-            data-cy='import-aoi-button'
-            variation='primary-raised-dark'
-            size='medium'
-            useIcon='tick'
-            visuallyDisabled={!file}
-            disabled={!file}
-            style={{ gridColumn: '1 / -1' }}
-            onClick={() => {
-              if (onImport(file)) {
-                setRevealed(false);
-              } else {
-                setWarning(
-                  'An unexpected error occurred, please upload a valid GeoJSON file or try again later.'
-                );
-              }
-            }}
-          >
-            Import
-          </Button>
-        </Wrapper>
-      }
-    />
+    <ModalHeadline>
+      <h1>{messages[activeModal]}</h1>
+    </ModalHeadline>
   );
-}
+};
 
-UploadAoiModal.propTypes = {
-  revealed: T.bool,
-  setRevealed: T.func,
-  onImport: T.func,
-  apiLimits: T.object,
+ActiveModalHeadline.propTypes = {
+  activeModal: T.string,
+};
+
+const ActiveModalContent = ({ activeModal, aoiArea }) => {
+  const { apiLimits } = useApiLimits();
+
+  const maxArea = formatThousands(apiLimits.live_inference / 1e6);
+  const formattedAoiArea = formatThousands(aoiArea / 1e6, { decimals: 1 });
+  const messages = {
+    'batch-inference': `Live inference is not available for areas larger
+      than ${maxArea} km². You can run inference on this AOI as a background
+      process, or resize to a smaller size to engage in retraining and run
+      live inference.`,
+    'area-too-large': `The AOI area is ${formattedAoiArea} km², please select an
+      area smaller than ${maxArea} km².`,
+    'area-too-tiny': `The AOI area is ${formattedAoiArea} km², please select an
+      area greater than ${config.minimumAoiArea / 1e6} km².`,
+  };
+
+  return <div>{messages[activeModal]}</div>;
+};
+ActiveModalContent.propTypes = {
+  activeModal: T.string,
+  aoiArea: T.number,
 };
 
 export function AoiEditButtons(props) {
@@ -278,6 +142,10 @@ export function AoiEditButtons(props) {
         {aoiArea > 0 && (
           <EditButton
             onClick={function () {
+              if (aoiArea < config.minimumAoiArea) {
+                setActiveModal('area-too-tiny');
+                return;
+              }
               if (!apiLimits || apiLimits.live_inference > aoiArea) {
                 applyAoi();
               } else if (apiLimits.max_inference > aoiArea) {
@@ -335,37 +203,14 @@ export function AoiEditButtons(props) {
             size='small'
             closeButton={false}
             renderHeadline={() => (
-              <ModalHeadline>
-                {activeModal === 'batch-inference' ? (
-                  <h1>Save Area For Batch Prediction</h1>
-                ) : (
-                  <h1>Area too large</h1>
-                )}
-              </ModalHeadline>
+              <ActiveModalHeadline activeModal={activeModal} />
             )}
             content={
-              activeModal === 'batch-inference' ? (
-                <div>
-                  Live inference is not available for areas larger than{' '}
-                  {formatThousands(apiLimits.live_inference / 1e6)} km². You can
-                  run inference on this AOI as a background process, or resize
-                  to a smaller size to engage in retraining and run live
-                  inference.
-                </div>
-              ) : (
-                <div>
-                  The area has {formatThousands(aoiArea / 1e6, { decimals: 0 })}{' '}
-                  km², please select an area smaller than{' '}
-                  {formatThousands(apiLimits.max_inference / 1e6, {
-                    decimals: 0,
-                  })}{' '}
-                  km².
-                </div>
-              )
+              <ActiveModalContent activeModal={activeModal} aoiArea={aoiArea} />
             }
             renderFooter={() => (
               <ModalFooter>
-                {activeModal && activeModal !== 'area-too-large' && (
+                {activeModal && activeModal === 'batch-inference' && (
                   <Button
                     size='xlarge'
                     variation='base-plain'
@@ -380,6 +225,7 @@ export function AoiEditButtons(props) {
                 )}
                 <Button
                   size='xlarge'
+                  data-cy='keep-editing-button'
                   variation='primary-plain'
                   onClick={() => {
                     setActiveModal(false);
