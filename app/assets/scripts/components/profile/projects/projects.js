@@ -81,7 +81,7 @@ function renderRow(proj) {
 
 function Projects() {
   const history = useHistory();
-  const { apiToken, refreshAuth } = useAuth();
+  const { apiToken } = useAuth();
 
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(null);
@@ -103,7 +103,6 @@ function Projects() {
         } catch (err) {
           if (err.statusCode === 401) {
             toasts.error('Authentication failed, please try again later.');
-            refreshAuth();
           } else {
             toasts.error('Unexpected error.');
           }

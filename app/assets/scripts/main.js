@@ -44,13 +44,6 @@ const ProtectedRoute = (
 
 // Root component.
 function Root() {
-  useEffect(() => {
-    // Hide the welcome banner.
-    const banner = document.querySelector('#welcome-banner');
-    banner.classList.add('dismissed');
-    setTimeout(() => banner.remove(), 500);
-  }, []);
-
   return (
     <AuthProvider>
       <ErrorBoundary>

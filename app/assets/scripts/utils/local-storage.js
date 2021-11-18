@@ -25,7 +25,3 @@ export function getLocalStorageItem(key, format) {
   }
   return value;
 }
-
-export function setLocalStorageItem(key, value) {
-  theLocalStorage.setItem(key, value);
-}
