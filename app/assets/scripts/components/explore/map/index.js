@@ -60,6 +60,7 @@ import OsmQaLayer from '../../common/map/osm-qa-layer';
 const center = [38.889805, -77.009056];
 const zoom = 12;
 
+const MIN = 4;
 const MAX = 3;
 const NO_LIVE = 2;
 const LIVE = 1;
@@ -283,6 +284,11 @@ function Map() {
         onDrawEnd: (bbox, shape) => {
           const area = areaFromBounds(bbox);
 
+          if (area < config.minimumAoiArea) {
+            setActiveModal('area-too-tiny');
+            return;
+          }
+
           if (!apiLimits || apiLimits.live_inference > area) {
             const bounds = shape.getBounds();
             setMapMode(mapModes.BROWSE_MODE);
@@ -323,6 +329,14 @@ function Map() {
       });
       aoiRef.status = MAX;
     } else if (
+      inRange(aoiArea, 0, config.minimumAoiArea) &&
+      aoiRef.status !== MIN
+    ) {
+      aoiRef.setStyle({
+        color: theme.dark.color.danger,
+      });
+      aoiRef.status = MIN;
+    } else if (
       inRange(aoiArea, live_inference, max_inference) &&
       aoiRef.status !== NO_LIVE
     ) {
@@ -330,7 +344,10 @@ function Map() {
         color: theme.dark.color.warning,
       });
       aoiRef.status = NO_LIVE;
-    } else if (inRange(aoiArea, 0, live_inference) && aoiRef.status !== LIVE) {
+    } else if (
+      inRange(aoiArea, config.minimumAoiArea, live_inference) &&
+      aoiRef.status !== LIVE
+    ) {
       aoiRef.setStyle({
         color: theme.dark.color.info,
       });

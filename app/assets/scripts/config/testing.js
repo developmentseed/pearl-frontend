@@ -6,5 +6,6 @@ module.exports = {
     websocketEndpoint: 'ws://localhost:1999',
     instanceCreationTimeout: 5000,
     instanceCreationCheckInterval: 500,
+    minimumAoiArea: 40000,
   },
 };

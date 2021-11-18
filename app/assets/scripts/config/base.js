@@ -23,5 +23,6 @@ module.exports = {
     appInsightsKey: '07b5adb4-0447-4c6f-881a-a23e108bc861',
     instanceCreationTimeout: 30000,
     instanceCreationCheckInterval: 5000,
+    minimumAoiArea: 1000000,
   },
 };

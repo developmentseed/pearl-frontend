@@ -26,6 +26,20 @@ describe('Loads AOIs', () => {
     cy.get('[data-cy=selected-aoi-header]').contains('Judiciary Square');
   });
 
+  it('Try to draw a tiny AOI and check if alert modal is visible', () => {
+    map = Cypress.map;
+    map.setZoom(14);
+
+    cy.get('[data-cy=aoi-edit-button]').click();
+    cy.get('#map')
+      .trigger('mousedown', 150, 150)
+      .trigger('mousemove', 170, 170)
+      .trigger('mouseup');
+    cy.get('#confirm-area-size').contains('Area is too tiny');
+    cy.get('[data-cy=proceed-anyway-button]').should('not.exist');
+    cy.get('[data-cy=keep-editing-button]').should('exist').click();
+  });
+
   it('Can geocode a rural non addressable area', () => {
     map = Cypress.map;
     map.flyTo({ lat: 40.35813437224801, lon: -77.78670843690634 }, 14, {
@@ -274,7 +288,7 @@ describe('Can delete AOIs', () => {
     // Draw AOI
     cy.get('#map')
       .trigger('mousedown', 150, 150)
-      .trigger('mousemove', 200, 200)
+      .trigger('mousemove', 300, 300)
       .trigger('mouseup');
     cy.wait('@reverseGeocodeCity');
 
