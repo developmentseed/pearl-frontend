@@ -127,15 +127,17 @@ export const PartnerLogos = styled.ul`
   flex-flow: row wrap;
   p {
     flex-basis: 100%;
+    text-transform: uppercase;
+    font-size: 0.875rem;
   }
   li {
     list-style: none;
-    padding-top: ${glsp(4)};
-    padding-right: ${glsp(6)};
+    padding-top: ${glsp(1.5)};
+    padding-right: ${glsp(1.5)};
 
     img {
       max-width: 100%;
-      height: 2.25rem;
+      height: 2rem;
     }
   }
 `;
@@ -211,9 +213,7 @@ function Home() {
             )}
           </HomeCTA>
           <PartnerLogos>
-            <li>
-              <img src='../assets/graphics/content/logo_microsoft.svg' />
-            </li>
+            <p>A project by</p>
             <li>
               <img src='../assets/graphics/content/logo_devseed.svg' />
             </li>
