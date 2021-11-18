@@ -13,7 +13,6 @@ import {
 import { glsp } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
 import { StyledNavLink } from '../../../styles/links';
-import toasts from '../../common/toasts';
 import { useAuth } from '../../../context/auth';
 import { formatDateTime } from '../../../utils/format';
 import {
@@ -22,7 +21,7 @@ import {
 } from '../../common/global-loading';
 import Table, { TableRow, TableCell } from '../../common/table';
 import Paginator from '../../common/paginator';
-import { useHistory } from 'react-router';
+import logger from '../../../utils/logger';
 
 // Controls the size of each page
 const PROJECTS_PER_PAGE = 20;
@@ -80,7 +79,6 @@ function renderRow(proj) {
 }
 
 function Projects() {
-  const history = useHistory();
   const { apiToken } = useAuth();
 
   const [page, setPage] = useState(1);
@@ -93,25 +91,19 @@ function Projects() {
   useEffect(() => {
     async function fetchProjects() {
       if (apiToken) {
-        showGlobalLoadingMessage('Loading projects...');
         try {
+          showGlobalLoadingMessage('Loading projects...');
           const data = await restApiClient.get(
             `project/?page=${page - 1}&limit=${PROJECTS_PER_PAGE}`
           );
           setTotal(data.total);
           setProjects(data.projects);
-        } catch (err) {
-          if (err.statusCode === 401) {
-            toasts.error('Authentication failed, please try again later.');
-          } else {
-            toasts.error('Unexpected error.');
-          }
-          setIsLoading(false);
+        } catch (error) {
+          logger(error);
+        } finally {
           hideGlobalLoading();
-          history.push('/');
+          setIsLoading(false);
         }
-        hideGlobalLoading();
-        setIsLoading(false);
       }
     }
     fetchProjects();
