@@ -25,6 +25,7 @@ import {
 import { Subheading } from '../../../../styles/type/heading';
 import { useAoi } from '../../../../context/aoi';
 import { useApiLimits } from '../../../../context/global';
+import { useModel } from '../../../../context/model';
 import EditClass from './edit-class';
 import ImportGeojsonModal from './retrain/import-geojson-modal';
 import ApplyOsmModal from './retrain/apply-osm-modal';
@@ -50,6 +51,7 @@ function RetrainModel(props) {
   const [osmModalRevealed, setOsmModalRevealed] = useState(false);
   const { aoiArea } = useAoi();
   const { apiLimits } = useApiLimits();
+  const { selectedModel } = useModel();
 
   const isBatchArea =
     aoiArea && apiLimits && aoiArea > apiLimits['live_inference'];
@@ -230,8 +232,14 @@ function RetrainModel(props) {
                 radius='ellipsoid'
                 useLocalButton
                 useIcon='brand-osm'
-                visuallyDisabled={!currentCheckpoint.activeItem}
-                info='Apply OpenStreetMap features as samples'
+                visuallyDisabled={
+                  !currentCheckpoint.activeItem || !selectedModel.osmtag_id
+                }
+                info={
+                  !selectedModel.osmtag_id
+                    ? 'OpenStreetMap features are not available for the selected model'
+                    : 'Apply OpenStreetMap features as samples'
+                }
                 onClick={() => {
                   setOsmModalRevealed(true);
                 }}
