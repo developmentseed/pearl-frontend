@@ -94,12 +94,12 @@ function SecPanel() {
                       {Object.values(currentCheckpoint.classes).map(
                         (cl, ind) => {
                           return (
-                            <>
+                            <div key={cl.name}>
                               <Prose size='small'>{cl.name}</Prose>
                               <Prose size='small'>
                                 {`${currentCheckpoint.analytics[ind].counts}`}
                               </Prose>
-                            </>
+                            </div>
                           );
                         }
                       )}
