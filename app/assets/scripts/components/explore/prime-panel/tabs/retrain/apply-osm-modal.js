@@ -9,6 +9,7 @@ import {
   actions as checkpointActions,
 } from '../../../../../context/checkpoint';
 import { useModel } from '../../../../../context/model';
+import { useOsmQaLayer } from '../../../../../context/map';
 
 import { Modal } from '@devseed-ui/modal';
 import {
@@ -42,6 +43,7 @@ const Wrapper = styled.div`
 
 function ApplyOsmModal({ revealed, setRevealed }) {
   const { selectedModel } = useModel();
+  const { setEnableOsmQaLayer } = useOsmQaLayer();
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
   const activeClass = currentCheckpoint && currentCheckpoint.activeItem;
 
@@ -115,6 +117,7 @@ function ApplyOsmModal({ revealed, setRevealed }) {
               const selectedTagmap = selectedModel.osmtag.find(
                 (c) => c.name === selectedClass
               );
+              setEnableOsmQaLayer(true);
               dispatchCurrentCheckpoint({
                 type: checkpointActions.SET_OSM_TAGMAP,
                 data: {

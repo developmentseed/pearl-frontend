@@ -18,7 +18,12 @@ import {
   sessionModes,
 } from '../../../context/explore';
 import { actions as shortcutActions } from '../../../context/explore/shortcuts';
-import { useMapRef, useMapLayers, useUserLayers } from '../../../context/map';
+import {
+  useMapRef,
+  useMapLayers,
+  useUserLayers,
+  useOsmQaLayer,
+} from '../../../context/map';
 
 import GeoCoder from '../../common/map/geocoder';
 import GenericControl from '../../common/map/generic-control';
@@ -117,6 +122,7 @@ function Map() {
   const { aoiPatchList } = useAoiPatch();
 
   const { mapState, mapModes, setMapMode } = useMapState();
+  const { enableOsmQaLayer } = useOsmQaLayer();
 
   const { mapRef, setMapRef } = useMapRef();
   const [tileUrl, setTileUrl] = useState(null);
@@ -656,7 +662,8 @@ function Map() {
         {!window.Cypress &&
           sessionStatus?.mode === sessionModes.RETRAIN_READY &&
           currentCheckpoint &&
-          aoiRef && (
+          aoiRef &&
+          enableOsmQaLayer && (
             <OsmQaLayer
               modelClasses={currentCheckpoint.classes}
               aoiRef={aoiRef}
