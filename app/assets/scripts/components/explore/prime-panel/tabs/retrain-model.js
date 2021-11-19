@@ -237,7 +237,7 @@ function RetrainModel(props) {
                 }
                 info={
                   !selectedModel.osmtag_id
-                    ? 'OpenStreetMap features are not available for the selected model'
+                    ? 'OpenStreetMap features are not available for this model'
                     : 'Apply OpenStreetMap features as samples'
                 }
                 onClick={() => {
