@@ -48,7 +48,7 @@ const HomeIntro = styled(InpageBodyInner)`
   margin: 0;
   margin-top: 12vw;
   ${media.xlargeUp`
-    margin: 12vw 12vw 0;
+    margin: 6vh 6vh 0;
   `};
 `;
 
@@ -75,7 +75,7 @@ const HomeHeading = styled(Heading)`
 
 const HomeCTA = styled.article`
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
   flex-flow: column nowrap;
   ${media.smallUp`
     flex-flow: row nowrap;
@@ -85,7 +85,7 @@ const HomeCTA = styled.article`
     margin-bottom: ${glsp(2)};
     ${media.smallUp`
       min-width: 14rem;
-      margin-left: ${glsp(2)};
+      margin-right: ${glsp(2)};
     `}
   }
 `;
@@ -94,7 +94,8 @@ const HomeTout = styled(InpageBodyInner)`
   flex-basis: 100%;
   margin: ${glsp(2)} 0;
   ${media.xlargeUp`
-    margin: 0 12vw;
+    margin: 0 6vh;
+    padding: 6vh 4rem;
   `};
   ul {
     display: grid;
@@ -119,6 +120,25 @@ const StatusSection = styled.section`
   margin: ${glsp(1.5)} ${glsp()};
   > * {
     margin-right: ${glsp()};
+  }
+`;
+export const PartnerLogos = styled.ul`
+  display: flex;
+  flex-flow: row wrap;
+  p {
+    flex-basis: 100%;
+    text-transform: uppercase;
+    font-size: 0.875rem;
+  }
+  li {
+    list-style: none;
+    padding-top: ${glsp(1.5)};
+    padding-right: ${glsp(1.5)};
+
+    img {
+      max-width: 100%;
+      height: 2rem;
+    }
   }
 `;
 
@@ -192,6 +212,12 @@ function Home() {
               </Button>
             )}
           </HomeCTA>
+          <PartnerLogos>
+            <p>A project by</p>
+            <li>
+              <img src='../assets/graphics/content/logo_devseed.svg' />
+            </li>
+          </PartnerLogos>
         </HomeIntro>
         <HomeTout>
           <ul>
