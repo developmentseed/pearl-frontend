@@ -22,6 +22,6 @@ export default async function checkApiHealth() {
 
   if (!isHealthy) {
     history.push('/');
-    toasts.error('API is unreachable at the moment, please try again later.');
+    toasts.error('API is unreachable, please try again later.');
   }
 }

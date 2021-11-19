@@ -1,7 +1,7 @@
 import './wdyr';
 import '@babel/polyfill';
 import { install as installResizeObserver } from 'resize-observer';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { DevseedUiThemeProvider } from '@devseed-ui/theme-provider';
 
 import { render } from 'react-dom';
@@ -44,13 +44,6 @@ const ProtectedRoute = (
 
 // Root component.
 function Root() {
-  useEffect(() => {
-    // Hide the welcome banner.
-    const banner = document.querySelector('#welcome-banner');
-    banner.classList.add('dismissed');
-    setTimeout(() => banner.remove(), 500);
-  }, []);
-
   return (
     <AuthProvider>
       <ErrorBoundary>
