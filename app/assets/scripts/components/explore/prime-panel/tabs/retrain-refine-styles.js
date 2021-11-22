@@ -195,10 +195,21 @@ export const PickerStyles = {
       background: themeVal('color.surface'),
     },
     body: {
-      padding: '12px 12px 6px',
+      padding: '12px 0 6px',
     },
     saturation: {
       paddingBottom: '42%',
+    },
+  },
+  disableAlpha: {
+    color: {
+      width: '32px',
+    },
+    swatch: {
+      marginTop: '-5px',
+      width: '20px',
+      height: '20px',
+      borderRadius: '10px',
     },
   },
 };
@@ -209,10 +220,48 @@ export const PickerDropdownBody = styled(DropdownBody)`
 `;
 
 export const PickerDropdownItem = styled(DropdownItem)`
-  font-weight: 400;
-  grid-gap: 0;
+  justify-items: stretch;
+  grid-template-columns: auto;
   label {
+    display: flex;
+    flex-flow: column nowrap;
     font-size: 0.875rem;
+    & > input,
+    & > div {
+      margin-top: ${glsp(0.125)};
+    }
+  }
+  input[id^='rc-editable-input'] {
+    font-family: ${themeVal('type.base.family')} !important;
+    font-size: 0.875rem !important;
+    border: 1px solid rgba(240, 244, 255, 0.16) !important;
+    border-radius: 0.2rem !important;
+    background-color: #1c263c !important;
+    color: #f0f4ff !important;
+    line-height: 21px !important;
+    height: auto !important;
+    box-shadow: none !important;
+    &:hover {
+      box-shadow: none !important;
+      border-color: rgba(240, 244, 255, 0.32) !important;
+    }
+    &:active,
+    &:focus {
+      outline: 0 !important;
+      box-shadow: none !important;
+      border-color: rgba(240, 244, 255, 0.64) !important;
+    }
+  }
+  label[for^='rc-editable-input'] {
+    color: ${themeVal('color.base')} !important;
+    font-size: 0.875rem !important;
+  }
+  .chrome-picker .flexbox-fix svg {
+    fill: ${themeVal('color.baseAlphaE')} !important;
+    &:hover {
+      fill: ${themeVal('color.base')} !important;
+      background: transparent !important;
+    }
   }
 `;
 
@@ -221,4 +270,7 @@ export const PickerDropdownFooter = styled(DropdownFooter)`
   flex-flow: row nowrap;
   justify-content: space-around;
   align-items: center;
+  > ${DropdownItem} {
+    grid-template-columns: auto;
+  }
 `;

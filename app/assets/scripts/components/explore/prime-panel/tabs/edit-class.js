@@ -49,27 +49,31 @@ const EditClass = ({ currentClassName, currentColor = '#000000' }) => {
       </DropdownHeader>
       <PickerDropdownBody>
         <PickerDropdownItem nonhoverable as='div'>
-          <label htmlFor='addClassName'>Class Name</label>
-          <AutoFocusFormInput
-            inputId='addClassName'
-            value={addClassName}
-            setValue={setAddClassName}
-          />
+          <label htmlFor='addClassName'>
+            Class Name
+            <AutoFocusFormInput
+              inputId='addClassName'
+              value={addClassName}
+              setValue={setAddClassName}
+            />
+          </label>
         </PickerDropdownItem>
         <PickerDropdownItem nonhoverable as='div'>
-          <label>Label Color</label>
-          <ChromePicker
-            disableAlpha={true}
-            color={addClassColor}
-            width='100%'
-            styles={PickerStyles}
-            onChangeComplete={(color) => {
-              setAddClassColor(color.hex);
-            }}
-            onKeyDown={(e) => {
-              e.stopPropagation();
-            }}
-          />
+          <label>
+            Label Color
+            <ChromePicker
+              disableAlpha={true}
+              color={addClassColor}
+              width='100%'
+              styles={PickerStyles}
+              onChangeComplete={(color) => {
+                setAddClassColor(color.hex);
+              }}
+              onKeyDown={(e) => {
+                e.stopPropagation();
+              }}
+            />
+          </label>
         </PickerDropdownItem>
       </PickerDropdownBody>
       <PickerDropdownFooter>
