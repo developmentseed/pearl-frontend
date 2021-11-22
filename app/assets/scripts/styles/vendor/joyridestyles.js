@@ -9,11 +9,13 @@ export default () => css`
     }
   }
   .react-joyride__overlay {
-    background-color: rgba(0, 0, 0, 0.625);
-    position: absolute;
+    background-color: rgba(0, 0, 0, 0.625) !important;
   }
   .react-joyride__spotlight {
     background-color: #8c8c8c;
     border: 1px solid ${themeVal('color.secondary')};
+  }
+  .react-joyride__beacon {
+    display: none !important;
   }
 `;
