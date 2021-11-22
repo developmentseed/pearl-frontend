@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+
 import {
   Inpage,
   InpageHeader,
@@ -10,13 +11,12 @@ import {
 } from '../../styles/inpage';
 import PrimePanel from './prime-panel';
 import SecPanel from './sec-panel';
-
 import Map from './map';
-
 import Tour from '../common/tour';
-
 import { tourSteps } from './tour';
 import { useApiLimits } from '../../context/global';
+import { useSessionStatus } from '../../context/explore';
+import { sessionModes } from '../../context/explore/session-status';
 import LayersPanel from './layers-panel';
 
 const ExploreBody = styled(InpageBody)`
@@ -27,8 +27,14 @@ const ExploreBody = styled(InpageBody)`
 const ExploreCarto = styled.section``;
 function Explore() {
   const { apiLimits } = useApiLimits();
-
+  const { sessionStatus } = useSessionStatus();
   const [steps, setSteps] = useState(null);
+
+  const isLoading = [
+    sessionModes.LOADING,
+    sessionModes.LOADING_PROJECT,
+    sessionModes.SET_PROJECT_NAME,
+  ].includes(sessionStatus.mode);
 
   useEffect(() => {
     if (apiLimits) {
@@ -61,7 +67,7 @@ function Explore() {
           <LayersPanel parentId='layer-control' className='padded' />
           <SecPanel />
         </ExploreBody>
-        {steps && <Tour steps={steps} />}
+        {steps && !isLoading && <Tour steps={steps} />}
       </Inpage>
     </>
   );
