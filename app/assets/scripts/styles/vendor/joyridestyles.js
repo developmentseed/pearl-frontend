@@ -10,6 +10,7 @@ export default () => css`
   }
   .react-joyride__overlay {
     background-color: rgba(0, 0, 0, 0.625);
+    position: absolute;
   }
   .react-joyride__spotlight {
     background-color: #8c8c8c;
