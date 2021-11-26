@@ -13,6 +13,7 @@ export function MapProvider(props) {
   const [mapRef, setMapRef] = useState();
   const [mapLayers, setMapLayers] = useState({});
   const { aoiPatch } = useAoiPatch();
+  const [enableOsmQaLayer, setEnableOsmQaLayer] = useState(false);
 
   /*
    * Object tracking user layers to be controlled in frontend.
@@ -68,6 +69,9 @@ export function MapProvider(props) {
 
         userLayers,
         setUserLayers,
+
+        enableOsmQaLayer,
+        setEnableOsmQaLayer,
       }}
     >
       {props.children}
@@ -100,6 +104,19 @@ export const useMapRef = () => {
       setMapRef,
     }),
     [mapRef, setMapRef]
+  );
+};
+
+export const useOsmQaLayer = () => {
+  const { enableOsmQaLayer, setEnableOsmQaLayer } = useMapContext(
+    'useOsmQaLayer'
+  );
+  return useMemo(
+    () => ({
+      enableOsmQaLayer,
+      setEnableOsmQaLayer,
+    }),
+    [enableOsmQaLayer, setEnableOsmQaLayer]
   );
 };
 
