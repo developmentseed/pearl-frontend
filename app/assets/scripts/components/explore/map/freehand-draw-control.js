@@ -127,12 +127,12 @@ class FreehandDrawControl {
     });
   }
 
-  enableMode(mode, layerName) {
+  enableAdd(layerName) {
     let present;
     this._group.eachLayer(function (layer) {
       if (layer.category === layerName) {
         // enable drawing tool for type
-        layer.setMode(mode);
+        layer.setMode('add');
         present = true;
       } else {
         // disables other freehand instances
@@ -144,16 +144,10 @@ class FreehandDrawControl {
     }
   }
 
-  enableAdd(layerName) {
-    this.enableMode('add', layerName);
-  }
-
-  enableSubtract(layerName) {
-    this.enableMode('subtract', layerName);
-  }
-
-  enableDelete(layerName) {
-    this.enableMode('delete', layerName);
+  enableSubtract() {
+    this._group.eachLayer(function (layer) {
+      layer.setMode('subtract');
+    });
   }
 
   disable() {
