@@ -128,6 +128,7 @@
     "element-resize-event": "^3.0.3",
     "file-saver": "^2.0.5",
     "fill-range": "^7.0.1",
+    "formik": "^2.2.9",
     "gulp-replace": "^1.0.0",
     "history": "^4.10.1",
     "leaflet": "^1.7.1",
@@ -160,6 +161,7 @@
     "reconnecting-websocket": "^4.4.0",
     "request-promise": "^4.2.6",
     "resize-observer": "^1.0.2",
-    "styled-components": "^5.2.1"
+    "styled-components": "^5.2.1",
+    "yup": "^0.32.11"
   }
 }

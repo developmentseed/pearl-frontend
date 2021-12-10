@@ -25,7 +25,6 @@ import {
 import Table, { TableRow, TableCell } from '../../common/table';
 import Paginator from '../../common/paginator';
 import logger from '../../../utils/logger';
-import ModelCard from '../../explore/prime-panel/model-card';
 
 // Controls the size of each page
 const ITEMS_PER_PAGE = 20;
@@ -105,7 +104,7 @@ export default function ModelIndex() {
                 <InpageTitle>Models</InpageTitle>
                 <Button
                   forwardedAs={StyledNavLink}
-                  to='/model/new'
+                  to='/admin/models/new'
                   variation='primary-plain'
                   size='large'
                   useIcon='plus'

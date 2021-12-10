@@ -26,10 +26,9 @@ import GlobalLoadingProvider from './components/common/global-loading';
 import { ToastContainerCustom } from './components/common/toasts';
 import Project from './components/profile/project';
 import { AuthProvider, withAuthenticationRequired } from './context/auth';
-import AdminModels from './components/admin/models';
 import ModelIndex from './components/admin/models';
 import ViewModel from './components/admin/models/view';
-import NewModel from './components/admin/models/upload';
+import NewModel from './components/admin/models/new';
 
 installResizeObserver();
 
