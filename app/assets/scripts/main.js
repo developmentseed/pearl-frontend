@@ -26,6 +26,10 @@ import GlobalLoadingProvider from './components/common/global-loading';
 import { ToastContainerCustom } from './components/common/toasts';
 import Project from './components/profile/project';
 import { AuthProvider, withAuthenticationRequired } from './context/auth';
+import AdminModels from './components/admin/models';
+import ModelIndex from './components/admin/models';
+import ViewModel from './components/admin/models/view';
+import NewModel from './components/admin/models/upload';
 
 installResizeObserver();
 
@@ -70,6 +74,21 @@ function Root() {
                   exact
                   path='/profile/projects/:projectId'
                   component={Project}
+                />
+                <ProtectedRoute
+                  exact
+                  path='/admin/models'
+                  component={ModelIndex}
+                />
+                <ProtectedRoute
+                  exact
+                  path='/admin/models/new'
+                  component={NewModel}
+                />
+                <ProtectedRoute
+                  exact
+                  path='/admin/models/:modelId'
+                  component={ViewModel}
                 />
                 <Route exact path='/about' component={About} />
                 <Route path='*' component={UhOh} />

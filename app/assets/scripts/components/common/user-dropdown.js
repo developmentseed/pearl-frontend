@@ -97,6 +97,15 @@ function UserDropdown() {
                   Home
                 </DropdownItem>
               </li>
+              <li>
+                <DropdownItem
+                  as={StyledLink}
+                  to='/admin/models'
+                  useIcon='folder'
+                >
+                  Manage Models
+                </DropdownItem>
+              </li>
             </DropdownBody>
             <DropdownFooter>
               <DropdownItem useIcon='logout' onClick={logout}>
