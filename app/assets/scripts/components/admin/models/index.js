@@ -49,15 +49,15 @@ export const ModelsHeadline = styled(InpageHeadline)`
 `;
 
 // Render single models row
-function renderRow(proj) {
+function renderRow(model) {
   return (
-    <TableRow key={proj.id}>
+    <TableRow key={model.id}>
       <TableCell>
-        <StyledNavLink to={`/profile/models/${proj.id}`}>
-          {proj.name}
+        <StyledNavLink to={`/admin/models/${model.id}`}>
+          {model.name}
         </StyledNavLink>
       </TableCell>
-      <TableCell>{formatDateTime(proj.created)}</TableCell>
+      <TableCell>{formatDateTime(model.created)}</TableCell>
     </TableRow>
   );
 }
