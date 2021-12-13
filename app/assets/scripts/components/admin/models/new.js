@@ -12,8 +12,8 @@ import {
   InpageBody,
   InpageBodyInner,
 } from '../../../styles/inpage';
-import Button from '../../../styles/button';
-import { Form } from '@devseed-ui/form';
+import { Button } from '@devseed-ui/button';
+import { Form, FormInput } from '@devseed-ui/form';
 // import { FormikInputSelect } from '../../../common/forms/input-select';
 // import { FormikInputTextarea } from '../../common/forms/input-textarea';
 import { FormikInputText } from '../../common/forms/input-text';
@@ -21,6 +21,8 @@ import { withFormik } from 'formik';
 import toasts from '../../common/toasts';
 import logger from '../../../utils/logger';
 import { useAuth } from '../../../context/auth';
+import styled from 'styled-components';
+import { FormikInputSwitch } from '../../common/forms/input-switch';
 
 const FormSchema = Yup.object().shape({
   name: Yup.string().required('Required.'),
@@ -33,9 +35,18 @@ function InnerForm({ handleSubmit }) {
         id='name'
         name='name'
         label='Name'
-        labelHint='(required)'
         placeholder='Model name'
+        required
+        autoComplete='off'
       />
+      <FormikInputSwitch
+        id='active'
+        name='active'
+        label='Active'
+        required
+        autoComplete='off'
+      />
+
       {/* <FormikInputSelect
         id='type'
         name='type'
@@ -56,8 +67,7 @@ function InnerForm({ handleSubmit }) {
         type='submit'
         size='large'
         variation='primary-raised-dark'
-        data-tip='Create Organization'
-        data-cy='submit'
+        data-tip='Create Model'
       >
         Submit
       </Button>
@@ -78,8 +88,6 @@ const NewModelForm = withFormik({
     apiClient
       .post('org', {
         name,
-        type,
-        description,
       })
       .then(({ id }) => {
         toasts.success('Model created successfully.');
@@ -111,7 +119,9 @@ export default function NewModel() {
                 Please provide details for the model. You will be able to upload
                 the model once details are saved.
               </div>
-              <NewModelForm apiClient={apiClient} />
+              <section>
+                <NewModelForm apiClient={apiClient} />
+              </section>
             </InpageBodyInner>
           </InpageBody>
         </Inpage>

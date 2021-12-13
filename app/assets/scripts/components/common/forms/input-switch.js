@@ -1,7 +1,7 @@
 import React from 'react';
 import { PropTypes as T } from 'prop-types';
 import { Field, FastField } from 'formik';
-import { FormInput, FormHelperMessage } from '@devseed-ui/form';
+import { FormHelperMessage, FormSwitch } from '@devseed-ui/form';
 
 import FormGroupStructure from './form-group-structure';
 
@@ -22,7 +22,7 @@ import FormGroupStructure from './form-group-structure';
  * @prop {string} description Field description shown in a tooltip
  * @prop {node} helper Helper message shown below input.
  */
-function InputText(props) {
+export function InputSwitch(props) {
   const {
     id,
     label,
@@ -55,10 +55,10 @@ function InputText(props) {
       helper={helper}
       hideHeader={hideHeader}
     >
-      <FormInput
+      <FormSwitch
         disabled={disabled}
         ref={inputRef}
-        type='text'
+        type='checkbox'
         variation={inputVariation}
         id={id}
         size={inputSize}
@@ -75,7 +75,7 @@ function InputText(props) {
   );
 }
 
-InputText.propTypes = {
+InputSwitch.propTypes = {
   className: T.string,
   description: T.string,
   helper: T.node,
@@ -98,7 +98,7 @@ InputText.propTypes = {
 };
 
 /**
- * InputText component for usage with Formik
+ * InputSwitch component for usage with Formik
  *
  * @prop {string} id Input field id
  * @prop {string} name Input field name
@@ -113,7 +113,7 @@ InputText.propTypes = {
  * @prop {string} description Field description shown in a tooltip
  * @prop {node} helper Helper message shown below input.
  */
-export function FormikInputText({
+export function FormikInputSwitch({
   className,
   description,
   helper,
@@ -137,7 +137,7 @@ export function FormikInputText({
     <FormikField name={name}>
       {({ field, meta }) => {
         return (
-          <InputText
+          <InputSwitch
             disabled={disabled}
             className={className}
             description={description}
@@ -169,7 +169,7 @@ export function FormikInputText({
   );
 }
 
-FormikInputText.propTypes = {
+FormikInputSwitch.propTypes = {
   className: T.string,
   description: T.string,
   helper: T.node,
