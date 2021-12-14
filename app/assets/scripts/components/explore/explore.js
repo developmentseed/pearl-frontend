@@ -28,7 +28,7 @@ const ExploreBody = styled(InpageBody)`
 const ExploreCarto = styled.section``;
 function Explore() {
   const { apiLimits } = useApiLimits();
-  const { projectId } =  useParams();
+  const { projectId } = useParams();
   const { sessionStatus } = useSessionStatus();
   const [steps, setSteps] = useState(null);
 
@@ -54,9 +54,9 @@ function Explore() {
   useEffect(() => {
     if (projectId !== 'new') {
       tourSteps.splice(1, 4);
-      setSteps(tourSteps)
+      setSteps(tourSteps);
     }
-  }, [projectId])
+  }, [projectId]);
 
   return (
     <>
