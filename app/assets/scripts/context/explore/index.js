@@ -65,6 +65,12 @@ export function ExploreProvider(props) {
   useEffect(() => {
     localStorage.setItem('site-tour', tourStep);
   }, [tourStep]);
+  useEffect(() => {
+    // If this project is not new, make sure that site tour step is set to -1, we do not need to show the tour
+    if (projectId !== 'new') {
+      setTourStep(-1);
+    }
+  }, [projectId]);
 
   const { restApiClient, isLoading: authIsLoading } = useAuth();
   const {
