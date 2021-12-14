@@ -90,7 +90,7 @@ export default function ViewModel() {
                 {model.classes?.length ? (
                   <>
                     <Table
-                      headers={['Class Name', 'Color', 'OSM Tags (options)']}
+                      headers={['Class Name', 'Color', 'OSM Tags (optional)']}
                       data={model.classes}
                       renderRow={(c) => (
                         <TableRow key={c.name}>

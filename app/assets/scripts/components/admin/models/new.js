@@ -13,9 +13,11 @@ import {
   InpageBodyInner,
 } from '../../../styles/inpage';
 import { Button } from '@devseed-ui/button';
+import Table, { TableCell, TableRow } from '../../common/table';
+
 import { Form } from '@devseed-ui/form';
 import { FormikInputText } from '../../common/forms/input-text';
-import { withFormik } from 'formik';
+import { FieldArray, withFormik } from 'formik';
 import toasts from '../../common/toasts';
 import logger from '../../../utils/logger';
 import { useAuth } from '../../../context/auth';
@@ -41,6 +43,12 @@ const FormSchema = Yup.object().shape({
   model_inputshapeY: Yup.number().required().positive().integer().min(1),
   model_inputshapeZ: Yup.number().required().positive().integer().min(1),
 });
+
+const initialClassValues = {
+  name: '',
+  color: '',
+  osmtag: '',
+};
 
 function InnerForm({ handleSubmit, values }) {
   return (
@@ -70,7 +78,6 @@ function InnerForm({ handleSubmit, values }) {
         label='Type'
         labelHint='(required)'
         description='Underlying model type'
-        value={values.model_type}
       />
       <FormikInputText
         id='model_zoom'
@@ -106,6 +113,73 @@ function InnerForm({ handleSubmit, values }) {
         autoComplete='off'
         value={values.model_inputshapeZ}
       />
+      <h3>Class Colormap & OpenStreetMap Tag Map</h3>
+
+      <FieldArray
+        name='classes'
+        render={({ remove, push }) => (
+          <>
+            <Table
+              headers={['Class Name', 'Color', 'OSM Tags (optional)']}
+              data={values.classes}
+              renderRow={(c, i) => (
+                <TableRow key={c.name}>
+                  <TableCell>
+                    <FormikInputText
+                      id={`classes.${i}.name`}
+                      name={`classes.${i}.name`}
+                      autoComplete='off'
+                      value={c.name}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <FormikInputText
+                      id={`classes.${i}.color`}
+                      name={`classes.${i}.color`}
+                      autoComplete='off'
+                      value={c.color}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <FormikInputText
+                      id={`classes.${i}.osmtag`}
+                      name={`classes.${i}.osmtag`}
+                      autoComplete='off'
+                      value={c.osmtag}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Button
+                      variation='primary-plain'
+                      useIcon='trash-bin'
+                      size='medium'
+                      hideText
+                      onClick={() => {
+                        remove(i);
+                        if (values.classes.length === 1) {
+                          push(initialClassValues);
+                        }
+                      }}
+                    >
+                      Remove Class
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              )}
+            />
+            <Button
+              variation='primary-plain'
+              useIcon='plus--small'
+              className='add__class'
+              size='medium'
+              onClick={() => push(initialClassValues)}
+            >
+              Add Class
+            </Button>
+          </>
+        )}
+      />
+
       <Button
         type='submit'
         size='large'
@@ -132,6 +206,7 @@ const NewModelForm = withFormik({
     model_inputshapeX: 256,
     model_inputshapeY: 256,
     model_inputshapeZ: 4,
+    classes: [{ name: '', color: '', osmtag: '' }],
   }),
   validationSchema: FormSchema,
   handleSubmit: (
