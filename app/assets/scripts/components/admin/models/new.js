@@ -13,56 +13,99 @@ import {
   InpageBodyInner,
 } from '../../../styles/inpage';
 import { Button } from '@devseed-ui/button';
-import { Form, FormInput } from '@devseed-ui/form';
-// import { FormikInputSelect } from '../../../common/forms/input-select';
-// import { FormikInputTextarea } from '../../common/forms/input-textarea';
+import { Form } from '@devseed-ui/form';
 import { FormikInputText } from '../../common/forms/input-text';
 import { withFormik } from 'formik';
 import toasts from '../../common/toasts';
 import logger from '../../../utils/logger';
 import { useAuth } from '../../../context/auth';
-import styled from 'styled-components';
 import { FormikInputSwitch } from '../../common/forms/input-switch';
+import { FormikInputSelect } from '../../common/forms/input-select';
+
+const modelTypes = [
+  { value: '', label: 'Select a model type' },
+  { value: 'random_forest', label: 'random_forest' },
+  { value: 'pytorch_example', label: 'pytorch_example' },
+  { value: 'pytorch_solar', label: 'pytorch_solar' },
+  { value: 'deeplabv3plus', label: 'deeplabv3plus' },
+];
 
 const FormSchema = Yup.object().shape({
   name: Yup.string().required('Required.'),
+  active: Yup.bool().required('Required.'),
+  model_type: Yup.string()
+    .oneOf(modelTypes.map((t) => t.value))
+    .required('Required.'),
+  model_zoom: Yup.number().required().positive().integer().min(1).max(22),
+  model_inputshapeX: Yup.number().required().positive().integer().min(1),
+  model_inputshapeY: Yup.number().required().positive().integer().min(1),
+  model_inputshapeZ: Yup.number().required().positive().integer().min(1),
 });
 
-function InnerForm({ handleSubmit }) {
+function InnerForm({ handleSubmit, values }) {
   return (
     <Form onSubmit={handleSubmit} style={{ gridGap: '2rem' }}>
       <FormikInputText
         id='name'
         name='name'
         label='Name'
+        labelHint='(required)'
+        description='Human-readable name of the Model'
         placeholder='Model name'
-        required
         autoComplete='off'
+        value={values.name}
       />
       <FormikInputSwitch
         id='active'
         name='active'
         label='Active'
-        required
-        autoComplete='off'
+        description='Can the model be used for gpu instances'
+        checked={values.active}
       />
 
-      {/* <FormikInputSelect
+      <FormikInputSelect
         id='type'
-        name='type'
-        options={orgTypes}
+        name='model_type'
+        options={modelTypes}
         label='Type'
         labelHint='(required)'
-        description='Your organization type'
+        description='Underlying model type'
+        value={values.model_type}
       />
-      <FormikInputTextarea
-        id='description'
-        name='description'
-        label='Description'
-        labelHint='(optional)'
-        placeholder='Please describe your organization'
-        description='Organization description.' 
-      /> */}
+      <FormikInputText
+        id='model_zoom'
+        name='model_zoom'
+        label='Zoom'
+        labelHint='(required)'
+        description='The tile zoom level to run inferences on'
+        placeholder='Model zoom'
+        autoComplete='off'
+        value={values.model_zoom}
+      />
+      <FormikInputText
+        id='model_inputshapeX'
+        name='model_inputshapeX'
+        label='Input Shape X'
+        labelHint='(required)'
+        autoComplete='off'
+        value={values.model_inputshapeX}
+      />
+      <FormikInputText
+        id='model_inputshapeY'
+        name='model_inputshapeY'
+        label='Input Shape Y'
+        labelHint='(required)'
+        autoComplete='off'
+        value={values.model_inputshapeY}
+      />
+      <FormikInputText
+        id='model_inputshapeZ'
+        name='model_inputshapeZ'
+        label='Input Shape Z'
+        labelHint='(required)'
+        autoComplete='off'
+        value={values.model_inputshapeZ}
+      />
       <Button
         type='submit'
         size='large'
@@ -77,17 +120,32 @@ function InnerForm({ handleSubmit }) {
 
 InnerForm.propTypes = {
   handleSubmit: T.func.isRequired,
+  values: T.object.isRequired,
 };
 
 const NewModelForm = withFormik({
   mapPropsToValues: () => ({
     name: '',
+    active: false,
+    model_type: '',
+    model_zoom: 16,
+    model_inputshapeX: 256,
+    model_inputshapeY: 256,
+    model_inputshapeZ: 4,
   }),
   validationSchema: FormSchema,
-  handleSubmit: ({ name }, { props: { apiClient }, setSubmitting }) => {
-    apiClient
-      .post('org', {
-        name,
+  handleSubmit: (
+    { model_inputshapeX, model_inputshapeY, model_inputshapeZ, ...rest },
+    { props: { restApiClient }, setSubmitting }
+  ) => {
+    restApiClient
+      .post('model', {
+        model_inputshape: [
+          model_inputshapeX,
+          model_inputshapeY,
+          model_inputshapeZ,
+        ].map((i) => parseInt(i)),
+        ...rest,
       })
       .then(({ id }) => {
         toasts.success('Model created successfully.');
@@ -102,7 +160,7 @@ const NewModelForm = withFormik({
 })(InnerForm);
 
 export default function NewModel() {
-  const { apiClient } = useAuth();
+  const { restApiClient } = useAuth();
   return (
     <App pageTitle='Models'>
       <PageHeader />
@@ -115,12 +173,8 @@ export default function NewModel() {
           </InpageHeader>
           <InpageBody>
             <InpageBodyInner>
-              <div>
-                Please provide details for the model. You will be able to upload
-                the model once details are saved.
-              </div>
               <section>
-                <NewModelForm apiClient={apiClient} />
+                <NewModelForm restApiClient={restApiClient} />
               </section>
             </InpageBodyInner>
           </InpageBody>
