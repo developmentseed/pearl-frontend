@@ -47,7 +47,6 @@ const FormSchema = Yup.object().shape({
 const initialClassValues = {
   name: '',
   color: '',
-  osmtag: '',
 };
 
 function InnerForm({ handleSubmit, values }) {
@@ -120,16 +119,16 @@ function InnerForm({ handleSubmit, values }) {
         render={({ remove, push }) => (
           <>
             <Table
-              headers={['Class Name', 'Color', 'OSM Tags (optional)']}
+              headers={['Class Name', 'Color']}
               data={values.classes}
-              renderRow={(c, i) => (
-                <TableRow key={c.name}>
+              renderRow={(c, extraData, i) => (
+                <TableRow key={i}>
                   <TableCell>
                     <FormikInputText
                       id={`classes.${i}.name`}
                       name={`classes.${i}.name`}
                       autoComplete='off'
-                      value={c.name}
+                      value={values.classes[i]?.name}
                     />
                   </TableCell>
                   <TableCell>
@@ -137,15 +136,7 @@ function InnerForm({ handleSubmit, values }) {
                       id={`classes.${i}.color`}
                       name={`classes.${i}.color`}
                       autoComplete='off'
-                      value={c.color}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <FormikInputText
-                      id={`classes.${i}.osmtag`}
-                      name={`classes.${i}.osmtag`}
-                      autoComplete='off'
-                      value={c.osmtag}
+                      value={values.classes[i]?.color}
                     />
                   </TableCell>
                   <TableCell>
@@ -206,7 +197,7 @@ const NewModelForm = withFormik({
     model_inputshapeX: 256,
     model_inputshapeY: 256,
     model_inputshapeZ: 4,
-    classes: [{ name: '', color: '', osmtag: '' }],
+    classes: [{ name: '', color: '' }],
   }),
   validationSchema: FormSchema,
   handleSubmit: (
@@ -220,6 +211,7 @@ const NewModelForm = withFormik({
           model_inputshapeY,
           model_inputshapeZ,
         ].map((i) => parseInt(i)),
+        meta: {},
         ...rest,
       })
       .then(({ id }) => {

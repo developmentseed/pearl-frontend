@@ -89,7 +89,7 @@ function Table({ headers, data, renderRow, extraData, hoverable }) {
           ))}
         </TableRow>
       </TableHeader>
-      <TableBody>{data.map((d) => renderRow(d, extraData))}</TableBody>
+      <TableBody>{data.map((d, i) => renderRow(d, extraData, i))}</TableBody>
     </StyledTable>
   );
 }
