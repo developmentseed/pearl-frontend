@@ -24,6 +24,7 @@ import logger from '../../../utils/logger';
 import { useAuth } from '../../../context/auth';
 import { FormikInputSwitch } from '../../common/forms/input-switch';
 import { FormikInputSelect } from '../../common/forms/input-select';
+import { Link } from 'react-router-dom';
 
 const modelTypes = [
   { value: '', label: 'Select a model type' },
@@ -343,7 +344,9 @@ export default function NewModel() {
         <Inpage>
           <InpageHeader>
             <InpageHeaderInner>
-              <InpageTitle>Create New Model</InpageTitle>
+              <InpageTitle>
+                <Link to='/admin/models'>Models</Link> / New Model
+              </InpageTitle>
             </InpageHeaderInner>
           </InpageHeader>
           <InpageBody>

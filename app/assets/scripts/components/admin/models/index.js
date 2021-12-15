@@ -25,6 +25,7 @@ import {
 import Table, { TableRow, TableCell } from '../../common/table';
 import Paginator from '../../common/paginator';
 import logger from '../../../utils/logger';
+import { Link } from 'react-router-dom';
 
 // Controls the size of each page
 const ITEMS_PER_PAGE = 20;
@@ -101,7 +102,9 @@ export default function ModelIndex() {
           <InpageHeader>
             <InpageHeaderInner>
               <ModelsHeadline>
-                <InpageTitle>Models</InpageTitle>
+                <InpageTitle>
+                  <Link to='/admin/models'>Models</Link>
+                </InpageTitle>
                 <Button
                   forwardedAs={StyledNavLink}
                   to='/admin/models/new'

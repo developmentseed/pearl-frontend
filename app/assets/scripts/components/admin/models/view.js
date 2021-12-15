@@ -20,6 +20,7 @@ import { Heading } from '@devseed-ui/typography';
 
 import toasts from '../../common/toasts';
 import Table, { TableCell, TableRow } from '../../common/table';
+import { Link } from 'react-router-dom';
 
 export default function ViewModel() {
   const { modelId } = useParams();
@@ -61,7 +62,9 @@ export default function ViewModel() {
         <Inpage>
           <InpageHeader>
             <InpageHeaderInner>
-              <InpageTitle>{model.name}</InpageTitle>
+              <InpageTitle>
+                <Link to='/admin/models'>Models</Link> / {model.name}
+              </InpageTitle>
             </InpageHeaderInner>
           </InpageHeader>
           <InpageBody>
