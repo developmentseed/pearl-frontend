@@ -43,11 +43,30 @@ const FormSchema = Yup.object().shape({
   model_inputshapeX: Yup.number().required().positive().integer().min(1),
   model_inputshapeY: Yup.number().required().positive().integer().min(1),
   model_inputshapeZ: Yup.number().required().positive().integer().min(1),
+  meta: Yup.object().shape({
+    description: Yup.string().required('Required.'),
+    imagery: Yup.string().required('Required.'),
+    imagery_resolution: Yup.string().required('Required.'),
+    f1_weighted: Yup.number().required('Required.'),
+    label_sources: Yup.string().required('Required.'),
+  }),
+  classes: Yup.array()
+    .min(1)
+    .of(
+      Yup.object().shape({
+        name: Yup.string().required('Required.'),
+        color: Yup.string().required('Required.'),
+        f1_score: Yup.number().required('Required.'),
+        distribution: Yup.number().required('Required.'),
+      })
+    ),
 });
 
 const initialClassValues = {
   name: '',
   color: '',
+  f1_score: '',
+  distribution: '',
 };
 
 function InnerForm({ handleSubmit, values }) {
@@ -82,6 +101,7 @@ function InnerForm({ handleSubmit, values }) {
       <FormikInputText
         id='model_zoom'
         name='model_zoom'
+        type='number'
         label='Zoom'
         labelHint='(required)'
         description='The tile zoom level to run inferences on'
@@ -92,6 +112,7 @@ function InnerForm({ handleSubmit, values }) {
       <FormikInputText
         id='model_inputshapeX'
         name='model_inputshapeX'
+        type='number'
         label='Input Shape X'
         labelHint='(required)'
         autoComplete='off'
@@ -100,6 +121,7 @@ function InnerForm({ handleSubmit, values }) {
       <FormikInputText
         id='model_inputshapeY'
         name='model_inputshapeY'
+        type='number'
         label='Input Shape Y'
         labelHint='(required)'
         autoComplete='off'
@@ -108,19 +130,61 @@ function InnerForm({ handleSubmit, values }) {
       <FormikInputText
         id='model_inputshapeZ'
         name='model_inputshapeZ'
+        type='number'
         label='Input Shape Z'
         labelHint='(required)'
         autoComplete='off'
         value={values.model_inputshapeZ}
       />
-      <h3>Class Colormap & OpenStreetMap Tag Map</h3>
-
+      <h3>Meta</h3>
+      <FormikInputText
+        id='meta.description'
+        name='meta.description'
+        label='Description'
+        labelHint='(required)'
+        autoComplete='off'
+        value={values.meta.description}
+      />
+      <FormikInputText
+        id='meta.imagery'
+        name='meta.imagery'
+        label='Imagery'
+        labelHint='(required)'
+        autoComplete='off'
+        value={values.meta.imagery}
+      />
+      <FormikInputText
+        id='meta.imagery_resolution'
+        name='meta.imagery_resolution'
+        label='Imagery Resolution'
+        labelHint='(required)'
+        autoComplete='off'
+        value={values.meta.imagery_resolution}
+      />
+      <FormikInputText
+        id='meta.f1_weighted'
+        name='meta.f1_weighted'
+        type='number'
+        label='Global F1 Score'
+        labelHint='(required)'
+        autoComplete='off'
+        value={values.meta.f1_weighted}
+      />
+      <FormikInputText
+        id='meta.label_sources'
+        name='meta.label_sources'
+        label='Label Sources'
+        labelHint='(required)'
+        autoComplete='off'
+        value={values.meta.label_sources}
+      />
+      <h3>Class Colormap</h3>
       <FieldArray
         name='classes'
         render={({ remove, push }) => (
           <>
             <Table
-              headers={['Class Name', 'Color']}
+              headers={['Class Name', 'Color', 'F1 Score', 'Distribution']}
               data={values.classes}
               renderRow={(c, extraData, i) => (
                 <TableRow key={i}>
@@ -138,6 +202,24 @@ function InnerForm({ handleSubmit, values }) {
                       name={`classes.${i}.color`}
                       autoComplete='off'
                       value={values.classes[i]?.color}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <FormikInputText
+                      id={`classes.${i}.f1_score`}
+                      name={`classes.${i}.f1_score`}
+                      type='number'
+                      autoComplete='off'
+                      value={values.classes[i]?.f1_score}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <FormikInputText
+                      id={`classes.${i}.distribution`}
+                      name={`classes.${i}.distribution`}
+                      type='number'
+                      autoComplete='off'
+                      value={values.classes[i]?.distribution}
                     />
                   </TableCell>
                   <TableCell>
@@ -198,11 +280,25 @@ const NewModelForm = withFormik({
     model_inputshapeX: 256,
     model_inputshapeY: 256,
     model_inputshapeZ: 4,
-    classes: [{ name: '', color: '' }],
+    meta: {
+      description: '',
+      imagery: '',
+      imagery_resolution: '',
+      f1_weighted: '',
+      label_sources: '',
+    },
+    classes: [{ name: '', color: '', f1_score: '', distribution: '' }],
   }),
   validationSchema: FormSchema,
   handleSubmit: (
-    { model_inputshapeX, model_inputshapeY, model_inputshapeZ, ...rest },
+    {
+      model_inputshapeX,
+      model_inputshapeY,
+      model_inputshapeZ,
+      classes,
+      meta,
+      ...rest
+    },
     { props: { restApiClient }, setSubmitting }
   ) => {
     restApiClient
@@ -211,8 +307,19 @@ const NewModelForm = withFormik({
           model_inputshapeX,
           model_inputshapeY,
           model_inputshapeZ,
-        ].map((i) => parseInt(i)),
-        meta: {},
+        ],
+        classes: classes.map(({ name, color }) => ({ name, color })),
+        meta: {
+          ...meta,
+          f1_score: classes.reduce(
+            (a, c) => ({ ...a, [c.name]: c.f1_score }),
+            {}
+          ),
+          class_distribution: classes.reduce(
+            (a, c) => ({ ...a, [c.name]: c.distribution }),
+            {}
+          ),
+        },
         ...rest,
       })
       .then(({ id }) => {
