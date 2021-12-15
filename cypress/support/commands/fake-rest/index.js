@@ -71,6 +71,31 @@ Cypress.Commands.add('startServer', () => {
     { mosaics: ['naip.latest'] }
   );
 
+  cy.intercept(
+    {
+      url: restApiEndpoint + '/api/mosaic/naip.latest',
+    },
+
+    {
+      tilejson: '2.2.0',
+      name: 'mosaic',
+      version: '1.0.0',
+      scheme: 'xyz',
+      tiles: [
+        'http://lulc-helm-tiles/mosaic/naip.latest/tiles/{z}/{x}/{y}@1x?',
+      ],
+      minzoom: 12,
+      maxzoom: 18,
+      bounds: [
+        -124.81903735821528,
+        24.49673997373884,
+        -66.93084562551495,
+        49.44192498524237,
+      ],
+      center: [-95.87494149186512, 36.9693324794906, 12],
+    }
+  );
+
   // Geocoder
   cy.intercept(
     {
