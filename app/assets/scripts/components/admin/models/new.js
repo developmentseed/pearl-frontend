@@ -1,5 +1,6 @@
 import React from 'react';
 import { PropTypes as T } from 'prop-types';
+import history from '../../../history';
 import * as Yup from 'yup';
 import App from '../../common/app';
 import PageHeader from '../../common/page-header';
