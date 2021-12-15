@@ -1,5 +1,6 @@
 import React from 'react';
 import { PropTypes as T } from 'prop-types';
+import styled from 'styled-components';
 import history from '../../../history';
 import * as Yup from 'yup';
 import App from '../../common/app';
@@ -12,11 +13,15 @@ import {
   InpageTitle,
   InpageBody,
   InpageBodyInner,
+  InpageTagline,
+  InpageHeadline,
+  InpageTitleWrapper,
 } from '../../../styles/inpage';
 import { Button } from '@devseed-ui/button';
 import Table, { TableCell, TableRow } from '../../common/table';
 
-import { Form } from '@devseed-ui/form';
+import { Form as BaseForm } from '@devseed-ui/form';
+import { media, themeVal } from '@devseed-ui/theme-provider';
 import { FormikInputText } from '../../common/forms/input-text';
 import { FieldArray, withFormik } from 'formik';
 import toasts from '../../common/toasts';
@@ -24,7 +29,7 @@ import logger from '../../../utils/logger';
 import { useAuth } from '../../../context/auth';
 import { FormikInputSwitch } from '../../common/forms/input-switch';
 import { FormikInputSelect } from '../../common/forms/input-select';
-import { Link } from 'react-router-dom';
+import { StyledLink } from '../../../styles/links';
 
 const modelTypes = [
   { value: '', label: 'Select a model type' },
@@ -33,6 +38,32 @@ const modelTypes = [
   { value: 'pytorch_solar', label: 'pytorch_solar' },
   { value: 'deeplabv3plus', label: 'deeplabv3plus' },
 ];
+
+const FormWrapper = styled.section`
+  display: grid;
+  ${media.mediumUp`
+    grid-template-columns: minmax(36rem, 1fr) 1fr;
+    > * {
+      grid-column: 1;
+    }
+  `}
+  p {
+    margin-bottom: 2rem;
+  }
+`;
+
+const Form = styled(BaseForm)`
+  grid-template-columns: minmax(1px, 1fr);
+  grid-gap: 2rem;
+  fieldset {
+    display: grid;
+    grid-template-rows: auto;
+    grid-gap: 2rem;
+    padding: 1rem;
+    border-radius: 0.25rem;
+    border: 1px solid ${themeVal('color.baseAlphaC')};
+  }
+`;
 
 const FormSchema = Yup.object().shape({
   name: Yup.string().required('Required.'),
@@ -72,189 +103,204 @@ const initialClassValues = {
 
 function InnerForm({ handleSubmit, values }) {
   return (
-    <Form onSubmit={handleSubmit} style={{ gridGap: '2rem' }}>
-      <FormikInputText
-        id='name'
-        name='name'
-        label='Name'
-        labelHint='(required)'
-        description='Human-readable name of the Model'
-        placeholder='Model name'
-        autoComplete='off'
-        value={values.name}
-      />
-      <FormikInputSwitch
-        id='active'
-        name='active'
-        label='Active'
-        description='Can the model be used for gpu instances'
-        checked={values.active}
-      />
-
-      <FormikInputSelect
-        id='type'
-        name='model_type'
-        options={modelTypes}
-        label='Type'
-        labelHint='(required)'
-        description='Underlying model type'
-      />
-      <FormikInputText
-        id='model_zoom'
-        name='model_zoom'
-        type='number'
-        label='Zoom'
-        labelHint='(required)'
-        description='The tile zoom level to run inferences on'
-        placeholder='Model zoom'
-        autoComplete='off'
-        value={values.model_zoom}
-      />
-      <FormikInputText
-        id='model_inputshapeX'
-        name='model_inputshapeX'
-        type='number'
-        label='Input Shape X'
-        labelHint='(required)'
-        autoComplete='off'
-        value={values.model_inputshapeX}
-      />
-      <FormikInputText
-        id='model_inputshapeY'
-        name='model_inputshapeY'
-        type='number'
-        label='Input Shape Y'
-        labelHint='(required)'
-        autoComplete='off'
-        value={values.model_inputshapeY}
-      />
-      <FormikInputText
-        id='model_inputshapeZ'
-        name='model_inputshapeZ'
-        type='number'
-        label='Input Shape Z'
-        labelHint='(required)'
-        autoComplete='off'
-        value={values.model_inputshapeZ}
-      />
-      <h3>Meta</h3>
-      <FormikInputText
-        id='meta.description'
-        name='meta.description'
-        label='Description'
-        labelHint='(required)'
-        autoComplete='off'
-        value={values.meta.description}
-      />
-      <FormikInputText
-        id='meta.imagery'
-        name='meta.imagery'
-        label='Imagery'
-        labelHint='(required)'
-        autoComplete='off'
-        value={values.meta.imagery}
-      />
-      <FormikInputText
-        id='meta.imagery_resolution'
-        name='meta.imagery_resolution'
-        label='Imagery Resolution'
-        labelHint='(required)'
-        autoComplete='off'
-        value={values.meta.imagery_resolution}
-      />
-      <FormikInputText
-        id='meta.f1_weighted'
-        name='meta.f1_weighted'
-        type='number'
-        label='Global F1 Score'
-        labelHint='(required)'
-        autoComplete='off'
-        value={values.meta.f1_weighted}
-      />
-      <FormikInputText
-        id='meta.label_sources'
-        name='meta.label_sources'
-        label='Label Sources'
-        labelHint='(required)'
-        autoComplete='off'
-        value={values.meta.label_sources}
-      />
-      <h3>Class Colormap</h3>
-      <FieldArray
-        name='classes'
-        render={({ remove, push }) => (
-          <>
-            <Table
-              headers={['Class Name', 'Color', 'F1 Score', 'Distribution']}
-              data={values.classes}
-              renderRow={(c, extraData, i) => (
-                <TableRow key={i}>
-                  <TableCell>
-                    <FormikInputText
-                      id={`classes.${i}.name`}
-                      name={`classes.${i}.name`}
-                      autoComplete='off'
-                      value={values.classes[i]?.name}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <FormikInputText
-                      id={`classes.${i}.color`}
-                      name={`classes.${i}.color`}
-                      autoComplete='off'
-                      value={values.classes[i]?.color}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <FormikInputText
-                      id={`classes.${i}.f1_score`}
-                      name={`classes.${i}.f1_score`}
-                      type='number'
-                      autoComplete='off'
-                      value={values.classes[i]?.f1_score}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <FormikInputText
-                      id={`classes.${i}.distribution`}
-                      name={`classes.${i}.distribution`}
-                      type='number'
-                      autoComplete='off'
-                      value={values.classes[i]?.distribution}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Button
-                      variation='primary-plain'
-                      useIcon='trash-bin'
-                      size='medium'
-                      hideText
-                      onClick={() => {
-                        remove(i);
-                        if (values.classes.length === 1) {
-                          push(initialClassValues);
-                        }
-                      }}
-                    >
-                      Remove Class
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              )}
-            />
-            <Button
-              variation='primary-plain'
-              useIcon='plus--small'
-              className='add__class'
-              size='medium'
-              onClick={() => push(initialClassValues)}
-            >
-              Add Class
-            </Button>
-          </>
-        )}
-      />
-
+    <Form onSubmit={handleSubmit}>
+      <fieldset>
+        <legend>
+          <h3>Model Details</h3>
+        </legend>
+        <FormikInputText
+          id='name'
+          name='name'
+          label='Name'
+          labelHint='(required)'
+          description='Human-readable name of the Model'
+          placeholder='Model name'
+          autoComplete='off'
+          value={values.name}
+        />
+        <FormikInputSwitch
+          id='active'
+          name='active'
+          label='Active'
+          description='Can the model be used for gpu instances'
+          checked={values.active}
+        />
+        <FormikInputSelect
+          id='type'
+          name='model_type'
+          options={modelTypes}
+          label='Type'
+          labelHint='(required)'
+          description='Underlying model type'
+        />
+        <FormikInputText
+          id='model_zoom'
+          name='model_zoom'
+          type='number'
+          label='Zoom'
+          labelHint='(required)'
+          description='The tile zoom level to run inferences on'
+          placeholder='Model zoom'
+          autoComplete='off'
+          value={values.model_zoom}
+        />
+        <FormikInputText
+          id='model_inputshapeX'
+          name='model_inputshapeX'
+          type='number'
+          label='Input Shape X'
+          labelHint='(required)'
+          autoComplete='off'
+          value={values.model_inputshapeX}
+        />
+        <FormikInputText
+          id='model_inputshapeY'
+          name='model_inputshapeY'
+          type='number'
+          label='Input Shape Y'
+          labelHint='(required)'
+          autoComplete='off'
+          value={values.model_inputshapeY}
+        />
+        <FormikInputText
+          id='model_inputshapeZ'
+          name='model_inputshapeZ'
+          type='number'
+          label='Input Shape Z'
+          labelHint='(required)'
+          autoComplete='off'
+          value={values.model_inputshapeZ}
+        />
+      </fieldset>
+      <fieldset>
+        <legend>
+          <h3>Model Metadata</h3>
+        </legend>
+        <FormikInputText
+          id='meta.description'
+          name='meta.description'
+          label='Description'
+          labelHint='(required)'
+          autoComplete='off'
+          value={values.meta.description}
+        />
+        <FormikInputText
+          id='meta.imagery'
+          name='meta.imagery'
+          label='Imagery'
+          labelHint='(required)'
+          autoComplete='off'
+          value={values.meta.imagery}
+        />
+        <FormikInputText
+          id='meta.imagery_resolution'
+          name='meta.imagery_resolution'
+          label='Imagery Resolution'
+          labelHint='(required)'
+          autoComplete='off'
+          value={values.meta.imagery_resolution}
+        />
+        <FormikInputText
+          id='meta.f1_weighted'
+          name='meta.f1_weighted'
+          type='number'
+          label='Global F1 Score'
+          labelHint='(required)'
+          autoComplete='off'
+          value={values.meta.f1_weighted}
+        />
+        <FormikInputText
+          id='meta.label_sources'
+          name='meta.label_sources'
+          label='Label Sources'
+          labelHint='(required)'
+          autoComplete='off'
+          value={values.meta.label_sources}
+        />
+      </fieldset>
+      <fieldset>
+        <legend>
+          <h3>Class Colormap</h3>
+        </legend>
+        <FieldArray
+          name='classes'
+          render={({ remove, push }) => (
+            <>
+              <Table
+                headers={['Class Name', 'Color', 'F1 Score', 'Distribution']}
+                data={values.classes}
+                renderRow={(c, extraData, i) => (
+                  <TableRow key={i}>
+                    <TableCell>
+                      <FormikInputText
+                        id={`classes.${i}.name`}
+                        name={`classes.${i}.name`}
+                        hideHeader
+                        autoComplete='off'
+                        value={values.classes[i]?.name}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <FormikInputText
+                        id={`classes.${i}.color`}
+                        name={`classes.${i}.color`}
+                        hideHeader
+                        autoComplete='off'
+                        value={values.classes[i]?.color}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <FormikInputText
+                        id={`classes.${i}.f1_score`}
+                        name={`classes.${i}.f1_score`}
+                        type='number'
+                        hideHeader
+                        autoComplete='off'
+                        value={values.classes[i]?.f1_score}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <FormikInputText
+                        id={`classes.${i}.distribution`}
+                        name={`classes.${i}.distribution`}
+                        type='number'
+                        hideHeader
+                        autoComplete='off'
+                        value={values.classes[i]?.distribution}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Button
+                        variation='primary-plain'
+                        useIcon='trash-bin'
+                        size='medium'
+                        hideText
+                        onClick={() => {
+                          remove(i);
+                          if (values.classes.length === 1) {
+                            push(initialClassValues);
+                          }
+                        }}
+                      >
+                        Remove Class
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                )}
+              />
+              <Button
+                variation='primary-plain'
+                useIcon='plus--small'
+                className='add__class'
+                size='medium'
+                onClick={() => push(initialClassValues)}
+              >
+                Add Class
+              </Button>
+            </>
+          )}
+        />
+      </fieldset>
       <Button
         type='submit'
         size='large'
@@ -344,16 +390,27 @@ export default function NewModel() {
         <Inpage>
           <InpageHeader>
             <InpageHeaderInner>
-              <InpageTitle>
-                <Link to='/admin/models'>Models</Link> / New Model
-              </InpageTitle>
+              <InpageHeadline>
+                <InpageTagline>
+                  <StyledLink to='/admin/models'>Models</StyledLink>
+                </InpageTagline>
+                <InpageTitleWrapper>
+                  <InpageTitle>New Model</InpageTitle>
+                </InpageTitleWrapper>
+              </InpageHeadline>
             </InpageHeaderInner>
           </InpageHeader>
           <InpageBody>
             <InpageBodyInner>
-              <section>
+              <FormWrapper>
+                <h3>Submitting new models</h3>
+                <p>
+                  Add new model details, including available metadata and class
+                  colors, on this page. After successfully submitting the model
+                  information, you can upload the model file on the next page.
+                </p>
                 <NewModelForm restApiClient={restApiClient} />
-              </section>
+              </FormWrapper>
             </InpageBodyInner>
           </InpageBody>
         </Inpage>

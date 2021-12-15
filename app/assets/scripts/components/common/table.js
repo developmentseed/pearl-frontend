@@ -68,6 +68,9 @@ export const TableCell = styled.td`
     vertical-align: inherit;
     font-size: inherit;
   }
+  [class*='FormGroupBody'] {
+    grid-template-columns: minmax(1px, 1fr);
+  }
 `;
 
 /**
