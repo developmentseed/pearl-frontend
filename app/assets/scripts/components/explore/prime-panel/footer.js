@@ -32,9 +32,6 @@ import {
 } from '../../common/global-loading';
 import toasts from '../../common/toasts';
 
-import booleanWithin from '@turf/boolean-within';
-import bboxPolygon from '@turf/bbox-polygon';
-
 const PanelControls = styled(PanelBlockFooter)`
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -66,7 +63,6 @@ function PrimeButton({
   mapRef,
   setAoiBounds,
 }) {
-  const [aoiWithinBounds, setAoiWithinBounds] = useState();
   const { sessionStatus, setSessionStatusMode } = useSessionStatus();
   const {
     runPrediction,
@@ -75,39 +71,10 @@ function PrimeButton({
     retrain,
     refine,
   } = useInstance();
-  const {
-    aoiArea,
-    setActiveModal,
-    aoiRef,
-    setCurrentAoi,
-    aoiBounds,
-  } = useAoi();
+  const { aoiArea, setActiveModal, aoiRef, setCurrentAoi } = useAoi();
   const { updateAoiName } = useAoiName();
   const { apiLimits } = useApiLimits();
   const { mapState, setMapMode } = useMapState();
-
-  const mosaicMeta = useFetch('mosaic/naip.latest');
-
-  useEffect(() => {
-    if (!aoiBounds || !mosaicMeta.isReady) return;
-    const aoiBboxPolygon = bboxPolygon([
-      aoiBounds.getWest(),
-      aoiBounds.getSouth(),
-      aoiBounds.getEast(),
-      aoiBounds.getNorth(),
-    ]);
-
-    const mosaicBounds = bboxPolygon(mosaicMeta.data.bounds);
-
-    const isWithinMosaicBounds = booleanWithin(aoiBboxPolygon, mosaicBounds);
-
-    if (!isWithinMosaicBounds) {
-      toasts.error(
-        'AOI is not within mosaic boundary. Inference is not permitted'
-      );
-    }
-    setAoiWithinBounds(isWithinMosaicBounds);
-  }, [aoiBounds, mosaicMeta.isReady]);
 
   const applyAoi = () => {
     setMapMode(mapModes.BROWSE_MODE);
@@ -274,10 +241,6 @@ function PrimeButton({
   const { mode } = sessionStatus;
 
   const checkDisabledState = () => {
-    if (!aoiWithinBounds) {
-      // If the aoi is outside of the mosaic bounds, we cannot run any type of inference in any mode
-      return true;
-    }
     if (mode === sessionModes.PREDICTION_READY) {
       // Only one batch prediction permitted at a time
       if (runningBatch && isBatchArea) {

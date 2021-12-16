@@ -339,6 +339,7 @@ export function AoiEditButtons(props) {
         revealed={showUploadAoiModal}
         setRevealed={setShowUploadAoiModal}
         apiLimits={apiLimits}
+        mosaicMeta={mosaicMeta}
         onImport={({ bounds, totalArea }) => {
           try {
             let aoiShape;

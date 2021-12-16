@@ -11,6 +11,8 @@ import { FauxFileDialog } from '../../common/faux-file-dialog';
 import { areaFromBounds } from '../../../utils/map';
 import logger from '../../../utils/logger';
 import { inRange } from '../../../utils/utils';
+import booleanWithin from '@turf/boolean-within';
+import bboxPolygon from '@turf/bbox-polygon';
 
 const Wrapper = styled.div`
   display: grid;
@@ -27,7 +29,13 @@ const Wrapper = styled.div`
   grid-gap: 1rem;
 `;
 
-function UploadAoiModal({ revealed, setRevealed, onImport, apiLimits }) {
+function UploadAoiModal({
+  revealed,
+  setRevealed,
+  onImport,
+  apiLimits,
+  mosaicMeta,
+}) {
   const [file, setFile] = useState(null);
   const [warning, setWarning] = useState(null);
   const onFileSelect = async (uploadedFile) => {
@@ -52,6 +60,15 @@ function UploadAoiModal({ revealed, setRevealed, onImport, apiLimits }) {
 
       const bounds = bbox(geojson);
       const totalArea = areaFromBounds(bounds);
+
+      const mosaicBounds = bboxPolygon(mosaicMeta.data.bounds);
+
+      if (!booleanWithin(bboxPolygon(bounds), mosaicBounds)) {
+        setWarning(
+          'Area is out of imagery bounds. Please upload another file.'
+        );
+        return;
+      }
 
       if (isNaN(totalArea) || totalArea === 0) {
         // Area should be bigger than zero, abort import
@@ -185,6 +202,7 @@ UploadAoiModal.propTypes = {
   setRevealed: T.func,
   onImport: T.func,
   apiLimits: T.object,
+  mosaicBounds: T.array,
 };
 
 export { UploadAoiModal };
