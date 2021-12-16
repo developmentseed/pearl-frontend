@@ -47,6 +47,7 @@ const ActiveModalHeadline = ({ activeModal }) => {
     'batch-inference': 'Save Area For Batch Prediction',
     'area-too-large': 'Area is too large',
     'area-too-tiny': 'Area is too tiny',
+    'area-out-of-bounds': 'Area is out of imagery bounds'
   };
 
   return (
@@ -74,6 +75,7 @@ const ActiveModalContent = ({ activeModal, aoiArea }) => {
       area smaller than ${maxArea} km².`,
     'area-too-tiny': `The AOI area is ${formattedAoiArea} km², please select an
       area greater than ${config.minimumAoiArea / 1e6} km².`,
+    'area-out-of-bounds': `The aoi is outside of imagery bounds`
   };
 
   return <div>{messages[activeModal]}</div>;
@@ -142,6 +144,7 @@ export function AoiEditButtons(props) {
         {aoiArea > 0 && (
           <EditButton
             onClick={function () {
+
               if (aoiArea < config.minimumAoiArea) {
                 setActiveModal('area-too-tiny');
                 return;

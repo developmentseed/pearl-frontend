@@ -12,6 +12,7 @@ const GlobalContext = createContext({});
 
 export function GlobalContextProvider(props) {
   const [tourStep, setTourStep] = useState(0);
+  const mosaicMeta = useFetch('mosaic/naip.latest');
 
   const apiLimits = useFetch('', {
     authRequired: false,
@@ -41,6 +42,8 @@ export function GlobalContextProvider(props) {
 
           tourStep,
           setTourStep,
+
+          mosaicMeta
         }}
       >
         {props.children}
@@ -78,11 +81,12 @@ export const useApiLimits = () => {
 };
 
 export const useMosaics = () => {
-  const { mosaics } = useGlobalContext('useMosaics');
+  const { mosaics, mosaicMeta } = useGlobalContext('useMosaics');
 
   return useMemo(
     () => ({
       mosaics,
+      mosaicMeta
     }),
     [mosaics]
   );
