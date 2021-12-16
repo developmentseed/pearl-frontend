@@ -90,6 +90,7 @@ const FormSchema = Yup.object().shape({
         color: Yup.string().required('Required.'),
         f1_score: Yup.number().required('Required.'),
         distribution: Yup.number().required('Required.'),
+        osmtag: Yup.string(),
       })
     ),
 });
@@ -220,14 +221,20 @@ function InnerForm({ handleSubmit, values }) {
       </fieldset>
       <fieldset>
         <legend>
-          <h3>Class Colormap</h3>
+          <h3>Class Colormap & OpenStreetMap Tags</h3>
         </legend>
         <FieldArray
           name='classes'
           render={({ remove, push }) => (
             <>
               <Table
-                headers={['Class Name', 'Color', 'F1 Score', 'Distribution']}
+                headers={[
+                  'Class Name',
+                  'Color',
+                  'F1 Score',
+                  'Distribution',
+                  'OSM Tags',
+                ]}
                 data={values.classes}
                 renderRow={(c, extraData, i) => (
                   <TableRow key={i}>
@@ -267,6 +274,15 @@ function InnerForm({ handleSubmit, values }) {
                         hideHeader
                         autoComplete='off'
                         value={values.classes[i]?.distribution}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <FormikInputText
+                        id={`classes.${i}.osmtag`}
+                        name={`classes.${i}.osmtag`}
+                        hideHeader
+                        autoComplete='off'
+                        value={values.classes[i]?.osmtag}
                       />
                     </TableCell>
                     <TableCell>
@@ -334,7 +350,9 @@ const NewModelForm = withFormik({
       f1_weighted: '',
       label_sources: '',
     },
-    classes: [{ name: '', color: '', f1_score: '', distribution: '' }],
+    classes: [
+      { name: '', color: '', f1_score: '', distribution: '', osmtag: '' },
+    ],
   }),
   validationSchema: FormSchema,
   handleSubmit: (
@@ -348,27 +366,40 @@ const NewModelForm = withFormik({
     },
     { props: { restApiClient }, setSubmitting }
   ) => {
+    const payload = {
+      model_inputshape: [
+        model_inputshapeX,
+        model_inputshapeY,
+        model_inputshapeZ,
+      ],
+      classes: classes.map(({ name, color }) => ({ name, color })),
+      meta: {
+        ...meta,
+        f1_score: classes.reduce(
+          (a, c) => ({ ...a, [c.name]: c.f1_score }),
+          {}
+        ),
+        class_distribution: classes.reduce(
+          (a, c) => ({ ...a, [c.name]: c.distribution }),
+          {}
+        ),
+      },
+      ...rest,
+    };
+
+    // Check if any tagmap is defined before adding to payload
+    if (classes.filter((c) => c.osmtag).length > 0) {
+      payload.tagmap = classes.reduce((a, c, i) => {
+        a[i] = c.osmtag.split(',').map((tag) => {
+          const [key, value] = tag.split('=');
+          return { key, value };
+        });
+        return a;
+      }, {});
+    }
+
     restApiClient
-      .post('model', {
-        model_inputshape: [
-          model_inputshapeX,
-          model_inputshapeY,
-          model_inputshapeZ,
-        ],
-        classes: classes.map(({ name, color }) => ({ name, color })),
-        meta: {
-          ...meta,
-          f1_score: classes.reduce(
-            (a, c) => ({ ...a, [c.name]: c.f1_score }),
-            {}
-          ),
-          class_distribution: classes.reduce(
-            (a, c) => ({ ...a, [c.name]: c.distribution }),
-            {}
-          ),
-        },
-        ...rest,
-      })
+      .post('model', payload)
       .then(({ id }) => {
         toasts.success('Model created successfully.');
         history.push(`/admin/models/${id}`);
