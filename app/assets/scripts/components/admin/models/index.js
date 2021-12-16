@@ -23,12 +23,8 @@ import {
   hideGlobalLoading,
 } from '../../common/global-loading';
 import Table, { TableRow, TableCell } from '../../common/table';
-import Paginator from '../../common/paginator';
 import logger from '../../../utils/logger';
 import { Link } from 'react-router-dom';
-
-// Controls the size of each page
-const ITEMS_PER_PAGE = 20;
 
 const HEADERS = ['Name', 'Created'];
 
@@ -78,9 +74,7 @@ export default function ModelIndex() {
       if (apiToken) {
         try {
           showGlobalLoadingMessage('Loading models...');
-          const data = await restApiClient.get(
-            `model/?page=${page - 1}&limit=${ITEMS_PER_PAGE}`
-          );
+          const data = await restApiClient.get(`model/?active=all&storage=all`);
           setTotal(data.total);
           setModels(data.models);
         } catch (error) {
@@ -128,12 +122,6 @@ export default function ModelIndex() {
                       data={models}
                       renderRow={renderRow}
                       hoverable
-                    />
-                    <Paginator
-                      currentPage={page}
-                      gotoPage={setPage}
-                      totalItems={total}
-                      itemsPerPage={ITEMS_PER_PAGE}
                     />
                   </>
                 ) : (
