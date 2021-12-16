@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
+import styled, { css } from 'styled-components';
 import { useHistory } from 'react-router-dom';
 import { Button } from '@devseed-ui/button';
 import { Modal } from '@devseed-ui/modal';
+import { glsp, themeVal } from '@devseed-ui/theme-provider';
+import { Heading } from '@devseed-ui/typography';
 import { ModalWrapper } from '../../common/modal-wrapper';
 import App from '../../common/app';
 import PageHeader from '../../common/page-header';
@@ -21,12 +24,48 @@ import {
   hideGlobalLoading,
 } from '../../common/global-loading';
 import { useParams } from 'react-router';
-import { Heading } from '@devseed-ui/typography';
 import logger from '../../../utils/logger';
 
 import toasts from '../../common/toasts';
 import Table, { TableCell, TableRow } from '../../common/table';
 import { Link } from 'react-router-dom';
+const ModelInformation = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-rows: auto auto;
+  grid-gap: ${glsp()};
+
+  .details {
+    grid-column: 1 / 3;
+  }
+  .meta {
+    grid-column: 3 / -1;
+  }
+  .tags {
+    grid-column: 1 / 4;
+    grid-template-columns: 1fr;
+  }
+`;
+const ModelSection = styled.section`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  .heading {
+    grid-column: 1 / -1;
+  }
+  ${Heading} {
+    margin: 0;
+  }
+`;
+const ColorSwatch = styled.div`
+  ${({ background }) =>
+    background &&
+    css`
+      background: ${background}!important;
+    `}
+  height: ${glsp(2)};
+  padding: ${glsp(0.1)};
+  outline: 1px solid ${themeVal('color.baseLight')};
+`;
 
 export default function ViewModel() {
   const { modelId } = useParams();
@@ -35,6 +74,7 @@ export default function ViewModel() {
   const { restApiClient, apiToken } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [model, setModel] = useState(null);
+  const [osmTags, setOsmTags] = useState(null);
   const [deleteModel, setDeleteModel] = useState(null);
 
   useEffect(() => {
@@ -64,6 +104,24 @@ export default function ViewModel() {
     }
     fetchModel();
   }, [apiToken]);
+
+  useEffect(() => {
+    async function getTags() {
+      if (model?.id) {
+        setIsLoading(true);
+        showGlobalLoadingMessage('Loading model...');
+        try {
+          const tags = await restApiClient.getModelOsmTags(model.id);
+          setOsmTags(tags);
+        } catch (err) {
+          toasts.error('Osm tags could not be retrieved');
+        }
+        setIsLoading(false);
+        hideGlobalLoading();
+      }
+    }
+    getTags();
+  }, [model]);
 
   if (isLoading || !model) {
     return null;
@@ -141,46 +199,71 @@ export default function ViewModel() {
           </InpageHeader>
           <InpageBody>
             <InpageBodyInner>
-              <section>
-                <h3>Model Details</h3>
-                <div>Name: {model.name}</div>
-                <div>Active: {model.active ? 'true' : 'false'}</div>
-                <div>Type: {model.model_type}</div>
-                <div>Zoom: {model.model_zoom}</div>
-                <div>Input Shape: {model.model_inputshape}</div>
-                <div>Bounds: {model.bounds?.join(', ')}</div>
-              </section>
-              {model.meta && (
-                <section>
-                  <h3>Model Metadata</h3>
-                  <div>Area: {model.meta.name}</div>
-                  <div>Imagery: {model.meta.imagery}</div>
-                  <div>Imagery Resolution: {model.meta.imagery_resolution}</div>
-                  <div>Global F1 Score: {model.meta.f1_weighted}</div>
-                  <div>Label Sources: {model.meta.label_sources}</div>
-                </section>
-              )}
-              <section>
-                <h3>Class Colormap & OpenStreetMap Tag Map</h3>
-                {model.classes?.length ? (
-                  <>
-                    <Table
-                      headers={['Class Name', 'Color', 'OSM Tags (optional)']}
-                      data={model.classes}
-                      renderRow={(c) => (
-                        <TableRow key={c.name}>
-                          <TableCell>{c.name}</TableCell>
-                          <TableCell>{c.color}</TableCell>
-                          <TableCell>TBA</TableCell>
-                        </TableRow>
-                      )}
-                      hoverable
-                    />
-                  </>
-                ) : (
-                  <Heading>No classes found.</Heading>
+              <ModelInformation>
+                <ModelSection className='details'>
+                  <Heading className='heading' size='small'>
+                    Model Details
+                  </Heading>
+                  <Heading useAlt>Name </Heading>
+                  <div>{model.name}</div>
+                  <Heading useAlt>Active </Heading>
+                  <div>{model.active ? 'true' : 'false'}</div>
+                  <Heading useAlt>Type</Heading>
+                  <div>{model.model_type}</div>
+                  <Heading useAlt>Zoom</Heading>
+                  <div>{model.model_zoom}</div>
+                  <Heading useAlt>Input Shape </Heading>
+                  <div>{model.model_inputshape}</div>
+                  <Heading useAlt>Bounds</Heading>
+                  <div>{model.bounds?.join(', ')}</div>
+                </ModelSection>
+                {model.meta && (
+                  <ModelSection className='meta'>
+                    <Heading className='heading' size='small'>
+                      Model Metadata
+                    </Heading>
+                    <Heading useAlt>Area</Heading>
+                    <div>{model.meta.name}</div>
+                    <Heading useAlt>Imagery</Heading>
+                    <div>{model.meta.imagery}</div>
+                    <Heading useAlt>Imagery Resolution</Heading>
+                    <div>{model.meta.imagery_resolution}</div>
+                    <Heading useAlt>Global F1 Score</Heading>
+                    <div>{model.meta.f1_weighted}</div>
+                    <Heading useAlt>Label Sources</Heading>
+                    <div>{model.meta.label_sources}</div>
+                  </ModelSection>
                 )}
-              </section>
+                <ModelSection className='tags'>
+                  <h3>Class Colormap & OpenStreetMap Tag Map</h3>
+                  {model.classes?.length ? (
+                    <>
+                      <Table
+                        headers={['Class Name', 'Color', 'OSM Tags (optional)']}
+                        data={model.classes}
+                        renderRow={(c, _, i) => (
+                          <TableRow key={c.name}>
+                            <TableCell>{c.name}</TableCell>
+                            <TableCell>
+                              <ColorSwatch background={c.color} />
+                            </TableCell>
+                            <TableCell>
+                              {osmTags
+                                ? osmTags.tagmap[i]
+                                    .map((t) => t.value)
+                                    .join(', ')
+                                : 'N/A'}
+                            </TableCell>
+                          </TableRow>
+                        )}
+                        hoverable
+                      />
+                    </>
+                  ) : (
+                    <Heading>No classes found.</Heading>
+                  )}
+                </ModelSection>
+              </ModelInformation>
             </InpageBodyInner>
           </InpageBody>
         </Inpage>
