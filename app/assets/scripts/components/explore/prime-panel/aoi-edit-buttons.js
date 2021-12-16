@@ -14,7 +14,7 @@ import { EditButton } from '../../../styles/button';
 import { BOUNDS_PADDING } from '../../common/map/constants';
 import { useMapState, useAoiMeta } from '../../../context/explore';
 import { useMapRef } from '../../../context/map';
-import { useApiLimits } from '../../../context/global';
+import { useApiLimits, useMosaics } from '../../../context/global';
 import { useInstance } from '../../../context/instance';
 import { useAoi, useAoiName } from '../../../context/aoi';
 import {
@@ -27,6 +27,8 @@ import { areaFromBounds } from '../../../utils/map';
 import logger from '../../../utils/logger';
 import config from '../../../config';
 import { UploadAoiModal } from './upload-aoi-modal';
+import booleanWithin from '@turf/boolean-within';
+import bboxPolygon from '@turf/bbox-polygon';
 
 const ModalFooter = styled(BaseModalFooter)`
   padding: ${glsp(2)} 0 0 0;
@@ -109,6 +111,9 @@ export function AoiEditButtons(props) {
   const { aoiArea, aoiBounds, setAoiBounds, createNewAoi } = useAoiMeta();
   const { mapRef } = useMapRef();
 
+  const { mosaicMeta } = useMosaics();
+
+
   const { dispatchCurrentCheckpoint, currentCheckpoint } = useCheckpoint();
 
   const { apiLimits } = useApiLimits();
@@ -144,6 +149,22 @@ export function AoiEditButtons(props) {
         {aoiArea > 0 && (
           <EditButton
             onClick={function () {
+              const bounds = aoiRef.getBounds()
+
+              const aoiBboxPolygon = bboxPolygon([
+                bounds.getWest(),
+                bounds.getSouth(),
+                bounds.getEast(),
+                bounds.getNorth(),
+              ]);
+
+              const mosaicBounds = bboxPolygon(mosaicMeta.data.bounds);
+
+              if (!booleanWithin(aoiBboxPolygon, mosaicBounds)) {
+                setActiveModal('area-out-of-bounds');
+                return;
+              }
+
 
               if (aoiArea < config.minimumAoiArea) {
                 setActiveModal('area-too-tiny');
