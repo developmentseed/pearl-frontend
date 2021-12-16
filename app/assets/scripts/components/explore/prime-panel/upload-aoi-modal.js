@@ -202,7 +202,7 @@ UploadAoiModal.propTypes = {
   setRevealed: T.func,
   onImport: T.func,
   apiLimits: T.object,
-  mosaicBounds: T.array,
+  mosaicMeta: T.object,
 };
 
 export { UploadAoiModal };

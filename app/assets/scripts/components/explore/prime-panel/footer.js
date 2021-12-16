@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import T from 'prop-types';
 import styled, { css } from 'styled-components';
 import { glsp, disabled as disabledStyles } from '@devseed-ui/theme-provider';
@@ -17,7 +17,6 @@ import {
 import { useInstance } from '../../../context/instance';
 import { Subheading } from '../../../styles/type/heading';
 import { useAoi, useAoiName } from '../../../context/aoi';
-import useFetch from '../../../utils/use-fetch';
 import { useApiLimits } from '../../../context/global';
 import { useMapState, sessionModes } from '../../../context/explore';
 import { mapModes } from '../../../context/reducers/map';

@@ -43,7 +43,7 @@ export function GlobalContextProvider(props) {
           tourStep,
           setTourStep,
 
-          mosaicMeta
+          mosaicMeta,
         }}
       >
         {props.children}
@@ -86,7 +86,7 @@ export const useMosaics = () => {
   return useMemo(
     () => ({
       mosaics,
-      mosaicMeta
+      mosaicMeta,
     }),
     [mosaics]
   );

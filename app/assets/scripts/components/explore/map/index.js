@@ -64,7 +64,6 @@ import OsmQaLayer from '../../common/map/osm-qa-layer';
 import booleanWithin from '@turf/boolean-within';
 import bboxPolygon from '@turf/bbox-polygon';
 
-
 const center = [38.889805, -77.009056];
 const zoom = 12;
 
