@@ -63,19 +63,17 @@ function UploadAoiModal({
 
       const mosaicBounds = bboxPolygon(mosaicMeta.data.bounds);
 
-      if (!booleanWithin(bboxPolygon(bounds), mosaicBounds)) {
-        setWarning(
-          'Area is out of imagery bounds. Please upload another file.'
-        );
-        return;
-      }
-
       if (isNaN(totalArea) || totalArea === 0) {
         // Area should be bigger than zero, abort import
         setWarning(
           'File is empty or does not conform a valid area, please upload another file.'
         );
         setFile(null);
+        return;
+      } else if (!booleanWithin(bboxPolygon(bounds), mosaicBounds)) {
+        setWarning(
+          'Area is out of imagery bounds. Please upload another file.'
+        );
         return;
       } else if (totalArea > apiLimits.max_inference) {
         // Area should be lower than max_inference, abort import
