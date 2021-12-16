@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { Button } from '@devseed-ui/button';
+import collecticon from '@devseed-ui/collecticons';
 import {
   Inpage,
   InpageHeader,
@@ -26,7 +27,7 @@ import Table, { TableRow, TableCell } from '../../common/table';
 import logger from '../../../utils/logger';
 import { Link } from 'react-router-dom';
 
-const HEADERS = ['Name', 'Created'];
+const HEADERS = ['Name', 'Created', 'Active', 'Uploaded'];
 
 export const ModelsBody = styled(InpageBodyInner)`
   display: grid;
@@ -34,6 +35,15 @@ export const ModelsBody = styled(InpageBodyInner)`
   grid-auto-rows: auto 1fr;
   grid-gap: ${glsp()};
   padding-top: 0;
+`;
+
+export const BooleanIcon = styled.div`
+  ${({ value }) =>
+    css`
+      &::before {
+        ${value ? collecticon('tick--small') : collecticon('xmark--small')}
+      }
+    `}
 `;
 
 export const ModelsHeadline = styled(InpageHeadline)`
@@ -55,6 +65,12 @@ function renderRow(model) {
         </StyledNavLink>
       </TableCell>
       <TableCell>{formatDateTime(model.created)}</TableCell>
+      <TableCell>
+        <BooleanIcon value={model.active} />
+      </TableCell>
+      <TableCell>
+        <BooleanIcon value={model.storage} />
+      </TableCell>
     </TableRow>
   );
 }
