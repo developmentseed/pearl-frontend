@@ -55,6 +55,8 @@ function Explore() {
     if (projectId !== 'new') {
       tourSteps.splice(1, 4);
       setSteps(tourSteps);
+    } else {
+      setSteps(tourSteps);
     }
   }, [projectId]);
 
