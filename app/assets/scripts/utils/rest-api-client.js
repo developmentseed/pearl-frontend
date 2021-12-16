@@ -55,6 +55,19 @@ class RestApiClient {
     return this.fetch('DELETE', path);
   }
 
+  uploadFile(path, file) {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    return fetch(this.getUrl(path), {
+      method: 'POST',
+      body: formData,
+      headers: {
+        Authorization: `Bearer ${this.apiToken}`,
+      },
+    }).then((response) => response.json());
+  }
+
   getApiMeta() {
     return this.get('').then((apiMeta) => {
       // Calculate available slots
