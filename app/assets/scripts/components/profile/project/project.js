@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { Button } from '@devseed-ui/button';
 import { Modal } from '@devseed-ui/modal';
 import tArea from '@turf/area';
+import { ModalWrapper } from '../../common/modal-wrapper';
 import {
   Inpage,
   InpageHeader,
@@ -15,7 +16,7 @@ import {
   InpageToolbar,
 } from '../../../styles/inpage';
 import { ProjectsBody as ProjectBody } from '../projects/projects';
-import { media, glsp } from '@devseed-ui/theme-provider';
+import { media } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
 import { FormInput } from '@devseed-ui/form';
 import { StyledLink } from '../../../styles/links';
@@ -40,18 +41,6 @@ const AOIS_PER_PAGE = 20;
 const ProjectTagline = styled(InpageTagline)`
   color: initial;
   opacity: 1;
-`;
-
-const ModalWrapper = styled.div`
-  display: grid;
-  grid-template-areas:
-    'a a'
-    'b c';
-  grid-gap: ${glsp(1)};
-  padding: ${glsp()};
-  div {
-    grid-area: a;
-  }
 `;
 
 const FormInputGroup = styled.div`
@@ -201,7 +190,7 @@ function Project() {
   const [isAoisLoading, setIsAoisLoading] = useState(true);
   const [project, setProject] = useState(null);
 
-  const [deleteProject, setDeleteProject] = useState(null);
+  const [deleteModel, setDeleteProject] = useState(null);
 
   const { restApiClient } = useAuth();
 
@@ -281,7 +270,7 @@ function Project() {
                   <Modal
                     id='confirm-delete-project-modal'
                     data-cy='confirm-delete-project-modal'
-                    revealed={deleteProject}
+                    revealed={deleteModel}
                     onOverlayClick={() => setDeleteProject(null)}
                     onCloseClick={() => setDeleteProject(null)}
                     title='Delete Project'
@@ -307,7 +296,7 @@ function Project() {
                           useIcon='tick'
                           onClick={async () => {
                             try {
-                              await restApiClient.deleteProject(projectId);
+                              await restApiClient.deleteModel(projectId);
                               toasts.success('Project successfully deleted.');
                               history.push(`/profile/projects`);
                             } catch (err) {

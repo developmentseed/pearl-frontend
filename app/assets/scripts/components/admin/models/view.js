@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
+import { Button } from '@devseed-ui/button';
+import { Modal } from '@devseed-ui/modal';
+import { ModalWrapper } from '../../common/modal-wrapper';
 import App from '../../common/app';
 import PageHeader from '../../common/page-header';
 import { PageBody } from '../../../styles/page';
@@ -8,6 +11,7 @@ import {
   InpageHeader,
   InpageHeaderInner,
   InpageTitle,
+  InpageToolbar,
   InpageBody,
   InpageBodyInner,
 } from '../../../styles/inpage';
@@ -18,6 +22,7 @@ import {
 } from '../../common/global-loading';
 import { useParams } from 'react-router';
 import { Heading } from '@devseed-ui/typography';
+import logger from '../../../utils/logger';
 
 import toasts from '../../common/toasts';
 import Table, { TableCell, TableRow } from '../../common/table';
@@ -30,6 +35,7 @@ export default function ViewModel() {
   const { restApiClient, apiToken } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [model, setModel] = useState(null);
+  const [deleteModel, setDeleteModel] = useState(null);
 
   useEffect(() => {
     async function fetchModel() {
@@ -73,6 +79,64 @@ export default function ViewModel() {
               <InpageTitle>
                 <Link to='/admin/models'>Models</Link> / {model.name}
               </InpageTitle>
+              <InpageToolbar>
+                {model.active && (
+                  <Button
+                    variation='danger-plain'
+                    data-cy='delete-model-button'
+                    title='Delete Model'
+                    useIcon='trash-bin'
+                    onClick={async () => setDeleteModel(modelId)}
+                  >
+                    Delete Model
+                  </Button>
+                )}
+
+                <Modal
+                  id='confirm-delete-model-modal'
+                  data-cy='confirm-delete-model-modal'
+                  revealed={deleteModel}
+                  onOverlayClick={() => setDeleteModel(null)}
+                  onCloseClick={() => setDeleteModel(null)}
+                  title='Delete Model'
+                  size='small'
+                  content={
+                    <ModalWrapper>
+                      <div>Are you sure you want to delete this model?</div>
+                      <Button
+                        data-cy='cancel-model-delete'
+                        variation='base-plain'
+                        size='medium'
+                        useIcon='xmark'
+                        onClick={() => {
+                          setDeleteModel(null);
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        data-cy='confirm-model-delete'
+                        variation='danger-raised-dark'
+                        size='medium'
+                        useIcon='tick'
+                        onClick={async () => {
+                          try {
+                            await restApiClient.deleteModel(modelId);
+                            toasts.success('Model successfully deleted.');
+                            history.push(`/admin/models`);
+                          } catch (err) {
+                            logger('Failed to delete model', err);
+                            toasts.error('Failed to delete model.', err);
+                          }
+                          setDeleteModel(null);
+                        }}
+                      >
+                        Delete Model
+                      </Button>
+                    </ModalWrapper>
+                  }
+                />
+              </InpageToolbar>
             </InpageHeaderInner>
           </InpageHeader>
           <InpageBody>

@@ -102,6 +102,10 @@ class RestApiClient {
     return this.get(`model/${id}`);
   }
 
+  deleteModel(id) {
+    return this.delete(`model/${id}`);
+  }
+
   getAOIs(projectId) {
     return this.get(`project/${projectId}/aoi`);
   }
