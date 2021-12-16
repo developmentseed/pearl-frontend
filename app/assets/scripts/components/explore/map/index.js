@@ -332,7 +332,7 @@ function Map() {
         setAoiArea(areaFromBounds(bbox));
       },
     });
-  }, [mapRef, aoiInitializer, apiLimits]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [mapRef, aoiInitializer, apiLimits, mosaicMeta.isReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Update color on area size change during draw
   useEffect(() => {
