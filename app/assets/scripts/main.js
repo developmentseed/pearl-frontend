@@ -29,6 +29,7 @@ import { AuthProvider, withAuthenticationRequired } from './context/auth';
 import ModelIndex from './components/admin/models';
 import ViewModel from './components/admin/models/view';
 import NewModel from './components/admin/models/new';
+import UploadModel from './components/admin/models/upload';
 
 installResizeObserver();
 
@@ -88,6 +89,11 @@ function Root() {
                   exact
                   path='/admin/models/:modelId'
                   component={ViewModel}
+                />
+                <ProtectedRoute
+                  exact
+                  path='/admin/models/:modelId/upload'
+                  component={UploadModel}
                 />
                 <Route exact path='/about' component={About} />
                 <Route path='*' component={UhOh} />

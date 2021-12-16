@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import App from '../../common/app';
 import PageHeader from '../../common/page-header';
 import { PageBody } from '../../../styles/page';
@@ -24,6 +25,7 @@ import { Link } from 'react-router-dom';
 
 export default function ViewModel() {
   const { modelId } = useParams();
+  const history = useHistory();
 
   const { restApiClient, apiToken } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
@@ -36,7 +38,13 @@ export default function ViewModel() {
         showGlobalLoadingMessage('Loading model...');
         try {
           const data = await restApiClient.getModel(modelId);
-          setModel(data);
+
+          // Redirect to upload if model file is not present
+          if (data?.storage) {
+            setModel(data);
+          } else {
+            history.push(`/admin/models/${modelId}/upload`);
+          }
         } catch (err) {
           toasts.error('Model not found.');
           setIsLoading(false);

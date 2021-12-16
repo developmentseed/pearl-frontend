@@ -62,8 +62,6 @@ function renderRow(model) {
 export default function ModelIndex() {
   const { apiToken } = useAuth();
 
-  const [page, setPage] = useState(1);
-  const [total, setTotal] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [models, setModels] = useState([]);
 
@@ -75,7 +73,6 @@ export default function ModelIndex() {
         try {
           showGlobalLoadingMessage('Loading models...');
           const data = await restApiClient.get(`model/?active=all&storage=all`);
-          setTotal(data.total);
           setModels(data.models);
         } catch (error) {
           logger(error);
@@ -86,7 +83,7 @@ export default function ModelIndex() {
       }
     }
     fetchModels();
-  }, [apiToken, page]);
+  }, [apiToken]);
 
   return (
     <App pageTitle='Models'>
