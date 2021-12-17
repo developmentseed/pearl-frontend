@@ -102,6 +102,10 @@ class RestApiClient {
     return this.get(`model/${id}`);
   }
 
+  getModelOsmTags(id) {
+    return this.get(`model/${id}/osmtag`);
+  }
+
   deleteModel(id) {
     return this.delete(`model/${id}`);
   }

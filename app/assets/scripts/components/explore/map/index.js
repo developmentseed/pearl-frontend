@@ -169,7 +169,10 @@ function Map() {
             // On KEYUP, we will dispatch an update to return to previousMode, but overrideBrowseMode
             // will be set to false before the mode update can be dispatched
             // do nothing
-          } else if (mapState.mode === mapModes.BROWSE_MODE) {
+          } else if (
+            mapState.mode === mapModes.BROWSE_MODE ||
+            mapState.mode === mapModes.DELETE_SAMPLES
+          ) {
             mapRef.polygonDraw.disable();
           }
           break;
@@ -226,7 +229,7 @@ function Map() {
       case mapModes.DELETE_SAMPLES:
         if (currentCheckpoint?.activeItem) {
           mapRef._container.style.cursor = 'grab';
-          mapRef.freehandDraw.enableSubtract(currentCheckpoint.activeItem);
+          mapRef.freehandDraw.enableSubtract();
         }
         break;
       default:

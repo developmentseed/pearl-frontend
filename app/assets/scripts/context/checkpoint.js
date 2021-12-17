@@ -380,10 +380,10 @@ function checkpointReducer(state, action) {
     }
     case actions.REMOVE_POINT_SAMPLE: {
       // Get coords
-      const { lat, lng } = action.data;
+      const { lat, lng, className } = action.data;
 
       // Merge coords into class
-      const currentClass = state.classes[state.activeItem];
+      const currentClass = state.classes[className];
       const updatedClass = {
         ...currentClass,
         points: {
@@ -409,7 +409,7 @@ function checkpointReducer(state, action) {
 
         classes: {
           ...state.classes,
-          [state.activeItem]: updatedClass,
+          [className]: updatedClass,
         },
       };
       break;
