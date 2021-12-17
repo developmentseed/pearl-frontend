@@ -64,6 +64,18 @@ const Form = styled(BaseForm)`
   }
 `;
 
+function validOsmTagString() {
+  return this.matches(
+    /^([a-zA-Z0-9]+=[a-zA-Z0-9]+,)*([a-zA-Z0-9]+=[a-zA-Z0-9]+)$/,
+    {
+      message:
+        'OSM tags should be specified in the format of key1=value1,key2=value2...',
+      excludeEmptyStrings: true,
+    }
+  );
+}
+Yup.addMethod(Yup.string, 'validOsmTagString', validOsmTagString);
+
 const FormSchema = Yup.object().shape({
   name: Yup.string().required('Required.'),
   active: Yup.bool().required('Required.'),
@@ -89,7 +101,7 @@ const FormSchema = Yup.object().shape({
         color: Yup.string().required('Required.'),
         f1_score: Yup.number().required('Required.'),
         distribution: Yup.number().required('Required.'),
-        osmtag: Yup.string(),
+        osmtag: Yup.string().validOsmTagString(),
       })
     ),
 });
