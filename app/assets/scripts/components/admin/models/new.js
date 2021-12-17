@@ -66,7 +66,7 @@ const Form = styled(BaseForm)`
 `;
 
 function validOsmTagString() {
-  return this.matches(/^([a-zA-Z]+=[a-zA-Z]+,)*([a-zA-Z]+=[a-zA-Z]+)$/, {
+  return this.matches(/^([a-zA-Z]+=[a-zA-Z0-9]+,)*([a-zA-Z]+=[a-zA-Z0-9]+)$/, {
     message:
       'OSM tags should be specified in the format of key1=value1,key2=value2...',
     excludeEmptyStrings: true,
