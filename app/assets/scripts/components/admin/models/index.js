@@ -19,6 +19,8 @@ import { formatDateTime } from '../../../utils/format';
 import App from '../../common/app';
 import { FormSwitch } from '@devseed-ui/form';
 import PageHeader from '../../common/page-header';
+import { Modal } from '@devseed-ui/modal';
+import { ModalWrapper } from '../../common/modal-wrapper';
 import { PageBody } from '../../../styles/page';
 import {
   showGlobalLoadingMessage,
@@ -103,6 +105,8 @@ export default function ModelIndex() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [models, setModels] = useState([]);
+  const [modelToDelete, setModelToDelete] = useState(null);
+  const [modelToActivate, setModelToActivate] = useState(null);
 
   const { restApiClient } = useAuth();
 
@@ -118,28 +122,6 @@ export default function ModelIndex() {
         hideGlobalLoading();
         setIsLoading(false);
       }
-    }
-  }
-
-  async function deleteModel(modelId) {
-    try {
-      await restApiClient.deleteModel(modelId);
-      toasts.success('Model successfully deleted.');
-      fetchModels();
-    } catch (err) {
-      logger('Failed to delete project', err);
-      toasts.error('Failed to delete project.', err);
-    }
-  }
-
-  async function activateModel(modelId) {
-    try {
-      await restApiClient.patch(`model/${modelId}`, { active: true });
-      toasts.success('Model successfully activated.');
-      fetchModels();
-    } catch (err) {
-      logger('Failed to activate project', err);
-      toasts.error('Failed to activate project.', err);
     }
   }
 
@@ -180,7 +162,10 @@ export default function ModelIndex() {
                       headers={HEADERS}
                       data={models}
                       renderRow={(m) =>
-                        renderRow(m, { deleteModel, activateModel })
+                        renderRow(m, {
+                          deleteModel: () => setModelToDelete(m),
+                          activateModel: () => setModelToActivate(m),
+                        })
                       }
                       hoverable
                     />
@@ -193,6 +178,101 @@ export default function ModelIndex() {
             </ModelsBody>
           </InpageBody>
         </Inpage>
+        <Modal
+          id='confirm-delete-model-modal'
+          data-cy='confirm-delete-model-modal'
+          revealed={modelToDelete !== null}
+          onOverlayClick={() => setModelToDelete(null)}
+          onCloseClick={() => setModelToDelete(null)}
+          title='Delete Model'
+          size='small'
+          content={
+            <ModalWrapper>
+              <div>
+                Are you sure you want to delete model {modelToDelete?.name}?
+              </div>
+              <Button
+                data-cy='cancel-model-delete'
+                variation='base-plain'
+                size='medium'
+                useIcon='xmark'
+                onClick={() => {
+                  setModelToDelete(null);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                data-cy='confirm-model-delete'
+                variation='danger-raised-dark'
+                size='medium'
+                useIcon='tick'
+                onClick={async () => {
+                  try {
+                    await restApiClient.deleteModel(modelToDelete.id);
+                    toasts.success('Model successfully deleted.');
+                    fetchModels();
+                  } catch (err) {
+                    logger('Failed to delete model', err);
+                    toasts.error('Failed to delete model.', err);
+                  }
+                  setModelToDelete(null);
+                }}
+              >
+                Delete Model
+              </Button>
+            </ModalWrapper>
+          }
+        />
+        <Modal
+          id='confirm-activate-model-modal'
+          data-cy='confirm-activate-model-modal'
+          revealed={modelToActivate !== null}
+          onOverlayClick={() => setModelToActivate(null)}
+          onCloseClick={() => setModelToActivate(null)}
+          title='Activate Model'
+          size='small'
+          content={
+            <ModalWrapper>
+              <div>
+                Are you sure you want to make model {modelToActivate?.name}{' '}
+                public? This action is irreversible.
+              </div>
+              <Button
+                data-cy='cancel-activate-model'
+                variation='base-plain'
+                size='medium'
+                useIcon='xmark'
+                onClick={() => {
+                  setModelToActivate(null);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                data-cy='confirm-activate-model'
+                variation='danger-raised-dark'
+                size='medium'
+                useIcon='tick'
+                onClick={async () => {
+                  try {
+                    await restApiClient.patch(`model/${modelToActivate.id}`, {
+                      active: true,
+                    });
+                    toasts.success('Model successfully activated.');
+                    fetchModels();
+                  } catch (err) {
+                    logger('Failed to activate project', err);
+                    toasts.error('Failed to activate project.', err);
+                  }
+                  setModelToActivate(null);
+                }}
+              >
+                Activate Model
+              </Button>
+            </ModalWrapper>
+          }
+        />
       </PageBody>
     </App>
   );
