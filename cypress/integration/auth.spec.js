@@ -16,7 +16,7 @@ describe('The app header', () => {
   });
 
   it('admin user can see link and access Model admin page', () => {
-    cy.fakeLogin();
+    cy.fakeLogin('admin');
     cy.visit('/');
     cy.get('body');
     cy.get('[data-cy=account-button]').should('exist').click();
@@ -25,7 +25,7 @@ describe('The app header', () => {
   });
 
   it('normal user does not see the Manage models link', () => {
-    cy.fakeLogin('user');
+    cy.fakeLogin();
     cy.visit('/');
     cy.get('body');
     cy.get('[data-cy=account-button]').should('exist').click();

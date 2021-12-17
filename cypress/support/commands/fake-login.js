@@ -11,7 +11,7 @@ Cypress.Commands.add('fakeLogin', (access) => {
       isLoading: false,
       error: false,
       isAuthenticated: true,
-      userAccessLevel: access || 'admin',
+      userAccessLevel: access || 'user',
       apiToken: FAKE_API_TOKEN,
       user: {
         name: 'Test User',
