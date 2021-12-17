@@ -17,6 +17,7 @@ import { StyledNavLink } from '../../../styles/links';
 import { useAuth } from '../../../context/auth';
 import { formatDateTime } from '../../../utils/format';
 import App from '../../common/app';
+import { FormSwitch } from '@devseed-ui/form';
 import PageHeader from '../../common/page-header';
 import { PageBody } from '../../../styles/page';
 import {
@@ -26,8 +27,9 @@ import {
 import Table, { TableRow, TableCell } from '../../common/table';
 import logger from '../../../utils/logger';
 import { Link } from 'react-router-dom';
+import toasts from '../../common/toasts';
 
-const HEADERS = ['Name', 'Created', 'Active', 'Uploaded'];
+const HEADERS = ['Name', 'Created', 'Active', 'Ready', 'Action'];
 
 export const ModelsBody = styled(InpageBodyInner)`
   display: grid;
@@ -56,7 +58,7 @@ export const ModelsHeadline = styled(InpageHeadline)`
 `;
 
 // Render single models row
-function renderRow(model) {
+function renderRow(model, { deleteModel, activateModel }) {
   return (
     <TableRow key={model.id}>
       <TableCell>
@@ -66,10 +68,29 @@ function renderRow(model) {
       </TableCell>
       <TableCell>{formatDateTime(model.created)}</TableCell>
       <TableCell>
-        <BooleanIcon value={model.active} />
+        <FormSwitch
+          hideText
+          checked={model.active}
+          onChange={() => {
+            activateModel(model.id);
+          }}
+        />
       </TableCell>
+      <TableCell>{model.storage && <BooleanIcon value={true} />}</TableCell>
       <TableCell>
-        <BooleanIcon value={model.storage} />
+        {!model.active && (
+          <Button
+            variation='primary-plain'
+            useIcon='trash-bin'
+            size='medium'
+            hideText
+            onClick={() => {
+              deleteModel(model.id);
+            }}
+          >
+            Remove Model
+          </Button>
+        )}
       </TableCell>
     </TableRow>
   );
@@ -83,21 +104,44 @@ export default function ModelIndex() {
 
   const { restApiClient } = useAuth();
 
-  useEffect(() => {
-    async function fetchModels() {
-      if (apiToken) {
-        try {
-          showGlobalLoadingMessage('Loading models...');
-          const data = await restApiClient.get(`model/?active=all&storage=all`);
-          setModels(data.models);
-        } catch (error) {
-          logger(error);
-        } finally {
-          hideGlobalLoading();
-          setIsLoading(false);
-        }
+  async function fetchModels() {
+    if (apiToken) {
+      try {
+        showGlobalLoadingMessage('Loading models...');
+        const data = await restApiClient.get(`model/?active=all&storage=all`);
+        setModels(data.models);
+      } catch (error) {
+        logger(error);
+      } finally {
+        hideGlobalLoading();
+        setIsLoading(false);
       }
     }
+  }
+
+  async function deleteModel(modelId) {
+    try {
+      await restApiClient.deleteModel(modelId);
+      toasts.success('Model successfully deleted.');
+      fetchModels();
+    } catch (err) {
+      logger('Failed to delete project', err);
+      toasts.error('Failed to delete project.', err);
+    }
+  }
+
+  async function activateModel(modelId) {
+    try {
+      await restApiClient.patch(`model/${modelId}`, { active: true });
+      toasts.success('Model successfully activated.');
+      fetchModels();
+    } catch (err) {
+      logger('Failed to activate project', err);
+      toasts.error('Failed to activate project.', err);
+    }
+  }
+
+  useEffect(() => {
     fetchModels();
   }, [apiToken]);
 
@@ -133,7 +177,9 @@ export default function ModelIndex() {
                     <Table
                       headers={HEADERS}
                       data={models}
-                      renderRow={renderRow}
+                      renderRow={(m) =>
+                        renderRow(m, { deleteModel, activateModel })
+                      }
                       hoverable
                     />
                   </>
