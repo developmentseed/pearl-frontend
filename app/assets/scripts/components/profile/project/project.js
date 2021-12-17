@@ -190,7 +190,7 @@ function Project() {
   const [isAoisLoading, setIsAoisLoading] = useState(true);
   const [project, setProject] = useState(null);
 
-  const [deleteModel, setDeleteProject] = useState(null);
+  const [deleteProject, setDeleteProject] = useState(null);
 
   const { restApiClient } = useAuth();
 
@@ -270,7 +270,7 @@ function Project() {
                   <Modal
                     id='confirm-delete-project-modal'
                     data-cy='confirm-delete-project-modal'
-                    revealed={deleteModel}
+                    revealed={deleteProject}
                     onOverlayClick={() => setDeleteProject(null)}
                     onCloseClick={() => setDeleteProject(null)}
                     title='Delete Project'
@@ -296,7 +296,7 @@ function Project() {
                           useIcon='tick'
                           onClick={async () => {
                             try {
-                              await restApiClient.deleteModel(projectId);
+                              await restApiClient.deleteProject(projectId);
                               toasts.success('Project successfully deleted.');
                               history.push(`/profile/projects`);
                             } catch (err) {

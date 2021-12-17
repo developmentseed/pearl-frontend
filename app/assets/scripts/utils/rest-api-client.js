@@ -169,6 +169,10 @@ class RestApiClient {
       patches,
     });
   }
+
+  getUserDetails() {
+    return this.get('user/me');
+  }
 }
 
 export default RestApiClient;

@@ -27,6 +27,7 @@ const StyledLink = filterComponentProps(Link, propsToFilter);
 function UserDropdown() {
   const {
     isAuthenticated,
+    userAccessLevel,
     user,
     authStateIsLoading,
     login,
@@ -84,6 +85,11 @@ function UserDropdown() {
             </DropdownHeader>
             <DropdownBody>
               <li>
+                <DropdownItem as={StyledLink} to='/project/new' useIcon='globe'>
+                  New Project
+                </DropdownItem>
+              </li>
+              <li>
                 <DropdownItem
                   as={StyledLink}
                   to='/profile/projects'
@@ -92,20 +98,18 @@ function UserDropdown() {
                   My Projects
                 </DropdownItem>
               </li>
-              <li>
-                <DropdownItem as={StyledLink} to='/' useIcon='house'>
-                  Home
-                </DropdownItem>
-              </li>
-              <li>
-                <DropdownItem
-                  as={StyledLink}
-                  to='/admin/models'
-                  useIcon='folder'
-                >
-                  Manage Models
-                </DropdownItem>
-              </li>
+              {userAccessLevel === 'admin' && (
+                <li>
+                  <DropdownItem
+                    as={StyledLink}
+                    to='/admin/models'
+                    useIcon='folder'
+                    data-cy='manage-models-link'
+                  >
+                    Manage Models
+                  </DropdownItem>
+                </li>
+              )}
             </DropdownBody>
             <DropdownFooter>
               <DropdownItem useIcon='logout' onClick={logout}>
