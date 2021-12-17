@@ -72,7 +72,7 @@ function renderRow(model, { deleteModel, activateModel }) {
           hideText
           checked={model.active}
           onChange={() => {
-            if (!model.active) {
+            if (!model.active && model.storage) {
               activateModel(model.id);
             }
           }}
