@@ -77,7 +77,7 @@ const ActiveModalContent = ({ activeModal, aoiArea }) => {
       area smaller than ${maxArea} km².`,
     'area-too-tiny': `The AOI area is ${formattedAoiArea} km², please select an
       area greater than ${config.minimumAoiArea / 1e6} km².`,
-    'area-out-of-bounds': `The aoi is outside of imagery bounds`,
+    'area-out-of-bounds': `The AOI is outside of imagery bounds`,
   };
 
   return <div>{messages[activeModal]}</div>;
