@@ -19,6 +19,7 @@ import { formatDateTime } from '../../../utils/format';
 import App from '../../common/app';
 import { FormSwitch } from '@devseed-ui/form';
 import PageHeader from '../../common/page-header';
+import Paginator from '../../common/paginator';
 import { Modal } from '@devseed-ui/modal';
 import { ModalWrapper } from '../../common/modal-wrapper';
 import { PageBody } from '../../../styles/page';
@@ -30,6 +31,9 @@ import Table, { TableRow, TableCell } from '../../common/table';
 import logger from '../../../utils/logger';
 import { Link } from 'react-router-dom';
 import toasts from '../../common/toasts';
+
+// Controls the size of each page
+const ITEMS_PER_PAGE = 10;
 
 const HEADERS = ['Name', 'Created', 'Active', 'Ready', 'Action'];
 
@@ -105,6 +109,8 @@ export default function ModelIndex() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [models, setModels] = useState([]);
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(null);
   const [modelToDelete, setModelToDelete] = useState(null);
   const [modelToActivate, setModelToActivate] = useState(null);
 
@@ -114,7 +120,12 @@ export default function ModelIndex() {
     if (apiToken) {
       try {
         showGlobalLoadingMessage('Loading models...');
-        const data = await restApiClient.get(`model/?active=all&storage=all`);
+        const data = await restApiClient.get(
+          `model/?active=all&storage=all&page=${
+            page - 1
+          }&limit=${ITEMS_PER_PAGE}`
+        );
+        setTotal(data.total);
         setModels(data.models);
       } catch (error) {
         logger(error);
@@ -168,6 +179,12 @@ export default function ModelIndex() {
                         })
                       }
                       hoverable
+                    />
+                    <Paginator
+                      currentPage={page}
+                      gotoPage={setPage}
+                      totalItems={total}
+                      itemsPerPage={ITEMS_PER_PAGE}
                     />
                   </>
                 ) : (
