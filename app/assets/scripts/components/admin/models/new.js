@@ -27,7 +27,6 @@ import { FieldArray, withFormik } from 'formik';
 import toasts from '../../common/toasts';
 import logger from '../../../utils/logger';
 import { useAuth } from '../../../context/auth';
-import { FormikInputSwitch } from '../../common/forms/input-switch';
 import { FormikInputSelect } from '../../common/forms/input-select';
 import { StyledLink } from '../../../styles/links';
 
@@ -118,13 +117,6 @@ function InnerForm({ handleSubmit, values }) {
           placeholder='Model name'
           autoComplete='off'
           value={values.name}
-        />
-        <FormikInputSwitch
-          id='active'
-          name='active'
-          label='Active'
-          description='Can the model be used for gpu instances'
-          checked={values.active}
         />
         <FormikInputSelect
           id='type'
