@@ -40,7 +40,7 @@ const ProtectedRoute = (
     component={
       window.Cypress && window.localStorage.getItem('useFakeLogin')
         ? component
-        : withAuthenticationRequired(component)
+        : withAuthenticationRequired(component, args.access)
     }
     {...args}
   />
@@ -79,21 +79,25 @@ function Root() {
                   exact
                   path='/admin/models'
                   component={ModelIndex}
+                  access='admin'
                 />
                 <ProtectedRoute
                   exact
                   path='/admin/models/new'
                   component={NewModel}
+                  access='admin'
                 />
                 <ProtectedRoute
                   exact
                   path='/admin/models/:modelId'
                   component={ViewModel}
+                  access='admin'
                 />
                 <ProtectedRoute
                   exact
                   path='/admin/models/:modelId/upload'
                   component={UploadModel}
+                  access='admin'
                 />
                 <Route exact path='/about' component={About} />
                 <Route path='*' component={UhOh} />

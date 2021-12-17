@@ -15,6 +15,23 @@ describe('The app header', () => {
     cy.get('[data-cy=login-button]').should('not.exist');
   });
 
+  it('admin user can see link and access Model admin page', () => {
+    cy.fakeLogin();
+    cy.visit('/');
+    cy.get('body');
+    cy.get('[data-cy=account-button]').should('exist').click();
+    cy.get('[data-cy=manage-models-link]').should('exist').click();
+    cy.get('body').should('contain', 'Models');
+  });
+
+  it('normal user does not see the Manage models link', () => {
+    cy.fakeLogin('user');
+    cy.visit('/');
+    cy.get('body');
+    cy.get('[data-cy=account-button]').should('exist').click();
+    cy.get('[data-cy=manage-models-link]').should('not.exist');
+  });
+
   it('invalid route displays uhoh page', () => {
     cy.visit('/invalid-route');
     cy.get('body').should('contain', 'Page not found.');
