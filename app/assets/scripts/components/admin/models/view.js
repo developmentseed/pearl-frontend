@@ -213,7 +213,7 @@ export default function ViewModel() {
                   <Heading useAlt>Zoom</Heading>
                   <div>{model.model_zoom}</div>
                   <Heading useAlt>Input Shape </Heading>
-                  <div>{model.model_inputshape}</div>
+                  <div>{model.model_inputshape?.join(', ')}</div>
                   <Heading useAlt>Bounds</Heading>
                   <div>{model.bounds?.join(', ')}</div>
                 </ModelSection>
@@ -239,7 +239,7 @@ export default function ViewModel() {
                   {model.classes?.length ? (
                     <>
                       <Table
-                        headers={['Class Name', 'Color', 'OSM Tags (optional)']}
+                        headers={['Class Name', 'Color', 'OSM Tags']}
                         data={model.classes}
                         renderRow={(c, _, i) => (
                           <TableRow key={c.name}>
@@ -250,7 +250,7 @@ export default function ViewModel() {
                             <TableCell>
                               {osmTags
                                 ? osmTags.tagmap[i]
-                                    .map((t) => t.value)
+                                    .map((t) => `${t.key}=${t.value}`)
                                     .join(', ')
                                 : 'N/A'}
                             </TableCell>
