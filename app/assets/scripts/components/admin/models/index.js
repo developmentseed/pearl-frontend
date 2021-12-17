@@ -17,7 +17,11 @@ import { StyledNavLink } from '../../../styles/links';
 import { useAuth } from '../../../context/auth';
 import { formatDateTime } from '../../../utils/format';
 import App from '../../common/app';
+import { FormSwitch } from '@devseed-ui/form';
 import PageHeader from '../../common/page-header';
+import Paginator from '../../common/paginator';
+import { Modal } from '@devseed-ui/modal';
+import { ModalWrapper } from '../../common/modal-wrapper';
 import { PageBody } from '../../../styles/page';
 import {
   showGlobalLoadingMessage,
@@ -26,8 +30,12 @@ import {
 import Table, { TableRow, TableCell } from '../../common/table';
 import logger from '../../../utils/logger';
 import { Link } from 'react-router-dom';
+import toasts from '../../common/toasts';
 
-const HEADERS = ['Name', 'Created', 'Active', 'Uploaded'];
+// Controls the size of each page
+const ITEMS_PER_PAGE = 10;
+
+const HEADERS = ['Name', 'Created', 'Active', 'Ready', 'Action'];
 
 export const ModelsBody = styled(InpageBodyInner)`
   display: grid;
@@ -56,7 +64,7 @@ export const ModelsHeadline = styled(InpageHeadline)`
 `;
 
 // Render single models row
-function renderRow(model) {
+function renderRow(model, { deleteModel, activateModel }) {
   return (
     <TableRow key={model.id}>
       <TableCell>
@@ -66,10 +74,31 @@ function renderRow(model) {
       </TableCell>
       <TableCell>{formatDateTime(model.created)}</TableCell>
       <TableCell>
-        <BooleanIcon value={model.active} />
+        <FormSwitch
+          hideText
+          checked={model.active}
+          onChange={() => {
+            if (!model.active && model.storage) {
+              activateModel(model.id);
+            }
+          }}
+        />
       </TableCell>
+      <TableCell>{model.storage && <BooleanIcon value={true} />}</TableCell>
       <TableCell>
-        <BooleanIcon value={model.storage} />
+        {!model.active && (
+          <Button
+            variation='primary-plain'
+            useIcon='trash-bin'
+            size='medium'
+            hideText
+            onClick={() => {
+              deleteModel(model.id);
+            }}
+          >
+            Remove Model
+          </Button>
+        )}
       </TableCell>
     </TableRow>
   );
@@ -80,24 +109,34 @@ export default function ModelIndex() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [models, setModels] = useState([]);
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(null);
+  const [modelToDelete, setModelToDelete] = useState(null);
+  const [modelToActivate, setModelToActivate] = useState(null);
 
   const { restApiClient } = useAuth();
 
-  useEffect(() => {
-    async function fetchModels() {
-      if (apiToken) {
-        try {
-          showGlobalLoadingMessage('Loading models...');
-          const data = await restApiClient.get(`model/?active=all&storage=all`);
-          setModels(data.models);
-        } catch (error) {
-          logger(error);
-        } finally {
-          hideGlobalLoading();
-          setIsLoading(false);
-        }
+  async function fetchModels() {
+    if (apiToken) {
+      try {
+        showGlobalLoadingMessage('Loading models...');
+        const data = await restApiClient.get(
+          `model/?active=all&storage=all&page=${
+            page - 1
+          }&limit=${ITEMS_PER_PAGE}`
+        );
+        setTotal(data.total);
+        setModels(data.models);
+      } catch (error) {
+        logger(error);
+      } finally {
+        hideGlobalLoading();
+        setIsLoading(false);
       }
     }
+  }
+
+  useEffect(() => {
     fetchModels();
   }, [apiToken]);
 
@@ -133,8 +172,19 @@ export default function ModelIndex() {
                     <Table
                       headers={HEADERS}
                       data={models}
-                      renderRow={renderRow}
+                      renderRow={(m) =>
+                        renderRow(m, {
+                          deleteModel: () => setModelToDelete(m),
+                          activateModel: () => setModelToActivate(m),
+                        })
+                      }
                       hoverable
+                    />
+                    <Paginator
+                      currentPage={page}
+                      gotoPage={setPage}
+                      totalItems={total}
+                      itemsPerPage={ITEMS_PER_PAGE}
                     />
                   </>
                 ) : (
@@ -145,6 +195,101 @@ export default function ModelIndex() {
             </ModelsBody>
           </InpageBody>
         </Inpage>
+        <Modal
+          id='confirm-delete-model-modal'
+          data-cy='confirm-delete-model-modal'
+          revealed={modelToDelete !== null}
+          onOverlayClick={() => setModelToDelete(null)}
+          onCloseClick={() => setModelToDelete(null)}
+          title='Delete Model'
+          size='small'
+          content={
+            <ModalWrapper>
+              <div>
+                Are you sure you want to delete model {modelToDelete?.name}?
+              </div>
+              <Button
+                data-cy='cancel-model-delete'
+                variation='base-plain'
+                size='medium'
+                useIcon='xmark'
+                onClick={() => {
+                  setModelToDelete(null);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                data-cy='confirm-model-delete'
+                variation='danger-raised-dark'
+                size='medium'
+                useIcon='tick'
+                onClick={async () => {
+                  try {
+                    await restApiClient.deleteModel(modelToDelete.id);
+                    toasts.success('Model successfully deleted.');
+                    fetchModels();
+                  } catch (err) {
+                    logger('Failed to delete model', err);
+                    toasts.error('Failed to delete model.', err);
+                  }
+                  setModelToDelete(null);
+                }}
+              >
+                Delete Model
+              </Button>
+            </ModalWrapper>
+          }
+        />
+        <Modal
+          id='confirm-activate-model-modal'
+          data-cy='confirm-activate-model-modal'
+          revealed={modelToActivate !== null}
+          onOverlayClick={() => setModelToActivate(null)}
+          onCloseClick={() => setModelToActivate(null)}
+          title='Activate Model'
+          size='small'
+          content={
+            <ModalWrapper>
+              <div>
+                Are you sure you want to make model {modelToActivate?.name}{' '}
+                public? This action is irreversible.
+              </div>
+              <Button
+                data-cy='cancel-activate-model'
+                variation='base-plain'
+                size='medium'
+                useIcon='xmark'
+                onClick={() => {
+                  setModelToActivate(null);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                data-cy='confirm-activate-model'
+                variation='danger-raised-dark'
+                size='medium'
+                useIcon='tick'
+                onClick={async () => {
+                  try {
+                    await restApiClient.patch(`model/${modelToActivate.id}`, {
+                      active: true,
+                    });
+                    toasts.success('Model successfully activated.');
+                    fetchModels();
+                  } catch (err) {
+                    logger('Failed to activate project', err);
+                    toasts.error('Failed to activate project.', err);
+                  }
+                  setModelToActivate(null);
+                }}
+              >
+                Activate Model
+              </Button>
+            </ModalWrapper>
+          }
+        />
       </PageBody>
     </App>
   );
