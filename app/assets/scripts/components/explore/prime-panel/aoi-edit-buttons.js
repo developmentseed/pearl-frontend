@@ -14,7 +14,7 @@ import { EditButton } from '../../../styles/button';
 import { BOUNDS_PADDING } from '../../common/map/constants';
 import { useMapState, useAoiMeta } from '../../../context/explore';
 import { useMapRef } from '../../../context/map';
-import { useApiLimits } from '../../../context/global';
+import { useApiLimits, useMosaics } from '../../../context/global';
 import { useInstance } from '../../../context/instance';
 import { useAoi, useAoiName } from '../../../context/aoi';
 import {
@@ -27,6 +27,8 @@ import { areaFromBounds } from '../../../utils/map';
 import logger from '../../../utils/logger';
 import config from '../../../config';
 import { UploadAoiModal } from './upload-aoi-modal';
+import booleanWithin from '@turf/boolean-within';
+import bboxPolygon from '@turf/bbox-polygon';
 
 const ModalFooter = styled(BaseModalFooter)`
   padding: ${glsp(2)} 0 0 0;
@@ -47,6 +49,7 @@ const ActiveModalHeadline = ({ activeModal }) => {
     'batch-inference': 'Save Area For Batch Prediction',
     'area-too-large': 'Area is too large',
     'area-too-tiny': 'Area is too tiny',
+    'area-out-of-bounds': 'Area is out of imagery bounds',
   };
 
   return (
@@ -74,6 +77,7 @@ const ActiveModalContent = ({ activeModal, aoiArea }) => {
       area smaller than ${maxArea} km².`,
     'area-too-tiny': `The AOI area is ${formattedAoiArea} km², please select an
       area greater than ${config.minimumAoiArea / 1e6} km².`,
+    'area-out-of-bounds': `The AOI is outside of imagery bounds`,
   };
 
   return <div>{messages[activeModal]}</div>;
@@ -106,6 +110,8 @@ export function AoiEditButtons(props) {
 
   const { aoiArea, aoiBounds, setAoiBounds, createNewAoi } = useAoiMeta();
   const { mapRef } = useMapRef();
+
+  const { mosaicMeta } = useMosaics();
 
   const { dispatchCurrentCheckpoint, currentCheckpoint } = useCheckpoint();
 
@@ -142,6 +148,22 @@ export function AoiEditButtons(props) {
         {aoiArea > 0 && (
           <EditButton
             onClick={function () {
+              const bounds = aoiRef.getBounds();
+
+              const aoiBboxPolygon = bboxPolygon([
+                bounds.getWest(),
+                bounds.getSouth(),
+                bounds.getEast(),
+                bounds.getNorth(),
+              ]);
+
+              const mosaicBounds = bboxPolygon(mosaicMeta.data.bounds);
+
+              if (!booleanWithin(aoiBboxPolygon, mosaicBounds)) {
+                setActiveModal('area-out-of-bounds');
+                return;
+              }
+
               if (aoiArea < config.minimumAoiArea) {
                 setActiveModal('area-too-tiny');
                 return;
@@ -315,6 +337,7 @@ export function AoiEditButtons(props) {
         revealed={showUploadAoiModal}
         setRevealed={setShowUploadAoiModal}
         apiLimits={apiLimits}
+        mosaicMeta={mosaicMeta}
         onImport={({ bounds, totalArea }) => {
           try {
             let aoiShape;
