@@ -109,7 +109,7 @@ const FormSchema = Yup.object().shape({
 
 const initialClassValues = {
   name: '',
-  color: '',
+  color: '#ffffff',
   f1_score: '',
   distribution: '',
 };
@@ -355,15 +355,7 @@ const NewModelForm = withFormik({
       f1_weighted: '',
       label_sources: '',
     },
-    classes: [
-      {
-        name: '',
-        color: '#ffffff',
-        f1_score: '',
-        distribution: '',
-        osmtag: '',
-      },
-    ],
+    classes: [initialClassValues],
   }),
   validationSchema: FormSchema,
   handleSubmit: (
