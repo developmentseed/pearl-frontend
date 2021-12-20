@@ -132,7 +132,9 @@ export default function ViewModel() {
           const tags = await restApiClient.getModelOsmTags(model.id);
           setOsmTags(tags);
         } catch (err) {
-          toasts.error('Osm tags could not be retrieved');
+          if (err.statusCode !== 404) {
+            toasts.error('Osm tags could not be retrieved');
+          }
         }
         setIsLoading(false);
         hideGlobalLoading();
