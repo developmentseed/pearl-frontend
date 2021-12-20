@@ -28,6 +28,7 @@ import toasts from '../../common/toasts';
 import logger from '../../../utils/logger';
 import { useAuth } from '../../../context/auth';
 import { FormikInputSelect } from '../../common/forms/input-select';
+import { FormikInputColor } from '../../common/forms/input-color';
 import { StyledLink } from '../../../styles/links';
 
 const modelTypes = [
@@ -252,7 +253,7 @@ function InnerForm({ handleSubmit, values }) {
                       />
                     </TableCell>
                     <TableCell>
-                      <FormikInputText
+                      <FormikInputColor
                         id={`classes.${i}.color`}
                         name={`classes.${i}.color`}
                         hideHeader

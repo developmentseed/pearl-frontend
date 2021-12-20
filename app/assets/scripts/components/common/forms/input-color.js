@@ -1,0 +1,219 @@
+import React from 'react';
+import { PropTypes as T } from 'prop-types';
+import styled from 'styled-components';
+import { Field, FastField } from 'formik';
+import { FormHelperMessage } from '@devseed-ui/form';
+import { ChromePicker } from 'react-color';
+
+import { Dropdown, DropdownTrigger } from '../../../styles/dropdown';
+import {
+  PickerStyles,
+  PickerDropdownBody,
+  PickerDropdownItem,
+} from '../../explore/prime-panel/tabs/retrain-refine-styles';
+
+import FormGroupStructure from './form-group-structure';
+
+
+const ColorInput = styled.span`
+  cursor: pointer;
+  text-decoration: underline;
+  > *:before {
+    display: none;
+  }
+`;
+
+/**
+ * Text input with form group structure.
+ *
+ * @prop {string} id Input field id
+ * @prop {string} name Input field name
+ * @prop {string} label Label for the input
+ * @prop {function|string} labelHint Hint for the label. Setting it to true
+ * shows (optional)
+ * @prop {mixed} value Input value
+ * @prop {string} inputSize Styled input size option
+ * @prop {string} inputVariation Styled input variation option
+ * @prop {boolean} invalid If value is invalid or not
+ * @prop {function} onChange On change event handler
+ * @prop {string} placeholder Input placeholder value.
+ * @prop {string} description Field description shown in a tooltip
+ * @prop {node} helper Helper message shown below input.
+ */
+function InputColor(props) {
+  const {
+    id,
+    label,
+    labelHint,
+    className,
+    inputSize,
+    inputVariation,
+    description,
+    helper,
+    inputRef,
+    invalid,
+    name,
+    value,
+    placeholder,
+    onChange,
+    onBlur,
+    onKeyUp,
+    hideHeader,
+    disabled,
+    ...rest
+  } = props;
+
+  return (
+    <FormGroupStructure
+      id={id}
+      label={label}
+      labelHint={labelHint}
+      className={className}
+      description={description}
+      helper={helper}
+      hideHeader={hideHeader}
+    >
+      <Dropdown
+        alignment='center'
+        direction='up'
+        triggerElement={(props) => (
+          <ColorInput as={DropdownTrigger} {...props}>
+            {value || '#000'}
+          </ColorInput>
+        )}
+        className='add-class__dropdown'
+      >
+        <PickerDropdownBody>
+          <PickerDropdownItem nonhoverable as='div'>
+            <ChromePicker
+              disableAlpha={true}
+              color={value || '#000'}
+              width='100%'
+              styles={PickerStyles}
+              onChangeComplete={(color) => {
+                onChange(color.hex);
+              }}
+              onKeyDown={(e) => {
+                e.stopPropagation();
+              }}
+            />
+          </PickerDropdownItem>
+        </PickerDropdownBody>
+      </Dropdown>
+    </FormGroupStructure>
+  );
+}
+
+InputColor.propTypes = {
+  className: T.string,
+  description: T.string,
+  helper: T.node,
+  id: T.string,
+  inputRef: T.object,
+  inputSize: T.string,
+  inputVariation: T.string,
+  invalid: T.bool,
+  label: T.string,
+  labelHint: T.oneOfType([T.bool, T.func, T.string]),
+  name: T.string,
+  onBlur: T.func,
+  onChange: T.func,
+  onKeyUp: T.func,
+  placeholder: T.oneOfType([T.string, T.number]),
+  value: T.oneOfType([T.string, T.number]),
+  hideHeader: T.bool,
+  'data-cy': T.string,
+  disabled: T.bool,
+};
+
+/**
+ * InputText component for usage with Formik
+ *
+ * @prop {string} id Input field id
+ * @prop {string} name Input field name
+ * @prop {string} label Label for the input
+ * @prop {function|string} labelHint Hint for the label. Setting it to true
+ * shows (optional)
+ * @prop {mixed} value Input value
+ * @prop {string} inputSize Styled input size option
+ * @prop {string} inputVariation Styled input variation option
+ * @prop {function} onChange On change event handler
+ * @prop {string} placeholder Input placeholder value
+ * @prop {string} description Field description shown in a tooltip
+ * @prop {node} helper Helper message shown below input.
+ */
+export function FormikInputColor({
+  className,
+  description,
+  helper,
+  id,
+  inputRef,
+  inputSize,
+  inputVariation,
+  label,
+  labelHint,
+  name,
+  onChange,
+  onBlur,
+  placeholder,
+  value,
+  useFastField,
+  disabled,
+  ...rest
+}) {
+  const FormikField = useFastField ? FastField : Field;
+  return (
+    <FormikField name={name}>
+      {({ field, meta }) => {
+        return (
+          <InputColor
+            disabled={disabled}
+            className={className}
+            description={description}
+            id={id}
+            helper={
+              meta.touched && meta.error ? (
+                <FormHelperMessage invalid>{`${meta.error}`}</FormHelperMessage>
+              ) : (
+                helper
+              )
+            }
+            inputRef={inputRef}
+            inputSize={inputSize}
+            inputVariation={inputVariation}
+            label={label}
+            labelHint={labelHint}
+            name={name}
+            placeholder={placeholder}
+            {...field}
+            onChange={onChange || field.onChange}
+            onBlur={onBlur || field.onBlur}
+            value={value}
+            invalid={!!meta.touched && !!meta.error}
+            {...rest}
+          />
+        );
+      }}
+    </FormikField>
+  );
+}
+
+FormikInputColor.propTypes = {
+  className: T.string,
+  description: T.string,
+  helper: T.node,
+  id: T.string,
+  inputRef: T.object,
+  inputSize: T.string,
+  inputVariation: T.string,
+  label: T.string,
+  labelHint: T.oneOfType([T.bool, T.func, T.string]),
+  name: T.string,
+  onChange: T.func,
+  onBlur: T.func,
+  placeholder: T.oneOfType([T.string, T.number]),
+  value: T.oneOfType([T.string, T.number]),
+  useFastField: T.bool,
+  'data-cy': T.string,
+  disabled: T.bool,
+};
