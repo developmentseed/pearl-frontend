@@ -19,12 +19,9 @@ import FormGroupStructure from './form-group-structure';
  * @prop {string} name Input field name
  * @prop {string} label Label for the input
  * @prop {function|string} labelHint Hint for the label. Setting it to true
+ * @prop {string} className Classname for the input
  * shows (optional)
  * @prop {mixed} value Input value
- * @prop {string} inputSize Styled input size option
- * @prop {string} inputVariation Styled input variation option
- * @prop {boolean} invalid If value is invalid or not
- * @prop {function} onChange On change event handler
  * @prop {string} placeholder Input placeholder value.
  * @prop {string} description Field description shown in a tooltip
  * @prop {node} helper Helper message shown below input.
@@ -32,26 +29,17 @@ import FormGroupStructure from './form-group-structure';
 function InputColor(props) {
   const {
     id,
+    name,
     label,
     labelHint,
     className,
-    inputSize,
-    inputVariation,
     description,
     helper,
-    inputRef,
-    invalid,
-    name,
     value,
-    placeholder,
-    onChange,
-    onBlur,
-    onKeyUp,
     hideHeader,
-    disabled,
-    ...rest
   } = props;
 
+  // eslint-disable-next-line
   const [field, meta, helpers] = useField(props);
 
   return (
@@ -111,21 +99,12 @@ InputColor.propTypes = {
   description: T.string,
   helper: T.node,
   id: T.string,
-  inputRef: T.object,
-  inputSize: T.string,
-  inputVariation: T.string,
-  invalid: T.bool,
   label: T.string,
   labelHint: T.oneOfType([T.bool, T.func, T.string]),
   name: T.string,
-  onBlur: T.func,
-  onChange: T.func,
-  onKeyUp: T.func,
-  placeholder: T.oneOfType([T.string, T.number]),
   value: T.oneOfType([T.string, T.number]),
   hideHeader: T.bool,
   'data-cy': T.string,
-  disabled: T.bool,
 };
 
 /**

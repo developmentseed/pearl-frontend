@@ -356,7 +356,6 @@ const NewModelForm = withFormik({
       label_sources: '',
     },
     classes: [
-      { name: '', color: '#fff', f1_score: '', distribution: '', osmtag: '' },
       {
         name: '',
         color: '#ffffff',
