@@ -3,7 +3,7 @@ import styled, { css } from 'styled-components';
 import { useHistory } from 'react-router-dom';
 import { Button } from '@devseed-ui/button';
 import { Modal } from '@devseed-ui/modal';
-import { glsp, themeVal } from '@devseed-ui/theme-provider';
+import { glsp, themeVal, media } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
 import { ModalWrapper } from '../../common/modal-wrapper';
 import App from '../../common/app';
@@ -33,27 +33,40 @@ const ModelInformation = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr;
   grid-template-rows: auto auto;
-  grid-gap: ${glsp()};
+  grid-gap: ${glsp(4)} ${glsp()};
 
-  .details {
-    grid-column: 1 / 3;
-  }
-  .meta {
-    grid-column: 3 / -1;
+  .details,
+  .meta,
+  .tags {
+    grid-column: 1 / -1;
   }
   .tags {
-    grid-column: 1 / 4;
     grid-template-columns: 1fr;
   }
+  ${media.mediumUp`
+    .details {
+      grid-column: 1 / 3;
+    }
+    .meta {
+      grid-column: 3 / -1;
+    }
+    .tags {
+      grid-column: 1 / 4;
+    }
+  `}
 `;
 const ModelSection = styled.section`
   display: grid;
   grid-template-columns: 1fr 1fr;
+  grid-gap: ${glsp(0.5)};
   .heading {
     grid-column: 1 / -1;
   }
   ${Heading} {
     margin: 0;
+  }
+  tbody td {
+    vertical-align: middle;
   }
 `;
 const ColorSwatch = styled.div`
@@ -62,7 +75,8 @@ const ColorSwatch = styled.div`
     css`
       background: ${background}!important;
     `}
-  height: ${glsp(2)};
+  height: ${glsp(1)};
+  width: ${glsp(2)};
   padding: ${glsp(0.1)};
   outline: 1px solid ${themeVal('color.baseLight')};
 `;
@@ -256,7 +270,6 @@ export default function ViewModel() {
                             </TableCell>
                           </TableRow>
                         )}
-                        hoverable
                       />
                     </>
                   ) : (
