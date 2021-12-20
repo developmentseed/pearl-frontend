@@ -61,6 +61,8 @@ import toasts from '../../common/toasts';
 import logger from '../../../utils/logger';
 import PolygonDrawControl from './polygon-draw-control';
 import OsmQaLayer from '../../common/map/osm-qa-layer';
+import booleanWithin from '@turf/boolean-within';
+import bboxPolygon from '@turf/bbox-polygon';
 
 const center = [38.889805, -77.009056];
 const zoom = 12;
@@ -132,7 +134,7 @@ function Map() {
   const { mapLayers, setMapLayers } = useMapLayers();
   const { userLayers, setUserLayers } = useUserLayers();
 
-  const { mosaics } = useMosaics();
+  const { mosaics, mosaicMeta } = useMosaics();
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
   const [mostRecentClass, setMostRecentClass] = useState(null);
 
@@ -292,6 +294,14 @@ function Map() {
         },
         onDrawEnd: (bbox, shape) => {
           const area = areaFromBounds(bbox);
+          const aoiBboxPoly = bboxPolygon(bbox);
+
+          const mosaicBounds = bboxPolygon(mosaicMeta.data.bounds);
+
+          if (!booleanWithin(aoiBboxPoly, mosaicBounds)) {
+            setActiveModal('area-out-of-bounds');
+            return;
+          }
 
           if (area < config.minimumAoiArea) {
             setActiveModal('area-too-tiny');
@@ -322,7 +332,7 @@ function Map() {
         setAoiArea(areaFromBounds(bbox));
       },
     });
-  }, [mapRef, aoiInitializer, apiLimits]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [mapRef, aoiInitializer, apiLimits, mosaicMeta.isReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Update color on area size change during draw
   useEffect(() => {

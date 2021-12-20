@@ -138,7 +138,7 @@ export default function ModelIndex() {
 
   useEffect(() => {
     fetchModels();
-  }, [apiToken]);
+  }, [apiToken, page]);
 
   return (
     <App pageTitle='Models'>
@@ -268,7 +268,7 @@ export default function ModelIndex() {
               </Button>
               <Button
                 data-cy='confirm-activate-model'
-                variation='danger-raised-dark'
+                variation='primary-raised-dark'
                 size='medium'
                 useIcon='tick'
                 onClick={async () => {

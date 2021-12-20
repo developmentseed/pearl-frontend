@@ -3,7 +3,7 @@ import styled, { css } from 'styled-components';
 import { useHistory } from 'react-router-dom';
 import { Button } from '@devseed-ui/button';
 import { Modal } from '@devseed-ui/modal';
-import { glsp, themeVal } from '@devseed-ui/theme-provider';
+import { glsp, themeVal, media } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
 import { ModalWrapper } from '../../common/modal-wrapper';
 import App from '../../common/app';
@@ -23,37 +23,52 @@ import {
   showGlobalLoadingMessage,
   hideGlobalLoading,
 } from '../../common/global-loading';
+import { FormSwitch } from '@devseed-ui/form';
 import { useParams } from 'react-router';
 import logger from '../../../utils/logger';
 
 import toasts from '../../common/toasts';
 import Table, { TableCell, TableRow } from '../../common/table';
 import { Link } from 'react-router-dom';
+import { formatDateTime } from '../../../utils/format';
 const ModelInformation = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr;
   grid-template-rows: auto auto;
-  grid-gap: ${glsp()};
+  grid-gap: ${glsp(4)} ${glsp()};
 
-  .details {
-    grid-column: 1 / 3;
-  }
-  .meta {
-    grid-column: 3 / -1;
+  .details,
+  .meta,
+  .tags {
+    grid-column: 1 / -1;
   }
   .tags {
-    grid-column: 1 / 4;
     grid-template-columns: 1fr;
   }
+  ${media.mediumUp`
+    .details {
+      grid-column: 1 / 3;
+    }
+    .meta {
+      grid-column: 3 / -1;
+    }
+    .tags {
+      grid-column: 1 / 4;
+    }
+  `}
 `;
 const ModelSection = styled.section`
   display: grid;
   grid-template-columns: 1fr 1fr;
+  grid-gap: ${glsp(0.5)};
   .heading {
     grid-column: 1 / -1;
   }
   ${Heading} {
     margin: 0;
+  }
+  tbody td {
+    vertical-align: middle;
   }
 `;
 const ColorSwatch = styled.div`
@@ -62,7 +77,8 @@ const ColorSwatch = styled.div`
     css`
       background: ${background}!important;
     `}
-  height: ${glsp(2)};
+  height: ${glsp(1)};
+  width: ${glsp(2)};
   padding: ${glsp(0.1)};
   outline: 1px solid ${themeVal('color.baseLight')};
 `;
@@ -76,32 +92,34 @@ export default function ViewModel() {
   const [model, setModel] = useState(null);
   const [osmTags, setOsmTags] = useState(null);
   const [deleteModel, setDeleteModel] = useState(null);
+  const [modelToActivate, setModelToActivate] = useState(null);
+
+  async function fetchModel() {
+    if (apiToken) {
+      setIsLoading(true);
+      showGlobalLoadingMessage('Loading model...');
+      try {
+        const data = await restApiClient.getModel(modelId);
+
+        // Redirect to upload if model file is not present
+        if (data?.storage) {
+          setModel(data);
+        } else {
+          history.push(`/admin/models/${modelId}/upload`);
+        }
+      } catch (err) {
+        toasts.error('Model not found.');
+        setIsLoading(false);
+        hideGlobalLoading();
+        history.push('/admin/models');
+        return;
+      }
+      hideGlobalLoading();
+      setIsLoading(false);
+    }
+  }
 
   useEffect(() => {
-    async function fetchModel() {
-      if (apiToken) {
-        setIsLoading(true);
-        showGlobalLoadingMessage('Loading model...');
-        try {
-          const data = await restApiClient.getModel(modelId);
-
-          // Redirect to upload if model file is not present
-          if (data?.storage) {
-            setModel(data);
-          } else {
-            history.push(`/admin/models/${modelId}/upload`);
-          }
-        } catch (err) {
-          toasts.error('Model not found.');
-          setIsLoading(false);
-          hideGlobalLoading();
-          history.push('/admin/models');
-          return;
-        }
-        hideGlobalLoading();
-        setIsLoading(false);
-      }
-    }
     fetchModel();
   }, [apiToken]);
 
@@ -138,7 +156,7 @@ export default function ViewModel() {
                 <Link to='/admin/models'>Models</Link> / {model.name}
               </InpageTitle>
               <InpageToolbar>
-                {model.active && (
+                {!model.active && (
                   <Button
                     variation='danger-plain'
                     data-cy='delete-model-button'
@@ -149,6 +167,60 @@ export default function ViewModel() {
                     Delete Model
                   </Button>
                 )}
+
+                <Modal
+                  id='confirm-activate-model-modal'
+                  data-cy='confirm-activate-model-modal'
+                  revealed={modelToActivate !== null}
+                  onOverlayClick={() => setModelToActivate(null)}
+                  onCloseClick={() => setModelToActivate(null)}
+                  title='Activate Model'
+                  size='small'
+                  content={
+                    <ModalWrapper>
+                      <div>
+                        Are you sure you want to make model{' '}
+                        {modelToActivate?.name} public? This action is
+                        irreversible.
+                      </div>
+                      <Button
+                        data-cy='cancel-activate-model'
+                        variation='base-plain'
+                        size='medium'
+                        useIcon='xmark'
+                        onClick={() => {
+                          setModelToActivate(null);
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        data-cy='confirm-activate-model'
+                        variation='primary-raised-dark'
+                        size='medium'
+                        useIcon='tick'
+                        onClick={async () => {
+                          try {
+                            await restApiClient.patch(
+                              `model/${modelToActivate.id}`,
+                              {
+                                active: true,
+                              }
+                            );
+                            toasts.success('Model successfully activated.');
+                            fetchModel();
+                          } catch (err) {
+                            logger('Failed to activate project', err);
+                            toasts.error('Failed to activate project.', err);
+                          }
+                          setModelToActivate(null);
+                        }}
+                      >
+                        Activate Model
+                      </Button>
+                    </ModalWrapper>
+                  }
+                />
 
                 <Modal
                   id='confirm-delete-model-modal'
@@ -204,10 +276,20 @@ export default function ViewModel() {
                   <Heading className='heading' size='small'>
                     Model Details
                   </Heading>
-                  <Heading useAlt>Name </Heading>
+                  <Heading useAlt>Name</Heading>
                   <div>{model.name}</div>
-                  <Heading useAlt>Active </Heading>
-                  <div>{model.active ? 'true' : 'false'}</div>
+                  <Heading useAlt>Active</Heading>
+                  <FormSwitch
+                    hideText
+                    checked={model.active}
+                    onChange={() => {
+                      if (!model.active && model.storage) {
+                        setModelToActivate(model);
+                      }
+                    }}
+                  />
+                  <Heading useAlt>Created At</Heading>
+                  <div>{formatDateTime(model.created)}</div>
                   <Heading useAlt>Type</Heading>
                   <div>{model.model_type}</div>
                   <Heading useAlt>Zoom</Heading>
@@ -256,7 +338,6 @@ export default function ViewModel() {
                             </TableCell>
                           </TableRow>
                         )}
-                        hoverable
                       />
                     </>
                   ) : (

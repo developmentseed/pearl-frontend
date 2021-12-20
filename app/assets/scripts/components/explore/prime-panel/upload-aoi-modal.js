@@ -11,6 +11,8 @@ import { FauxFileDialog } from '../../common/faux-file-dialog';
 import { areaFromBounds } from '../../../utils/map';
 import logger from '../../../utils/logger';
 import { inRange } from '../../../utils/utils';
+import booleanWithin from '@turf/boolean-within';
+import bboxPolygon from '@turf/bbox-polygon';
 
 const Wrapper = styled.div`
   display: grid;
@@ -27,7 +29,13 @@ const Wrapper = styled.div`
   grid-gap: 1rem;
 `;
 
-function UploadAoiModal({ revealed, setRevealed, onImport, apiLimits }) {
+function UploadAoiModal({
+  revealed,
+  setRevealed,
+  onImport,
+  apiLimits,
+  mosaicMeta,
+}) {
   const [file, setFile] = useState(null);
   const [warning, setWarning] = useState(null);
   const onFileSelect = async (uploadedFile) => {
@@ -53,12 +61,19 @@ function UploadAoiModal({ revealed, setRevealed, onImport, apiLimits }) {
       const bounds = bbox(geojson);
       const totalArea = areaFromBounds(bounds);
 
+      const mosaicBounds = bboxPolygon(mosaicMeta.data.bounds);
+
       if (isNaN(totalArea) || totalArea === 0) {
         // Area should be bigger than zero, abort import
         setWarning(
           'File is empty or does not conform a valid area, please upload another file.'
         );
         setFile(null);
+        return;
+      } else if (!booleanWithin(bboxPolygon(bounds), mosaicBounds)) {
+        setWarning(
+          'Area is out of imagery bounds. Please upload another file.'
+        );
         return;
       } else if (totalArea > apiLimits.max_inference) {
         // Area should be lower than max_inference, abort import
@@ -185,6 +200,7 @@ UploadAoiModal.propTypes = {
   setRevealed: T.func,
   onImport: T.func,
   apiLimits: T.object,
+  mosaicMeta: T.object,
 };
 
 export { UploadAoiModal };

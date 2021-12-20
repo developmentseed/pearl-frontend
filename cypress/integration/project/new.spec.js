@@ -314,7 +314,7 @@ describe('Create new project', () => {
     );
   });
 
-  it('Check model filter based on location', () => {
+  it('Do not allow upload of aoi out of imagery bounds', () => {
     // Set mock WS workflow in case creation succeeds (it shouldn't here)
     cy.setWebsocketWorkflow('websocket-workflow/base-model-prediction.json');
 
@@ -349,21 +349,9 @@ describe('Create new project', () => {
       'aoi-upload/aoi-outside-usa.geojson'
     );
     // No warning is displayed
-    cy.get('[data-cy=import-aoi-warning-text').should('not.exist');
-    // Proceed importing
-    cy.get('[data-cy=import-aoi-button').should('be.enabled').click();
-
-    // Check session status message
-    cy.get('[data-cy=session-status]').should(
-      'have.text',
-      'Session Status: Select Model'
+    cy.get('[data-cy=import-aoi-warning-text').should(
+      'contain',
+      'Area is out of imagery bounds. Please upload another file'
     );
-
-    // Open the Model selection modal
-    cy.get('[data-cy=select-model-label]').should('exist').click();
-    // There are not recommended models for that aoi region
-    cy.get('[data-cy=recommended-models-label]').should('not.exist');
-    // Check that the 2 models are available
-    cy.get('.list-container').children().should('have.length', 2);
   });
 });
