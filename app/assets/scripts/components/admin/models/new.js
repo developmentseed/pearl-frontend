@@ -28,6 +28,7 @@ import toasts from '../../common/toasts';
 import logger from '../../../utils/logger';
 import { useAuth } from '../../../context/auth';
 import { FormikInputSelect } from '../../common/forms/input-select';
+import { FormikInputColor } from '../../common/forms/input-color';
 import { StyledLink } from '../../../styles/links';
 
 const modelTypes = [
@@ -41,7 +42,7 @@ const modelTypes = [
 const FormWrapper = styled.section`
   display: grid;
   ${media.mediumUp`
-    grid-template-columns: minmax(36rem, 1fr) 1fr;
+    grid-template-columns: minmax(42rem, 1fr) 1fr;
     > * {
       grid-column: 1;
     }
@@ -108,7 +109,7 @@ const FormSchema = Yup.object().shape({
 
 const initialClassValues = {
   name: '',
-  color: '',
+  color: '#ffffff',
   f1_score: '',
   distribution: '',
 };
@@ -252,7 +253,7 @@ function InnerForm({ handleSubmit, values }) {
                       />
                     </TableCell>
                     <TableCell>
-                      <FormikInputText
+                      <FormikInputColor
                         id={`classes.${i}.color`}
                         name={`classes.${i}.color`}
                         hideHeader
@@ -354,9 +355,7 @@ const NewModelForm = withFormik({
       f1_weighted: '',
       label_sources: '',
     },
-    classes: [
-      { name: '', color: '', f1_score: '', distribution: '', osmtag: '' },
-    ],
+    classes: [initialClassValues],
   }),
   validationSchema: FormSchema,
   handleSubmit: (
