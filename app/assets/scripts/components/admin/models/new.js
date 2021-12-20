@@ -42,7 +42,7 @@ const modelTypes = [
 const FormWrapper = styled.section`
   display: grid;
   ${media.mediumUp`
-    grid-template-columns: minmax(36rem, 1fr) 1fr;
+    grid-template-columns: minmax(42rem, 1fr) 1fr;
     > * {
       grid-column: 1;
     }
@@ -357,6 +357,13 @@ const NewModelForm = withFormik({
     },
     classes: [
       { name: '', color: '#fff', f1_score: '', distribution: '', osmtag: '' },
+      {
+        name: '',
+        color: '#ffffff',
+        f1_score: '',
+        distribution: '',
+        osmtag: '',
+      },
     ],
   }),
   validationSchema: FormSchema,

@@ -1,6 +1,5 @@
 import React from 'react';
 import { PropTypes as T } from 'prop-types';
-import styled from 'styled-components';
 import { Field, FastField, useField } from 'formik';
 import { FormHelperMessage } from '@devseed-ui/form';
 import { ChromePicker } from 'react-color';
@@ -11,16 +10,7 @@ import {
   PickerDropdownBody,
   PickerDropdownItem,
 } from '../../explore/prime-panel/tabs/retrain-refine-styles';
-
 import FormGroupStructure from './form-group-structure';
-
-const ColorInput = styled.span`
-  cursor: pointer;
-  text-decoration: underline;
-  > *:before {
-    display: none;
-  }
-`;
 
 /**
  * Text input with form group structure.
@@ -79,9 +69,19 @@ function InputColor(props) {
         alignment='center'
         direction='up'
         triggerElement={(props) => (
-          <ColorInput as={DropdownTrigger} {...props}>
+          <span
+            style={{
+              color: '#F0F4FF',
+              cursor: 'pointer',
+              padding: '0.25rem 0.5rem 0.25rem 0.25rem',
+              border: '1px solid rgba(240,244,255,0.16)',
+              borderRadius: '0.25rem',
+            }}
+            as={DropdownTrigger}
+            {...props}
+          >
             {value}
-          </ColorInput>
+          </span>
         )}
         className='add-class__dropdown'
       >

@@ -12,7 +12,7 @@ const StyledTable = styled.table`
   max-width: 100%;
   td,
   th {
-    padding: ${glsp(1 / 2)};
+    padding: ${glsp(1 / 4)};
     vertical-align: top;
     text-align: left;
   }
