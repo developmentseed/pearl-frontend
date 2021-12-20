@@ -138,7 +138,7 @@ export default function ModelIndex() {
 
   useEffect(() => {
     fetchModels();
-  }, [apiToken]);
+  }, [apiToken, page]);
 
   return (
     <App pageTitle='Models'>
