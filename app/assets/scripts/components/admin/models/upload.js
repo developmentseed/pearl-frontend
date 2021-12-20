@@ -29,6 +29,7 @@ import { InputFile } from '../../common/forms/input-file';
 
 const FormWrapper = styled.section`
   display: grid;
+  grid-gap: 1rem;
   ${media.mediumUp`
     grid-template-columns: minmax(36rem, 1fr) 1fr;
     > * {
@@ -110,6 +111,8 @@ export default function UploadModel() {
           <InpageBody>
             <InpageBodyInner>
               <FormWrapper>
+                <h3>Upload model file</h3>
+                <p>Models must be in .zip format.</p>
                 <InputFile
                   id='files'
                   name='files'
@@ -121,7 +124,6 @@ export default function UploadModel() {
                 )}
                 <Button
                   type='submit'
-                  size='small'
                   variation='primary-raised-dark'
                   visuallyDisabled={error || !file}
                   onClick={() => {
