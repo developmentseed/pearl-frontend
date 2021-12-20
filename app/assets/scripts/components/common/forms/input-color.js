@@ -1,7 +1,7 @@
 import React from 'react';
 import { PropTypes as T } from 'prop-types';
 import styled from 'styled-components';
-import { Field, FastField } from 'formik';
+import { Field, FastField, useField } from 'formik';
 import { FormHelperMessage } from '@devseed-ui/form';
 import { ChromePicker } from 'react-color';
 
@@ -13,7 +13,6 @@ import {
 } from '../../explore/prime-panel/tabs/retrain-refine-styles';
 
 import FormGroupStructure from './form-group-structure';
-
 
 const ColorInput = styled.span`
   cursor: pointer;
@@ -63,9 +62,12 @@ function InputColor(props) {
     ...rest
   } = props;
 
+  const [field, meta, helpers] = useField(props);
+
   return (
     <FormGroupStructure
       id={id}
+      name={name}
       label={label}
       labelHint={labelHint}
       className={className}
@@ -78,7 +80,7 @@ function InputColor(props) {
         direction='up'
         triggerElement={(props) => (
           <ColorInput as={DropdownTrigger} {...props}>
-            {value || '#000'}
+            {value}
           </ColorInput>
         )}
         className='add-class__dropdown'
@@ -87,11 +89,11 @@ function InputColor(props) {
           <PickerDropdownItem nonhoverable as='div'>
             <ChromePicker
               disableAlpha={true}
-              color={value || '#000'}
+              color={value}
               width='100%'
               styles={PickerStyles}
-              onChangeComplete={(color) => {
-                onChange(color.hex);
+              onChange={(color) => {
+                helpers.setValue(color.hex);
               }}
               onKeyDown={(e) => {
                 e.stopPropagation();
@@ -163,7 +165,7 @@ export function FormikInputColor({
 }) {
   const FormikField = useFastField ? FastField : Field;
   return (
-    <FormikField name={name}>
+    <FormikField id={id} name={name}>
       {({ field, meta }) => {
         return (
           <InputColor
