@@ -29,6 +29,7 @@ import logger from '../../../utils/logger';
 import toasts from '../../common/toasts';
 import Table, { TableCell, TableRow } from '../../common/table';
 import { Link } from 'react-router-dom';
+import { formatDateTime } from '../../../utils/format';
 const ModelInformation = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr;
@@ -218,10 +219,12 @@ export default function ViewModel() {
                   <Heading className='heading' size='small'>
                     Model Details
                   </Heading>
-                  <Heading useAlt>Name </Heading>
+                  <Heading useAlt>Name</Heading>
                   <div>{model.name}</div>
-                  <Heading useAlt>Active </Heading>
-                  <div>{model.active ? 'true' : 'false'}</div>
+                  <Heading useAlt>Active</Heading>
+                  <div>{model.active ? 'Yes' : 'No'}</div>
+                  <Heading useAlt>Created At</Heading>
+                  <div>{formatDateTime(model.created)}</div>
                   <Heading useAlt>Type</Heading>
                   <div>{model.model_type}</div>
                   <Heading useAlt>Zoom</Heading>
