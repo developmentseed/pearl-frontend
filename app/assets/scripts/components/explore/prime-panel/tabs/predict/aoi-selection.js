@@ -15,6 +15,7 @@ import { Subheading } from '../../../../../styles/type/heading';
 import { EditButton } from '../../../../../styles/button';
 import ShadowScrollbar from '../../../../common/shadow-scrollbar';
 import toasts from '../../../../common/toasts';
+import { ModalWrapper } from '../../../../common/modal-wrapper';
 import { BOUNDS_PADDING } from '../../../../common/map/constants';
 import { formatThousands } from '../../../../../utils/format';
 import {
@@ -28,17 +29,6 @@ import { useAoi } from '../../../../../context/aoi';
 import { useAuth } from '../../../../../context/auth';
 import { useCheckpoint } from '../../../../../context/checkpoint';
 import { useProject } from '../../../../../context/project';
-
-const ModalWrapper = styled.div`
-  display: grid;
-  grid-template-areas:
-    'a a'
-    'b c';
-  grid-gap: ${glsp(1)};
-  div {
-    grid-area: a;
-  }
-`;
 
 const AoiOption = styled(Option)`
   grid-template-columns: auto min-content;

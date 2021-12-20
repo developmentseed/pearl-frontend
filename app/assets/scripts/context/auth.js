@@ -93,11 +93,14 @@ function InnerAuthProvider(props) {
       const token = await getAccessTokenSilently({
         audience: config.restApiEndpoint,
       });
+      const restApiClient = new RestApiClient({ apiToken: token });
+      const userDetails = await restApiClient.getUserDetails();
       dispatchAuthState({
         type: actions.RECEIVE_LOGIN,
         data: {
           user,
           apiToken: token,
+          userAccessLevel: userDetails.access,
         },
       });
     } catch (error) {
@@ -215,6 +218,7 @@ export const useAuth = () => {
   const {
     apiToken,
     user,
+    userAccessLevel,
     isAuthenticated,
     isLoading,
     login,
@@ -231,6 +235,7 @@ export const useAuth = () => {
       apiToken,
       isLoading,
       user,
+      userAccessLevel,
       isAuthenticated,
       login,
       logout,
@@ -249,16 +254,24 @@ export const useAuth = () => {
  *      path={path}
  *      />
  */
-export function withAuthenticationRequired(WrapperComponent) {
+export function withAuthenticationRequired(WrapperComponent, access) {
   /* eslint-disable react-hooks/rules-of-hooks */
-  const { isAuthenticated, isLoading, isLoggingOut } = useAuth();
+  const {
+    isAuthenticated,
+    userAccessLevel,
+    isLoading,
+    isLoggingOut,
+  } = useAuth();
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated && !isLoggingOut) {
       toasts.error('Please sign in to view this page.');
       history.push('/');
+    } else if (isAuthenticated && access && access !== userAccessLevel) {
+      toasts.error('You do not have permission to view this page.');
+      history.push('/');
     }
-  }, [isLoading, isAuthenticated, isLoggingOut]);
+  }, [isLoading, isAuthenticated, isLoggingOut, access, userAccessLevel]);
 
   if (isLoading || !isAuthenticated || isLoggingOut) return;
 

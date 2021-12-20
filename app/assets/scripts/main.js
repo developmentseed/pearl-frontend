@@ -26,6 +26,10 @@ import GlobalLoadingProvider from './components/common/global-loading';
 import { ToastContainerCustom } from './components/common/toasts';
 import Project from './components/profile/project';
 import { AuthProvider, withAuthenticationRequired } from './context/auth';
+import ModelIndex from './components/admin/models';
+import ViewModel from './components/admin/models/view';
+import NewModel from './components/admin/models/new';
+import UploadModel from './components/admin/models/upload';
 
 installResizeObserver();
 
@@ -36,7 +40,7 @@ const ProtectedRoute = (
     component={
       window.Cypress && window.localStorage.getItem('useFakeLogin')
         ? component
-        : withAuthenticationRequired(component)
+        : withAuthenticationRequired(component, args.access)
     }
     {...args}
   />
@@ -70,6 +74,30 @@ function Root() {
                   exact
                   path='/profile/projects/:projectId'
                   component={Project}
+                />
+                <ProtectedRoute
+                  exact
+                  path='/admin/models'
+                  component={ModelIndex}
+                  access='admin'
+                />
+                <ProtectedRoute
+                  exact
+                  path='/admin/models/new'
+                  component={NewModel}
+                  access='admin'
+                />
+                <ProtectedRoute
+                  exact
+                  path='/admin/models/:modelId'
+                  component={ViewModel}
+                  access='admin'
+                />
+                <ProtectedRoute
+                  exact
+                  path='/admin/models/:modelId/upload'
+                  component={UploadModel}
+                  access='admin'
                 />
                 <Route exact path='/about' component={About} />
                 <Route path='*' component={UhOh} />

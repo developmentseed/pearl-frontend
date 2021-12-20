@@ -55,6 +55,19 @@ class RestApiClient {
     return this.fetch('DELETE', path);
   }
 
+  uploadFile(path, file) {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    return fetch(this.getUrl(path), {
+      method: 'POST',
+      body: formData,
+      headers: {
+        Authorization: `Bearer ${this.apiToken}`,
+      },
+    }).then((response) => response.json());
+  }
+
   getApiMeta() {
     return this.get('').then((apiMeta) => {
       // Calculate available slots
@@ -87,6 +100,14 @@ class RestApiClient {
 
   getModel(id) {
     return this.get(`model/${id}`);
+  }
+
+  getModelOsmTags(id) {
+    return this.get(`model/${id}/osmtag`);
+  }
+
+  deleteModel(id) {
+    return this.delete(`model/${id}`);
   }
 
   getAOIs(projectId) {
@@ -151,6 +172,10 @@ class RestApiClient {
     return this.patch(`project/${projectId}/aoi/${aoiId}`, {
       patches,
     });
+  }
+
+  getUserDetails() {
+    return this.get('user/me');
   }
 }
 

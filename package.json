@@ -108,9 +108,10 @@
     "@devseed-ui/button": "^3.0.2",
     "@devseed-ui/collecticons": "^3.0.0",
     "@devseed-ui/dropdown": "^2.0.2",
-    "@devseed-ui/form": "^1.0.3",
+    "@devseed-ui/form": "^1.0.5",
     "@devseed-ui/modal": "^3.0.1",
     "@devseed-ui/theme-provider": "^3.0.0",
+    "@devseed-ui/toolbar": "^2.1.2",
     "@devseed-ui/typography": "^1.0.0",
     "@microsoft/applicationinsights-react-js": "3.1.2",
     "@microsoft/applicationinsights-web": "^2.6.2",
@@ -129,6 +130,7 @@
     "element-resize-event": "^3.0.3",
     "file-saver": "^2.0.5",
     "fill-range": "^7.0.1",
+    "formik": "^2.2.9",
     "gulp-replace": "^1.0.0",
     "history": "^4.10.1",
     "leaflet": "^1.7.1",
@@ -161,6 +163,7 @@
     "reconnecting-websocket": "^4.4.0",
     "request-promise": "^4.2.6",
     "resize-observer": "^1.0.2",
-    "styled-components": "^5.2.1"
+    "styled-components": "^5.2.1",
+    "yup": "^0.32.11"
   }
 }
