@@ -35,7 +35,7 @@ import toasts from '../../common/toasts';
 // Controls the size of each page
 const ITEMS_PER_PAGE = 10;
 
-const HEADERS = ['Name', 'Created', 'Active', 'Ready', 'Action'];
+const HEADERS = ['Name', 'Created', 'Active', 'File Uploaded', 'Action'];
 
 export const ModelsBody = styled(InpageBodyInner)`
   display: grid;
@@ -64,7 +64,7 @@ export const ModelsHeadline = styled(InpageHeadline)`
 `;
 
 // Render single models row
-function renderRow(model, { deleteModel, activateModel }) {
+function renderRow(model, { deleteModel, toggleModelActivation }) {
   return (
     <TableRow key={model.id}>
       <TableCell>
@@ -78,8 +78,12 @@ function renderRow(model, { deleteModel, activateModel }) {
           hideText
           checked={model.active}
           onChange={() => {
-            if (!model.active && model.storage) {
-              activateModel(model.id);
+            if (!model.storage) {
+              toasts.error(
+                'Please upload a model file before activating this model.'
+              );
+            } else {
+              toggleModelActivation(model.id);
             }
           }}
         />
@@ -110,7 +114,6 @@ export default function ModelIndex() {
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(null);
   const [modelToDelete, setModelToDelete] = useState(null);
-  const [modelToActivate, setModelToActivate] = useState(null);
 
   const { restApiClient } = useAuth();
 
@@ -173,7 +176,25 @@ export default function ModelIndex() {
                       renderRow={(m) =>
                         renderRow(m, {
                           deleteModel: () => setModelToDelete(m),
-                          activateModel: () => setModelToActivate(m),
+                          toggleModelActivation: async () => {
+                            try {
+                              await restApiClient.patch(`model/${m.id}`, {
+                                active: !m.active,
+                              });
+                              toasts.success(
+                                `Model successfully ${
+                                  m.active ? 'disabled' : 'activated'
+                                }.`
+                              );
+                              fetchModels();
+                            } catch (err) {
+                              logger('Failed to update the project', err);
+                              toasts.error(
+                                'Failed to update the project.',
+                                err
+                              );
+                            }
+                          },
                         })
                       }
                       hoverable
@@ -242,55 +263,6 @@ export default function ModelIndex() {
                 }}
               >
                 Delete Model
-              </Button>
-            </ModalWrapper>
-          }
-        />
-        <Modal
-          id='confirm-activate-model-modal'
-          data-cy='confirm-activate-model-modal'
-          revealed={modelToActivate !== null}
-          onOverlayClick={() => setModelToActivate(null)}
-          onCloseClick={() => setModelToActivate(null)}
-          title='Activate Model'
-          size='small'
-          content={
-            <ModalWrapper>
-              <div>
-                Are you sure you want to make model {modelToActivate?.name}{' '}
-                public? This action is irreversible.
-              </div>
-              <Button
-                data-cy='cancel-activate-model'
-                variation='base-plain'
-                size='medium'
-                useIcon='xmark'
-                onClick={() => {
-                  setModelToActivate(null);
-                }}
-              >
-                Cancel
-              </Button>
-              <Button
-                data-cy='confirm-activate-model'
-                variation='primary-raised-dark'
-                size='medium'
-                useIcon='tick'
-                onClick={async () => {
-                  try {
-                    await restApiClient.patch(`model/${modelToActivate.id}`, {
-                      active: true,
-                    });
-                    toasts.success('Model successfully activated.');
-                    fetchModels();
-                  } catch (err) {
-                    logger('Failed to activate project', err);
-                    toasts.error('Failed to activate project.', err);
-                  }
-                  setModelToActivate(null);
-                }}
-              >
-                Activate Model
               </Button>
             </ModalWrapper>
           }
