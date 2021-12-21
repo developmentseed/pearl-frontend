@@ -157,17 +157,15 @@ export default function ViewModel() {
                 <Link to='/admin/models'>Models</Link> / {model.name}
               </InpageTitle>
               <InpageToolbar>
-                {!model.active && (
-                  <Button
-                    variation='danger-plain'
-                    data-cy='delete-model-button'
-                    title='Delete Model'
-                    useIcon='trash-bin'
-                    onClick={async () => setDeleteModel(modelId)}
-                  >
-                    Delete Model
-                  </Button>
-                )}
+                <Button
+                  variation='danger-plain'
+                  data-cy='delete-model-button'
+                  title='Delete Model'
+                  useIcon='trash-bin'
+                  onClick={async () => setDeleteModel(modelId)}
+                >
+                  Delete Model
+                </Button>
                 <Modal
                   id='confirm-delete-model-modal'
                   data-cy='confirm-delete-model-modal'
@@ -202,7 +200,14 @@ export default function ViewModel() {
                             history.push(`/admin/models`);
                           } catch (err) {
                             logger('Failed to delete model', err);
-                            toasts.error('Failed to delete model.', err);
+                            if (err.statusCode === 403) {
+                              toasts.error(
+                                'Model is being used in other projects and can not be deleted.',
+                                err
+                              );
+                            } else {
+                              toasts.error('Failed to delete model.', err);
+                            }
                           }
                           setDeleteModel(null);
                         }}
