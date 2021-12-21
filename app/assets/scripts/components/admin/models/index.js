@@ -188,11 +188,8 @@ export default function ModelIndex() {
                               );
                               fetchModels();
                             } catch (err) {
-                              logger('Failed to update the project', err);
-                              toasts.error(
-                                'Failed to update the project.',
-                                err
-                              );
+                              logger('Failed to update the model', err);
+                              toasts.error('Failed to update the model.', err);
                             }
                           },
                         })
