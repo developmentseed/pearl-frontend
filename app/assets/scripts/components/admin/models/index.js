@@ -229,7 +229,14 @@ export default function ModelIndex() {
                     fetchModels();
                   } catch (err) {
                     logger('Failed to delete model', err);
-                    toasts.error('Failed to delete model.', err);
+                    if (err.statusCode === 403) {
+                      toasts.error(
+                        'Model is being used in other projects and can not be deleted.',
+                        err
+                      );
+                    } else {
+                      toasts.error('Failed to delete model.', err);
+                    }
                   }
                   setModelToDelete(null);
                 }}
