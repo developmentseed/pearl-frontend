@@ -86,19 +86,17 @@ function renderRow(model, { deleteModel, activateModel }) {
       </TableCell>
       <TableCell>{model.storage && <BooleanIcon value={true} />}</TableCell>
       <TableCell>
-        {!model.active && (
-          <Button
-            variation='primary-plain'
-            useIcon='trash-bin'
-            size='medium'
-            hideText
-            onClick={() => {
-              deleteModel(model.id);
-            }}
-          >
-            Remove Model
-          </Button>
-        )}
+        <Button
+          variation='primary-plain'
+          useIcon='trash-bin'
+          size='medium'
+          hideText
+          onClick={() => {
+            deleteModel(model.id);
+          }}
+        >
+          Remove Model
+        </Button>
       </TableCell>
     </TableRow>
   );
