@@ -83,7 +83,7 @@ function renderRow(model, { deleteModel, toggleModelActivation }) {
                 'Please upload a model file before activating this model.'
               );
             } else {
-              toggleModelActivation(model.id);
+              toggleModelActivation();
             }
           }}
         />
