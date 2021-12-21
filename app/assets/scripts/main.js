@@ -1,7 +1,7 @@
 import './wdyr';
 import '@babel/polyfill';
 import { install as installResizeObserver } from 'resize-observer';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { DevseedUiThemeProvider } from '@devseed-ui/theme-provider';
 
 import { render } from 'react-dom';
@@ -26,6 +26,10 @@ import GlobalLoadingProvider from './components/common/global-loading';
 import { ToastContainerCustom } from './components/common/toasts';
 import Project from './components/profile/project';
 import { AuthProvider, withAuthenticationRequired } from './context/auth';
+import ModelIndex from './components/admin/models';
+import ViewModel from './components/admin/models/view';
+import NewModel from './components/admin/models/new';
+import UploadModel from './components/admin/models/upload';
 
 installResizeObserver();
 
@@ -36,7 +40,7 @@ const ProtectedRoute = (
     component={
       window.Cypress && window.localStorage.getItem('useFakeLogin')
         ? component
-        : withAuthenticationRequired(component)
+        : withAuthenticationRequired(component, args.access)
     }
     {...args}
   />
@@ -44,13 +48,6 @@ const ProtectedRoute = (
 
 // Root component.
 function Root() {
-  useEffect(() => {
-    // Hide the welcome banner.
-    const banner = document.querySelector('#welcome-banner');
-    banner.classList.add('dismissed');
-    setTimeout(() => banner.remove(), 500);
-  }, []);
-
   return (
     <AuthProvider>
       <ErrorBoundary>
@@ -77,6 +74,30 @@ function Root() {
                   exact
                   path='/profile/projects/:projectId'
                   component={Project}
+                />
+                <ProtectedRoute
+                  exact
+                  path='/admin/models'
+                  component={ModelIndex}
+                  access='admin'
+                />
+                <ProtectedRoute
+                  exact
+                  path='/admin/models/new'
+                  component={NewModel}
+                  access='admin'
+                />
+                <ProtectedRoute
+                  exact
+                  path='/admin/models/:modelId'
+                  component={ViewModel}
+                  access='admin'
+                />
+                <ProtectedRoute
+                  exact
+                  path='/admin/models/:modelId/upload'
+                  component={UploadModel}
+                  access='admin'
                 />
                 <Route exact path='/about' component={About} />
                 <Route path='*' component={UhOh} />

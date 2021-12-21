@@ -1,0 +1,38 @@
+[
+  {
+    "type": "server",
+    "payload": { "message": "info#connected" }
+  },
+  {
+    "type": "client",
+    "payload": { "action": "model#status" }
+  },
+  {
+    "type": "client",
+    "payload": {"action":"model#aoi", "data":{"id":2}}
+  },
+  {
+    "type": "server",
+    "payload": {"message": "model#aoi#progress", "data": {"aoi": 2, "processed": 0, "total": 1}}
+  },
+  {
+    "type": "server",
+    "payload": {"message": "model#aoi#complete", "data": {"aoi": 2}}
+  },
+  {
+    "type": "client",
+    "payload": { "action": "model#status" }
+  },
+  {
+    "type": "server",
+    "payload": {
+      "message": "model#status",
+      "data": {
+        "is_aborting": false,
+        "processing": false,
+        "aoi": 2,
+        "checkpoint": 2
+      }
+    }
+  }
+]

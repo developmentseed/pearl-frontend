@@ -2,7 +2,12 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 import { rgba } from 'polished';
 import T from 'prop-types';
-import { glsp, themeVal, stylizeFunction } from '@devseed-ui/theme-provider';
+import {
+  glsp,
+  themeVal,
+  stylizeFunction,
+  media,
+} from '@devseed-ui/theme-provider';
 import { Subheading } from '../../styles/type/heading';
 
 const _rgba = stylizeFunction(rgba);
@@ -12,7 +17,7 @@ const StyledTable = styled.table`
   max-width: 100%;
   td,
   th {
-    padding: ${glsp(1 / 2)};
+    padding: ${glsp(1 / 4)};
     vertical-align: top;
     text-align: left;
   }
@@ -68,6 +73,11 @@ export const TableCell = styled.td`
     vertical-align: inherit;
     font-size: inherit;
   }
+  ${media.mediumDown`
+    [class*='FormGroupBody'] {
+      grid-template-columns: minmax(1px, 1fr);
+    }
+  `}
 `;
 
 /**
@@ -89,7 +99,7 @@ function Table({ headers, data, renderRow, extraData, hoverable }) {
           ))}
         </TableRow>
       </TableHeader>
-      <TableBody>{data.map((d) => renderRow(d, extraData))}</TableBody>
+      <TableBody>{data.map((d, i) => renderRow(d, extraData, i))}</TableBody>
     </StyledTable>
   );
 }

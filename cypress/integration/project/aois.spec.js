@@ -1,5 +1,6 @@
 import config from '../../../app/assets/scripts/config/testing';
 const { restApiEndpoint } = config.default;
+
 describe('Loads AOIs', () => {
   let map;
 
@@ -23,6 +24,20 @@ describe('Loads AOIs', () => {
       .trigger('mouseup');
     cy.wait('@reverseGeocodeCity');
     cy.get('[data-cy=selected-aoi-header]').contains('Judiciary Square');
+  });
+
+  it('Try to draw a tiny AOI and check if alert modal is visible', () => {
+    map = Cypress.map;
+    map.setZoom(14);
+
+    cy.get('[data-cy=aoi-edit-button]').click();
+    cy.get('#map')
+      .trigger('mousedown', 150, 150)
+      .trigger('mousemove', 170, 170)
+      .trigger('mouseup');
+    cy.get('#confirm-area-size').contains('Area is too tiny');
+    cy.get('[data-cy=proceed-anyway-button]').should('not.exist');
+    cy.get('[data-cy=keep-editing-button]').should('exist').click();
   });
 
   it('Can geocode a rural non addressable area', () => {
@@ -143,6 +158,49 @@ describe('Loads AOIs', () => {
   });
 });
 
+describe('Load AOIs and draw a third one', () => {
+  beforeEach(() => {
+    cy.startServer();
+  });
+
+  it('Should show the confirmation modal if switching to another AOI before running prediction', () => {
+    cy.fakeLogin();
+    cy.setWebsocketWorkflow('websocket-workflow/load-aoi.json');
+
+    cy.visit('/project/1');
+    cy.wait('@loadAois');
+    // go to the Predict tab
+    cy.get('[data-cy=predict-tab]').click();
+    // add new AOI
+    cy.get('[data-cy=add-aoi-button]').click();
+    cy.get('#map')
+      .trigger('mousedown', 150, 150)
+      .trigger('mousemove', 300, 300)
+      .trigger('mouseup');
+    // check that we have 2 AOIs besides the one we are creating
+    cy.get('.listed-aoi').should('have.length', 2);
+    // try to switch to the first AOI and check if the confirmation modal is shown
+    cy.get('.listed-aoi').eq(1).contains('Seneca Rocks #1').click();
+    cy.get('[data-cy=confirm-clear-aoi-modal]').should('exist');
+    // cancel the AOI switch
+    cy.get('[data-cy=cancel-clear-aoi]').should('exist').click();
+    // check if the AOIs were not changed
+    cy.get('.listed-aoi').should('have.length', 2);
+    cy.get('[data-cy=confirm-clear-aoi-modal]').should('not.exist');
+
+    // try to switch again
+    cy.get('.listed-aoi').eq(1).contains('Seneca Rocks #1').click();
+    cy.get('[data-cy=confirm-clear-aoi-modal]').should('exist');
+    // confirm that we are clearing the third AOI
+    cy.get('[data-cy=confirm-clear-aoi]').should('exist').click();
+    cy.wait('@fetchAoi2');
+    cy.get('[data-cy=global-loading]').should('not.exist');
+    cy.get('[data-cy=predict-tab]').click();
+    cy.get('.listed-aoi').should('have.length', 1);
+    cy.get('[data-cy=confirm-clear-aoi-modal]').should('not.exist');
+  });
+});
+
 describe('Can delete AOIs', () => {
   beforeEach(() => {
     cy.startServer();
@@ -181,8 +239,7 @@ describe('Can delete AOIs', () => {
     cy.get('[data-cy=confirm-delete-aoi-modal]').should('exist');
     cy.get('[data-cy=confirm-aoi-delete]').should('exist').click();
     cy.get('[data-cy=confirm-delete-aoi-modal]').should('not.exist');
-    //cy.get('[data-cy=aoi-selection-trigger]').click();
-    cy.get('.aoi-delete-button').should('have.length', 1);
+    cy.get('.aoi-delete-button').should('have.length', 0);
     cy.intercept(
       {
         url: restApiEndpoint + '/api/project/1/aoi',
@@ -190,9 +247,11 @@ describe('Can delete AOIs', () => {
       {
         fixture: 'aois.0.json',
       }
-    ).as('loadAois1');
-    // Delete buttons are hidden, so cypress requires a force true
-    cy.get('.aoi-delete-button').first().click({ force: true });
+    ).as('loadAois0');
+    cy.get('[data-cy=predict-tab]').click();
+
+    cy.get('[data-cy=delete-current-aoi-button]').click();
+    cy.get('[data-cy=confirm-delete-aoi-modal]').should('exist');
     cy.get('[data-cy=confirm-aoi-delete]').should('exist').click();
   });
 
@@ -229,7 +288,7 @@ describe('Can delete AOIs', () => {
     // Draw AOI
     cy.get('#map')
       .trigger('mousedown', 150, 150)
-      .trigger('mousemove', 200, 200)
+      .trigger('mousemove', 300, 300)
       .trigger('mouseup');
     cy.wait('@reverseGeocodeCity');
 

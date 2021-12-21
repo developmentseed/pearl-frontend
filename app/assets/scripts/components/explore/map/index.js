@@ -18,7 +18,12 @@ import {
   sessionModes,
 } from '../../../context/explore';
 import { actions as shortcutActions } from '../../../context/explore/shortcuts';
-import { useMapRef, useMapLayers, useUserLayers } from '../../../context/map';
+import {
+  useMapRef,
+  useMapLayers,
+  useUserLayers,
+  useOsmQaLayer,
+} from '../../../context/map';
 
 import GeoCoder from '../../common/map/geocoder';
 import GenericControl from '../../common/map/generic-control';
@@ -56,10 +61,13 @@ import toasts from '../../common/toasts';
 import logger from '../../../utils/logger';
 import PolygonDrawControl from './polygon-draw-control';
 import OsmQaLayer from '../../common/map/osm-qa-layer';
+import booleanWithin from '@turf/boolean-within';
+import bboxPolygon from '@turf/bbox-polygon';
 
 const center = [38.889805, -77.009056];
 const zoom = 12;
 
+const MIN = 4;
 const MAX = 3;
 const NO_LIVE = 2;
 const LIVE = 1;
@@ -117,6 +125,7 @@ function Map() {
   const { aoiPatchList } = useAoiPatch();
 
   const { mapState, mapModes, setMapMode } = useMapState();
+  const { enableOsmQaLayer } = useOsmQaLayer();
 
   const { mapRef, setMapRef } = useMapRef();
   const [tileUrl, setTileUrl] = useState(null);
@@ -125,7 +134,7 @@ function Map() {
   const { mapLayers, setMapLayers } = useMapLayers();
   const { userLayers, setUserLayers } = useUserLayers();
 
-  const { mosaics } = useMosaics();
+  const { mosaics, mosaicMeta } = useMosaics();
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
   const [mostRecentClass, setMostRecentClass] = useState(null);
 
@@ -162,7 +171,10 @@ function Map() {
             // On KEYUP, we will dispatch an update to return to previousMode, but overrideBrowseMode
             // will be set to false before the mode update can be dispatched
             // do nothing
-          } else if (mapState.mode === mapModes.BROWSE_MODE) {
+          } else if (
+            mapState.mode === mapModes.BROWSE_MODE ||
+            mapState.mode === mapModes.DELETE_SAMPLES
+          ) {
             mapRef.polygonDraw.disable();
           }
           break;
@@ -219,7 +231,7 @@ function Map() {
       case mapModes.DELETE_SAMPLES:
         if (currentCheckpoint?.activeItem) {
           mapRef._container.style.cursor = 'grab';
-          mapRef.freehandDraw.enableSubtract(currentCheckpoint.activeItem);
+          mapRef.freehandDraw.enableSubtract();
         }
         break;
       default:
@@ -282,6 +294,19 @@ function Map() {
         },
         onDrawEnd: (bbox, shape) => {
           const area = areaFromBounds(bbox);
+          const aoiBboxPoly = bboxPolygon(bbox);
+
+          const mosaicBounds = bboxPolygon(mosaicMeta.data.bounds);
+
+          if (!booleanWithin(aoiBboxPoly, mosaicBounds)) {
+            setActiveModal('area-out-of-bounds');
+            return;
+          }
+
+          if (area < config.minimumAoiArea) {
+            setActiveModal('area-too-tiny');
+            return;
+          }
 
           if (!apiLimits || apiLimits.live_inference > area) {
             const bounds = shape.getBounds();
@@ -307,7 +332,7 @@ function Map() {
         setAoiArea(areaFromBounds(bbox));
       },
     });
-  }, [mapRef, aoiInitializer, apiLimits]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [mapRef, aoiInitializer, apiLimits, mosaicMeta.isReady]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Update color on area size change during draw
   useEffect(() => {
@@ -323,6 +348,14 @@ function Map() {
       });
       aoiRef.status = MAX;
     } else if (
+      inRange(aoiArea, 0, config.minimumAoiArea) &&
+      aoiRef.status !== MIN
+    ) {
+      aoiRef.setStyle({
+        color: theme.dark.color.danger,
+      });
+      aoiRef.status = MIN;
+    } else if (
       inRange(aoiArea, live_inference, max_inference) &&
       aoiRef.status !== NO_LIVE
     ) {
@@ -330,7 +363,10 @@ function Map() {
         color: theme.dark.color.warning,
       });
       aoiRef.status = NO_LIVE;
-    } else if (inRange(aoiArea, 0, live_inference) && aoiRef.status !== LIVE) {
+    } else if (
+      inRange(aoiArea, config.minimumAoiArea, live_inference) &&
+      aoiRef.status !== LIVE
+    ) {
       aoiRef.setStyle({
         color: theme.dark.color.info,
       });
@@ -397,6 +433,16 @@ function Map() {
 
     mapRef.polygonDraw.setCheckpoint(currentCheckpoint);
   }, [mapRef, currentCheckpoint, activeClass]);
+
+  useEffect(() => {
+    if (
+      shortcutState.escapePressed &&
+      mapRef?.polygonDraw &&
+      mapState.mode === mapModes.ADD_SAMPLE_POLYGON
+    ) {
+      mapRef.polygonDraw._clear();
+    }
+  }, [mapState.mode, shortcutState.escapePressed, mapRef?.polygonDraw]);
 
   const displayMap = useMemo(() => {
     return (
@@ -646,7 +692,8 @@ function Map() {
         {!window.Cypress &&
           sessionStatus?.mode === sessionModes.RETRAIN_READY &&
           currentCheckpoint &&
-          aoiRef && (
+          aoiRef &&
+          enableOsmQaLayer && (
             <OsmQaLayer
               modelClasses={currentCheckpoint.classes}
               aoiRef={aoiRef}

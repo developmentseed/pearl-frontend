@@ -38,6 +38,8 @@ export const actions = {
   ADD_POINT_SAMPLES: 'ADD_POINT_SAMPLES',
   REMOVE_POINT_SAMPLE: 'REMOVE_POINT_SAMPLE',
   CLEAR_SAMPLES: 'CLEAR_SAMPLES',
+  CLEAR_CLASS_SAMPLES: 'CLEAR_CLASS_SAMPLES',
+  CLEAR_CHECKPOINT_BRUSHES: 'CLEAR_CHECKPOINT_BRUSHES',
   SET_OSM_TAGMAP: 'SET_OSM_TAGMAP',
   RESET_CHECKPOINT: 'RESET_CHECKPOINT',
   UPDATE_POLYGONS: 'UPDATE_POLYGONS',
@@ -378,10 +380,10 @@ function checkpointReducer(state, action) {
     }
     case actions.REMOVE_POINT_SAMPLE: {
       // Get coords
-      const { lat, lng } = action.data;
+      const { lat, lng, className } = action.data;
 
       // Merge coords into class
-      const currentClass = state.classes[state.activeItem];
+      const currentClass = state.classes[className];
       const updatedClass = {
         ...currentClass,
         points: {
@@ -407,7 +409,7 @@ function checkpointReducer(state, action) {
 
         classes: {
           ...state.classes,
-          [state.activeItem]: updatedClass,
+          [className]: updatedClass,
         },
       };
       break;
@@ -437,6 +439,56 @@ function checkpointReducer(state, action) {
       };
       break;
     }
+    case actions.CLEAR_CLASS_SAMPLES: {
+      nextState = {
+        ...state,
+        history: [
+          ...state.history,
+          {
+            classes: state.classes,
+            checkpointBrushes: state.checkpointBrushes,
+          },
+        ],
+        classes: Object.values(state.classes).reduce((accum, c) => {
+          return {
+            ...accum,
+            [c.name]:
+              c.name === action.data.className
+                ? {
+                    ...c,
+                    points: {
+                      type: 'MultiPoint',
+                      coordinates: [],
+                    },
+                    polygons: [],
+                  }
+                : c,
+          };
+        }, {}),
+      };
+      break;
+    }
+    case actions.CLEAR_CHECKPOINT_BRUSHES: {
+      nextState = {
+        ...state,
+        history: [
+          ...state.history,
+          {
+            classes: state.classes,
+            checkpointBrushes: state.checkpointBrushes,
+          },
+        ],
+        checkpointBrushes: {
+          ...state.checkpointBrushes,
+          [action.data.id]: {
+            ...state.checkpointBrushes[action.data.id],
+            polygons: [],
+          },
+        },
+      };
+      break;
+    }
+
     case actions.SET_OSM_TAGMAP: {
       const { name, tagmap } = action.data;
 

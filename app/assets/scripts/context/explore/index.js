@@ -38,7 +38,11 @@ import {
   useSessionStatusReducer,
 } from './session-status';
 
-import { useShortcutReducer, listenForShortcuts } from './shortcuts';
+import {
+  useShortcutReducer,
+  listenForShortcuts,
+  actions as shortcutActions,
+} from './shortcuts';
 
 export { sessionModes };
 /**
@@ -61,6 +65,12 @@ export function ExploreProvider(props) {
   useEffect(() => {
     localStorage.setItem('site-tour', tourStep);
   }, [tourStep]);
+  useEffect(() => {
+    // If this project is not new, make sure that site tour step is set to -1, we do not need to show the tour
+    if (projectId !== 'new') {
+      setTourStep(-1);
+    }
+  }, [projectId]);
 
   const { restApiClient, isLoading: authIsLoading } = useAuth();
   const {
@@ -216,8 +226,7 @@ export function ExploreProvider(props) {
 
     try {
       showGlobalLoadingMessage('Fetching model...');
-      const model = await restApiClient.getModel(project.model_id);
-      setSelectedModel(model);
+      await setSelectedModel(project.model_id);
 
       showGlobalLoadingMessage('Fetching areas of interest...');
       const aoiReq = await restApiClient.get(`project/${project.id}/aoi`);
@@ -258,11 +267,13 @@ export function ExploreProvider(props) {
 
   useEffect(() => {
     if (predictions.fetching) {
-      const { processed, total } = predictions;
-      if (!total) {
-        setSessionStatusMessage(`Waiting for predictions...`);
-      } else {
+      const { processed, total, retrainProgress } = predictions;
+      if (total) {
         setSessionStatusMessage(`Received image ${processed} of ${total}...`);
+      } else if (retrainProgress >= 100) {
+        setSessionStatusMessage(`Retrain finished...`);
+      } else if (retrainProgress > 0) {
+        setSessionStatusMessage(`${retrainProgress}% retrained...`);
       }
     } else if (predictions.isReady()) {
       // Update AOI List with newest AOI
@@ -289,6 +300,9 @@ export function ExploreProvider(props) {
           });
 
         setSessionStatusMode(sessionModes.RETRAIN_READY);
+        dispatchShortcutState({
+          type: shortcutActions.SET_PREDICTION_OPACITY_100,
+        });
       }
 
       if (predictions.error) {
@@ -472,6 +486,7 @@ export function ExploreProvider(props) {
       toasts.error(
         'Tiles do not exist for this AOI and this checkpoint. Treating as geometry only'
       );
+      setAoiName(aoiObject.name);
       if (currentCheckpoint) {
         dispatchCurrentCheckpoint({
           type: checkpointActions.SET_CHECKPOINT_MODE,
@@ -479,6 +494,7 @@ export function ExploreProvider(props) {
             mode: checkpointModes.RUN,
           },
         });
+        setSessionStatusMode(sessionModes.PREDICTION_READY);
       }
       setCurrentAoi(null);
       hideGlobalLoading();

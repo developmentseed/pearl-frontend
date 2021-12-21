@@ -172,6 +172,8 @@ function ImportGeojsonModal({ revealed, setRevealed }) {
             onClick={() => {
               importFile();
               setRevealed(false);
+              setFile(null);
+              setWarning(null);
             }}
           >
             Import

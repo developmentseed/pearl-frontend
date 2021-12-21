@@ -365,7 +365,7 @@ function PrimePanel() {
             model={model}
             onClick={() => {
               setShowSelectModelModal(false);
-              setSelectedModel(model);
+              setSelectedModel(model.id);
             }}
             selected={model.overlapsAoi}
           />

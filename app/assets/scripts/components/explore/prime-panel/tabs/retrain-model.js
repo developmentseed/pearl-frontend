@@ -7,6 +7,8 @@ import { PlaceholderMessage } from '../../../../styles/placeholder.js';
 import { actions, useCheckpoint } from '../../../../context/checkpoint.js';
 import { useMapState } from '../../../../context/explore';
 import { useSessionStatus } from '../../../../context/explore';
+import { useMapRef } from '../../../../context/map';
+
 import { Dropdown, DropdownTrigger } from '../../../../styles/dropdown';
 import {
   ToolsWrapper,
@@ -23,6 +25,7 @@ import {
 import { Subheading } from '../../../../styles/type/heading';
 import { useAoi } from '../../../../context/aoi';
 import { useApiLimits } from '../../../../context/global';
+import { useModel } from '../../../../context/model';
 import EditClass from './edit-class';
 import ImportGeojsonModal from './retrain/import-geojson-modal';
 import ApplyOsmModal from './retrain/apply-osm-modal';
@@ -37,6 +40,7 @@ function RetrainModel(props) {
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
   const { setMapMode, mapModes, mapState } = useMapState();
   const { sessionStatus } = useSessionStatus();
+  const { mapRef } = useMapRef();
   const isLoading = ['loading-project', 'retraining'].includes(
     sessionStatus.mode
   );
@@ -47,6 +51,7 @@ function RetrainModel(props) {
   const [osmModalRevealed, setOsmModalRevealed] = useState(false);
   const { aoiArea } = useAoi();
   const { apiLimits } = useApiLimits();
+  const { selectedModel } = useModel();
 
   const isBatchArea =
     aoiArea && apiLimits && aoiArea > apiLimits['live_inference'];
@@ -227,8 +232,14 @@ function RetrainModel(props) {
                 radius='ellipsoid'
                 useLocalButton
                 useIcon='brand-osm'
-                visuallyDisabled={!currentCheckpoint.activeItem}
-                info='Apply OpenStreetMap features as samples'
+                visuallyDisabled={
+                  !currentCheckpoint.activeItem || !selectedModel.osmtag_id
+                }
+                info={
+                  !selectedModel.osmtag_id
+                    ? 'OpenStreetMap features are not available for this model'
+                    : 'Apply OpenStreetMap features as samples'
+                }
                 onClick={() => {
                   setOsmModalRevealed(true);
                 }}
@@ -272,6 +283,32 @@ function RetrainModel(props) {
                           `selected since last retrain`}
                       </ClassSamples>
                     </ClassInfoWrapper>
+                    {points + polygons > 0 && (
+                      <InfoButton
+                        variation='base-plain'
+                        size='medium'
+                        useIcon='arrow-loop'
+                        title='Clear class samples drawn since last retrain or save'
+                        info='Clear class samples drawn since last retrain or save'
+                        id='reset-button-trigger'
+                        hideText
+                        disabled={currentCheckpoint.activeItem !== c.name}
+                        visuallyDisabled={
+                          currentCheckpoint.activeItem !== c.name
+                        }
+                        onClick={() => {
+                          dispatchCurrentCheckpoint({
+                            type: actions.CLEAR_CLASS_SAMPLES,
+                            data: {
+                              className: c.name,
+                            },
+                          });
+                          mapRef.freehandDraw.clearLayer(c.name);
+                        }}
+                      >
+                        Clear
+                      </InfoButton>
+                    )}
                   </Class>
                 );
               })}

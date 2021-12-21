@@ -11,13 +11,64 @@ import config from '../config';
 import logger from '../utils/logger';
 import history from '../history';
 import RestApiClient from '../utils/rest-api-client';
-import {
-  getLocalStorageItem,
-  setLocalStorageItem,
-} from '../utils/local-storage';
 import toasts from '../components/common/toasts';
+import { getLocalStorageItem } from '../utils/local-storage';
 
 const AuthContext = createContext(null);
+
+const actions = {
+  REQUEST_LOGIN: 'REQUEST_LOGIN',
+  RECEIVE_LOGIN: 'RECEIVE_LOGIN',
+  RESET_LOGIN: 'RESET_LOGIN',
+  LOGOUT: 'LOGOUT',
+};
+
+const initialState = {
+  isLoading: true,
+  error: false,
+  isAuthenticated: false,
+};
+
+const authReducer = function (state, action) {
+  const { type, data } = action;
+  let newState;
+
+  switch (type) {
+    case actions.LOAD_AUTH_STATE: {
+      return data;
+    }
+    case actions.REQUEST_LOGIN: {
+      newState = {
+        ...initialState,
+        isLoading: true,
+      };
+      break;
+    }
+    case actions.RECEIVE_LOGIN: {
+      newState = {
+        isLoading: false,
+        error: false,
+        isAuthenticated: true,
+        ...data,
+      };
+      break;
+    }
+    case actions.RESET_LOGIN: {
+      newState = {
+        ...initialState,
+        isLoading: false,
+        isAuthenticated: false,
+        ...action.data,
+      };
+      break;
+    }
+    default:
+      logger('Unexpected action ', action);
+      throw new Error('Unexpected error.');
+  }
+
+  return newState;
+};
 
 /**
  * Inner provider to be wrapped by Auth0 provider
@@ -32,73 +83,24 @@ function InnerAuthProvider(props) {
     getAccessTokenSilently,
     logout: logoutAuth0,
   } = useAuth0();
-  const [authState, dispatchAuthState] = useReducer(authReducer, {});
-
-  function resetLogin() {
-    dispatchAuthState({
-      type: actions.RESET_LOGIN,
-    });
-  }
-
-  useEffect(() => {
-    // Read auth state from local storage, logout on error
-    const localStorageAuthState = getLocalStorageItem('authState', 'json');
-
-    // If no auth state is found, reset login
-    if (
-      !localStorageAuthState ||
-      (localStorageAuthState && !localStorageAuthState.apiToken)
-    ) {
-      resetLogin();
-      return;
-    }
-
-    // When running Cypress load auth state and bypass API token check
-    if (window.Cypress) {
-      dispatchAuthState({
-        type: actions.LOAD_AUTH_STATE,
-        data: localStorageAuthState,
-      });
-      return;
-    }
-
-    // Create new API client to validate API token
-    const client = new RestApiClient({
-      apiToken: localStorageAuthState.apiToken,
-    });
-
-    // Check API token is still valid
-    client
-      .get('user/me')
-      .then(() => {
-        // On success finish loading auth data to state
-        dispatchAuthState({
-          type: actions.LOAD_AUTH_STATE,
-          data: localStorageAuthState,
-        });
-      })
-      .catch((err) => {
-        logger(err);
-
-        // If still authenticated to Auth0, try to refresh token
-        if (isAuthenticatedAuth0) {
-          fetchToken();
-        } else {
-          resetLogin();
-        }
-      });
-  }, []);
+  const [authState, dispatchAuthState] = useReducer(authReducer, initialState);
 
   const fetchToken = async () => {
     try {
+      dispatchAuthState({
+        type: actions.REQUEST_LOGIN,
+      });
       const token = await getAccessTokenSilently({
         audience: config.restApiEndpoint,
       });
+      const restApiClient = new RestApiClient({ apiToken: token });
+      const userDetails = await restApiClient.getUserDetails();
       dispatchAuthState({
         type: actions.RECEIVE_LOGIN,
         data: {
           user,
           apiToken: token,
+          userAccessLevel: userDetails.access,
         },
       });
     } catch (error) {
@@ -117,27 +119,37 @@ function InnerAuthProvider(props) {
     useEffect(() => {
       if (isLoading) return;
 
-      if (isAuthenticatedAuth0 !== authState.isAuthenticated) {
-        if (isAuthenticatedAuth0) {
-          dispatchAuthState({
-            type: actions.REQUEST_LOGIN,
-          });
-          fetchToken();
-        } else {
-          history.push('/');
-          dispatchAuthState({
-            type: actions.RESET_LOGIN,
-          });
-        }
+      if (!isAuthenticatedAuth0) {
+        dispatchAuthState({ type: actions.RESET_LOGIN });
+      } else {
+        fetchToken();
       }
     }, [isLoading, isAuthenticatedAuth0, auth0Error]); // eslint-disable-line react-hooks/exhaustive-deps
+  } else {
+    useEffect(() => {
+      const localStorageAuthState = getLocalStorageItem('authState', 'json');
+
+      dispatchAuthState({
+        type: actions.LOAD_AUTH_STATE,
+        data: {
+          ...initialState,
+          ...localStorageAuthState,
+          isLoading: false,
+        },
+      });
+      return;
+    }, []);
   }
+
+  // Remove welcome banner after auth is resolved
+  useEffect(() => {
+    if (authState.isLoading) return;
+    const banner = document.querySelector('#welcome-banner');
+    banner.classList.add('dismissed');
+  }, [authState?.isLoading]);
 
   const value = {
     ...authState,
-    isLoading,
-    authStateIsLoading: authState.isLoading,
-    refreshAuth: fetchToken,
     login: () => loginWithRedirect(),
     logout: () => {
       dispatchAuthState({
@@ -187,69 +199,6 @@ AuthProvider.propTypes = {
   children: T.node,
 };
 
-const actions = {
-  LOAD_AUTH_STATE: 'LOAD_AUTH_STATE',
-  REQUEST_LOGIN: 'REQUEST_LOGIN',
-  RECEIVE_LOGIN: 'RECEIVE_LOGIN',
-  LOGOUT: 'LOGOUT',
-};
-
-const initialState = {
-  isLoading: false,
-  error: false,
-  isAuthenticated: false,
-};
-
-const authReducer = function (state, action) {
-  const { type, data } = action;
-  let newState;
-
-  switch (type) {
-    case actions.LOAD_AUTH_STATE: {
-      return data;
-    }
-    case actions.REQUEST_LOGIN: {
-      newState = {
-        ...initialState,
-        isLoading: true,
-      };
-      break;
-    }
-    case actions.RECEIVE_LOGIN: {
-      newState = {
-        isLoading: false,
-        error: false,
-        isAuthenticated: true,
-        ...data,
-      };
-      break;
-    }
-    case actions.RESET_LOGIN: {
-      newState = {
-        ...initialState,
-        isAuthenticated: false,
-        ...action.data,
-      };
-      break;
-    }
-    default:
-      throw new Error('Unexpected error.');
-  }
-
-  // Persist auth state to local storage it not using Cypress
-  if (!window.Cypress) {
-    // Write auth state to local storage
-    try {
-      setLocalStorageItem('authState', JSON.stringify(newState));
-    } catch (error) {
-      logger('Cannot persist auth state to local storage.');
-      logger(error);
-    }
-  }
-
-  return newState;
-};
-
 // Check if consumer function is used properly
 const useCheckContext = (fnName) => {
   const context = useContext(AuthContext);
@@ -269,10 +218,9 @@ export const useAuth = () => {
   const {
     apiToken,
     user,
+    userAccessLevel,
     isAuthenticated,
     isLoading,
-    authStateIsLoading,
-    refreshAuth,
     login,
     logout,
     isLoggingOut,
@@ -286,22 +234,14 @@ export const useAuth = () => {
       restApiClient,
       apiToken,
       isLoading,
-      authStateIsLoading,
       user,
+      userAccessLevel,
       isAuthenticated,
-      refreshAuth,
       login,
       logout,
       isLoggingOut,
     };
-  }, [
-    apiToken,
-    isLoading,
-    authStateIsLoading,
-    user && user.id,
-    isAuthenticated,
-    isLoggingOut,
-  ]);
+  }, [apiToken, isLoading, user && user.id, isAuthenticated, isLoggingOut]);
 };
 
 /*
@@ -314,25 +254,26 @@ export const useAuth = () => {
  *      path={path}
  *      />
  */
-export function withAuthenticationRequired(WrapperComponent) {
+export function withAuthenticationRequired(WrapperComponent, access) {
   /* eslint-disable react-hooks/rules-of-hooks */
   const {
     isAuthenticated,
-    authStateIsLoading,
+    userAccessLevel,
     isLoading,
     isLoggingOut,
   } = useAuth();
 
   useEffect(() => {
-    if (!authStateIsLoading && !isLoading) {
-      if (!isAuthenticated && !isLoggingOut) {
-        toasts.error('Please sign in to view this page.');
-        history.push('/');
-      }
+    if (!isLoading && !isAuthenticated && !isLoggingOut) {
+      toasts.error('Please sign in to view this page.');
+      history.push('/');
+    } else if (isAuthenticated && access && access !== userAccessLevel) {
+      toasts.error('You do not have permission to view this page.');
+      history.push('/');
     }
-  }, [isAuthenticated, authStateIsLoading, isLoading, isLoggingOut]);
+  }, [isLoading, isAuthenticated, isLoggingOut, access, userAccessLevel]);
 
-  if (authStateIsLoading || isLoading || !isAuthenticated) return;
+  if (isLoading || !isAuthenticated || isLoggingOut) return;
 
   return WrapperComponent;
   /* eslint-enable react-hooks/rules-of-hooks */
