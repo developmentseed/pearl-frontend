@@ -92,7 +92,6 @@ export default function ViewModel() {
   const [model, setModel] = useState(null);
   const [osmTags, setOsmTags] = useState(null);
   const [deleteModel, setDeleteModel] = useState(null);
-  const [modelToActivate, setModelToActivate] = useState(null);
 
   async function fetchModel() {
     if (apiToken) {
@@ -158,72 +157,15 @@ export default function ViewModel() {
                 <Link to='/admin/models'>Models</Link> / {model.name}
               </InpageTitle>
               <InpageToolbar>
-                {!model.active && (
-                  <Button
-                    variation='danger-plain'
-                    data-cy='delete-model-button'
-                    title='Delete Model'
-                    useIcon='trash-bin'
-                    onClick={async () => setDeleteModel(modelId)}
-                  >
-                    Delete Model
-                  </Button>
-                )}
-
-                <Modal
-                  id='confirm-activate-model-modal'
-                  data-cy='confirm-activate-model-modal'
-                  revealed={modelToActivate !== null}
-                  onOverlayClick={() => setModelToActivate(null)}
-                  onCloseClick={() => setModelToActivate(null)}
-                  title='Activate Model'
-                  size='small'
-                  content={
-                    <ModalWrapper>
-                      <div>
-                        Are you sure you want to make model{' '}
-                        {modelToActivate?.name} public? This action is
-                        irreversible.
-                      </div>
-                      <Button
-                        data-cy='cancel-activate-model'
-                        variation='base-plain'
-                        size='medium'
-                        useIcon='xmark'
-                        onClick={() => {
-                          setModelToActivate(null);
-                        }}
-                      >
-                        Cancel
-                      </Button>
-                      <Button
-                        data-cy='confirm-activate-model'
-                        variation='primary-raised-dark'
-                        size='medium'
-                        useIcon='tick'
-                        onClick={async () => {
-                          try {
-                            await restApiClient.patch(
-                              `model/${modelToActivate.id}`,
-                              {
-                                active: true,
-                              }
-                            );
-                            toasts.success('Model successfully activated.');
-                            fetchModel();
-                          } catch (err) {
-                            logger('Failed to activate project', err);
-                            toasts.error('Failed to activate project.', err);
-                          }
-                          setModelToActivate(null);
-                        }}
-                      >
-                        Activate Model
-                      </Button>
-                    </ModalWrapper>
-                  }
-                />
-
+                <Button
+                  variation='danger-plain'
+                  data-cy='delete-model-button'
+                  title='Delete Model'
+                  useIcon='trash-bin'
+                  onClick={async () => setDeleteModel(modelId)}
+                >
+                  Delete Model
+                </Button>
                 <Modal
                   id='confirm-delete-model-modal'
                   data-cy='confirm-delete-model-modal'
@@ -258,7 +200,14 @@ export default function ViewModel() {
                             history.push(`/admin/models`);
                           } catch (err) {
                             logger('Failed to delete model', err);
-                            toasts.error('Failed to delete model.', err);
+                            if (err.statusCode === 403) {
+                              toasts.error(
+                                'Model is being used in other projects and can not be deleted.',
+                                err
+                              );
+                            } else {
+                              toasts.error('Failed to delete model.', err);
+                            }
                           }
                           setDeleteModel(null);
                         }}
@@ -284,9 +233,26 @@ export default function ViewModel() {
                   <FormSwitch
                     hideText
                     checked={model.active}
-                    onChange={() => {
-                      if (!model.active && model.storage) {
-                        setModelToActivate(model);
+                    onChange={async () => {
+                      if (!model.storage) {
+                        toasts.error(
+                          'Please upload a model file before activating this model.'
+                        );
+                      } else {
+                        try {
+                          await restApiClient.patch(`model/${model.id}`, {
+                            active: !model.active,
+                          });
+                          toasts.success(
+                            `Model successfully ${
+                              model.active ? 'disabled' : 'activated'
+                            }.`
+                          );
+                          fetchModel();
+                        } catch (err) {
+                          logger('Failed to update the model', err);
+                          toasts.error('Failed to update the model.', err);
+                        }
                       }
                     }}
                   />
