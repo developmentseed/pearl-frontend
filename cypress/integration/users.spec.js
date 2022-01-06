@@ -16,7 +16,7 @@ describe('The app header', () => {
     cy.get('[data-cy=manage-users-link]').should('not.exist');
   });
 
-  it.only('admin user can see link and access Model admin page', () => {
+  it('admin user can see link and access Model admin page', () => {
     cy.fakeLogin('admin');
     cy.visit('/');
     cy.get('body');
@@ -41,12 +41,11 @@ describe('The app header', () => {
 
     // Check available columns
     cy.get('th')
-      .should('have.length', 5)
+      .should('have.length', 4)
       .should('include.text', 'Id')
       .should('include.text', 'Username')
       .should('include.text', 'E-mail')
-      .should('include.text', 'Admin')
-      .should('include.text', 'GPU Access');
+      .should('include.text', 'Admin');
 
     // Check if page is well-formed
     cy.get('tbody').find('tr').should('have.length', 10);
@@ -58,9 +57,7 @@ describe('The app header', () => {
     cy.get('tbody tr:nth-child(1) td:nth-child(4) input').should(
       'not.be.checked'
     );
-    cy.get('tbody tr:nth-child(5) td:nth-child(4) input').should(
-      'not.be.checked'
-    );
+    cy.get('tbody tr:nth-child(3) td:nth-child(4) input').should('be.checked');
 
     // Check if next page works
     cy.get('[data-cy=next-page-button').click();

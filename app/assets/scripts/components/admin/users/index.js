@@ -29,7 +29,7 @@ import { Link } from 'react-router-dom';
 // Controls the size of each page
 const ITEMS_PER_PAGE = 10;
 
-const HEADERS = ['Id', 'Username', 'E-mail', 'Admin', 'GPU Access'];
+const HEADERS = ['Id', 'Username', 'E-mail', 'Admin'];
 
 export const UsersBody = styled(InpageBodyInner)`
   display: grid;
@@ -65,9 +65,6 @@ function renderRow(user) {
           hideText
           checked={user.access === 'admin'}
         />
-      </TableCell>
-      <TableCell>
-        <FormSwitch hideText checked={false} />
       </TableCell>
     </TableRow>
   );
