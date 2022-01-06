@@ -30,6 +30,7 @@ import ModelIndex from './components/admin/models';
 import ViewModel from './components/admin/models/view';
 import NewModel from './components/admin/models/new';
 import UploadModel from './components/admin/models/upload';
+import UserIndex from './components/admin/users';
 
 installResizeObserver();
 
@@ -97,6 +98,12 @@ function Root() {
                   exact
                   path='/admin/models/:modelId/upload'
                   component={UploadModel}
+                  access='admin'
+                />
+                <ProtectedRoute
+                  exact
+                  path='/admin/users'
+                  component={UserIndex}
                   access='admin'
                 />
                 <Route exact path='/about' component={About} />

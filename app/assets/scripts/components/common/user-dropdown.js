@@ -99,16 +99,28 @@ function UserDropdown() {
                 </DropdownItem>
               </li>
               {userAccessLevel === 'admin' && (
-                <li>
-                  <DropdownItem
-                    as={StyledLink}
-                    to='/admin/models'
-                    useIcon='folder'
-                    data-cy='manage-models-link'
-                  >
-                    Manage Models
-                  </DropdownItem>
-                </li>
+                <>
+                  <li>
+                    <DropdownItem
+                      as={StyledLink}
+                      to='/admin/models'
+                      useIcon='folder'
+                      data-cy='manage-models-link'
+                    >
+                      Manage Models
+                    </DropdownItem>
+                  </li>
+                  <li>
+                    <DropdownItem
+                      as={StyledLink}
+                      to='/admin/users'
+                      useIcon='user'
+                      data-cy='manage-users-link'
+                    >
+                      Manage Users
+                    </DropdownItem>
+                  </li>
+                </>
               )}
             </DropdownBody>
             <DropdownFooter>
