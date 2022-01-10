@@ -2,14 +2,20 @@ import React, { useContext, useMemo, createContext, useReducer } from 'react';
 import T from 'prop-types';
 import logger from '../utils/logger';
 
-import { initialApiRequestState, wrapLogReducer } from './reducers/utils';
+import { wrapLogReducer } from './reducers/utils';
 
 const PredictionsContext = createContext(null);
+
+const initialState = {
+  status: 'idle',
+  data: {},
+  error: null,
+};
 
 export function PredictionsProvider(props) {
   const [predictions, dispatchPredictions] = useReducer(
     wrapLogReducer(predictionsReducer),
-    initialApiRequestState
+    initialState
   );
 
   const value = {
@@ -65,54 +71,39 @@ export const actions = {
   CLEAR_PREDICTION: 'CLEAR_PREDICTION',
 };
 
-function wrapApiResult(stateData) {
-  const { fetched, fetching, data, error } = stateData;
-  const ready = fetched && !fetching;
-  return {
-    ...stateData,
-    raw: () => stateData,
-    isReady: () => {
-      return ready;
-    },
-    hasError: () => ready && !!error,
-    getData: (def = {}) => (ready ? data.results || data : def),
-    getMeta: (def = {}) => (ready ? data.meta : def),
-  };
-}
-
 export function predictionsReducer(state, action) {
   const { data } = action;
+  let newState;
 
   switch (action.type) {
     case actions.START_PREDICTION:
-      return wrapApiResult({
-        ...initialApiRequestState,
-        fetching: true,
+      newState = {
+        ...initialState,
+        status: 'running',
         processed: 0,
         retrainProgress: 0,
-        receivedAt: Date.now(),
         data: {
           predictions: [],
           aoiId: null,
           type: data.type,
         },
-      });
-
+      };
+      break;
     case actions.RECEIVE_AOI_META:
-      return wrapApiResult({
+      newState = {
         ...state,
         data: {
           ...state.data,
           aoiId: data.id,
         },
-      });
-
+      };
+      break;
     case actions.RECEIVE_RETRAIN_PROGRESS:
-      return {
+      newState = {
         ...state,
         retrainProgress: data,
       };
-
+      break;
     case actions.RECEIVE_PREDICTION: {
       // Get bounds
       const predictionAoiId = data.aoi;
@@ -141,40 +132,50 @@ export function predictionsReducer(state, action) {
         }
 
         // Add it to state
-        return wrapApiResult({
+        newState = {
           ...state,
           processed: data.processed,
           total: data.total,
-          receivedAt: Date.now(),
           data: {
             ...state.data,
             predictions,
           },
-        });
+        };
       } else {
         logger('Received prediction for previous AOI', data);
-        return state;
+        newState = { ...state };
       }
+      break;
     }
     case actions.COMPLETE_PREDICTION:
-      return wrapApiResult({
+      newState = {
         ...state,
-        receivedAt: Date.now(),
-        fetching: false,
-        fetched: true,
-      });
+        status: 'success',
+      };
+      break;
     case actions.CLEAR_PREDICTION:
-      return wrapApiResult({
-        ...initialApiRequestState,
-      });
+      newState = {
+        ...initialState,
+      };
+      break;
     case actions.FAILED_PREDICTION:
-      return wrapApiResult({
+      newState = {
         ...state,
-        fetching: false,
-        fetched: false,
+        status: 'error',
         error: true,
-      });
+      };
+      break;
     default:
+      logger(`Unexpected action type ${action.type} on predictions reducer.`);
       throw new Error('Unexpected error.');
   }
+
+  // Add helper props
+  newState = {
+    ...newState,
+    isReady: newState.status !== 'idle' && newState.status !== 'loading',
+    hasError: newState.status === 'error',
+  };
+
+  return newState;
 }

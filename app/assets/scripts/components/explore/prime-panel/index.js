@@ -104,7 +104,7 @@ function PrimePanel() {
 
   // Retrain Panel Tab Empty State message
   const retrainPlaceHolderMessage = () => {
-    if (predictions.isReady()) {
+    if (predictions.isReady) {
       // If predictions are ready, do not need a placeholder
       return null;
     }

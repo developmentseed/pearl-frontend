@@ -604,7 +604,7 @@ function Map() {
           currentProject &&
           currentCheckpoint &&
           currentAoi &&
-          !predictions.fetching && (
+          !(predictions.status === 'running') && (
             <TileLayerWithHeaders
               url={tileUrl}
               headers={[
@@ -625,7 +625,7 @@ function Map() {
               }
               eventHandlers={{
                 add: () => {
-                  if (predictions.isReady() || !predictions.data.predictions) {
+                  if (predictions.isReady || !predictions.data.predictions) {
                     setUserLayers({
                       ...userLayers,
                       predictions: {
@@ -636,7 +636,7 @@ function Map() {
                   }
                 },
                 load: () => {
-                  if (predictions.isReady() || !predictions.data.predictions) {
+                  if (predictions.isReady || !predictions.data.predictions) {
                     setTimeout(() => {
                       dispatchPredictions({
                         type: predictionActions.CLEAR_PREDICTION,

@@ -266,7 +266,7 @@ export function ExploreProvider(props) {
   }, [authIsLoading, restApiClient]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (predictions.fetching) {
+    if (predictions.status === 'running') {
       const { processed, total, retrainProgress } = predictions;
       if (total) {
         setSessionStatusMessage(`Received image ${processed} of ${total}...`);
@@ -275,11 +275,11 @@ export function ExploreProvider(props) {
       } else if (retrainProgress > 0) {
         setSessionStatusMessage(`${retrainProgress}% retrained...`);
       }
-    } else if (predictions.isReady()) {
+    } else if (predictions.isReady) {
       // Update AOI List with newest AOI
       // If predictions is ready, restApiClient must be ready
 
-      if (predictions.fetched && predictions.data.predictions?.length > 0) {
+      if (predictions.data.predictions?.length > 0) {
         restApiClient.get(`project/${currentProject.id}/aoi/`).then((aois) => {
           setAoiList(aois.aois);
         });
@@ -287,14 +287,12 @@ export function ExploreProvider(props) {
         // means new checkpoint available
         loadCheckpointList(currentProject.id);
 
-        if (predictions.getData().type === checkpointModes.RETRAIN) {
+        if (predictions.data.type === checkpointModes.RETRAIN) {
           loadMetrics();
         }
 
         restApiClient
-          .get(
-            `project/${currentProject.id}/aoi/${predictions.getData().aoiId}`
-          )
+          .get(`project/${currentProject.id}/aoi/${predictions.data.aoiId}`)
           .then((aoi) => {
             setCurrentAoi(aoi);
           });
