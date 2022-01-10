@@ -296,9 +296,10 @@ function Map() {
           const area = areaFromBounds(bbox);
           const aoiBboxPoly = bboxPolygon(bbox);
 
-          const mosaicBounds = bboxPolygon(mosaicMeta.data.bounds);
-
-          if (!booleanWithin(aoiBboxPoly, mosaicBounds)) {
+          if (
+            mosaicMeta.data?.bounds &&
+            !booleanWithin(aoiBboxPoly, bboxPolygon(mosaicMeta.data.bounds))
+          ) {
             setActiveModal('area-out-of-bounds');
             return;
           }
