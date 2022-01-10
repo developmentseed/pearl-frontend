@@ -20,3 +20,9 @@ addCommand();
 
 require('./commands/fake-login');
 require('./commands/fake-rest');
+
+afterEach(function () {
+  if (this.currentTest.state === 'failed') {
+    Cypress.runner.stop();
+  }
+});
