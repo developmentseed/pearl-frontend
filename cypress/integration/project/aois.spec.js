@@ -163,7 +163,7 @@ describe('Load AOIs and draw a third one', () => {
     cy.startServer();
   });
 
-  it.only('Should show the confirmation modal if switching to another AOI before running prediction', () => {
+  it('Should show the confirmation modal if switching to another AOI before running prediction', () => {
     cy.fakeLogin();
     cy.setWebsocketWorkflow('websocket-workflow/load-aoi.json');
 
