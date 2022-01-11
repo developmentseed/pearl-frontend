@@ -99,6 +99,7 @@ jobs:
         with:
           start: yarn serve:testing
           wait-on: 'http://localhost:9000'
+          spec: cypress/integration/project/aois.spec.js
 
   build:
     needs: test
