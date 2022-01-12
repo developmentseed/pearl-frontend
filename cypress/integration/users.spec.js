@@ -41,10 +41,11 @@ describe('The app header', () => {
 
     // Check available columns
     cy.get('th')
-      .should('have.length', 3)
+      .should('have.length', 4)
       .should('include.text', 'Username')
       .should('include.text', 'E-mail')
-      .should('include.text', 'Admin');
+      .should('include.text', 'Admin')
+      .should('include.text', 'GPU Allowed');
 
     // Check if page is well-formed
     cy.get('tbody').find('tr').should('have.length', 15);
@@ -89,14 +90,48 @@ describe('The app header', () => {
         username: `User ${i}`,
         email: `user${i}@localhost`,
         access: i % 3 === 0 || i === 25 ? 'admin' : 'user',
+        flags: {
+          gpu: false,
+        },
       }))
     ).as('fetchUsers');
 
     // Click admin switch
-    cy.get('tbody tr:nth-child(3) td input').click({ force: true });
+    cy.get('tbody tr:nth-child(3) td input').first().click({ force: true });
+
+    cy.wait('@patchUser25')
+      .its('request.body')
+      .should(($body) => expect($body).to.deep.eq({ access: 'admin' }));
 
     cy.wait('@fetchUsers');
 
     cy.get('tbody tr:nth-child(3) td:nth-child(3) input').should('be.checked');
+
+    cy.intercept(
+      {
+        url: restApiEndpoint + '/api/user/?*',
+        method: 'GET',
+      },
+      paginatedList('users', (i) => ({
+        id: i,
+        username: `User ${i}`,
+        email: `user${i}@localhost`,
+        access: i % 3 === 0 || i === 25 ? 'admin' : 'user',
+        flags: {
+          gpu: i === 25,
+        },
+      }))
+    ).as('fetchUsers');
+
+    cy.get('tbody tr:nth-child(3) td:nth-child(4) input')
+      .should('not.be.checked')
+      .click({ force: true });
+
+    cy.wait('@patchUser25')
+      .its('request.body')
+      .should(($body) => expect($body).to.deep.eq({ flags: { gpu: true } }));
+
+    cy.get('tbody tr:nth-child(3) input').should('be.checked');
+    // cy.get('tbody tr:nth-child(3) td:nth-child(4) input').should('be.checked');
   });
 });

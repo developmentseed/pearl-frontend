@@ -30,7 +30,7 @@ import toasts from '../../common/toasts';
 // Controls the size of each page
 const ITEMS_PER_PAGE = 15;
 
-const HEADERS = ['Username', 'E-mail', 'Admin'];
+const HEADERS = ['Username', 'E-mail', 'Admin', 'GPU Allowed'];
 
 export const UsersBody = styled(InpageBodyInner)`
   display: grid;
@@ -67,6 +67,26 @@ function renderRow(user, { restApiClient, fetchUsers }) {
             try {
               await restApiClient.patch(`user/${user.id}`, {
                 access: user.access === 'admin' ? 'user' : 'admin',
+              });
+              fetchUsers();
+            } catch (err) {
+              logger('Failed to update user', err);
+              toasts.error('An unexpected error occurred.');
+            }
+          }}
+        />
+      </TableCell>
+      <TableCell>
+        <FormSwitch
+          hideText
+          checked={user.flags?.gpu}
+          onChange={async () => {
+            try {
+              await restApiClient.patch(`user/${user.id}`, {
+                flags: {
+                  ...user.flags,
+                  gpu: !user.flags?.gpu,
+                },
               });
               fetchUsers();
             } catch (err) {
