@@ -25,11 +25,12 @@ import {
 import Table, { TableRow, TableCell } from '../../common/table';
 import logger from '../../../utils/logger';
 import { Link } from 'react-router-dom';
+import toasts from '../../common/toasts';
 
 // Controls the size of each page
-const ITEMS_PER_PAGE = 10;
+const ITEMS_PER_PAGE = 15;
 
-const HEADERS = ['Id', 'Username', 'E-mail', 'Admin'];
+const HEADERS = ['Username', 'E-mail', 'Admin', 'GPU Allowed'];
 
 export const UsersBody = styled(InpageBodyInner)`
   display: grid;
@@ -49,10 +50,9 @@ export const UsersHeadline = styled(InpageHeadline)`
 `;
 
 // Render single users row
-function renderRow(user) {
+function renderRow(user, { restApiClient, fetchUsers }) {
   return (
     <TableRow key={user.id}>
-      <TableCell>{user.id}</TableCell>
       <TableCell>
         <StyledNavLink to={`/admin/users/${user.id}`}>
           {user.username}
@@ -61,9 +61,39 @@ function renderRow(user) {
       <TableCell>{user.email}</TableCell>
       <TableCell>
         <FormSwitch
-          data-cy='user-admin-checkbox'
           hideText
           checked={user.access === 'admin'}
+          onChange={async () => {
+            try {
+              await restApiClient.patch(`user/${user.id}`, {
+                access: user.access === 'admin' ? 'user' : 'admin',
+              });
+              fetchUsers();
+            } catch (err) {
+              logger('Failed to update user', err);
+              toasts.error('An unexpected error occurred.');
+            }
+          }}
+        />
+      </TableCell>
+      <TableCell>
+        <FormSwitch
+          hideText
+          checked={user.flags?.gpu}
+          onChange={async () => {
+            try {
+              await restApiClient.patch(`user/${user.id}`, {
+                flags: {
+                  ...user.flags,
+                  gpu: !user.flags?.gpu,
+                },
+              });
+              fetchUsers();
+            } catch (err) {
+              logger('Failed to update user', err);
+              toasts.error('An unexpected error occurred.');
+            }
+          }}
         />
       </TableCell>
     </TableRow>
@@ -85,7 +115,7 @@ export default function UserIndex() {
       try {
         showGlobalLoadingMessage('Loading users...');
         const data = await restApiClient.get(
-          `user/?page=${page - 1}&limit=${ITEMS_PER_PAGE}`
+          `user/?sort=username&page=${page - 1}&limit=${ITEMS_PER_PAGE}`
         );
         setTotal(data.total);
         setUsers(data.users);
@@ -124,7 +154,9 @@ export default function UserIndex() {
                     <Table
                       headers={HEADERS}
                       data={users}
-                      renderRow={(m) => renderRow(m)}
+                      renderRow={(r) =>
+                        renderRow(r, { restApiClient, fetchUsers })
+                      }
                       hoverable
                     />
                     <Paginator
