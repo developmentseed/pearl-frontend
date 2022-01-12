@@ -41,29 +41,62 @@ describe('The app header', () => {
 
     // Check available columns
     cy.get('th')
-      .should('have.length', 4)
-      .should('include.text', 'Id')
+      .should('have.length', 3)
       .should('include.text', 'Username')
       .should('include.text', 'E-mail')
       .should('include.text', 'Admin');
 
     // Check if page is well-formed
-    cy.get('tbody').find('tr').should('have.length', 10);
+    cy.get('tbody').find('tr').should('have.length', 15);
     cy.get('tbody tr:nth-child(1) td')
       .should('include.text', 'User 1')
       .should('include.text', 'user1@localhost');
 
     // Confirm admin status is populated
-    cy.get('tbody tr:nth-child(1) td:nth-child(4) input').should(
+    cy.get('tbody tr:nth-child(1) td:nth-child(3) input').should(
       'not.be.checked'
     );
-    cy.get('tbody tr:nth-child(3) td:nth-child(4) input').should('be.checked');
+    cy.get('tbody tr:nth-child(4) td:nth-child(3) input').should('be.checked');
+
+    // Capture patch on user 25
+    cy.intercept(
+      {
+        url: restApiEndpoint + '/api/user/25',
+        method: 'PATCH',
+      },
+      { status: 200 }
+    ).as('patchUser25');
 
     // Check if next page works
     cy.get('[data-cy=next-page-button').click();
     cy.get('tbody').find('tr').should('have.length', 10);
+
+    // Check if user 25 exist and is not an admin
     cy.get('tbody tr:nth-child(3) td')
-      .should('include.text', 'User 13')
-      .should('include.text', 'user13@localhost');
+      .should('include.text', 'User 25')
+      .should('include.text', 'user25@localhost')
+      .find('input')
+      .should('not.be.checked');
+
+    // Make user 25 to be an admin on new paginated requests
+    cy.intercept(
+      {
+        url: restApiEndpoint + '/api/user/?*',
+        method: 'GET',
+      },
+      paginatedList('users', (i) => ({
+        id: i,
+        username: `User ${i}`,
+        email: `user${i}@localhost`,
+        access: i % 3 === 0 || i === 25 ? 'admin' : 'user',
+      }))
+    ).as('fetchUsers');
+
+    // Click admin switch
+    cy.get('tbody tr:nth-child(3) td input').click({ force: true });
+
+    cy.wait('@fetchUsers');
+
+    cy.get('tbody tr:nth-child(3) td:nth-child(3) input').should('be.checked');
   });
 });
