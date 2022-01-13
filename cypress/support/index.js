@@ -20,3 +20,12 @@ addCommand();
 
 require('./commands/fake-login');
 require('./commands/fake-rest');
+
+//
+// Uncomment next block to stop testing on first failure
+//
+// afterEach(function () {
+//   if (this.currentTest.state === 'failed') {
+//     Cypress.runner.stop();
+//   }
+// });

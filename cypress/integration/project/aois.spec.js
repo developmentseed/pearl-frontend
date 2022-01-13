@@ -167,8 +167,11 @@ describe('Load AOIs and draw a third one', () => {
     cy.fakeLogin();
     cy.setWebsocketWorkflow('websocket-workflow/load-aoi.json');
 
+    // Load project
     cy.visit('/project/1');
     cy.wait('@loadAois');
+    cy.get('[data-cy=global-loading]').should('not.exist');
+
     // go to the Predict tab
     cy.get('[data-cy=predict-tab]').click();
     // add new AOI
