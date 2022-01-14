@@ -24,7 +24,8 @@ describe('Create new project', () => {
     // Active instances list
     cy.intercept(
       {
-        url: restApiEndpoint + '/api/project/1/instance/?status=active',
+        url:
+          restApiEndpoint + '/api/project/1/instance/?status=active&type=cpu',
       },
       {
         total: 0,

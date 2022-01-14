@@ -119,7 +119,12 @@ export function ExploreProvider(props) {
     }
   );
   const [currentInstance, setCurrentInstance] = useState(null);
-  const { initInstance, loadAoiOnInstance, getRunningBatch } = useInstance();
+  const {
+    initInstance,
+    loadAoiOnInstance,
+    getRunningBatch,
+    instanceType,
+  } = useInstance();
 
   /**
    * Session status
@@ -242,7 +247,7 @@ export function ExploreProvider(props) {
         latestAoi = aois.find((a) => Number(a.checkpoint_id) === checkpoint.id);
       }
 
-      showGlobalLoadingMessage('Looking for active GPU instances...');
+      showGlobalLoadingMessage('Initializing instance...');
       const instance = await initInstance(
         project.id,
         checkpoint && checkpoint.id,
@@ -260,10 +265,10 @@ export function ExploreProvider(props) {
 
   // Load project meta on load and api client ready
   useEffect(() => {
-    if (!authIsLoading && restApiClient) {
+    if (!authIsLoading && restApiClient && instanceType) {
       loadInitialData();
     }
-  }, [authIsLoading, restApiClient]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [authIsLoading, restApiClient, instanceType]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (predictions.status === 'running') {

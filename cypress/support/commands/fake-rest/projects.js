@@ -227,7 +227,7 @@ export default function () {
    */
   cy.intercept(
     {
-      url: restApiEndpoint + '/api/project/1/instance/?status=active',
+      url: restApiEndpoint + '/api/project/1/instance/?status=active&type=cpu',
     },
     {
       total: 1,
@@ -238,6 +238,7 @@ export default function () {
           active: true,
           created: '2021-03-18T18:42:42.224Z',
           token: 'app_client',
+          type: 'cpu',
         },
       ],
     }
@@ -262,6 +263,7 @@ export default function () {
         phase: 'Running',
       },
       token: 'app_client',
+      type: 'cpu',
     }
   );
 

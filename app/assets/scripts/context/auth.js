@@ -78,7 +78,6 @@ function InnerAuthProvider(props) {
     loginWithRedirect,
     isAuthenticated: isAuthenticatedAuth0,
     error: auth0Error,
-    user,
     isLoading,
     getAccessTokenSilently,
     logout: logoutAuth0,
@@ -98,7 +97,7 @@ function InnerAuthProvider(props) {
       dispatchAuthState({
         type: actions.RECEIVE_LOGIN,
         data: {
-          user,
+          user: userDetails,
           apiToken: token,
           userAccessLevel: userDetails.access,
         },

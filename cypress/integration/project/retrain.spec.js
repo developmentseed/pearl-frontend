@@ -14,6 +14,7 @@ const instance = {
   status: {
     phase: 'Running',
   },
+  type: 'cpu',
 };
 
 describe('Retrain existing project', () => {

@@ -134,8 +134,10 @@ class RestApiClient {
     return this.get(`project/${projectId}/instance/${instanceId}`);
   }
 
-  getActiveInstances(projectId) {
-    return this.get(`project/${projectId}/instance/?status=active`);
+  getActiveInstances(projectId, instanceType) {
+    return this.get(
+      `project/${projectId}/instance/?status=active&type=${instanceType}`
+    );
   }
 
   getTileJSON(projectId, aoiId) {
