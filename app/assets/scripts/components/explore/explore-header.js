@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect, useRef } from 'react';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import T from 'prop-types';
@@ -148,6 +148,17 @@ const Shortcut = styled.dt`
   padding: ${glsp(0.125)} ${glsp(0.5)};
 `;
 
+const useFocus = (delay = 0) => {
+  const htmlElRef = useRef(null);
+  const setFocus = () => {
+    setTimeout(() => {
+      htmlElRef.current && htmlElRef.current.focus();
+    }, delay);
+  };
+
+  return [htmlElRef, setFocus];
+};
+
 function ExploreHeader(props) {
   const { projectId } = useProjectId();
   const { isMediumDown } = props;
@@ -175,6 +186,15 @@ function ExploreHeader(props) {
   const [exportShareURL, setExportShareURL] = useState(null);
 
   useEffect(() => setLocalProjectName(initialName), [initialName]);
+
+  const newProjectNameModalRevealed =
+    !projectName && projectId && projectId === 'new';
+
+  // Delays focus
+  const [projectNameInputRef, setProjectNameInputFocus] = useFocus(800);
+  useEffect(() => {
+    setProjectNameInputFocus();
+  }, [newProjectNameModalRevealed]);
 
   const handleSubmit = (evt) => {
     evt.preventDefault();
@@ -300,7 +320,6 @@ function ExploreHeader(props) {
               }}
               value={localProjectName || ''}
               disabled={!isAuthenticated}
-              autoFocus
               data-cy='project-input'
             />
             <Button
@@ -495,7 +514,7 @@ function ExploreHeader(props) {
         data-cy='project-name-modal'
         title='New project'
         // Reveal modal on mount for new projects, not existing ones
-        revealed={!projectName && projectId && projectId === 'new'}
+        revealed={newProjectNameModalRevealed}
         size='small'
         closeButton={true}
         onCloseClick={() => history.push('/profile/projects')}
@@ -503,6 +522,7 @@ function ExploreHeader(props) {
           <ModalForm onSubmit={handleSubmit}>
             <p>Enter a project name to get started</p>
             <HeadingInput
+              id='project-name-modal-input'
               name='projectName'
               placeholder='Set Project Name'
               onKeyDown={(e) => {
@@ -514,7 +534,7 @@ function ExploreHeader(props) {
               }}
               value={localProjectName || ''}
               disabled={!isAuthenticated}
-              autoFocus
+              ref={projectNameInputRef}
               data-cy='modal-project-input'
             />
             <Button
