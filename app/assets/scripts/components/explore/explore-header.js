@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect, useRef } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import T from 'prop-types';
@@ -30,6 +30,7 @@ import { useAuth } from '../../context/auth';
 import { useAoi } from '../../context/aoi';
 import toasts from '../common/toasts';
 import logger from '../../utils/logger';
+import useFocus from '../../utils/use-focus';
 import { downloadGeotiff as downloadGeotiffUtil } from '../../utils/map';
 import { useTour } from '../../context/explore';
 
@@ -147,17 +148,6 @@ const Shortcut = styled.dt`
   justify-self: flex-start;
   padding: ${glsp(0.125)} ${glsp(0.5)};
 `;
-
-const useFocus = (delay = 0) => {
-  const htmlElRef = useRef(null);
-  const setFocus = () => {
-    setTimeout(() => {
-      htmlElRef.current && htmlElRef.current.focus();
-    }, delay);
-  };
-
-  return [htmlElRef, setFocus];
-};
 
 function ExploreHeader(props) {
   const { projectId } = useProjectId();
