@@ -193,8 +193,10 @@ function ExploreHeader(props) {
   // Delays focus
   const [projectNameInputRef, setProjectNameInputFocus] = useFocus(800);
   useEffect(() => {
-    setProjectNameInputFocus();
-  }, [newProjectNameModalRevealed]);
+    if (newProjectNameModalRevealed && projectNameInputRef.current) {
+      setProjectNameInputFocus();
+    }
+  }, [projectNameInputRef.current, newProjectNameModalRevealed]);
 
   const handleSubmit = (evt) => {
     evt.preventDefault();
@@ -522,7 +524,6 @@ function ExploreHeader(props) {
           <ModalForm onSubmit={handleSubmit}>
             <p>Enter a project name to get started</p>
             <HeadingInput
-              id='project-name-modal-input'
               name='projectName'
               placeholder='Set Project Name'
               onKeyDown={(e) => {
@@ -535,7 +536,7 @@ function ExploreHeader(props) {
               value={localProjectName || ''}
               disabled={!isAuthenticated}
               ref={projectNameInputRef}
-              data-cy='modal-project-input'
+              data-cy='new-project-name-modal-input'
             />
             <Button
               type='submit'

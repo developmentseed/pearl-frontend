@@ -122,7 +122,9 @@ describe('Batch predictions', () => {
     cy.visit('/project/new');
 
     cy.get('[data-cy=project-name-modal]').should('be.visible');
-    cy.get('[data-cy=modal-project-input]').clear().type('Project name');
+    cy.get('[data-cy=new-project-name-modal-input]')
+      .should('be.focused')
+      .type('Project name');
     cy.get('[data-cy=create-project-button]').click();
 
     // Set AOI
@@ -531,7 +533,9 @@ describe('Batch predictions', () => {
     cy.visit('/project/new');
 
     cy.get('[data-cy=project-name-modal]').should('be.visible');
-    cy.get('[data-cy=modal-project-input]').clear().type('Project name');
+    cy.get('[data-cy=new-project-name-modal-input]')
+      .should('be.focused')
+      .type('Project name');
     cy.get('[data-cy=create-project-button]').click();
 
     // Set AOI
