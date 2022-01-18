@@ -34,7 +34,7 @@ import useFocus from '../../utils/use-focus';
 import { downloadGeotiff as downloadGeotiffUtil } from '../../utils/map';
 import { useTour } from '../../context/explore';
 
-import { Modal } from '@devseed-ui/modal';
+import { Modal } from '../common/custom-modal';
 import { StyledLink } from '../../styles/links';
 
 const Wrapper = styled.div`
@@ -98,6 +98,7 @@ const ProjectHeading = styled.div`
 `;
 
 const HeadingInput = styled(FormInput)`
+  transition: none;
   margin-left: ${glsp(0.25)};
   font-weight: ${themeVal('type.heading.weight')};
 `;
@@ -181,12 +182,7 @@ function ExploreHeader(props) {
     !projectName && projectId && projectId === 'new';
 
   // Delays focus
-  const [projectNameInputRef, setProjectNameInputFocus] = useFocus(1000);
-  useEffect(() => {
-    if (newProjectNameModalRevealed && projectNameInputRef.current) {
-      setProjectNameInputFocus();
-    }
-  }, [projectNameInputRef.current, newProjectNameModalRevealed]);
+  const [projectNameInputRef, setProjectNameInputFocus] = useFocus(0);
 
   const handleSubmit = (evt) => {
     evt.preventDefault();
@@ -510,6 +506,9 @@ function ExploreHeader(props) {
         size='small'
         closeButton={true}
         onCloseClick={() => history.push('/profile/projects')}
+        onEntered={() => {
+          setProjectNameInputFocus();
+        }}
         content={
           <ModalForm onSubmit={handleSubmit}>
             <p>Enter a project name to get started</p>
