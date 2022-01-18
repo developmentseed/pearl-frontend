@@ -181,7 +181,7 @@ function ExploreHeader(props) {
     !projectName && projectId && projectId === 'new';
 
   // Delays focus
-  const [projectNameInputRef, setProjectNameInputFocus] = useFocus(800);
+  const [projectNameInputRef, setProjectNameInputFocus] = useFocus(1000);
   useEffect(() => {
     if (newProjectNameModalRevealed && projectNameInputRef.current) {
       setProjectNameInputFocus();
