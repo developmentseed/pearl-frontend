@@ -17,7 +17,6 @@ const instance = {
   type: 'cpu',
 };
 
-// describe.only('Retrain existing project', () => {
 describe('Retrain existing project', () => {
   beforeEach(() => {
     cy.startServer();
