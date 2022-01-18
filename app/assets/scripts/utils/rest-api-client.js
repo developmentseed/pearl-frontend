@@ -71,17 +71,26 @@ class RestApiClient {
   getApiMeta() {
     return this.get('').then((apiMeta) => {
       // Calculate available slots
-      const totalGpus = get(apiMeta, 'limits.total_gpus');
+      const totalGpus = get(apiMeta, 'limits.total_gpus') || 0;
       const activeGpus = get(apiMeta, 'limits.active_gpus') || 0;
-
       const availableGpus =
         Number.isInteger(totalGpus) &&
         Number.isInteger(activeGpus) &&
         Math.max(totalGpus - activeGpus, 0);
 
+      const totalCpus = get(apiMeta, 'limits.total_cpus') || 0;
+      const activeCpus = get(apiMeta, 'limits.active_cpus') || 0;
+      const availableCpus =
+        Number.isInteger(totalCpus) &&
+        Number.isInteger(activeCpus) &&
+        Math.max(totalCpus - activeCpus, 0);
+
       return {
         ...apiMeta,
-        availableGpus,
+        availableInstances: {
+          gpu: availableGpus,
+          cpu: availableCpus,
+        },
       };
     });
   }

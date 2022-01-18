@@ -200,10 +200,10 @@ export function ExploreProvider(props) {
       setSessionStatusMode(sessionModes.LOADING_PROJECT);
     }
 
-    const { availableGpus } = await restApiClient.getApiMeta('');
+    const { availableInstances } = await restApiClient.getApiMeta('');
 
     // Do not run when no instances are available
-    if (!availableGpus) {
+    if (!availableInstances[instanceType]) {
       hideGlobalLoading();
       toasts.error('No instances available, please try again later.', {
         autoClose: false,
