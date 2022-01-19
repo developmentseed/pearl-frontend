@@ -8,6 +8,8 @@ import React, {
   useRef,
 } from 'react';
 import T from 'prop-types';
+import { formatDuration } from 'date-fns';
+import config from '../../config';
 import { useAuth } from '../auth';
 import {
   showGlobalLoadingMessage,
@@ -247,7 +249,13 @@ export function ExploreProvider(props) {
         latestAoi = aois.find((a) => Number(a.checkpoint_id) === checkpoint.id);
       }
 
-      showGlobalLoadingMessage('Initializing instance...');
+      const initializingInstanceMessage =
+        instanceType === 'cpu'
+          ? 'Initializing CPU instance...'
+          : `Initializing GPU instance, this may take up to ${formatDuration({
+              minutes: config.instanceCreationTimeout / (60 * 60 * 1000),
+            })}...`;
+      showGlobalLoadingMessage(initializingInstanceMessage);
       const instance = await initInstance(
         project.id,
         checkpoint && checkpoint.id,
