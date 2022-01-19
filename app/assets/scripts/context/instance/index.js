@@ -213,6 +213,11 @@ export function InstanceProvider(props) {
   useEffect(() => {
     return () => {
       if (websocketClient) {
+        if (instanceType === 'gpu') {
+          dispatchMessageQueue({
+            type: messageQueueActionTypes.TERMINATE_INSTANCE,
+          });
+        }
         websocketClient.close();
       }
     };
