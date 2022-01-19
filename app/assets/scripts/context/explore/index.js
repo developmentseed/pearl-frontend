@@ -259,7 +259,10 @@ export function ExploreProvider(props) {
       setCurrentInstance(instance);
     } catch (error) {
       logger(error);
-      toasts.error('Error loading project, please try again later.');
+      toasts.error(
+        'Unexpected error while loading the project, please try again later.'
+      );
+      history.push(`/profile/projects/${project.id}`);
     }
   }
 
