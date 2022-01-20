@@ -88,6 +88,7 @@ export function InstanceProvider(props) {
   const { dispatchAoiPatch } = useAoiPatch();
   const { selectedModel } = useModel();
 
+  const [instanceType, setInstanceType] = useState('cpu');
   const [websocketClient, setWebsocketClient] = useState(null);
 
   /**
@@ -212,6 +213,11 @@ export function InstanceProvider(props) {
   useEffect(() => {
     return () => {
       if (websocketClient) {
+        if (instanceType === 'gpu') {
+          dispatchMessageQueue({
+            type: messageQueueActionTypes.TERMINATE_INSTANCE,
+          });
+        }
         websocketClient.close();
       }
     };
@@ -254,10 +260,10 @@ export function InstanceProvider(props) {
     });
 
     // Check if instance slots are available
-    const { availableGpus } = await restApiClient.getApiMeta('');
+    const { availableInstances } = await restApiClient.getApiMeta('');
 
     // Do not run when no instances are available
-    if (!availableGpus) {
+    if (!availableInstances[instanceType]) {
       throw Error('No instances available');
     }
 
@@ -265,17 +271,23 @@ export function InstanceProvider(props) {
 
     // Fetch active instances for this project
     let instance;
-    const activeInstances = await restApiClient.getActiveInstances(projectId);
+    const activeInstances = await restApiClient.getActiveInstances(
+      projectId,
+      instanceType
+    );
     if (activeInstances.total > 0) {
       const { id: instanceId } = activeInstances.instances[0];
       instance = await restApiClient.getInstance(projectId, instanceId);
     } else if (checkpointId) {
       instance = await restApiClient.createInstance(projectId, {
+        type: instanceType,
         checkpoint_id: checkpointId,
         aoi_id: aoiId,
       });
     } else {
-      instance = await restApiClient.createInstance(projectId);
+      instance = await restApiClient.createInstance(projectId, {
+        type: instanceType,
+      });
     }
 
     // Confirm instance has running status
@@ -464,6 +476,8 @@ export function InstanceProvider(props) {
   }
 
   const value = {
+    instanceType,
+    setInstanceType,
     instance,
     setInstanceStatusMessage: (message) =>
       applyInstanceStatus({
@@ -920,6 +934,8 @@ const useCheckContext = (fnName) => {
 
 export const useInstance = () => {
   const {
+    instanceType,
+    setInstanceType,
     instance,
     setInstanceStatusMessage,
     getRunningBatch,
@@ -935,6 +951,8 @@ export const useInstance = () => {
   } = useCheckContext(InstanceContext);
   return useMemo(
     () => ({
+      instanceType,
+      setInstanceType,
       instance,
       loadAoiOnInstance,
       setInstanceStatusMessage,

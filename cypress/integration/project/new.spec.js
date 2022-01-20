@@ -24,7 +24,8 @@ describe('Create new project', () => {
     // Active instances list
     cy.intercept(
       {
-        url: restApiEndpoint + '/api/project/1/instance/?status=active',
+        url:
+          restApiEndpoint + '/api/project/1/instance/?status=active&type=cpu',
       },
       {
         total: 0,
@@ -40,11 +41,6 @@ describe('Create new project', () => {
       },
       instance
     );
-  });
-
-  it('Run new project', () => {
-    // Set mock WS workflow in case creation succeeds (it shouldn't here)
-    cy.setWebsocketWorkflow('websocket-workflow/base-model-prediction.json');
 
     // Visit page
     cy.visit('/project/new');
@@ -110,6 +106,11 @@ describe('Create new project', () => {
       'have.text',
       'Session Status: Ready for prediction run'
     );
+  });
+
+  it('Run new project', () => {
+    // Set mock WS workflow in case creation succeeds (it shouldn't here)
+    cy.setWebsocketWorkflow('websocket-workflow/base-model-prediction.json');
 
     // Instance pending
     cy.intercept(
@@ -207,61 +208,6 @@ describe('Create new project', () => {
   it('Abort new project', () => {
     cy.setWebsocketWorkflow('websocket-workflow/run-prediction-aborted.json');
 
-    // Visit page
-    cy.visit('/project/new');
-
-    // Check session status message
-    cy.get('[data-cy=session-status]').should(
-      'have.text',
-      'Session Status: Set Project Name'
-    );
-
-    // Set project name
-    cy.get('[data-cy=new-project-name-modal-input]')
-      .should('be.focused')
-      .type('Project name');
-    cy.get('[data-cy=create-project-button]').should('exist').click();
-
-    // Check session status message
-    cy.get('[data-cy=session-status]').should(
-      'have.text',
-      'Session Status: Set AOI'
-    );
-
-    // Draw AOI
-    cy.get('[data-cy=aoi-edit-button]').should('exist').click();
-    cy.get('#map')
-      .trigger('mousedown', 150, 150)
-      .trigger('mousemove', 200, 200)
-      .trigger('mouseup');
-    cy.wait('@reverseGeocodeCity');
-
-    // Re-enter edit mode
-    cy.get('[data-cy=aoi-edit-button]').click();
-
-    // Panel prime button should be in AOI Confirm mode
-    cy.get('[data-cy=panel-aoi-confirm]')
-      .should('exist')
-      .should('not.be.disabled')
-      .click();
-
-    // Set model
-    // Check session status message
-    cy.get('[data-cy=session-status]').should(
-      'have.text',
-      'Session Status: Select Model'
-    );
-
-    // Select model
-    cy.get('[data-cy=select-model-label]').should('exist').click();
-    cy.get('[data-cy=select-model-1-card]').should('exist').click();
-
-    // Check session status message
-    cy.get('[data-cy=session-status]').should(
-      'have.text',
-      'Session Status: Ready for prediction run'
-    );
-
     // Instance is running
     cy.intercept(
       {
@@ -316,25 +262,10 @@ describe('Create new project', () => {
     // Set mock WS workflow in case creation succeeds (it shouldn't here)
     cy.setWebsocketWorkflow('websocket-workflow/base-model-prediction.json');
 
-    // Visit page
-    cy.visit('/project/new');
-
     // Check session status message
     cy.get('[data-cy=session-status]').should(
       'have.text',
-      'Session Status: Set Project Name'
-    );
-
-    // Set project name
-    cy.get('[data-cy=new-project-name-modal-input]')
-      .should('be.focused')
-      .type('Project name');
-    cy.get('[data-cy=create-project-button]').should('exist').click();
-
-    // Check session status message
-    cy.get('[data-cy=session-status]').should(
-      'have.text',
-      'Session Status: Set AOI'
+      'Session Status: Ready for prediction run'
     );
 
     // Open import modal

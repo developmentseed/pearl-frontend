@@ -27,6 +27,7 @@ import {
 import { actions as shortcutActions } from '../../context/explore/shortcuts';
 import { useProject } from '../../context/project';
 import { useAuth } from '../../context/auth';
+import { useInstance } from '../../context/instance';
 import { useAoi } from '../../context/aoi';
 import toasts from '../common/toasts';
 import logger from '../../utils/logger';
@@ -153,8 +154,10 @@ const Shortcut = styled.dt`
 function ExploreHeader(props) {
   const { projectId } = useProjectId();
   const { isMediumDown } = props;
-  const { isAuthenticated, restApiClient } = useAuth();
+  const { isAuthenticated, restApiClient, user } = useAuth();
   const { setTourStep } = useTour();
+  const { instanceType, setInstanceType } = useInstance();
+  const nextInstanceType = instanceType === 'gpu' ? 'cpu' : 'gpu';
 
   const { currentAoi } = useAoi();
 
@@ -336,6 +339,18 @@ function ExploreHeader(props) {
         <span>Session Status: </span>
         {sessionStatus.message}
       </StatusHeading>
+      {user?.flags?.gpu && (
+        <Button
+          data-cy='toggle-instance-type-button'
+          variation='primary-plain'
+          title={`Click to switch to ${nextInstanceType.toUpperCase()} instance`}
+          onClick={() => {
+            setInstanceType(nextInstanceType);
+          }}
+        >
+          {instanceType.toUpperCase()}
+        </Button>
+      )}
       <Button
         useIcon='keyboard'
         variation='primary-plain'

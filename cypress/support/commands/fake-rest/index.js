@@ -57,6 +57,8 @@ Cypress.Commands.add('startServer', () => {
         live_inference: 10000000,
         max_inference: 100000000,
         instance_window: 600,
+        total_cpus: 15,
+        active_cpus: 5,
         total_gpus: 15,
         active_gpus: 5,
       },
