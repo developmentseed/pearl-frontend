@@ -88,7 +88,7 @@ export const useMosaics = () => {
       mosaics,
       mosaicMeta,
     }),
-    [mosaics]
+    [mosaics, mosaicMeta]
   );
 };
 

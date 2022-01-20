@@ -61,8 +61,6 @@ function UploadAoiModal({
       const bounds = bbox(geojson);
       const totalArea = areaFromBounds(bounds);
 
-      const mosaicBounds = bboxPolygon(mosaicMeta.data.bounds);
-
       if (isNaN(totalArea) || totalArea === 0) {
         // Area should be bigger than zero, abort import
         setWarning(
@@ -70,7 +68,11 @@ function UploadAoiModal({
         );
         setFile(null);
         return;
-      } else if (!booleanWithin(bboxPolygon(bounds), mosaicBounds)) {
+      } else if (
+        // If mosaic bounds is available, check if geojson is contained
+        mosaicMeta.data?.bounds &&
+        !booleanWithin(bboxPolygon(bounds), bboxPolygon(mosaicMeta.data.bounds))
+      ) {
         setWarning(
           'Area is out of imagery bounds. Please upload another file.'
         );

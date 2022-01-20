@@ -52,9 +52,8 @@ describe('Create new project', () => {
     );
 
     // Set project name
-    cy.get('[data-cy=modal-project-input]')
-      .should('exist')
-      .clear()
+    cy.get('[data-cy=new-project-name-modal-input]')
+      .should('be.focused')
       .type('Project name');
     cy.get('[data-cy=create-project-button]').should('exist').click();
 

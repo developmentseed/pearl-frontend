@@ -9,7 +9,9 @@ describe('Loads AOIs', () => {
     cy.fakeLogin();
     cy.visit('/project/new');
 
-    cy.get('[data-cy=modal-project-input]').clear().type('Project name');
+    cy.get('[data-cy=new-project-name-modal-input]')
+      .should('be.focused')
+      .type('Project name');
     cy.get('[data-cy=create-project-button]').click({ force: true });
   });
 
