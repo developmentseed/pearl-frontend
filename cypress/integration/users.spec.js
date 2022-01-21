@@ -1,6 +1,5 @@
-const {
-  restApiEndpoint,
-} = require('../../app/assets/scripts/config/testing').default;
+const restApiEndpoint = Cypress.config('restApiEndpoint');
+
 import { paginatedList } from '../support/commands/fake-rest/utils';
 
 describe('The app header', () => {

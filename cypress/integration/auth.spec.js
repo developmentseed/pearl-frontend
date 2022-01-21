@@ -1,6 +1,4 @@
-const {
-  restApiEndpoint,
-} = require('../../app/assets/scripts/config/testing').default;
+const restApiEndpoint = Cypress.config('restApiEndpoint');
 
 describe('The app header', () => {
   beforeEach(() => {

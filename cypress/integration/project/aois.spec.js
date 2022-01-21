@@ -1,5 +1,4 @@
-import config from '../../../app/assets/scripts/config/testing';
-const { restApiEndpoint } = config.default;
+const restApiEndpoint = Cypress.config('restApiEndpoint');
 
 describe('Loads AOIs', () => {
   let map;

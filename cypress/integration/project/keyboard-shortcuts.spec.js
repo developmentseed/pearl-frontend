@@ -1,6 +1,4 @@
-const {
-  restApiEndpoint,
-} = require('../../../app/assets/scripts/config/testing').default;
+const restApiEndpoint = Cypress.config('restApiEndpoint');
 
 /* eslint-disable camelcase */
 const instance = {

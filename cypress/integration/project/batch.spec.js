@@ -2,9 +2,7 @@ import { sortBy } from 'lodash';
 import { getQueryElement } from '../../support/commands/fake-rest/utils';
 const format = require('date-fns/format').default;
 
-const {
-  restApiEndpoint,
-} = require('../../../app/assets/scripts/config/testing').default;
+const restApiEndpoint = Cypress.config('restApiEndpoint');
 
 const instance = {
   id: 1,

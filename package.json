@@ -19,12 +19,13 @@
     "postinstall": "[ -f app/assets/scripts/config/local.js ] || echo \"'use strict';\n\nexport default {\n  environment: 'development',\n};\" > app/assets/scripts/config/local.js",
     "serve": "NODE_ENV=development gulp serve",
     "serve:production": "NODE_ENV=production gulp serve",
+    "serve:cypress": "NODE_ENV=cypress gulp serve",
     "serve:testing": "NODE_ENV=testing gulp serve",
     "build": "NODE_ENV=production gulp",
     "stage": "NODE_ENV=staging gulp",
     "lint": "eslint app/assets/scripts/ cypress/ --ext .js",
     "lint:css": "stylelint 'app/assets/styles/**/**' 'app/assets/scripts/**/*.js'",
-    "cy:open": "cypress open",
+    "cy:open": "NODE_ENV=cypress cypress open",
     "cy:run": "cypress run --browser chrome"
   },
   "engines": {
@@ -56,6 +57,7 @@
     "@babel/plugin-transform-spread": "^7.12.1",
     "@babel/preset-env": "^7.12.1",
     "@babel/preset-react": "^7.12.5",
+    "@babel/register": "^7.16.9",
     "babel-eslint": "^10.1.0",
     "babelify": "^10.0.0",
     "browser-sync": "^2.26.13",
