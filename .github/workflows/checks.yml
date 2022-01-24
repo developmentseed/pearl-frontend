@@ -95,7 +95,7 @@ jobs:
           CYPRESS_AUTH0_PASSWORD: ${{ secrets.CYPRESS_AUTH0_PASSWORD }}
         with:
           browser: chrome
-          start: yarn serve:testing
+          start: yarn serve:cypress
           wait-on: 'http://localhost:9000'
 
   build:
