@@ -3,9 +3,6 @@
   "experimentalFetchPolyfill": true,
   "chromeWebSecurity": false,
   "defaultCommandTimeout": 7000,
-  "retries": 1,
-  "testFiles": "**/!(stress-live-api.spec.js)",
-  "env": {
-    "NODE_ENV": "cypress"
-  }
+  "testFiles": "**/stress-live-api.spec.js"
 }
+

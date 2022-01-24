@@ -26,6 +26,7 @@
     "lint": "eslint app/assets/scripts/ cypress/ --ext .js",
     "lint:css": "stylelint 'app/assets/styles/**/**' 'app/assets/scripts/**/*.js'",
     "cy:open": "NODE_ENV=cypress cypress open",
+    "cy:open:stress": "NODE_ENV=testing cypress open --config-file cypress-stress.json",
     "cy:run": "cypress run --browser chrome"
   },
   "engines": {

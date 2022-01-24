@@ -19,5 +19,6 @@ module.exports = (on, cypressConfig) => {
   return {
     ...cypressConfig,
     restApiEndpoint: appConfig.restApiEndpoint,
+    apiToken: appConfig.apiToken,
   };
 };
