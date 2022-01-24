@@ -1,6 +1,6 @@
-// module exports is required to be able to load from gulpfile.
 module.exports = {
   default: {
-    environment: 'staging',
+    restApiEndpoint: 'https://api.lulc-staging.ds.io',
+    websocketEndpoint: 'wss://socket.lulc-staging.ds.io',
   },
 };

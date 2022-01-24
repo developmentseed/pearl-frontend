@@ -17,7 +17,7 @@
   "homepage": "https://github.com/developmentseed/lulc-frontend",
   "scripts": {
     "postinstall": "[ -f app/assets/scripts/config/local.js ] || echo \"'use strict';\n\nexport default {\n  environment: 'development',\n};\" > app/assets/scripts/config/local.js",
-    "serve": "NODE_ENV=development gulp serve",
+    "serve": "NODE_ENV=cypress gulp serve",
     "serve:production": "NODE_ENV=production gulp serve",
     "serve:cypress": "NODE_ENV=cypress gulp serve",
     "serve:testing": "NODE_ENV=testing gulp serve",

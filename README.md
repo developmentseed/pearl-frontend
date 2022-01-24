@@ -32,16 +32,12 @@ yarn install
 #### Config files
 
 All the config files can be found in `app/assets/scripts/config`.
-After installing the projects there will be 3 main files:
+After installing the following files will be available:
 
-- `local.js` - Used only for local development. On production this file should not exist or be empty.
-- `staging.js`
-- `production.js`
-
-The `production.js` file serves as base and the other 2 will override it as needed:
-
-- `staging.js` will be loaded whenever the env variable `DS_ENV` is set to staging.
-- `local.js` will be loaded if it exists.
+- `base.js`: default configuration for all environments
+- `cypress.js`: configuration used when running Cypress specs
+- `production.js`, `testing.js`, `staging.js`: deployment environments
+- `local.js`: Used only for local development, will override any of previous files. On production this file should not exist or be empty
 
 The following options must be set: (The used file will depend on the context):
 
@@ -51,7 +47,7 @@ Example:
 
 ```javascript
 module.exports = {
-  value: 'some-value'
+  value: 'some-value',
 };
 ```
 
@@ -69,14 +65,14 @@ Compiles the javascript and launches the server making the site available at `ht
 The system will watch files and execute tasks whenever one of them changes.
 The site will automatically refresh since it is bundled with livereload.
 
-## Test
+## Local Testing with Cypress
 
-The app is using cypress to perform end-to-end testing. New tests should be added to `cypress/integrations/*.spec.js`.
+The app is using Cypress to perform end-to-end testing. New tests should be added to `cypress/integrations/*.spec.js`.
 
-Start the front-end in testing mode:
+Start the front-end for Cypress testing:
 
 ```sh
-yarn run serve:testing
+yarn run serve:cypress
 ```
 
 Run tests:
@@ -85,11 +81,32 @@ Run tests:
 yarn run cy:run
 ```
 
-## Develop with Cypress Dashboard
+This the method used in CI for PR/merge checks.
 
-Start the dashboard: `yarn cy:open`.
+## Develop with Cypress Dashboard and auto-reload
 
-Copy config file `testing.js` to `local.js` and run `yarn serve`. This will enable live reload on Cypress Dashboard.
+This should be the easiest method for developing locally. Start the app with
+auto-reload:
+
+```sh
+yarn run serve
+```
+
+Open Cypress dashboard: `yarn cy:open`.
+
+To use a different API, please add REST and Websocket URLs to `config/local.js`.
+
+## Stress test an live API
+
+By default Cypress will use mocked API endpoints for testing. Please do the
+follow steps to run automate testing to a live API:
+
+- Update `config/local.json` with target API URLs (REST and Websocket)
+- Start front-end server: `yarn run serve`
+- Start Cypress Dashboard in "stress" mode: `yarn run cy:open:stress`
+
+Please refer to instructions in [cypress/integration/stress-live-api.spec.js]() file
+for more details on this testing approach.
 
 ## Deployment
 
