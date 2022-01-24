@@ -103,6 +103,11 @@ follow steps to run automate testing to a live API:
 
 - Update `config/local.json` with target API URLs (REST and Websocket)
 - Start front-end server: `yarn run serve`
+- Visit http://localhost:9000
+- Login
+- Open developer tools, visit an protected route and collect your JWT API Token by
+  inspecting a request to the API
+- Add `apiToken` property to `config/local.json` with value collected
 - Start Cypress Dashboard in "stress" mode: `yarn run cy:open:stress`
 
 Please refer to instructions in [cypress/integration/stress-live-api.spec.js]() file
