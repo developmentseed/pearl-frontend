@@ -17,7 +17,7 @@
   "homepage": "https://github.com/developmentseed/lulc-frontend",
   "scripts": {
     "postinstall": "[ -f app/assets/scripts/config/local.js ] || echo \"'use strict';\n\nexport default {\n  environment: 'development',\n};\" > app/assets/scripts/config/local.js",
-    "serve": "NODE_ENV=cypress gulp serve",
+    "serve": "gulp serve",
     "serve:production": "NODE_ENV=production gulp serve",
     "serve:cypress": "NODE_ENV=cypress gulp serve",
     "serve:testing": "NODE_ENV=testing gulp serve",
@@ -27,7 +27,7 @@
     "lint:css": "stylelint 'app/assets/styles/**/**' 'app/assets/scripts/**/*.js'",
     "cy:open": "NODE_ENV=cypress cypress open",
     "cy:open:stress": "NODE_ENV=testing cypress open --config-file cypress-stress.json",
-    "cy:run": "cypress run --browser chrome"
+    "cy:run": "NODE_ENV=cypress cypress run --browser chrome"
   },
   "engines": {
     "node": "14.x"

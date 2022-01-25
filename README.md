@@ -72,13 +72,13 @@ The app is using Cypress to perform end-to-end testing. New tests should be adde
 Start the front-end for Cypress testing:
 
 ```sh
-yarn run serve:cypress
+yarn serve:cypress
 ```
 
 Run tests:
 
 ```sh
-yarn run cy:run
+yarn cy:run
 ```
 
 This the method used in CI for PR/merge checks.
@@ -89,7 +89,7 @@ This should be the easiest method for developing locally. Start the app with
 auto-reload:
 
 ```sh
-yarn run serve
+yarn serve
 ```
 
 Open Cypress dashboard: `yarn cy:open`.
@@ -98,20 +98,24 @@ To use a different API, please add REST and Websocket URLs to `config/local.js`.
 
 ## Stress test an live API
 
-By default Cypress will use mocked API endpoints for testing. Please do the
+By default, Cypress will use mocked API endpoints for testing. Please do the
 follow steps to run automate testing to a live API:
 
-- Update `config/local.json` with target API URLs (REST and Websocket)
-- Start front-end server: `yarn run serve`
-- Visit http://localhost:9000
-- Login
-- Open developer tools, visit an protected route and collect your JWT API Token by
-  inspecting a request to the API
-- Add `apiToken` property to `config/local.json` with value collected
-- Start Cypress Dashboard in "stress" mode: `yarn run cy:open:stress`
+1. Start the app using `testing` API with `yarn serve:testing`
+2. Visit http://localhost:9000
+3. Login in the website, following Auth0 workflow
+4. Open developer tools, visit a protected route and collect your API Token by
+   inspecting request headers to the API
+5. Add `apiToken` property to `config/local.json` with value collected
+6. Start Cypress Dashboard in "stress" mode: `yarn cy:open:stress`
 
 Please refer to instructions in [cypress/integration/stress-live-api.spec.js]() file
 for more details on this testing approach.
+
+To run test against an API other than `testing`, replace the first step with:
+
+- Update `config/local.json` with target API URLs (REST and Websocket)
+- Start front-end server: `yarn serve`
 
 ## Deployment
 
