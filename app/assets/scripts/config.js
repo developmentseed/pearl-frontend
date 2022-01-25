@@ -40,8 +40,14 @@ if (process.env.NODE_ENV === 'production') {
   config = defaultsDeep(envConfig.staging, config);
 }
 
-// Apply local config
-config = defaultsDeep(require('./config/local.js') || {}, config);
+// Apply local config when not in production
+if (process.env.NODE_ENV !== 'production') {
+  try {
+    config = defaultsDeep(require('./config/local.js') || {}, config);
+  } catch (error) {
+    // local.js file was not found, do nothing
+  }
+}
 
 // The require doesn't play super well with es6 imports. It creates an internal
 // 'default' property. Export that.
