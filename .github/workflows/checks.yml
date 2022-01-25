@@ -123,5 +123,8 @@ jobs:
         if: steps.cache-node-modules.outputs.cache-hit != 'true'
         run: yarn install
 
+      - name: Post install (make sure local.js exists to avoid breaking config)
+        run: yarn postinstall
+
       - name: Build
         run: yarn build
