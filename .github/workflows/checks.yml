@@ -93,7 +93,7 @@ jobs:
           CYPRESS_AUTH0_SCOPE: ${{ secrets.CYPRESS_AUTH0_SCOPE }}
           CYPRESS_AUTH0_USERNAME: ${{ secrets.CYPRESS_AUTH0_USERNAME }}
           CYPRESS_AUTH0_PASSWORD: ${{ secrets.CYPRESS_AUTH0_PASSWORD }}
-          CYPRESS_NODE_ENV: cypress
+          NODE_ENV: cypress
         with:
           browser: chrome
           start: yarn serve:cypress
