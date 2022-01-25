@@ -46,8 +46,6 @@ config = defaultsDeep(require('./config/local.js') || {}, config);
 /* eslint-disable no-console */
 console.log('config file');
 console.log(config);
-console.log(process.env);
-
 // The require doesn't play super well with es6 imports. It creates an internal
 // 'default' property. Export that.
 export default config.default;
