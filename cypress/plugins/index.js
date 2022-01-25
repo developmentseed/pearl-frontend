@@ -15,10 +15,6 @@ const { startMockWsServer } = require('cypress-websocket-server');
 module.exports = (on, cypressConfig) => {
   startMockWsServer(cypressConfig);
 
-  /* eslint-disable no-console */
-  console.log('appConfig');
-  console.log(appConfig);
-
   // Pass app config to Cypress tests
   return {
     ...cypressConfig,

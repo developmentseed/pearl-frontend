@@ -43,9 +43,6 @@ if (process.env.NODE_ENV === 'production') {
 // Apply local config
 config = defaultsDeep(require('./config/local.js') || {}, config);
 
-/* eslint-disable no-console */
-console.log('config file');
-console.log(config);
 // The require doesn't play super well with es6 imports. It creates an internal
 // 'default' property. Export that.
 export default config.default;
