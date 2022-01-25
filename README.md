@@ -99,11 +99,11 @@ To use a different API, please add REST and Websocket URLs to `config/local.js`.
 ## Stress test an live API
 
 By default, Cypress will use mocked API endpoints for testing. Please do the
-follow steps to run automate testing to a live API:
+follow steps to run automate testing using a live API:
 
 1. Start the app using `testing` API with `yarn serve:testing`
 2. Visit http://localhost:9000
-3. Login in the website, following Auth0 workflow
+3. Login to the website, following Auth0 workflow
 4. Open developer tools, visit a protected route and collect your API Token by
    inspecting request headers to the API
 5. Add `apiToken` property to `config/local.json` with value collected
