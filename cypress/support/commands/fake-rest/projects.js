@@ -1,6 +1,4 @@
-const {
-  restApiEndpoint,
-} = require('../../../../app/assets/scripts/config/testing').default;
+const restApiEndpoint = Cypress.config('restApiEndpoint');
 
 /**
  * Mock a project scenario: an instance is running with checkpoint 2 and AOI 2 applied.

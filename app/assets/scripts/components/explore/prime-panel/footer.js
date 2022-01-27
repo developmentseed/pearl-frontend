@@ -219,6 +219,8 @@ function PrimeButton({
             toasts.error(
               'Could not start instance at the moment, please try again later.'
             );
+          } else if (error.message === 'No instances available') {
+            toasts.error('No instances available, please try again later.');
           } else {
             toasts.error('Unexpected error, please try again later');
           }
