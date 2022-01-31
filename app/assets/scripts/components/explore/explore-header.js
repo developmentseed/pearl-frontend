@@ -27,13 +27,15 @@ import {
 import { actions as shortcutActions } from '../../context/explore/shortcuts';
 import { useProject } from '../../context/project';
 import { useAuth } from '../../context/auth';
+import { useInstance } from '../../context/instance';
 import { useAoi } from '../../context/aoi';
 import toasts from '../common/toasts';
 import logger from '../../utils/logger';
+import useFocus from '../../utils/use-focus';
 import { downloadGeotiff as downloadGeotiffUtil } from '../../utils/map';
 import { useTour } from '../../context/explore';
 
-import { Modal } from '@devseed-ui/modal';
+import { Modal } from '../common/custom-modal';
 import { StyledLink } from '../../styles/links';
 
 const Wrapper = styled.div`
@@ -97,6 +99,7 @@ const ProjectHeading = styled.div`
 `;
 
 const HeadingInput = styled(FormInput)`
+  transition: none;
   margin-left: ${glsp(0.25)};
   font-weight: ${themeVal('type.heading.weight')};
 `;
@@ -151,8 +154,10 @@ const Shortcut = styled.dt`
 function ExploreHeader(props) {
   const { projectId } = useProjectId();
   const { isMediumDown } = props;
-  const { isAuthenticated, restApiClient } = useAuth();
+  const { isAuthenticated, restApiClient, user } = useAuth();
   const { setTourStep } = useTour();
+  const { instanceType, setInstanceType } = useInstance();
+  const nextInstanceType = instanceType === 'gpu' ? 'cpu' : 'gpu';
 
   const { currentAoi } = useAoi();
 
@@ -175,6 +180,12 @@ function ExploreHeader(props) {
   const [exportShareURL, setExportShareURL] = useState(null);
 
   useEffect(() => setLocalProjectName(initialName), [initialName]);
+
+  const newProjectNameModalRevealed =
+    !projectName && projectId && projectId === 'new';
+
+  // Delays focus
+  const [projectNameInputRef, setProjectNameInputFocus] = useFocus(0);
 
   const handleSubmit = (evt) => {
     evt.preventDefault();
@@ -300,7 +311,6 @@ function ExploreHeader(props) {
               }}
               value={localProjectName || ''}
               disabled={!isAuthenticated}
-              autoFocus
               data-cy='project-input'
             />
             <Button
@@ -329,6 +339,18 @@ function ExploreHeader(props) {
         <span>Session Status: </span>
         {sessionStatus.message}
       </StatusHeading>
+      {user?.flags?.gpu && (
+        <Button
+          data-cy='toggle-instance-type-button'
+          variation='primary-plain'
+          title={`Click to switch to ${nextInstanceType.toUpperCase()} instance`}
+          onClick={() => {
+            setInstanceType(nextInstanceType);
+          }}
+        >
+          {instanceType.toUpperCase()}
+        </Button>
+      )}
       <Button
         useIcon='keyboard'
         variation='primary-plain'
@@ -495,10 +517,13 @@ function ExploreHeader(props) {
         data-cy='project-name-modal'
         title='New project'
         // Reveal modal on mount for new projects, not existing ones
-        revealed={!projectName && projectId && projectId === 'new'}
+        revealed={newProjectNameModalRevealed}
         size='small'
         closeButton={true}
         onCloseClick={() => history.push('/profile/projects')}
+        onEntered={() => {
+          setProjectNameInputFocus();
+        }}
         content={
           <ModalForm onSubmit={handleSubmit}>
             <p>Enter a project name to get started</p>
@@ -514,8 +539,8 @@ function ExploreHeader(props) {
               }}
               value={localProjectName || ''}
               disabled={!isAuthenticated}
-              autoFocus
-              data-cy='modal-project-input'
+              ref={projectNameInputRef}
+              data-cy='new-project-name-modal-input'
             />
             <Button
               type='submit'

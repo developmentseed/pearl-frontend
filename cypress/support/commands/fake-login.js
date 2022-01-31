@@ -1,9 +1,9 @@
-const FAKE_API_TOKEN = 'FAKE_API_TOKEN';
+const apiToken = Cypress.config('apiToken') || 'FAKE_API_TOKEN';
 
 /**
  * Make client look like it has authenticated
  */
-Cypress.Commands.add('fakeLogin', (access) => {
+Cypress.Commands.add('fakeLogin', (access, flags = {}) => {
   window.localStorage.setItem('useFakeLogin', true);
   window.localStorage.setItem(
     'authState',
@@ -12,9 +12,10 @@ Cypress.Commands.add('fakeLogin', (access) => {
       error: false,
       isAuthenticated: true,
       userAccessLevel: access || 'user',
-      apiToken: FAKE_API_TOKEN,
+      apiToken,
       user: {
         name: 'Test User',
+        flags,
       },
     })
   );

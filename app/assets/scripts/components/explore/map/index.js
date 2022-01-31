@@ -296,9 +296,10 @@ function Map() {
           const area = areaFromBounds(bbox);
           const aoiBboxPoly = bboxPolygon(bbox);
 
-          const mosaicBounds = bboxPolygon(mosaicMeta.data.bounds);
-
-          if (!booleanWithin(aoiBboxPoly, mosaicBounds)) {
+          if (
+            mosaicMeta.data?.bounds &&
+            !booleanWithin(aoiBboxPoly, bboxPolygon(mosaicMeta.data.bounds))
+          ) {
             setActiveModal('area-out-of-bounds');
             return;
           }
@@ -604,7 +605,7 @@ function Map() {
           currentProject &&
           currentCheckpoint &&
           currentAoi &&
-          !predictions.fetching && (
+          !(predictions.status === 'running') && (
             <TileLayerWithHeaders
               url={tileUrl}
               headers={[
@@ -625,7 +626,7 @@ function Map() {
               }
               eventHandlers={{
                 add: () => {
-                  if (predictions.isReady() || !predictions.data.predictions) {
+                  if (predictions.isReady || !predictions.data.predictions) {
                     setUserLayers({
                       ...userLayers,
                       predictions: {
@@ -636,7 +637,7 @@ function Map() {
                   }
                 },
                 load: () => {
-                  if (predictions.isReady() || !predictions.data.predictions) {
+                  if (predictions.isReady || !predictions.data.predictions) {
                     setTimeout(() => {
                       dispatchPredictions({
                         type: predictionActions.CLEAR_PREDICTION,

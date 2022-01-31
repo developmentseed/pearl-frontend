@@ -113,5 +113,6 @@ tmp
 .tmp
 dist
 cypress/**/*.mp4
+cypress/**/*.png
 cypress.env.json
 cypress/fixtures/example.json

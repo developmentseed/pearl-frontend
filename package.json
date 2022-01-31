@@ -1,6 +1,6 @@
 {
   "name": "lulc-frontend",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "Web application of Microsoft Land Use and Land Classification (LULC) project.",
   "repository": {
     "type": "git",
@@ -17,15 +17,17 @@
   "homepage": "https://github.com/developmentseed/lulc-frontend",
   "scripts": {
     "postinstall": "[ -f app/assets/scripts/config/local.js ] || echo \"'use strict';\n\nexport default {\n  environment: 'development',\n};\" > app/assets/scripts/config/local.js",
-    "serve": "NODE_ENV=development gulp serve",
+    "serve": "gulp serve",
     "serve:production": "NODE_ENV=production gulp serve",
+    "serve:cypress": "NODE_ENV=cypress gulp serve",
     "serve:testing": "NODE_ENV=testing gulp serve",
     "build": "NODE_ENV=production gulp",
     "stage": "NODE_ENV=staging gulp",
     "lint": "eslint app/assets/scripts/ cypress/ --ext .js",
     "lint:css": "stylelint 'app/assets/styles/**/**' 'app/assets/scripts/**/*.js'",
-    "cy:open": "cypress open",
-    "cy:run": "cypress run"
+    "cy:open": "NODE_ENV=cypress cypress open",
+    "cy:open:stress": "NODE_ENV=testing cypress open --config-file cypress-stress.json",
+    "cy:run": "NODE_ENV=cypress cypress run --browser chrome"
   },
   "engines": {
     "node": "14.x"
@@ -56,12 +58,13 @@
     "@babel/plugin-transform-spread": "^7.12.1",
     "@babel/preset-env": "^7.12.1",
     "@babel/preset-react": "^7.12.5",
+    "@babel/register": "^7.16.9",
     "babel-eslint": "^10.1.0",
     "babelify": "^10.0.0",
     "browser-sync": "^2.26.13",
     "browserify": "^17.0.0",
     "collecticons-processor": "^4.1.0",
-    "cypress": "^8.4.1",
+    "cypress": "^9.3.1",
     "cypress-file-upload": "^5.0.8",
     "cypress-websocket-server": "^0.1.2",
     "del": "^6.0.0",

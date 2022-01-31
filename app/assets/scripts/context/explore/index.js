@@ -8,6 +8,8 @@ import React, {
   useRef,
 } from 'react';
 import T from 'prop-types';
+import { formatDuration } from 'date-fns';
+import config from '../../config';
 import { useAuth } from '../auth';
 import {
   showGlobalLoadingMessage,
@@ -119,7 +121,12 @@ export function ExploreProvider(props) {
     }
   );
   const [currentInstance, setCurrentInstance] = useState(null);
-  const { initInstance, loadAoiOnInstance, getRunningBatch } = useInstance();
+  const {
+    initInstance,
+    loadAoiOnInstance,
+    getRunningBatch,
+    instanceType,
+  } = useInstance();
 
   /**
    * Session status
@@ -195,10 +202,10 @@ export function ExploreProvider(props) {
       setSessionStatusMode(sessionModes.LOADING_PROJECT);
     }
 
-    const { availableGpus } = await restApiClient.getApiMeta('');
+    const { availableInstances } = await restApiClient.getApiMeta('');
 
     // Do not run when no instances are available
-    if (!availableGpus) {
+    if (!availableInstances[instanceType]) {
       hideGlobalLoading();
       toasts.error('No instances available, please try again later.', {
         autoClose: false,
@@ -242,7 +249,13 @@ export function ExploreProvider(props) {
         latestAoi = aois.find((a) => Number(a.checkpoint_id) === checkpoint.id);
       }
 
-      showGlobalLoadingMessage('Looking for active GPU instances...');
+      const initializingInstanceMessage =
+        instanceType === 'cpu'
+          ? 'Initializing CPU instance...'
+          : `Initializing GPU instance, this may take up to ${formatDuration({
+              minutes: config.instanceCreationTimeout / (60 * 60 * 1000),
+            })}...`;
+      showGlobalLoadingMessage(initializingInstanceMessage);
       const instance = await initInstance(
         project.id,
         checkpoint && checkpoint.id,
@@ -254,19 +267,22 @@ export function ExploreProvider(props) {
       setCurrentInstance(instance);
     } catch (error) {
       logger(error);
-      toasts.error('Error loading project, please try again later.');
+      toasts.error(
+        'Unexpected error while loading the project, please try again later.'
+      );
+      history.push(`/profile/projects/${project.id}`);
     }
   }
 
   // Load project meta on load and api client ready
   useEffect(() => {
-    if (!authIsLoading && restApiClient) {
+    if (!authIsLoading && restApiClient && instanceType) {
       loadInitialData();
     }
-  }, [authIsLoading, restApiClient]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [authIsLoading, restApiClient, instanceType]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (predictions.fetching) {
+    if (predictions.status === 'running') {
       const { processed, total, retrainProgress } = predictions;
       if (total) {
         setSessionStatusMessage(`Received image ${processed} of ${total}...`);
@@ -275,11 +291,11 @@ export function ExploreProvider(props) {
       } else if (retrainProgress > 0) {
         setSessionStatusMessage(`${retrainProgress}% retrained...`);
       }
-    } else if (predictions.isReady()) {
+    } else if (predictions.isReady) {
       // Update AOI List with newest AOI
       // If predictions is ready, restApiClient must be ready
 
-      if (predictions.fetched && predictions.data.predictions?.length > 0) {
+      if (predictions.data.predictions?.length > 0) {
         restApiClient.get(`project/${currentProject.id}/aoi/`).then((aois) => {
           setAoiList(aois.aois);
         });
@@ -287,14 +303,12 @@ export function ExploreProvider(props) {
         // means new checkpoint available
         loadCheckpointList(currentProject.id);
 
-        if (predictions.getData().type === checkpointModes.RETRAIN) {
+        if (predictions.data.type === checkpointModes.RETRAIN) {
           loadMetrics();
         }
 
         restApiClient
-          .get(
-            `project/${currentProject.id}/aoi/${predictions.getData().aoiId}`
-          )
+          .get(`project/${currentProject.id}/aoi/${predictions.data.aoiId}`)
           .then((aoi) => {
             setCurrentAoi(aoi);
           });

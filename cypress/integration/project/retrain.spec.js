@@ -1,6 +1,4 @@
-const {
-  restApiEndpoint,
-} = require('../../../app/assets/scripts/config/testing').default;
+const restApiEndpoint = Cypress.config('restApiEndpoint');
 
 const instance = {
   id: 1,
@@ -14,6 +12,7 @@ const instance = {
   status: {
     phase: 'Running',
   },
+  type: 'cpu',
 };
 
 describe('Retrain existing project', () => {
@@ -44,8 +43,8 @@ describe('Retrain existing project', () => {
           live_inference: 10000000,
           max_inference: 100000000,
           instance_window: 600,
-          total_gpus: 15,
-          active_gpus: 15,
+          total_cpus: 15,
+          active_cpus: 15,
         },
       }
     );
@@ -74,8 +73,8 @@ describe('Retrain existing project', () => {
           live_inference: 10000000,
           max_inference: 100000000,
           instance_window: 600,
-          total_gpus: 15,
-          active_gpus: 20,
+          total_cpus: 15,
+          active_cpus: 20,
         },
       }
     );
@@ -260,8 +259,8 @@ describe('Retrain existing project', () => {
           live_inference: 10000000,
           max_inference: 100000000,
           instance_window: 600,
-          total_gpus: 15,
-          active_gpus: 15,
+          total_cpus: 15,
+          active_cpus: 15,
         },
       }
     ).as('fetchAvailableInstancesCount');
@@ -288,8 +287,8 @@ describe('Retrain existing project', () => {
           live_inference: 10000000,
           max_inference: 100000000,
           instance_window: 600,
-          total_gpus: 15,
-          active_gpus: 5,
+          total_cpus: 15,
+          active_cpus: 5,
         },
       }
     ).as('fetchAvailableInstancesCount');
@@ -391,8 +390,8 @@ describe('Retrain existing project', () => {
           live_inference: 10000000,
           max_inference: 100000000,
           instance_window: 600,
-          total_gpus: 1,
-          active_gpus: 0,
+          total_cpus: 1,
+          active_cpus: 0,
         },
       }
     ).as('fetchAvailableInstancesCount');
@@ -444,8 +443,8 @@ describe('Retrain existing project', () => {
           live_inference: 10000000,
           max_inference: 100000000,
           instance_window: 600,
-          total_gpus: 1,
-          active_gpus: 1,
+          total_cpus: 1,
+          active_cpus: 1,
         },
       }
     ).as('fetchAvailableInstancesCount');

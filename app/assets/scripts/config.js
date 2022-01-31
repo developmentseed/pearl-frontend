@@ -19,18 +19,29 @@ import defaultsDeep from 'lodash.defaultsdeep';
  *      polluting the repo.
  */
 
-var configurations = require('./config/*.js', { mode: 'hash' });
-var config = configurations.base || {};
+// Initialize with base config
+var config = require('./config/base.js');
+
+// Load environment-specific configs
+var envConfig = {
+  cypress: require('./config/cypress.js'),
+  production: require('./config/production.js'),
+  staging: require('./config/staging.js'),
+  testing: require('./config/testing.js'),
+};
 
 if (process.env.NODE_ENV === 'production') {
-  config = defaultsDeep(configurations.production || {}, config);
+  config = defaultsDeep(envConfig.production || {}, config);
+} else if (process.env.NODE_ENV === 'cypress') {
+  config = defaultsDeep(envConfig.cypress || {}, config);
 } else if (process.env.NODE_ENV === 'testing') {
-  config = defaultsDeep(configurations.testing || {}, config);
+  config = defaultsDeep(envConfig.testing || {}, config);
 } else if (process.env.NODE_ENV === 'staging') {
-  config = defaultsDeep(configurations.staging, config);
-} else if (process.env.NODE_ENV === 'development') {
-  config = defaultsDeep(configurations.local || {}, config);
+  config = defaultsDeep(envConfig.staging, config);
 }
+
+// Apply local config
+config = defaultsDeep(require('./config/local.js') || {}, config);
 
 // The require doesn't play super well with es6 imports. It creates an internal
 // 'default' property. Export that.
