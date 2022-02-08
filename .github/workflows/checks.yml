@@ -20,7 +20,9 @@ jobs:
           access_token: ${{ github.token }}
 
       - name: Checkout
-        uses: actions/checkout@v2.3.4
+        uses: actions/checkout@v2
+        with:
+          repository: developmentseed/pearl-frontend
 
       - name: Use Node.js 14
         uses: actions/setup-node@v1
