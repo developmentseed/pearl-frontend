@@ -21,8 +21,6 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@v2
-        with:
-          repository: developmentseed/pearl-frontend
 
       - name: Use Node.js 14
         uses: actions/setup-node@v1
