@@ -1,6 +1,6 @@
-# LULC Front-end
+# Pearl Frontend
 
-Web application for Microsoft Land Use and Land Classification (LULC) project.
+Web application for Pearl Land Use and Land Classification (LULC) project.
 
 ## Installation and Usage
 

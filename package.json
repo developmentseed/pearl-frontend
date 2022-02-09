@@ -1,7 +1,7 @@
 {
   "name": "pearl-frontend",
   "version": "1.6.0",
-  "description": "Web application of Microsoft Land Use and Land Classification (LULC) project.",
+  "description": "Web application of Pearl Land Use and Land Classification (LULC) project.",
   "repository": {
     "type": "git",
     "url": "https://github.com/developmentseed/pearl-frontend.git"
