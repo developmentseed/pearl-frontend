@@ -1,10 +1,10 @@
 {
-  "name": "lulc-frontend",
+  "name": "pearl-frontend",
   "version": "1.6.0",
   "description": "Web application of Microsoft Land Use and Land Classification (LULC) project.",
   "repository": {
     "type": "git",
-    "url": "https://github.com/developmentseed/lulc-frontend.git"
+    "url": "https://github.com/developmentseed/pearl-frontend.git"
   },
   "author": {
     "name": "Development Seed",
@@ -12,9 +12,9 @@
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/developmentseed/lulc-frontend/issues"
+    "url": "https://github.com/developmentseed/pearl-frontend/issues"
   },
-  "homepage": "https://github.com/developmentseed/lulc-frontend",
+  "homepage": "https://github.com/developmentseed/pearl-frontend",
   "scripts": {
     "postinstall": "[ -f app/assets/scripts/config/local.js ] || echo \"'use strict';\n\nexport default {\n  environment: 'development',\n};\" > app/assets/scripts/config/local.js",
     "serve": "gulp serve",
