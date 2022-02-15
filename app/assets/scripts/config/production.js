@@ -7,7 +7,7 @@ module.exports = {
     auth0Domain: 'pearl-landcover.us.auth0.com',
     auth0ClientId: 'OQtYR72fGdgrogeokjr9CBl4vg1P6SYP',
     tileUrlTemplate:
-      'https://tiles.lulc.ds.io/mosaic/{LAYER_NAME}/tiles/{z}/{x}/{y}?bidx=1%2C2%2C3',
+      'https://tiles.lulc.ds.io/mosaic/{LAYER_NAME}/tiles/{z}/{x}/{y}?asset_bidx=image|1,2,3&assets=image&collection=naip',
     appInsightsKey: '0291f153-9634-463e-8aa0-34700141d37c',
   },
 };
