@@ -1,6 +1,6 @@
-# Pearl Frontend
+<h1 align=center>PEARL Frontend</h1>
 
-Web application for Pearl Land Use and Land Classification (LULC) project.
+Web application for Planetary Computer Land Cover Mapping platform. For the API and infrastructure, see [pearl-backend](https://github.com/developmentseed/pearl-backend).
 
 ## Installation and Usage
 
