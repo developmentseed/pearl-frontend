@@ -19,7 +19,7 @@ module.exports = {
     bingSearchUrl: 'https://dev.virtualearth.net/REST/v1',
     reverseGeocodeRadius: 1,
     tileUrlTemplate:
-      'https://tiles.lulc-staging.ds.io/mosaic/{LAYER_NAME}/tiles/{z}/{x}/{y}?bidx=1%2C2%2C3',
+      'https://tiles.lulc-staging.ds.io/mosaic/{LAYER_NAME}/tiles/{z}/{x}/{y}?asset_bidx=image|1,2,3&assets=image&collection=naip',
     appInsightsKey: '07b5adb4-0447-4c6f-881a-a23e108bc861',
     instanceCreationTimeout: 10 * 60 * 60 * 1000,
     instanceCreationCheckInterval: 5000,
