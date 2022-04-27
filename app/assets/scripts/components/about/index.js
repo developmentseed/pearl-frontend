@@ -308,9 +308,6 @@ class About extends React.Component {
                     In Partnership With
                   </Heading>
                   <li>
-                    <img src='../assets/graphics/content/logo_microsoft.svg' />
-                  </li>
-                  <li>
                     <img src='../assets/graphics/content/logo_devseed.svg' />
                   </li>
                 </PartnerLogos>
