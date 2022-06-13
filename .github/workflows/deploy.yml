@@ -78,7 +78,7 @@ jobs:
         uses: azure/CLI@v1
         with:
           inlineScript: |
-              az storage blob upload-batch --account-name $STAGING_STORAGE_ACCOUNT_NAME -d '$web' -s ./dist
+              az storage blob upload-batch --account-name $STAGING_STORAGE_ACCOUNT_NAME --overwrite -d '$web' -s ./dist
 
       - name: Upload to blob storage
         if: github.ref == 'refs/heads/main'
