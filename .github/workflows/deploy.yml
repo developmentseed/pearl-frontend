@@ -85,7 +85,7 @@ jobs:
         uses: azure/CLI@v1
         with:
           inlineScript: |
-              az storage blob upload-batch --account-name $PRODUCTION_STORAGE_ACCOUNT_NAME -d '$web' -s ./dist
+              az storage blob upload-batch --account-name $PRODUCTION_STORAGE_ACCOUNT_NAME --overwrite -d '$web' -s ./dist
 
 
       - name: Purge CDN endpoint
