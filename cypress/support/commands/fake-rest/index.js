@@ -8,6 +8,13 @@ Cypress.Commands.add('startServer', () => {
   require('./projects')();
   require('./batch')();
 
+  cy.intercept(
+    {
+      hostname: 'dc.services.visualstudio.com',
+    },
+    {}
+  );
+
   // Fake OSM Tiles
   cy.intercept(
     {
