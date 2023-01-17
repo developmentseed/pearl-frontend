@@ -1,4 +1,3 @@
-import './wdyr';
 import '@babel/polyfill';
 import { install as installResizeObserver } from 'resize-observer';
 import React from 'react';
