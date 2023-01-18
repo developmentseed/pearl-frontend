@@ -1,7 +1,6 @@
 // module exports is required to be able to load from gulpfile.
 module.exports = {
   default: {
-    wdyrLogs: false,
     reduxeedLogs: false,
     appTitle: 'PEARL',
     appLongTitle: 'Planetary Computer Land Cover Mapping',
