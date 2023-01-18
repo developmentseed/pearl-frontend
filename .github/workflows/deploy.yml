@@ -3,8 +3,8 @@ name: Deploy
 on:
   push:
     branches:
-    - 'develop'
-    - 'main'
+      # - 'develop' (staging website is temporarily disabled)
+      - 'main'
 
 env:
   STAGING_STORAGE_ACCOUNT_NAME: lulcstagingfrontend
