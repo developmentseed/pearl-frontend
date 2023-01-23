@@ -28,7 +28,9 @@ export function AoiProvider(props) {
   const [aoiRef, setAoiRef] = useState(null);
   const [aoiName, setAoiName] = useState(null);
   const [aoiList, setAoiList] = useState([]);
+  const [aoiIsRectangle, setAoiIsRectangle] = useState(true);
 
+  const [aoiGeometry, setAoiGeometry] = useState(null);
   const [aoiBounds, setAoiBounds] = useState(null);
 
   const [aoiPatch, dispatchAoiPatch] = useReducer(
@@ -102,9 +104,14 @@ export function AoiProvider(props) {
     aoiName,
     setAoiName,
 
+    aoiIsRectangle,
+    setAoiIsRectangle,
+
     aoiArea,
     setAoiArea,
 
+    aoiGeometry,
+    setAoiGeometry,
     aoiBounds,
     setAoiBounds,
 
@@ -161,11 +168,15 @@ export const useAoi = () => {
     setAoiRef,
     aoiName,
     setAoiName,
+    aoiIsRectangle,
+    setAoiIsRectangle,
     currentAoi,
     dispatchCurrentAoi,
 
     aoiList,
     setAoiList,
+    aoiGeometry,
+    setAoiGeometry,
     aoiBounds,
     setAoiBounds,
 
@@ -182,10 +193,14 @@ export const useAoi = () => {
       setAoiRef,
       aoiName,
       setAoiName,
+      aoiIsRectangle,
+      setAoiIsRectangle,
       currentAoi,
       dispatchCurrentAoi,
       aoiList,
       setAoiList,
+      aoiGeometry,
+      setAoiGeometry,
       aoiBounds,
       setAoiBounds,
 
@@ -199,9 +214,11 @@ export const useAoi = () => {
     [
       aoiRef,
       aoiName,
+      aoiIsRectangle,
       currentAoi,
       dispatchCurrentAoi,
       aoiList,
+      aoiGeometry,
       aoiBounds,
       aoiArea,
       activeModal,

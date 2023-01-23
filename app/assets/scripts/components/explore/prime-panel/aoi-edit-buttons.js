@@ -12,7 +12,12 @@ import {
 
 import { EditButton } from '../../../styles/button';
 import { BOUNDS_PADDING } from '../../common/map/constants';
-import { useMapState, useAoiMeta } from '../../../context/explore';
+import {
+  useMapState,
+  useAoiMeta,
+  useSessionStatus,
+  sessionModes,
+} from '../../../context/explore';
 import { useMapRef } from '../../../context/map';
 import { useApiLimits, useMosaics } from '../../../context/global';
 import { useInstance } from '../../../context/instance';
@@ -91,6 +96,7 @@ export function AoiEditButtons(props) {
   const { deleteAoi } = props;
 
   const { runningBatch } = useInstance();
+  const { setSessionStatusMode } = useSessionStatus();
   const { mapState, setMapMode, mapModes } = useMapState();
   const [showUploadAoiModal, setShowUploadAoiModal] = useState(false);
   // updateAoiName applies geocoding
@@ -104,8 +110,10 @@ export function AoiEditButtons(props) {
 
     // Set aoiname sets a string directly
     setAoiName,
+    setAoiGeometry,
     aoiRef,
     setAoiRef,
+    setAoiIsRectangle,
   } = useAoi();
 
   const { aoiArea, aoiBounds, setAoiBounds, createNewAoi } = useAoiMeta();
@@ -338,28 +346,35 @@ export function AoiEditButtons(props) {
         setRevealed={setShowUploadAoiModal}
         apiLimits={apiLimits}
         mosaicMeta={mosaicMeta}
-        onImport={({ bounds, totalArea }) => {
+        onImport={({ totalArea, aoiGeometry }) => {
           try {
-            let aoiShape;
-            const [minX, minY, maxX, maxY] = bounds;
-            const leafletBounds = [
-              [minY, minX],
-              [maxY, maxX],
-            ];
-            if (!aoiRef) {
-              aoiShape = L.rectangle(leafletBounds).addTo(mapRef);
-              setAoiRef(aoiShape);
-            } else {
-              aoiShape = aoiRef;
-              aoiRef.setBounds(leafletBounds);
+            // Remove existing AOI layer
+            if (aoiRef) {
+              aoiRef.remove();
             }
 
+            // Create GeoJSON layer and add to map
+            let aoiShape = L.geoJSON(aoiGeometry).addTo(mapRef);
+            setAoiRef(aoiShape);
+
+            // TODO Geocode polygon AOI
+            setAoiName('Polygon');
+
+            // Add geometry to state, along with total area and bounds
+            setAoiGeometry(aoiGeometry);
+            setAoiArea(totalArea);
+            setAoiBounds(aoiShape.getBounds());
+
+            // Define AOI as non-rectangle
+            setAoiIsRectangle(false);
+
+            // Pan map to GeoJSON bounds
             mapRef.fitBounds(aoiShape.getBounds(), {
               padding: BOUNDS_PADDING,
             });
-            setAoiArea(totalArea);
-            setAoiBounds(aoiShape.getBounds());
-            setMapMode(mapModes.EDIT_AOI_MODE);
+
+            // Change session state to prediction mode
+            setSessionStatusMode(sessionModes.PREDICTION_READY);
 
             return true;
           } catch (error) {

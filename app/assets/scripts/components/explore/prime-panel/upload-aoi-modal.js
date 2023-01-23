@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import { Button } from '@devseed-ui/button';
 import { themeVal } from '@devseed-ui/theme-provider';
 import { Modal } from '@devseed-ui/modal';
+import geojsonValidation from 'geojson-validation';
 
 import Prose from '../../../styles/type/prose';
 import { FauxFileDialog } from '../../common/faux-file-dialog';
@@ -13,6 +14,7 @@ import logger from '../../../utils/logger';
 import { inRange } from '../../../utils/utils';
 import booleanWithin from '@turf/boolean-within';
 import bboxPolygon from '@turf/bbox-polygon';
+import get from 'lodash.get';
 
 const Wrapper = styled.div`
   display: grid;
@@ -50,6 +52,12 @@ function UploadAoiModal({
       // Parse JSON
       const geojson = JSON.parse(await uploadedFile.text());
 
+      // Validate with geojson-validation module
+      if (!geojsonValidation.valid(geojson)) {
+        setWarning(`GeJSON is not valid, please upload a valid file.`);
+        return;
+      }
+
       // Check for a FeatureCollection
       if (geojson.type !== 'FeatureCollection') {
         setWarning(
@@ -65,6 +73,16 @@ function UploadAoiModal({
         setWarning(
           `GeoJSON 'crs' property is not supported, please remove it and use WGS 84 coordinate reference system.`
         );
+        return;
+      }
+
+      // The first feature in the GeoJSON file should contain the AOI geometry
+      const aoiGeometry = get(geojson, 'features[0].geometry');
+      if (
+        geojson.features.length !== 1 ||
+        !geojsonValidation.isPolygon(aoiGeometry)
+      ) {
+        setWarning(`GeoJSON file must contain a single Polygon.`);
         return;
       }
 
@@ -103,7 +121,7 @@ function UploadAoiModal({
       }
 
       // File is ok, allow importing
-      setFile({ name: filename, bounds, totalArea });
+      setFile({ name: filename, bounds, totalArea, aoiGeometry });
     } catch (error) {
       logger(error);
       setWarning(
