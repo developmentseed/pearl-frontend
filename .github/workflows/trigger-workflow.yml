@@ -5,7 +5,50 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
-    - uses: benc-uk/workflow-dispatch@v1
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Use Node.js 14
+      uses: actions/setup-node@v1
+      with:
+        node-version: 14
+
+    - name: Cache node modules
+      id: cache-node-modules
+      uses: actions/cache@v2
+      env:
+        cache-name: cache-node-modules
+      with:
+        path: node_modules
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/yarn.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-build-${{ env.cache-name }}-
+          ${{ runner.os }}-build-
+          ${{ runner.os }}-
+
+    - name: Install
+      if: steps.cache-node-modules.outputs.cache-hit != 'true'
+      run: yarn install
+
+    - name: Post install (make sure local.js exists to avoid breaking config)
+      run: yarn postinstall
+
+    - name: Build Stage
+      # if: github.ref == 'refs/heads/develop'
+      run: yarn stage
+
+    - name: Build Prod
+      if: github.ref == 'refs/heads/main'
+      run: yarn build
+
+    - name: Upload build to GH artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: pearl-frontend
+        path: ./dist
+
+    - name: Trigger deploy workflow
+      uses: benc-uk/workflow-dispatch@v1
       with:
         workflow: frontend-staging.yml
         repo: developmentseed/pearl-reforestamos-deploy
