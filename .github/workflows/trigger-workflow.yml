@@ -2,6 +2,8 @@ name: Invoke workflow in another repo with inputs
 on: push
 jobs:
   deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
     steps:
     - uses: benc-uk/workflow-dispatch@v1
       with:
