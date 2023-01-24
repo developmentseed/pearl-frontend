@@ -4,7 +4,6 @@ on:
   push:
     branches:
       # - 'develop' (staging website is temporarily disabled)
-      - 'test-gh-workflow'
       - 'main'
 
 env:
