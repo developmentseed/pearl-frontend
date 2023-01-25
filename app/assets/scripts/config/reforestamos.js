@@ -1,7 +1,7 @@
 // module exports is required to be able to load from gulpfile.
 module.exports = {
   default: {
-    environment: 'production',
+    environment: 'reforestamos',
     restApiEndpoint: 'https://api.reforestamos-staging.ds.io',
     websocketEndpoint: 'wss://socket.reforestamos-staging.ds.io',
     auth0Domain: 'pearl-landcover.us.auth0.com',
