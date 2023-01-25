@@ -15,6 +15,6 @@ jobs:
       with:
         workflow: frontend-staging.yml
         repo: developmentseed/pearl-reforestamos-deploy
-        inputs: '{ "message": "blah blah", "something": "true" }'
+        inputs: '{ "commit": "develop" }'
         ref: frontend
         token: ${{ secrets.PAT }}
