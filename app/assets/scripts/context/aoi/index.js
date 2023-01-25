@@ -6,14 +6,14 @@ import React, {
   useState,
 } from 'react';
 import T from 'prop-types';
-import logger from '../utils/logger';
-import aoiPatchReducer from './reducers/aoi_patch';
-import { initialApiRequestState, wrapLogReducer } from './reducers/utils';
+import logger from '../../utils/logger';
+import aoiPatchReducer from '../reducers/aoi_patch';
+import { initialApiRequestState, wrapLogReducer } from '../reducers/utils';
 import {
   showGlobalLoadingMessage,
   hideGlobalLoading,
-} from '../components/common/global-loading';
-import reverseGeoCode from '../utils/reverse-geocode';
+} from '../../components/common/global-loading';
+import reverseGeoCode from '../../utils/reverse-geocode';
 
 const AoiContext = createContext(null);
 
