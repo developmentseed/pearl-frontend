@@ -480,20 +480,22 @@ export function ExploreProvider(props) {
     ];
     let area;
 
+    // Check if AOI bounds map layer exist
     if (aoiRef) {
-      // Load existing AOI that was returned by the api
-      aoiRef.setBounds(bounds);
-      setAoiBounds(aoiRef.getBounds());
-      setAoiName(aoiObject.name);
+      // Remove it
+      aoiRef.remove();
 
+      // Clear previous predictions
       if (predictions.isReady) {
         dispatchPredictions({ type: predictionActions.CLEAR_PREDICTION });
       }
-    } else {
-      // initializing map with first AOI
-      setAoiInitializer(bounds);
-      setAoiName(aoiObject.name);
     }
+
+    // Set aoi initializer. This will make AoiDrawControl add AOI map layer.
+    // This logic is very brittle and should be refactored when possible, as not
+    // all AOIs should be editable. (TODO)
+    setAoiInitializer(aoi.bounds);
+    setAoiName(aoiObject.name);
 
     area = areaFromBounds(tBbox(aoi.bounds));
     setAoiArea(area);
