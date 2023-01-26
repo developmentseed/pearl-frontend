@@ -45,6 +45,7 @@ import {
   listenForShortcuts,
   actions as shortcutActions,
 } from './shortcuts';
+import { isRectangle } from '../../utils/is-rectangle';
 
 export { sessionModes };
 /**
@@ -92,6 +93,7 @@ export function ExploreProvider(props) {
     setAoiList,
     aoiBounds,
     setAoiBounds,
+    setAoiIsRectangle,
 
     aoiArea,
     setAoiArea,
@@ -495,6 +497,8 @@ export function ExploreProvider(props) {
 
     area = areaFromBounds(tBbox(aoi.bounds));
     setAoiArea(area);
+
+    setAoiIsRectangle(isRectangle(aoi.bounds));
 
     if (!aoiMatchesCheckpoint) {
       toasts.error(

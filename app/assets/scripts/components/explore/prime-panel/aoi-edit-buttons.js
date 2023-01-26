@@ -114,6 +114,7 @@ export function AoiEditButtons(props) {
     aoiRef,
     setAoiRef,
     setAoiIsRectangle,
+    aoiIsRectangle,
   } = useAoi();
 
   const { aoiArea, aoiBounds, setAoiBounds, createNewAoi } = useAoiMeta();
@@ -382,19 +383,21 @@ export function AoiEditButtons(props) {
           }
         }}
       />
-      <EditButton
-        onClick={() => {
-          setMapMode(
-            !aoiRef ? mapModes.CREATE_AOI_MODE : mapModes.EDIT_AOI_MODE
-          );
-        }}
-        title={!aoiRef ? 'Draw Area of Interest' : 'Edit Current AOI'}
-        id='edit-aoi-trigger'
-        useIcon='pencil'
-        data-cy='aoi-edit-button'
-      >
-        Select AOI
-      </EditButton>
+      {aoiIsRectangle && (
+        <EditButton
+          onClick={() => {
+            setMapMode(
+              !aoiRef ? mapModes.CREATE_AOI_MODE : mapModes.EDIT_AOI_MODE
+            );
+          }}
+          title={!aoiRef ? 'Draw Area of Interest' : 'Edit Current AOI'}
+          id='edit-aoi-trigger'
+          useIcon='pencil'
+          data-cy='aoi-edit-button'
+        >
+          Select AOI
+        </EditButton>
+      )}
     </>
   );
 }
