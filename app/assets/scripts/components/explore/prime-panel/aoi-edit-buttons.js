@@ -346,7 +346,7 @@ export function AoiEditButtons(props) {
         setRevealed={setShowUploadAoiModal}
         apiLimits={apiLimits}
         mosaicMeta={mosaicMeta}
-        onImport={({ totalArea, aoiGeometry }) => {
+        onImport={({ name, totalArea, aoiGeometry }) => {
           try {
             // Remove existing AOI layer
             if (aoiRef) {
@@ -357,8 +357,7 @@ export function AoiEditButtons(props) {
             let aoiShape = L.geoJSON(aoiGeometry).addTo(mapRef);
             setAoiRef(aoiShape);
 
-            // TODO Geocode polygon AOI
-            setAoiName('Polygon');
+            setAoiName(name);
 
             // Add geometry to state, along with total area and bounds
             setAoiGeometry(aoiGeometry);
