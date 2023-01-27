@@ -201,7 +201,7 @@ function PrimePanel() {
                   tabTooltip={
                     isBatchArea
                       ? 'Retrain is not available for batch areas'
-                      : 'Retrain is not availble until model has been run over AOI.'
+                      : 'Retrain is not available until model has been run over AOI.'
                   }
                   disabled={
                     isBatchArea ||

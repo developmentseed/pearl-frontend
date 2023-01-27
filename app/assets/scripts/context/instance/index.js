@@ -84,7 +84,15 @@ export function InstanceProvider(props) {
   } = useCheckpoint();
   const { currentProject, setCurrentProject, projectName } = useProject();
   const { dispatchPredictions } = usePredictions();
-  const { currentAoi, setCurrentAoi, aoiName, aoiRef, setAoiList } = useAoi();
+  const {
+    currentAoi,
+    setCurrentAoi,
+    aoiName,
+    aoiRef,
+    setAoiList,
+    aoiGeometry,
+    aoiIsRectangle,
+  } = useAoi();
   const { dispatchAoiPatch } = useAoiPatch();
   const { selectedModel } = useModel();
 
@@ -593,7 +601,9 @@ export function InstanceProvider(props) {
             action: 'model#prediction',
             data: {
               name: aoiName,
-              polygon: aoiBoundsToPolygon(aoiRef.getBounds()),
+              polygon: aoiIsRectangle
+                ? aoiBoundsToPolygon(aoiRef.getBounds())
+                : aoiGeometry,
             },
           },
         });
@@ -633,7 +643,9 @@ export function InstanceProvider(props) {
           showGlobalLoadingMessage('Requesting batch predictions...');
           const options = {
             name: aoiName,
-            bounds: aoiBoundsToPolygon(aoiRef.getBounds()),
+            polygon: aoiIsRectangle
+              ? aoiBoundsToPolygon(aoiRef.getBounds())
+              : aoiGeometry,
           };
 
           if (currentCheckpoint) {
