@@ -1,5 +1,6 @@
 import L from 'leaflet';
 import tBbox from '@turf/bbox';
+import getFeatureArea from '@turf/area';
 import { isRectangle } from '../../../utils/is-rectangle';
 class AoiDrawControl {
   constructor(map, geometry, apiLimits, events) {
@@ -21,7 +22,10 @@ class AoiDrawControl {
     }
   }
 
-  // Draw control is initialized with a shape
+  // Draw control is initialized with a shape. This is where all AOIs are added
+  // to the map, which is not ideal. This class should only be responsible for
+  // controlling the drawing new AOIs and needs a refactor to separate logic of
+  // loading existing AOIs. (TODO)
   initialize(geometry) {
     if (isRectangle(geometry)) {
       const [lonMin, latMin, lonMax, latMax] = tBbox(geometry);
@@ -36,7 +40,10 @@ class AoiDrawControl {
       this._shape = new L.GeoJSON(geometry).addTo(this._map);
     }
     this._shape.setStyle({ fillOpacity: 0 });
-    this.onInitialize(this.getBbox(), this._shape);
+    this.onInitialize({
+      aoiRef: this._shape,
+      aoiArea: getFeatureArea(geometry),
+    });
   }
 
   getEventLatLng(event) {

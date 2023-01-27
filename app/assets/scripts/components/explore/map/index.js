@@ -279,12 +279,11 @@ function Map() {
       aoiInitializer,
       apiLimits,
       {
-        onInitialize: (bbox, shape) => {
-          setAoiRef(shape);
-          setAoiBounds(shape.getBounds());
-          setAoiArea(areaFromBounds(bbox));
-
-          mapRef.fitBounds(shape.getBounds(), { padding: BOUNDS_PADDING });
+        onInitialize: ({ aoiRef: newAoiRef, aoiArea: newAoiArea }) => {
+          setAoiRef(newAoiRef);
+          setAoiBounds(newAoiRef.getBounds());
+          setAoiArea(newAoiArea);
+          mapRef.fitBounds(newAoiRef.getBounds(), { padding: BOUNDS_PADDING });
         },
         onDrawStart: (shape) => {
           setAoiRef(shape);

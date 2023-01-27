@@ -9,10 +9,10 @@ import geojsonValidation from 'geojson-validation';
 
 import Prose from '../../../styles/type/prose';
 import { FauxFileDialog } from '../../common/faux-file-dialog';
-import { areaFromBounds } from '../../../utils/map';
 import logger from '../../../utils/logger';
 import { inRange } from '../../../utils/utils';
 import booleanWithin from '@turf/boolean-within';
+import getFeatureArea from '@turf/area';
 import bboxPolygon from '@turf/bbox-polygon';
 import get from 'lodash.get';
 
@@ -78,16 +78,8 @@ function UploadAoiModal({
 
       // The first feature in the GeoJSON file should contain the AOI geometry
       const aoiGeometry = get(geojson, 'features[0].geometry');
-      if (
-        geojson.features.length !== 1 ||
-        !geojsonValidation.isPolygon(aoiGeometry)
-      ) {
-        setWarning(`GeoJSON file must contain a single Polygon.`);
-        return;
-      }
-
       const bounds = bbox(geojson);
-      const totalArea = areaFromBounds(bounds);
+      const totalArea = getFeatureArea(geojson);
 
       if (isNaN(totalArea) || totalArea === 0) {
         // Area should be bigger than zero, abort import
@@ -115,6 +107,12 @@ function UploadAoiModal({
       ) {
         // If area is bigger than apiLimits.live_inference, show warning and proceed import
         setWarning('Due to area size live inference will not be available.');
+      } else if (
+        geojson.features.length !== 1 ||
+        !geojsonValidation.isPolygon(aoiGeometry)
+      ) {
+        setWarning(`GeoJSON file must contain a single Polygon.`);
+        return;
       } else {
         // Area is ok, clear warning
         setWarning(null);
