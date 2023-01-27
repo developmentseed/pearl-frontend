@@ -336,8 +336,10 @@ describe('Batch predictions', () => {
     cy.get('[data-cy=proceed-anyway-button]').should('exist').click();
     cy.wait('@reverseGeocodeCity');
 
-    // Start batch
+    // Ready to run batch prediction
     cy.get('[data-cy=run-button]').should('have.text', 'Run Batch Prediction');
+
+    // Mock batch list
     cy.intercept(
       {
         url: restApiEndpoint + '/api/project/1/batch*',
@@ -360,12 +362,7 @@ describe('Batch predictions', () => {
       }
     ).as('batchList1');
 
-    cy.get('[data-cy=run-button]').click();
-    cy.wait('@postBatch');
-    // Mock batch job at 0%
-
-    cy.wait('@batchList1');
-
+    // Mock batch job
     const batchJob = {
       id: 1,
       uid: 1,
@@ -392,6 +389,7 @@ describe('Batch predictions', () => {
       instance: 1,
     };
 
+    // Mock batch start
     cy.intercept(
       {
         url: restApiEndpoint + '/api/project/1/batch/1',
@@ -399,7 +397,16 @@ describe('Batch predictions', () => {
       },
       batchJob
     ).as('batch0');
+
+    // Run job
+    cy.get('[data-cy=run-button]').click();
+
+    // Wait for requests executed on batch prediction start
+    cy.wait('@postBatch');
+    cy.wait('@batchList1');
     cy.wait('@batch0');
+
+    // Update progress in batch request mock
     cy.intercept(
       {
         url: restApiEndpoint + '/api/project/1/batch/1',
