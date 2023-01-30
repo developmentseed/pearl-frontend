@@ -105,9 +105,3 @@ jobs:
 
       - name: Azure Logout
         run: az logout
-
-      - name: Upload build to GH artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: pearl-frontend
-          path: ./dist

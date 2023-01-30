@@ -1,5 +1,9 @@
 name: Invoke workflow in another repo with inputs
-on: push
+on:
+  push:
+    branches:
+      - 'develop'
+      - 'main'
 jobs:
   trigger-deploy:
     runs-on: ubuntu-latest
