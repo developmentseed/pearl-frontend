@@ -26,12 +26,15 @@ var config = require('./config/base.js');
 var envConfig = {
   cypress: require('./config/cypress.js'),
   production: require('./config/production.js'),
+  reforestamos: require('./config/reforestamos.js'),
   staging: require('./config/staging.js'),
   testing: require('./config/testing.js'),
 };
 
 if (process.env.NODE_ENV === 'production') {
   config = defaultsDeep(envConfig.production || {}, config);
+} else if (process.env.NODE_ENV === 'reforestamos') {
+  config = defaultsDeep(envConfig.reforestamos || {}, config);
 } else if (process.env.NODE_ENV === 'cypress') {
   config = defaultsDeep(envConfig.cypress || {}, config);
 } else if (process.env.NODE_ENV === 'testing') {

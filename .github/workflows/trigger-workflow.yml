@@ -1,0 +1,19 @@
+name: Invoke workflow in another repo with inputs
+on:
+  push:
+    branches:
+      - 'develop'
+      - 'main'
+jobs:
+  trigger-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+    - name: Trigger deploy workflow
+      uses: benc-uk/workflow-dispatch@v1
+      with:
+        workflow: frontend-staging.yml
+        repo: developmentseed/pearl-reforestamos-deploy
+        inputs: '{ "commit": "${{ github.event.after }}" }'
+        ref: frontend
+        token: ${{ secrets.PAT }}
