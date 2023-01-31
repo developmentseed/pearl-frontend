@@ -61,8 +61,10 @@ import toasts from '../../common/toasts';
 import logger from '../../../utils/logger';
 import PolygonDrawControl from './polygon-draw-control';
 import OsmQaLayer from '../../common/map/osm-qa-layer';
+import turfArea from '@turf/area';
+import turfBboxPolygon from '@turf/bbox-polygon';
+
 import booleanWithin from '@turf/boolean-within';
-import bboxPolygon from '@turf/bbox-polygon';
 
 const center = [38.889805, -77.009056];
 const zoom = 12;
@@ -118,6 +120,7 @@ function Map() {
     currentAoi,
     setActiveModal,
     setCurrentAoi,
+    setAoiGeometry,
   } = useAoi();
   const { updateAoiName } = useAoiName();
 
@@ -292,16 +295,8 @@ function Map() {
           setAoiArea(areaFromBounds(bbox));
         },
         onDrawEnd: (bbox, shape) => {
-          const area = areaFromBounds(bbox);
-          const aoiBboxPoly = bboxPolygon(bbox);
-
-          if (
-            mosaicMeta.data?.bounds &&
-            !booleanWithin(aoiBboxPoly, bboxPolygon(mosaicMeta.data.bounds))
-          ) {
-            setActiveModal('area-out-of-bounds');
-            return;
-          }
+          const bboxPolygon = turfBboxPolygon(bbox);
+          const area = turfArea(bboxPolygon);
 
           if (area < config.minimumAoiArea) {
             setActiveModal('area-too-tiny');
@@ -315,6 +310,7 @@ function Map() {
             updateAoiName(bounds);
 
             setAoiRef(shape);
+            setAoiGeometry(bboxPolygon);
             //Current AOI should only be set after AOI has been sent to the api
             setCurrentAoi(null);
           } else if (apiLimits.max_inference > area) {
