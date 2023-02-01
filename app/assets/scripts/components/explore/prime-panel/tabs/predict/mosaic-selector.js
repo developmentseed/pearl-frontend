@@ -1,3 +1,5 @@
+import bboxPolygon from '@turf/bbox-polygon';
+import booleanWithin from '@turf/boolean-within';
 import React, { useMemo, useState } from 'react';
 import { useAoi } from '../../../../../context/aoi';
 import { EditButton } from '../../../../../styles/button';
@@ -10,6 +12,7 @@ import {
   Subheading,
   SubheadingStrong,
 } from '../../../../../styles/type/heading';
+import { MosaicSelectorModal } from './mosaic-selector-modal';
 
 export function MosaicSelector() {
   const isAuthenticated = true;
@@ -17,8 +20,6 @@ export function MosaicSelector() {
   const { aoiGeometry } = useAoi();
   const [selectedMosaic, setSelectedMosaic] = useState(null);
   const [showSelectMosaicModal, setShowSelectMosaicModal] = useState(false);
-
-  console.log({ aoiGeometry });
 
   // Mimic a hook returning a mosaics list
   const mosaicList = {
@@ -52,7 +53,7 @@ export function MosaicSelector() {
         ],
         minzoom: 0,
         maxzoom: 24,
-        bounds: [-180, -85.0511287798066, 180, 85.0511287798066],
+        bounds: [-180, -85.0511287798066, 180, 0],
         center: [0, 0, 0],
       },
     ],
@@ -68,38 +69,56 @@ export function MosaicSelector() {
     } else if (mosaicList.data.length === 0) {
       return 'No mosaics available.';
     } else if (!aoiGeometry) {
-      return 'Please select an AOI first';
+      return 'Please define an AOI first';
     } else if (!selectedMosaic) {
-      return 'Select an Mosaic';
+      return 'Select a mosaic';
     } else {
       return selectedMosaic.name;
     }
-  }, [mosaicList, aoiGeometry, selectedMosaic]);
+  }, [isAuthenticated, mosaicList, aoiGeometry, selectedMosaic]);
+
+  const availableMosaics = useMemo(() => {
+    if (mosaicList.isReady && mosaicList.data?.length > 0 && aoiGeometry) {
+      return mosaicList?.data.filter((m) =>
+        booleanWithin(aoiGeometry, bboxPolygon(m.bounds))
+      );
+    } else {
+      return [];
+    }
+  }, [mosaicList, aoiGeometry]);
 
   return (
-    <HeadOption>
-      <HeadOptionHeadline usePadding>
-        <Subheading>Base Mosaic</Subheading>
-      </HeadOptionHeadline>
-      <SubheadingStrong
-        onClick={() => {}}
-        title={aoiGeometry ? 'Select Mosaic' : 'Select an AOI first'}
-        disabled={!aoiGeometry}
-      >
-        {selectorLabel}
-      </SubheadingStrong>
-      <HeadOptionToolbar>
-        <EditButton
-          useIcon='swap-horizontal'
-          id='select-mosaic-trigger'
-          onClick={() => {
-            setShowSelectMosaicModal(true);
-          }}
-          title='Select Mosaic'
+    <>
+      <MosaicSelectorModal
+        setSelectedMosaic={setSelectedMosaic}
+        showSelectMosaicModal={showSelectMosaicModal}
+        setShowSelectMosaicModal={setShowSelectMosaicModal}
+        availableMosaics={availableMosaics}
+      />
+      <HeadOption>
+        <HeadOptionHeadline usePadding>
+          <Subheading>Base Mosaic</Subheading>
+        </HeadOptionHeadline>
+        <SubheadingStrong
+          onClick={() => {}}
+          title={aoiGeometry ? 'Select Mosaic' : 'An AOI is required'}
+          disabled={!aoiGeometry}
         >
-          Edit Mosaic Selection
-        </EditButton>
-      </HeadOptionToolbar>
-    </HeadOption>
+          {selectorLabel}
+        </SubheadingStrong>
+        <HeadOptionToolbar>
+          <EditButton
+            useIcon='swap-horizontal'
+            id='select-mosaic-trigger'
+            onClick={() => {
+              setShowSelectMosaicModal(true);
+            }}
+            title='Select Mosaic'
+          >
+            Edit Mosaic Selection
+          </EditButton>
+        </HeadOptionToolbar>
+      </HeadOption>
+    </>
   );
 }
