@@ -3,7 +3,12 @@ import T from 'prop-types';
 
 import { FormInput } from '@devseed-ui/form';
 
-const AutoFocusFormInput = ({ value, setValue, placeholder, inputId }) => {
+export const AutoFocusFormInput = ({
+  value,
+  setValue,
+  placeholder,
+  inputId,
+}) => {
   const inputRef = useRef();
 
   useEffect(() => {
