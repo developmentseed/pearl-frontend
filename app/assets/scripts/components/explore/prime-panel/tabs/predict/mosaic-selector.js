@@ -2,6 +2,7 @@ import bboxPolygon from '@turf/bbox-polygon';
 import booleanWithin from '@turf/boolean-within';
 import React, { useMemo, useState } from 'react';
 import { useAoi } from '../../../../../context/aoi';
+import { useMosaics } from '../../../../../context/mosaics';
 import { EditButton } from '../../../../../styles/button';
 import {
   HeadOption,
@@ -18,7 +19,7 @@ export function MosaicSelector() {
   const isAuthenticated = true;
 
   const { aoiGeometry } = useAoi();
-  const [selectedMosaic, setSelectedMosaic] = useState(null);
+  const { selectedMosaic, setSelectedMosaic } = useMosaics();
   const [showSelectMosaicModal, setShowSelectMosaicModal] = useState(false);
 
   // Mimic a hook returning a mosaics list
