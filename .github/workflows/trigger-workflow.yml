@@ -16,5 +16,5 @@ jobs:
         workflow: frontend-staging.yml
         repo: developmentseed/pearl-reforestamos-deploy
         inputs: '{ "commit": "${{ github.event.after }}" }'
-        ref: frontend
+        ref: main
         token: ${{ secrets.PAT }}
