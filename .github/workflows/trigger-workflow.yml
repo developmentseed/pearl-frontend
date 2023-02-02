@@ -4,6 +4,7 @@ on:
     branches:
       - 'develop'
       - 'main'
+      - 'add/select-mosaic'
 jobs:
   trigger-deploy:
     runs-on: ubuntu-latest
