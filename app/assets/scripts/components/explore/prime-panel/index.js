@@ -42,30 +42,6 @@ const StyledPanelBlock = styled(PanelBlock)`
   `}
 `;
 
-const ModalHeader = styled.header`
-  padding: ${glsp(2)} ${glsp(2)} 0;
-`;
-
-const Headline = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  padding-bottom: ${glsp(1)};
-
-  h1 {
-    margin: 0;
-  }
-
-  ${Button} {
-    height: min-content;
-    align-self: center;
-  }
-`;
-
-const FilterSection = styled.div`
-  padding-bottom: ${glsp(1)};
-`;
-
 const TABS = [0, 1, 2];
 const [PREDICT_TAB_INDEX, RETRAIN_TAB_INDEX, REFINE_TAB_INDEX] = TABS;
 
@@ -312,65 +288,6 @@ function PrimePanel() {
             />
           </StyledPanelBlock>
         }
-      />
-      <SelectModal
-        id='select-model-modal'
-        revealed={showSelectModelModal}
-        onOverlayClick={() => setShowSelectModelModal(false)}
-        data={
-          models.isReady && !models.hasError
-            ? models.data.map((model) => {
-                model.overlapsAoi = bboxIntersectsMapBounds(
-                  model.bounds,
-                  aoiBounds
-                );
-                return model;
-              })
-            : []
-        }
-        renderHeader={() => (
-          <ModalHeader>
-            <Headline>
-              {' '}
-              <Heading>Starter Models</Heading>
-              <Button
-                hideText
-                variation='base-plain'
-                size='small'
-                useIcon='xmark'
-                onClick={() => {
-                  setShowSelectModelModal(false);
-                  setModelFilter('');
-                }}
-              >
-                Close modal
-              </Button>
-            </Headline>
-            <FilterSection>
-              <AutoFocusFormInput
-                inputId='modelsFilter'
-                value={modelFilter}
-                setValue={setModelFilter}
-                placeholder='Search models by name'
-              />
-            </FilterSection>
-          </ModalHeader>
-        )}
-        filterCard={(card) =>
-          card.name.toLowerCase().includes(modelFilter.toLowerCase())
-        }
-        renderCard={(model) => (
-          <ModelCard
-            key={model.name}
-            model={model}
-            onClick={() => {
-              setShowSelectModelModal(false);
-              setSelectedModel(model.id);
-            }}
-            selected={model.overlapsAoi}
-          />
-        )}
-        nonScrolling
       />
       <ClearSamplesModal
         revealed={showClearSamplesModal !== null}
