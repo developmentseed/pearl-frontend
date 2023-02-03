@@ -33,15 +33,15 @@ export function ModelSelector() {
 
   // Selector label can assume different values depending on state variables, we
   // use useMemo hook to avoid computing it on every render.
-  const selectorLabel = useMemo(() => {
+  const selectorState = useMemo(() => {
     if (!isAuthenticated) {
       // Needs auth
-      return 'Login to select model';
+      return { enabled: false, label: 'Login to select model' };
     } else if (!models.isReady) {
       // Model list is loading
-      return 'Loading...';
+      return { enabled: false, label: 'Loading...' };
     } else if (!selectedMosaic) {
-      return 'Please select an imagery source';
+      return { enabled: false, label: 'Please select an imagery source' };
     } else if (
       models.status === 'success' &&
       models.data &&
@@ -49,13 +49,14 @@ export function ModelSelector() {
       !selectedModel
     ) {
       // Model list is ready and a model can be selected
-      return 'Select Model';
+      return { enabled: true, label: 'Select Model' };
     } else if (selectedModel) {
-      // Display selected model name
-      return selectedModel.name;
+      // Display selected model name, do not enable selector if there model ran
+      // before (has checkpoints)
+      return { enabled: !checkpointList?.length, label: selectedModel.name };
     } else {
       // No models available/sapplicable
-      return 'No models available';
+      return { enabled: false, label: 'No models available' };
     }
   }, [isAuthenticated, models, selectedModel]);
 
@@ -94,7 +95,7 @@ export function ModelSelector() {
           }
           disabled={modelNotChangeable}
         >
-          {selectorLabel}
+          {selectorState.label}
         </SubheadingStrong>
         {!modelNotChangeable && (
           <HeadOptionToolbar>

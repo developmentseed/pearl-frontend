@@ -60,21 +60,38 @@ export function MosaicSelector() {
     ],
   };
 
-  // Selector label can assume different values depending on state variables, we
-  // use useMemo hook to avoid computing it on every render.
-  const selectorLabel = useMemo(() => {
+  // Define selector state (enabled/label)
+  const selectorState = useMemo(() => {
     if (!isAuthenticated) {
-      return 'Login to select model';
+      return {
+        enabled: false,
+        label: 'Login to select model',
+      };
     } else if (!mosaicList.isReady) {
-      return 'Loading...';
+      return {
+        enabled: false,
+        label: 'Loading...',
+      };
     } else if (mosaicList.data.length === 0) {
-      return 'No mosaics available.';
+      return {
+        enabled: false,
+        label: 'No mosaics available.',
+      };
     } else if (!aoiGeometry) {
-      return 'Please define an AOI first';
+      return {
+        enabled: false,
+        label: 'Please define an AOI first',
+      };
     } else if (!selectedMosaic) {
-      return 'Select a mosaic';
+      return {
+        enabled: true,
+        label: 'Select a mosaic',
+      };
     } else {
-      return selectedMosaic.name;
+      return {
+        enabled: true,
+        label: selectedMosaic.name,
+      };
     }
   }, [isAuthenticated, mosaicList, aoiGeometry, selectedMosaic]);
 
@@ -105,20 +122,22 @@ export function MosaicSelector() {
           title={aoiGeometry ? 'Select Mosaic' : 'An AOI is required'}
           disabled={!aoiGeometry}
         >
-          {selectorLabel}
+          {selectorState.label}
         </SubheadingStrong>
-        <HeadOptionToolbar>
-          <EditButton
-            useIcon='swap-horizontal'
-            id='select-mosaic-trigger'
-            onClick={() => {
-              setShowSelectMosaicModal(true);
-            }}
-            title='Select Mosaic'
-          >
-            Edit Mosaic Selection
-          </EditButton>
-        </HeadOptionToolbar>
+        {selectorState.enabled && (
+          <HeadOptionToolbar>
+            <EditButton
+              useIcon='swap-horizontal'
+              id='select-mosaic-trigger'
+              onClick={() => {
+                setShowSelectMosaicModal(true);
+              }}
+              title='Select Mosaic'
+            >
+              Edit Mosaic Selection
+            </EditButton>
+          </HeadOptionToolbar>
+        )}
       </HeadOption>
     </>
   );
