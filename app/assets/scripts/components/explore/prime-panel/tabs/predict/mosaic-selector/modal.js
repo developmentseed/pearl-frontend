@@ -5,7 +5,7 @@ import { Modal } from '@devseed-ui/modal';
 import { glsp } from '@devseed-ui/theme-provider';
 import { Button } from '@devseed-ui/button';
 import { Heading } from '@devseed-ui/typography';
-import CardList, { Card } from '../../../../common/card-list';
+import CardList, { Card } from '../../../../../common/card-list';
 
 const ModalHeader = styled.header`
   padding: ${glsp(2)} ${glsp(2)} 0;

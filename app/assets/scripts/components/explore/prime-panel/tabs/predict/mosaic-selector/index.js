@@ -1,19 +1,19 @@
 import bboxPolygon from '@turf/bbox-polygon';
 import booleanWithin from '@turf/boolean-within';
 import React, { useMemo, useState } from 'react';
-import { useAoi } from '../../../../../context/aoi';
-import { useMosaics } from '../../../../../context/mosaics';
-import { EditButton } from '../../../../../styles/button';
+import { useAoi } from '../../../../../../context/aoi';
+import { useMosaics } from '../../../../../../context/mosaics';
+import { EditButton } from '../../../../../../styles/button';
 import {
   HeadOption,
   HeadOptionHeadline,
   HeadOptionToolbar,
-} from '../../../../../styles/panel';
+} from '../../../../../../styles/panel';
 import {
   Subheading,
   SubheadingStrong,
-} from '../../../../../styles/type/heading';
-import { MosaicSelectorModal } from './mosaic-selector-modal';
+} from '../../../../../../styles/type/heading';
+import { MosaicSelectorModal } from './modal';
 
 export function MosaicSelector() {
   const isAuthenticated = true;
