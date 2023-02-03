@@ -85,7 +85,7 @@ export function ModelSelectorModal({
           model={model}
           onClick={() => {
             setShowSelectModelModal(false);
-            setSelectedModel(model.id);
+            setSelectedModel(model);
           }}
           selected={selectedModel?.id === model.id}
         />
@@ -96,7 +96,7 @@ export function ModelSelectorModal({
 }
 
 const ModelType = T.shape({
-  id: T.string.isRequired,
+  id: T.number.isRequired,
   name: T.string.isRequired,
 });
 

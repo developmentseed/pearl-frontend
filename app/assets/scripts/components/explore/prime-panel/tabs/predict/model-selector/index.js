@@ -23,16 +23,7 @@ export function ModelSelector() {
 
   const [showSelectModelModal, setShowSelectModelModal] = useState(false);
 
-  // Check if model cannot be changed
-  const modelNotChangeable =
-    !isAuthenticated ||
-    !selectedMosaic ||
-    !models.isReady ||
-    models.hasError ||
-    checkpointList?.length;
-
-  // Selector label can assume different values depending on state variables, we
-  // use useMemo hook to avoid computing it on every render.
+  // Check selector state depending on other state variables
   const selectorState = useMemo(() => {
     if (!isAuthenticated) {
       // Needs auth
@@ -53,12 +44,13 @@ export function ModelSelector() {
     } else if (selectedModel) {
       // Display selected model name, do not enable selector if there model ran
       // before (has checkpoints)
-      return { enabled: !checkpointList?.length, label: selectedModel.name };
+      const hasCheckpoints = checkpointList?.length > 0;
+      return { enabled: !hasCheckpoints, label: selectedModel.name };
     } else {
-      // No models available/sapplicable
+      // No models available/applicable
       return { enabled: false, label: 'No models available' };
     }
-  }, [isAuthenticated, models, selectedModel]);
+  }, [isAuthenticated, models, selectedModel, selectedMosaic]);
 
   // Available models depend on the selected imagery
   const availableModels = useMemo(() => {
@@ -85,19 +77,13 @@ export function ModelSelector() {
         </HeadOptionHeadline>
         <SubheadingStrong
           data-cy='select-model-label'
-          onClick={() => {
-            !modelNotChangeable && setShowSelectModelModal(true);
-          }}
-          title={
-            !checkpointList?.length
-              ? 'Select Model'
-              : 'Models can not be changed after running inference'
-          }
-          disabled={modelNotChangeable}
+          onClick={() => selectorState.enabled && setShowSelectModelModal(true)}
+          title={selectorState.enabled ? 'Select Model' : selectorState.label}
+          disabled={!selectorState.enabled}
         >
           {selectorState.label}
         </SubheadingStrong>
-        {!modelNotChangeable && (
+        {selectorState.enabled && (
           <HeadOptionToolbar>
             <EditButton
               data-cy='show-select-model-button'
