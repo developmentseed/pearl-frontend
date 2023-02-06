@@ -27,6 +27,9 @@ const CardMedia = styled.figure`
       `}
     pointer-events: none;
   }
+  img {
+    max-width: 100%;
+  }
 `;
 const CardTitle = styled.h4`
   ${truncated}
@@ -50,7 +53,7 @@ export const CardWrapper = styled.article`
       `;
     } else if (cardMedia) {
       return css`
-        grid-template-columns: 2fr;
+        grid-template-columns: minmax(0, 1fr);
         grid-template-rows: auto 4fr;
         ${CardMedia} {
           grid-row: 1 / -1;

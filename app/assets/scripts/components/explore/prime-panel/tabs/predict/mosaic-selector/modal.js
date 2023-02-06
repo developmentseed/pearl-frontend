@@ -89,7 +89,6 @@ export function MosaicSelectorModal({
                 key={mosaic.id}
                 title={mosaic.name}
                 details={mosaic}
-                expanded
                 borderlessMedia
                 selected={selectedMosaic && selectedMosaic.id === mosaic.id}
                 onClick={() => {
