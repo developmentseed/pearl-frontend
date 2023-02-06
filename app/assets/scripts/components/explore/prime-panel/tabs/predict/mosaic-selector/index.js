@@ -115,11 +115,11 @@ export function MosaicSelector() {
       />
       <HeadOption>
         <HeadOptionHeadline usePadding>
-          <Subheading>Base Mosaic</Subheading>
+          <Subheading>Base Imagery</Subheading>
         </HeadOptionHeadline>
         <SubheadingStrong
           onClick={() => {}}
-          title={aoiGeometry ? 'Select Mosaic' : 'An AOI is required'}
+          title={aoiGeometry ? 'Select Imagery Mosaic' : 'An AOI is required'}
           disabled={!aoiGeometry}
         >
           {selectorState.label}
@@ -132,9 +132,9 @@ export function MosaicSelector() {
               onClick={() => {
                 setShowSelectMosaicModal(true);
               }}
-              title='Select Mosaic'
+              title='Select Imagery Mosaic'
             >
-              Edit Mosaic Selection
+              Edit Imagery Mosaic Selection
             </EditButton>
           </HeadOptionToolbar>
         )}

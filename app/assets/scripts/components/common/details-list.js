@@ -10,7 +10,7 @@ const List = styled.ol`
   li {
     display: grid;
     grid-gap: 1rem;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     align-items: center;
     h1 {
       margin: 0;
@@ -18,6 +18,10 @@ const List = styled.ol`
   }
   ${Heading} {
     letter-spacing: ${({ useAlt }) => useAlt && '0.5px'};
+  }
+  dd {
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 `;
 
