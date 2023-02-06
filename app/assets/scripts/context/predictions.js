@@ -106,11 +106,11 @@ export function predictionsReducer(state, action) {
       break;
     case actions.RECEIVE_PREDICTION: {
       // Get bounds
-      const predictionAoiId = data.aoi;
+      const predictionTimeframeId = data.timeframe;
       const currentAoiId = state.data.aoiId;
 
       // only process prediction if AOI ID matches current AOI ID
-      if (predictionAoiId === currentAoiId) {
+      if (predictionTimeframeId === currentAoiId) {
         let predictions = state.data.predictions || [];
 
         // Extract geo-located image from message
