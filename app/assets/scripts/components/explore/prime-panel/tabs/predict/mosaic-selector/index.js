@@ -44,12 +44,12 @@ export function MosaicSelector() {
       };
     } else if (!selectedImagerySource) {
       return {
-        enabled: true,
-        label: 'Select an imagery source first',
+        enabled: false,
+        label: 'Please select an imagery source first',
       };
     } else if (selectedImagerySourceMosaics.length === 0) {
       return {
-        enabled: true,
+        enabled: false,
         label: 'No mosaics available',
       };
     } else if (!selectedMosaic) {

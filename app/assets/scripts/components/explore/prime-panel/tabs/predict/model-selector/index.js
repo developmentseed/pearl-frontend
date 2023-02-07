@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { useAoi } from '../../../../../../context/aoi';
 import { useAuth } from '../../../../../../context/auth';
 import { useCheckpoint } from '../../../../../../context/checkpoint';
 import { useImagerySource } from '../../../../../../context/imagery-sources';
@@ -17,6 +18,8 @@ import { ModelSelectorModal } from './modal';
 
 export function ModelSelector() {
   const { isAuthenticated } = useAuth();
+  const { aoiGeometry } = useAoi();
+
   const { models, selectedModel, setSelectedModel } = useModel();
   const { selectedMosaic, selectedImagerySource } = useImagerySource();
   const { checkpointList } = useCheckpoint();
@@ -31,10 +34,12 @@ export function ModelSelector() {
     } else if (!models.isReady) {
       // Model list is loading
       return { enabled: false, label: 'Loading...' };
+    } else if (!aoiGeometry) {
+      return { enabled: false, label: 'Please define an AOI first' };
     } else if (!selectedImagerySource) {
-      return { enabled: false, label: 'Please select an imagery source' };
+      return { enabled: false, label: 'Please select an imagery source first' };
     } else if (!selectedMosaic) {
-      return { enabled: false, label: 'Please select a mosaic' };
+      return { enabled: false, label: 'Please select a mosaic first' };
     } else if (
       models.status === 'success' &&
       models.data &&
@@ -52,7 +57,14 @@ export function ModelSelector() {
       // No models available/applicable
       return { enabled: false, label: 'No models available' };
     }
-  }, [isAuthenticated, models, selectedModel, selectedMosaic]);
+  }, [
+    isAuthenticated,
+    aoiGeometry,
+    models,
+    selectedModel,
+    selectedMosaic,
+    selectedImagerySource,
+  ]);
 
   // Available models depend on the selected imagery
   const availableModels = useMemo(() => {
