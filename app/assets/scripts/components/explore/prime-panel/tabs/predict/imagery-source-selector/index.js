@@ -1,3 +1,5 @@
+import bboxPolygon from '@turf/bbox-polygon';
+import booleanWithin from '@turf/boolean-within';
 import React, { useMemo, useState } from 'react';
 import { useAoi } from '../../../../../../context/aoi';
 import { useImagerySource } from '../../../../../../context/imagery-sources';
@@ -11,31 +13,35 @@ import {
   Subheading,
   SubheadingStrong,
 } from '../../../../../../styles/type/heading';
-import { MosaicSelectorModal } from './modal';
+import { ImagerySourceSelectorModal } from './modal';
 
-export function MosaicSelector() {
+export function ImagerySourceSelector() {
   const isAuthenticated = true;
 
   const { aoiGeometry } = useAoi();
-  const {
-    imagerySources,
-    selectedImagerySource,
-    selectedImagerySourceMosaics,
-    selectedMosaic,
-  } = useImagerySource();
-  const [showSelectMosaicModal, setShowSelectMosaicModal] = useState(false);
+  const { imagerySources, selectedImagerySource } = useImagerySource();
+
+  const [
+    showSelectImagerySourceModal,
+    setShowSelectImagerySourceModal,
+  ] = useState(false);
 
   // Define selector state (enabled/label)
   const selectorState = useMemo(() => {
     if (!isAuthenticated) {
       return {
         enabled: false,
-        label: 'Login to select model',
+        label: 'Login to select imagery source',
       };
     } else if (!imagerySources.isReady) {
       return {
         enabled: false,
         label: 'Loading...',
+      };
+    } else if (imagerySources.data.length === 0) {
+      return {
+        enabled: false,
+        label: 'No imagery sources available.',
       };
     } else if (!aoiGeometry) {
       return {
@@ -45,46 +51,44 @@ export function MosaicSelector() {
     } else if (!selectedImagerySource) {
       return {
         enabled: true,
-        label: 'Select an imagery source first',
-      };
-    } else if (selectedImagerySourceMosaics.length === 0) {
-      return {
-        enabled: true,
-        label: 'No mosaics available',
-      };
-    } else if (!selectedMosaic) {
-      return {
-        enabled: true,
-        label: 'Select a mosaic',
+        label: 'Select an imagery source',
       };
     } else {
       return {
         enabled: true,
-        label: selectedMosaic.name,
+        label: selectedImagerySource.name,
       };
     }
-  }, [
-    isAuthenticated,
-    imagerySources,
-    aoiGeometry,
-    selectedMosaic,
-    selectedImagerySource,
-    selectedImagerySourceMosaics,
-  ]);
+  }, [isAuthenticated, imagerySources, aoiGeometry, selectedImagerySource]);
+
+  const availableImagerySources = useMemo(() => {
+    if (
+      imagerySources.isReady &&
+      imagerySources.data?.length > 0 &&
+      aoiGeometry
+    ) {
+      return imagerySources?.data.filter((m) =>
+        booleanWithin(aoiGeometry, bboxPolygon(m.bounds))
+      );
+    } else {
+      return [];
+    }
+  }, [imagerySources, aoiGeometry]);
 
   return (
     <>
-      <MosaicSelectorModal
-        showSelectMosaicModal={showSelectMosaicModal}
-        setShowSelectMosaicModal={setShowSelectMosaicModal}
+      <ImagerySourceSelectorModal
+        showSelectImagerySourceModal={showSelectImagerySourceModal}
+        setShowSelectImagerySourceModal={setShowSelectImagerySourceModal}
+        availableImagerySources={availableImagerySources}
       />
       <HeadOption>
         <HeadOptionHeadline usePadding>
-          <Subheading>Base Mosaic</Subheading>
+          <Subheading>Imagery Source</Subheading>
         </HeadOptionHeadline>
         <SubheadingStrong
           onClick={() => {}}
-          title={aoiGeometry ? 'Select Imagery Mosaic' : 'An AOI is required'}
+          title={aoiGeometry ? 'Select Imagery Source' : 'An AOI is required'}
           disabled={!aoiGeometry}
         >
           {selectorState.label}
@@ -95,11 +99,11 @@ export function MosaicSelector() {
               useIcon='swap-horizontal'
               id='select-mosaic-trigger'
               onClick={() => {
-                setShowSelectMosaicModal(true);
+                setShowSelectImagerySourceModal(true);
               }}
-              title='Select Imagery Mosaic'
+              title='Select Imagery ImagerySource'
             >
-              Edit Mosaic Selection
+              Edit Imagery ImagerySource Selection
             </EditButton>
           </HeadOptionToolbar>
         )}

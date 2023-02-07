@@ -1,8 +1,8 @@
 import React, { useMemo, useState } from 'react';
 import { useAuth } from '../../../../../../context/auth';
 import { useCheckpoint } from '../../../../../../context/checkpoint';
+import { useImagerySource } from '../../../../../../context/imagery-sources';
 import { useModel } from '../../../../../../context/model';
-import { useMosaics } from '../../../../../../context/mosaics';
 import { EditButton } from '../../../../../../styles/button';
 import {
   HeadOption,
@@ -18,7 +18,7 @@ import { ModelSelectorModal } from './modal';
 export function ModelSelector() {
   const { isAuthenticated } = useAuth();
   const { models, selectedModel, setSelectedModel } = useModel();
-  const { selectedMosaic } = useMosaics();
+  const { selectedMosaic, selectedImagerySource } = useImagerySource();
   const { checkpointList } = useCheckpoint();
 
   const [showSelectModelModal, setShowSelectModelModal] = useState(false);
@@ -31,8 +31,10 @@ export function ModelSelector() {
     } else if (!models.isReady) {
       // Model list is loading
       return { enabled: false, label: 'Loading...' };
-    } else if (!selectedMosaic) {
+    } else if (!selectedImagerySource) {
       return { enabled: false, label: 'Please select an imagery source' };
+    } else if (!selectedMosaic) {
+      return { enabled: false, label: 'Please select a mosaic' };
     } else if (
       models.status === 'success' &&
       models.data &&
@@ -54,14 +56,14 @@ export function ModelSelector() {
 
   // Available models depend on the selected imagery
   const availableModels = useMemo(() => {
-    if (models.isReady && models.data?.length > 0 && selectedMosaic) {
+    if (models.isReady && models.data?.length > 0 && selectedImagerySource) {
       return models?.data.filter(
-        (m) => m.meta?.imagery_id === selectedMosaic.id
+        (m) => m.meta?.imagery_id === selectedImagerySource.id
       );
     } else {
       return [];
     }
-  }, [models, selectedMosaic]);
+  }, [models, selectedImagerySource]);
 
   return (
     <>

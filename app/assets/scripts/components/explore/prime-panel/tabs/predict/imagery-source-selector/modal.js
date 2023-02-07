@@ -39,36 +39,36 @@ const HeadingWrapper = styled.div`
   align-items: baseline;
 `;
 
-export function MosaicSelectorModal({
-  showSelectMosaicModal,
-  setShowSelectMosaicModal,
+export function ImagerySourceSelectorModal({
+  showSelectImagerySourceModal,
+  setShowSelectImagerySourceModal,
+  availableImagerySources,
 }) {
   const {
-    selectedMosaic,
-    setSelectedMosaic,
-    selectedImagerySourceMosaics,
+    selectedImagerySource,
+    setSelectedImagerySource,
   } = useImagerySource();
 
   return (
     <Modal
-      id='select-mosaic-modal'
+      id='select-imagery-source-modal'
       className='select'
       size='xlarge'
-      revealed={showSelectMosaicModal}
-      onOverlayClick={() => setShowSelectMosaicModal(false)}
+      revealed={showSelectImagerySourceModal}
+      onOverlayClick={() => setShowSelectImagerySourceModal(false)}
       closeButton={false}
       renderHeader={() => (
         <ModalHeader>
           <Headline>
             {' '}
-            <Heading>Select an base mosaic</Heading>
+            <Heading>Select an imagery source</Heading>
             <Button
               hideText
               variation='base-plain'
               size='small'
               useIcon='xmark'
               onClick={() => {
-                setShowSelectMosaicModal(false);
+                setShowSelectImagerySourceModal(false);
               }}
             >
               Close modal
@@ -86,18 +86,21 @@ export function MosaicSelectorModal({
           <CardList
             nonScrolling
             numColumns={2}
-            data={selectedImagerySourceMosaics}
-            renderCard={(mosaic) => (
+            data={availableImagerySources}
+            renderCard={(imagerySource) => (
               <Card
-                data-cy={`select-model-${mosaic.id}-card`}
-                key={mosaic.id}
-                title={mosaic.name}
-                details={mosaic}
+                data-cy={`select-model-${imagerySource.id}-card`}
+                key={imagerySource.id}
+                title={imagerySource.name}
+                details={imagerySource}
                 borderlessMedia
-                selected={selectedMosaic && selectedMosaic.id === mosaic.id}
+                selected={
+                  selectedImagerySource &&
+                  selectedImagerySource.id === imagerySource.id
+                }
                 onClick={() => {
-                  setSelectedMosaic(mosaic);
-                  setShowSelectMosaicModal(false);
+                  setSelectedImagerySource(imagerySource);
+                  setShowSelectImagerySourceModal(false);
                 }}
               />
             )}
@@ -108,7 +111,8 @@ export function MosaicSelectorModal({
   );
 }
 
-MosaicSelectorModal.propTypes = {
-  showSelectMosaicModal: T.bool,
-  setShowSelectMosaicModal: T.func.isRequired,
+ImagerySourceSelectorModal.propTypes = {
+  showSelectImagerySourceModal: T.bool,
+  setShowSelectImagerySourceModal: T.func.isRequired,
+  availableImagerySources: T.array,
 };

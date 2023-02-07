@@ -15,7 +15,7 @@ import { InstanceProvider } from '../../context/instance';
 import { PredictionsProvider } from '../../context/predictions';
 import { ModelProvider } from '../../context/model';
 import Composer from '../../utils/compose-components';
-import { MosaicProvider } from '../../context/mosaics';
+import { ImagerySourceProvider } from '../../context/imagery-sources';
 
 function Explore() {
   const [isMediumDown, setIsMediumDown] = useState(false);
@@ -31,7 +31,7 @@ function Explore() {
           CheckpointProvider,
           AoiProvider,
           ModelProvider,
-          MosaicProvider,
+          ImagerySourceProvider,
           ProjectProvider,
           PredictionsProvider,
           InstanceProvider,

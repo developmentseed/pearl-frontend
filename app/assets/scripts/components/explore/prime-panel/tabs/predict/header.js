@@ -6,8 +6,9 @@ import { glsp } from '@devseed-ui/theme-provider';
 import { PanelBlockHeader as BasePanelBlockHeader } from '../../../../common/panel-block';
 import AoiSelection from './aoi-selection.js';
 import CheckpointSelection from './checkpoint-selection';
-import { MosaicSelector } from './mosaic-selector';
 import { ModelSelector } from './model-selector';
+import { ImagerySourceSelector } from './imagery-source-selector';
+import { MosaicSelector } from './mosaic-selector';
 
 const PanelBlockHeader = styled(BasePanelBlockHeader)`
   display: grid;
@@ -23,6 +24,7 @@ function Header(props) {
   return (
     <PanelBlockHeader id='header'>
       <AoiSelection />
+      <ImagerySourceSelector />
       <MosaicSelector />
       <ModelSelector />
       <CheckpointSelection checkpointHasSamples={checkpointHasSamples} />
