@@ -501,9 +501,9 @@ function Map() {
         {mosaics &&
           mosaics.map((layer) => (
             <TileLayer
-              key={layer}
+              key={layer.id}
               attribution='&copy; NAIP'
-              url={config.tileUrlTemplate.replace('{LAYER_NAME}', layer)}
+              url={config.tileUrlTemplate.replace('{LAYER_NAME}', layer.name)}
               minZoom={12}
               maxZoom={20}
               pane='tilePane'
@@ -514,7 +514,7 @@ function Map() {
                     [layer]: {
                       layer: v.target,
                       active: true,
-                      name: layer,
+                      name: layer.name,
                       opacity: 1,
                     },
                   });

@@ -2,6 +2,7 @@ import bboxPolygon from '@turf/bbox-polygon';
 import booleanWithin from '@turf/boolean-within';
 import React, { useMemo, useState } from 'react';
 import { useAoi } from '../../../../../../context/aoi';
+import { useMosaics } from '../../../../../../context/global';
 import { useImagerySource } from '../../../../../../context/imagery-sources';
 import { EditButton } from '../../../../../../styles/button';
 import {
@@ -19,7 +20,8 @@ export function ImagerySourceSelector() {
   const isAuthenticated = true;
 
   const { aoiGeometry } = useAoi();
-  const { imagerySources, selectedImagerySource } = useImagerySource();
+  const { imagerySources } = useMosaics();
+  const { selectedImagerySource } = useImagerySource();
 
   const [
     showSelectImagerySourceModal,
@@ -67,8 +69,9 @@ export function ImagerySourceSelector() {
       imagerySources.data?.length > 0 &&
       aoiGeometry
     ) {
+      // If imagery source has bounds prop defined, check if AOI is contained
       return imagerySources?.data.filter((m) =>
-        booleanWithin(aoiGeometry, bboxPolygon(m.bounds))
+        m.bounds ? booleanWithin(aoiGeometry, bboxPolygon(m.bounds)) : true
       );
     } else {
       return [];

@@ -42,12 +42,9 @@ const HeadingWrapper = styled.div`
 export function MosaicSelectorModal({
   showSelectMosaicModal,
   setShowSelectMosaicModal,
+  availableMosaics,
 }) {
-  const {
-    selectedMosaic,
-    setSelectedMosaic,
-    selectedImagerySourceMosaics,
-  } = useImagerySource();
+  const { selectedMosaic, setSelectedMosaic } = useImagerySource();
 
   return (
     <Modal
@@ -86,7 +83,23 @@ export function MosaicSelectorModal({
           <CardList
             nonScrolling
             numColumns={2}
-            data={selectedImagerySourceMosaics}
+            data={availableMosaics?.map(
+              ({
+                id,
+                name,
+                created,
+                updated,
+                mosaic_ts_end,
+                mosaic_ts_start,
+              }) => ({
+                id,
+                name,
+                created,
+                updated,
+                mosaic_ts_end,
+                mosaic_ts_start,
+              })
+            )}
             renderCard={(mosaic) => (
               <Card
                 data-cy={`select-model-${mosaic.id}-card`}
@@ -111,4 +124,5 @@ export function MosaicSelectorModal({
 MosaicSelectorModal.propTypes = {
   showSelectMosaicModal: T.bool,
   setShowSelectMosaicModal: T.func.isRequired,
+  availableMosaics: T.array,
 };
