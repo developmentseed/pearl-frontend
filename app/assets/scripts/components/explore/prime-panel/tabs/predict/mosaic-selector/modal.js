@@ -83,37 +83,39 @@ export function MosaicSelectorModal({
           <CardList
             nonScrolling
             numColumns={2}
-            data={availableMosaics?.map(
-              ({
+            data={availableMosaics}
+            renderCard={(mosaic) => {
+              const {
                 id,
                 name,
                 created,
                 updated,
                 mosaic_ts_end,
                 mosaic_ts_start,
-              }) => ({
-                id,
-                name,
-                created,
-                updated,
-                mosaic_ts_end,
-                mosaic_ts_start,
-              })
-            )}
-            renderCard={(mosaic) => (
-              <Card
-                data-cy={`select-model-${mosaic.id}-card`}
-                key={mosaic.id}
-                title={mosaic.name}
-                details={mosaic}
-                borderlessMedia
-                selected={selectedMosaic && selectedMosaic.id === mosaic.id}
-                onClick={() => {
-                  setSelectedMosaic(mosaic);
-                  setShowSelectMosaicModal(false);
-                }}
-              />
-            )}
+              } = mosaic;
+
+              return (
+                <Card
+                  data-cy={`select-model-${mosaic.id}-card`}
+                  key={mosaic.id}
+                  title={mosaic.name}
+                  details={{
+                    id,
+                    name,
+                    created,
+                    updated,
+                    mosaic_ts_end,
+                    mosaic_ts_start,
+                  }}
+                  borderlessMedia
+                  selected={selectedMosaic && selectedMosaic.id === mosaic.id}
+                  onClick={() => {
+                    setSelectedMosaic(mosaic);
+                    setShowSelectMosaicModal(false);
+                  }}
+                />
+              );
+            }}
           />
         </ModalContent>
       }
