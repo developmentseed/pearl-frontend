@@ -71,7 +71,7 @@ export function ImagerySourceSelector() {
     ) {
       // If imagery source has bounds prop defined, check if AOI is contained
       return imagerySources?.data.filter((m) =>
-        m.bounds ? booleanWithin(aoiGeometry, bboxPolygon(m.bounds)) : true
+        m.bounds ? booleanWithin(aoiGeometry, m.bounds) : true
       );
     } else {
       return [];

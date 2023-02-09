@@ -26,7 +26,7 @@ export function MosaicSelector() {
   const availableMosaics = useMemo(() => {
     if (selectedImagerySource && mosaics.isReady && !mosaics.hasError) {
       return mosaics.data.filter(
-        (m) => m.source_id === selectedImagerySource.id
+        (m) => m.imagery_source_id === selectedImagerySource.id
       );
     } else {
       [];

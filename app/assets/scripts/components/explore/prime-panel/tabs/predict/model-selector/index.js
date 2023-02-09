@@ -70,7 +70,7 @@ export function ModelSelector() {
   const availableModels = useMemo(() => {
     if (models.isReady && models.data?.length > 0 && selectedImagerySource) {
       return models?.data.filter(
-        (m) => m.meta?.imagery_id === selectedImagerySource.id
+        (m) => m.imagery_source_id === selectedImagerySource.id
       );
     } else {
       return [];

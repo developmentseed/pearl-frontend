@@ -92,7 +92,11 @@ export function ImagerySourceSelectorModal({
                 data-cy={`select-model-${imagerySource.id}-card`}
                 key={imagerySource.id}
                 title={imagerySource.name}
-                details={imagerySource}
+                details={{
+                  name: imagerySource.name,
+                  created: imagerySource.created,
+                  updated: imagerySource.updated,
+                }}
                 borderlessMedia
                 selected={
                   selectedImagerySource &&

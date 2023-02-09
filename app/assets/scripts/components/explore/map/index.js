@@ -442,7 +442,6 @@ function Map() {
 
   const selectedMosaicUrl = useMemo(() => {
     if (!selectedMosaic || !selectedMosaic.params) return;
-    const { id } = selectedMosaic;
 
     let params = selectedMosaic.params
       ? new URLSearchParams(selectedMosaic.params)
