@@ -235,13 +235,30 @@ export function ExploreProvider(props) {
 
     try {
       showGlobalLoadingMessage('Fetching model...');
-      await setSelectedModel(project.model_id);
+      const projectModel = await restApiClient.get(`model/${project.model_id}`);
+      await setSelectedModel(projectModel);
 
       showGlobalLoadingMessage('Fetching areas of interest...');
-      const aoiReq = await restApiClient.get(`project/${project.id}/aoi`);
-      const aois = aoiReq.aois;
+      const { aois: existingAois } = await restApiClient.get(
+        `project/${project.id}/aoi`
+      );
 
-      setAoiList(aois);
+      setAoiList(existingAois);
+
+      if (existingAois.length > 0) {
+        latestAoi = sortBy(existingAois, 'updated', 'desc')[0];
+        const { timeframes: existingTimeframes } = await restApiClient.get(
+          `project/${project.id}/aoi/${latestAoi.id}/timeframe`
+        );
+        setCurrentAoi(latestAoi);
+        setTimeframes(existingTimeframes);
+      } else {
+        // Project has no timeframes and needs to run a first prediction
+        setTimeframes([]);
+        setSessionStatusMode(sessionModes.PREDICTION_READY);
+        hideGlobalLoading();
+        return;
+      }
 
       showGlobalLoadingMessage('Fetching checkpoints...');
       const { checkpoints } = await loadCheckpointList(projectId);
