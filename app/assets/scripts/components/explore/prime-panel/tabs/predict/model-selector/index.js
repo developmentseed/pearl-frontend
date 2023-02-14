@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { useAoi } from '../../../../../../context/aoi';
 import { useAuth } from '../../../../../../context/auth';
 import { useCheckpoint } from '../../../../../../context/checkpoint';
+import { useProjectId } from '../../../../../../context/explore';
 import { useImagerySource } from '../../../../../../context/imagery-sources';
 import { useModel } from '../../../../../../context/model';
 import { EditButton } from '../../../../../../styles/button';
@@ -19,6 +20,7 @@ import { ModelSelectorModal } from './modal';
 export function ModelSelector() {
   const { isAuthenticated } = useAuth();
   const { aoiGeometry } = useAoi();
+  const projectId = useProjectId();
 
   const { models, selectedModel, setSelectedModel } = useModel();
   const { selectedMosaic, selectedImagerySource } = useImagerySource();
@@ -34,12 +36,6 @@ export function ModelSelector() {
     } else if (!models.isReady) {
       // Model list is loading
       return { enabled: false, label: 'Loading...' };
-    } else if (!aoiGeometry) {
-      return { enabled: false, label: 'Please define an AOI first' };
-    } else if (!selectedImagerySource) {
-      return { enabled: false, label: 'Please select an imagery source first' };
-    } else if (!selectedMosaic) {
-      return { enabled: false, label: 'Please select a mosaic first' };
     } else if (
       models.status === 'success' &&
       models.data &&
@@ -52,7 +48,16 @@ export function ModelSelector() {
       // Display selected model name, do not enable selector if there model ran
       // before (has checkpoints)
       const hasCheckpoints = checkpointList?.length > 0;
-      return { enabled: !hasCheckpoints, label: selectedModel.name };
+      return {
+        enabled: !hasCheckpoints && projectId === 'new',
+        label: selectedModel.name,
+      };
+    } else if (!aoiGeometry) {
+      return { enabled: false, label: 'Please define an AOI first' };
+    } else if (!selectedImagerySource) {
+      return { enabled: false, label: 'Please select an imagery source first' };
+    } else if (!selectedMosaic) {
+      return { enabled: false, label: 'Please select a mosaic first' };
     } else {
       // No models available/applicable
       return { enabled: false, label: 'No models available' };
