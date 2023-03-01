@@ -46,6 +46,7 @@ import {
   actions as shortcutActions,
 } from './shortcuts';
 import { isRectangle } from '../../utils/is-rectangle';
+import { useImagerySource } from '../imagery-sources';
 
 export { sessionModes };
 /**
@@ -100,6 +101,7 @@ export function ExploreProvider(props) {
   } = useAoi();
   const { predictions, dispatchPredictions } = usePredictions();
   const { selectedModel, setSelectedModel } = useModel();
+  const { selectedMosaic } = useImagerySource();
   const {
     currentCheckpoint,
     dispatchCurrentCheckpoint,
@@ -600,7 +602,7 @@ export function ExploreProvider(props) {
         showGlobalLoadingMessage('Creating project...');
         project = await restApiClient.createProject({
           model_id: selectedModel.id,
-          mosaic: 'naip.latest',
+          mosaic: selectedMosaic.id,
           name: projectName,
         });
         setCurrentProject(project);

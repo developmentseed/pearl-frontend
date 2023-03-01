@@ -37,6 +37,7 @@ import { delay } from '../../utils/utils';
 import { actions as instanceActions, useInstanceReducer } from './reducer';
 import { aoiBoundsToArray } from '../../utils/map';
 import { round } from '../../utils/format';
+import { useImagerySource } from '../imagery-sources';
 
 const BATCH_REFRESH_INTERVAL = 4000;
 
@@ -75,6 +76,7 @@ const InstanceContext = createContext(null);
 export function InstanceProvider(props) {
   const history = useHistory();
   const { restApiClient } = useAuth();
+  const { selectedMosaic } = useImagerySource();
 
   const {
     currentCheckpoint,
@@ -514,7 +516,7 @@ export function InstanceProvider(props) {
           showGlobalLoadingMessage('Creating project...');
           project = await restApiClient.createProject({
             model_id: selectedModel.id,
-            mosaic: 'naip.latest',
+            mosaic: selectedMosaic.id,
             name: projectName,
           });
           setCurrentProject(project);
@@ -617,7 +619,7 @@ export function InstanceProvider(props) {
             action: 'model#prediction',
             data: {
               aoi_id: aoi.id,
-              mosaic: 'naip.latest',
+              mosaic: selectedMosaic.id,
             },
           },
         });
@@ -639,7 +641,7 @@ export function InstanceProvider(props) {
             showGlobalLoadingMessage('Creating project...');
             project = await restApiClient.createProject({
               model_id: selectedModel.id,
-              mosaic: 'naip.latest',
+              mosaic: selectedMosaic.id,
               name: projectName,
             });
             setCurrentProject(project);
