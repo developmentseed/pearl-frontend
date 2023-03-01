@@ -65,7 +65,7 @@ import turfArea from '@turf/area';
 import turfBboxPolygon from '@turf/bbox-polygon';
 import { useImagerySource } from '../../../context/imagery-sources';
 
-const center = [38.889805, -77.009056];
+const center = [19.22819, -99.995841];
 const zoom = 12;
 
 const MIN = 4;
