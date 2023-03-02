@@ -3,34 +3,20 @@ import T from 'prop-types';
 import styled from 'styled-components';
 import { Heading } from '@devseed-ui/typography';
 import { Button } from '@devseed-ui/button';
-import { glsp } from '@devseed-ui/theme-provider';
+import { Modal } from '@devseed-ui/modal';
 
 import ModelCard from '../../../model-card';
-import SelectModal from '../../../../../common/select-modal';
-import AutoFocusFormInput from '../../../../../common/auto-focus-form-input';
+import CardList from '../../../../../common/card-list';
 
-const ModalHeader = styled.header`
-  padding: ${glsp(2)} ${glsp(2)} 0;
+const ModalContent = styled.div`
+  display: block;
 `;
 
-const Headline = styled.div`
+const HeadingWrapper = styled.div`
   display: flex;
-  flex-direction: row;
+  flex-flow: row nowrap;
   justify-content: space-between;
-  padding-bottom: ${glsp(1)};
-
-  h1 {
-    margin: 0;
-  }
-
-  ${Button} {
-    height: min-content;
-    align-self: center;
-  }
-`;
-
-const FilterSection = styled.div`
-  padding-bottom: ${glsp(1)};
+  align-items: baseline;
 `;
 
 export function ModelSelectorModal({
@@ -43,16 +29,18 @@ export function ModelSelectorModal({
   const [modelFilter, setModelFilter] = useState('');
 
   return (
-    <SelectModal
+    <Modal
       id='select-model-modal'
       revealed={showSelectModelModal}
       onOverlayClick={() => setShowSelectModelModal(false)}
+      closeButton={false}
       data={availableModels}
-      renderHeader={() => (
-        <ModalHeader>
-          <Headline>
-            {' '}
-            <Heading>Starter Models</Heading>
+      content={
+        <ModalContent>
+          <HeadingWrapper>
+            <Heading size='small' as='h4'>
+              Available Models
+            </Heading>
             <Button
               hideText
               variation='base-plain'
@@ -65,31 +53,28 @@ export function ModelSelectorModal({
             >
               Close modal
             </Button>
-          </Headline>
-          <FilterSection>
-            <AutoFocusFormInput
-              inputId='modelsFilter'
-              value={modelFilter}
-              setValue={setModelFilter}
-              placeholder='Search models by name'
-            />
-          </FilterSection>
-        </ModalHeader>
-      )}
-      filterCard={(card) =>
-        card.name.toLowerCase().includes(modelFilter.toLowerCase())
+          </HeadingWrapper>
+          <CardList
+            numColumns={2}
+            data={availableModels}
+            renderCard={(model) => (
+              <ModelCard
+                key={model.name}
+                model={model}
+                onClick={() => {
+                  setShowSelectModelModal(false);
+                  setSelectedModel(model);
+                }}
+                selected={selectedModel?.id === model.id}
+              />
+            )}
+            filterCard={(card) =>
+              card.name.toLowerCase().includes(modelFilter.toLowerCase())
+            }
+            nonScrolling
+          />
+        </ModalContent>
       }
-      renderCard={(model) => (
-        <ModelCard
-          key={model.name}
-          model={model}
-          onClick={() => {
-            setShowSelectModelModal(false);
-            setSelectedModel(model);
-          }}
-          selected={selectedModel?.id === model.id}
-        />
-      )}
       nonScrolling
     />
   );

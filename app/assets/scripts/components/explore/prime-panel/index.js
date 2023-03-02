@@ -6,7 +6,6 @@ import { media, glsp } from '@devseed-ui/theme-provider';
 
 import Panel from '../../common/panel';
 import { PanelBlock, PanelBlockBody } from '../../common/panel-block';
-import SelectModal from '../../common/select-modal';
 import AutoFocusFormInput from '../../common/auto-focus-form-input';
 import ModelCard from './model-card';
 import { useMapRef } from '../../../context/map';
