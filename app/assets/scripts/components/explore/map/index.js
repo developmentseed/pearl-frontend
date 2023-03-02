@@ -443,9 +443,20 @@ function Map() {
   const selectedMosaicUrl = useMemo(() => {
     if (!selectedMosaic || !selectedMosaic.params) return;
 
-    let params = selectedMosaic.params
-      ? new URLSearchParams(selectedMosaic.params)
-      : '';
+    const { assets, ...otherParams } = selectedMosaic.params;
+
+    let params = [];
+
+    // The tiler doesn't support array[] notation in the querystring, this will
+    // generate a custom notation like 'asset=a&asset=b&asset=c'
+    assets.forEach((a) => params.push(`assets=${a}`));
+
+    // Serialize remaining params
+    for (var p in otherParams) params.push(p + '=' + otherParams[p]);
+
+    // Join all
+    params = params.join('&');
+
     return `https://planetarycomputer.microsoft.com/api/data/v1/mosaic/tiles/${selectedMosaic.id}/{z}/{x}/{y}?${params}`;
   }, [selectedMosaic]);
 
