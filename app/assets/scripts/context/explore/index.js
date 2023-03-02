@@ -47,6 +47,7 @@ import {
 } from './shortcuts';
 import { isRectangle } from '../../utils/is-rectangle';
 import { useImagerySource } from '../imagery-sources';
+import sortBy from 'lodash.sortby';
 
 export { sessionModes };
 /**
@@ -230,7 +231,9 @@ export function ExploreProvider(props) {
     } catch (error) {
       hideGlobalLoading();
       logger(error);
-      toasts.error('Project not found.');
+      toasts.error(
+        'Could not load project at the moment, please try again later.'
+      );
       history.push('/profile/projects');
       return;
     }
