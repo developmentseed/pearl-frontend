@@ -100,6 +100,8 @@ export function ExploreProvider(props) {
     aoiArea,
     setAoiArea,
   } = useAoi();
+  const [timeframes, setTimeframes] = useState(null);
+  const [selectedTimeframe, setSelectedTimeframe] = useState(null);
   const { predictions, dispatchPredictions } = usePredictions();
   const { selectedModel, setSelectedModel } = useModel();
   const { selectedMosaic } = useImagerySource();
@@ -252,11 +254,12 @@ export function ExploreProvider(props) {
 
       if (existingAois.length > 0) {
         latestAoi = sortBy(existingAois, 'updated', 'desc')[0];
+        setCurrentAoi(latestAoi);
         const { timeframes: existingTimeframes } = await restApiClient.get(
           `project/${project.id}/aoi/${latestAoi.id}/timeframe`
         );
-        setCurrentAoi(latestAoi);
         setTimeframes(existingTimeframes);
+        setSelectedTimeframe(existingTimeframes[0]);
       } else {
         // Project has no timeframes and needs to run a first prediction
         setTimeframes([]);
@@ -676,6 +679,9 @@ export function ExploreProvider(props) {
 
         loadAoi,
 
+        timeframes,
+        selectedTimeframe,
+
         currentInstance,
         setCurrentInstance,
 
@@ -747,6 +753,18 @@ export const useAoiMeta = () => {
       createNewAoi,
     }),
     [aoiBounds, aoiArea, aoiList, loadAoi, createNewAoi]
+  );
+};
+
+export const useTimeframes = () => {
+  const { timeframes, selectedTimeframe } = useExploreContext('useTimeframes');
+
+  return useMemo(
+    () => ({
+      timeframes,
+      selectedTimeframe,
+    }),
+    [timeframes, selectedTimeframe]
   );
 };
 

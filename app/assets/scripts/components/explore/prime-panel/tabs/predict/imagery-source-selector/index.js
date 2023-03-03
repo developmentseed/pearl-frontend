@@ -1,4 +1,3 @@
-import bboxPolygon from '@turf/bbox-polygon';
 import booleanWithin from '@turf/boolean-within';
 import React, { useMemo, useState } from 'react';
 import { useAoi } from '../../../../../../context/aoi';
