@@ -39,7 +39,7 @@ const modesMeta = [
   {
     mode: sessionModes.SELECT_MODEL,
     level: 'info',
-    message: 'Select Model',
+    message: 'Select Mosaic & Model',
   },
   {
     mode: sessionModes.PREDICTION_READY,
