@@ -14,6 +14,35 @@ const instance = {
   },
 };
 
+const aoi1 = {
+  id: 1,
+  name: 'Amanalco',
+  project_id: 53,
+  created: 1678122994960,
+  updated: 1678122994960,
+  bounds: {
+    type: 'Polygon',
+    coordinates: [
+      [
+        [-100.05626678466797, 19.23303922076886],
+        [-100.03704071044923, 19.23303922076886],
+        [-100.03704071044923, 19.253784196994395],
+        [-100.05626678466797, 19.253784196994395],
+        [-100.05626678466797, 19.23303922076886],
+      ],
+    ],
+    bounds: [
+      -100.05626678466797,
+      19.23303922076886,
+      -100.03704071044923,
+      19.253784196994395,
+    ],
+  },
+  bookmarked: false,
+  bookmarked_at: null,
+  area: 4641850,
+};
+
 describe('Create new project', () => {
   beforeEach(() => {
     cy.mockApiRoutes();
@@ -38,6 +67,17 @@ describe('Create new project', () => {
         method: 'POST',
       },
       instance
+    );
+
+    // POST /project/:id/instance
+    cy.intercept(
+      {
+        url: restApiEndpoint + '/api/project/1/aoi',
+        method: 'POST',
+      },
+      {
+        ...aoi1,
+      }
     );
 
     // Visit page
