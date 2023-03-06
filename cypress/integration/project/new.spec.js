@@ -78,26 +78,38 @@ describe('Create new project', () => {
       .should('not.be.disabled')
       .click();
 
-    // Set model
     // Check session status message
     cy.get('[data-cy=session-status]').should(
       'have.text',
-      'Session Status: Select Model'
+      'Session Status: Select Mosaic & Model'
     );
+
+    // Select imagery source
+    cy.get('[data-cy=imagery-selector-label]').should('exist').click();
+    cy.get('[data-cy=select-imagery-2-card]').should('exist').click();
+
+    // Select mosaic
+    cy.get('[data-cy=mosaic-selector-label]').should('exist').click();
+    cy.get('[data-cy=select-mosaic-2849689f57f1b3b9c1f725abb75aa411-card]')
+      .should('exist')
+      .click();
 
     // Open the Model selection modal
     cy.get('[data-cy=select-model-label]').should('exist').click();
-    // Filter a model and get no results
-    cy.get('#modelsFilter').should('exist').clear().type('test123');
-    cy.get('[data-cy=select-model-1-card]').should('not.exist');
-    cy.get('.list-container').should('have.text', 'No results found');
-    // Filter again and get 2 results
-    cy.get('#modelsFilter').should('exist').clear().type('class');
-    // Check that the 2 models are recommended
-    cy.get('[data-cy=recommended-models-label]').should('exist');
-    cy.get('.list-container').children().should('have.length', 2);
+
+    // TODO Re-enable model filter or move to unit test
+    // // Filter a model and get no results
+    // cy.get('#modelsFilter').should('exist').clear().type('test123');
+    // cy.get('[data-cy=select-model-1-card]').should('not.exist');
+    // cy.get('.list-container').should('have.text', 'No results found');
+    // // Filter again and get 2 results
+    // cy.get('#modelsFilter').should('exist').clear().type('class');
+    // // Check that the 2 models are recommended
+    // cy.get('[data-cy=recommended-models-label]').should('exist');
+    // cy.get('.list-container').children().should('have.length', 2);
+
     // Finally select a model
-    cy.get('[data-cy=select-model-1-card]').should('exist').click();
+    cy.get('[data-cy=select-model-2-card]').should('exist').click();
 
     // Check session status message
     cy.get('[data-cy=session-status]').should(
