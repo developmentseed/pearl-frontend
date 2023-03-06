@@ -16,7 +16,7 @@ const instance = {
 
 describe('Test running GPUs', () => {
   it('Run project on GPU', () => {
-    cy.startServer();
+    cy.mockApiRoutes();
     cy.fakeLogin('user', { gpu: true });
 
     // Active instances list

@@ -16,7 +16,7 @@ const instance = {
 
 describe('Create new project', () => {
   beforeEach(() => {
-    cy.startServer();
+    cy.mockApiRoutes();
     cy.fakeLogin();
 
     // Active instances list

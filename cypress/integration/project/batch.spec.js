@@ -1,5 +1,5 @@
 import { sortBy } from 'lodash';
-import { getQueryElement } from '../../support/commands/fake-rest/utils';
+import { getQueryElement } from '../../support/commands/mock-api-routes/utils';
 const format = require('date-fns/format').default;
 
 const restApiEndpoint = Cypress.config('restApiEndpoint');
@@ -20,7 +20,7 @@ const instance = {
 
 describe('Batch predictions', () => {
   beforeEach(() => {
-    cy.startServer();
+    cy.mockApiRoutes();
 
     const paginatedBatchList = (req) => {
       let total = 25;
@@ -294,7 +294,7 @@ describe('Batch predictions', () => {
   });
 
   it('Inference and retrain can happen during batch', () => {
-    cy.startServer();
+    cy.mockApiRoutes();
     /**
      * GET /project/:id/instance/:id
      */
