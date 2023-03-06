@@ -96,7 +96,7 @@ export function MosaicSelectorModal({
 
               return (
                 <Card
-                  data-cy={`select-model-${mosaic.id}-card`}
+                  data-cy={`select-mosaic-${mosaic.id}-card`}
                   key={mosaic.id}
                   title={mosaic.name}
                   details={{

@@ -92,7 +92,10 @@ export function MosaicSelector() {
           <Subheading>Base Mosaic</Subheading>
         </HeadOptionHeadline>
         <SubheadingStrong
-          onClick={() => {}}
+          data-cy='mosaic-selector-label'
+          onClick={() =>
+            selectorState.enabled && setShowSelectMosaicModal(true)
+          }
           title={aoiGeometry ? 'Select Imagery Mosaic' : 'An AOI is required'}
           disabled={!aoiGeometry}
         >
