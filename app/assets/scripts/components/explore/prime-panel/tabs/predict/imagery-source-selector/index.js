@@ -39,12 +39,15 @@ export function ImagerySourceSelector() {
         enabled: true,
         label: selectedImagerySource.name,
       };
-    } else if (!imagerySources.isReady) {
+    } else if (imagerySources.status === 'loading') {
       return {
         enabled: false,
         label: 'Loading...',
       };
-    } else if (imagerySources.data.length === 0) {
+    } else if (
+      imagerySources.status === 'error' ||
+      (imagerySources.status === 'success' && imagerySources.data.length === 0)
+    ) {
       return {
         enabled: false,
         label: 'No imagery sources available.',
@@ -89,7 +92,10 @@ export function ImagerySourceSelector() {
           <Subheading>Imagery Source</Subheading>
         </HeadOptionHeadline>
         <SubheadingStrong
-          onClick={() => {}}
+          data-cy='imagery-selector-label'
+          onClick={() =>
+            selectorState.enabled && setShowSelectImagerySourceModal(true)
+          }
           title={aoiGeometry ? 'Select Imagery Source' : 'An AOI is required'}
           disabled={!aoiGeometry}
         >
