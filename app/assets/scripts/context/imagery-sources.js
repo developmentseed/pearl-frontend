@@ -93,6 +93,7 @@ export const useImagerySource = () => {
       selectedImagerySource,
       selectedImagerySourceMosaics,
       selectedMosaic,
+      setSelectedMosaic,
     ]
   );
 };

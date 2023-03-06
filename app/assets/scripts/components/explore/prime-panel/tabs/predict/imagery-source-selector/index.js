@@ -34,6 +34,11 @@ export function ImagerySourceSelector() {
         enabled: false,
         label: 'Login to select imagery source',
       };
+    } else if (selectedImagerySource) {
+      return {
+        enabled: true,
+        label: selectedImagerySource.name,
+      };
     } else if (!imagerySources.isReady) {
       return {
         enabled: false,
@@ -49,15 +54,10 @@ export function ImagerySourceSelector() {
         enabled: false,
         label: 'Please define an AOI first',
       };
-    } else if (!selectedImagerySource) {
-      return {
-        enabled: true,
-        label: 'Select an imagery source',
-      };
     } else {
       return {
         enabled: true,
-        label: selectedImagerySource.name,
+        label: 'Select an imagery source',
       };
     }
   }, [isAuthenticated, imagerySources, aoiGeometry, selectedImagerySource]);

@@ -9,7 +9,6 @@ import CheckpointSelection from './checkpoint-selection';
 import { ModelSelector } from './model-selector';
 import { ImagerySourceSelector } from './imagery-source-selector';
 import { MosaicSelector } from './mosaic-selector';
-import TimeframeSelector from './timeframe-selector';
 
 const PanelBlockHeader = styled(BasePanelBlockHeader)`
   display: grid;
@@ -25,7 +24,6 @@ function Header(props) {
   return (
     <PanelBlockHeader id='header'>
       <AoiSelection />
-      <TimeframeSelector />
       <ImagerySourceSelector />
       <MosaicSelector />
       <ModelSelector />

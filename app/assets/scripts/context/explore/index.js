@@ -48,6 +48,7 @@ import {
 import { isRectangle } from '../../utils/is-rectangle';
 import { useImagerySource } from '../imagery-sources';
 import sortBy from 'lodash.sortby';
+import { useMosaics } from '../global';
 
 export { sessionModes };
 /**
@@ -61,12 +62,14 @@ export function ExploreProvider(props) {
 
   const isInitialized = useRef(false);
 
+  /**
+   * Tour steps state
+   */
   const [tourStep, setTourStep] = useState(
     localStorage.getItem('site-tour')
       ? Number(localStorage.getItem('site-tour'))
       : null
   );
-
   useEffect(() => {
     localStorage.setItem('site-tour', tourStep);
   }, [tourStep]);
@@ -104,7 +107,13 @@ export function ExploreProvider(props) {
   const [selectedTimeframe, setSelectedTimeframe] = useState(null);
   const { predictions, dispatchPredictions } = usePredictions();
   const { selectedModel, setSelectedModel } = useModel();
-  const { selectedMosaic } = useImagerySource();
+  const { mosaics, imagerySources } = useMosaics();
+  const {
+    selectedMosaic,
+    setSelectedMosaic,
+    setSelectedImagerySource,
+  } = useImagerySource();
+
   const {
     currentCheckpoint,
     dispatchCurrentCheckpoint,
@@ -259,7 +268,18 @@ export function ExploreProvider(props) {
           `project/${project.id}/aoi/${latestAoi.id}/timeframe`
         );
         setTimeframes(existingTimeframes);
-        setSelectedTimeframe(existingTimeframes[0]);
+
+        const latestTimeframe = existingTimeframes[0];
+        const latestTimeframeMosaic = mosaics.data.find(
+          (m) => m.id === latestTimeframe.mosaic
+        );
+        const latestTimeframeImagerySource = imagerySources.data.find(
+          (s) => s.id === latestTimeframeMosaic.imagery_source_id
+        );
+
+        setSelectedImagerySource(latestTimeframeImagerySource);
+        setSelectedMosaic(latestTimeframeMosaic);
+        setSelectedTimeframe(latestTimeframe);
       } else {
         // Project has no timeframes and needs to run a first prediction
         setTimeframes([]);
@@ -272,9 +292,9 @@ export function ExploreProvider(props) {
       const { checkpoints } = await loadCheckpointList(projectId);
       const checkpoint = checkpoints[0];
       let latestAoi;
-      if (aoiReq.total > 0) {
-        latestAoi = aois.find((a) => Number(a.checkpoint_id) === checkpoint.id);
-      }
+      // if (aoiReq.total > 0) {
+      //   latestAoi = aois.find((a) => Number(a.checkpoint_id) === checkpoint.id);
+      // }
 
       const initializingInstanceMessage =
         instanceType === 'cpu'
@@ -757,14 +777,19 @@ export const useAoiMeta = () => {
 };
 
 export const useTimeframes = () => {
-  const { timeframes, selectedTimeframe } = useExploreContext('useTimeframes');
+  const {
+    timeframes,
+    selectedTimeframe,
+    setSelectedTimeframe,
+  } = useExploreContext('useTimeframes');
 
   return useMemo(
     () => ({
       timeframes,
       selectedTimeframe,
+      setSelectedTimeframe,
     }),
-    [timeframes, selectedTimeframe]
+    [timeframes, selectedTimeframe, setSelectedTimeframe]
   );
 };
 
