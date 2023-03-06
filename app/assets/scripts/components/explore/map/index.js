@@ -449,7 +449,11 @@ function Map() {
 
     // The tiler doesn't support array[] notation in the querystring, this will
     // generate a custom notation like 'asset=a&asset=b&asset=c'
-    assets.forEach((a) => params.push(`assets=${a}`));
+    if (Array.isArray(assets)) {
+      assets.forEach((a) => params.push(`assets=${a}`));
+    } else {
+      params.push(`assets=${assets}`);
+    }
 
     // Serialize remaining params
     for (var p in otherParams) params.push(p + '=' + otherParams[p]);
