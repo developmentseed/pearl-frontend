@@ -47,7 +47,7 @@
     "payload": {
       "action": "model#retrain",
       "data": {
-        "name": "Seneca Rocks #1",
+        "name": "Seneca Rocks",
         "classes": [
           {
             "name": "Water / Wetland",
@@ -85,7 +85,7 @@
                   "properties": {},
                   "geometry": {
                     "type": "MultiPoint",
-                    "coordinates": [[-79.3850612640381, 38.84067698741475]]
+                    "coordinates": [[-79.3890953063965, 38.84425352847781]]
                   }
                 }
               ]

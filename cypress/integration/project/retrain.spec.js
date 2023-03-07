@@ -94,9 +94,6 @@ describe('Retrain existing project', () => {
 
     cy.visit('/project/1');
 
-    // Wait for data loading
-    cy.wait(['@fetchAoi2', '@fetchCheckpoint2']);
-
     // Check ready for retrain status
     cy.get('[data-cy=session-status]').should(
       'have.text',

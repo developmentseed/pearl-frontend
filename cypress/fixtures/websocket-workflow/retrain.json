@@ -14,7 +14,7 @@
       "data": {
         "is_aborting": false,
         "processing": false,
-        "aoi": 2,
+        "timeframe": 2,
         "checkpoint": 2
       }
     }
@@ -37,7 +37,7 @@
       "data": {
         "is_aborting": false,
         "processing": false,
-        "aoi": 2,
+        "timeframe": 2,
         "checkpoint": 2
       }
     }
@@ -230,7 +230,7 @@
       "data": {
         "is_aborting": false,
         "processing": true,
-        "aoi": 2,
+        "timeframe": 2,
         "checkpoint": 2
       }
     }
