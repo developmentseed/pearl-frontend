@@ -323,10 +323,15 @@ export function ExploreProvider(props) {
 
   // Load project meta on load and api client ready
   useEffect(() => {
-    if (!authIsLoading && restApiClient && instanceType) {
+    if (
+      !authIsLoading &&
+      restApiClient &&
+      instanceType &&
+      mosaics.status === 'success'
+    ) {
       loadInitialData();
     }
-  }, [authIsLoading, restApiClient, instanceType]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [authIsLoading, restApiClient, instanceType, mosaics]);
 
   useEffect(() => {
     if (predictions.status === 'running') {
