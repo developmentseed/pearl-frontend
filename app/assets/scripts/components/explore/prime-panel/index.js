@@ -1,13 +1,9 @@
 import React, { useEffect, useState, useContext } from 'react';
 import styled from 'styled-components';
-import { Heading } from '@devseed-ui/typography';
-import { Button } from '@devseed-ui/button';
 import { media, glsp } from '@devseed-ui/theme-provider';
 
 import Panel from '../../common/panel';
 import { PanelBlock, PanelBlockBody } from '../../common/panel-block';
-import AutoFocusFormInput from '../../common/auto-focus-form-input';
-import ModelCard from './model-card';
 import { useMapRef } from '../../../context/map';
 import {
   ExploreContext,
@@ -33,7 +29,6 @@ import { usePredictions } from '../../../context/predictions';
 import { useApiLimits } from '../../../context/global';
 import ClearSamplesModal from './clear-samples-modal';
 import { actions as shortcutActions } from '../../../context/explore/shortcuts';
-import { bboxIntersectsMapBounds } from '../../../utils/map';
 
 const StyledPanelBlock = styled(PanelBlock)`
   ${media.largeUp`
@@ -52,19 +47,17 @@ function PrimePanel() {
 
   const { updateCheckpointName } = useContext(ExploreContext);
 
-  const { aoiBounds, setAoiBounds, aoiArea } = useAoiMeta();
+  const { setAoiBounds, aoiArea } = useAoiMeta();
 
   const { aoiRef, currentAoi } = useAoi();
 
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
 
-  const { models, selectedModel, setSelectedModel } = useModel();
+  const { selectedModel } = useModel();
 
   const { predictions } = usePredictions();
 
-  const [showSelectModelModal, setShowSelectModelModal] = useState(false);
   const [showClearSamplesModal, setShowClearSamplesModal] = useState(null);
-  const [modelFilter, setModelFilter] = useState('');
 
   const [localCheckpointName, setLocalCheckpointName] = useState(
     (currentCheckpoint &&
@@ -139,7 +132,6 @@ function PrimePanel() {
                   className='predict-model'
                   tabId='predict-tab-trigger'
                   checkpointHasSamples={checkpointHasSamples}
-                  setShowSelectModelModal={setShowSelectModelModal}
                   onTabClick={() => {
                     function onContinue() {
                       setActiveTab(PREDICT_TAB_INDEX);
