@@ -16,6 +16,7 @@ import { PredictionsProvider } from '../../context/predictions';
 import { ModelProvider } from '../../context/model';
 import Composer from '../../utils/compose-components';
 import { ImagerySourceProvider } from '../../context/imagery-sources';
+import { ExploreMachineProvider } from '../../context/explore-machine';
 
 function Explore() {
   const [isMediumDown, setIsMediumDown] = useState(false);
@@ -37,6 +38,7 @@ function Explore() {
           InstanceProvider,
           ExploreProvider,
           MapProvider,
+          ExploreMachineProvider,
         ]}
       >
         <SizeAwareElement
