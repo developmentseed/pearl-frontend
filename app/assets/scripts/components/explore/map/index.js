@@ -441,9 +441,9 @@ function Map() {
   }, [mapState.mode, shortcutState.escapePressed, mapRef?.polygonDraw]);
 
   const selectedMosaicUrl = useMemo(() => {
-    if (!selectedMosaic || !selectedMosaic.params) return;
+    if (!selectedMosaic || !selectedMosaic.ui_params) return;
 
-    const { assets, ...otherParams } = selectedMosaic.params;
+    const { assets, ...otherParams } = selectedMosaic.ui_params;
 
     let params = [];
 
