@@ -19,6 +19,7 @@ import { useSessionStatus } from '../../context/explore';
 import { sessionModes } from '../../context/explore/session-status';
 import { useParams } from 'react-router-dom';
 import LayersPanel from './layers-panel';
+import { ExploreMachineContext } from '../../context/explore-machine';
 
 const ExploreBody = styled(InpageBody)`
   display: grid;
@@ -31,6 +32,17 @@ function Explore() {
   const { projectId } = useParams();
   const { sessionStatus } = useSessionStatus();
   const [steps, setSteps] = useState(null);
+
+  const isPageReady = ExploreMachineContext.useSelector((s) =>
+    s.matches('Page is ready')
+  );
+  const exploreActor = ExploreMachineContext.useActorRef();
+
+  useEffect(() => {
+    if (isPageReady) {
+      exploreActor.send('Start loading project');
+    }
+  }, [isPageReady]);
 
   const isLoading = [
     sessionModes.LOADING,
