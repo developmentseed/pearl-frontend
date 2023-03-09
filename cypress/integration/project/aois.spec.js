@@ -121,10 +121,10 @@ describe('Loads AOIs', () => {
       '80.49  km2'
     );
 
-    // TODO: after implemeting polygon AOI imports, the page won't open the edit
+    // TODO: after implementing polygon AOI imports, the page won't open the edit
     // controller, which is responsible for displaying the large AOI warning.
     // The next lines are commented out because of this. The warning workflow
-    // needs to be updated to not depende on the editor.
+    // needs to be updated to not depend on the editor.
 
     // cy.get('[data-cy=panel-aoi-confirm]')
     //   .should('exist')
@@ -204,6 +204,7 @@ describe('Load AOIs and draw a third one', () => {
     cy.get('[data-cy=confirm-clear-aoi]').should('exist').click();
     cy.wait('@fetchAoi2');
     cy.get('[data-cy=global-loading]').should('not.exist');
+
     cy.get('[data-cy=predict-tab]').click();
     cy.get('.listed-aoi').should('have.length', 1);
     cy.get('[data-cy=confirm-clear-aoi-modal]').should('not.exist');
