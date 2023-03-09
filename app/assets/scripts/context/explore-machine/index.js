@@ -21,7 +21,7 @@ export function ExploreMachineProvider(props) {
         },
       })}
     >
-      {environment !== 'production' && <MachineStateLogger />}
+      <MachineStateLogger />
       {props.children}
     </ExploreMachineContext.Provider>
   );

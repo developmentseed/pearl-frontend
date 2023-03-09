@@ -36,9 +36,9 @@ function Explore() {
           ProjectProvider,
           PredictionsProvider,
           InstanceProvider,
+          ExploreMachineProvider,
           ExploreProvider,
           MapProvider,
-          ExploreMachineProvider,
         ]}
       >
         <SizeAwareElement

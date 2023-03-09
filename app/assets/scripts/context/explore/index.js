@@ -49,6 +49,7 @@ import { isRectangle } from '../../utils/is-rectangle';
 import { useImagerySource } from '../imagery-sources';
 import sortBy from 'lodash.sortby';
 import { useMosaics } from '../global';
+import { ExploreMachineContext } from '../explore-machine';
 
 export { sessionModes };
 /**
@@ -59,6 +60,8 @@ export const ExploreContext = createContext(null);
 export function ExploreProvider(props) {
   const history = useHistory();
   let { projectId } = useParams();
+
+  const exploreActor = ExploreMachineContext.useActorRef();
 
   const isInitialized = useRef(false);
 
@@ -207,11 +210,13 @@ export function ExploreProvider(props) {
   }, [isInitialized.current, dispatchShortcutState]);
 
   async function loadInitialData() {
+    exploreActor.send('Project fetch start');
     showGlobalLoadingMessage('Loading configuration...');
 
     // Update session status
     if (projectId === 'new') {
       setSessionStatusMode(sessionModes.SET_PROJECT_NAME);
+      exploreActor.send('Project fetch end');
       hideGlobalLoading();
       return; // Bypass loading project when new
     } else {
@@ -321,9 +326,13 @@ export function ExploreProvider(props) {
     }
   }
 
+  const isPageReady = ExploreMachineContext.useSelector((s) =>
+    s.matches('Page is ready')
+  );
   // Load project meta on load and api client ready
   useEffect(() => {
     if (
+      isPageReady &&
       !authIsLoading &&
       restApiClient &&
       instanceType &&
@@ -331,7 +340,7 @@ export function ExploreProvider(props) {
     ) {
       loadInitialData();
     }
-  }, [authIsLoading, restApiClient, instanceType, mosaics]);
+  }, [isPageReady, authIsLoading, restApiClient, instanceType, mosaics]);
 
   useEffect(() => {
     if (predictions.status === 'running') {
@@ -567,6 +576,7 @@ export function ExploreProvider(props) {
         setSessionStatusMode(sessionModes.PREDICTION_READY);
       }
       setCurrentAoi(null);
+      exploreActor.send('Project fetch end');
       hideGlobalLoading();
     } else {
       setCurrentAoi(aoi);
@@ -575,6 +585,7 @@ export function ExploreProvider(props) {
       if (currentInstance && !noLoadOnInst && aoiObject.storage) {
         loadAoiOnInstance(aoi.id);
       } else {
+        exploreActor.send('Project fetch end');
         hideGlobalLoading();
       }
 
