@@ -258,7 +258,7 @@ export function InstanceProvider(props) {
     }
   }, [batchReady, currentAoi, currentProject]);
 
-  async function initInstance(projectId, checkpointId, aoiId) {
+  async function initInstance(projectId, checkpointId, timeframeId) {
     // Close existing websocket
     if (websocketClient) {
       websocketClient.close();
@@ -292,7 +292,7 @@ export function InstanceProvider(props) {
       instance = await restApiClient.createInstance(projectId, {
         type: instanceType,
         checkpoint_id: checkpointId,
-        aoi_id: aoiId,
+        timeframe_id: timeframeId,
       });
     } else {
       instance = await restApiClient.createInstance(projectId, {
@@ -350,7 +350,7 @@ export function InstanceProvider(props) {
         fetchCheckpoint(
           projectId,
           checkpointId,
-          aoiId ? checkpointModes.RETRAIN : checkpointModes.RUN,
+          timeframeId ? checkpointModes.RETRAIN : checkpointModes.RUN,
           true
         );
       }
@@ -493,7 +493,7 @@ export function InstanceProvider(props) {
         gpuMessage: message,
       }),
     initInstance,
-    loadAoiOnInstance: (id) => {
+    loadAoiTimeframeOnInstance: (id) => {
       showGlobalLoadingMessage('Loading AOI on Instance...');
       dispatchMessageQueue({
         type: messageQueueActionTypes.ADD_EXPRESS,
@@ -975,14 +975,14 @@ export const useInstance = () => {
     retrain,
     refine,
     applyCheckpoint,
-    loadAoiOnInstance,
+    loadAoiTimeframeOnInstance,
   } = useCheckContext(InstanceContext);
   return useMemo(
     () => ({
       instanceType,
       setInstanceType,
       instance,
-      loadAoiOnInstance,
+      loadAoiTimeframeOnInstance,
       setInstanceStatusMessage,
       getRunningBatch,
       runningBatch,
@@ -1104,7 +1104,7 @@ export class WebsocketClient extends ReconnectingWebsocket {
               },
             });
             dispatchPredictions({
-              type: predictionsActions.RECEIVE_AOI_META,
+              type: predictionsActions.RECEIVE_TIMEFRAME_META,
               data: {
                 id: data.id,
               },

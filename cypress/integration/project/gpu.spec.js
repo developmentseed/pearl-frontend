@@ -82,7 +82,7 @@ describe('Test running GPUs', () => {
     // Check session status message
     cy.get('[data-cy=session-status]').should(
       'have.text',
-      'Session Status: Select Model'
+      'Session Status: Select Mosaic & Model'
     );
 
     // Open the Model selection modal

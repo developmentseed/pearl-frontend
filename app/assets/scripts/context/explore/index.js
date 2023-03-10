@@ -142,7 +142,7 @@ export function ExploreProvider(props) {
   const [currentInstance, setCurrentInstance] = useState(null);
   const {
     initInstance,
-    loadAoiOnInstance,
+    loadAoiTimeframeOnInstance,
     getRunningBatch,
     instanceType,
   } = useInstance();
@@ -267,7 +267,7 @@ export function ExploreProvider(props) {
       setAoiList(existingAois);
 
       if (existingAois.length > 0) {
-        latestAoi = sortBy(existingAois, 'updated', 'desc')[0];
+        let latestAoi = sortBy(existingAois, 'updated', 'desc')[0];
         setCurrentAoi(latestAoi);
         const { timeframes: existingTimeframes } = await restApiClient.get(
           `project/${project.id}/aoi/${latestAoi.id}/timeframe`
@@ -285,6 +285,27 @@ export function ExploreProvider(props) {
         setSelectedImagerySource(latestTimeframeImagerySource);
         setSelectedMosaic(latestTimeframeMosaic);
         setSelectedTimeframe(latestTimeframe);
+
+        showGlobalLoadingMessage('Fetching checkpoints...');
+        const { checkpoints } = await loadCheckpointList(projectId);
+        const checkpoint = checkpoints[0];
+
+        const initializingInstanceMessage =
+          instanceType === 'cpu'
+            ? 'Initializing CPU instance...'
+            : `Initializing GPU instance, this may take up to ${formatDuration({
+                minutes: config.instanceCreationTimeout / (60 * 60 * 1000),
+              })}...`;
+        showGlobalLoadingMessage(initializingInstanceMessage);
+        const instance = await initInstance(
+          project.id,
+          checkpoint && checkpoint.id,
+          latestTimeframe && latestTimeframe.id
+        );
+
+        loadAoiTimeframe(project, latestAoi, latestTimeframe, true, true);
+
+        setCurrentInstance(instance);
       } else {
         // Project has no timeframes and needs to run a first prediction
         setTimeframes([]);
@@ -292,31 +313,6 @@ export function ExploreProvider(props) {
         hideGlobalLoading();
         return;
       }
-
-      showGlobalLoadingMessage('Fetching checkpoints...');
-      const { checkpoints } = await loadCheckpointList(projectId);
-      const checkpoint = checkpoints[0];
-      let latestAoi;
-      // if (aoiReq.total > 0) {
-      //   latestAoi = aois.find((a) => Number(a.checkpoint_id) === checkpoint.id);
-      // }
-
-      const initializingInstanceMessage =
-        instanceType === 'cpu'
-          ? 'Initializing CPU instance...'
-          : `Initializing GPU instance, this may take up to ${formatDuration({
-              minutes: config.instanceCreationTimeout / (60 * 60 * 1000),
-            })}...`;
-      showGlobalLoadingMessage(initializingInstanceMessage);
-      const instance = await initInstance(
-        project.id,
-        checkpoint && checkpoint.id,
-        latestAoi && latestAoi.id
-      );
-
-      loadAoi(project, latestAoi, true, true);
-
-      setCurrentInstance(instance);
     } catch (error) {
       logger(error);
       toasts.error(
@@ -503,7 +499,7 @@ export function ExploreProvider(props) {
         (aoi) => Number(aoi.checkpoint_id) === Number(currentCheckpoint.id)
       );
       if (aoi) {
-        loadAoi(currentProject, aoi, true);
+        loadAoiTimeframe(currentProject, aoi, true);
       }
     }
   }, [aoiList, checkId]);
@@ -517,10 +513,11 @@ export function ExploreProvider(props) {
    *                  AOI listing endpoint
    */
 
-  async function loadAoi(
+  async function loadAoiTimeframe(
     project,
     aoiObject,
-    aoiMatchesCheckpoint,
+    aoiTimeframe,
+    aoiTimeframeMatchesCheckpoint,
     noLoadOnInst
   ) {
     if (!aoiObject) {
@@ -561,7 +558,7 @@ export function ExploreProvider(props) {
 
     setAoiIsRectangle(isRectangle(aoi.bounds));
 
-    if (!aoiMatchesCheckpoint) {
+    if (!aoiTimeframeMatchesCheckpoint) {
       toasts.error(
         'Tiles do not exist for this AOI and this checkpoint. Treating as geometry only'
       );
@@ -581,9 +578,9 @@ export function ExploreProvider(props) {
     } else {
       setCurrentAoi(aoi);
 
-      // Only load AOI   on instance if storage is true
+      // Only load AOI on instance if storage is true
       if (currentInstance && !noLoadOnInst && aoiObject.storage) {
-        loadAoiOnInstance(aoi.id);
+        loadAoiTimeframeOnInstance(aoiTimeframe.id);
       } else {
         exploreActor.send('Project fetch end');
         hideGlobalLoading();
@@ -713,7 +710,7 @@ export function ExploreProvider(props) {
         aoiBounds,
         setAoiBounds,
 
-        loadAoi,
+        loadAoiTimeframe,
 
         timeframes,
         selectedTimeframe,
@@ -774,7 +771,7 @@ export const useAoiMeta = () => {
     setAoiBounds,
     aoiArea,
     aoiList,
-    loadAoi,
+    loadAoiTimeframe,
     createNewAoi,
   } = useExploreContext('useAoiMeta');
 
@@ -785,10 +782,10 @@ export const useAoiMeta = () => {
       aoiArea,
       aoiList,
 
-      loadAoi,
+      loadAoiTimeframe,
       createNewAoi,
     }),
-    [aoiBounds, aoiArea, aoiList, loadAoi, createNewAoi]
+    [aoiBounds, aoiArea, aoiList, loadAoiTimeframe, createNewAoi]
   );
 };
 

@@ -252,7 +252,7 @@ export function addProjectEndpoints() {
     {
       id: 1,
       project_id: 1,
-      aoi_id: 2,
+      timeframe_id: 2,
       checkpoint_id: 2,
       last_update: '2021-07-12T09:59:04.442Z',
       created: '2021-07-12T09:58:57.459Z',

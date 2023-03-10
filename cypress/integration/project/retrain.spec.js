@@ -3,7 +3,7 @@ const restApiEndpoint = Cypress.config('restApiEndpoint');
 const instance = {
   id: 1,
   project_id: 1,
-  aoi_id: 2,
+  timeframe_id: 2,
   checkpoint_id: 2,
   last_update: '2021-07-12T09:59:04.442Z',
   created: '2021-07-12T09:58:57.459Z',
@@ -362,9 +362,6 @@ describe('Retrain existing project', () => {
 
     cy.visit('/project/1');
 
-    // Wait for data loading
-    cy.wait(['@fetchAoi2', '@fetchCheckpoint2']);
-
     // Check ready for retrain status
     cy.get('[data-cy=session-status]').should(
       'have.text',
@@ -456,9 +453,6 @@ describe('Retrain existing project', () => {
 
   it('load existing checkpoint, can predict new AOI', () => {
     cy.visit('/project/1');
-
-    // Wait for data loading
-    cy.wait(['@fetchAoi2', '@fetchCheckpoint2']);
 
     // Check ready for retrain status
     cy.get('[data-cy=session-status]').should(
