@@ -47,6 +47,7 @@ import {
 } from './shortcuts';
 import { isRectangle } from '../../utils/is-rectangle';
 import { useImagerySource } from '../imagery-sources';
+import sortBy from 'lodash.sortby';
 
 export { sessionModes };
 /**
