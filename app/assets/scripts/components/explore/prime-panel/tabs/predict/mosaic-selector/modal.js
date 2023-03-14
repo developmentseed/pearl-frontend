@@ -7,6 +7,7 @@ import { Button } from '@devseed-ui/button';
 import { Heading } from '@devseed-ui/typography';
 import CardList, { Card } from '../../../../../common/card-list';
 import { useImagerySource } from '../../../../../../context/imagery-sources';
+import { formatDateTime } from '../../../../../../utils/format';
 
 const ModalHeader = styled.header`
   padding: ${glsp(2)} ${glsp(2)} 0;
@@ -102,10 +103,10 @@ export function MosaicSelectorModal({
                   details={{
                     id,
                     name,
-                    created,
-                    updated,
-                    mosaic_ts_end,
-                    mosaic_ts_start,
+                    created: formatDateTime(created),
+                    updated: formatDateTime(updated),
+                    mosaic_ts_end: formatDateTime(mosaic_ts_end),
+                    mosaic_ts_start: formatDateTime(mosaic_ts_start),
                   }}
                   borderlessMedia
                   selected={selectedMosaic && selectedMosaic.id === mosaic.id}
