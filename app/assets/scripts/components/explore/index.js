@@ -46,7 +46,7 @@ function Explore() {
           className='header'
           onChange={resizeListener}
         >
-          <PageHeader>
+          <PageHeader hideLongAppTitle>
             <ExploreHeader isMediumDown={isMediumDown} />
           </PageHeader>
         </SizeAwareElement>
