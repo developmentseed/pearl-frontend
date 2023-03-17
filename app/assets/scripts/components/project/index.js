@@ -5,6 +5,7 @@ import {
   ProjectMachineContext,
   ProjectMachineProvider,
 } from '../../context/project-xstate';
+import { PageBody } from '../../styles/page';
 
 import theme from '../../styles/theme';
 import Composer from '../../utils/compose-components';
@@ -12,6 +13,7 @@ import App from '../common/app';
 import PageHeader from '../common/page-header';
 import SizeAwareElement from '../common/size-aware-element';
 import ProjectPageHeader from './header';
+import ProjectPageMain from './main';
 
 export const ProjectPage = () => {
   return (
@@ -43,14 +45,19 @@ const ProjectPageInner = () => {
   }, [isLoading, isAuthenticated, projectId]);
 
   return (
-    <SizeAwareElement
-      element='header'
-      className='header'
-      onChange={resizeListener}
-    >
-      <PageHeader hideLongAppTitle>
-        <ProjectPageHeader isMediumDown={isMediumDown} />
-      </PageHeader>
-    </SizeAwareElement>
+    <>
+      <SizeAwareElement
+        element='header'
+        className='header'
+        onChange={resizeListener}
+      >
+        <PageHeader hideLongAppTitle>
+          <ProjectPageHeader isMediumDown={isMediumDown} />
+        </PageHeader>
+      </SizeAwareElement>
+      <PageBody role='main'>
+        <ProjectPageMain />
+      </PageBody>
+    </>
   );
 };
