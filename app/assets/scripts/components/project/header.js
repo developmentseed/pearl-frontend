@@ -12,6 +12,7 @@ import { ProjectMachineContext } from '../../context/project-xstate';
 
 import { Modal } from '../common/custom-modal';
 import get from 'lodash.get';
+import { sessionLevel } from '../../context/project-xstate/machine';
 
 const Wrapper = styled.div`
   flex: 1;
@@ -130,6 +131,7 @@ const selectors = {
   displayProjectNameModal: (state) =>
     state.matches('Entering new project name'),
   projectName: (state) => get(state, 'context.project.name', ''),
+  sessionStatus: (state) => get(state, 'context.sessionStatus', {}),
 };
 
 function ProjectPageHeader() {
@@ -139,6 +141,9 @@ function ProjectPageHeader() {
     selectors.displayProjectNameModal
   );
   const projectName = ProjectMachineContext.useSelector(selectors.projectName);
+  const sessionStatus = ProjectMachineContext.useSelector(
+    selectors.sessionStatus
+  );
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -162,6 +167,17 @@ function ProjectPageHeader() {
           {projectName}
         </Heading>
       </ProjectHeading>
+
+      <StatusHeading
+        data-cy='session-status'
+        variation={
+          sessionStatus.level === sessionLevel.ERROR ? 'danger' : 'primary'
+        }
+        size='xxsmall'
+      >
+        <span>Session Status: </span>
+        {sessionStatus.message}
+      </StatusHeading>
 
       <Modal
         id='project-name-modal'

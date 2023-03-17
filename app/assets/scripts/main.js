@@ -62,11 +62,11 @@ function Root() {
                 <Route exact path='/' component={Home} />
                 <Route exact path='/share/:uuid/map' component={ShareMap} />
                 <ProtectedRoute
-                  path='/project/:projectId'
+                  path='/project-old/:projectId'
                   component={Explore}
                 />
                 <ProtectedRoute
-                  path='/project-new/:projectId'
+                  path='/project/:projectId'
                   component={ProjectPage}
                 />
                 <ProtectedRoute exact path='/profile/maps' component={Maps} />

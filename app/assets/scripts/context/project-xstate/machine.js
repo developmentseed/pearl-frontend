@@ -1,13 +1,38 @@
 import { createMachine, assign } from 'xstate';
 
+export const sessionLevel = {
+  INFO: 'INFO',
+  ERROR: 'ERROR',
+};
+
+/**
+ * These are helpers to set context without repetion, mostly used on onEntry
+ * actions.
+ */
+const set = {
+  sessionStatus: (sessionStatus) =>
+    assign((context) => {
+      return {
+        ...context,
+        sessionStatus,
+      };
+    }),
+};
+
 export const projectMachine = createMachine(
   {
-    /** @xstate-layout N4IgpgJg5mDOIC5QAcBOB7AVmAxgFwFoBbAQxwAsBLAOzADoAFEmAAkthaPQFdq9IAxAElqlPJRIAbSgC8wLZM3mw8JfgG0ADAF1EKdLDGV01PSAAeiAEwBGAGx0A7AE4AHDYCstq1dce7ACwANCAAnojudAF+jpoBAMwBjlYBds4AvukhaFi4hKQUNPRMrOwsqGAkEKECWrpIIMgGRiZmlggeyXRxHl7+yTaJIeEINpqadDZWzvHumoNWvfGZ2RjY+MRkVLSMSmwcFVU16jb1+obirQ3tnVbdAb2LdgNDYYiernR2Nq4zHvFWRweeaOFaNNZ5TaFHYAYXIuAA1jQoGwAGYsbiwMCofYsEjcPDwviUHBqQR1MxNC7GUzXd49OiuTR+AHxNKdRzDRAzJw2AIBRbxTSLVzfME5db5LZFOhwxHItEYrE4sr4wlgYmk-gQWqnSnNS600DtMYPRnM-5WNnODlc0ZeOhWOLjZwC-l2aZWcUQjYFbb0ACifGxCtoAHcFD68CxqCQiGABABlMDRiV5GNxsAUhpUlpGizvAKux3ROyzcYuHxWO08p12DzuDwPTQ23yZLIgajoCBwSlRqH+-XUq7GxAEOx2ggeOjOGZFuJl+IueJeb25X3SnYleRlLi8bVDvNtRACu2mpzOGyxRJL5INjIdtMb6HFPZlQ7VQ+G48IAUTVxJN8tzzEknJvKMcQXlemg3o4d6-GukoDjKco4Ei1AopQ6KYtiuJqkS4hapAX40j+QJ3PyVj1nYdjMgENiDDWnxLs8cH-KkrixK4iGQn6MoADLoFUCpgOY7DiBhkbrngJEjgWCDkVEArUbRAEMfEZ7+IyNHxACraXm4PHPv6dBBvwqChmAEZPtGsbxrJ+YmikdzzK6bh+DBYwTuBl4zt8rg+M4vjjAKRlSi+dAAEqQJQFT4CweDoCw5DoPGChKA5P5TAK3Q2G5rgefEXmaRMDx8iuQIrosUxhchOwACJgKiRRsKI4hSCwACCADyQiZXSozJC5ARxGyulwY4oo1jYflXkFgTzsKdjtukQA */
+    /** @xstate-layout N4IgpgJg5mDOIC5QAcBOB7AVmAxgFwFoBbAQxwAsBLAOzADoAFEmAAkthaPQFdq9IAxAElqlPJRIAbSgC8wLZM3mw8JfgG0ADAF1EKdLDGV01PSAAeiAEwBGAGx0A7I4AcdmwE43LgKx2ALFYANCAAnoguNnT+jh42fjYAzJ6uVh4AvukhaFi4hKQUNPRMrOwsqGAkEKECWrpIIMgGRiZmlgg+jlEePR7OHv72Lskh4Qg2mpp0E30uXTZWiYNWmdkY2PjEZFS0jEpsHBVVNeo29fqG4q0N7Z3dvf2DdsM2o4jxLnQ+PYmOPolWOy2RKJOyrRrrPJbQq7ADC5FwAGsaFA2AAzFjcWBgVAHFgkbh4BF8Sg4NSCOpmJqXYymG7vTT+HxOP49ZyJOZ2P5vcZ-Oh2Lk+TSxfyaZJecE5Db5bZFOjwpEo9GY7G4soEolgElk-gQWpnKnNK500DtCZMlnfPqODmOQU8jyJfkDXyi4WpJKSyGbAo7egAUT4OKVtAA7gpvXgWNQSEQwAIAMpgKNSvLR2NgSkNaktE0Wd4+Tr8qz+Dx2Ppc0VuHk2G3RWyiuKTIExGyZLIgajoCBwKmR6F+w0066mxAEOw88d0SaTGzmpIeTTWr25H2y3YleRlLi8XVD3NtRCBGuMpx2QteTqJMvfFfSgdyzd4o7VffGw8IQJTSJC752TRJEycwnv4Z4Xr4No3hkHapmuML0AqODItQqKUBiWI4niGrEuIOqQG+tIfn8Vj1mW-7uKWCwOp8iRCgKPj+OWorPIkd5Qr6coADLoFUSpgOY7DiChEarngBEjvmCDEaRAqaBRcTBGEBYOC4oqAo2XLuCsMH9hxuyBvwqAhmA4awVGMZxuJeZmiW3T-i4bjxHY15JDWQr1v8ViaJ0cyeB4PhsXBfp0AASpAlAVPgLB4OgLDkOgcYKEoVkfgsgx0GWmgOe4fguYkDrdLRjiBM4wxpAMgUyvBdAACJgGiRRsKI4hSCwACCADyQgpfSvL+E6xUxJEakAq8Sm8k6i7DGWXRZZprHtkAA */
     predictableActionArguments: true,
     id: 'project-machine',
     initial: 'Page is mounted',
 
-    context: {},
+    context: {
+      project: {},
+      sessionStatus: {
+        level: sessionLevel.INFO,
+        message: 'Loading...',
+      },
+    },
 
     states: {
       'Page is mounted': {
@@ -52,10 +77,14 @@ export const projectMachine = createMachine(
             actions: 'setProjectName',
           },
         },
+
+        entry: 'setEnteringProjectNameStatus',
       },
 
       'Redirect to home page': {},
-      'Define initial AOI': {},
+      'Define initial AOI': {
+        entry: 'setFirstAoiStatus',
+      },
     },
   },
   {
@@ -80,6 +109,14 @@ export const projectMachine = createMachine(
             name: projectName,
           },
         };
+      }),
+      setEnteringProjectNameStatus: set.sessionStatus({
+        level: sessionLevel.INFO,
+        message: 'Set Project Name',
+      }),
+      setFirstAoiStatus: set.sessionStatus({
+        level: sessionLevel.INFO,
+        message: 'Set AOI',
       }),
     },
     services: {},
