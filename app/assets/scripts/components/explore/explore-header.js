@@ -31,7 +31,7 @@ import { useInstance } from '../../context/instance';
 import { useAoi } from '../../context/aoi';
 import toasts from '../common/toasts';
 import logger from '../../utils/logger';
-import useFocus from '../../utils/use-focus';
+import { useFocus } from '../../utils/use-focus';
 import { downloadGeotiff as downloadGeotiffUtil } from '../../utils/map';
 import { useTour } from '../../context/explore';
 

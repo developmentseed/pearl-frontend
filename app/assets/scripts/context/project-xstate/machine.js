@@ -2,7 +2,7 @@ import { createMachine, assign } from 'xstate';
 
 export const projectMachine = createMachine(
   {
-    /** @xstate-layout N4IgpgJg5mDOIC5QAcBOB7AVmAxgFwFoBbAQxwAsBLAOzADoAFEmAAkthaPQFdq9IAxAElqlPJRIAbSgC8wLZM3mw8JfgG0ADAF1EKdLDGV01PSAAeiAEwBGAGx0A7AE4AHDYCstq1dce7ACwANCAAnojudAF+jpoBAMwBjlYBds4AvukhaFi4hKQUNPRMrOwsqGAkEKECWrpIIMgGRiZmlggeyXRxHl7+yTaJIeEINpqadDZWzvHumoNWvfGZ2RjY+MRkVLSMSmwcFVU16jb1+obirQ3tnVbdAb2LdgNDYYiernR2Nq4zHvFWRweeaOFaNNZ5TaFHYAYXIuAA1jQoGwAGYsbiwMCofYsEjcPDwviUHBqQR1MxNC7GUzXd49OiuTR+AHxNKdRzDRAzJw2AIBRbxTSLVzfME5db5LZFOhwxHItEYrE4sr4wlgYmk-gQWqnSnNS600DtMYPRnM-5WNnODlc0ZeOhWOLjZwC-l2aZWTJZEDUdAQOCUiEbArbMD66lXY2IAh2O2x7rjJPJ5Ogn0SyGhmUleRlLi8bURlpGiyIAV201OZw2WKJeKOZIeX7i4NS6HFPZlQ7VIuGtplp2MpLfW7zJKct6jOJVmuaOsNkUZdOtqFh2XwnBI6goyjozHY3FqoniLWQXs0-sIIF3flWOz+OzMgI2QZ2tx0evPBv-VKuWKuFtchDaUdgAGXQKoFTAcx2HEbcFFbc8o1LK8HVve87EfVxn1fSdPAcUU7HiAEbWmGw3EAyVVxlABRPhsQVWgAHcEKAvAWGoEgiHDBoqWLS8pgFbpyICNw-DnMY40nas6Gcb5XB8ZxfHGAVKMzED6AAJUgSgKnwFg8HQFhyHQbiFCUJCSxNFI7nmV0xOBeJJIrYEog8Pl4k6f4+imb10iAA */
+    /** @xstate-layout N4IgpgJg5mDOIC5QAcBOB7AVmAxgFwFoBbAQxwAsBLAOzADoAFEmAAkthaPQFdq9IAxAElqlPJRIAbSgC8wLZM3mw8JfgG0ADAF1EKdLDGV01PSAAeiAEwBGAGx0A7AE4AHDYCstq1dce7ACwANCAAnojudAF+jpoBAMwBjlYBds4AvukhaFi4hKQUNPRMrOwsqGAkEKECWrpIIMgGRiZmlggeyXRxHl7+yTaJIeEINpqadDZWzvHumoNWvfGZ2RjY+MRkVLSMSmwcFVU16jb1+obirQ3tnVbdAb2LdgNDYYiernR2Nq4zHvFWRweeaOFaNNZ5TaFHYAYXIuAA1jQoGwAGYsbiwMCofYsEjcPDwviUHBqQR1MxNC7GUzXd49OiuTR+AHxNKdRzDRAzJw2AIBRbxTSLVzfME5db5LZFOhwxHItEYrE4sr4wlgYmk-gQWqnSnNS600DtMYPRnM-5WNnODlc0ZeOhWOLjZwC-l2aZWcUQjYFbb0ACifGxCtoAHcFD68CxqCQiGABABlMDRiV5GNxsAUhpUlpGizvAKux3ROyzcYuHxWO08p12DzuDwPTQ23yZLIgajoCBwSlRqH+-XUq7GxAEOx2ggeOjOGZFuJl+IueJeb25X3SnYleRlLi8bVDvNtRACu2mpzOGyxRJL5INjIdtMb6HFPZlQ7VQ+G48IAUTVxJN8tzzEknJvKMcQXlemg3o4d6-GukoDjKco4Ei1AopQ6KYtiuJqkS4hapAX40j+QJ3PyVj1nYdjMgENiDDWnxLs8cH-KkrixK4iGQn6MoADLoFUCpgOY7DiBhkbrngJEjgWCDkVEArUbRAEMfEZ7+IyNHxACraXm4PHPv6dBBvwqChmAEZPtGsbxrJ+YmikdzzK6bh+DBYwTuBl4zt8rg+M4vjjAKRlSi+dAAEqQJQFT4CweDoCw5DoPGChKA5P5TAK3Q2G5rgefEXmaRMDx8iuQIrosUxhchOwACJgKiRRsKI4hSCwACCADyQiZXSozJC5ARxGyulwY4oo1jYflXkFgTzsKdjtukQA */
     predictableActionArguments: true,
     id: 'project-machine',
     initial: 'Page is mounted',
@@ -44,8 +44,18 @@ export const projectMachine = createMachine(
       },
 
       'Loading existing project': {},
-      'Entering new project name': {},
+
+      'Entering new project name': {
+        on: {
+          'Set project name': {
+            target: 'Define initial AOI',
+            actions: 'setProjectName',
+          },
+        },
+      },
+
       'Redirect to home page': {},
+      'Define initial AOI': {},
     },
   },
   {
@@ -59,6 +69,16 @@ export const projectMachine = createMachine(
         return {
           project: { id: projectId },
           isAuthenticated,
+        };
+      }),
+      setProjectName: assign((context, event) => {
+        const { projectName } = event.data;
+        return {
+          ...context,
+          project: {
+            ...context.project,
+            name: projectName,
+          },
         };
       }),
     },
