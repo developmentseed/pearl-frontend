@@ -9,6 +9,8 @@ import {
   InpageTitle,
   InpageBody,
 } from '../../styles/inpage';
+import Map from './map';
+import { PrimePanel } from './prime-panel';
 
 const ProjectPageBody = styled(InpageBody)`
   display: grid;
@@ -26,7 +28,12 @@ function ProjectPageMain() {
             </InpageHeadline>
           </InpageHeaderInner>
         </InpageHeader>
-        <ProjectPageBody>Content</ProjectPageBody>
+        <ProjectPageBody>
+          <PrimePanel />
+          <section id='welcome-trigger'>
+            <Map />
+          </section>
+        </ProjectPageBody>
       </Inpage>
     </>
   );

@@ -38,7 +38,7 @@ const ProjectPageInner = () => {
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
       projectActor.send({
-        type: 'Initialize page state',
+        type: 'Resolve authentication',
         data: { projectId, isAuthenticated },
       });
     }
