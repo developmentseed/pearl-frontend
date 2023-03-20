@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import SizeAwareElement from '../../common/size-aware-element';
 import { MapContainer } from 'react-leaflet';
@@ -9,6 +9,7 @@ import {
 } from '../../common/map/base-map-layer';
 
 import { themeVal, multiply } from '@devseed-ui/theme-provider';
+import { ProjectMachineContext } from '../../../context/project-xstate';
 
 const center = [19.22819, -99.995841];
 const zoom = 12;
@@ -40,8 +41,16 @@ const Container = styled.div`
   }
 `;
 
+const selectors = {
+  isLoadingMap: (state) => state.matches('Creating map'),
+};
+
 function Map() {
   const [mapRef, setMapRef] = useState();
+  const actorRef = ProjectMachineContext.useActorRef();
+  const isLoadingMap = ProjectMachineContext.useSelector(
+    selectors.isLoadingMap
+  );
 
   const displayMap = useMemo(() => {
     return (
@@ -61,6 +70,17 @@ function Map() {
       </MapContainer>
     );
   }, [setMapRef]);
+
+  useEffect(() => {
+    if (isLoadingMap && mapRef) {
+      actorRef.send({
+        type: 'Map is created',
+        data: {
+          mapRef,
+        },
+      });
+    }
+  }, [mapRef, isLoadingMap]);
 
   return (
     <SizeAwareElement

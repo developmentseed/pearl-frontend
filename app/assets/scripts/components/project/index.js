@@ -1,3 +1,4 @@
+import get from 'lodash.get';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 import { useAuth } from '../../context/auth';
@@ -10,6 +11,7 @@ import { PageBody } from '../../styles/page';
 import theme from '../../styles/theme';
 import Composer from '../../utils/compose-components';
 import App from '../common/app';
+import { hideGlobalLoading, showGlobalLoading } from '../common/global-loading';
 import PageHeader from '../common/page-header';
 import SizeAwareElement from '../common/size-aware-element';
 import ProjectPageHeader from './header';
@@ -25,6 +27,11 @@ export const ProjectPage = () => {
   );
 };
 
+const selectors = {
+  displayGlobalLoading: (state) =>
+    get(state, 'context.displayGlobalLoading', false),
+};
+
 const ProjectPageInner = () => {
   const { projectId } = useParams();
   const { isLoading, isAuthenticated } = useAuth();
@@ -33,16 +40,27 @@ const ProjectPageInner = () => {
   const resizeListener = ({ width }) => {
     setIsMediumDown(width < theme.dark.mediaRanges.large[0]);
   };
+  const displayGlobalLoading = ProjectMachineContext.useSelector(
+    selectors.displayGlobalLoading
+  );
 
   // After authentication is resolved, send machine event
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
       projectActor.send({
-        type: 'Resolve authentication',
+        type: 'Set initial page props',
         data: { projectId, isAuthenticated },
       });
     }
   }, [isLoading, isAuthenticated, projectId]);
+
+  useEffect(() => {
+    if (displayGlobalLoading) {
+      showGlobalLoading();
+    } else {
+      hideGlobalLoading();
+    }
+  }, [displayGlobalLoading]);
 
   return (
     <>

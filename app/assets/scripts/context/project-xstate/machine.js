@@ -34,12 +34,13 @@ const set = {
 
 export const projectMachine = createMachine(
   {
-    /** @xstate-layout N4IgpgJg5mDOIC5QAcBOB7AVmAxgFwFoBbAQxwAsBLAOzADoAFEmAAkthaPQFdq9IAxACU46ADYA3MCxLc85MH0o4SeSumoBtAAwBdRCnSxKajQZAAPRACYAjADY6AdgCcADlvv3AZgAsn+18AGhAAT0QPOl83AFZ7NzdvGO1Y7Ri3AF8MkLQsXEJSChp6JlZ2FlQwEghQgR19JBBkIxN1anMrBBiXJzok23SHGNtohxDwhFttbTpbaxc-a215+27tbyycjGx8YjIqWkZmaXLK6trNWwbDY1N2xs7u3v7B1ZGPe3HEAbc6e1s3C4pk4Et40k4Ypsmtt8nsiocAMIKHAAaxoUDYADMWNxYGBUGwOLJ5Io1Cp+BA6npzM1bm0Ot9tE5bLN7PYnL4nNY3E5tC5tMEwt8Ic5plNEr4XED4vYobkdgV9sU6EjcGjqBjKNjcfjCTI5AolOTBJdrk0WncGZMmSyHOzOdzefzBRMFs4Rr4+Us-OLIdloXldoUDvQAKJ8fHoli0ADuLHl+WjJCIYAEAGUwHh4zD8EmU-UaRb6Q9vulvHQBYkpuy3Oz2V9Jsk-v5okDFutrFl-dR0BA4DSc4r4WBC3SzCWEARPkLJzE6FKF4ulxt-Qmg0rDqUThwuLwKaPWuPQJ1fNYG1NfM5pfZrLfht1bE45YO4SGjmUOGcagfLRPfL5HAGbw2XsAVvH5BZzwFK87Vvax7yBJ9VxfYNlVVVEoy1HE8QJcpiUNMlVEgH9i2PRAnAoug3GmRIYmSGIKP8Bt3D6Jx2XmcDAVsKZbGfQMhzfAAZdBqijMALHYNQNWzfiSKPSxyMo6iUiSejGNsc84iotlvGsewkkCPiFVfZVw34VAo1jGSFTzEdGlpQ97jIyY9OeCjmRcW99MCJxNJmXxhnApIwQGAE-S2fiTMOEQIEoSpczwdAWHIdAU3jY45KchSXPZViKM8LzgM5ZiWRcf5XFWLk2W5FcIuM1DDgAETATFijYahWhIMQWAAQQAeQASUyq1H3sFxZh5XluUQ7wBnPbxegC7xltcZJmT5FcsiAA */
+    /** @xstate-layout N4IgpgJg5mDOIC5QAcBOB7AVmAxgFwFoBbAQxwAsBLAOzADoAFEmAAkthaPQFdq9IAxAGUweNtUp5KJADYtkzMPIzJYAbQAMAXUQp0sSZXTVdIAB6IATAEYAbHQDsDgBy3LAFmuWAzLeveATgAaEABPRAD3R1d3SO9rBw0Nd1sHAF80kLQsXEJSChp6JlZ2FlQwEghQgU0dJBBkfUNjUwsEAO8ogLsAVlsAvpsEyxDwhGt-Ok8HCYCHHstEjR7rDKyMbHxiMipaRkU2DnLK6rVrOr0DKRb6to6u3v7BiYcRsMQE6zoAjVt+6w0DnclmcGgCtjWDQ2uW2BT2AGFyLgANY0KBsABmLG4sDAqEOLBI3DwSL4lBwJH4EBq2lMjSuRhMtw+7g0zjo-UsPUGsR6ARsow+znZc3czh6rm8TgBdkh2U2eR2hToiJRaMx2Nx+NKRJJYDJFKpNXOdKa1yZoDa1lZ7M53LcvP51kF40BdCSNilDlswLszjl0K2+V29AAonw8eraAB3ZQ5fAsagkIhgYSiOMKxPJsC1U0Mm6Wj78jR0HqeVl9azg5zeF12bzfSz8jrg62s6z+zJQ+OKuH0eHHKTUdGkZACACyJGQBJwg8gufq9OaFvMiAlDdcVcsfm8gWWDhdzi+7gc3Q6YN+7m8GS71HQEDgdMDvZDeeXrUQBFsLq-AZ7sJDfYSg4LheCpN9zQ-BBgTrDt3VeH4el8SIAhrAI-wVADlWKJRSmOKoIMZKCXAbBx4leXcy2tbwelg9lASbZZkNiNCMJhYNlVVHBUWHDUcTxAldVJKRDUgQiC1XcYJh6OhOjcbdbGSOwOlgr5bAlDRvA0LlAWFPw2KDJU9gAGXQSp1TAMx2CHdF5VycSVytaTZJSSwFKU-pa3ecZEjoa15ildwemWZJUgMl9lXDfhUCjMBYzshMkxTByoLsZI6GcJwpVsQJFniOscscbxtxrRIeiBOZwqwvYACVIEocoEzwdAWHIdAU3kRQUuZcZFKiTKyO9XKyOdbyARkjwtLFbcfGSboqo4vYABEwAxQpxEMWQWAAQQAeQASW6wsEBsX4OT8QFXn3cq62CoqXHBfp3DFKUFqM-tB3VUcjskq9LDoJtIj+09FK5dw6PgxikKe1DXpvIA */
     predictableActionArguments: true,
     id: 'project-machine',
     initial: 'Page is mounted',
 
     context: {
+      displayGlobalLoading: true,
       project: {},
       sessionStatus: {
         level: sessionLevel.INFO,
@@ -51,9 +52,9 @@ export const projectMachine = createMachine(
     states: {
       'Page is mounted': {
         on: {
-          'Resolve authentication': {
-            target: 'Page is ready',
-            actions: 'initPage',
+          'Set initial page props': {
+            target: 'Creating map',
+            actions: 'setInitialPageProps',
           },
         },
       },
@@ -96,8 +97,18 @@ export const projectMachine = createMachine(
       },
 
       'Redirect to home page': {},
+
       'Define initial AOI': {
         entry: ['setFirstAoiStatus', 'setEmptyAoi'],
+      },
+
+      'Creating map': {
+        on: {
+          'Map is created': {
+            target: 'Page is ready',
+            actions: ['setMapRef', 'toggleGlobalLoading'],
+          },
+        },
       },
     },
   },
@@ -107,11 +118,17 @@ export const projectMachine = createMachine(
       isAuthenticated: (c) => c.isAuthenticated,
     },
     actions: {
-      initPage: assign((context, event) => {
+      setInitialPageProps: assign((context, event) => {
         const { projectId, isAuthenticated } = event.data;
         return {
           project: { id: projectId },
           isAuthenticated,
+        };
+      }),
+      toggleGlobalLoading: assign((context) => {
+        return {
+          ...context,
+          displayGlobalLoading: !context.displayGlobalLoading,
         };
       }),
       setProjectName: assign((context, event) => {
@@ -122,6 +139,13 @@ export const projectMachine = createMachine(
             ...context.project,
             name: projectName,
           },
+        };
+      }),
+      setMapRef: assign((context, event) => {
+        const { setMapRef } = event.data;
+        return {
+          ...context,
+          setMapRef,
         };
       }),
       setEnteringProjectNameStatus: set.sessionStatus({
