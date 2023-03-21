@@ -2,6 +2,7 @@ import config from '../config';
 import tBboxPolygon from '@turf/bbox-polygon';
 import tCentroid from '@turf/centroid';
 import toasts from '../components/common/toasts';
+import logger from './logger';
 
 /*
  * Reverse geocode using Bing
@@ -9,10 +10,7 @@ import toasts from '../components/common/toasts';
  * @param bbox - should be turf bbox [minx, miny, maxX, maxY] or polygon feature
  */
 export default async function reverseGeoCode(bbox) {
-  /*
-    if (!aoiBounds) {
-      console.error('defined bounds before reverse geocoding')
-    }*/
+  // TODO after migrating to XState machine this function should be removed
 
   let center;
   if (Array.isArray(bbox)) {
@@ -60,5 +58,43 @@ export default async function reverseGeoCode(bbox) {
     name = 'Area';
   }
   // else leave name undefined, should be set by user
+  return name;
+}
+
+/**
+ * Get locality name from lat,lng
+ */
+export async function reverseGeocodeLatLng(lat, lng) {
+  let name = 'Area';
+
+  try {
+    const address = await fetch(
+      `${config.bingSearchUrl}/Locations/${lat},${lng}?radius=${config.reverseGeocodeRadius}&includeEntityTypes=address,AdminDivision1,AdminDivision2, CountryRegion&key=${config.bingApiKey}`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        mode: 'cors',
+      }
+    ).then((res) => res.json());
+
+    if (address && address.resourceSets[0].estimatedTotal) {
+      const result = address.resourceSets[0].resources[0];
+      const { entityType } = result;
+
+      switch (entityType) {
+        case 'Address':
+          name = result.address.locality;
+          break;
+        case 'AdminDivision1':
+        case 'AdminDivision2':
+        case 'CountryRegion':
+          name = result.name;
+      }
+    }
+  } catch (error) {
+    logger(error);
+  }
+
   return name;
 }

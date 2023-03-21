@@ -1,5 +1,11 @@
 import { createMachine, assign } from 'xstate';
 import L from 'leaflet';
+import {
+  reverseGeocodeFromBounds,
+  reverseGeocodeLatLng,
+} from '../../utils/reverse-geocode';
+import turfBboxPolygon from '@turf/bbox-polygon';
+import turfCentroid from '@turf/centroid';
 
 export const sessionLevel = {
   INFO: 'INFO',
@@ -35,7 +41,7 @@ const set = {
 
 export const projectMachine = createMachine(
   {
-    /** @xstate-layout N4IgpgJg5mDOIC5QAcBOB7AVmAxgFwFoBbAQxwAsBLAOzADoAFEmAAkthaPQFdq9IAxAGUweNtUp5KJADYtkzMPIzJYAbQAMAXUQp0sSZXTVdIAB6IATAEYAbHQDsDgBwBmV7eeWALAFY-vrYANCAAnojWDq50rg7WAJyW8a7W3t4J7gC+mSFoWLiEpBQ09Eys7CyoYCQQoQKyAO4koerapsj6hsamFgjJ3nTxdrYJic7j-iHhCNbO8Y6B3nMaXv6Wbtm5GNj4xGRUtIyKbBxVNXWNzerWOkggHQZS3Xe9-YPDo+sT3lNWS3Q+EYaDSWXzWSyWWybe7bAp7YqHADC5FwAGsaFA2AAzFjcWBgVAnFgkbh4FF8Sg4Ej8CD1GRNFqaW56R5GEwvCLeByWQYOWz8+L+VzOWyueK-GZuGLpXy+YXOJy2CEOaF5HaFfYlOjItEY7G4-GEiokslgClUml0hnXZn3TpPdmgXqpbm8-m2QXeYWi8VhKy2XwxVIJPm+Iay7yq2G7IoHegAUT4BL1tAayny+BY1BIRDAwlE6fVWZzYCZ7XtbJ6Vg03nm1g08T81nr3IbDgldg0dDWDcsGjl3j7-ajGY1CNK0bE5BIHGo6BYAEEAPIASVgAkRMkpqMgLAgqBIadTi9XLAARqS8MYy3cHl1HeY-r4HI5G5ZXOlm-5Jn6EEku-y3g1u4PguC4I7qvCcbamcUjUJipDIAIACyJDIESOCwZAN4sveVYIL4UoijY-hxGGoKuB2thdhotjeKKviWA4GiRK4kIQXCsZagA6iQhjwSwWLoIS+7MCwwksFS1A4GAMgoWhnA8PiEDoA01A4XarLPE6VjxHE3b9qktH+OMCoSv+dCAcBbFcgqzgcTGmqHAAIgeDR6suK7nqEe4HlAUAYvJ6FcHiYBcAAbqWbS3hW2mPggbGeACrgaGKCq+DWXg-L+zjWHQXJDA4fjUWCGWWA5Y7Qa5h4eaeZ4+aJ-mBahwVKWA3DIBpd4OvhH7xPYYK5XEXrCkxlG-tYYYArKdjOEBUS1uxOQwqOUFatV7kCZ53m+cwAXwRuW44DuECSSQ0mySeXmiWmF54Fe6nRbhPUcn+el5RlYJAQGSzjO2E1cnQ1hsc4qXCqxpkVWthwAGI0Ow5CSbBtUrgIDCTiw04cJ5rS2t1lavWKNiWQ2KTghkbG+B2Xh0P29H8iC-ajdky1zhAcDtJO0NgOWWkPr0BDBL+gu08CYvi+LKrLWqnFOaUxwVCFSYQLzeGvYOHb9ZZhEyq4cqeClUtbKtXGHGUSgVGctSqy9OkIC40RRJEQIpH4ZkTVrAZzZNeseG4GhGytkGm-QOrHXqlA4qFRocCa5JSBakA2wTdvNg48yiqlCTUW4aSa12PgfiM1EegHjZQyHdAADLoDUepgGY7BwZiMv4MncXOpEGcpSk-UrB+2XTD4ziOO4AdMQ4spDMDFdy3Qib8KgKZgGmrdiNmubt-zERRNEaT63p-a0RrE3UdK-gBvEuWDrKviz+OdAAEqQJQVSZlemPoLm8iKFv+GsXvPwHhD4ZTopYcyAY6Cg2bFfFik1wR32llzSu6NRyYxnFmecOM-6vQhHrAESQ7BxFmD4awVEuwfgvmGa+oJZT32goiZGAlEI4Ltl6HkSRGzEMPp6TW9gva631v7QOa9uZ0F4vxTEQkRJ+XEoSKSMkZCsPimNPKAcL50SvjYca0wUjREFDWRUudBSgnoetNyKMdqNX2lAZRvREo8jTuTUUNDqY8n8HYfwaR+QzyQSbOecMJCwERphaozcrp2MQLEFKgw9I2X7MxIYbjuzpB+t4kYrgzGHBEDIAoilYB8RwJEhA6RUqDDFP1Fwco+T-WmCQlJni0j018dkIAA */
+    /** @xstate-layout N4IgpgJg5mDOIC5QAcBOB7AVmAxgFwFoBbAQxwAsBLAOzADoAFEmAAkthaPQFdq9IAxAGUweNtUp5KJADYtkzMPIzJYAbQAMAXUQp0sSZXTVdIAB6IATAEYAbHQDsDgBwOArM4CcGgCyfrzraWADQgAJ6I1g4AzHTRDtaezpZulhrO1hruAL7ZoWhYuISkFDT0TKzsLKhgJBBhApo6SCDI+obGphYIntE+dP4OGtHWiZYjtrahEQhjdBoalrZ2GtZLS565+RjY+MRkVLSMimwcNXUNatbNegZSnS3dvf2Dw6Oe43ZT4VZuGnR+SxpcYJRaWZw+LatHZFfalI4AYXIuAA1jQoGwAGYsbiwMCoU4sEjcPDIviUHAkfgQRraUxtO5GEyPSI+dJ0Wy9NaTByTIHOaaRZxuOgeXmudKJZxgqEFXbFA5lOhI1HorE4vEEqrE0lgcmU6mNa709r3ZmgbrWNnODlcpa2XlBcGChBLByi2zDNwfZzRQJuWyQvLQwp7EqHegAUT4+LVtAA7spQ2JqCQiGBhKIk-KWKn000TYyHhbIh9-m4fDY-rY3BNAi6VqLK9yXIFhtForKYWHFUcACJgTFlcSGWQsACCAHkAJICBEyCkoyAsCCoEiJhMTmcsABGJLwxgLLQZHXN5is0UsnjoQKGl5igY0nhdV-+kzZ7lcPj6Fa7ybhEbKucUjUBipDIAIACyJDIISODAZAR63KeXSIB4sSBDY1ipM8bIhD8syevMga2M4ELChKvJ-vKAFKgA6iQhigSwmLoASq7MCwbEsJS1A4GAMhQTBnA8HiEDoPG1BIa0ppMqhroQpYAzxORCTRM8Dgvt4HKPp+Djfj4v7BnKsLhkqfZrvGapTtOu5hCua5QFA6JCbBXC4mAXAAG5gNJJ5mvJIzqTpIwbJWSyuC6GQAg4-ikT4EIBhF1Gmb29AWeu1nbju9kcU5LnQW5olgNwyB+bJxbnggHYOgMfwfJ6sW1tYDbejebipCkvixZYfhBts-5mf2llZbZOUOcwzmgXOC44EuEA8SQfECVutkcYme54AeUl0seFVnt04KVspLgJWpGkNj47rWJeyQxL0LhXm4KU9vC9AAGI0Ow5A8cBo0COJRw0F56BLnQJmvYBn0SLAP3wbUIEYjZCDA+gBpMk05VFgdiB+qRAyrD4CXNdEAYNkR7j+DYngdW4UqWLkwbUOgEBwPS3YKm9hYoSyCAEN8Mz8y9nOARUShVO5MYQNzAW85WDaePYNYQipQJRJ1wu0UcYuEuc9Qy3JvMuLEMSJHT8QpDdCtKx436PTY7hAprQ30Cqc1qpQ2IeVqHA6mSUgGpABuVZaowin0kyeokPiNQr-y9aTN1Wp4Qy+M9xkc1r9AADLoHUapgGY7CI9mRTBzjsxh3EMeTKsngx1kL4JY4HbpA6HYeBoQTO2ldDRvwqBxmAiYQymaZgOX8krP0rixf4wqkWRbjk-8P5+L67gBt+DMZ4NvcAEqQJQNT4CwB4sOQ6DpvIiiT7z090LPnjzwGZHCi+NaP6sCckZWNU929OgA4hy0BHFIMcNk74lldJkJWyx65ZFrH4UiK9q4VgXqsXwwoAGAQRH9Zi4EoFVW3jeZ+3pRhrFcB1aI1sOS21Vg7DWu8aIuzoAxJiGJWLsUclxAkvF+IyCIYdT0Sk-gZBpv4dICUfAuiCnVDQFZGpcjsDg8yI1mI2TshNfKoEhG4xurECsSR1IZASkkBsyQmx2GSFdDetZ04DRYb3aG31foI1Gno6qIiATRAWL0b0xNLCaQItha8CjhSK1sH0JemxmGpUASIGQRQRKwEYjgTxPhRixBGB1TIV42Q1mXiEyxFZrG9WNu4UmjNshAA */
     predictableActionArguments: true,
     id: 'project-machine',
     initial: 'Page is mounted',
@@ -91,7 +97,7 @@ export const projectMachine = createMachine(
       'Entering new project name': {
         on: {
           'Set project name': {
-            target: 'Project has no AOIs',
+            target: 'Define initial AOI',
             actions: 'setProjectName',
           },
         },
@@ -101,7 +107,7 @@ export const projectMachine = createMachine(
 
       'Redirect to home page': {},
 
-      'Project has no AOIs': {
+      'Define initial AOI': {
         entry: 'initializeAoiList',
 
         on: {
@@ -143,15 +149,19 @@ export const projectMachine = createMachine(
             actions: ['endNewRectangleAoiDraw'],
           },
           'Clicked cancel AOI draw button': {
-            target: 'Project has no AOIs',
+            target: 'Define initial AOI',
             actions: 'resetMapEventHandlers',
           },
         },
       },
 
       'Finish creating AOI': {
-        on: {
-          'Project has AOIs': 'Select mosaic',
+        invoke: {
+          src: 'geocodeAoi',
+          onDone: {
+            target: 'Select mosaic',
+            actions: 'setAoiName',
+          },
         },
       },
 
@@ -185,6 +195,13 @@ export const projectMachine = createMachine(
             ...context.project,
             name: projectName,
           },
+        };
+      }),
+      setAoiName: assign((context, event) => {
+        const { aoiName } = event.data;
+        return {
+          ...context,
+          aoiName,
         };
       }),
       setMapRef: assign((context, event) => {
@@ -259,8 +276,11 @@ export const projectMachine = createMachine(
         };
       }),
       endNewRectangleAoiDraw: assign((context) => {
+        // Take rectangle bounds and generate GeoJSON polygon feature
+        const aoiGeojson = turfBboxPolygon(context.rectangleAoi.bounds.flat());
         return {
           ...context,
+          aoiGeojson,
           mapEventHandlers: {
             dragging: false,
             mousedown: false,
@@ -280,6 +300,13 @@ export const projectMachine = createMachine(
         };
       }),
     },
-    services: {},
+    services: {
+      geocodeAoi: async (context) => {
+        const centroid = turfCentroid(context.aoiGeojson);
+        const [lng, lat] = centroid.geometry.coordinates;
+        const aoiName = await reverseGeocodeLatLng(lng, lat);
+        return { aoiName };
+      },
+    },
   }
 );
