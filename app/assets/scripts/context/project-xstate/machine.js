@@ -6,6 +6,7 @@ import {
 } from '../../utils/reverse-geocode';
 import turfBboxPolygon from '@turf/bbox-polygon';
 import turfCentroid from '@turf/centroid';
+import { aoiActionButtonModes } from '../../components/project/prime-panel/tabs/predict/aoi-selector/action-buttons';
 
 export const sessionLevel = {
   INFO: 'INFO',
@@ -60,6 +61,10 @@ export const projectMachine = createMachine(
         message: 'Loading...',
       },
       aoiStatus: aoiStatuses.LOADING,
+      aoiActionButtons: {
+        drawNewAoi: aoiActionButtonModes.ACTIVE,
+        cancelAoiDraw: aoiActionButtonModes.HIDDEN,
+      },
     },
 
     states: {
