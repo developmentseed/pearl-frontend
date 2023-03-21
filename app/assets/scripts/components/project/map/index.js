@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import SizeAwareElement from '../../common/size-aware-element';
 import { MapContainer } from 'react-leaflet';
@@ -41,8 +41,16 @@ const Container = styled.div`
   }
 `;
 
+function getEventLatLng(event) {
+  const {
+    latlng: { lng, lat },
+  } = event;
+  return [lat, lng];
+}
+
 const selectors = {
   isLoadingMap: (state) => state.matches('Creating map'),
+  mapEventHandlers: (state) => state.context.mapEventHandlers,
 };
 
 function Map() {
@@ -50,6 +58,39 @@ function Map() {
   const actorRef = ProjectMachineContext.useActorRef();
   const isLoadingMap = ProjectMachineContext.useSelector(
     selectors.isLoadingMap
+  );
+  const mapEventHandlers = ProjectMachineContext.useSelector(
+    selectors.mapEventHandlers
+  );
+
+  const handleMouseDown = useCallback(
+    (e) => {
+      actorRef.send({
+        type: 'Map mousedown',
+        data: { latLng: getEventLatLng(e) },
+      });
+    },
+    [actorRef]
+  );
+
+  const handleMouseUp = useCallback(
+    (e) => {
+      actorRef.send({
+        type: 'Map mouseup',
+        data: { latLng: getEventLatLng(e) },
+      });
+    },
+    [actorRef]
+  );
+
+  const handleMouseMove = useCallback(
+    (e) => {
+      actorRef.send({
+        type: 'Map mousemove',
+        data: { latLng: getEventLatLng(e) },
+      });
+    },
+    [actorRef]
   );
 
   const displayMap = useMemo(() => {
@@ -81,6 +122,50 @@ function Map() {
       });
     }
   }, [mapRef, isLoadingMap]);
+
+  // Enable/disable map drag
+  useEffect(() => {
+    if (!mapRef) return;
+
+    if (mapEventHandlers.dragging) {
+      mapRef.dragging.enable();
+    } else {
+      mapRef.dragging.disable();
+    }
+  }, [mapRef, mapEventHandlers.dragging]);
+
+  // Enable/disable map mousedown
+  useEffect(() => {
+    if (!mapRef) return;
+
+    if (mapEventHandlers.mousedown) {
+      mapRef.on('mousedown', handleMouseDown);
+    } else {
+      mapRef.off('mousedown', handleMouseDown);
+    }
+  }, [mapRef, mapEventHandlers.mousedown]);
+
+  // Enable/disable map mouseup
+  useEffect(() => {
+    if (!mapRef) return;
+
+    if (mapEventHandlers.mouseup) {
+      mapRef.on('mouseup', handleMouseUp);
+    } else {
+      mapRef.off('mouseup', handleMouseUp);
+    }
+  }, [mapRef, mapEventHandlers.mouseup]);
+
+  // Enable/disable map mousemove
+  useEffect(() => {
+    if (!mapRef) return;
+
+    if (mapEventHandlers.mousemove) {
+      mapRef.on('mousemove', handleMouseMove);
+    } else {
+      mapRef.off('mousemove', handleMouseMove);
+    }
+  }, [mapRef, mapEventHandlers.mousemove]);
 
   return (
     <SizeAwareElement
