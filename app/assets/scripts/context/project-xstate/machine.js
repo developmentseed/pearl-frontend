@@ -35,7 +35,7 @@ const set = {
 
 export const projectMachine = createMachine(
   {
-    /** @xstate-layout N4IgpgJg5mDOIC5QAcBOB7AVmAxgFwFoBbAQxwAsBLAOzADoAFEmAAkthaPQFdq9IAxAGUweNtUp5KJADYtkzMPIzJYAbQAMAXUQp0sSZXTVdIAB6IATAEYAbHQDsATgAcGgMwa7lhwBYH7pYANCAAnojWAXS+GpbuAKw+Dg4a8V4OAL4ZIWhYuISkFDT0TKzsLKhgJBChApo6SCDI+obGphYITu6+dE5OvmkuLr5xvrYOIeEI1k6WdBpjHqku8f0umdlNGNj4xGRUtIyKbByV1bVq1g16BlJtjR1dPX0DGkMj3eOTVml08Qm2ay+Oz-BZ+LI5bb5PZFQ4AYXIuAA1jQoGwAGYsbiwMCoE4sEjcPCIviUHAkfgQOraUzNW5GEwPCIxFx0NyuayWfo+dyzb7TFZ0WzuawaJzWazxIE+XzuCFbPK7QoHegI5GojFYnF48qE4lgUnkyl1K60lp3RmgDpAt5ssUuTncgJ8sJWcZCuwOB0jFyWWyuWzy3I7Ar7Yp0ACifFxGtoAHdlIqxNQSEQwMJRImQywU2n6mb6fcrRFZhoheL3C5bMDBiL+XYy-EHJZfE5bDyxnFLEGoUqw4cGL2xOQSBxqOgWABBADyAElYAI4TIyUjICwIKgSAn41O5ywAEZEvDGfONOmtS3mKyBJzRN5uPycjzxeL8rlllJt1ut9zJWXxHskxhFU6DhM4pGoNFSGQAQAFkSGQfEcHAyBTxuC92kQeIXHcXpLGfHCxX6ZJ61sMsxTSWxVnbbCBkAkNgPDAB1EhDEglh0XQPEN2YFguJYclqBwMAZDghDOB4HEIHQONqDQppzQZTCEEsYZcMlSxVPcbpVNlN8nA-MVbHbXw3E9X96OhZVwwAEU3OMNRnWcD1CddNygKBUTExCuGxMAuAANzAeTzwtZSRV5XoNA8VtVg0asfH5B1ohWcYvViWwq1mSy+1heg7K3Ry933VyeI8rz4J8ySwG4ZAQsUosrwQbTMrofDZTbcUxTsdx61WNqHUsf4cLcYzrBy0M8roAqHPYpyXLc5hPMgxdlxwVcIAEkghJE3dnJ4hNDzwY85JpM8GsvDpdPUxItJ0tT638OhJSGasUn9AJ-AmxjDgAMRodhyAE8CitnARByTFgRw4Jz1DO9CwqZZrnFwkU0j6Yz-nGWx619eZ1hbAIHHbIYAiyTZxwgOBaSHH6wALDCkYIHHXQQZn5mizmua5jZISA6yB2OcpfOjCAGcR4sEBGes20cN4ElbZsqwdb6BZKIXTiqGpxaUpGvVw5wxsBIbJS8GX7BSHD4kV1TMvGzZgys-tVURdaNUoTE-J1Dg9RJKQjUgHXGutCV4miWUHUSImqN61mZjLLlukiHSvCGwMHdptW6AAGXQaoNTAMx2AgtFHfwIPLoiUPw8rDTo-+N9TMcQi3lbbGBgAjP+edyNo1QWMwATMvk1TenzsLSvpjIsPYg0ZwJVSpsXFIstKziKt3DIw3wS7his4AJUgShKnwFhjyh9A03kRQK+UhsZ-w+frEXr03yotlq0iJtVmbJxeYVPePcIbZmhjmCcsNb5IxsPFNknh3pdDeKKWOUwGx0DXpWYUW82w7z5oAqaYEqgl04AhSBktZRzG0oRGw1hfwOE5ObOWVsbbK3trgp2U0WJsTRJxbi7k+J4kEsJGQpCmp+liHLJw8QyJvGJnPfkIoeheCkbKDwMw-6qx7jNUGC0yrLSgCIjoEUDYjVFMCQIitcZzGws2KRHhKzDDnhoqa-0JCwCBshQhoMDGIE3uI-00VhjzzoXESxfwCa2MoQ4-+w86Z0BEDIfIElYCsRwN45qf8w6Yxan0KUvhQnWLTnY94jjyZAA */
+    /** @xstate-layout N4IgpgJg5mDOIC5QAcBOB7AVmAxgFwFoBbAQxwAsBLAOzADoAFEmAAkthaPQFdq9IAxAGUweNtUp5KJADYtkzMPIzJYAbQAMAXUQp0sSZXTVdIAB6IATAEYAbHQDsDgBwBmV7eeWALAFY-vrYANCAAnojWDq50rg7WAJyW8a7W3t4J7gC+mSFoWLiEpBQ09Eys7CyoYCQQoQKyAO4koerapsj6hsamFgjJ3nTxdrYJic7j-iHhCNbO8Y6B3nMaXv6Wbtm5GNj4xGRUtIyKbBxVNXWNzerWOkggHQZS3Xe9-YPDo+sT3lNWS3Q+EYaDSWXzWSyWWybe7bAp7YqHADC5FwAGsaFA2AAzFjcWBgVAnFgkbh4FF8Sg4Ej8CD1GRNFqaW56R5GEwvCLeByWQYOWz8+L+VzOWyueK-GZuGLpXy+YXOJy2CEOaF5HaFfYlOjItEY7G4-GEiokslgClUml0hnXZn3TpPdmgXqpbm8-m2QXeYWi8VhKy2XwxVIJPm+Iay7yq2G7IoHegAUT4BL1tAayny+BY1BIRDAwlE6fVWZzYCZ7XtbJ6Vg03nm1g08T81nr3IbDgldg0dDWDcsGjl3j7-ajGY1CNK0bE5BIHGo6BYAEEAPIASVgAkRMkpqMgLAgqBIadTi9XLAARqS8MYy3cHl1HeY-r4HI5G5ZXOlm-5Jn6EEku-y3g1u4PguC4I7qvCcbamcUjUJipDIAIACyJDIESOCwZAN4sveVYIL4UoijY-hxGGoKuB2thdhotjeKKviWA4GiRK4kIQXCsZagA6iQhjwSwWLoIS+7MCwwksFS1A4GAMgoWhnA8PiEDoA01A4XarLPE6VjxHE3b9qktH+OMCoSv+dCAcBbFcgqzgcTGmqHAAIgeDR6suK7nqEe4HlAUAYvJ6FcHiYBcAAbqWbS3hW2mPggbGeACrgaGKCq+DWXg-L+zjWHQXJDA4fjUWCGWWA5Y7Qa5h4eaeZ4+aJ-mBahwVKWA3DIBpd4OvhH7xPYYK5XEXrCkxlG-tYYYArKdjOEBUS1uxOQwqOUFatV7kCZ53m+cwAXwRuW44DuECSSQ0mySeXmiWmF54Fe6nRbhPUcn+el5RlYJAQGSzjO2E1cnQ1hsc4qXCqxpkVWthwAGI0Ow5CSbBtUrgIDCTiw04cJ5rS2t1lavWKNiWQ2KTghkbG+B2Xh0P29H8iC-ajdky1zhAcDtJO0NgOWWkPr0BDBL+gu08CYvi+LKrLWqnFOaUxwVCFSYQLzeGvYOHb9ZZhEyq4cqeClUtbKtXGHGUSgVGctSqy9OkIC40RRJEQIpH4ZkTVrAZzZNeseG4GhGytkGm-QOrHXqlA4qFRocCa5JSBakA2wTdvNg48yiqlCTUW4aSa12PgfiM1EegHjZQyHdAADLoDUepgGY7BwZiMv4MncXOpEGcpSk-UrB+2XTD4ziOO4AdMQ4spDMDFdy3Qib8KgKZgGmrdiNmubt-zERRNEaT63p-a0RrE3UdK-gBvEuWDrKviz+OdAAEqQJQVSZlemPoLm8iKFv+GsXvPwHhD4ZTopYcyAY6Cg2bFfFik1wR32llzSu6NRyYxnFmecOM-6vQhHrAESQ7BxFmD4awVEuwfgvmGa+oJZT32goiZGAlEI4Ltl6HkSRGzEMPp6TW9gva631v7QOa9uZ0F4vxTEQkRJ+XEoSKSMkZCsPimNPKAcL50SvjYca0wUjREFDWRUudBSgnoetNyKMdqNX2lAZRvREo8jTuTUUNDqY8n8HYfwaR+QzyQSbOecMJCwERphaozcrp2MQLEFKgw9I2X7MxIYbjuzpB+t4kYrgzGHBEDIAoilYB8RwJEhA6RUqDDFP1Fwco+T-WmCQlJni0j018dkIAA */
     predictableActionArguments: true,
     id: 'project-machine',
     initial: 'Page is mounted',
@@ -67,27 +67,23 @@ export const projectMachine = createMachine(
       },
 
       'Page is ready': {
-        on: {
-          '': [
-            {
-              target: 'Checking if user is authenticated',
-              cond: 'isProjectNew',
-            },
-            'Loading existing project',
-          ],
-        },
+        always: [
+          {
+            target: 'Checking if user is authenticated',
+            cond: 'isProjectNew',
+          },
+          'Loading existing project',
+        ],
       },
 
       'Checking if user is authenticated': {
-        on: {
-          '': [
-            {
-              target: 'Entering new project name',
-              cond: 'isAuthenticated',
-            },
-            'Redirect to home page',
-          ],
-        },
+        always: [
+          {
+            target: 'Entering new project name',
+            cond: 'isAuthenticated',
+          },
+          'Redirect to home page',
+        ],
       },
 
       'Loading existing project': {},
