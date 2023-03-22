@@ -34,7 +34,7 @@ const selectors = {
 
 const ProjectPageInner = () => {
   const { projectId } = useParams();
-  const { isLoading, isAuthenticated } = useAuth();
+  const { isLoading, isAuthenticated, restApiClient } = useAuth();
   const projectActor = ProjectMachineContext.useActorRef();
   const [isMediumDown, setIsMediumDown] = useState(false);
   const resizeListener = ({ width }) => {
@@ -46,10 +46,10 @@ const ProjectPageInner = () => {
 
   // After authentication is resolved, send machine event
   useEffect(() => {
-    if (!isLoading && isAuthenticated) {
+    if (!isLoading) {
       projectActor.send({
-        type: 'Set initial page props',
-        data: { projectId, isAuthenticated },
+        type: 'Resolve authentication',
+        data: { projectId, isAuthenticated, apiClient: restApiClient },
       });
     }
   }, [isLoading, isAuthenticated, projectId]);

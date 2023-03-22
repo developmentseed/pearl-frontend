@@ -18,18 +18,11 @@ const set = {
         sessionStatusMessage,
       };
     }),
-  aoiStatus: (aoiStatus) =>
-    assign((context) => {
-      return {
-        ...context,
-        aoiStatus,
-      };
-    }),
 };
 
 export const projectMachine = createMachine(
   {
-    /** @xstate-layout N4IgpgJg5mDOIC5QAcBOB7AVmAxgFwFoBbAQxwAsBLAOzADoAFEmAAkthaPQFdq9IAxACU46ADYA3MCxLc85MH0o4SeSumoBtAAwBdRCnSxKajQZAAPRACYAjADY6AdicAOewE4AzE4As1618AVgAaEABPG2svOi9bLy97Ww93a217V18AXyywtCxcQlIKGnomVnYWVDASCHCBHX0kEGQjE3VqcysEeKcgukC7eyD3bV9fVycwyIRrTzptBwn7J0WvbW0gnLyMbHxiMipaRmZpSura+s1bJsNjU07m7t7+wYcR+zGJqYibW206EE5h5tB4Qclkhlti1doUDiVjgBhBQ4ADWNCgbAAZixuLAwKg2BxZPJFGoVPwIA09OZWvcOl1ELZMh4FszIWkvL5tK5Qr9Zn06L44r5mUl7HFbNYtrkYQV9sUjvRkbh0dRMZQcXiCUSZHIFEoKYJrrcWm0Hoyeiy2a4OdouTy+TM0gDVqs4kF7AFvP5ofk9kVDqU6ABRPgEjEsWgAdxY-sKUZIRDAAgAymA8HHYfhE8nGrTzQynjZEgD3E5bJ77MNJl5pjYggCvLzMk5vF45m3srL4wqg8cACJgLGlNjUdokMQsACCAHkAJICRFiZSoyAsCCoEixmMzhcsABGcjwGnzzTp7TMxYF8yCQO0Ff+oLi9dm1YGHiC8RWDg8fmsfrZoGCLKhcajqpwJDIAIACyUG6jgYGQGedyXo8oDPNogR0MyfhgqCjauD4r4BL4AzLJkgRcuMTj2IB8rAUqdAAOokO0EFYughKbswLBcSwKjUDgYBiLB8FcNqEDoNGWg0uehZXhhiAdkRAwSlKyRYUEfQke+1ift+FaeP+9EBvCTEDlu0aRnO86HuEG5blAUAYmJyCcDw+JcFIKFmvSimWMp2msikRHNiMbZeN4r4QmyIIeP4QRcrY-xeKZcKKsGlnbjZ+4Hg5PHOa5cHuRJ+LcMgvkXha17NjyAy0c+vgeHMUX2LprjOAZiRGX+vo9kB5lZVZuV2fljnMC56pLiuaLroJwlTrZE2xkeeAnrJprVUWSkICpMStRpILSjp-JStYzgSq4rhgik4wJE46V9iBdAAGI0Ow5ACWBo0CFJxw0BI6BrnQvaMcG73jrAX2ITU4GYrZCCA+gFIdI0VUKehgUIP4vhOHQLXCk4cy+PYEyuCRqwfiCwobL+jYyjsDFDccr0ZhQY4TlOECqCQf0aPQyMg2DLP0GzeAcx9aiThuvNI9QQOo6eegY-5WPdCsTZ3RskWSj8zpRQsQQpEkGzDGCj0DczmWs+zX1S5QMs83gfMEhgqCg2IqicagRCg4NNti3bnPS9zcvI0rm2q2hlqa7E2sPu2KX64gtpCm2Di8qKlZpAB0LUOgEBwLSAf9mABZq5aBDtfy1cLBsDeNw3tjdkzZmBycFQcBJ4YQBXMfXv4JGk4CYK2vpxurEE-VtxlZed2cHAXHU-c1bt51kZsxPb-aIKZLpZa414ja0X4jNyu388qmikaari+KEpUJIGuSqiQKvO3Y5Wd50D+7grJ8Iiul8YnUSJ4Dwtg+jaTolbS+L0AAy6BaiRjABYdg8MswMQ-gFZ4d5+h-2rI1IB-I0idVPq4MY111gRTzrPZ6TEwz8FQJGXcYNczl3kpXa8aRggDHtM+DYN0XDWBIo2HCN0AhETNm2MET1wbHBEBASg1QcwnhYOQdAyY4ynGwerGwYxXj8O8IIv8xMYoQN-mCasSQIEpH0q3C+c8XpDhHLQEOjsloLl0ZaaUI8Tafiiv4MY6RREAmZC1awUj0gyI8HI0WdBEQ-QgqQZA3jryTAul6Rs8Qop2Dxh4A+dBKLChPisYIcSO6sXYpiH2E1MT8QWiJNJu11j+CKQkY+Thj4QICCRG6gJbQRU8GMbeFT57ZWshBZa41CpTSgM07GnSYiTEbM1NwCQ0gp1mC1BYgzJjDLxtYS2dD5Fiw+tDb6cNRoLO6NyNpUCjlSlJt-GuzoMij15JAnkwpUhpVgU4pi6YxAJi4LANiOAbmIHGG0-wCV7pHIobYDqHzp5k2GH0HwxzHH0IhsHB2TteaQpxiPFKpM7DxEiaCV5UQYgpTKdEJKSQbo5ByEAA */
+    /** @xstate-layout N4IgpgJg5mDOIC5QAcBOB7AVmAxgFwFoBbAQxwAsBLAOzADoAFEmAAkthaPQFdq9IAxACU46ADYA3MCxLc85MH0o4SeSumoBtAAwBdRCnSxKajQZAAPRACYAjADY6AdicAOAKz33r6+6cBmAE5AgBoQAE8ba386f1t-f1d-bQTbFPt7AF9MsLQsXEJSChp6JlZ2FlQwEghwgR19JBBkIxN1anMrBHindzprABZrFIH3FOD3azDIhGt7QLptBwHg+zjAl20nbNyMbHxiMipaRmZpCqqaus1bRsNjUw6mrp6+weH-UfHAyembNLok3m2iWvgGtj87h2zT2BUOxROAGEFDgANY0KBsABmLG4sDAqDYHFk8kUahU-Ag9T05haD3anUQtlcK0WzO0A2Sw3cgSmERsvTonNs4O09jSTl87ihORh+QORWO9GRuHR1ExlBxeIJRJkcgUSgpghud2arUejO6LIWS1cHK52h5fJmw20zi29uigXm9kd0Ly+0KRxKdAAonwCRiWLQAO4sAMFaMkIhgAQAZTAeHjsPwSZTDVp5oZzyigRinOGrlckusgVszpsY1iHlca2sHx5tn9OaDCPoABEwFiSmxqG0SGIWABBADyAEkBIixMpUZAWBBUCQ47Hp-OWAAjOR4DQFpp0tpmEuzJzaax0Wy2G-uWzBZLiv6zDL9H4QuIZBJjNssoJgqwZIpcajqpwJDIAIACyMG6jgEGQKe9wXk8oAvLeAz3tWiQvv49hDNWH7trhgzVuk7j+DeD5Abs8q9kqdAAOokG0UFYughIbswLA8SwKjUDgYBiPBiFcNqEDoDGWg0meRaXlhiD+HYfQ+G4iQDE4OlzGRX61s+NEOGs-iAd2THwix-abjGUaznOB7hOum5QFAGIScgnA8PiXBSGhZr0spliqc+d7SrW9i6WpunWE4H4vrYbJ1nYYpOHW2hlpZgbWSGtlbg5e77i5fHuZ5CHeVJ+LcMggXnhaV60QMbosmKAz2PFVbxe4BmuM4P4mf+5lbDlcKKvldlFU5JWucwHnqouy5omuwmiZOjlzXGh54Me8mmg1xYqQgakQnQmlJCyumSvYiXts4ayBFsowuCy7gDGNoF9nQABiNDsOQQkQdNAgyScNASOgq50CBzEhn9Y6wIDyHVJBmKOQgEPoBS7QNPVSmYaFCDgnaQquHW4rtmWvJkTe35PYkWXBMsWTAT2eUnD9mYUKO46ThAqgkKDGj0Fj0Owxz9Bc3gPP-WoE7roLmPUJDOMnno+PBYTXTRW6QRJEZGVOA4ZFBIsPJVg4z69J8XZs1ZE2c9zgNy5QCsC3gQsEhgqAw2IqjcagRAw+zjtS87vPy-zStY2r+2axhlq67EgQGz8Rsm-yCCuMlOl1k4nVfIkQTZLK1DoBAcC0qHYFgIWWuWgQt1ZwQfTBO3Hed-4n1wycZTnBwUkRhA9eJ1eQxkR1gLBCy0TW3arOMblYenOUHCXLUo+Ncd9aDObxu+ra4LmQZrVDKMvpESy5M95LdAqmiUaari+KEhUJIGuSqiQFvR1ExC0o6DRUfCKVsgwvD+AMk4fofhzI5zFF4MsMol7jVrnQAAMugGoUYwAWHYGjbMTFf4hReNKPowDjYDDAR1GiZFtD9QLq9GicxUrxFvivcM-BUBRh3LDPMddFINyvMMUY-Rby8hogMKhzcXRNmZLyIIWUso51cOwtBIgICUCqLmY8LByDoBTPGM4xDtY2A5G8cRvhPjSMSnWIBqx-wPmiKMZBcpl5oMHMOWgkc3YbXnCYy0gwMqAmfOTdOOkYpkTkeTL0SjU7MjUd9REwMoKkGQAEq81Y7yFyevFDYvJU6n3OufTw6Rr6BESSxdinFMSBzmpiQSa0xIZOOrWQU+toi0R8B1FwZFyaAhzpTKhYx6yVMmoVKCm1ZplQWlAFpRMRqOE5BsIIPRHQyJsLyRYgz6zDNBGMzm-0kZA1RtNeZXQgjtJfFk6wHhIoJSznMfqFtJgM3mH4AuBz6DhhIPuMQ0g5ykBgKgFyaYeCoFEiwDM-z8A8XOYgTkuk6DBBItpDKhTHn2GeanV56R06fPtu4760tZZjijorT28LiZTwfKMUyvhggPJdNEe8Dg3AF1bFI3kH1S5AA */
     predictableActionArguments: true,
     id: 'project-machine',
     initial: 'Page is mounted',
@@ -50,9 +43,13 @@ export const projectMachine = createMachine(
         confirmAoiDraw: aoiActionButtonModes.HIDDEN,
         cancelAoiDraw: aoiActionButtonModes.HIDDEN,
       },
-      mosaicSelector: {
-        disabled: true,
+      imagerySourceSelector: {
         message: 'Loading...',
+        disabled: true,
+      },
+      mosaicSelector: {
+        message: 'Loading...',
+        disabled: true,
       },
     },
 
@@ -96,7 +93,7 @@ export const projectMachine = createMachine(
           },
         },
 
-        entry: 'setEnteringProjectNameStatus',
+        entry: 'initializeNewProject',
       },
 
       'Redirect to home page': {},
@@ -153,14 +150,14 @@ export const projectMachine = createMachine(
         invoke: {
           src: 'geocodeAoi',
           onDone: {
-            target: 'Select mosaic',
+            target: 'Enable Imagery Source Selector',
             actions: 'setCurrentAoiName',
           },
         },
       },
 
-      'Select mosaic': {
-        entry: 'setSelectMosaicSessionStatus',
+      'Enable Imagery Source Selector': {
+        entry: 'enableImagerySourceSelector',
       },
       'Fetch initial data': {
         invoke: {
@@ -192,10 +189,12 @@ export const projectMachine = createMachine(
         };
       }),
       setInitialData: assign((context, event) => {
-        const { mosaics } = event.data;
+        const { mosaicsList, imagerySourcesList } = event.data;
         return {
           ...context,
-          mosaicList: mosaics,
+          imagerySourcesList,
+          imagerySourceStatusMessage: 'Select a imagery source',
+          mosaicsList,
           mosaicSelector: {
             disabled: false,
             message: 'Select a mosaic',
@@ -236,12 +235,26 @@ export const projectMachine = createMachine(
           mapRef,
         };
       }),
-      setEnteringProjectNameStatus: set.sessionStatusMessage(
-        'Set Project Name'
-      ),
-      setSelectMosaicSessionStatus: set.sessionStatusMessage(
-        'Select Mosaic & Model'
-      ),
+      initializeNewProject: assign((context) => {
+        return {
+          ...context,
+          sessionStatusMessage: 'Set Project Name',
+          imagerySourceSelector: {
+            disabled: true,
+            message: 'Define AOI first',
+          },
+        };
+      }),
+      enableImagerySourceSelector: assign((context) => {
+        return {
+          ...context,
+          sessionStatusMessage: 'Select Mosaic & Model',
+          imagerySourceSelector: {
+            disabled: false,
+            message: 'Select Imagery Source ',
+          },
+        };
+      }),
       resetMapEventHandlers: assign((context) => {
         return {
           ...context,
@@ -341,10 +354,14 @@ export const projectMachine = createMachine(
       fetchInitialData: async (context) => {
         const { apiClient } = context;
 
-        const { mosaics } = await apiClient.get('mosaic');
+        const { mosaics: mosaicsList } = await apiClient.get('mosaic');
+        const { imagery_sources: imagerySourcesList } = await apiClient.get(
+          'imagery'
+        );
 
         return {
-          mosaics,
+          mosaicsList,
+          imagerySourcesList,
         };
       },
       geocodeAoi: async (context) => {

@@ -5,6 +5,8 @@ import { glsp } from '@devseed-ui/theme-provider';
 import { PlaceholderMessage } from '../../../../../styles/placeholder';
 import { PanelBlockHeader as BasePanelBlockHeader } from '../../../../common/panel-block';
 import { AoiSelector } from './aoi-selector';
+import { ImagerySourceSelector } from './imagery-source-selector';
+import { MosaicSelector } from './mosaic-selector';
 
 export const ToolsWrapper = styled.div`
   display: grid;
@@ -40,6 +42,8 @@ function Header() {
   return (
     <PanelBlockHeader id='header'>
       <AoiSelector />
+      <ImagerySourceSelector />
+      <MosaicSelector />
     </PanelBlockHeader>
   );
 }
