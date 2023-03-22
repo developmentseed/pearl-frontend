@@ -12,16 +12,24 @@ import {
 } from '../../../../../../styles/type/heading';
 import { ImagerySourceSelectorModal } from './modal';
 
-const imagerySourceSelectorSelector = (state) =>
-  state.context.imagerySourceSelector;
+export const imagerySourceSelectors = {
+  selectorStatus: (state) => state.context.imagerySourceSelector,
+  currentImagerySource: (state) => state.context.currentImagerySource,
+  imagerySourcesList: (state) => state.context.imagerySourcesList,
+};
 
 export function ImagerySourceSelector() {
   const [showModal, setShowModal] = useState(false);
   const imagerySourceSelector = ProjectMachineContext.useSelector(
-    imagerySourceSelectorSelector
+    imagerySourceSelectors.selectorStatus
+  );
+  const currentImagerySource = ProjectMachineContext.useSelector(
+    imagerySourceSelectors.currentImagerySource
   );
 
-  const { message, disabled } = imagerySourceSelector;
+  const { disabled } = imagerySourceSelector;
+
+  const label = currentImagerySource?.name || imagerySourceSelector.message;
 
   return (
     <>
@@ -36,10 +44,10 @@ export function ImagerySourceSelector() {
         <SubheadingStrong
           data-cy='imagery-selector-label'
           onClick={() => !disabled && setShowModal(true)}
-          title={message}
+          title={label}
           disabled={disabled}
         >
-          {message}
+          {label}
         </SubheadingStrong>
         <HeadOptionToolbar>
           <EditButton

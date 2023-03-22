@@ -6,23 +6,9 @@ import turfCentroid from '@turf/centroid';
 import turfArea from '@turf/area';
 import { aoiActionButtonModes } from '../../components/project/prime-panel/tabs/predict/aoi-selector/action-buttons';
 
-/**
- * These are helpers to set context without repetion, mostly used on onEntry
- * actions.
- */
-const set = {
-  sessionStatusMessage: (sessionStatusMessage) =>
-    assign((context) => {
-      return {
-        ...context,
-        sessionStatusMessage,
-      };
-    }),
-};
-
 export const projectMachine = createMachine(
   {
-    /** @xstate-layout N4IgpgJg5mDOIC5QAcBOB7AVmAxgFwFoBbAQxwAsBLAOzADoAFEmAAkthaPQFdq9IAxACU46ADYA3MCxLc85MH0o4SeSumoBtAAwBdRCnSxKajQZAAPRACYAjADY6AdicAOAKz33r6+6cBmAE5AgBoQAE8ba386f1t-f1d-bQTbFPt7AF9MsLQsXEJSChp6JlZ2FlQwEghwgR19JBBkIxN1anMrBHindzprABZrFIH3FOD3azDIhGt7QLptBwHg+zjAl20nbNyMbHxiMipaRmZpCqqaus1bRsNjUw6mrp6+weH-UfHAyembNLok3m2iWvgGtj87h2zT2BUOxROAGEFDgANY0KBsABmLG4sDAqDYHFk8kUahU-Ag9T05haD3anUQtlcK0WzO0A2Sw3cgSmERsvTonNs4O09jSTl87ihORh+QORWO9GRuHR1ExlBxeIJRJkcgUSgpghud2arUejO6LIWS1cHK52h5fJmw20zi29uigXm9kd0Ly+0KRxKdAAonwCRiWLQAO4sAMFaMkIhgAQAZTAeHjsPwSZTDVp5oZzyigRinOGrlckusgVszpsY1iHlca2sHx5tn9OaDCPoABEwFiSmxqG0SGIWABBADyAEkBIixMpUZAWBBUCQ47Hp-OWAAjOR4DQFpp0tpmEuzJzaax0Wy2G-uWzBZLiv6zDL9H4QuIZBJjNssoJgqwZIpcajqpwJDIAIACyMG6jgEGQKe9wXk8oAvLeAz3tWiQvv49hDNWH7trhgzVuk7j+DeD5Abs8q9kqdAAOokG0UFYughIbswLA8SwKjUDgYBiPBiFcNqEDoDGWg0meRaXlhiD+HYfQ+G4iQDE4OlzGRX61s+NEOGs-iAd2THwix-abjGUaznOB7hOum5QFAGIScgnA8PiXBSGhZr0spliqc+d7SrW9i6WpunWE4H4vrYbJ1nYYpOHW2hlpZgbWSGtlbg5e77i5fHuZ5CHeVJ+LcMggXnhaV60QMbosmKAz2PFVbxe4BmuM4P4mf+5lbDlcKKvldlFU5JWucwHnqouy5omuwmiZOjlzXGh54Me8mmg1xYqQgakQnQmlJCyumSvYiXts4ayBFsowuCy7gDGNoF9nQABiNDsOQQkQdNAgyScNASOgq50CBzEhn9Y6wIDyHVJBmKOQgEPoBS7QNPVSmYaFCDgnaQquHW4rtmWvJkTe35PYkWXBMsWTAT2eUnD9mYUKO46ThAqgkKDGj0Fj0Owxz9Bc3gPP-WoE7roLmPUJDOMnno+PBYTXTRW6QRJEZGVOA4ZFBIsPJVg4z69J8XZs1ZE2c9zgNy5QCsC3gQsEhgqAw2IqjcagRAw+zjtS87vPy-zStY2r+2axhlq67EgQGz8Rsm-yCCuMlOl1k4nVfIkQTZLK1DoBAcC0qHYFgIWWuWgQt1ZwQfTBO3Hed-4n1wycZTnBwUkRhA9eJ1eQxkR1gLBCy0TW3arOMblYenOUHCXLUo+Ncd9aDObxu+ra4LmQZrVDKMvpESy5M95LdAqmiUaari+KEhUJIGuSqiQFvR1ExC0o6DRUfCKVsgwvD+AMk4fofhzI5zFF4MsMol7jVrnQAAMugGoUYwAWHYGjbMTFf4hReNKPowDjYDDAR1GiZFtD9QLq9GicxUrxFvivcM-BUBRh3LDPMddFINyvMMUY-Rby8hogMKhzcXRNmZLyIIWUso51cOwtBIgICUCqLmY8LByDoBTPGM4xDtY2A5G8cRvhPjSMSnWIBqx-wPmiKMZBcpl5oMHMOWgkc3YbXnCYy0gwMqAmfOTdOOkYpkTkeTL0SjU7MjUd9REwMoKkGQAEq81Y7yFyevFDYvJU6n3OufTw6Rr6BESSxdinFMSBzmpiQSa0xIZOOrWQU+toi0R8B1FwZFyaAhzpTKhYx6yVMmoVKCm1ZplQWlAFpRMRqOE5BsIIPRHQyJsLyRYgz6zDNBGMzm-0kZA1RtNeZXQgjtJfFk6wHhIoJSznMfqFtJgM3mH4AuBz6DhhIPuMQ0g5ykBgKgFyaYeCoFEiwDM-z8A8XOYgTkuk6DBBItpDKhTHn2GeanV56R06fPtu4760tZZjijorT28LiZTwfKMUyvhggPJdNEe8Dg3AF1bFI3kH1S5AA */
+    /** @xstate-layout N4IgpgJg5mDOIC5QAcBOB7AVmAxgFwFoBbAQxwAsBLAOzADoAFEmAAkthaPQFdq9IAxACU46ADYA3MCxLc85MH0o4SeSumoBtAAwBdRCnSxKajQZAAPRACYAjADY6AdicAOAKz33r6+6cBmAE5AgBoQAE9EW1cnOntbABY-VyD-Dy8AXwywtCxcQlIKGnomVnYWVDASCHCBHX0kEGQjE3VqcysEW38ndzprBOttfyTh4PcwyK7A6zptbWt4+etAkYTbJyycjGx8YjIqWkZmaXLK6trNWwbDY1N2xs7u3v7B4dGgwImIm3dtOgSMyGX387kC2nc7gSWyaO3y+yKRwAwgocABrGhQNgAMxY3FgYFQbA4snkijUKn4EDqenMzTubQ6UVcgLm0W0CX8CwhgQ2k2ZfW8TnsSTB9kC9l61hhuV2BQOxToKNwGOoWMouPxhOJMjkCiUlMEVxuTRa9yZXRZgTZrg5XKGYL5PwQi3+-lsQ3sIrs9l8DhlcL2hUO9AAonxCZiWLQAO4sWX5aMkIhgAQAZTAeHjgaz1GTYHqdLNjMeNhW-gB-iGrhi1hWtkS-K69n+UOBPm0Xu0tm0rgDeSDCqOABEwNjimxqK0SGIWABBADyAEkBEixMo0ZAWBBUCQ47H58uWAAjOR4DSFxr01pmUsupwLOgNh-uWzBLkt+xNlb-L0JCFBOKGyeO4-ZygiIZKucahqpwJDIAIACy8E6jg0GQJetw3g8oBPAsCRPjEaRvv43oxE2Dj-J2CSSg4CSchsPRgfCwaKgA6iQrSwdi6BEjuzAsLxLAqNQOBgGISEoVwWoQOgMZaLSV7FreuGIFWth9D4bhpAkTi6b43xTD+cQigBEq8r0mTZLCA7yoi9DDruMZRouS4nuE267lAUCYpJyCcDwBJcFImGmgyKmWGpr6zJCKySpy1h6dYTauLYAJOLy4qgk4zx9tZCaDvZdCOXuLlHseHn8d5vnIf50kEtwyChde5p3j0-50Cy1G+m4WkUWC-Sxd2oqeG+oH5TmEGKiVzmwa57mecwPlqqu67oluIlibO838XGp54OeCkmi1JaqQg6maYlKQsnpTgGRRulPlWto+J+frjdstlTUcABiNDsOQwnQWVK6yUcNASOgm50AVdmQX9U6wIDaFVDBWKuQgEPoJSbT1M1yk4ZFCDrLaAKuJlHrljMFEts4YK9vYaS8py-j+MxhXw5mFCTtOs4QKoJACGD9BY9DsPffQP1c4D-1qDO24C5j1CQzjF56Pj4WE50kpuoEKQrH4gQ5WCFF6Z1vRWt6pEStCE1faxv3Szzct8wLAiEhgqAw2Iqg8agRAw5NDuS07suUPL-N4CQSsq6ouPq4pWGtWdOt0EE+tfBlxuhM6PSuHMkJti2RvaL07Nw4q4YkMeYjSEupAwKgHlpjwqBiSwGa1-gvECPXJxNx3rft+UBJd1SGvYRaNGuI49gz3riW9u4dj9daBlvqXniLG+eWfeBwd0FXNfSIhRicTgHfifkPen7A586qP+QYYnYWT3er7ipWnIgd4N2r4Ny8exQn-H4SEWRrLUHQBAOAdIg5DjAEWTWFoCBfmdCg8uEtjhlA4NJCMEBEFvzOoMb8PY6Dgh7D0HKvhWaDAwQfUopwODnBqAQ5ORNKYEQhDlFs3YWTdGSs6N8s9vCDH-IlGir46HwKVKiVU6pNQEiJOUUk+oKSqEgKw067DC5xByjlBIM8BheAouCV4Iw55-DESKD6Nl97SIADLoGqFGMAFh2Bo2zLZTREUng6NovowxEjvwGOcKzbQgRdLtV4ZsO2diirhn4KgKMB5YZJhTN4rWNgOR9CGCsah9EPB6xpm6JIul-wuDrJQqRRURAQEoJUfALBzwsHIOgFM8YTgZItEMJI-QFgzHcGsQprhvxeE6t2OwPRBmlwidUyCo5xy0GduHbay4ul3gGBlOgkJojjFunpYpadSl6VLndawVTYksWkUiYGsFSDIHWWdWscQBjgkSkbGYRsTHCJZAMBYekvC2DmexTiHi-aLSxEJTa4lHlExWC8dO5y85GICE2d0FYvgQn4TEDwixgUjiciDBaVVlpQFhZ0UEnZKxGyCM8CE3gKI+G2esLsLhBhpBnviyW-0kZA1RiDclakjZ9HdHrM5HhYr+H-hCDwLgqzxBZF6Llh88zHxYH3Ruzch7SE7tfVAgribtTIRE6w11dLBBGYIgaMq-ABG3oqtmlyOaKilngbmYcI4CwNfRRwDYkgOF9GCL5giYgAg2HrLk+luSBGVUfWuLBb7311d3fVSkkF3kBL0kuqUA2DDnoymKLLaLgnFN4ZVB5YBR34CwWwBrBlel0akDkJcNIFuZQGnKJavh5SyEAA */
     predictableActionArguments: true,
     id: 'project-machine',
     initial: 'Page is mounted',
@@ -158,7 +144,15 @@ export const projectMachine = createMachine(
 
       'Enable Imagery Source Selector': {
         entry: 'enableImagerySourceSelector',
+
+        on: {
+          'Imagery Source is selected': {
+            target: 'Enable Mosaic Selector',
+            actions: 'setCurrentImagerySource',
+          },
+        },
       },
+
       'Fetch initial data': {
         invoke: {
           src: 'fetchInitialData',
@@ -171,6 +165,17 @@ export const projectMachine = createMachine(
           },
         },
       },
+
+      'Enable Mosaic Selector': {
+        on: {
+          'Mosaic is selected': {
+            target: 'new state 1',
+            actions: 'setCurrentMosaic',
+          },
+        },
+      },
+
+      'new state 1': {},
     },
   },
   {
@@ -226,6 +231,13 @@ export const projectMachine = createMachine(
             ...currentAoi,
             name: aoiName,
           },
+        };
+      }),
+      setCurrentImagerySource: assign((context, event) => {
+        const { imagerySource } = event.data;
+        return {
+          ...context,
+          currentImagerySource: imagerySource,
         };
       }),
       setMapRef: assign((context, event) => {

@@ -7,6 +7,7 @@ import { Button } from '@devseed-ui/button';
 import { Heading } from '@devseed-ui/typography';
 import CardList, { Card } from '../../../../../common/card-list';
 import { ProjectMachineContext } from '../../../../../../context/project-xstate';
+import { imagerySourceSelectors } from '.';
 
 const ModalHeader = styled.header`
   padding: ${glsp(2)} ${glsp(2)} 0;
@@ -39,11 +40,13 @@ const HeadingWrapper = styled.div`
   align-items: baseline;
 `;
 
-const imagerySourcesListSelector = (state) => state.context.imagerySourcesList;
-
 export function ImagerySourceSelectorModal({ showModal, setShowModal }) {
+  const actorRef = ProjectMachineContext.useActorRef();
   const imagerySourcesList = ProjectMachineContext.useSelector(
-    imagerySourcesListSelector
+    imagerySourceSelectors.imagerySourcesList
+  );
+  const currentImagerySource = ProjectMachineContext.useSelector(
+    imagerySourceSelectors.currentImagerySource
   );
 
   return (
@@ -95,14 +98,17 @@ export function ImagerySourceSelectorModal({ showModal, setShowModal }) {
                   updated: imagerySource.updated,
                 }}
                 borderlessMedia
-                // selected={
-                //   selectedImagerySource &&
-                //   selectedImagerySource.id === imagerySource.id
-                // }
-                // onClick={() => {
-                //   setSelectedImagerySource(imagerySource);
-                //   setShowModal(false);
-                // }}
+                selected={
+                  currentImagerySource &&
+                  currentImagerySource.id === imagerySource.id
+                }
+                onClick={() => {
+                  actorRef.send({
+                    type: 'Imagery Source is selected',
+                    data: { imagerySource },
+                  });
+                  setShowModal(false);
+                }}
               />
             )}
           />
