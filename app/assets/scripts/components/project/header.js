@@ -131,7 +131,8 @@ const selectors = {
   displayProjectNameModal: (state) =>
     state.matches('Entering new project name'),
   projectName: (state) => get(state, 'context.project.name', ''),
-  sessionStatus: (state) => get(state, 'context.sessionStatus', {}),
+  sessionStatusMessage: (state) =>
+    get(state, 'context.sessionStatusMessage', {}),
 };
 
 function ProjectPageHeader() {
@@ -141,8 +142,8 @@ function ProjectPageHeader() {
     selectors.displayProjectNameModal
   );
   const projectName = ProjectMachineContext.useSelector(selectors.projectName);
-  const sessionStatus = ProjectMachineContext.useSelector(
-    selectors.sessionStatus
+  const sessionStatusMessage = ProjectMachineContext.useSelector(
+    selectors.sessionStatusMessage
   );
 
   const handleSubmit = (e) => {
@@ -170,13 +171,11 @@ function ProjectPageHeader() {
 
       <StatusHeading
         data-cy='session-status'
-        variation={
-          sessionStatus.level === sessionLevel.ERROR ? 'danger' : 'primary'
-        }
+        variation='primary'
         size='xxsmall'
       >
         <span>Session Status: </span>
-        {sessionStatus.message}
+        {sessionStatusMessage}
       </StatusHeading>
 
       <Modal
