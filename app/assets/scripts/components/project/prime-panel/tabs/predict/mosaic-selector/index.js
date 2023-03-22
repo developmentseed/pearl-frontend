@@ -12,42 +12,48 @@ import {
 } from '../../../../../../styles/type/heading';
 import { MosaicSelectorModal } from './modal';
 
-const mosaicSelectorSelector = (state) => state.context.mosaicSelector;
+export const mosaicsSelectors = {
+  selectorStatus: (state) => state.context.mosaicSelector,
+  currentMosaic: (state) => state.context.currentMosaic,
+  mosaicsList: (state) => state.context.mosaicsList,
+};
 
 export function MosaicSelector() {
-  const [showSelectMosaicModal, setShowSelectMosaicModal] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   const mosaicSelector = ProjectMachineContext.useSelector(
-    mosaicSelectorSelector
+    mosaicsSelectors.selectorStatus
   );
+  const currentMosaic = ProjectMachineContext.useSelector(
+    mosaicsSelectors.currentMosaic
+  );
+
+  const { disabled } = mosaicSelector;
+
+  const label = currentMosaic?.name || mosaicSelector.message;
 
   return (
     <>
-      <MosaicSelectorModal
-        showSelectMosaicModal={showSelectMosaicModal}
-        setShowSelectMosaicModal={setShowSelectMosaicModal}
-      />
+      <MosaicSelectorModal showModal={showModal} setShowModal={setShowModal} />
       <HeadOption>
         <HeadOptionHeadline usePadding>
           <Subheading>Base Mosaic</Subheading>
         </HeadOptionHeadline>
         <SubheadingStrong
           data-cy='mosaic-selector-label'
-          onClick={() =>
-            !mosaicSelector.disabled && setShowSelectMosaicModal(true)
-          }
-          title={mosaicSelector.message}
-          disabled={mosaicSelector.disabled}
+          onClick={() => !disabled && setShowModal(true)}
+          title={label}
+          disabled={disabled}
         >
-          {mosaicSelector.message}
+          {label}
         </SubheadingStrong>
         <HeadOptionToolbar>
           <EditButton
             useIcon='swap-horizontal'
             id='select-mosaic-trigger'
-            disabled={mosaicSelector.disabled}
+            disabled={disabled}
             onClick={() => {
-              !mosaicSelector.disabled && setShowSelectMosaicModal(true);
+              !disabled && setShowModal(true);
             }}
             title='Select Imagery Mosaic'
           >

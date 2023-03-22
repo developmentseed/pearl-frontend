@@ -7,6 +7,7 @@ import { Button } from '@devseed-ui/button';
 import { Heading } from '@devseed-ui/typography';
 import CardList, { Card } from '../../../../../common/card-list';
 import { ProjectMachineContext } from '../../../../../../context/project-xstate';
+import { mosaicsSelectors } from '.';
 
 const ModalHeader = styled.header`
   padding: ${glsp(2)} ${glsp(2)} 0;
@@ -39,16 +40,13 @@ const HeadingWrapper = styled.div`
   align-items: baseline;
 `;
 
-const mosaicListSelector = (state) => state.context.mosaicList;
-const selectedMosaicSelector = (state) => state.context.selectedMosaic;
-
-export function MosaicSelectorModal({
-  showSelectMosaicModal,
-  setShowSelectMosaicModal,
-}) {
-  const mosaicList = ProjectMachineContext.useSelector(mosaicListSelector);
-  const selectedMosaic = ProjectMachineContext.useSelector(
-    selectedMosaicSelector
+export function MosaicSelectorModal({ showModal, setShowModal }) {
+  const actorRef = ProjectMachineContext.useActorRef();
+  const mosaicsList = ProjectMachineContext.useSelector(
+    mosaicsSelectors.mosaicsList
+  );
+  const currentMosaic = ProjectMachineContext.useSelector(
+    mosaicsSelectors.currentMosaic
   );
 
   return (
@@ -56,8 +54,8 @@ export function MosaicSelectorModal({
       id='select-mosaic-modal'
       className='select'
       size='xlarge'
-      revealed={showSelectMosaicModal}
-      onOverlayClick={() => setShowSelectMosaicModal(false)}
+      revealed={showModal}
+      onOverlayClick={() => setShowModal(false)}
       closeButton={false}
       renderHeader={() => (
         <ModalHeader>
@@ -70,7 +68,7 @@ export function MosaicSelectorModal({
               size='small'
               useIcon='xmark'
               onClick={() => {
-                setShowSelectMosaicModal(false);
+                setShowModal(false);
               }}
             >
               Close modal
@@ -88,7 +86,7 @@ export function MosaicSelectorModal({
           <CardList
             nonScrolling
             numColumns={2}
-            data={mosaicList}
+            data={mosaicsList}
             renderCard={(mosaic) => {
               const {
                 id,
@@ -113,9 +111,13 @@ export function MosaicSelectorModal({
                     mosaic_ts_start,
                   }}
                   borderlessMedia
-                  selected={selectedMosaic && selectedMosaic.id === mosaic.id}
+                  selected={currentMosaic && currentMosaic.id === mosaic.id}
                   onClick={() => {
-                    setShowSelectMosaicModal(false);
+                    actorRef.send({
+                      type: 'Mosaic is selected',
+                      data: { mosaic },
+                    });
+                    setShowModal(false);
                   }}
                 />
               );
@@ -128,6 +130,6 @@ export function MosaicSelectorModal({
 }
 
 MosaicSelectorModal.propTypes = {
-  showSelectMosaicModal: T.bool,
-  setShowSelectMosaicModal: T.func.isRequired,
+  showModal: T.bool,
+  setShowModal: T.func.isRequired,
 };

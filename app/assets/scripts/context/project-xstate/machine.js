@@ -198,12 +198,7 @@ export const projectMachine = createMachine(
         return {
           ...context,
           imagerySourcesList,
-          imagerySourceStatusMessage: 'Select a imagery source',
           mosaicsList,
-          mosaicSelector: {
-            disabled: false,
-            message: 'Select a mosaic',
-          },
         };
       }),
       toggleGlobalLoading: assign((context) => {
@@ -238,6 +233,17 @@ export const projectMachine = createMachine(
         return {
           ...context,
           currentImagerySource: imagerySource,
+          mosaicSelector: {
+            disabled: false,
+            message: 'Select a mosaic',
+          },
+        };
+      }),
+      setCurrentMosaic: assign((context, event) => {
+        const { mosaic } = event.data;
+        return {
+          ...context,
+          currentMosaic: mosaic,
         };
       }),
       setMapRef: assign((context, event) => {
@@ -252,6 +258,10 @@ export const projectMachine = createMachine(
           ...context,
           sessionStatusMessage: 'Set Project Name',
           imagerySourceSelector: {
+            disabled: true,
+            message: 'Define AOI first',
+          },
+          mosaicSelector: {
             disabled: true,
             message: 'Define AOI first',
           },

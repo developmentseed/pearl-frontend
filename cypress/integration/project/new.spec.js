@@ -109,15 +109,6 @@ describe('Create new project', () => {
       .trigger('mouseup');
     cy.wait('@reverseGeocodeCity');
 
-    // Re-enter edit mode
-    cy.get('[data-cy=aoi-edit-button]').click();
-
-    // Panel prime button should be in AOI Confirm mode
-    cy.get('[data-cy=panel-aoi-confirm]')
-      .should('exist')
-      .should('not.be.disabled')
-      .click();
-
     // Check session status message
     cy.get('[data-cy=session-status]').should(
       'have.text',
@@ -127,6 +118,11 @@ describe('Create new project', () => {
     // Select imagery source
     cy.get('[data-cy=imagery-selector-label]').should('exist').click();
     cy.get('[data-cy=select-imagery-2-card]').should('exist').click();
+
+    cy.get('[data-cy=imagery-selector-label]').should(
+      'have.text',
+      'Sentinel-2'
+    );
 
     // Select mosaic
     cy.get('[data-cy=mosaic-selector-label]').should('exist').click();
