@@ -15,6 +15,7 @@ import ShadowScrollbar from '../../../../../common/shadow-scrollbar';
 import { aoiStatuses } from '../../../../../../context/project-xstate/machine';
 import { ProjectMachineContext } from '../../../../../../context/project-xstate';
 import { SelectorHeadOption, SelectorOption } from '../../../selection-styles';
+import { formatThousands } from '../../../../../../utils/format';
 
 const AoiOption = styled(SelectorOption)`
   grid-template-columns: auto min-content;
@@ -52,31 +53,17 @@ const AoiOption = styled(SelectorOption)`
 `;
 
 const selectors = {
-  aoiStatus: (state) => state.context.aoiStatus,
+  aoiStatusMessage: (state) => state.context.aoiStatusMessage,
+  currentAoi: (state) => state.context.currentAoi,
 };
 
-const ActiveAoiOption = ({ aoiStatus, aoi }) => {
-  let label;
-  let area;
-
-  switch (aoiStatus) {
-    case aoiStatuses.LOADING:
-      label = 'Loading...';
-      break;
-    case aoiStatuses.EMPTY:
-      label = 'Draw area on map or upload an AOI geometry';
-      break;
-    default:
-      label = aoi.name;
-      break;
-  }
-
+const ActiveAoiOption = ({ label, area }) => {
   return (
     <AoiOption hasSubtitle selected data-cy='selected-aoi-header'>
       <Heading size='xsmall'>{label}</Heading>
       {area && (
         <Subheading size='xsmall' className='subtitle'>
-          {area}
+          {`${formatThousands(area / 1e6)} km2`}
         </Subheading>
       )}
     </AoiOption>
@@ -84,14 +71,17 @@ const ActiveAoiOption = ({ aoiStatus, aoi }) => {
 };
 
 ActiveAoiOption.propTypes = {
-  aoiStatus: T.string,
-  aoi: {
-    name: T.string,
-  },
+  label: T.string,
+  area: T.number,
 };
 
 export function AoiSelector() {
-  const aoiStatus = ProjectMachineContext.useSelector(selectors.aoiStatus);
+  const aoiStatusMessage = ProjectMachineContext.useSelector(
+    selectors.aoiStatusMessage
+  );
+  const currentAoi = ProjectMachineContext.useSelector(selectors.currentAoi);
+
+  // TODO fix selector title
 
   return (
     <>
@@ -110,7 +100,10 @@ export function AoiSelector() {
           }}
           data-cy='aoi-list'
         >
-          <ActiveAoiOption aoiStatus={aoiStatus} />
+          <ActiveAoiOption
+            label={currentAoi?.name || aoiStatusMessage}
+            area={currentAoi?.area}
+          />
         </ShadowScrollbar>
         <HeadOptionToolbar>
           <AoiActionButtons />

@@ -1,7 +1,7 @@
 import React from 'react';
 import { ProjectMachineContext } from '../../../../../../context/project-xstate';
 
-import { EditButton } from '../../../../../../styles/button';
+import { ActionButton, EditButton } from '../../../../../../styles/button';
 
 export const aoiActionButtonModes = {
   ACTIVE: 'ACTIVE',
@@ -17,12 +17,12 @@ export function AoiActionButtons() {
     aoiActionButtonsSelector
   );
 
-  const { drawNewAoi, cancelAoiDraw } = aoiActionButtons;
+  const { drawNewAoi, cancelAoiDraw, confirmAoiDraw } = aoiActionButtons;
 
   return (
     <>
       {drawNewAoi !== aoiActionButtonModes.HIDDEN && (
-        <EditButton
+        <ActionButton
           title='Draw Area of Interest'
           id='edit-aoi-trigger'
           useIcon='pencil'
@@ -34,10 +34,25 @@ export function AoiActionButtons() {
           }}
         >
           Draw new AOI
-        </EditButton>
+        </ActionButton>
+      )}
+      {confirmAoiDraw !== aoiActionButtonModes.HIDDEN && (
+        <ActionButton
+          title='Confirm AOI Draw'
+          id='confirm-aoi-draw-button'
+          useIcon='tick--small'
+          data-cy='confirm-aoi-draw-button'
+          onClick={() => {
+            actorRef.send({
+              type: 'Clicked confirm AOI draw button',
+            });
+          }}
+        >
+          Confirm AOI draw
+        </ActionButton>
       )}
       {cancelAoiDraw !== aoiActionButtonModes.HIDDEN && (
-        <EditButton
+        <ActionButton
           title='Cancel AOI Draw'
           id='cancel-aoi-draw-button'
           useIcon='xmark'
@@ -49,7 +64,7 @@ export function AoiActionButtons() {
           }}
         >
           Cancel AOI draw
-        </EditButton>
+        </ActionButton>
       )}
     </>
   );
