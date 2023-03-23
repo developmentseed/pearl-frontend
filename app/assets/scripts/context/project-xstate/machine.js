@@ -9,10 +9,11 @@ import config from '../../config';
 import get from 'lodash.get';
 import { delay } from '../../utils/utils';
 import toasts from '../../components/common/toasts';
+import { BOUNDS_PADDING } from '../../components/common/map/constants';
 
 export const projectMachine = createMachine(
   {
-    /** @xstate-layout N4IgpgJg5mDOIC5QAcBOB7AVmAxgFwFoBbAQxwAsBLAOzADoAFEmAAkthaPQFdq9IAxACU46ADYA3MCxLc85MH0o4SeSumoBtAAwBdRCnSxKajQZAAPRACYAjADY6AdicAOAMxvt9z7dvWAFgAaEABPG2sAVjoATn8nGMjrJ20HANsnAF9MkLQsXEJSChp6JlZ2FlQwEghQgR19JBBkIxN1anMrBFt3AOiogICYz1T3P0iQ8IRk2zp7W0i4uMX7a20PbNyMbHxiMipaRmZpCqqaus1bRsNjUw6mrp6+ugGhkZ7xyZseun8fF1sHhigQ2OWa2wKe2KhwAwgocABrGhQNgAMxY3FgYFQbA4snkijUKn4EHqenMLVu7U6iEBthidG07m87k8S20kVcX2mbkZzNckXcawC9hi9kiAU24PyuyKB3ocNwSOoKMo6Mx2NxMjkCiUxMEl2uzVadxp3Vc9L5LLZ9I5XLCNiZdGZ9gCKW8MQ8kXFUryO0K+xKdAAonxsciWLQAO4sP0FSMkIhgAQAZTAeFjEPwCaTDQpJupDxszKczsCTns4otiW5UWssQF1lcLmB1hiTkFvqzAeh9AAImBUSU2NQ2iQxCwAIIAeQAkgIYWJlAjICwIKgSDHo1O5ywAEZyPAaPNNSltMxF6ZCgJzSJ3jJ+VmRJzc9yJZwfb3pebueyuLsyj28p0DCZxqCqnAkMgAgALJQVqOBgZAJ43Oe9ygI82iBL8rj2E41h4akyQCrWATaL8d7pPSCzMrYgwAf6ULAQA6iQbQQai6A4uuzAsFxLAqNQOBgGIsHwVwGoQOgUZaOSp4FheGG0tWVo+DaMR2ty9jaAyLh2OKlaLHe9gMZCcpBn2G5RhGM6zvuoRrhuUBQMiYnIJwPBYlwUgocaVKKZYjr4c42kxEM2hYdo+HcoKDKBIM2h9K6dieqZsqBoclmbjZu57g5PHOa5cHuRJWLcMgvlnqal7WCWZZuoZ1YTA6CCrO4dABO4gqEa4YVke4aVARZVk5XZeWOcwLkqguS6IqugnCROtkTTGB54EeslGlVhZKVeUX1RWVb0s1UxJKWnhNjMuFhb+g1MUGABiNDsOQAlgaNAhSYcNASOgK50HG6W9nQT2jrAr2IdU4EorZCA-egxLtA0lUKehgXTLh9ZrB2iVjIE8xadhwzAp1gp+MMWRgoDQ2HKGJB7mI0izqQMCoA5KY8KgwksGmjP4FxAjM8cbM85z3MVFifMkij-lo10rJ-h1HK-rViz6YT7Wk7+KS9QlA1U9292HA96YUCOY4ThAqgkJ9Gj0PD-3U0b9Am3gZvPWo45rtbcPUL9iPHnoMtoWahHOu2FZq4KmOkbM4rDGMYqsgKfR3eZxum69HuUF7Vt4Db2IYKgANiKonGoEQAOG+nLuZ+bnuWz78MB5twfVbtYdvi48dRO4Mcta4N5RQKYp-neXWD2nGX0HTDPSDBRhsTgPMiQUAsL7AS9apLBTIXJqHt+jfeRLMCzJIMEfHxrHVddr6x9UyU-A7PjMsAvEAiSvUvr+gH8ThLq98B7y2qjM0nUOQvDPtYNswxeonUQG1G+3UdYP31lsQCztGBVAgMoO4lRqi1AEAwVAlAkz7kPBoTMcAsQQDbjtdGnUxgNm0k4D4YomwxSwnQSIHoIq1SineGIT9gKhn4DiNAkBcHtEqLwMkIDZZmibKsF4Ajcb+BFLYbkthvDODsF1DIrIwoVklAbDBNcQxhnEdgqRlDUCyMNPmBRNVMYqJxp1dRBMWqBAZBfaBTJnxuD-P+UxjFzGiM1BInB+BpF2OoPUaw8iQ7OOUdjHh7j8aaJap4Us2i-BkW9ByeKlN0GhOniBd6EFbK22+n7P69AnbmNAlDUavt-aqCRkHfefkkm7WPqfM6F8XBXy8dougHgHBMjsICLqiRhFBhEAAR24HAaGI5YD5yEsmL69tamO2rmUxZyz1kRhoOskgmzWkI3aYHXQdCApdHAf0KBMC+41iyRA5ITIwqDx+akOZhxDkrJOdQM5myBCFy4iXMuXFK4NIOWAJZQKIKnI2cJS5LdkZdO2vcxAjzIFJGgTEWBbyphdXrPheY9ILRvjopEf59A0x4HKms1FWy7Z0AdvU-ZwNGXMpRectFzdrmtyxaAy8AQLQ3i6pyC+ZMSWIGZP0FIb4JWqtcH8kJZkDm8FHBBSJNi4l3LlogJIqRYhRXbBpRK6QYi1lcPWN0OkooBCbJMsK9LynNL1d2apOzfp7LMWUpp7TvWAXRcKzFiTD7y1-K4JW3VVbAgcNyDwvwEh-iSq6PCt0pTUF-nACk3L5SOJ6ejAg9huTlsZBFGttaa2ug9WUE4HAJJhggCW6NuLrCkQZPSYYHIegnzdHRRtxwtRnFqB2+hjx6RD1FCkFInUoj2imARTWNq7BeCbPRTVQNgKKkRCc9UWIcQVHxLqIkqhIBTpxd0JI0QM3QOfBKXCQxayijGd6BI7ZtJRQSGg6UpTgYABl0A1AjGACw7BVnUxvcau9UQ5iDyfR2CVrpbUjNmNrZIiRmwSlYSZXdNMZ6WIjNuamOYwBwcURyBkOlnzaPVUCPCtYkjOFcLhbNDgJQ9EIyUrVwMRA4KqNmI8LByDoDIcgY41Gaq0cZIkVh6x1hvhYy1WdLwiUskStpZsrIPUDiHLQeuOclpzlk7tAi+1hiGScCKXoUVOHRAtLVaBqtnXWA9cG1ZpBkAWfRs2esqx0iDx8N4CK7h33rvpJu9V26TH8b3UGVi7EUTlwmiifiC0RL+ceM+dqv6OMZDcx2F8LVguxArJ6OIPgNIJcAwJ4CWVrKVNyvlJyU0oC5cdJWOYDUCP+F6CuhBZFnTeAFPhCUHJOxEcwaDF6b0vUw3M-JJxlmKuejs96fwdhkhlamIg2qzYmQRScLfOls2wnUHpq-IWrN2Zi2kLzNeqBusIEVY4VhBEiXel6Eka+R3lWnfOx6127tRwN29vnN7gxHB5IWBKnSZ2-C1kQwRuwSRcI1uKQ1pLtNrtzzfovZQX8XtvZVqWP8SabpjHSFpEUuiMhxBgR8D1L9575onM9-mr3VuloeYlONb5ap43wyKAHfcgdRRB5dspxDJHRNsQQqYB9p24u278CKro8NGIwwds1zY3QBNgSfWwbPLFUKiXg2Jb2rP1hs+KOzPgyL7YVQzsYCsoqpHVSfLzFTluznJ-8BTWF8N2c6i4WsOlfhjG0WMBInIU4esBcc5FILWUw7tGMvCnI6RtgR6+X87HmRMl40kUeHreXuX5ZsmHz7Yi1ZdVFcs8CMbkRcEyDjC6J4cmTzqiM+rFdo2xfBnhoz7X4XLArWqr5EovEFH0E+iR2xMgA3C4G3mB-dnJ3H346isLobvMkFNsw3Q1Zlc+EmOP1-AREOcFg6Wqh4A3DQGRw+xW7R4+1VhbhXMeFSXau3sql3tLpyL3tkJkEAA */
+    /** @xstate-layout N4IgpgJg5mDOIC5QAcBOB7AVmAxgFwFoBbAQxwAsBLAOzADoAFEmAAkthaPQFdq9IAxACU46ADYA3MCxLc85MH0o4SeSumoBtAAwBdRCnSxKajQZAAPRACYAjADY6AdgCcADmva3AFnvfvAMxubvYANCAAnoj2AKy2dG621m5OwQEuQW4AvlnhaFi4hKQUNPRMrOwsqGAkEBECOvpIIMhGJurU5lYInl50Ad5Oft4e3tZxYZGIbjExdC4uTkveXrba2i7eOXkY2PjEZFS0jMzSldW19Zq2TYbGpp3N3b1u-YPDo+MO4VEICy50GIjeweWwBGLjey2bYtXaFA4lY4AYQUOAA1jQoGwAGYsbiwMCoNgcWTyRRqFT8CANPTmVr3DpdRBOdKA2wZNxeVLaWJOH7TWzeOjspyDXp+cZbXKwgr7YpHego3AY6hYyi4-GE4kyOQKJSUwTXW4tNoPJkIFkAuIcrmc3n8hD2JzaOjeGKxd3BaxO3ww-J7IqHUp0ACifEJmJYtAA7ix-YUoyQiGABABlMB4ONw-CJ5ONOmmxlPGzeFyOH3+T5eSa-NwBF0ZDLrUu2BxSnaywOI+gAETA2NKbGo7RIYhYAEEAPIASQESLEyjRkBYEFQJFjMYnM5YACM5HgNPnmvT2mZiz04kL1nFnd664kAg6nNYhXXRYkWZ4-C4-dmuwq6CRC41FVTgSGQAQAFlwO1HBgMgI87lPR5QG6WwYlcBI3W9Ww6xcGIAlFB0fDmXD7GsZ92RcLwNl-TsEQAgB1Eh2lA7F0CJVdmBYDiWBUagcDAMQoJgrhNQgdBoy0Wlj0LM9UJsdZXgGIZKxfL4a0QAj4k5NY628VsxlbOiAwY4MezXaNIynaddwiFc1ygKBMRE5BOB4AkuCkRCTQZeTLBsb1rDoDZAmfMsNnsJ0HV8eJxkIpwMLcBYnDBEz4XlczLOs7cd3srinJc6C3LEgluGQHyTzNc8XzLOgKxGdTqwdAjgvsAYDIrRK3XSuUg2OCz1xy2y8oc5hnNVOcF3RZd+MEscbLG2M9zwA9pONKqiwUnpS3LUU1LGZqpkdZJnHBTYXGsIIVkWXr-2DAAxGh2HIPjgOGgQJOOGgJHQJc6HjPruzoJ7h1gV64JqECsRshAfvQSkOkaSq5JQgKEHrOJATrAJcMu7QIRSFqBmFcFtCScZtDsWI7rM44wxIHcxGkadSBgVB7NTHhUEElh02Z-AOIEVnTg5vnud5yoCQFqkUb8tHunBDDnE2cZqI8dJrGJtqOocfbupiWnMuOB6MwoIcRzHCBVBIT6NHoeH-sB+6TbN17nrUUcVxtuHqF+xHDz0OXkPNVt7BdKntESqPkkMmJiN8eqQhCJZtDdMYf2lZ26foU28HNj3KC9628FtwkMFQAGxFUdjUCIAG-xzkG3Ytz2rZ9+GA-W4Pqu2sOI88aPn0SQV4+O1wAXZHwBhiFwHGbI3+voBmmekSCjBYnA+aEwohfX2BN+1aXCgQmSkN79GVhWbGo9iOfnXI7X6t1rqgUNrPG+N5fqEZ5mWHXiAQlt4yz3ugQBY4pY73wKfDaqNzT+E2PVewF0eTIKOr8Vqz9-B638AbRewMGDVAgMoB4VQah1AEIQygyZdz7g0FmOABIIA9y2pfCE8RAjpBZMsEEj5joGXiMgzYsxOQxGSq4Jw+CAJhn4ESNAkASEdCqLwGksD5bmkxvEMRARcbJU8ITPkx01iOBZP4Xk9Z3Blnfh2UyX9QzhjkUQxR9DUAqKNAWdR55NHYx0XjfRyRDG-Fqq6RKQQvBAlFGnbIH96J2JkVqeRxD8BKNcdQBo1g1Ehy8QTLROM-EEwCQ6aw+FXSzxBOMAiIQQT2CkcGICUMPpfQdn7P69Bs52PqaoYavt-ZdMDroFh-luhXxdGI2+s9bAPy1sddwdBITR2CGnQi1iZS2KXnQEQABHbgcBoZDlgKXASKYml0Edm0z+6ytk7IOZGGgBySBHJ6QjPp3cz6+SydtBBQooooJ+egxASQdJllwpHcOPhcK1OOFc3ZtzqD3KOQIcuHEq41w4vXdplywDbJhaBO5hzBJPK7sjN5m0hmIC+Ug35aCQgOgcACa6ARinOgMsEIYkL6DpjwOVfZ+Ljn21OS0p2Fzgacu5Xih5BLO4vOJZki+wyFgBASAEdquFIRRxcLSuwCRgWci-F4Fl7KNm8GHKBRJzi0mDIVlpIIHDBTsh0alMEbgHQLBCtRfVdgEpckNZ0vZzs7bfUFec2J6zfWRmdoS6VQcSVwK8bMJwKsxizy8FdS6xFFWTOGNoueKQAg5GlNQMBcA6TCoVB4j56MCCaQQFWkK6x60NvrXYQ15QzgcDEuGCA5a5Xkumb8J0pFcI4ypmMUYLbTjaguHUbtrC0KigBKKNYl1kHJH+AnIUCwoRXUZXYDCkiYlrOBkqdEtyNQEiJJUUkeoKSqEgDOslCAzHCgIu6J0uMnQsgdAO4UQ6dEjuSC+Q18TUCRk3M7XMYB71Wp6C+V4SbVLYRmBq46dYXTzvQg4QUL4vCGpEMQ6oOYDwsHIOgGhyBThQdDsq4K8VFiBG9OsF8X7ErzHYVFcEQx0I1IPRldZfYBy0FbkXBaM5KM1VSAm+s4ceRXVSJdPtzIXz1UGIMWeKQQiER9e9UCpBkBib7prZwYjw6bDWJRbwxEQSunk96IIXCCKGuYqxLEtcxpYl4nNIS+n0aZuCtRUsuN3AE0ZchjB7VhSsvBBRSZ2h0iGsGlZUCi1RoFQmlAbzzwKnzCWPpPwGGibHXdMFJW9YPB1nIjTHjQMAKgxem9BpSXROyU8dtZIad+jum4e4Z0PIx4YMZa6fw3pUhOjrGlKrLtv6-xZmzQknMJbSH5rvVAGXECMsThsGI6xLqqVmE-fwYxRujdxnmibTc84F2HG3b2pdVt-HBGdNOFFh5LGrakV4mwUhR0-LJ6JNjePAxXn-feh8luCxW81itisPxutUqkWYdLAlaVmPMFYhENjFL8MEIDP9V7-yLWOMHB4Ifn1nb2wiSqdGfeTo-QrA2DvDZTmN07-3qvBkIQo5JLjyG-FJw+lToyQRU2KXjDIDpMjOFi1F-aNEVkYsBw4hhSTSGpLuxRDw-QeTrHIoRPRCmEB6VJlTLb2kCkQi0w1mGTW+fQaCN6QESkbzOkmUMF1jhX3a9LKI1NuGsXXL2eKo5d2xgjH6EkKXiwNiEVpa2ZTKr0LpHrGrQ1oq3KB8EsHxKcxAiCmbGZkYLrJMKvSMzmYlXWeTaNdQE1WIzVc7RqS6D1oXSMqieCN0qq+sAs8NqoEo6MieEZfuivTcw2mr-HdkLwUWyzCCO6dIgpiIcJmM7t0QvPB-dWQDgCIhLgsFc9UPAa4aDKIb7G7aswMhzPR1UueOSY-T4kSsYp-gttQnzVkIAA */
     predictableActionArguments: true,
     id: 'project-machine',
     initial: 'Page is mounted',
@@ -60,7 +61,7 @@ export const projectMachine = createMachine(
       'Page is mounted': {
         on: {
           'Resolve authentication': {
-            target: 'Fetch initial data',
+            target: 'Checking if user is authenticated',
             actions: 'setInitialContext',
           },
         },
@@ -69,24 +70,24 @@ export const projectMachine = createMachine(
       'Page is ready': {
         always: [
           {
-            target: 'Checking if user is authenticated',
+            target: 'Entering new project name',
             cond: 'isProjectNew',
           },
-          'Loading existing project',
+          'Ready for retrain run',
         ],
+
+        entry: 'disableGlobalLoading',
       },
 
       'Checking if user is authenticated': {
         always: [
           {
-            target: 'Entering new project name',
+            target: 'Fetch initial data',
             cond: 'isAuthenticated',
           },
           'Redirect to home page',
         ],
       },
-
-      'Loading existing project': {},
 
       'Entering new project name': {
         on: {
@@ -116,7 +117,7 @@ export const projectMachine = createMachine(
         on: {
           'Map is created': {
             target: 'Page is ready',
-            actions: ['setMapRef'],
+            actions: ['initializeMap'],
           },
         },
       },
@@ -295,17 +296,12 @@ export const projectMachine = createMachine(
           project: { id: projectId },
           isAuthenticated,
           apiClient,
+          globalLoading: {
+            disabled: false,
+          },
         };
       }),
-      setInitialData: assign((context, event) => {
-        const { mosaicsList, imagerySourcesList, modelsList } = event.data;
-        return {
-          imagerySourcesList,
-          mosaicsList,
-          modelsList,
-        };
-      }),
-
+      setInitialData: assign((context, event) => ({ ...event.data })),
       setProjectName: assign((context, event) => {
         const { projectName } = event.data;
         return {
@@ -347,10 +343,33 @@ export const projectMachine = createMachine(
       setCurrentAoi: assign((context, event) => ({
         currentAoi: event.data.aoi,
       })),
-      setMapRef: assign((context, event) => {
+      initializeMap: assign((context, event) => {
         const { mapRef } = event.data;
+
+        const { currentAoi } = context;
+        let aoiGeojson;
+        let aoiShape;
+
+        // Add currentAoi to map, if it exists
+        if (currentAoi && currentAoi.bounds) {
+          const aoiGeojson = {
+            type: 'Feature',
+            properties: {},
+            geometry: currentAoi.bounds,
+          };
+          const aoiShape = L.geoJSON(aoiGeojson).addTo(mapRef);
+          mapRef.fitBounds(aoiShape.getBounds(), {
+            padding: BOUNDS_PADDING,
+          });
+        }
+
         return {
           mapRef,
+          currentAoi: currentAoi && {
+            ...currentAoi,
+            shape: aoiShape,
+            geojson: aoiGeojson,
+          },
         };
       }),
       setProject: assign((context, event) => ({
@@ -516,23 +535,92 @@ export const projectMachine = createMachine(
           label: 'Retrain Model',
         },
       })),
+      disableGlobalLoading: assign(() => ({
+        globalLoading: {
+          disabled: true,
+        },
+      })),
     },
     services: {
       fetchInitialData: async (context) => {
-        const { apiClient } = context;
+        const {
+          apiClient,
+          project: { id: projectId },
+        } = context;
 
+        // Initialize project and aois
+        let project;
+        let aoisList;
+        let timeframesList;
+        let checkpointList;
+        let currentAoi;
+        let currentTimeframe;
+        let currentImagerySource;
+        let currentMosaic;
+        let currentModel;
+
+        // Fetch lists
         const { mosaics: mosaicsList } = await apiClient.get('mosaic');
         const { imagery_sources: imagerySourcesList } = await apiClient.get(
           'imagery'
         );
         const { models: modelsList } = await apiClient.get('model');
 
+        // If project is not new, fetch project data
+        if (projectId !== 'new') {
+          project = await apiClient.get(`project/${projectId}`);
+
+          currentModel = modelsList.find(
+            (model) => model.id === project.model_id
+          );
+
+          // Fetch project aois
+          aoisList = (await apiClient.get(`project/${projectId}/aoi`)).aois;
+
+          // If there are aois, fetch the first one's timeframes
+          if (aoisList.length > 0) {
+            currentAoi = aoisList[0];
+
+            timeframesList = (
+              await apiClient.get(
+                `project/${projectId}/aoi/${currentAoi.id}/timeframe`
+              )
+            ).timeframes;
+
+            if (timeframesList.length > 0) {
+              currentTimeframe = timeframesList[0];
+              currentMosaic = mosaicsList.find(
+                (mosaic) => mosaic.id === currentTimeframe.mosaic
+              );
+              currentImagerySource = imagerySourcesList.find(
+                (imagerySource) =>
+                  imagerySource.id === currentMosaic.imagery_source_id
+              );
+            }
+          }
+
+          // Get project's checkpoints
+          checkpointList = (
+            await apiClient.get(`project/${projectId}/checkpoint`)
+          ).checkpoints;
+        }
+
         return {
           mosaicsList,
           imagerySourcesList,
           modelsList,
+          project: project || { id: 'new' },
+          aoisList,
+          checkpointList,
+          timeframesList,
+          currentAoi,
+          currentTimeframe,
+          currentImagerySource,
+          currentMosaic,
+          currentModel,
         };
       },
+
       geocodeAoi: async (context) => {
         const centroid = turfCentroid(context.currentAoi.geojson);
         const [lng, lat] = centroid.geometry.coordinates;

@@ -110,6 +110,7 @@ export function addProjectEndpoints() {
             id: 1,
             name: 'Seneca Rocks',
             bookmarked: true,
+            area: 10489000,
             bounds: {
               type: 'Polygon',
               coordinates: [
@@ -149,6 +150,7 @@ export function addProjectEndpoints() {
             id: 2,
             name: 'Seneca Rocks #1',
             bookmarked: true,
+            area: 10489000,
             bounds: {
               type: 'Polygon',
               coordinates: [
