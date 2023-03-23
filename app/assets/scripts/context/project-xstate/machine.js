@@ -41,6 +41,10 @@ export const projectMachine = createMachine(
         placeholderLabel: 'Loading...',
         disabled: true,
       },
+      primeButton: {
+        label: 'Ready for prediction run',
+        disabled: true,
+      },
       mosaicsList: [],
       imagerySourcesList: [],
       modelsList: [],
@@ -195,6 +199,14 @@ export const projectMachine = createMachine(
 
       'Prediction ready': {
         entry: 'enablePredictionRun',
+
+        on: {
+          'Prime button pressed': 'Running prediction',
+        },
+      },
+
+      'Running prediction': {
+        entry: 'enterPredictionRun',
       },
     },
   },
@@ -303,6 +315,17 @@ export const projectMachine = createMachine(
       })),
       enablePredictionRun: assign(() => ({
         sessionStatusMessage: 'Ready for prediction run',
+        primeButton: {
+          disabled: false,
+          label: 'Run Prediction',
+        },
+      })),
+      enterPredictionRun: assign(() => ({
+        sessionStatusMessage: 'Running prediction',
+        primeButton: {
+          disabled: false,
+          label: 'Run Prediction',
+        },
       })),
       resetMapEventHandlers: assign(() => {
         return {
