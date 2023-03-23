@@ -29,7 +29,7 @@ export function ModelSelector() {
 
   const { disabled } = modelSelector;
 
-  const label = currentModel?.name || modelSelector.message;
+  const label = currentModel?.name || modelSelector.placeholderLabel;
 
   return (
     <>

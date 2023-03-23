@@ -8,7 +8,7 @@ import { aoiActionButtonModes } from '../../components/project/prime-panel/tabs/
 
 export const projectMachine = createMachine(
   {
-    /** @xstate-layout N4IgpgJg5mDOIC5QAcBOB7AVmAxgFwFoBbAQxwAsBLAOzADoAFEmAAkthaPQFdq9IAxACU46ADYA3MCxLc85MH0o4SeSumoBtAAwBdRCnSxKajQZAAPRACYAjADY6AdicAOAKz33r6+6cBmAE5AgBoQAE9EW1cnOntbABY-VyD-Dy8AXwywtCxcQlIKGnomVnYWVDASCHCBHX0kEGQjE3VqcysEW38ndzprBOttfyTh4PcwyK7A6zptbWt4+etAkYTbJyycjGx8YjIqWkZmaXLK6trNWwbDY1N2xs7u3v7B4dGgwImIm3dtOgSMyGX387kC2nc7gSWyaO3y+yKRwAwgocABrGhQNgAMxY3FgYFQbA4snkijUKn4EDqenMzTubQ6UVcgLm0W0CX8CwhgQ2k2ZfW8TnsSTB9kC9l61hhuV2BQOxToKNwGOoWMouPxhOJMjkCiUlMEVxuTRa9yZXRZgTZrg5XKGYL5PwQi3+-lsQ3sIrs9l8DhlcL2hUO9AAonxCZiWLQAO4sWX5aMkIhgAQAZTAeHjgaz1GTYHqdLNjMeNhW-gB-iGrhi1hWtkS-K69n+UOBPm0Xu0tm0rgDeSDCqOABEwNjimxqK0SGIWABBADyAEkBEixMo0ZAWBBUCQ47H58uWAAjOR4DSFxr01pmUsupwLOgNh-uWzBLkt+xNlb-L0JCFBOKGyeO4-ZygiIZKucahqpwJDIAIACy8E6jg0GQJetw3g8oBPAsCRPjEaRvv43oxE2Dj-J2CSSg4CSchsPRgfCwaKgA6iQrSwdi6BEjuzAsLxLAqNQOBgGISEoVwWoQOgMZaLSV7FreuGIFWth9D4bhpAkTi6b43xTD+cQigBEq8r0mTZLCA7yoi9DDruMZRouS4nuE267lAUCYpJyCcDwBJcFImGmgyKmWGpr6zJCKySpy1h6dYTauLYAJOLy4qgk4zx9tZCaDvZdCOXuLlHseHn8d5vnIf50kEtwyChde5p3j0-50Cy1G+m4WkUWC-Sxd2oqeG+oH5TmEGKiVzmwa57mecwPlqqu67oluIlibO838XGp54OeCkmi1JaqQg6maYlKQsnpTgGRRulPlWto+J+frjdstlTUcABiNDsOQwnQWVK6yUcNASOgm50AVdmQX9U6wIDaFVDBWKuQgEPoJSbT1M1yk4ZFCDrLaAKuJlHrljMFEts4YK9vYaS8py-j+MxhXw5mFCTtOs4QKoJACGD9BY9DsPffQP1c4D-1qDO24C5j1CQzjF56Pj4WE50kpuoEKQrH4gQ5WCFF6Z1vRWt6pEStCE1faxv3Szzct8wLAiEhgqAw2Iqg8agRAw5NDuS07suUPL-N4CQSsq6ouPq4pWGtWdOt0EE+tfBlxuhM6PSuHMkJti2RvaL07Nw4q4YkMeYjSEupAwKgHlpjwqBiSwGa1-gvECPXJxNx3rft+UBJd1SGvYRaNGuI49gz3riW9u4dj9daBlvqXniLG+eWfeBwd0FXNfSIhRicTgHfifkPen7A586qP+QYYnYWT3er7ipWnIgd4N2r4Ny8exQn-H4SEWRrLUHQBAOAdIg5DjAEWTWFoCBfmdCg8uEtjhlA4NJCMEBEFvzOoMb8PY6Dgh7D0HKvhWaDAwQfUopwODnBqAQ5ORNKYEQhDlFs3YWTdGSs6N8s9vCDH-IlGir46HwKVKiVU6pNQEiJOUUk+oKSqEgKw067DC5xByjlBIM8BheAouCV4Iw55-DESKD6Nl97SIADLoGqFGMAFh2Bo2zLZTREUng6NovowxEjvwGOcKzbQgRdLtV4ZsO2diirhn4KgKMB5YZJhTN4rWNgOR9CGCsah9EPB6xpm6JIul-wuDrJQqRRURAQEoJUfALBzwsHIOgFM8YTgZItEMJI-QFgzHcGsQprhvxeE6t2OwPRBmlwidUyCo5xy0GduHbay4ul3gGBlOgkJojjFunpYpadSl6VLndawVTYksWkUiYGsFSDIHWWdWscQBjgkSkbGYRsTHCJZAMBYekvC2DmexTiHi-aLSxEJTa4lHlExWC8dO5y85GICE2d0FYvgQn4TEDwixgUjiciDBaVVlpQFhZ0UEnZKxGyCM8CE3gKI+G2esLsLhBhpBnviyW-0kZA1RiDclakjZ9HdHrM5HhYr+H-hCDwLgqzxBZF6Llh88zHxYH3Ruzch7SE7tfVAgribtTIRE6w11dLBBGYIgaMq-ABG3oqtmlyOaKilngbmYcI4CwNfRRwDYkgOF9GCL5giYgAg2HrLk+luSBGVUfWuLBb7311d3fVSkkF3kBL0kuqUA2DDnoymKLLaLgnFN4ZVB5YBR34CwWwBrBlel0akDkJcNIFuZQGnKJavh5SyEAA */
+    /** @xstate-layout N4IgpgJg5mDOIC5QAcBOB7AVmAxgFwFoBbAQxwAsBLAOzADoAFEmAAkthaPQFdq9IAxACU46ADYA3MCxLc85MH0o4SeSumoBtAAwBdRCnSxKajQZAAPRACYAjADY6AdicAOe9etO72gJwBWABoQAE8bawBmOgjbCIjfSKcEj38AX1TgtCxcQlIKGnomVnYWVDASCBCBHX0kEGQjE3VqcysEWKd-OmsAFk9-Vwj-LxTgsIRre186bQd-eZ7fJwdXefTMjGx8YjIqWkZmaRKyiqrNW1rDY1MWuraOrt7+weGnUdCbW206YftBt38EW0ESc2lc63qmxyO3y+wAwgocABrGhQNgAMxY3FgYFQbA4snkijUKn4EGqenMDWuzVaiFsrkWMwZfR6X18ATGNk6dB6MX8YNsA2sg3sEKyW1yuwKdARuBR1DRlEx2Nx+JkcgUSlJgnOl3qjRudPajOms0ZvXZnI+E2031BoN8wNcbzt-h64qh2zye3oAFE+LjUSxaAB3FgSnIhkhEMACADKYDwEa9yeoMbANSphtpd3CviifN6vg8rgSBYiXImAuiq0GcTerlsTg9GUh2W90v2ABEwOiCmxqE0SGIWABBADyAEkBHCxMokZAWBBUCRw2Hx9OWAAjOR4DRZurUppmPMTUHWOi2ZueWbaaxLexOKuTRwPgW+RauRmzNJtyOdrC9BwicaiKpwJDIAIACykHqjgoGQIeVwnrcoD3PePRXi69jaH0qzaP4vgvr03Q9O4PRsqsApOBE1ieh2UpAXQADqJBNOB6LoHiK7MCw3EsCo1A4GAYgwXBXCqhA6ChlolJHjmp7oYgdFCnQrgitev62AEcQvvYb4BH4X4-kKDGSjCvp0N2q6hsGk5TjuITLquUBQKi4nIJwPA4lwUjIQaNJKZYKn+LYl7zDEZZOkkdhBDaOm2MyToOBEriEfYYV-hsjGWTKNlrvZW7bs5vFuR5sFeZJOLcMgAXHkaZ4gj03yMteczfuF2jPjakyuM4Rmfr434tWZ-6pnlPa2UVjklS5zDuYqs7zsiS5CSJo4OfN4a7ng+5yfqDW5spCCqV0GlNl8Qo6YClYJZ4zj2GlLYRE9vhfJ45nQj6MoAGI0Ow5CCaBM0CNJ+w0BI6CLnQAFMVZ-1DrAQMIeUYFog5CCQ+gpLNDU9WKWhIUIFR3zkcN2j2A4QrvS+oLdMNSxNuRQJ9F9gFWQGJDbmI0hTqQMCoM58Y8KgIksImvP4NxAj84cQsS6L4slDiUtkgTQVE20PR-I4fwabr-LNvF4x9QNH4maN2XthZP37L9SYUIOw6jhAqgkGDGj0NjMNw5N9AO3gTsA2oI7Lu7WPUFDuMHnoGuocaT7fPEpojCCeE9ab8QzERLp4T+ButjlttdgHjtAyHlBh27eAe7iGCoLDYiqFxqBELDE122XQcV0OoeuxH2Mxwd8eNSdSfRMNixp6CPSZ4gTa8kkzZU54sS9GK425V3dBczz0jQUY7E4BLok5DLh+wMf6qqzkSHyShY-E2FUy8kMjJPg2rj6f1SQW8NplrZ+x3nvXmLBD4QFEqfNWF90CQNHCrM++B76HUJsafwHhCzDX8N4PCfh7A-3NnhfokQ-B-jbNQOBcAqSd1LtmTWxoCAEJtAQLoHIOR0W6qsP4ERFjs3hjKIoRwOCSUDBAehCczx9BfDrH47C6IaXeu4Jw-D-YHGKBwE4lQJFP3uJ4LChEWztSIisaw+lWp9FeC4NkeEHCqJ3nKZEwZlRYhxHiEohItQklUJAHRx1iZCnmHQJ81g-CU0mKE+Y+knDdBwb0OIGDGTcPsaXOgAAZdAFRgxgAsOwdGKZGJ+OCvceYXQQlhI8B4QiJsbBgkem4QYdoXC2CLCk5iAZ+CoGDBuOG0ZYxFK1rUnojxgSqXcAWQYZjeo1gZMkd6Bl5hPTaVZEQEBKBlHwCwfcLByDoFjBGQ4AzjShOGd0UZdhxlpTolWRKwT2FgibC2Neyz8p9gHJXMODkjlnl6EkH4wxQmfhwU2ewPQXwzLLJMeZmUMERBefCEG4FSDIG+SdF0l4UixCFBlSi39eq4XUpYrw1ivhsk3sXb6qS2IcTRK3eaaIBLrVEqi4mD4eQpwWH8FpuFmGmzLD8EFQw+STJwfC+gBU7LgS2nNMqi0oAsraEMSmb8ORPTBFMfOL4EgzGZjgjwAQ54qK3iXZiiNAbAzRjNBVKklhdE4Qky0BknyENzkMB8UxXq9CAbQ9p6Z94sDloLYWStpCS3Pqga1JNmp0A5MMaK5E+TEXxf1V1wwSwFg8MMsVdBA7Bz7lXAetdI2UUcNeYZ8yYgtT8CRKI14-iaQ1bMNmxrKW+u5mAy+18w3SwjQpBhUigUxu8C02idpK1asvIKYZbx3yGuzaAg+VDRzdv3L2x+-i2iAgMsEzoUwWoggwWC5NcjGS8ICPMgs2aGBlDWfgZopRyjaL7ZIk6AxYg-CejgoYzZBgTp1S09wfwnRM03ukIAA */
     predictableActionArguments: true,
     id: 'project-machine',
     initial: 'Page is mounted',
@@ -38,7 +38,7 @@ export const projectMachine = createMachine(
         disabled: true,
       },
       modelSelector: {
-        message: 'Loading...',
+        placeholderLabel: 'Loading...',
         disabled: true,
       },
       mosaicsList: [],
@@ -176,13 +176,26 @@ export const projectMachine = createMachine(
       'Enable Mosaic Selector': {
         on: {
           'Mosaic is selected': {
-            target: 'new state 1',
+            target: 'Enable Model Selector',
             actions: 'setCurrentMosaic',
           },
         },
       },
 
-      'new state 1': {},
+      'Enable Model Selector': {
+        entry: 'enableModelSelector',
+
+        on: {
+          'Model is selected': {
+            target: 'Prediction ready',
+            actions: 'setCurrentModel',
+          },
+        },
+      },
+
+      'Prediction ready': {
+        entry: 'enablePredictionRun',
+      },
     },
   },
   {
@@ -245,12 +258,11 @@ export const projectMachine = createMachine(
         const { mosaic } = event.data;
         return {
           currentMosaic: mosaic,
-          modelSelector: {
-            disabled: false,
-            message: 'Select a model',
-          },
         };
       }),
+      setCurrentModel: assign((context, event) => ({
+        currentModel: event.data.model,
+      })),
       setMapRef: assign((context, event) => {
         const { mapRef } = event.data;
         return {
@@ -270,7 +282,7 @@ export const projectMachine = createMachine(
           },
           modelSelector: {
             disabled: true,
-            message: 'Define AOI first',
+            placeholderLabel: 'Define AOI first',
           },
         };
       }),
@@ -279,10 +291,19 @@ export const projectMachine = createMachine(
           sessionStatusMessage: 'Select Mosaic & Model',
           imagerySourceSelector: {
             disabled: false,
-            message: 'Select Imagery Source ',
+            message: 'Select Imagery Source',
           },
         };
       }),
+      enableModelSelector: assign(() => ({
+        modelSelector: {
+          disabled: false,
+          placeholderLabel: 'Select Model',
+        },
+      })),
+      enablePredictionRun: assign(() => ({
+        sessionStatusMessage: 'Ready for prediction run',
+      })),
       resetMapEventHandlers: assign(() => {
         return {
           mapEventHandlers: {
