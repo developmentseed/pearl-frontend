@@ -194,7 +194,6 @@ export const projectMachine = createMachine(
       setInitialContext: assign((context, event) => {
         const { projectId, isAuthenticated, apiClient } = event.data;
         return {
-          ...context,
           project: { id: projectId },
           isAuthenticated,
           apiClient,
@@ -203,7 +202,6 @@ export const projectMachine = createMachine(
       setInitialData: assign((context, event) => {
         const { mosaicsList, imagerySourcesList, modelsList } = event.data;
         return {
-          ...context,
           imagerySourcesList,
           mosaicsList,
           modelsList,
@@ -211,14 +209,12 @@ export const projectMachine = createMachine(
       }),
       toggleGlobalLoading: assign((context) => {
         return {
-          ...context,
           displayGlobalLoading: !context.displayGlobalLoading,
         };
       }),
       setProjectName: assign((context, event) => {
         const { projectName } = event.data;
         return {
-          ...context,
           project: {
             ...context.project,
             name: projectName,
@@ -229,7 +225,6 @@ export const projectMachine = createMachine(
         const { aoiName } = event.data;
         const { currentAoi } = context;
         return {
-          ...context,
           currentAoi: {
             ...currentAoi,
             name: aoiName,
@@ -239,7 +234,6 @@ export const projectMachine = createMachine(
       setCurrentImagerySource: assign((context, event) => {
         const { imagerySource } = event.data;
         return {
-          ...context,
           currentImagerySource: imagerySource,
           mosaicSelector: {
             disabled: false,
@@ -250,7 +244,6 @@ export const projectMachine = createMachine(
       setCurrentMosaic: assign((context, event) => {
         const { mosaic } = event.data;
         return {
-          ...context,
           currentMosaic: mosaic,
           modelSelector: {
             disabled: false,
@@ -261,13 +254,11 @@ export const projectMachine = createMachine(
       setMapRef: assign((context, event) => {
         const { mapRef } = event.data;
         return {
-          ...context,
           mapRef,
         };
       }),
-      initializeNewProject: assign((context) => {
+      initializeNewProject: assign(() => {
         return {
-          ...context,
           sessionStatusMessage: 'Set Project Name',
           imagerySourceSelector: {
             disabled: true,
@@ -283,9 +274,8 @@ export const projectMachine = createMachine(
           },
         };
       }),
-      enableImagerySourceSelector: assign((context) => {
+      enableImagerySourceSelector: assign(() => {
         return {
-          ...context,
           sessionStatusMessage: 'Select Mosaic & Model',
           imagerySourceSelector: {
             disabled: false,
@@ -293,17 +283,15 @@ export const projectMachine = createMachine(
           },
         };
       }),
-      resetMapEventHandlers: assign((context) => {
+      resetMapEventHandlers: assign(() => {
         return {
-          ...context,
           mapEventHandlers: {
             dragging: true,
           },
         };
       }),
-      setupNewRectangleAoiDraw: assign((context) => {
+      setupNewRectangleAoiDraw: assign(() => {
         return {
-          ...context,
           mapEventHandlers: {
             dragging: false,
             mousedown: true,
@@ -314,7 +302,6 @@ export const projectMachine = createMachine(
       }),
       startNewRectangleAoiDraw: assign((context, event) => {
         return {
-          ...context,
           aoiStatusMessage: 'New AOI',
           mapEventHandlers: {
             dragging: false,
@@ -345,7 +332,6 @@ export const projectMachine = createMachine(
         // Calculate area
         const aoiGeojson = turfBboxPolygon(bounds.flat());
         return {
-          ...context,
           currentAoi: {
             area: turfArea(aoiGeojson),
             geojson: aoiGeojson,
@@ -367,7 +353,6 @@ export const projectMachine = createMachine(
         const aoiGeojson = turfBboxPolygon(context.rectangleAoi.bounds.flat());
 
         return {
-          ...context,
           currentAoi: {
             area: turfArea(aoiGeojson),
             geojson: aoiGeojson,
@@ -380,9 +365,8 @@ export const projectMachine = createMachine(
           },
         };
       }),
-      initializeAoiList: assign((context) => {
+      initializeAoiList: assign(() => {
         return {
-          ...context,
           sessionStatusMessage: 'Set AOI',
           aoiStatusMessage: 'Draw area on map or upload an AOI geometry',
         };
