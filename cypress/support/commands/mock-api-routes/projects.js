@@ -225,7 +225,7 @@ export function addProjectEndpoints() {
    */
   cy.intercept(
     {
-      url: restApiEndpoint + '/api/project/1/instance/?status=active&type=cpu',
+      url: restApiEndpoint + '/api/project/1/instance/?status=active*',
     },
     {
       total: 1,

@@ -11,7 +11,11 @@ import { PageBody } from '../../styles/page';
 import theme from '../../styles/theme';
 import Composer from '../../utils/compose-components';
 import App from '../common/app';
-import { hideGlobalLoading, showGlobalLoading } from '../common/global-loading';
+import {
+  hideGlobalLoading,
+  showGlobalLoading,
+  showGlobalLoadingMessage,
+} from '../common/global-loading';
 import PageHeader from '../common/page-header';
 import SizeAwareElement from '../common/size-aware-element';
 import ProjectPageHeader from './header';
@@ -28,8 +32,7 @@ export const ProjectPage = () => {
 };
 
 const selectors = {
-  displayGlobalLoading: (state) =>
-    get(state, 'context.displayGlobalLoading', false),
+  globalLoading: (state) => state.context.globalLoading,
 };
 
 const ProjectPageInner = () => {
@@ -40,8 +43,8 @@ const ProjectPageInner = () => {
   const resizeListener = ({ width }) => {
     setIsMediumDown(width < theme.dark.mediaRanges.large[0]);
   };
-  const displayGlobalLoading = ProjectMachineContext.useSelector(
-    selectors.displayGlobalLoading
+  const globalLoading = ProjectMachineContext.useSelector(
+    selectors.globalLoading
   );
 
   // After authentication is resolved, send machine event
@@ -55,12 +58,14 @@ const ProjectPageInner = () => {
   }, [isLoading, isAuthenticated, projectId]);
 
   useEffect(() => {
-    if (displayGlobalLoading) {
-      showGlobalLoading();
-    } else {
+    if (globalLoading.disabled) {
       hideGlobalLoading();
+    } else if (globalLoading.message) {
+      showGlobalLoadingMessage(globalLoading.message);
+    } else {
+      showGlobalLoading();
     }
-  }, [displayGlobalLoading]);
+  }, [globalLoading]);
 
   return (
     <>

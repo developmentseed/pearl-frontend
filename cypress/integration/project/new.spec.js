@@ -145,7 +145,7 @@ describe('Create new project', () => {
     // cy.get('.list-container').children().should('have.length', 2);
 
     // Finally select a model
-    cy.get('[data-cy=select-model-2-card]').should('exist').click();
+    cy.get('[data-cy=select-model-1-card]').should('exist').click();
 
     // Check session status message
     cy.get('[data-cy=session-status]').should(
@@ -172,7 +172,7 @@ describe('Create new project', () => {
     );
 
     // Run
-    cy.get('[data-cy=run-button]').click();
+    cy.get('[data-cy=prime-button]').should('be.enabled').click();
 
     // Check session status message
     cy.get('[data-cy=session-status]').should(
@@ -222,7 +222,7 @@ describe('Create new project', () => {
     );
 
     // Run
-    cy.get('[data-cy=run-button]').should('exist').click();
+    cy.get('[data-cy=prime-button]').should('exist').click();
 
     // Check session status message
     cy.get('[data-cy=session-status]').should(

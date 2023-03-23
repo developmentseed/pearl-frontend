@@ -5,16 +5,22 @@ import turfBboxPolygon from '@turf/bbox-polygon';
 import turfCentroid from '@turf/centroid';
 import turfArea from '@turf/area';
 import { aoiActionButtonModes } from '../../components/project/prime-panel/tabs/predict/aoi-selector/action-buttons';
+import config from '../../config';
+import get from 'lodash.get';
+import { delay } from '../../utils/utils';
+import toasts from '../../components/common/toasts';
 
 export const projectMachine = createMachine(
   {
-    /** @xstate-layout N4IgpgJg5mDOIC5QAcBOB7AVmAxgFwFoBbAQxwAsBLAOzADoAFEmAAkthaPQFdq9IAxACU46ADYA3MCxLc85MH0o4SeSumoBtAAwBdRCnSxKajQZAAPRACYAjADY6AdicAOe9etO72gJwBWABoQAE8bawBmOgjbCIjfSKcEj38AX1TgtCxcQlIKGnomVnYWVDASCBCBHX0kEGQjE3VqcysEWKd-OmsAFk9-Vwj-LxTgsIRre186bQd-eZ7fJwdXefTMjGx8YjIqWkZmaRKyiqrNW1rDY1MWuraOrt7+weGnUdCbW206YftBt38EW0ESc2lc63qmxyO3y+wAwgocABrGhQNgAMxY3FgYFQbA4snkijUKn4EGqenMDWuzVaiFsrkWMwZfR6X18ATGNk6dB6MX8YNsA2sg3sEKyW1yuwKdARuBR1DRlEx2Nx+JkcgUSlJgnOl3qjRudPajOms0ZvXZnI+E2031BoN8wNcbzt-h64qh2zye3oAFE+LjUSxaAB3FgSnIhkhEMACADKYDwEa9yeoMbANSphtpd3CviifN6vg8rgSBYiXImAuiq0GcTerlsTg9GUh2W90v2ABEwOiCmxqE0SGIWABBADyAEkBHCxMokZAWBBUCRw2Hx9OWAAjOR4DRZurUppmPMTUHWOi2ZueWbaaxLexOKuTRwPgW+RauRmzNJtyOdrC9BwicaiKpwJDIAIACykHqjgoGQIeVwnrcoD3PePRXi69jaH0qzaP4vgvr03Q9O4PRsqsApOBE1ieh2UpAXQADqJBNOB6LoHiK7MCw3EsCo1A4GAYgwXBXCqhA6ChlolJHjmp7oYgdFCnQrgitev62AEcQvvYb4BH4X4-kKDGSjCvp0N2q6hsGk5TjuITLquUBQKi4nIJwPA4lwUjIQaNJKZYKn+LYl7zDEZZOkkdhBDaOm2MyToOBEriEfYYV-hsjGWTKNlrvZW7bs5vFuR5sFeZJOLcMgAXHkaZ4gj03yMteczfuF2jPjakyuM4Rmfr434tWZ-6pnlPa2UVjklS5zDuYqs7zsiS5CSJo4OfN4a7ng+5yfqDW5spCCqV0GlNl8Qo6YClYJZ4zj2GlLYRE9vhfJ45nQj6MoAGI0Ow5CCaBM0CNJ+w0BI6CLnQAFMVZ-1DrAQMIeUYFog5CCQ+gpLNDU9WKWhIUIFR3zkcN2j2A4QrvS+oLdMNSxNuRQJ9F9gFWQGJDbmI0hTqQMCoM58Y8KgIksImvP4NxAj84cQsS6L4slDiUtkgTQVE20PR-I4fwabr-LNvF4x9QNH4maN2XthZP37L9SYUIOw6jhAqgkGDGj0NjMNw5N9AO3gTsA2oI7Lu7WPUFDuMHnoGuocaT7fPEpojCCeE9ab8QzERLp4T+ButjlttdgHjtAyHlBh27eAe7iGCoLDYiqFxqBELDE122XQcV0OoeuxH2Mxwd8eNSdSfRMNixp6CPSZ4gTa8kkzZU54sS9GK425V3dBczz0jQUY7E4BLok5DLh+wMf6qqzkSHyShY-E2FUy8kMjJPg2rj6f1SQW8NplrZ+x3nvXmLBD4QFEqfNWF90CQNHCrM++B76HUJsafwHhCzDX8N4PCfh7A-3NnhfokQ-B-jbNQOBcAqSd1LtmTWxoCAEJtAQLoHIOR0W6qsP4ERFjs3hjKIoRwOCSUDBAehCczx9BfDrH47C6IaXeu4Jw-D-YHGKBwE4lQJFP3uJ4LChEWztSIisaw+lWp9FeC4NkeEHCqJ3nKZEwZlRYhxHiEohItQklUJAHRx1iZCnmHQJ81g-CU0mKE+Y+knDdBwb0OIGDGTcPsaXOgAAZdAFRgxgAsOwdGKZGJ+OCvceYXQQlhI8B4QiJsbBgkem4QYdoXC2CLCk5iAZ+CoGDBuOG0ZYxFK1rUnojxgSqXcAWQYZjeo1gZMkd6Bl5hPTaVZEQEBKBlHwCwfcLByDoFjBGQ4AzjShOGd0UZdhxlpTolWRKwT2FgibC2Neyz8p9gHJXMODkjlnl6EkH4wxQmfhwU2ewPQXwzLLJMeZmUMERBefCEG4FSDIG+SdF0l4UixCFBlSi39eq4XUpYrw1ivhsk3sXb6qS2IcTRK3eaaIBLrVEqi4mD4eQpwWH8FpuFmGmzLD8EFQw+STJwfC+gBU7LgS2nNMqi0oAsraEMSmb8ORPTBFMfOL4EgzGZjgjwAQ54qK3iXZiiNAbAzRjNBVKklhdE4Qky0BknyENzkMB8UxXq9CAbQ9p6Z94sDloLYWStpCS3Pqga1JNmp0A5MMaK5E+TEXxf1V1wwSwFg8MMsVdBA7Bz7lXAetdI2UUcNeYZ8yYgtT8CRKI14-iaQ1bMNmxrKW+u5mAy+18w3SwjQpBhUigUxu8C02idpK1asvIKYZbx3yGuzaAg+VDRzdv3L2x+-i2iAgMsEzoUwWoggwWC5NcjGS8ICPMgs2aGBlDWfgZopRyjaL7ZIk6AxYg-CejgoYzZBgTp1S09wfwnRM03ukIAA */
+    /** @xstate-layout N4IgpgJg5mDOIC5QAcBOB7AVmAxgFwFoBbAQxwAsBLAOzADoAFEmAAkthaPQFdq9IAxACU46ADYA3MCxLc85MH0o4SeSumoBtAAwBdRCnSxKajQZAAPRACYAjADY6AdicAOAMxvt9z7dvWAFgAaEABPG2sAVjoATn8nGMjrJ20HANsnAF9MkLQsXEJSChp6JlZ2FlQwEghQgR19JBBkIxN1anMrBFt3AOiogICYz1T3P0iQ8IRk2zp7W0i4uMX7a20PbNyMbHxiMipaRmZpCqqaus1bRsNjUw6mrp6+ugGhkZ7xyZseun8fF1sHhigQ2OWa2wKe2KhwAwgocABrGhQNgAMxY3FgYFQbA4snkijUKn4EHqenMLVu7U6iEBthidG07m87k8S20kVcX2mbkZzNckXcawC9hi9kiAU24PyuyKB3ocNwSOoKMo6Mx2NxMjkCiUxMEl2uzVadxp3Vc9L5LLZ9I5XLCNiZdGZ9gCKW8MQ8kXFUryO0K+xKdAAonxsciWLQAO4sP0FSMkIhgAQAZTAeFjEPwCaTDQpJupDxszKczsCTns4otiW5UWssQF1lcLmB1hiTkFvqzAeh9AAImBUSU2NQ2iQxCwAIIAeQAkgIYWJlAjICwIKgSDHo1O5ywAEZyPAaPNNSltMxF6ZCgJzSJ3jJ+VmRJzc9yJZwfb3pebueyuLsyj28p0DCZxqCqnAkMgAgALJQVqOBgZAJ43Oe9ygI82iBL8rj2E41h4akyQCrWATaL8d7pPSCzMrYgwAf6ULAQA6iQbQQai6A4uuzAsFxLAqNQOBgGIsHwVwGoQOgUZaOSp4FheGG0tWVo+DaMR2ty9jaAyLh2OKlaLHe9gMZCcpBn2G5RhGM6zvuoRrhuUBQMiYnIJwPBYlwUgocaVKKZYjr4c42kxEM2hYdo+HcoKDKBIM2h9K6dieqZsqBoclmbjZu57g5PHOa5cHuRJWLcMgvlnqal7WCWZZuoZ1YTA6CCrO4dABO4gqEa4YVke4aVARZVk5XZeWOcwLkqguS6IqugnCROtkTTGB54EeslGlVhZKVeUX1RWVb0s1UxJKWnhNjMuFhb+g1MUGABiNDsOQAlgaNAhSYcNASOgK50HG6W9nQT2jrAr2IdU4EorZCA-egxLtA0lUKehgXTLh9ZrB2iVjIE8xadhwzAp1gp+MMWRgoDQ2HKGJB7mI0izqQMCoA5KY8KgwksGmjP4FxAjM8cbM85z3MVFifMkij-lo10rJ-h1HK-rViz6YT7Wk7+KS9QlA1U9292HA96YUCOY4ThAqgkJ9Gj0PD-3U0b9Am3gZvPWo45rtbcPUL9iPHnoMtoWahHOu2FZq4KmOkbM4rDGMYqsgKfR3eZxum69HuUF7Vt4Db2IYKgANiKonGoEQAOG+nLuZ+bnuWz78MB5twfVbtYdvi48dRO4Mcta4N5RQKYp-neXWD2nGX0HTDPSDBRhsTgPMiQUAsL7AS9apLBTIXJqHt+jfeRLMCzJIMEfHxrHVddr6x9UyU-A7PjMsAvEAiSvUvr+gH8ThLq98B7y2qjM0nUOQvDPtYNswxeonUQG1G+3UdYP31lsQCztGBVAgMoO4lRqi1AEAwVAlAkz7kPBoTMcAsQQDbjtdGnUxgNm0k4D4YomwxSwnQSIHoIq1SineGIT9gKhn4DiNAkBcHtEqLwMkIDZZmibKsF4Ajcb+BFLYbkthvDODsF1DIrIwoVklAbDBNcQxhnEdgqRlDUCyMNPmBRNVMYqJxp1dRBMWqBAZBfaBTJnxuD-P+UxjFzGiM1BInB+BpF2OoPUaw8iQ7OOUdjHh7j8aaJap4Us2i-BkW9ByeKlN0GhOniBd6EFbK22+n7P69AnbmNAlDUavt-aqCRkHfefkkm7WPqfM6F8XBXy8dougHgHBMjsICLqiRhFBhEAAR24HAaGI5YD5yEsmL69tamO2rmUxZyz1kRhoOskgmzWkI3aYHXQdCApdHAf0KBMC+41iyRA5ITIwqDx+akOZhxDkrJOdQM5myBCFy4iXMuXFK4NIOWAJZQKIKnI2cJS5LdkZdO2vcxAjzIFJGgTEWBbyphdXrPheY9ILRvjopEf59A0x4HKms1FWy7Z0AdvU-ZwNGXMpRectFzdrmtyxaAy8AQLQ3i6pyC+ZMSWIGZP0FIb4JWqtcH8kJZkDm8FHBBSJNi4l3LlogJIqRYhRXbBpRK6QYi1lcPWN0OkooBCbJMsK9LynNL1d2apOzfp7LMWUpp7TvWAXRcKzFiTD7y1-K4JW3VVbAgcNyDwvwEh-iSq6PCt0pTUF-nACk3L5SOJ6ejAg9huTlsZBFGttaa2ug9WUE4HAJJhggCW6NuLrCkQZPSYYHIegnzdHRRtxwtRnFqB2+hjx6RD1FCkFInUoj2imARTWNq7BeCbPRTVQNgKKkRCc9UWIcQVHxLqIkqhIBTpxd0JI0QM3QOfBKXCQxayijGd6BI7ZtJRQSGg6UpTgYABl0A1AjGACw7BVnUxvcau9UQ5iDyfR2CVrpbUjNmNrZIiRmwSlYSZXdNMZ6WIjNuamOYwBwcURyBkOlnzaPVUCPCtYkjOFcLhbNDgJQ9EIyUrVwMRA4KqNmI8LByDoDIcgY41Gaq0cZIkVh6x1hvhYy1WdLwiUskStpZsrIPUDiHLQeuOclpzlk7tAi+1hiGScCKXoUVOHRAtLVaBqtnXWA9cG1ZpBkAWfRs2esqx0iDx8N4CK7h33rvpJu9V26TH8b3UGVi7EUTlwmiifiC0RL+ceM+dqv6OMZDcx2F8LVguxArJ6OIPgNIJcAwJ4CWVrKVNyvlJyU0oC5cdJWOYDUCP+F6CuhBZFnTeAFPhCUHJOxEcwaDF6b0vUw3M-JJxlmKuejs96fwdhkhlamIg2qzYmQRScLfOls2wnUHpq-IWrN2Zi2kLzNeqBusIEVY4VhBEiXel6Eka+R3lWnfOx6127tRwN29vnN7gxHB5IWBKnSZ2-C1kQwRuwSRcI1uKQ1pLtNrtzzfovZQX8XtvZVqWP8SabpjHSFpEUuiMhxBgR8D1L9575onM9-mr3VuloeYlONb5ap43wyKAHfcgdRRB5dspxDJHRNsQQqYB9p24u278CKro8NGIwwds1zY3QBNgSfWwbPLFUKiXg2Jb2rP1hs+KOzPgyL7YVQzsYCsoqpHVSfLzFTluznJ-8BTWF8N2c6i4WsOlfhjG0WMBInIU4esBcc5FILWUw7tGMvCnI6RtgR6+X87HmRMl40kUeHreXuX5ZsmHz7Yi1ZdVFcs8CMbkRcEyDjC6J4cmTzqiM+rFdo2xfBnhoz7X4XLArWqr5EovEFH0E+iR2xMgA3C4G3mB-dnJ3H346isLobvMkFNsw3Q1Zlc+EmOP1-AREOcFg6Wqh4A3DQGRw+xW7R4+1VhbhXMeFSXau3sql3tLpyL3tkJkEAA */
     predictableActionArguments: true,
     id: 'project-machine',
     initial: 'Page is mounted',
 
     context: {
-      displayGlobalLoading: true,
+      globalLoading: {
+        disabled: true,
+      },
       mapEventHandlers: {
         dragging: true,
         mousedown: false,
@@ -110,7 +116,7 @@ export const projectMachine = createMachine(
         on: {
           'Map is created': {
             target: 'Page is ready',
-            actions: ['setMapRef', 'toggleGlobalLoading'],
+            actions: ['setMapRef'],
           },
         },
       },
@@ -201,18 +207,85 @@ export const projectMachine = createMachine(
         entry: 'enablePredictionRun',
 
         on: {
-          'Prime button pressed': 'Running prediction',
+          'Prime button pressed': 'Enter prediction run',
+        },
+      },
+
+      'Enter prediction run': {
+        entry: 'enterPredictionRun',
+        always: [
+          {
+            target: 'Creating project',
+            cond: 'isProjectNew',
+          },
+          {
+            target: 'Creating AOI',
+            cond: 'isAoiNew',
+          },
+          'Requesting instance',
+        ],
+      },
+
+      'Creating AOI': {
+        invoke: {
+          src: 'createAoi',
+          onDone: {
+            target: 'Requesting instance',
+            actions: 'setCurrentAoi',
+          },
+        },
+      },
+
+      'Requesting instance': {
+        invoke: {
+          src: 'requestInstance',
+          onDone: {
+            target: 'Setup instance',
+          },
+          onError: {
+            target: 'Prediction ready',
+            actions: 'handleInstanceCreationError',
+          },
+        },
+      },
+
+      'Setup instance': {
+        invoke: {
+          src: 'setupInstance',
+          onDone: {
+            target: 'Running prediction',
+          },
         },
       },
 
       'Running prediction': {
-        entry: 'enterPredictionRun',
+        always: [
+          {
+            target: 'Ready for retrain run',
+            actions: 'handlePredictionFinish',
+          },
+        ],
+      },
+
+      'Creating project': {
+        invoke: {
+          src: 'createProject',
+          onDone: {
+            target: 'Creating AOI',
+            actions: 'setProject',
+          },
+        },
+      },
+
+      'Ready for retrain run': {
+        entry: 'enterRetrainIsReady',
       },
     },
   },
   {
     guards: {
       isProjectNew: (c) => c.project.id === 'new',
+      isAoiNew: (c) => !c.currentAoi.id,
       isAuthenticated: (c) => c.isAuthenticated,
     },
     actions: {
@@ -232,11 +305,7 @@ export const projectMachine = createMachine(
           modelsList,
         };
       }),
-      toggleGlobalLoading: assign((context) => {
-        return {
-          displayGlobalLoading: !context.displayGlobalLoading,
-        };
-      }),
+
       setProjectName: assign((context, event) => {
         const { projectName } = event.data;
         return {
@@ -275,12 +344,18 @@ export const projectMachine = createMachine(
       setCurrentModel: assign((context, event) => ({
         currentModel: event.data.model,
       })),
+      setCurrentAoi: assign((context, event) => ({
+        currentAoi: event.data.aoi,
+      })),
       setMapRef: assign((context, event) => {
         const { mapRef } = event.data;
         return {
           mapRef,
         };
       }),
+      setProject: assign((context, event) => ({
+        project: event.data.project,
+      })),
       initializeNewProject: assign(() => {
         return {
           sessionStatusMessage: 'Set Project Name',
@@ -322,6 +397,10 @@ export const projectMachine = createMachine(
       })),
       enterPredictionRun: assign(() => ({
         sessionStatusMessage: 'Running prediction',
+        globalLoading: {
+          disabled: false,
+          message: 'Running prediction',
+        },
         primeButton: {
           disabled: false,
           label: 'Run Prediction',
@@ -415,6 +494,28 @@ export const projectMachine = createMachine(
           aoiStatusMessage: 'Draw area on map or upload an AOI geometry',
         };
       }),
+      handleInstanceCreationError: assign(() => {
+        toasts.error(
+          'Could not start instance at the moment, please try again later.'
+        );
+        return {
+          globalLoading: {
+            disabled: true,
+          },
+        };
+      }),
+      handlePredictionFinish: assign(() => ({
+        globalLoading: {
+          disabled: true,
+        },
+      })),
+      enterRetrainIsReady: assign(() => ({
+        sessionStatusMessage: 'Ready for retrain run',
+        primeButton: {
+          disabled: false,
+          label: 'Retrain Model',
+        },
+      })),
     },
     services: {
       fetchInitialData: async (context) => {
@@ -437,6 +538,97 @@ export const projectMachine = createMachine(
         const [lng, lat] = centroid.geometry.coordinates;
         const aoiName = await reverseGeocodeLatLng(lng, lat);
         return { aoiName };
+      },
+      createProject: async (context) => {
+        const {
+          apiClient,
+          project: { name: projectName },
+          currentModel,
+        } = context;
+
+        const project = await apiClient.post('project', {
+          name: projectName,
+          model_id: currentModel.id,
+        });
+
+        // Update page URL. For the context of this page, it is ok not to use
+        // react-router as we are not keeping track of the project ID in the
+        // URL at this point.
+        window.history.replaceState(
+          null,
+          projectName,
+          `/project/${project.id}`
+        );
+
+        return { project };
+      },
+      createAoi: async (context) => {
+        const { apiClient } = context;
+        const { name, geojson } = context.currentAoi;
+        const { id: projectId } = context.project;
+
+        const aoi = await apiClient.post(`/project/${projectId}/aoi`, {
+          name: name,
+          bounds: geojson,
+        });
+
+        return { aoi };
+      },
+      requestInstance: async (context) => {
+        const { apiClient } = context;
+        const { id: projectId } = context.project;
+
+        let instance;
+
+        // Fetch active instances for this project
+        const activeInstances = await apiClient.get(
+          `/project/${projectId}/instance/?status=active`
+        );
+
+        // Reuse existing instance if available
+        if (activeInstances.total > 0) {
+          const { id: instanceId } = activeInstances.instances[0];
+          instance = await apiClient.get(
+            `/project/${projectId}/instance/${instanceId}`
+          );
+        } else {
+          instance = await apiClient.post(`/project/${projectId}/instance`);
+        }
+
+        // Confirm instance has running status
+        let instanceStatus;
+        let creationDuration = 0;
+        while (
+          !instanceStatus ||
+          creationDuration < config.instanceCreationTimeout
+        ) {
+          // Get instance status
+          instanceStatus = await apiClient.get(
+            `project/${projectId}/instance/${instance.id}`
+          );
+          const instancePhase = get(instanceStatus, 'status.phase');
+
+          // Process status
+          if (instancePhase === 'Running') {
+            break;
+          } else if (instancePhase === 'Failed') {
+            throw new Error('Instance creation failed');
+          }
+
+          // Update timer
+          await delay(config.instanceCreationCheckInterval);
+          creationDuration += config.instanceCreationCheckInterval;
+
+          // Check timeout
+          if (creationDuration >= config.instanceCreationTimeout) {
+            throw new Error('Instance creation timeout');
+          }
+        }
+
+        return { instance };
+      },
+      setupInstance: async () => {
+        return {};
       },
     },
   }
