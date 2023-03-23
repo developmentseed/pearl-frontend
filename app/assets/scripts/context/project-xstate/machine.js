@@ -37,6 +37,13 @@ export const projectMachine = createMachine(
         message: 'Loading...',
         disabled: true,
       },
+      modelSelector: {
+        message: 'Loading...',
+        disabled: true,
+      },
+      mosaicsList: [],
+      imagerySourcesList: [],
+      modelsList: [],
     },
 
     states: {
@@ -194,11 +201,12 @@ export const projectMachine = createMachine(
         };
       }),
       setInitialData: assign((context, event) => {
-        const { mosaicsList, imagerySourcesList } = event.data;
+        const { mosaicsList, imagerySourcesList, modelsList } = event.data;
         return {
           ...context,
           imagerySourcesList,
           mosaicsList,
+          modelsList,
         };
       }),
       toggleGlobalLoading: assign((context) => {
@@ -244,6 +252,10 @@ export const projectMachine = createMachine(
         return {
           ...context,
           currentMosaic: mosaic,
+          modelSelector: {
+            disabled: false,
+            message: 'Select a model',
+          },
         };
       }),
       setMapRef: assign((context, event) => {
@@ -262,6 +274,10 @@ export const projectMachine = createMachine(
             message: 'Define AOI first',
           },
           mosaicSelector: {
+            disabled: true,
+            message: 'Define AOI first',
+          },
+          modelSelector: {
             disabled: true,
             message: 'Define AOI first',
           },
@@ -380,10 +396,12 @@ export const projectMachine = createMachine(
         const { imagery_sources: imagerySourcesList } = await apiClient.get(
           'imagery'
         );
+        const { models: modelsList } = await apiClient.get('model');
 
         return {
           mosaicsList,
           imagerySourcesList,
+          modelsList,
         };
       },
       geocodeAoi: async (context) => {

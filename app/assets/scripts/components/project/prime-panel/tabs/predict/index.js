@@ -7,6 +7,7 @@ import { PanelBlockHeader as BasePanelBlockHeader } from '../../../../common/pan
 import { AoiSelector } from './aoi-selector';
 import { ImagerySourceSelector } from './imagery-source-selector';
 import { MosaicSelector } from './mosaic-selector';
+import { ModelSelector } from './model-selector';
 
 export const ToolsWrapper = styled.div`
   display: grid;
@@ -44,6 +45,7 @@ function Header() {
       <AoiSelector />
       <ImagerySourceSelector />
       <MosaicSelector />
+      <ModelSelector />
     </PanelBlockHeader>
   );
 }
