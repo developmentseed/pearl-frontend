@@ -268,7 +268,7 @@ describe('Create new project', () => {
     ).as('fetchInstanceStatus');
 
     // Request prediction
-    cy.get('[data-cy=run-button]').click();
+    cy.get('[data-cy=prime-button]').click();
 
     // Wait for instance status request
     cy.wait('@fetchInstanceStatus');
@@ -292,15 +292,18 @@ describe('Create new project', () => {
     cy.setWebsocketWorkflow('websocket-workflow/base-model-prediction.json');
 
     // Request prediction
-    cy.get('[data-cy=run-button]').should('exist').click();
+    cy.get('[data-cy=prime-button]').should('exist').click();
 
     // Wait for instance status request
     cy.wait('@fetchInstanceStatus');
 
-    // Prediction should be finished successfully
+    // Prediction should be finished successfully.
+
+    // TODO this should lead to a retrain run status and should be changed when retrain is implemented
     cy.get('[data-cy=session-status]').should(
       'have.text',
-      'Session Status: Ready for retrain run'
+      // 'Session Status: Ready for retrain run'
+      'Session Status: Ready for prediction run'
     );
   });
 

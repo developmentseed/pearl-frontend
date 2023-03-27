@@ -1,4 +1,4 @@
-import { createMachine, assign, raise } from 'xstate';
+import { createMachine, assign, send } from 'xstate';
 import L from 'leaflet';
 import { reverseGeocodeLatLng } from '../../utils/reverse-geocode';
 import turfBboxPolygon from '@turf/bbox-polygon';
@@ -11,10 +11,11 @@ import { delay } from '../../utils/utils';
 import toasts from '../../components/common/toasts';
 import { BOUNDS_PADDING } from '../../components/common/map/constants';
 import { WebsocketClient } from './websocket-client';
+import logger from '../../utils/logger';
 
 export const projectMachine = createMachine(
   {
-    /** @xstate-layout N4IgpgJg5mDOIC5QAcBOB7AVmAxgFwFoBbAQxwAsBLAOzADoAFEmAAkthaPQFdq9IAxACU46ADYA3MCxLc85MH0o4SeSumoBtAAwBdRCnSxKajQZAAPRACYA7NbrbrANm0BWe9YCcbgIzbfABoQAE8bWwAOOl9bLwjfPwAWD0TfX0SAXwzgtCxcQlIKGnomVnYWVDASCBCBHX0kEGQjE3VqcysEa21nAGY6ZPjk22c453TgsIRe3qjfazcPeecIu0SvLJyMbHxiMipaRmZpcsrq2s1fBsNjU3bGzu6+gbchj1GI8cTJm16HZw+7l6iQiiUStmSmya23yeyKhwAwgocABrGhQNgAMxY3FgYFQbA4snkijUKn4EDqenMzVubQ6iFiiTotm08T+wK8Xm831CiF62i8dGciW0fxGvnGvVsbky2WheV2hQO9CRuDR1AxlGxuPxhJkcgUSnJgku1yaLTuDIQTJZbN8HPW3K8vKmDuZvS5TK8vgi2lsvoiUNyOwK+2KdAAonx8eiWLQAO4sEP5eMkIhgAQAZTAeGTMPwaYz9RplvpDxsiw9o0W7jcgtBP2mDscsS5bMiiWskrcwYLYfh9AAImBMcU2NRWiQxCwAIIAeQAkgIEWJlCjICwIKgSEnE3OlywAEZyPAaEuNWmtMwVrpLO1OTteAG+pvJNx0P2RCEg149PuKgOKp0AiZxqJqnAkMgAgALJQfqOBgZAF43Ne9ygJ0krAnQcRYd0-j2JKTbeFEETSn8XjAvalFylsgFwsBADqJCtBBmLoAS27MCwHEsCo1A4GAYiwfBXC6hA6AJlo1KXmWN4YTYPT9IM6TvGMEx8ggAJCp8KxkQE-jOG4vQAaGDERkOO4JnGC6LseIRbjuUBQOiInIJwPB4lwUgoRadLyZYvy+jhMyzIkzgyl4ARNm4XJ0DMPoOjM74+qZsLKhZVk2YeR4OVxzmuXB7liXi3DIL5V5WreCyyvFNb1rWcSuogKz9MZ2jaOFZGsv4GzyimSrhoclm7tldm5Y5zAuZqK5rqim78YJM62ZNSYnngZ7SealXlgpd61b09V1g2zUIK8tgDBFbijA6PidUG-X9uZhwAGI0Ow5B8WBY0CBJhw0BI6AbnQA1ARGb2TrAn2IVU4EYrZCAA+g5JtPUFVyehgXNoKdALNYnofNY4UJE2KwfmKnq2L0tbWLpaWDYOUbUCQR5iNIi6kDAqAOVmPCoIJLA5mz+AcQIHPHNzgt8wL5R4sLFLo-5mOdIdCQvGKnV2L60puKTZF0O1nWtT1gr02Dr25hQE5TjOECqCQv0aPQSPA6Dz30C9lufe9ajTlu9uI9QgMo+eeiK2h1rzGrMQrH0Na+D4zhNgK2jxakCyuLKgp+Gb7t0J7eBWz7lB+3beAO-iGCoCDYiqOxqBECDT0ZRbhfe5Ovu2wHSMh1t4dVXtUcfjHnyHT4CfXcRbgOBEESyrPVGzAGzi5y39DRizbMsDBRgsTggtCfkos77Ae-6nL+TITJqED1jopxNEXi2AG0+dh4uuaa1Bsp110oBKbj16JryZpvaQO8IBCQPvLY+6AIEzlloffAV9toY2tO+BwLgAhP3rAsHoes2o-2Nv-PqdEzLAIYJUCAyg7gVCqDUAQFDKAZmPKeDQ+Y4B4ggP3Xad8PBCjFP4FwPp7peBis4f4AQjKz2SAnVYq8hrrxjASNAkBqFtAqLwKkKClbWl6L1XG08CZxCJuMD+boASfklP6RIMxYhOEovIxm0Z+DKMoWothqBNFmlLDo28eicZ4yMasYmZj+Q41lJ6bssdKLuEccBZxeoVFUPwOozx1A6jWG0RHPx+jAnPmMSEt80pH6vDBIKX0xlDpxIjKBWGP0-rOyDkDegbtgG1NUGNQOwcOmh10NwgKnR75zCfi-OwoJ37EVZDhFwwIYgBgFAGaphwRAAEduBwDhhOWA5cBKZgaXQF2LTm4KLoKs9Z2y4w0G2SQXZXTkY9L7tfPy2S9roNxq4BOMonD1iTppAUQoRjjABCMCIcQ2S0QVGQk5ZyNmXOoNc3ZAhK4cRrnXDijdWnQrAGs2FEErk7MEnc3uaMnk7QGYgN5mDPk4J+W+eYn5uhz26npWYvZAFQsZkIXgk4IJJPcekkQglKBSAgHxZEKJmg0DwP05WFKIgjANrFamrUFgJybJKIUei+jpE+LFcKtgln0C5dQHlGI+UpI0AILgcCBAsw4nmSoQqRUyutH4AUl0ZhAtnn0UJ0xZ4sipq8OIfhZ6GtOdyuM5q7hWtgUJAQ1y8C4loU65BPiXl31iP0KKIK7AymBL6-wBibFsmMtYbwEIEhhuNaa9hyTo3WrjWoDMmIdwZgEDgdARBkBs34MmsAwrU2yV8XtN1qdwqeslN66mxF5WfnCunPRoIXAjCrRG3lbiLXpPxTcwSAgXFEBoKoaQeI+AutvKOj1qs9I+uTrMeKgpnzjG7FTWIYb2mbNBo7f6TTXbHMZu+yN-YiUPJJVk2+KtTHqwFF2AM3UC02Nxj+RY4jwT3yyPKagsb4CXj-SqNN4HEAEF+VMAgz9ca4NmPKpwZbnxhtKCcDgYkYwQHwzwzoT9cbgm7ETWIAYITJwCJdcRHgZS0xFBCzFjN6P6jODUVj5KEC+k6p+EU1MfREzBHo4iD8RT+l9LggEZa33isuTqPEBJyjEiNGSI9LGh3ps6PWXwdUKnfKiuyATznwrCeftPT4YIw0JNQHGfcoMixgHk7KroAo2r4yJvjZ8Ccn7J3pQvYE4xPlRSqey9KWKqGOrzGeFg5BO3SGQMcSLkdUgXVFMCMtoLvCUQiMRMEwpuj+NlDEYEcicsM2AiOMctBradwPIuSr1U57MlwosbsMT+OaWuh+bNYpRgimXivXr5tVTfQgqQZA43B5gguolAUrhxGrGin8st0R8Z+mupKVIscw3MVYhieuk0MS8UWkJA7WNfTBScKCD44w569D1uTPjLgqNP0+GGka1kIIrQmvlaaUBfuPD0TPbobIehMusE2VkY6AixX8H8Ho08w0Qw+l9OpiOlzo5sPKhwYp8bSlnjKeYzXP761CjYlIZNZiBeZqzdmnN8Q82ltIIWR9UAM+mDFlk7xOpdkWI2bn-RefUwhALh6pDcuMwLkXDuJcu7lzl+2T8MSkp+BQ8RxnHpcJL0wQ+oXoDt672UFAmXcul7MipqkF0sHuynVZM4SxRl8ZpEwaCV3Iv3dwK9yLWX9mCMIC7D4AY0ohEdT+H4fB8Vkpa66sZXXkL9fAQoaozdtDzhy5BAGd56ei-+jt1pcYOEawghmD0fJQuXG1v5RozGZKou03WDheIM2E4LNOqKMPop4hPB8DMa6EncM1J2-DenKe2P8mkdEam+NXCEU6sRUY5GRP2JdFW7F5zNnbt2XXgUS35h-ifnYcRydnyfmfhW+6sRYdNs84cxE13IH9BI698c-lYocJVccFVZbsDUgDgFq1AMq9b4R80F5VnMXAm8UgW9b0ohYgPgYgZFYhK1kCTkAN11AIfdqZU4Eh-cF9x5bB1VUgDYqZuROo0gE5-Qb9zgWB3tKg8AdwaAh85d8YxQDY4suwCYktWDNJugasP8khn1D86MN0aFyhBsPpIA5dZQLEFgZQ1t6wwQZ0ohQpIkYdkgXAND0D1FLMjx7U9Cd8FMDCw8jDV8vkzC-lVhHAo4fQUhQQ+D0MgA */
+    /** @xstate-layout N4IgpgJg5mDOIC5QAcBOB7AVmAxgFwFoBbAQxwAsBLAOzADoAFEmAAkthaPQFdq9IAxACU46ADYA3MCxLc85MH0o4SeSumoBtAAwBdRCnSxKajQZAAPRACYA7NbrbrAVgCcrgBwBGAMzPbnl4ANCAAnoi2PgAsdB72tpEAbNrafs7OAL4ZIWhYuISkFDT0TKzsLKhgJBChAjr6SCDIRibq1OZWCNbaiT50Uf5RvVEp1onOiSHhCM7esX5RUa6LySPWWTkY2PjEZFS0jMzS5ZXVtZpeDYbGpu2Nnd29-YPDo+OTYYhRtol0PgH2bT+FxJRIbJpbfK7IoHADCChwAGsaFA2AAzFjcWBgVBsDiyeSKNQqfgQOp6czNG5tDoRZZ0WzaALeDyJVxeWxLKaIRLWPrJZwjDw+PyuHxi8G5bYFPbFOjw3DI6ioygYrE4vEyOQKJQkwQXK5NFq3WkIAIxRnMrys9mc1zcs2JX4inx2AXRMZg7IQvI7Qr7egAUT4OJRLFoAHcWFL8uGSEQwAIAMpgPDRyH4OMJ+qU400+42dIxHyJOIeOxRayuMYO9K-WweTwN1KN7y2SUZmUw+gAETAaOKbGorRIYhYAEEAPIASQEsLEykRkBYEFQJCjkYnM5YACM5HgNDnGlTWmYC11-F46GzXBNPQMfrYHT4mdeetZvIsPE4Eh3fV2A3lU41GVTgSGQAQAFlwM1HBgMgI9rlPO5QE6LxhjoTxtA8OJeldVxelrSs6EFexnGsa1-B8a0-2laFAIAdRIVpQLRdBcVXZgWHYlgVGoHAwDEKCYK4dUIHQCMtApY88zPVCbB6PoHyGaI3gmB10JiJlnFSMZVJSH5aKhf05R7NcIzDKdp13UIVzXKAoBRYTkE4HhsS4KREKNak5MsGxqI8TDXQmH5KwbB0xRI74KImas+R8VkjL9WUDjM9dLO3HdbM4hynOglzROxbhkC8k8TXPFxBT+UsGwrKsa0+BA5kSWwQt8BJImo9ZvRjZLuzoNKLNAqybLs5hHOVOcFyRZc+IEscRs4qM9zwA8pMNMr83ki8qpLMs6urD5pg5WwGQS7phU5YVyPbHrO3ouUADEaHYcheOAjLZ3Eg4aAkdAlzoXqAKel7YDeuCqhA1ErIQX70BJNp6lK2SUL8hBqO0Vw6BcdDBSic6cIdYU6A5W8cMZbpnHFHwkuBg5gxIHcxGkadSBgVBbKTHhUAElgU2Z-B2IEVmjg5vnud58psQF0lkZ81HOhLLxnH6JZBQo6wPx6I7EGa1qWvahIRS8brNn-B6Dke1MKCHEcxwgVQSAEb76DhgGgYt+grbwG2XrUUcV0d2HqD+hHDz0OXkNNE3lZJn40i8Aiq18IitOcLxlYIlqAh6WnPbob3feHf37cdgQcQwVBAbEVQ2NQIhAfukzLett6-coAOHbwEhg9D1REYj6SkPK7aY5VjlenSRPeXZHwHV6U6vCBDwohwsU+UyO7zeboNqEZ5mWEgoxmJwPnBPyIWj9gE-NWl-IEKH7yo-PKJE76ajX++ctvESKIiavFqbV-hGy6nnHedAGZM2kEfCAgkz4y0vugWBY4pbn3wA-DaKNTRDDmLFNIbgV6T3-tefWthDadRNmAlKJRKgQGULcCoVQagCAYKgSgCZdz7g0OmOA2IICRxHmjb42E-gjBOhnVkGcNJxDOuWbC-xV5+DsFQ-qwZ+C4jQJAehbQKi8HJJg+WpoMZYxxuMRYBMPDPhFAyGOvRljVm0PjTeZs6LgLURqTRdD8A6NQHog0uZDHnmMdjdOZj8bf0sY1b4vxFijGiL-b8ToogqMAu4jRtDtHcN8dQOo1gDHP22sE0xeMLHz0cY4dkyxAHskcSkuUsIPrDRnM7DQrsQ7-XoB7cBDTIafV7vDfu4ddACK2kIt+fwvCf1qj-P+UT-ixE1iMG6Tjvh1IOCIAAjtwOAUMhywG7vxRMLs6Bu06U3ahdBNnbP2WGGg+ySCHP6WHdaIzfKdErLHMUvh-jVkTv4ZwEUfh-HTo4xO1YcKrzWfQK5OzbnUHuYc8uqBK7V1ruxBuXSLkwpuaBO5ByBJPMGS8x+m03lfFLFePB6QCEqQBY1fwgUgQ-irOyFeFEoWXN4MOUCnjMk5OOacugEYwA7lgPDJceBXkKy+OMj+kzpmaQ0j0LGSy2QryXg2asHKhBcrDLy7xGgkUouQDXPAdcG7CtFeK1MUrsEjCxonAYicfi3hNhpa02gSIER6AkWY2gaJb1cVi3VPKMkGpyVwZBAh7l4CxIwgSlApD8JJVgoJrhMbY1cICdkfJIhMndT0BZPxJktQiabH0Qb+o6uoNy1E+rbjCFwGARNs0ESImaDQSVKbAmFPZPWBKiRlbAMTtYJVS8GTjAzoyHSfJkmBuMsGmteqw0NpEAmpNLA1AJjRGubM3aClo3FN0Em-wmWpDIT8CKkyGROEHcsTWHry2YqrSGutK62iNvXcuetOjchQEqLAWAtqgk4WdIAyZ2EyFpH-oFX+-qKLmhNrybVr6eFeIbeOHc7E0zZOA72-wsRFKJ1ZI48YdLpj2AcP4YtPxHETErChpdoatHhpYe+7hEYSD4iw6gWW+7BHvNlZM+V39FWNRNukEiysl4YwSDJjlPT+6hv-C0n67T3bnP6op3ZQNCW3CRvx0ZitB0q0WLeD5mtEk63RuOjkjiCKcmiDpTe3pqBILgJSTTAYAkHs6AQazBAVbuGCyF0LNN519UAqUY4HBRIhggD5gTiAs3Y2+HWBKcUGxPkaq1QKmdNbVnjosZxFaF39Wi5qU4NREtGcQB6mIrJT3sgmKkQi9LiJ+EUu8F8Lg50uLK4BBUSJblqmxLicoBIdTElUJAGrZKZj+uqpRSdQIdKzIo7MEmbgCtumiAMDlaSwybiBlmMAc3pVdBfH0ciOM3ANmSHPelEwvWuneFmpwEoIt02hVoyomYDwsHIOgDhyAjjnejq-U6awPD+AFHaUdOWCPBUbG4fG-qM4cr7AOWgtsS5bmnODiqK8YhYXiKKOK1mXxQ8xk6GpyRWrRAU401EpBkCE9HosU6NTYpOl6BndbiAJgq2FP8SZlZXQflcBypiLFUR1zGqiHic1BLs7Rtaa0jg7D2EoumvkkTpjBQmRncUr9vmckx+ZT6o0coTSgKrh4XVYhv1fsT6TGl6TJCzeRUsYpRQcuesOMG71elNIJzJHtaMPy8kcNREKbpV7691leb46asvdBfKvW6-XItykgQfEW7NOYS2kPzC+qB7eIBFKkBkExhS88ovmxqcwU9MjiOnxxcR-et1xx3Uu3cK8IHcJ6xsYxolxBFAEWsnhqqukferVIB295QMPsfZQ8Cy8D-FBmgI3Rl7lkFMEcT5Sk7oUSR-SIWfSs5-pkvg+MC4Gl8FuX8PvmviVgtEMTnA6HvEJb2n1IHel+z6UW7G1AjCZwA+Sw3wzwX8TISw6E2Wx0ikfwNo1o34-q3g4W2e32ECIY6SLGDC2SA+H44omE34ZObgFOtY5E2MvgqQAwQIOcUuX2+c2mn0m+6aDqkQOkikMObgDo+MvwMcOEFEbIswBE2qYAWysKuK8K+KZ2L+SWCAiwVYZBIwAQJuPwCO0wsOoiWaSw5MTIQBXmcoKYsaLkeKDyAkkB2hPINBjInWbIv8CUswjGtaaGfKm+cQFoLo5Y96SwIoGk3Qp0jY6OfIikDGLB3SzO6Y-4m+nWW2ToPQKkSw9ojUL4gUQw7gLqjqJukhZwLA8ulQeAa4NAuiqMpKF24R12ms6cd2JGj20wTqJ6DOt6lMQwxh28FyrCBBOi5Q2Or0s2ihtWMwWkQIGciyaqlm-8vwCS3g1K1glYC+WQGQQAA */
     predictableActionArguments: true,
     id: 'project-machine',
     initial: 'Page is mounted',
@@ -260,22 +261,18 @@ export const projectMachine = createMachine(
 
       'Running prediction': {
         on: {
-          'model#abort received': 'Prediction is aborted',
-
           'model#status received': {
             target: 'Running prediction',
             internal: true,
             actions: 'setCurrentInstanceStatus',
           },
 
-          'model#timeframe#complete received': 'Prediction is finished',
-
-          'instance#terminate sent': 'Prediction is aborted',
           'Received checkpoint': {
             target: 'Running prediction',
             internal: true,
             actions: 'setCurrentCheckpoint',
           },
+
           'Received timeframe': {
             target: 'Running prediction',
             internal: true,
@@ -287,11 +284,28 @@ export const projectMachine = createMachine(
             internal: true,
             actions: 'updateCurrentPrediction',
           },
+
+          'Abort run': {
+            target: 'Running prediction',
+            internal: true,
+            actions: send({ type: 'Abort run' }, { to: 'websocket' }),
+          },
+          'Prediction run was aborted': {
+            target: 'Prediction ready',
+            actions: 'clearCurrentPrediction',
+          },
+          'Prediction run was completed': {
+            target: 'Prediction ready',
+            actions: 'disableGlobalLoading',
+          },
         },
 
         invoke: {
+          id: 'websocket',
           src: 'runPrediction',
         },
+
+        entry: 'displayAbortButton',
       },
 
       'Creating project': {
@@ -309,7 +323,6 @@ export const projectMachine = createMachine(
       },
 
       'Prediction is finished': {},
-      'Prediction is aborted': {},
     },
   },
   {
@@ -413,6 +426,12 @@ export const projectMachine = createMachine(
           },
         };
       }),
+      clearCurrentPrediction: assign(() => ({
+        currentPrediction: null,
+        globalLoading: {
+          disabled: true,
+        },
+      })),
       initializeMap: assign((context, event) => {
         const { mapRef } = event.data;
 
@@ -605,6 +624,12 @@ export const projectMachine = createMachine(
           disabled: true,
         },
       })),
+      displayAbortButton: assign((context) => ({
+        globalLoading: {
+          ...context.globalLoading,
+          abortButton: true,
+        },
+      })),
     },
     services: {
       fetchInitialData: async (context) => {
@@ -780,9 +805,22 @@ export const projectMachine = createMachine(
 
         return { instance };
       },
-      runPrediction: (context) => (callback) => {
+      runPrediction: (context) => (callback, onReceive) => {
         const { token } = context.currentInstance;
         const websocket = new WebsocketClient(token);
+
+        onReceive((event) => {
+          if (event.type === 'Abort run') {
+            websocket.sendMessage({
+              action: 'instance#terminate',
+            });
+            // Ideally we should thrown an error here to make the service
+            // execute the 'onError' event, but XState doesn't support errors
+            // thrown inside onReceive. A fix is planned for XState v5, more
+            // here: https://github.com/statelyai/xstate/issues/3279
+            callback({ type: 'Prediction run was aborted' });
+          }
+        });
 
         websocket.addEventListener('message', (e) => {
           const { message, data } = JSON.parse(e.data);
@@ -828,8 +866,15 @@ export const projectMachine = createMachine(
                 data,
               });
               break;
+            case 'model#prediction#complete':
+              callback({
+                type: 'Prediction run was completed',
+                data,
+              });
+              break;
 
             default:
+              logger('Unhandled websocket message', message, data);
               break;
           }
         });

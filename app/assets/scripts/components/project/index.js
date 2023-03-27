@@ -1,4 +1,3 @@
-import get from 'lodash.get';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 import { useAuth } from '../../context/auth';
@@ -11,6 +10,7 @@ import { PageBody } from '../../styles/page';
 import theme from '../../styles/theme';
 import Composer from '../../utils/compose-components';
 import App from '../common/app';
+import { Button } from '@devseed-ui/button';
 import {
   hideGlobalLoading,
   showGlobalLoading,
@@ -61,7 +61,22 @@ const ProjectPageInner = () => {
     if (globalLoading.disabled) {
       hideGlobalLoading();
     } else if (globalLoading.message) {
-      showGlobalLoadingMessage(globalLoading.message);
+      // Display a message, and the abort button if it's available
+      showGlobalLoadingMessage(
+        <>
+          {globalLoading.message}
+          {globalLoading.abortButton && (
+            <Button
+              data-cy='abort-run-button'
+              style={{ display: 'block', margin: '1rem auto 0' }}
+              variation='danger-raised-dark'
+              onClick={() => projectActor.send({ type: 'Abort run' })}
+            >
+              Abort Run
+            </Button>
+          )}
+        </>
+      );
     } else {
       showGlobalLoading();
     }
