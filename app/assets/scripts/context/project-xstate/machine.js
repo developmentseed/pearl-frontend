@@ -1,4 +1,4 @@
-import { createMachine, assign } from 'xstate';
+import { createMachine, assign, raise } from 'xstate';
 import L from 'leaflet';
 import { reverseGeocodeLatLng } from '../../utils/reverse-geocode';
 import turfBboxPolygon from '@turf/bbox-polygon';
@@ -10,10 +10,11 @@ import get from 'lodash.get';
 import { delay } from '../../utils/utils';
 import toasts from '../../components/common/toasts';
 import { BOUNDS_PADDING } from '../../components/common/map/constants';
+import { WebsocketClient } from './websocket-client';
 
 export const projectMachine = createMachine(
   {
-    /** @xstate-layout N4IgpgJg5mDOIC5QAcBOB7AVmAxgFwFoBbAQxwAsBLAOzADoAFEmAAkthaPQFdq9IAxACU46ADYA3MCxLc85MH0o4SeSumoBtAAwBdRCnSxKajQZAAPRACYAjADY6AdgCcADmva3AFnvfvAMxubvYANCAAnoj2AKy2dG621m5OwQEuQW4AvlnhaFi4hKQUNPRMrOwsqGAkEBECOvpIIMhGJurU5lYInl50Ad5Oft4e3tZxYZGIbjExdC4uTkveXrba2i7eOXkY2PjEZFS0jMzSldW19Zq2TYbGpp3N3b1u-YPDo+MO4VEICy50GIjeweWwBGLjey2bYtXaFA4lY4AYQUOAA1jQoGwAGYsbiwMCoNgcWTyRRqFT8CANPTmVr3DpdRBOdKA2wZNxeVLaWJOH7TWzeOjspyDXp+cZbXKwgr7YpHego3AY6hYyi4-GE4kyOQKJSUwTXW4tNoPJkIFkAuIcrmc3n8hD2JzaOjeGKxd3BaxO3ww-J7IqHUp0ACifEJmJYtAA7ix-YUoyQiGABABlMB4ONw-CJ5ONOmmxlPGzeFyOH3+T5eSa-NwBF0ZDLrUu2BxSnaywOI+gAETA2NKbGo7RIYhYAEEAPIASQESLEyjRkBYEFQJFjMYnM5YACM5HgNPnmvT2mZiz04kL1nFnd664kAg6nNYhXXRYkWZ4-C4-dmuwq6CRC41FVTgSGQAQAFlwO1HBgMgI87lPR5QG6WwYlcBI3W9Ww6xcGIAlFB0fDmXD7GsZ92RcLwNl-TsEQAgB1Eh2lA7F0CJVdmBYDiWBUagcDAMQoJgrhNQgdBoy0Wlj0LM9UJsdZXgGIZKxfL4a0QAj4k5NY628VsxlbOiAwY4MezXaNIynaddwiFc1ygKBMRE5BOB4AkuCkRCTQZeTLBsb1rDoDZAmfMsNnsJ0HV8eJxkIpwMLcBYnDBEz4XlczLOs7cd3srinJc6C3LEgluGQHyTzNc8XzLOgKxGdTqwdAjgvsAYDIrRK3XSuUg2OCz1xy2y8oc5hnNVOcF3RZd+MEscbLG2M9zwA9pONKqiwUnpS3LUU1LGZqpkdZJnHBTYXGsIIVkWXr-2DAAxGh2HIPjgOGgQJOOGgJHQJc6HjPruzoJ7h1gV64JqECsRshAfvQSkOkaSq5JQgKEHrOJATrAJcMu7QIRSFqBmFcFtCScZtDsWI7rM44wxIHcxGkadSBgVB7NTHhUEElh02Z-AOIEVnTg5vnud5yoCQFqkUb8tHunBDDnE2cZqI8dJrGJtqOocfbupiWnMuOB6MwoIcRzHCBVBIT6NHoeH-sB+6TbN17nrUUcVxtuHqF+xHDz0OXkPNVt7BdKntESqPkkMmJiN8eqQhCJZtDdMYf2lZ26foU28HNj3KC9628FtwkMFQAGxFUdjUCIAG-xzkG3Ytz2rZ9+GA-W4Pqu2sOI88aPn0SQV4+O1wAXZHwBhiFwHGbI3+voBmmekSCjBYnA+aEwohfX2BN+1aXCgQmSkN79GVhWbGo9iOfnXI7X6t1rqgUNrPG+N5fqEZ5mWHXiAQlt4yz3ugQBY4pY73wKfDaqNzT+E2PVewF0eTIKOr8Vqz9-B638AbRewMGDVAgMoB4VQah1AEIQygyZdz7g0FmOABIIA9y2pfCE8RAjpBZMsEEj5joGXiMgzYsxOQxGSq4Jw+CAJhn4ESNAkASEdCqLwGksD5bmkxvEMRARcbJU8ITPkx01iOBZP4Xk9Z3Blnfh2UyX9QzhjkUQxR9DUAqKNAWdR55NHYx0XjfRyRDG-Fqq6RKQQvBAlFGnbIH96J2JkVqeRxD8BKNcdQBo1g1Ehy8QTLROM-EEwCQ6aw+FXSzxBOMAiIQQT2CkcGICUMPpfQdn7P69Bs52PqaoYavt-ZdMDroFh-luhXxdGI2+s9bAPy1sddwdBITR2CGnQi1iZS2KXnQEQABHbgcBoZDlgKXASKYml0Edm0z+6ytk7IOZGGgBySBHJ6QjPp3cz6+SydtBBQooooJ+egxASQdJllwpHcOPhcK1OOFc3ZtzqD3KOQIcuHEq41w4vXdplywDbJhaBO5hzBJPK7sjN5m0hmIC+Ug35aCQgOgcACa6ARinOgMsEIYkL6DpjwOVfZ+Ljn21OS0p2Fzgacu5Xih5BLO4vOJZki+wyFgBASAEdquFIRRxcLSuwCRgWci-F4Fl7KNm8GHKBRJzi0mDIVlpIIHDBTsh0alMEbgHQLBCtRfVdgEpckNZ0vZzs7bfUFec2J6zfWRmdoS6VQcSVwK8bMJwKsxizy8FdS6xFFWTOGNoueKQAg5GlNQMBcA6TCoVB4j56MCCaQQFWkK6x60NvrXYQ15QzgcDEuGCA5a5Xkumb8J0pFcI4ypmMUYLbTjaguHUbtrC0KigBKKNYl1kHJH+AnIUCwoRXUZXYDCkiYlrOBkqdEtyNQEiJJUUkeoKSqEgDOslCAzHCgIu6J0uMnQsgdAO4UQ6dEjuSC+Q18TUCRk3M7XMYB71Wp6C+V4SbVLYRmBq46dYXTzvQg4QUL4vCGpEMQ6oOYDwsHIOgGhyBThQdDsq4K8VFiBG9OsF8X7ErzHYVFcEQx0I1IPRldZfYBy0FbkXBaM5KM1VSAm+s4ceRXVSJdPtzIXz1UGIMWeKQQiER9e9UCpBkBib7prZwYjw6bDWJRbwxEQSunk96IIXCCKGuYqxLEtcxpYl4nNIS+n0aZuCtRUsuN3AE0ZchjB7VhSsvBBRSZ2h0iGsGlZUCi1RoFQmlAbzzwKnzCWPpPwGGibHXdMFJW9YPB1nIjTHjQMAKgxem9BpSXROyU8dtZIad+jum4e4Z0PIx4YMZa6fw3pUhOjrGlKrLtv6-xZmzQknMJbSH5rvVAGXECMsThsGI6xLqqVmE-fwYxRujdxnmibTc84F2HG3b2pdVt-HBGdNOFFh5LGrakV4mwUhR0-LJ6JNjePAxXn-feh8luCxW81itisPxutUqkWYdLAlaVmPMFYhENjFL8MEIDP9V7-yLWOMHB4Ifn1nb2wiSqdGfeTo-QrA2DvDZTmN07-3qvBkIQo5JLjyG-FJw+lToyQRU2KXjDIDpMjOFi1F-aNEVkYsBw4hhSTSGpLuxRDw-QeTrHIoRPRCmEB6VJlTLb2kCkQi0w1mGTW+fQaCN6QESkbzOkmUMF1jhX3a9LKI1NuGsXXL2eKo5d2xgjH6EkKXiwNiEVpa2ZTKr0LpHrGrQ1oq3KB8EsHxKcxAiCmbGZkYLrJMKvSMzmYlXWeTaNdQE1WIzVc7RqS6D1oXSMqieCN0qq+sAs8NqoEo6MieEZfuivTcw2mr-HdkLwUWyzCCO6dIgpiIcJmM7t0QvPB-dWQDgCIhLgsFc9UPAa4aDKIb7G7aswMhzPR1UueOSY-T4kSsYp-gttQnzVkIAA */
+    /** @xstate-layout N4IgpgJg5mDOIC5QAcBOB7AVmAxgFwFoBbAQxwAsBLAOzADoAFEmAAkthaPQFdq9IAxACU46ADYA3MCxLc85MH0o4SeSumoBtAAwBdRCnSxKajQZAAPRACYA7NbrbrANm0BWe9YCcbgIzbfABoQAE8bWwAOOl9bLwjfPwAWD0TfX0SAXwzgtCxcQlIKGnomVnYWVDASCBCBHX0kEGQjE3VqcysEa21nAGY6ZPjk22c453TgsIRe3qjfazcPeecIu0SvLJyMbHxiMipaRmZpcsrq2s1fBsNjU3bGzu6+gbchj1GI8cTJm16HZw+7l6iQiiUStmSmya23yeyKhwAwgocABrGhQNgAMxY3FgYFQbA4snkijUKn4EDqenMzVubQ6iFiiTotm08T+wK8Xm831CiF62i8dGciW0fxGvnGvVsbky2WheV2hQO9CRuDR1AxlGxuPxhJkcgUSnJgku1yaLTuDIQTJZbN8HPW3K8vKmDuZvS5TK8vgi2lsvoiUNyOwK+2KdAAonx8eiWLQAO4sEP5eMkIhgAQAZTAeGTMPwaYz9RplvpDxsiw9o0W7jcgtBP2mDscsS5bMiiWskrcwYLYfh9AAImBMcU2NRWiQxCwAIIAeQAkgIEWJlCjICwIKgSEnE3OlywAEZyPAaEuNWmtMwVrpLO1OTteAG+pvJNx0P2RCEg149PuKgOKp0AiZxqJqnAkMgAgALJQfqOBgZAF43Ne9ygJ0krAnQcRYd0-j2JKTbeFEETSn8XjAvalFylsgFwsBADqJCtBBmLoAS27MCwHEsCo1A4GAYiwfBXC6hA6AJlo1KXmWN4YTYPT9IM6TvGMEx8ggAJCp8KxkQE-jOG4vQAaGDERkOO4JnGC6LseIRbjuUBQOiInIJwPB4lwUgoRadLyZYvy+jhMyzIkzgyl4ARNm4XJ0DMPoOjM74+qZsLKhZVk2YeR4OVxzmuXB7liXi3DIL5V5WreCyyvFNb1rWcSuogKz9MZ2jaOFZGsv4GzyimSrhoclm7tldm5Y5zAuZqK5rqim78YJM62ZNSYnngZ7SealXlgpd61b09V1g2zUIK8tgDBFbijA6PidUG-X9uZhwAGI0Ow5B8WBY0CBJhw0BI6AbnQA1ARGb2TrAn2IVU4EYrZCAA+g5JtPUFVyehgXNoKdALNYnofNY4UJE2KwfmKnq2L0tbWLpaWDYOUbUCQR5iNIi6kDAqAOVmPCoIJLA5mz+AcQIHPHNzgt8wL5R4sLFLo-5mOdIdCQvGKnV2L60puKTZF0O1nWtT1gr02Dr25hQE5TjOECqCQv0aPQSPA6Dz30C9lufe9ajTlu9uI9QgMo+eeiK2h1rzGrMQrH0Na+D4zhNgK2jxakCyuLKgp+Gb7t0J7eBWz7lB+3beAO-iGCoCDYiqOxqBECDT0ZRbhfe5Ovu2wHSMh1t4dVXtUcfjHnyHT4CfXcRbgOBEESyrPVGzAGzi5y39DRizbMsDBRgsTggtCfkos77Ae-6nL+TITJqED1jopxNEXi2AG0+dh4uuaa1Bsp110oBKbj16JryZpvaQO8IBCQPvLY+6AIEzlloffAV9toY2tO+BwLgAhP3rAsHoes2o-2Nv-PqdEzLAIYJUCAyg7gVCqDUAQFDKAZmPKeDQ+Y4B4ggP3Xad8PBCjFP4FwPp7peBis4f4AQjKz2SAnVYq8hrrxjASNAkBqFtAqLwKkKClbWl6L1XG08CZxCJuMD+boASfklP6RIMxYhOEovIxm0Z+DKMoWothqBNFmlLDo28eicZ4yMasYmZj+Q41lJ6bssdKLuEccBZxeoVFUPwOozx1A6jWG0RHPx+jAnPmMSEt80pH6vDBIKX0xlDpxIjKBWGP0-rOyDkDegbtgG1NUGNQOwcOmh10NwgKnR75zCfi-OwoJ37EVZDhFwwIYgBgFAGaphwRAAEduBwDhhOWA5cBKZgaXQF2LTm4KLoKs9Z2y4w0G2SQXZXTkY9L7tfPy2S9roNxq4BOMonD1iTppAUQoRjjABCMCIcQ2S0QVGQk5ZyNmXOoNc3ZAhK4cRrnXDijdWnQrAGs2FEErk7MEnc3uaMnk7QGYgN5mDPk4J+W+eYn5uhz26npWYvZAFQsZkIXgk4IJJPcekkQglKBSAgHxZEKJmg0DwP05WFKIgjANrFamrUFgJybJKIUei+jpE+LFcKtgln0C5dQHlGI+UpI0AILgcCBAsw4nmSoQqRUyutH4AUl0ZhAtnn0UJ0xZ4sipq8OIfhZ6GtOdyuM5q7hWtgUJAQ1y8C4loU65BPiXl31iP0KKIK7AymBL6-wBibFsmMtYbwEIEhhuNaa9hyTo3WrjWoDMmIdwZgEDgdARBkBs34MmsAwrU2yV8XtN1qdwqeslN66mxF5WfnCunPRoIXAjCrRG3lbiLXpPxTcwSAgXFEBoKoaQeI+AutvKOj1qs9I+uTrMeKgpnzjG7FTWIYb2mbNBo7f6TTXbHMZu+yN-YiUPJJVk2+KtTHqwFF2AM3UC02Nxj+RY4jwT3yyPKagsb4CXj-SqNN4HEAEF+VMAgz9ca4NmPKpwZbnxhtKCcDgYkYwQHwzwzoT9cbgm7ETWIAYITJwCJdcRHgZS0xFBCzFjN6P6jODUVj5KEC+k6p+EU1MfREzBHo4iD8RT+l9LggEZa33isuTqPEBJyjEiNGSI9LGh3ps6PWXwdUKnfKiuyATznwrCeftPT4YIw0JNQHGfcoMixgHk7KroAo2r4yJvjZ8Ccn7J3pQvYE4xPlRSqey9KWKqGOrzGeFg5BO3SGQMcSLkdUgXVFMCMtoLvCUQiMRMEwpuj+NlDEYEcicsM2AiOMctBradwPIuSr1U57MlwosbsMT+OaWuh+bNYpRgimXivXr5tVTfQgqQZA43B5gguolAUrhxGrGin8st0R8Z+mupKVIscw3MVYhieuk0MS8UWkJA7WNfTBScKCD44w569D1uTPjLgqNP0+GGka1kIIrQmvlaaUBfuPD0TPbobIehMusE2VkY6AixX8H8Ho08w0Qw+l9OpiOlzo5sPKhwYp8bSlnjKeYzXP761CjYlIZNZiBeZqzdmnN8Q82ltIIWR9UAM+mDFlk7xOpdkWI2bn-RefUwhALh6pDcuMwLkXDuJcu7lzl+2T8MSkp+BQ8RxnHpcJL0wQ+oXoDt672UFAmXcul7MipqkF0sHuynVZM4SxRl8ZpEwaCV3Iv3dwK9yLWX9mCMIC7D4AY0ohEdT+H4fB8Vkpa66sZXXkL9fAQoaozdtDzhy5BAGd56ei-+jt1pcYOEawghmD0fJQuXG1v5RozGZKou03WDheIM2E4LNOqKMPop4hPB8DMa6EncM1J2-DenKe2P8mkdEam+NXCEU6sRUY5GRP2JdFW7F5zNnbt2XXgUS35h-ifnYcRydnyfmfhW+6sRYdNs84cxE13IH9BI698c-lYocJVccFVZbsDUgDgFq1AMq9b4R80F5VnMXAm8UgW9b0ohYgPgYgZFYhK1kCTkAN11AIfdqZU4Eh-cF9x5bB1VUgDYqZuROo0gE5-Qb9zgWB3tKg8AdwaAh85d8YxQDY4suwCYktWDNJugasP8khn1D86MN0aFyhBsPpIA5dZQLEFgZQ1t6wwQZ0ohQpIkYdkgXAND0D1FLMjx7U9Cd8FMDCw8jDV8vkzC-lVhHAo4fQUhQQ+D0MgA */
     predictableActionArguments: true,
     id: 'project-machine',
     initial: 'Page is mounted',
@@ -241,7 +242,8 @@ export const projectMachine = createMachine(
         invoke: {
           src: 'requestInstance',
           onDone: {
-            target: 'Setup instance',
+            target: 'Running prediction',
+            actions: 'setCurrentInstance',
           },
           onError: {
             target: 'Prediction ready',
@@ -252,20 +254,44 @@ export const projectMachine = createMachine(
 
       'Setup instance': {
         invoke: {
-          src: 'setupInstance',
-          onDone: {
-            target: 'Running prediction',
-          },
+          src: 'openWebsocket',
         },
       },
 
       'Running prediction': {
-        always: [
-          {
-            target: 'Ready for retrain run',
-            actions: 'handlePredictionFinish',
+        on: {
+          'model#abort received': 'Prediction is aborted',
+
+          'model#status received': {
+            target: 'Running prediction',
+            internal: true,
+            actions: 'setCurrentInstanceStatus',
           },
-        ],
+
+          'model#timeframe#complete received': 'Prediction is finished',
+
+          'instance#terminate sent': 'Prediction is aborted',
+          'Received checkpoint': {
+            target: 'Running prediction',
+            internal: true,
+            actions: 'setCurrentCheckpoint',
+          },
+          'Received timeframe': {
+            target: 'Running prediction',
+            internal: true,
+            actions: 'setCurrentTimeframe',
+          },
+
+          'Received prediction progress': {
+            target: 'Running prediction',
+            internal: true,
+            actions: 'updateCurrentPrediction',
+          },
+        },
+
+        invoke: {
+          src: 'runPrediction',
+        },
       },
 
       'Creating project': {
@@ -281,6 +307,9 @@ export const projectMachine = createMachine(
       'Ready for retrain run': {
         entry: 'enterRetrainIsReady',
       },
+
+      'Prediction is finished': {},
+      'Prediction is aborted': {},
     },
   },
   {
@@ -343,6 +372,47 @@ export const projectMachine = createMachine(
       setCurrentAoi: assign((context, event) => ({
         currentAoi: event.data.aoi,
       })),
+      setCurrentInstance: assign((context, event) => ({
+        currentInstance: event.data.instance,
+      })),
+      setCurrentInstanceStatus: assign((context, event) => ({
+        currentInstance: {
+          ...context.currentInstance,
+          ...event.data,
+        },
+      })),
+      setCurrentCheckpoint: assign((context, event) => ({
+        currentCheckpoint: event.data,
+      })),
+      setCurrentTimeframe: assign((context, event) => ({
+        currentTimeframe: event.data,
+      })),
+      updateCurrentPrediction: assign((context, { data }) => {
+        // Get bounds
+        let predictions = get(context, 'currentPrediction.predictions', []);
+
+        const [minX, minY, maxX, maxY] = data.bounds;
+
+        // Build prediction object
+        predictions = predictions.concat({
+          key: predictions.length + 1,
+          image: `data:image/png;base64,${data.image}`,
+          bounds: [
+            [minY, minX],
+            [maxY, maxX],
+          ],
+        });
+
+        return {
+          sessionStatusMessage: `Received image ${data.processed} of ${data.total}...`,
+          currentPrediction: {
+            ...context.currentPrediction,
+            processed: data.processed,
+            total: data.total,
+            predictions,
+          },
+        };
+      }),
       initializeMap: assign((context, event) => {
         const { mapRef } = event.data;
 
@@ -523,11 +593,6 @@ export const projectMachine = createMachine(
           },
         };
       }),
-      handlePredictionFinish: assign(() => ({
-        globalLoading: {
-          disabled: true,
-        },
-      })),
       enterRetrainIsReady: assign(() => ({
         sessionStatusMessage: 'Ready for retrain run',
         primeButton: {
@@ -715,8 +780,60 @@ export const projectMachine = createMachine(
 
         return { instance };
       },
-      setupInstance: async () => {
-        return {};
+      runPrediction: (context) => (callback) => {
+        const { token } = context.currentInstance;
+        const websocket = new WebsocketClient(token);
+
+        websocket.addEventListener('message', (e) => {
+          const { message, data } = JSON.parse(e.data);
+
+          switch (message) {
+            case 'info#connected':
+              // After connection, send a message to the server to request
+              // model status
+              websocket.sendMessage({
+                action: 'model#status',
+              });
+              break;
+            case 'model#status':
+              // If not already running or aborting, request prediction
+              if (!data.processing && !data.is_aborting) {
+                websocket.sendMessage({
+                  action: 'model#prediction',
+                  data: {
+                    aoi_id: context.currentAoi.id,
+                    mosaic: context.currentMosaic.id,
+                  },
+                });
+              }
+              break;
+            case 'model#checkpoint':
+              callback({
+                type: 'Received checkpoint',
+                data: { currentCheckpoint: data },
+              });
+              websocket.sendMessage({
+                action: 'model#status',
+              });
+              break;
+            case 'model#timeframe':
+              callback({
+                type: 'Received timeframe',
+                data,
+              });
+              break;
+            case 'model#prediction':
+              callback({
+                type: 'Received prediction progress',
+                data,
+              });
+              break;
+
+            default:
+              break;
+          }
+        });
+        return () => websocket.close();
       },
     },
   }
