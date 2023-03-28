@@ -245,9 +245,11 @@ describe('Create new project', () => {
 
     cy.wait('@fetchInstanceStatus');
 
+    // TODO this should be changed to "Ready for retrain run" once the
+    // workflow is updated.
     cy.get('[data-cy=session-status]').should(
       'have.text',
-      'Session Status: Ready for retrain run'
+      'Session Status: Ready for prediction run'
     );
   });
 
@@ -299,7 +301,8 @@ describe('Create new project', () => {
 
     // Prediction should be finished successfully.
 
-    // TODO this should lead to a retrain run status and should be changed when retrain is implemented
+    // TODO this should lead to a retrain run status and should be changed when
+    // retrain is implemented
     cy.get('[data-cy=session-status]').should(
       'have.text',
       // 'Session Status: Ready for retrain run'
