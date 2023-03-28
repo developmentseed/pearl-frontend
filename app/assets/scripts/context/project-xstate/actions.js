@@ -5,6 +5,8 @@ import turfBboxPolygon from '@turf/bbox-polygon';
 import turfArea from '@turf/area';
 import toasts from '../../components/common/toasts';
 import { BOUNDS_PADDING } from '../../components/common/map/constants';
+import { formatThousands } from '../../utils/format';
+import config from '../../config';
 
 export const actions = {
   setInitialContext: assign((context, event) => {
@@ -271,6 +273,24 @@ export const actions = {
       },
     };
   }),
+  displayAreaTooTinyModalDialog: assign((context) => {
+    const aoiArea = context.currentAoi.area;
+    const formattedAoiArea = formatThousands(aoiArea / 1e6, { decimals: 1 });
+
+    return {
+      aoiModalDialog: {
+        revealed: true,
+        headline: 'Area is too tiny',
+        content: `The AOI area is ${formattedAoiArea} km², please select an
+        area greater than ${config.minimumAoiArea / 1e6} km².`,
+      },
+    };
+  }),
+  closeAoiModalDialog: assign(() => ({
+    aoiModalDialog: {
+      revealed: false,
+    },
+  })),
   initializeAoiList: assign(() => {
     return {
       sessionStatusMessage: 'Set AOI',

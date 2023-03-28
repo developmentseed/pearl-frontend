@@ -20,6 +20,7 @@ import PageHeader from '../common/page-header';
 import SizeAwareElement from '../common/size-aware-element';
 import ProjectPageHeader from './header';
 import ProjectPageMain from './main';
+import { AoiModalDialog } from './aoi-modal-dialog';
 
 export const ProjectPage = () => {
   return (
@@ -96,6 +97,7 @@ const ProjectPageInner = () => {
       <PageBody role='main'>
         <ProjectPageMain />
       </PageBody>
+      <AoiModalDialog />
     </>
   );
 };

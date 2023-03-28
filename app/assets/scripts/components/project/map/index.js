@@ -105,6 +105,14 @@ function Map() {
         whenCreated={(m) => {
           // Add map to state
           setMapRef(m);
+
+          if (process.env.NODE_ENV !== 'production') {
+            // makes map accessible in console for debugging
+            window.map = m;
+            if (window.Cypress) {
+              window.Cypress.map = m;
+            }
+          }
         }}
       >
         <BaseMapLayer />
