@@ -59,9 +59,31 @@ export const actions = {
   setCurrentModel: assign((context, event) => ({
     currentModel: event.data.model,
   })),
-  setCurrentAoi: assign((context, event) => ({
-    currentAoi: event.data.aoi,
-  })),
+  setCurrentAoi: assign((context, event) => {
+    const { mapRef, currentAoi } = context;
+    const { aoi: newAoi } = event.data;
+
+    // Remove AOI layer
+    if (currentAoi?.shape) {
+      currentAoi.shape.remove();
+    }
+
+    // Add new layer from geojson, if exists
+    let aoiShape;
+    if (newAoi?.geojson) {
+      aoiShape = L.geoJSON(newAoi.geojson).addTo(mapRef);
+      mapRef.fitBounds(aoiShape.getBounds(), {
+        padding: BOUNDS_PADDING,
+      });
+    }
+
+    return {
+      currentAoi: {
+        ...newAoi,
+        shape: aoiShape,
+      },
+    };
+  }),
   setCurrentInstance: assign((context, event) => ({
     currentInstance: event.data.instance,
   })),
