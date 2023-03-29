@@ -93,6 +93,16 @@ export const services = {
     const aoiName = await reverseGeocodeLatLng(lng, lat);
     return { aoiName };
   },
+  deleteAoi: async (context, event) => {
+    const { apiClient } = context;
+    const { aoiId } = event.data;
+    const { id: projectId } = context.project;
+    await apiClient.delete(`/project/${projectId}/aoi/${aoiId}`);
+
+    return {
+      aoiId,
+    };
+  },
   createProject: async (context) => {
     const {
       apiClient,

@@ -59,19 +59,47 @@ export const actions = {
   setCurrentModel: assign((context, event) => ({
     currentModel: event.data.model,
   })),
-  setCurrentAoi: assign((context, event) => {
-    const { mapRef, currentAoi } = context;
-    const { aoi: newAoi } = event.data;
+  setCurrentAoi: assign((context, event) => ({
+    currentAoi: event.data.aoi,
+    aoiActionButtons: {
+      ...context.aoiActionButtons,
+      deleteAoi: true,
+    },
+  })),
+  loadLatestAoi: assign((context) => {
+    const { aoisList, mapRef } = context;
+    const latestAoi = aoisList[aoisList.length - 1];
 
-    // Remove AOI layer
+    let aoiShape;
+
+    // Add latest AOI to the map
+    if (latestAoi && latestAoi.bounds) {
+      aoiShape = L.geoJSON(latestAoi.bounds).addTo(mapRef);
+      mapRef.fitBounds(aoiShape.getBounds(), {
+        padding: BOUNDS_PADDING,
+      });
+    }
+
+    return {
+      currentAoi: { ...latestAoi, shape: aoiShape },
+      aoiActionButtons: {
+        uploadAoi: true,
+        deleteAoi: true,
+      },
+    };
+  }),
+  updateAoiLayer: assign((context) => {
+    const { mapRef, currentAoi } = context;
+
+    // Remove AOI layer, if exists
     if (currentAoi?.shape) {
       currentAoi.shape.remove();
     }
 
     // Add new layer from geojson, if exists
     let aoiShape;
-    if (newAoi?.geojson) {
-      aoiShape = L.geoJSON(newAoi.geojson).addTo(mapRef);
+    if (currentAoi.geojson) {
+      aoiShape = L.geoJSON(currentAoi.geojson).addTo(mapRef);
       mapRef.fitBounds(aoiShape.getBounds(), {
         padding: BOUNDS_PADDING,
       });
@@ -79,8 +107,49 @@ export const actions = {
 
     return {
       currentAoi: {
-        ...newAoi,
+        ...currentAoi,
         shape: aoiShape,
+      },
+    };
+  }),
+  onAoiDeletedSuccess: assign((context, event) => {
+    const { currentAoi, mapRef, aoisList } = context;
+    const { aoiId } = event.data;
+
+    // Remove AOI layer
+    if (currentAoi?.shape) {
+      currentAoi?.shape.remove();
+    }
+
+    const newAoiList = aoisList.filter((aoi) => aoi.id !== aoiId);
+    if (newAoiList.length === 0) {
+      return {
+        currentAoi: null,
+        aoisList: newAoiList,
+        aoiActionButtons: {
+          uploadAoi: true,
+          drawAoi: true,
+        },
+      };
+    }
+
+    const latestAoi = newAoiList[newAoiList.length - 1];
+
+    // Add latest AOI to map
+    if (latestAoi.geojson) {
+      const aoiShape = L.geoJSON(latestAoi.geojson).addTo(mapRef);
+      mapRef.fitBounds(aoiShape.getBounds(), {
+        padding: BOUNDS_PADDING,
+      });
+      latestAoi.shape = aoiShape;
+    }
+
+    return {
+      currentAoi: { ...latestAoi },
+      aoiActionButtons: {
+        uploadAoi: true,
+        drawAoi: true,
+        deleteAoi: true,
       },
     };
   }),
@@ -131,35 +200,9 @@ export const actions = {
       disabled: true,
     },
   })),
-  initializeMap: assign((context, event) => {
-    const { mapRef } = event.data;
-
-    const { currentAoi } = context;
-    let aoiGeojson;
-    let aoiShape;
-
-    // Add currentAoi to map, if it exists
-    if (currentAoi && currentAoi.bounds) {
-      const aoiGeojson = {
-        type: 'Feature',
-        properties: {},
-        geometry: currentAoi.bounds,
-      };
-      const aoiShape = L.geoJSON(aoiGeojson).addTo(mapRef);
-      mapRef.fitBounds(aoiShape.getBounds(), {
-        padding: BOUNDS_PADDING,
-      });
-    }
-
-    return {
-      mapRef,
-      currentAoi: currentAoi && {
-        ...currentAoi,
-        shape: aoiShape,
-        geojson: aoiGeojson,
-      },
-    };
-  }),
+  setMapRef: assign((context, event) => ({
+    mapRef: event.data.mapRef,
+  })),
   setProject: assign((context, event) => ({
     project: event.data.project,
   })),
@@ -334,13 +377,6 @@ export const actions = {
       },
     };
   }),
-  enterRetrainIsReady: assign(() => ({
-    sessionStatusMessage: 'Ready for retrain run',
-    primeButton: {
-      disabled: false,
-      label: 'Retrain Model',
-    },
-  })),
   disableGlobalLoading: assign(() => ({
     globalLoading: {
       disabled: true,
