@@ -115,7 +115,7 @@ export const actions = {
     };
   }),
   onAoiDeletedSuccess: assign((context, event) => {
-    const { currentAoi, mapRef, aoisList } = context;
+    const { currentAoi, aoisList } = context;
     const { aoiId } = event.data;
 
     // Remove AOI layer
@@ -124,37 +124,10 @@ export const actions = {
     }
 
     const newAoiList = aoisList.filter((aoi) => aoi.id !== aoiId);
-    if (newAoiList.length === 0) {
-      return {
-        currentAoi: null,
-        aoisList: newAoiList,
-        aoiActionButtons: {
-          addNewAoi: true,
-          uploadAoi: true,
-          drawAoi: true,
-        },
-      };
-    }
-
-    const latestAoi = newAoiList[newAoiList.length - 1];
-
-    // Add latest AOI to map
-    if (latestAoi.geojson) {
-      const aoiShape = L.geoJSON(latestAoi.geojson).addTo(mapRef);
-      mapRef.fitBounds(aoiShape.getBounds(), {
-        padding: BOUNDS_PADDING,
-      });
-      latestAoi.shape = aoiShape;
-    }
 
     return {
-      currentAoi: { ...latestAoi },
-      aoiActionButtons: {
-        addNewAoi: true,
-        uploadAoi: true,
-        drawAoi: true,
-        deleteAoi: true,
-      },
+      currentAoi: null,
+      aoisList: { ...newAoiList },
     };
   }),
   setCurrentInstance: assign((context, event) => ({

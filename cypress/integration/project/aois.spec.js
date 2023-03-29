@@ -223,6 +223,11 @@ describe('Can delete AOIs', () => {
     cy.visit('/project/1');
     cy.wait('@loadAois');
 
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Ready for prediction run'
+    );
+
     cy.intercept(
       {
         url: restApiEndpoint + '/api/project/1/aoi/1',
@@ -303,8 +308,8 @@ describe('Can delete AOIs', () => {
     cy.wait('@reverseGeocodeCity');
 
     cy.get('[data-cy=delete-current-aoi-button]').click();
+    cy.get('[data-cy=confirm-aoi-delete]').click();
 
-    cy.get('[data-cy=confirm-delete-aoi-modal]').should('not.exist');
     cy.get('@deleteAnyAoi').should('not.exist');
     cy.get('@loadAois1').should('not.exist');
   });

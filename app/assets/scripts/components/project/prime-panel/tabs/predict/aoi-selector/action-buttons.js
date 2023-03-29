@@ -69,7 +69,7 @@ export function AoiActionButtons() {
             Delete Current AOI
           </ActionButton>
           <ConfirmAoiDeleteModal
-            aoiId={currentAoi.id}
+            aoiId={currentAoi?.id}
             revealed={confirmDeleteAoiModal}
             setRevealed={setConfirmDeleteAoiModal}
           />

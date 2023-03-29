@@ -95,7 +95,11 @@ export const services = {
   },
   deleteAoi: async (context, event) => {
     const { apiClient } = context;
-    const { aoiId } = event.data;
+    const aoiId = event.data?.aoiId || context.currentAoi?.id;
+
+    // Bypass if aoi has no id
+    if (!aoiId) return {};
+
     const { id: projectId } = context.project;
     await apiClient.delete(`/project/${projectId}/aoi/${aoiId}`);
 
