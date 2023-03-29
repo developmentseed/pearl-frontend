@@ -1,13 +1,7 @@
 import React from 'react';
 import { ProjectMachineContext } from '../../../../../../context/project-xstate';
 
-import { ActionButton, EditButton } from '../../../../../../styles/button';
-
-export const aoiActionButtonModes = {
-  ACTIVE: 'ACTIVE',
-  INACTIVE: 'INACTIVE',
-  HIDDEN: 'HIDDEN',
-};
+import { ActionButton } from '../../../../../../styles/button';
 
 const aoiActionButtonsSelector = (state) => state.context.aoiActionButtons;
 
@@ -17,11 +11,31 @@ export function AoiActionButtons() {
     aoiActionButtonsSelector
   );
 
-  const { drawNewAoi, cancelAoiDraw, confirmAoiDraw } = aoiActionButtons;
+  const {
+    drawNewAoi,
+    cancelAoiDraw,
+    confirmAoiDraw,
+    uploadAoi,
+  } = aoiActionButtons;
 
   return (
     <>
-      {drawNewAoi !== aoiActionButtonModes.HIDDEN && (
+      {uploadAoi && (
+        <ActionButton
+          title='Upload AOI GeoJSON'
+          data-cy='upload-aoi-button'
+          id='upload-aoi-button'
+          useIcon='upload'
+          onClick={() => {
+            actorRef.send({
+              type: 'Pressed upload AOI button',
+            });
+          }}
+        >
+          Upload AOI
+        </ActionButton>
+      )}
+      {drawNewAoi && (
         <ActionButton
           title='Draw Area of Interest'
           id='edit-aoi-trigger'
@@ -29,14 +43,14 @@ export function AoiActionButtons() {
           data-cy='aoi-edit-button'
           onClick={() => {
             actorRef.send({
-              type: 'Clicked draw new AOI button',
+              type: 'Pressed draw new AOI button',
             });
           }}
         >
           Draw new AOI
         </ActionButton>
       )}
-      {confirmAoiDraw !== aoiActionButtonModes.HIDDEN && (
+      {confirmAoiDraw && (
         <ActionButton
           title='Confirm AOI Draw'
           id='confirm-aoi-draw-button'
@@ -44,14 +58,14 @@ export function AoiActionButtons() {
           data-cy='confirm-aoi-draw-button'
           onClick={() => {
             actorRef.send({
-              type: 'Clicked confirm AOI draw button',
+              type: 'Pressed confirm AOI draw button',
             });
           }}
         >
           Confirm AOI draw
         </ActionButton>
       )}
-      {cancelAoiDraw !== aoiActionButtonModes.HIDDEN && (
+      {cancelAoiDraw && (
         <ActionButton
           title='Cancel AOI Draw'
           id='cancel-aoi-draw-button'
@@ -59,7 +73,7 @@ export function AoiActionButtons() {
           data-cy='cancel-aoi-draw-button'
           onClick={() => {
             actorRef.send({
-              type: 'Clicked cancel AOI draw button',
+              type: 'Pressed cancel AOI draw button',
             });
           }}
         >

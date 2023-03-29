@@ -57,10 +57,10 @@ describe('Loads AOIs', () => {
 
   it('Can upload an AOI', () => {
     // Open import modal
-    cy.get('[data-cy=upload-aoi-modal-button]').click();
+    cy.get('[data-cy=upload-aoi-button]').should('exist').click();
 
     // Open select file dialog
-    cy.get('[data-cy=select-aoi-file-button').click();
+    cy.get('[data-cy=select-aoi-file-button').should('exist').click();
 
     // Apply large AOI file to input
     cy.get('[data-cy=aoi-upload-input]').attachFile(

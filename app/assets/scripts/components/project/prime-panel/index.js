@@ -17,6 +17,7 @@ import TabbedBlock from '../../common/tabbed-block-body';
 import Predict from './tabs/predict';
 import InfoButton from '../../common/info-button';
 import { ProjectMachineContext } from '../../../context/project-xstate';
+import { UploadAoiModal } from './upload-aoi-modal';
 
 const StyledPanelBlock = styled(PanelBlock)`
   ${media.largeUp`
@@ -38,6 +39,7 @@ const PanelControls = styled(PanelBlockFooter)`
 
 const selectors = {
   primeButton: (state) => state.context.primeButton,
+  uploadAoiModal: (state) => state.context.UploadAoiModal,
 };
 
 export function PrimePanel() {
@@ -48,6 +50,7 @@ export function PrimePanel() {
 
   return (
     <>
+      <UploadAoiModal />
       <Panel
         data-cy='primary-panel'
         collapsible

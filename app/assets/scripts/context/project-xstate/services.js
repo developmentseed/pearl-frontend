@@ -31,6 +31,9 @@ export const services = {
     );
     const { models: modelsList } = await apiClient.get('model');
 
+    // Fetch api limits
+    const { limits: apiLimits } = await apiClient.get('');
+
     // If project is not new, fetch project data
     if (projectId !== 'new') {
       project = await apiClient.get(`project/${projectId}`);
@@ -68,6 +71,7 @@ export const services = {
     }
 
     return {
+      apiLimits,
       mosaicsList,
       imagerySourcesList,
       modelsList,

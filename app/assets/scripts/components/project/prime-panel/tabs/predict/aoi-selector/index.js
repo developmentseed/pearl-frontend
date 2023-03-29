@@ -12,7 +12,6 @@ import {
 import { Subheading } from '../../../../../../styles/type/heading';
 import ShadowScrollbar from '../../../../../common/shadow-scrollbar';
 
-import { aoiStatuses } from '../../../../../../context/project-xstate/machine';
 import { ProjectMachineContext } from '../../../../../../context/project-xstate';
 import { SelectorHeadOption, SelectorOption } from '../../../selection-styles';
 import { formatThousands } from '../../../../../../utils/format';

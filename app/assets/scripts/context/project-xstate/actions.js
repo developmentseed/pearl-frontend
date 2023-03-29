@@ -291,6 +291,11 @@ export const actions = {
       revealed: false,
     },
   })),
+  toggleUploadAoiModal: assign((context) => ({
+    uploadAoiModal: {
+      revealed: !context.uploadAoiModal.revealed,
+    },
+  })),
   initializeAoiList: assign(() => {
     return {
       sessionStatusMessage: 'Set AOI',
