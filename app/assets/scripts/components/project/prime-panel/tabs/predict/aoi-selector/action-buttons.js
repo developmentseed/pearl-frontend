@@ -18,6 +18,7 @@ export function AoiActionButtons() {
 
   const {
     uploadAoi,
+    addNewAoi,
     deleteAoi,
     drawNewAoi,
     cancelAoiDraw,
@@ -44,6 +45,16 @@ export function AoiActionButtons() {
           }}
         >
           Upload AOI
+        </ActionButton>
+      )}
+      {addNewAoi && (
+        <ActionButton
+          useIcon='plus'
+          onClick={() => actorRef.send({ type: 'Pressed new AOI button' })}
+          data-cy='add-aoi-button'
+          title='Draw new AOI'
+        >
+          Add AOI
         </ActionButton>
       )}
       {deleteAoi && (
@@ -79,6 +90,7 @@ export function AoiActionButtons() {
           Draw new AOI
         </ActionButton>
       )}
+
       {confirmAoiDraw && (
         <ActionButton
           title='Confirm AOI Draw'

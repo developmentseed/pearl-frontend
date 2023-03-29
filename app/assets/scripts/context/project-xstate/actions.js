@@ -46,7 +46,7 @@ export const actions = {
       currentImagerySource: imagerySource,
       mosaicSelector: {
         disabled: false,
-        message: 'Select a mosaic',
+        placeholderLabel: 'Select a mosaic',
       },
     };
   }),
@@ -83,11 +83,13 @@ export const actions = {
     return {
       currentAoi: { ...latestAoi, shape: aoiShape },
       aoiActionButtons: {
+        addNewAoi: true,
         uploadAoi: true,
         deleteAoi: true,
       },
     };
   }),
+
   updateAoiLayer: assign((context) => {
     const { mapRef, currentAoi } = context;
 
@@ -127,6 +129,7 @@ export const actions = {
         currentAoi: null,
         aoisList: newAoiList,
         aoiActionButtons: {
+          addNewAoi: true,
           uploadAoi: true,
           drawAoi: true,
         },
@@ -147,6 +150,7 @@ export const actions = {
     return {
       currentAoi: { ...latestAoi },
       aoiActionButtons: {
+        addNewAoi: true,
         uploadAoi: true,
         drawAoi: true,
         deleteAoi: true,
@@ -211,11 +215,11 @@ export const actions = {
       sessionStatusMessage: 'Set Project Name',
       imagerySourceSelector: {
         disabled: true,
-        message: 'Define AOI first',
+        placeholderLabel: 'Define AOI first',
       },
       mosaicSelector: {
         disabled: true,
-        message: 'Define AOI first',
+        placeholderLabel: 'Define AOI first',
       },
       modelSelector: {
         disabled: true,
@@ -228,7 +232,7 @@ export const actions = {
       sessionStatusMessage: 'Select Mosaic & Model',
       imagerySourceSelector: {
         disabled: false,
-        message: 'Select Imagery Source',
+        placeholderLabel: 'Select Imagery Source',
       },
     };
   }),
@@ -263,8 +267,20 @@ export const actions = {
       },
     };
   }),
-  setupNewRectangleAoiDraw: assign(() => {
+  setupNewRectangleAoiDraw: assign((context) => {
+    const { currentAoi } = context;
+
+    if (currentAoi?.shape) {
+      currentAoi.shape.remove();
+    }
+
     return {
+      currentAoi: null,
+      rectangleAoi: null,
+      aoiActionButtons: {
+        confirmAoiDraw: true,
+        cancelAoiDraw: true,
+      },
       mapEventHandlers: {
         dragging: false,
         mousedown: true,
@@ -335,6 +351,43 @@ export const actions = {
         mousedown: false,
         mouseup: true,
         mousemove: true,
+      },
+    };
+  }),
+  exitRectangleAoiDrawMode: assign((context) => {
+    const { rectangleAoi } = context;
+
+    if (rectangleAoi?.shape) {
+      rectangleAoi.shape.remove();
+    }
+
+    return {
+      rectangleAoi: null,
+      currentImagerySource: null,
+      currentMosaic: null,
+      currentModel: null,
+      imagerySourceSelector: {
+        disabled: false,
+        placeholderLabel: 'Select imagery source',
+      },
+      mosaicSelector: {
+        disabled: true,
+        placeholderLabel: 'Define imagery source first',
+      },
+      modelSelector: {
+        disabled: true,
+        placeholderLabel: 'Define imagery source first',
+      },
+      aoiActionButtons: {
+        uploadAoi: true,
+        addNewAoi: true,
+        deleteAoi: true,
+      },
+      mapEventHandlers: {
+        dragging: true,
+        mousedown: false,
+        mouseup: false,
+        mousemove: false,
       },
     };
   }),

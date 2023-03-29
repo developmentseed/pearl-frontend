@@ -30,7 +30,7 @@ export function MosaicSelector() {
 
   const { disabled } = mosaicSelector;
 
-  const label = currentMosaic?.name || mosaicSelector.message;
+  const label = currentMosaic?.name || mosaicSelector.placeholderLabel;
 
   return (
     <>

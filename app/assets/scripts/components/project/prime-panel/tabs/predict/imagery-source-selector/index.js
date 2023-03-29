@@ -29,7 +29,8 @@ export function ImagerySourceSelector() {
 
   const { disabled } = imagerySourceSelector;
 
-  const label = currentImagerySource?.name || imagerySourceSelector.message;
+  const label =
+    currentImagerySource?.name || imagerySourceSelector.placeholderLabel;
 
   return (
     <>
