@@ -98,7 +98,35 @@ export const actions = {
       },
     };
   }),
+  applyExistingAoi: assign((context, event) => {
+    const { mapRef, currentAoi, aoisList } = context;
+    const { aoiId } = event.data;
 
+    const aoi = aoisList.find((aoi) => aoi.id === aoiId);
+
+    // Clear existing AOI layer
+    if (currentAoi?.shape) {
+      currentAoi.shape.remove();
+    }
+
+    // Add AOI to the map
+    let aoiShape;
+    if (aoi && aoi.bounds) {
+      aoiShape = L.geoJSON(aoi.bounds).addTo(mapRef);
+      mapRef.fitBounds(aoiShape.getBounds(), {
+        padding: BOUNDS_PADDING,
+      });
+    }
+
+    return {
+      currentAoi: { ...aoi, shape: aoiShape },
+      aoiActionButtons: {
+        addNewAoi: true,
+        uploadAoi: true,
+        deleteAoi: true,
+      },
+    };
+  }),
   updateAoiLayer: assign((context) => {
     const { mapRef, currentAoi } = context;
 
@@ -107,10 +135,12 @@ export const actions = {
       currentAoi.shape.remove();
     }
 
+    const geojson = currentAoi.geojson || currentAoi.bounds;
+
     // Add new layer from geojson, if exists
     let aoiShape;
-    if (currentAoi.geojson) {
-      aoiShape = L.geoJSON(currentAoi.geojson).addTo(mapRef);
+    if (geojson) {
+      aoiShape = L.geoJSON(geojson).addTo(mapRef);
       mapRef.fitBounds(aoiShape.getBounds(), {
         padding: BOUNDS_PADDING,
       });

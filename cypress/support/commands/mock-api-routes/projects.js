@@ -606,7 +606,7 @@ export function addProjectEndpoints() {
 
   cy.intercept(
     {
-      url: restApiEndpoint + '/api/project/1/aoi/1/timeframe',
+      url: restApiEndpoint + '/api/project/1/aoi/*/timeframe',
     },
 
     {

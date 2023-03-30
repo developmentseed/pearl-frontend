@@ -138,6 +138,33 @@ export const services = {
 
     return { aoi };
   },
+  fetchAoi: async (context, event) => {
+    const { apiClient, mosaicsList } = context;
+    const { id: projectId } = context.project;
+    const aoiId = event.data?.aoiId || context.currentAoi?.id;
+
+    const aoi = await apiClient.get(`/project/${projectId}/aoi/${aoiId}`);
+
+    const timeframesList = (
+      await apiClient.get(`/project/${projectId}/aoi/${aoi.id}/timeframe`)
+    ).timeframes;
+
+    let latestTimeframe;
+    let latestMosaic;
+
+    if (timeframesList.length > 0) {
+      latestTimeframe = timeframesList[0];
+      latestMosaic = mosaicsList.find(
+        (mosaic) => mosaic.id === latestTimeframe.mosaic
+      );
+    }
+
+    return {
+      aoi,
+      timeframe: latestTimeframe,
+      mosaic: latestMosaic,
+    };
+  },
   requestInstance: async (context) => {
     const { apiClient } = context;
     const { id: projectId } = context.project;

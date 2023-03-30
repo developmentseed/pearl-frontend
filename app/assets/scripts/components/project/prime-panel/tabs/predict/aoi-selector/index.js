@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import T from 'prop-types';
 import styled, { css } from 'styled-components';
 import { glsp } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
+import get from 'lodash.get';
 
 import { AoiActionButtons } from './action-buttons';
 import {
@@ -12,9 +13,11 @@ import {
 import { Subheading } from '../../../../../../styles/type/heading';
 import ShadowScrollbar from '../../../../../common/shadow-scrollbar';
 
+import { EditButton } from '../../../../../../styles/button';
 import { ProjectMachineContext } from '../../../../../../context/project-xstate';
 import { SelectorHeadOption, SelectorOption } from '../../../selection-styles';
 import { formatThousands } from '../../../../../../utils/format';
+import { ConfirmAoiChangeModal } from './modals/confirm-aoi-change';
 
 const AoiOption = styled(SelectorOption)`
   grid-template-columns: auto min-content;
@@ -51,11 +54,6 @@ const AoiOption = styled(SelectorOption)`
   }
 `;
 
-const selectors = {
-  aoiStatusMessage: (state) => state.context.aoiStatusMessage,
-  currentAoi: (state) => state.context.currentAoi,
-};
-
 const ActiveAoiOption = ({ label, area }) => {
   return (
     <AoiOption hasSubtitle selected data-cy='selected-aoi-header'>
@@ -74,16 +72,29 @@ ActiveAoiOption.propTypes = {
   area: T.number,
 };
 
+const selectors = {
+  aoiStatusMessage: (state) => state.context.aoiStatusMessage,
+  currentAoi: (state) => state.context.currentAoi,
+  aoisList: (state) => get(state, 'context.aoisList', []),
+};
+
 export function AoiSelector() {
+  const [aoiIdToSwitch, setAoiIdToSwitch] = useState(null);
+
   const aoiStatusMessage = ProjectMachineContext.useSelector(
     selectors.aoiStatusMessage
   );
   const currentAoi = ProjectMachineContext.useSelector(selectors.currentAoi);
+  const aoisList = ProjectMachineContext.useSelector(selectors.aoisList);
 
-  // TODO fix selector title
+  const nonSelectedAois = aoisList.filter((aoi) => aoi.id !== currentAoi?.id);
 
   return (
     <>
+      <ConfirmAoiChangeModal
+        aoiId={aoiIdToSwitch}
+        setAoiIdToSwitch={setAoiIdToSwitch}
+      />
       <SelectorHeadOption hasSubtitle>
         <HeadOptionHeadline usePadding>
           <Subheading>Areas of Interest</Subheading>
@@ -103,6 +114,20 @@ export function AoiSelector() {
             label={currentAoi?.name || aoiStatusMessage}
             area={currentAoi?.area}
           />
+          {
+            // Remainder of list
+            nonSelectedAois.map((aoi) => (
+              <AoiOption
+                key={aoi.id}
+                className='listed-aoi'
+                onClick={() => {
+                  setAoiIdToSwitch(aoi.id);
+                }}
+              >
+                <Heading size='xsmall'>{aoi.name}</Heading>
+              </AoiOption>
+            ))
+          }
         </ShadowScrollbar>
         <HeadOptionToolbar>
           <AoiActionButtons />
