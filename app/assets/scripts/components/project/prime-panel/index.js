@@ -43,7 +43,7 @@ const selectors = {
 };
 
 export function PrimePanel() {
-  const [activeTab, setActiveTab] = useState(0);
+  const [activeTab] = useState(0);
 
   const actorRef = ProjectMachineContext.useActorRef();
   const primeButton = ProjectMachineContext.useSelector(selectors.primeButton);

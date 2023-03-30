@@ -12,7 +12,6 @@ import { ProjectMachineContext } from '../../context/project-xstate';
 
 import { Modal } from '../common/custom-modal';
 import get from 'lodash.get';
-import { sessionLevel } from '../../context/project-xstate/machine';
 
 const Wrapper = styled.div`
   flex: 1;
@@ -80,51 +79,9 @@ const HeadingInput = styled(FormInput)`
   font-weight: ${themeVal('type.heading.weight')};
 `;
 
-const FormInputGroup = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 2.125rem;
-  input {
-    display: none;
-    ${media.mediumUp`
-      display: revert;
-    `};
-  }
-  > :first-child:not(:last-child) {
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-  }
-
-  > :last-child:not(:first-child) {
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-  }
-
-  .form__control::selection {
-    background-color: unset;
-    color: unset;
-  }
-`;
-
 const ModalForm = styled(Form)`
   display: grid;
   grid-gap: ${glsp(1)};
-`;
-
-const ShortcutsWrapper = styled.dl`
-  display: grid;
-  grid-template-columns: min-content 1fr;
-  align-items: baseline;
-  justify-content: space-between;
-  grid-gap: ${glsp()};
-`;
-const Shortcut = styled.dt`
-  background: ${themeVal('color.background')};
-  border: 1px solid ${themeVal('color.primaryAlphaB')};
-  font-weight: ${themeVal('type.heading.weight')};
-  text-align: center;
-  min-width: ${glsp(1.75)};
-  justify-self: flex-start;
-  padding: ${glsp(0.125)} ${glsp(0.5)};
 `;
 
 const selectors = {
