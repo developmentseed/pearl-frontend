@@ -347,7 +347,9 @@ export const actions = {
     }
 
     // Calculate area
-    const aoiGeojson = turfBboxPolygon(bounds.flat());
+    const aoiGeojson = turfBboxPolygon(
+      [boundStart.slice().reverse(), boundEnd.slice().reverse()].flat()
+    );
     return {
       currentAoi: {
         area: turfArea(aoiGeojson),
@@ -365,15 +367,8 @@ export const actions = {
       },
     };
   }),
-  endNewRectangleAoiDraw: assign((context) => {
-    // Take rectangle bounds and generate GeoJSON polygon feature
-    const aoiGeojson = turfBboxPolygon(context.rectangleAoi.bounds.flat());
-
+  endNewRectangleAoiDraw: assign(() => {
     return {
-      currentAoi: {
-        area: turfArea(aoiGeojson),
-        geojson: aoiGeojson,
-      },
       mapEventHandlers: {
         dragging: false,
         mousedown: false,

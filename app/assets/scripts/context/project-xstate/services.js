@@ -15,9 +15,9 @@ export const services = {
 
     // Initialize project and aois
     let project;
-    let aoisList;
-    let timeframesList;
-    let checkpointList;
+    let aoisList = [];
+    let timeframesList = [];
+    let checkpointList = [];
     let currentAoi;
     let currentTimeframe;
     let currentImagerySource;
