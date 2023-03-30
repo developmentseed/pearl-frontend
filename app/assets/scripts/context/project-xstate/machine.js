@@ -403,6 +403,7 @@ export const projectMachine = createMachine(
 
           'Requested AOI switch': 'Applying existing AOI',
           'Request AOI delete': 'Requested AOI delete',
+          'Prime button pressed': 'Enter prediction run',
         },
       },
 
