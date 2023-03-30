@@ -534,7 +534,7 @@ export function InstanceProvider(props) {
           showGlobalLoadingMessage('Creating AOI...');
           aoi = await restApiClient.post(`/project/${project.id}/aoi`, {
             name: aoiName,
-            bounds: aoiGeometry.geometry,
+            bounds: aoiGeometry?.geometry || aoiGeometry,
           });
           setCurrentAoi(aoi);
         } catch (error) {
