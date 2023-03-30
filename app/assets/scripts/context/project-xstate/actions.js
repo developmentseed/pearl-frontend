@@ -75,7 +75,15 @@ export const actions = {
       deleteAoi: true,
     },
   })),
-  clearCurrentAoi: assign(() => ({ currentAoi: null })),
+  clearCurrentAoi: assign((context) => {
+    const { currentAoi } = context;
+
+    if (currentAoi?.shape) {
+      currentAoi.shape.remove();
+    }
+
+    return { currentAoi: null, currentPrediction: null };
+  }),
   loadLatestAoi: assign((context) => {
     const { aoisList, mapRef } = context;
     const latestAoi = aoisList[aoisList.length - 1];
