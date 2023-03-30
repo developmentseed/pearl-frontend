@@ -18,6 +18,7 @@ import { ProjectMachineContext } from '../../../../../../context/project-xstate'
 import { SelectorHeadOption, SelectorOption } from '../../../selection-styles';
 import { formatThousands } from '../../../../../../utils/format';
 import { ConfirmAoiChangeModal } from './modals/confirm-aoi-change';
+import { ConfirmAoiDeleteModal } from './modals/confirm-aoi-delete';
 
 const AoiOption = styled(SelectorOption)`
   grid-template-columns: auto min-content;
@@ -80,7 +81,9 @@ const selectors = {
 
 export function AoiSelector() {
   const [aoiIdToSwitch, setAoiIdToSwitch] = useState(null);
+  const [aoiIdToDelete, setAoiIdToDelete] = useState(null);
 
+  const actorRef = ProjectMachineContext.useActorRef();
   const aoiStatusMessage = ProjectMachineContext.useSelector(
     selectors.aoiStatusMessage
   );
@@ -94,6 +97,10 @@ export function AoiSelector() {
       <ConfirmAoiChangeModal
         aoiId={aoiIdToSwitch}
         setAoiIdToSwitch={setAoiIdToSwitch}
+      />
+      <ConfirmAoiDeleteModal
+        aoiId={aoiIdToDelete}
+        setAoiIdToDelete={setAoiIdToDelete}
       />
       <SelectorHeadOption hasSubtitle>
         <HeadOptionHeadline usePadding>
@@ -121,16 +128,32 @@ export function AoiSelector() {
                 key={aoi.id}
                 className='listed-aoi'
                 onClick={() => {
-                  setAoiIdToSwitch(aoi.id);
+                  // If AOI is new, confirm AOI switch
+                  if (!currentAoi?.id) {
+                    setAoiIdToSwitch(aoi.id);
+                  } else {
+                    actorRef.send({
+                      type: 'Requested AOI switch',
+                      data: { aoiId: aoi.id },
+                    });
+                  }
                 }}
               >
                 <Heading size='xsmall'>{aoi.name}</Heading>
+                <EditButton
+                  useIcon='trash-bin'
+                  className='aoi-delete-button'
+                  hideText
+                  onClick={() => setAoiIdToDelete(aoi.id)}
+                >
+                  Delete AOI
+                </EditButton>
               </AoiOption>
             ))
           }
         </ShadowScrollbar>
         <HeadOptionToolbar>
-          <AoiActionButtons />
+          <AoiActionButtons setAoiIdToDelete={setAoiIdToDelete} />
         </HeadOptionToolbar>
       </SelectorHeadOption>
     </>

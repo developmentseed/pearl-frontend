@@ -312,5 +312,9 @@ describe('Can delete AOIs', () => {
 
     cy.get('@deleteAnyAoi').should('not.exist');
     cy.get('@loadAois1').should('not.exist');
+    cy.get('[data-cy=selected-aoi-header]').should(
+      'not.contain',
+      'Judiciary Square'
+    );
   });
 });

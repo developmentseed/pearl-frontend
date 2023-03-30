@@ -1,15 +1,15 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { ProjectMachineContext } from '../../../../../../context/project-xstate';
 
 import { ActionButton } from '../../../../../../styles/button';
-import { ConfirmAoiDeleteModal } from './modals/confirm-aoi-delete';
 
 const selectors = {
   aoiActionButtons: (state) => state.context.aoiActionButtons,
   currentAoi: (state) => state.context.currentAoi,
 };
 
-export function AoiActionButtons() {
+export function AoiActionButtons({ setAoiIdToDelete }) {
   const actorRef = ProjectMachineContext.useActorRef();
   const aoiActionButtons = ProjectMachineContext.useSelector(
     selectors.aoiActionButtons
@@ -24,11 +24,6 @@ export function AoiActionButtons() {
     cancelAoiDraw,
     confirmAoiDraw,
   } = aoiActionButtons;
-
-  // Control the visibility of the confirm delete modal
-  const [confirmDeleteAoiModal, setConfirmDeleteAoiModal] = React.useState(
-    false
-  );
 
   return (
     <>
@@ -60,7 +55,7 @@ export function AoiActionButtons() {
       {deleteAoi && (
         <>
           <ActionButton
-            onClick={() => setConfirmDeleteAoiModal(true)}
+            onClick={() => setAoiIdToDelete(currentAoi?.id)}
             title='Delete Current AOI'
             id='delete-aoi'
             useIcon='trash-bin'
@@ -68,11 +63,6 @@ export function AoiActionButtons() {
           >
             Delete Current AOI
           </ActionButton>
-          <ConfirmAoiDeleteModal
-            aoiId={currentAoi?.id}
-            revealed={confirmDeleteAoiModal}
-            setRevealed={setConfirmDeleteAoiModal}
-          />
         </>
       )}
       {drawNewAoi && (
@@ -124,3 +114,7 @@ export function AoiActionButtons() {
     </>
   );
 }
+
+AoiActionButtons.propTypes = {
+  setAoiIdToDelete: PropTypes.func,
+};

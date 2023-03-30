@@ -5,16 +5,18 @@ import { Modal } from '@devseed-ui/modal';
 import { ProjectMachineContext } from '../../../../../../../context/project-xstate';
 import { ModalWrapper } from '../../../../../../common/modal-wrapper';
 
-export function ConfirmAoiDeleteModal({ revealed, setRevealed, aoiId }) {
+export function ConfirmAoiDeleteModal({ aoiId, setAoiIdToDelete }) {
   const actorRef = ProjectMachineContext.useActorRef();
+
+  const revealed = aoiId !== null;
 
   return (
     <Modal
       id='confirm-delete-aoi-modal'
       data-cy='confirm-delete-aoi-modal'
       revealed={revealed}
-      onOverlayClick={() => setRevealed(false)}
-      onCloseClick={() => setRevealed(false)}
+      onOverlayClick={() => setAoiIdToDelete(null)}
+      onCloseClick={() => setAoiIdToDelete(null)}
       title='Delete AOI'
       size='small'
       content={
@@ -25,7 +27,7 @@ export function ConfirmAoiDeleteModal({ revealed, setRevealed, aoiId }) {
             variation='primary-plain'
             size='medium'
             useIcon='xmark'
-            onClick={() => setRevealed(false)}
+            onClick={() => setAoiIdToDelete(null)}
           >
             Cancel
           </Button>
@@ -35,8 +37,8 @@ export function ConfirmAoiDeleteModal({ revealed, setRevealed, aoiId }) {
             size='medium'
             useIcon='tick'
             onClick={() => {
-              actorRef.send({ type: 'Requested AOI delete', data: { aoiId } });
-              setRevealed(false);
+              actorRef.send({ type: 'Request AOI delete', data: { aoiId } });
+              setAoiIdToDelete(null);
             }}
           >
             Delete AOI
@@ -48,7 +50,6 @@ export function ConfirmAoiDeleteModal({ revealed, setRevealed, aoiId }) {
 }
 
 ConfirmAoiDeleteModal.propTypes = {
-  revealed: PropTypes.bool,
-  setRevealed: PropTypes.func,
+  setAoiIdToDelete: PropTypes.func,
   aoiId: PropTypes.number,
 };

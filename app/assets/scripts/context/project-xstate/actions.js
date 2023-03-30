@@ -75,6 +75,7 @@ export const actions = {
       deleteAoi: true,
     },
   })),
+  clearCurrentAoi: assign(() => ({ currentAoi: null })),
   loadLatestAoi: assign((context) => {
     const { aoisList, mapRef } = context;
     const latestAoi = aoisList[aoisList.length - 1];
@@ -162,11 +163,9 @@ export const actions = {
       currentAoi?.shape.remove();
     }
 
-    const newAoiList = aoisList.filter((aoi) => aoi.id !== aoiId);
-
     return {
       currentAoi: null,
-      aoisList: { ...newAoiList },
+      aoisList: aoisList.filter((aoi) => aoi.id !== aoiId),
     };
   }),
   setCurrentInstance: assign((context, event) => ({
@@ -185,9 +184,19 @@ export const actions = {
     currentTimeframe: event.data,
   })),
   refreshPredictionTab: assign((context) => {
-    const { currentImagerySource, currentMosaic, currentModel } = context;
+    const {
+      currentAoi,
+      currentImagerySource,
+      currentMosaic,
+      currentModel,
+    } = context;
 
     return {
+      aoiActionButtons: {
+        addNewAoi: true,
+        uploadAoi: true,
+        deleteAoi: currentAoi,
+      },
       imagerySourceSelector: {
         disabled: false,
         placeholderLabel: 'Select imagery source',
