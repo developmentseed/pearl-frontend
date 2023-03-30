@@ -204,7 +204,10 @@ export const actions = {
       currentImagerySource,
       currentMosaic,
       currentModel,
+      project,
     } = context;
+
+    const isExistingProject = project?.id !== 'new';
 
     return {
       aoiActionButtons: {
@@ -221,6 +224,7 @@ export const actions = {
         placeholderLabel: 'Select mosaic',
       },
       modelSelector: {
+        hidden: isExistingProject,
         disabled: !currentImagerySource,
         placeholderLabel: 'Select model',
       },

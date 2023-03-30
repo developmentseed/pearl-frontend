@@ -294,7 +294,7 @@ export const projectMachine = createMachine(
           src: 'createProject',
           onDone: {
             target: 'Creating AOI',
-            actions: 'setProject',
+            actions: ['setProject', 'refreshPredictionTab'],
           },
         },
       },

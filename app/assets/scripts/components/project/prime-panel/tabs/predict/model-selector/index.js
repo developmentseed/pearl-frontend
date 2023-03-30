@@ -15,6 +15,7 @@ import { ModelSelectorModal } from './modal';
 export const modelSelectors = {
   selectorStatus: (state) => state.context.modelSelector,
   currentModel: (state) => state.context.currentModel,
+  currentImagerySource: (state) => state.context.currentImagerySource,
   modelsList: (state) => state.context.modelsList,
 };
 
@@ -27,7 +28,7 @@ export function ModelSelector() {
     modelSelectors.currentModel
   );
 
-  const { disabled } = modelSelector;
+  const { disabled, hidden } = modelSelector;
 
   const label = currentModel?.name || modelSelector.placeholderLabel;
 
@@ -46,20 +47,22 @@ export function ModelSelector() {
         >
           {label}
         </SubheadingStrong>
-        <HeadOptionToolbar>
-          <EditButton
-            data-cy='show-select-model-button'
-            useIcon='swap-horizontal'
-            id='select-model-trigger'
-            disabled={disabled}
-            onClick={() => {
-              setShowModal(true);
-            }}
-            title='Select Model'
-          >
-            Edit Model Selection
-          </EditButton>
-        </HeadOptionToolbar>
+        {!hidden && (
+          <HeadOptionToolbar>
+            <EditButton
+              data-cy='show-select-model-button'
+              useIcon='swap-horizontal'
+              id='select-model-trigger'
+              disabled={disabled}
+              onClick={() => {
+                setShowModal(true);
+              }}
+              title='Select Model'
+            >
+              Edit Model Selection
+            </EditButton>
+          </HeadOptionToolbar>
+        )}
       </HeadOption>
     </>
   );
