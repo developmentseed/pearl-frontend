@@ -41,13 +41,22 @@ export const actions = {
     };
   }),
   setCurrentImagerySource: assign((context, event) => {
+    const { currentImagerySource } = context;
     const { imagerySource } = event.data;
+
+    // Bypass if imagery source is already selected and hasn't changed
+    if (
+      currentImagerySource &&
+      imagerySource &&
+      currentImagerySource.id === imagerySource.id
+    ) {
+      return {};
+    }
+
+    // Apply new imagery source and reset mosaic
     return {
       currentImagerySource: imagerySource,
-      mosaicSelector: {
-        disabled: false,
-        placeholderLabel: 'Select a mosaic',
-      },
+      currentMosaic: null,
     };
   }),
   setCurrentMosaic: assign((context, event) => {
@@ -145,6 +154,28 @@ export const actions = {
   setCurrentTimeframe: assign((context, event) => ({
     currentTimeframe: event.data,
   })),
+  refreshPredictionTab: assign((context) => {
+    const { currentImagerySource, currentMosaic, currentModel } = context;
+
+    return {
+      imagerySourceSelector: {
+        disabled: false,
+        placeholderLabel: 'Select imagery source',
+      },
+      mosaicSelector: {
+        disabled: !currentImagerySource,
+        placeholderLabel: 'Select mosaic',
+      },
+      modelSelector: {
+        disabled: !currentImagerySource,
+        placeholderLabel: 'Select model',
+      },
+      primeButton: {
+        disabled: !currentImagerySource || !currentMosaic || !currentModel,
+        label: 'Ready for prediction run',
+      },
+    };
+  }),
   updateCurrentPrediction: assign((context, { data }) => {
     // Get bounds
     let predictions = get(context, 'currentPrediction.predictions', []);
@@ -200,21 +231,6 @@ export const actions = {
       },
     };
   }),
-  enableImagerySourceSelector: assign(() => {
-    return {
-      sessionStatusMessage: 'Select Mosaic & Model',
-      imagerySourceSelector: {
-        disabled: false,
-        placeholderLabel: 'Select Imagery Source',
-      },
-    };
-  }),
-  enableModelSelector: assign(() => ({
-    modelSelector: {
-      disabled: false,
-      placeholderLabel: 'Select Model',
-    },
-  })),
   enablePredictionRun: assign(() => ({
     sessionStatusMessage: 'Ready for prediction run',
     primeButton: {

@@ -104,7 +104,7 @@ export function ImagerySourceSelectorModal({ showModal, setShowModal }) {
                 }
                 onClick={() => {
                   actorRef.send({
-                    type: 'Imagery Source is selected',
+                    type: 'Imagery source is selected',
                     data: { imagerySource },
                   });
                   setShowModal(false);
