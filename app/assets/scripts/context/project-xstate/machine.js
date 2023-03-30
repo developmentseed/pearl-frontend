@@ -216,7 +216,12 @@ export const projectMachine = createMachine(
           src: 'createAoi',
           onDone: {
             target: 'Requesting instance',
-            actions: 'setCurrentAoi',
+            actions: [
+              'clearCurrentAoi',
+              'setCurrentAoi',
+              'updateAoiLayer',
+              'prependAoisList',
+            ],
           },
         },
       },

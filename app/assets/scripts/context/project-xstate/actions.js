@@ -84,6 +84,13 @@ export const actions = {
 
     return { currentAoi: null, currentPrediction: null };
   }),
+  prependAoisList: assign((context, event) => {
+    const { aoisList } = context;
+    const { aoi } = event.data;
+    return {
+      aoisList: [aoi, ...aoisList],
+    };
+  }),
   loadLatestAoi: assign((context) => {
     const { aoisList, mapRef } = context;
     const latestAoi = aoisList[aoisList.length - 1];
@@ -311,7 +318,9 @@ export const actions = {
 
     return {
       currentAoi: null,
+      currentPrediction: null,
       rectangleAoi: null,
+      aoiStatusMessage: 'Drag on map to select area',
       aoiActionButtons: {
         confirmAoiDraw: true,
         cancelAoiDraw: true,
@@ -393,21 +402,6 @@ export const actions = {
 
     return {
       rectangleAoi: null,
-      currentImagerySource: null,
-      currentMosaic: null,
-      currentModel: null,
-      imagerySourceSelector: {
-        disabled: false,
-        placeholderLabel: 'Select imagery source',
-      },
-      mosaicSelector: {
-        disabled: true,
-        placeholderLabel: 'Define imagery source first',
-      },
-      modelSelector: {
-        disabled: true,
-        placeholderLabel: 'Define imagery source first',
-      },
       aoiActionButtons: {
         uploadAoi: true,
         addNewAoi: true,
