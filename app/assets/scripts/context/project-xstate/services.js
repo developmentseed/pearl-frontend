@@ -86,10 +86,9 @@ export const services = {
       currentModel,
     };
   },
-
   geocodeAoi: async (context) => {
     const centroid = turfCentroid(context.currentAoi.geojson);
-    const [lng, lat] = centroid.geometry.coordinates;
+    const [lat, lng] = centroid.geometry.coordinates;
     const aoiName = await reverseGeocodeLatLng(lng, lat);
     return { aoiName };
   },
