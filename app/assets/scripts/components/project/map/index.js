@@ -1,7 +1,7 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import SizeAwareElement from '../../common/size-aware-element';
-import { MapContainer } from 'react-leaflet';
+import { ImageOverlay, MapContainer } from 'react-leaflet';
 
 import {
   MAX_BASE_MAP_ZOOM_LEVEL,
@@ -51,6 +51,7 @@ function getEventLatLng(event) {
 const selectors = {
   isLoadingMap: (state) => state.matches('Creating map'),
   mapEventHandlers: (state) => state.context.mapEventHandlers,
+  currentPrediction: (state) => state.context.currentPrediction,
 };
 
 function Map() {
@@ -61,6 +62,9 @@ function Map() {
   );
   const mapEventHandlers = ProjectMachineContext.useSelector(
     selectors.mapEventHandlers
+  );
+  const currentPrediction = ProjectMachineContext.useSelector(
+    selectors.currentPrediction
   );
 
   const handleMouseDown = useCallback(
@@ -92,33 +96,6 @@ function Map() {
     },
     [actorRef]
   );
-
-  const displayMap = useMemo(() => {
-    return (
-      <MapContainer
-        tap={false}
-        center={center}
-        zoom={zoom}
-        maxZoom={MAX_BASE_MAP_ZOOM_LEVEL}
-        boxZoom={false}
-        style={{ height: '100%' }}
-        whenCreated={(m) => {
-          // Add map to state
-          setMapRef(m);
-
-          if (process.env.NODE_ENV !== 'production') {
-            // makes map accessible in console for debugging
-            window.map = m;
-            if (window.Cypress) {
-              window.Cypress.map = m;
-            }
-          }
-        }}
-      >
-        <BaseMapLayer />
-      </MapContainer>
-    );
-  }, [setMapRef]);
 
   useEffect(() => {
     if (isLoadingMap && mapRef) {
@@ -186,7 +163,33 @@ function Map() {
         }
       }}
     >
-      {displayMap}
+      <MapContainer
+        tap={false}
+        center={center}
+        zoom={zoom}
+        maxZoom={MAX_BASE_MAP_ZOOM_LEVEL}
+        boxZoom={false}
+        style={{ height: '100%' }}
+        whenCreated={(m) => {
+          // Add map to state
+          setMapRef(m);
+
+          if (process.env.NODE_ENV !== 'production') {
+            // makes map accessible in console for debugging
+            window.map = m;
+            if (window.Cypress) {
+              window.Cypress.map = m;
+            }
+          }
+        }}
+      >
+        <BaseMapLayer />
+        {currentPrediction &&
+          currentPrediction.predictions &&
+          currentPrediction.predictions.map((p) => (
+            <ImageOverlay key={p.key} url={p.image} bounds={p.bounds} />
+          ))}
+      </MapContainer>
     </SizeAwareElement>
   );
 }

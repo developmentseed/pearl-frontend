@@ -225,7 +225,7 @@ export const projectMachine = createMachine(
           src: 'requestInstance',
           onDone: {
             target: 'Running prediction',
-            actions: 'setCurrentInstance',
+            actions: ['setCurrentInstance', 'clearCurrentPrediction'],
           },
           onError: {
             target: 'Prediction ready',

@@ -216,20 +216,22 @@ export const actions = {
     };
   }),
   updateCurrentPrediction: assign((context, { data }) => {
-    // Get bounds
     let predictions = get(context, 'currentPrediction.predictions', []);
 
-    const [minX, minY, maxX, maxY] = data.bounds;
+    // Add prediction to the list if bounds exists
+    if (data.bounds) {
+      const [minX, minY, maxX, maxY] = data.bounds;
 
-    // Build prediction object
-    predictions = predictions.concat({
-      key: predictions.length + 1,
-      image: `data:image/png;base64,${data.image}`,
-      bounds: [
-        [minY, minX],
-        [maxY, maxX],
-      ],
-    });
+      // Build prediction object
+      predictions = predictions.concat({
+        key: predictions.length + 1,
+        image: `data:image/png;base64,${data.image}`,
+        bounds: [
+          [minY, minX],
+          [maxY, maxX],
+        ],
+      });
+    }
 
     return {
       sessionStatusMessage: `Received image ${data.processed} of ${data.total}...`,
@@ -243,9 +245,6 @@ export const actions = {
   }),
   clearCurrentPrediction: assign(() => ({
     currentPrediction: null,
-    globalLoading: {
-      disabled: true,
-    },
   })),
   setMapRef: assign((context, event) => ({
     mapRef: event.data.mapRef,
