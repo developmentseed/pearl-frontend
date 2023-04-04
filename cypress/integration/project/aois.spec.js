@@ -14,24 +14,103 @@ describe('Loads AOIs', () => {
     cy.get('[data-cy=create-project-button]').click({ force: true });
   });
 
-  it('Can draw an aoi', () => {
+  it('Can draw an aoi on new project', () => {
     map = Cypress.map;
     map.setZoom(14);
 
-    cy.get('[data-cy=aoi-edit-button]').click();
+    // Upload and draw first AOI button should be visible
+    cy.get('[data-cy=upload-aoi-button]').should('exist');
+    cy.get('[data-cy=draw-first-aoi-button]').should('exist');
+    cy.get('[data-cy=add-new-aoi-button]').should('not.exist');
+    cy.get('[data-cy=edit-current-aoi-button]').should('not.exist');
+    cy.get('[data-cy=delete-current-aoi-button]').should('not.exist');
+    cy.get('[data-cy=confirm-aoi-draw-button]').should('not.exist');
+    cy.get('[data-cy=cancel-aoi-draw-button]').should('not.exist');
+
+    // Start first AOI creation
+    cy.get('[data-cy=draw-first-aoi-button]').click();
+
+    // Only cancel button should be visible
+    cy.get('[data-cy=upload-aoi-button]').should('not.exist');
+    cy.get('[data-cy=draw-first-aoi-button]').should('not.exist');
+    cy.get('[data-cy=add-new-aoi-button]').should('not.exist');
+    cy.get('[data-cy=edit-current-aoi-button]').should('not.exist');
+    cy.get('[data-cy=delete-current-aoi-button]').should('not.exist');
+    cy.get('[data-cy=confirm-aoi-draw-button]').should('not.exist');
+    cy.get('[data-cy=cancel-aoi-draw-button]').should('exist');
+
+    // Cancel first AOI creation
+    cy.get('[data-cy=cancel-aoi-draw-button]').click();
+
+    // Upload and draw first AOI button should be visible
+    cy.get('[data-cy=upload-aoi-button]').should('exist');
+    cy.get('[data-cy=draw-first-aoi-button]').should('exist');
+    cy.get('[data-cy=add-new-aoi-button]').should('not.exist');
+    cy.get('[data-cy=edit-current-aoi-button]').should('not.exist');
+    cy.get('[data-cy=delete-current-aoi-button]').should('not.exist');
+    cy.get('[data-cy=confirm-aoi-draw-button]').should('not.exist');
+    cy.get('[data-cy=cancel-aoi-draw-button]').should('not.exist');
+
+    // Restart first AOI creation
+    cy.get('[data-cy=draw-first-aoi-button]').click();
+
+    // Only cancel button should be visible
+    cy.get('[data-cy=upload-aoi-button]').should('not.exist');
+    cy.get('[data-cy=draw-first-aoi-button]').should('not.exist');
+    cy.get('[data-cy=add-new-aoi-button]').should('not.exist');
+    cy.get('[data-cy=edit-current-aoi-button]').should('not.exist');
+    cy.get('[data-cy=delete-current-aoi-button]').should('not.exist');
+    cy.get('[data-cy=confirm-aoi-draw-button]').should('not.exist');
+    cy.get('[data-cy=cancel-aoi-draw-button]').should('exist');
+
+    // Drag mouse to draw the first AOI
     cy.get('#map')
       .trigger('mousedown', 150, 150)
       .trigger('mousemove', 300, 300)
       .trigger('mouseup');
     cy.wait('@reverseGeocodeCity');
     cy.get('[data-cy=selected-aoi-header]').contains('Judiciary Square');
+
+    // Upload, edit and delete buttons should be visible
+    cy.get('[data-cy=upload-aoi-button]').should('exist');
+    cy.get('[data-cy=draw-first-aoi-button]').should('not.exist');
+    cy.get('[data-cy=add-new-aoi-button]').should('not.exist');
+    cy.get('[data-cy=edit-current-aoi-button]').should('exist');
+    cy.get('[data-cy=delete-current-aoi-button]').should('exist');
+    cy.get('[data-cy=confirm-aoi-draw-button]').should('not.exist');
+    cy.get('[data-cy=cancel-aoi-draw-button]').should('not.exist');
+
+    // Delete aoi
+    cy.get('[data-cy=delete-current-aoi-button]').click();
+    cy.get('[data-cy=confirm-aoi-delete]').click();
+
+    // Upload and draw first AOI button should be visible
+    cy.get('[data-cy=upload-aoi-button]').should('exist');
+    cy.get('[data-cy=draw-first-aoi-button]').should('exist');
+    cy.get('[data-cy=add-new-aoi-button]').should('not.exist');
+    cy.get('[data-cy=edit-current-aoi-button]').should('not.exist');
+    cy.get('[data-cy=delete-current-aoi-button]').should('not.exist');
+    cy.get('[data-cy=confirm-aoi-draw-button]').should('not.exist');
+    cy.get('[data-cy=cancel-aoi-draw-button]').should('not.exist');
+
+    // Restart first AOI creation
+    cy.get('[data-cy=draw-first-aoi-button]').click();
+
+    // Only cancel button should be visible
+    cy.get('[data-cy=upload-aoi-button]').should('not.exist');
+    cy.get('[data-cy=draw-first-aoi-button]').should('not.exist');
+    cy.get('[data-cy=add-new-aoi-button]').should('not.exist');
+    cy.get('[data-cy=edit-current-aoi-button]').should('not.exist');
+    cy.get('[data-cy=delete-current-aoi-button]').should('not.exist');
+    cy.get('[data-cy=confirm-aoi-draw-button]').should('not.exist');
+    cy.get('[data-cy=cancel-aoi-draw-button]').should('exist');
   });
 
   it('Try to draw a tiny AOI and check if alert modal is visible', () => {
     map = Cypress.map;
     map.setZoom(14);
 
-    cy.get('[data-cy=aoi-edit-button]').click();
+    cy.get('[data-cy=draw-first-aoi-button]').click();
     cy.get('#map')
       .trigger('mousedown', 150, 150)
       .trigger('mousemove', 170, 170)
@@ -46,7 +125,7 @@ describe('Loads AOIs', () => {
     map.flyTo({ lat: 40.35813437224801, lon: -77.78670843690634 }, 14, {
       animate: false,
     });
-    cy.get('[data-cy=aoi-edit-button]').click();
+    cy.get('[data-cy=draw-first-aoi-button]').click();
     cy.get('#map')
       .trigger('mousedown', 150, 150)
       .trigger('mousemove', 300, 300)
@@ -181,7 +260,7 @@ describe('Load AOIs and draw a third one', () => {
     // go to the Predict tab
     cy.get('[data-cy=predict-tab]').click();
     // add new AOI
-    cy.get('[data-cy=add-aoi-button]').click();
+    cy.get('[data-cy=add-new-aoi-button]').click();
     cy.get('#map')
       .trigger('mousedown', 150, 150)
       .trigger('mousemove', 300, 300)
@@ -298,7 +377,7 @@ describe('Can delete AOIs', () => {
     ).as('loadAois1');
 
     cy.get('[data-cy=predict-tab]').click();
-    cy.get('[data-cy=add-aoi-button]').click();
+    cy.get('[data-cy=add-new-aoi-button]').click();
 
     // Draw AOI
     cy.get('#map')

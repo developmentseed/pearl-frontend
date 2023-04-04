@@ -23,11 +23,16 @@ export function AoiActionButtons({ setAoiIdToDelete }) {
   );
   const currentAoi = ProjectMachineContext.useSelector(selectors.currentAoi);
 
+  // These are the button types available, defined at the state machine. Most of
+  // them are self-explanatory, but the "drawFirstAoi" is a special case. It's
+  // only available when there are no AOIs in the project, and it's used to draw
+  // the first AOI. After that, the "addNewAoi" button is used to draw new AOIs.
   const {
     uploadAoi,
+    drawFirstAoi,
     addNewAoi,
+    editAoi,
     deleteAoi,
-    drawNewAoi,
     cancelAoiDraw,
     confirmAoiDraw,
   } = aoiActionButtons;
@@ -35,40 +40,52 @@ export function AoiActionButtons({ setAoiIdToDelete }) {
   return (
     <>
       {uploadAoi && (
-        <>
-          <ActionButton
-            title='Upload AOI GeoJSON'
-            data-cy='upload-aoi-button'
-            id='upload-aoi-button'
-            useIcon='upload'
-            onClick={() => {
-              actorRef.send({
-                type: 'Pressed upload AOI button',
-              });
-            }}
-          >
-            Upload AOI
-          </ActionButton>
-          <Separator>|</Separator>
-        </>
+        <ActionButton
+          title='Upload AOI GeoJSON'
+          data-cy='upload-aoi-button'
+          id='upload-aoi-button'
+          useIcon='upload'
+          onClick={() => {
+            actorRef.send({
+              type: 'Pressed upload AOI button',
+            });
+          }}
+        >
+          Upload AOI
+        </ActionButton>
       )}
-
       {addNewAoi && (
         <ActionButton
           useIcon='plus'
           onClick={() => actorRef.send({ type: 'Pressed new AOI button' })}
-          data-cy='add-aoi-button'
+          data-cy='add-new-aoi-button'
           title='Draw new AOI'
         >
           Add AOI
         </ActionButton>
       )}
+      {(uploadAoi || addNewAoi) && <Separator>|</Separator>}
+      {drawFirstAoi && (
+        <ActionButton
+          useIcon='pencil'
+          onClick={() => {
+            actorRef.send({
+              type: 'Pressed draw first AOI button',
+            });
+          }}
+          data-cy='draw-first-aoi-button'
+          title='Draw first AOI'
+        >
+          Add AOI
+        </ActionButton>
+      )}
+
       {deleteAoi && (
         <>
           <ActionButton
             onClick={() => setAoiIdToDelete(currentAoi?.id)}
             title='Delete Current AOI'
-            id='delete-aoi'
+            id='delete-current-aoi'
             useIcon='trash-bin'
             data-cy='delete-current-aoi-button'
           >
@@ -76,19 +93,19 @@ export function AoiActionButtons({ setAoiIdToDelete }) {
           </ActionButton>
         </>
       )}
-      {drawNewAoi && (
+      {editAoi && (
         <ActionButton
-          title='Draw Area of Interest'
+          title='Edit Area of Interest'
           id='edit-aoi-trigger'
           useIcon='pencil'
-          data-cy='aoi-edit-button'
+          data-cy='edit-current-aoi-button'
           onClick={() => {
             actorRef.send({
-              type: 'Pressed draw new AOI button',
+              type: 'Pressed edit AOI button',
             });
           }}
         >
-          Draw new AOI
+          Edit current AOI
         </ActionButton>
       )}
 

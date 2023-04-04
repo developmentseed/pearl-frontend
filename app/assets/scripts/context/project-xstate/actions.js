@@ -71,10 +71,18 @@ export const actions = {
   setCurrentAoi: assign((context, event) => ({
     currentAoi: { ...event.data.aoi },
   })),
-  setFirstAoiActionButtons: assign(() => ({
+  showFirstAoiActionButtons: assign(() => ({
     aoiActionButtons: {
-      drawNewAoi: true,
       uploadAoi: true,
+      drawFirstAoi: true,
+    },
+  })),
+  showExistingAoisActionButtons: assign(() => ({
+    aoiActionButtons: {
+      uploadAoi: true,
+      addNewAoi: true,
+      deleteAoi: true,
+      editAoi: true,
     },
   })),
   clearCurrentAoi: assign((context) => {
@@ -200,7 +208,6 @@ export const actions = {
   })),
   refreshPredictionTab: assign((context) => {
     const {
-      currentAoi,
       currentImagerySource,
       currentMosaic,
       currentModel,
@@ -210,11 +217,6 @@ export const actions = {
     const isExistingProject = project?.id !== 'new';
 
     return {
-      aoiActionButtons: {
-        addNewAoi: true,
-        uploadAoi: true,
-        deleteAoi: currentAoi,
-      },
       imagerySourceSelector: {
         disabled: false,
         placeholderLabel: 'Select imagery source',
@@ -403,11 +405,14 @@ export const actions = {
       rectangleAoi.shape.remove();
     }
 
+    const isFirstAoi = context.aoisList.length === 0;
+
     return {
       rectangleAoi: null,
       aoiActionButtons: {
         uploadAoi: true,
-        addNewAoi: true,
+        addNewAoi: !isFirstAoi,
+        editAoi: true,
         deleteAoi: true,
       },
       mapEventHandlers: {
