@@ -5,6 +5,7 @@ import get from 'lodash.get';
 import { delay } from '../../utils/utils';
 import { WebsocketClient } from './websocket-client';
 import logger from '../../utils/logger';
+import toasts from '../../components/common/toasts';
 
 export const services = {
   fetchInitialData: async (context) => {
@@ -43,7 +44,7 @@ export const services = {
       // Fetch project aois
       aoisList = (await apiClient.get(`project/${projectId}/aoi`)).aois;
 
-      // If there are aois, fetch the first one's timeframes
+      // If there are aois, fetch the first one's timeframes and mosaics
       if (aoisList.length > 0) {
         currentAoi = aoisList[0];
 
@@ -62,6 +63,16 @@ export const services = {
             (imagerySource) =>
               imagerySource.id === currentMosaic.imagery_source_id
           );
+
+          // Fetch timeframe tilejson
+          try {
+            currentTimeframe.tilejson = await apiClient.get(
+              `project/${projectId}/aoi/${currentAoi.id}/timeframe/${currentTimeframe.id}/tiles`
+            );
+          } catch (error) {
+            logger('Error fetching tilejson');
+            toasts.error('There was an error fetching the prediction layer.');
+          }
         }
       }
 
@@ -156,6 +167,16 @@ export const services = {
       latestMosaic = mosaicsList.find(
         (mosaic) => mosaic.id === latestTimeframe.mosaic
       );
+
+      // Fetch timeframe tilejson
+      try {
+        latestTimeframe.tilejson = await apiClient.get(
+          `project/${projectId}/aoi/${aoi.id}/timeframe/${latestTimeframe.id}/tiles`
+        );
+      } catch (error) {
+        logger('Error fetching tilejson');
+        toasts.error('There was an error fetching the prediction layer.');
+      }
     }
 
     return {

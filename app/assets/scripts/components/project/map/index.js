@@ -10,6 +10,9 @@ import {
 
 import { themeVal, multiply } from '@devseed-ui/theme-provider';
 import { ProjectMachineContext } from '../../../context/project-xstate';
+import get from 'lodash.get';
+import { useAuth } from '../../../context/auth';
+import TileLayerWithHeaders from '../../common/map/tile-layer';
 
 const center = [19.22819, -99.995841];
 const zoom = 12;
@@ -52,9 +55,11 @@ const selectors = {
   isLoadingMap: (state) => state.matches('Creating map'),
   mapEventHandlers: (state) => state.context.mapEventHandlers,
   currentPrediction: (state) => state.context.currentPrediction,
+  currentTilejson: (state) => get(state, 'context.currentTimeframe.tilejson'),
 };
 
 function Map() {
+  const { apiToken } = useAuth();
   const [mapRef, setMapRef] = useState();
   const actorRef = ProjectMachineContext.useActorRef();
   const isLoadingMap = ProjectMachineContext.useSelector(
@@ -65,6 +70,9 @@ function Map() {
   );
   const currentPrediction = ProjectMachineContext.useSelector(
     selectors.currentPrediction
+  );
+  const currentTilejson = ProjectMachineContext.useSelector(
+    selectors.currentTilejson
   );
 
   const handleMouseDown = useCallback(
@@ -184,6 +192,17 @@ function Map() {
         }}
       >
         <BaseMapLayer />
+        {currentTilejson && (
+          <TileLayerWithHeaders
+            url={currentTilejson.tiles[0]}
+            headers={[
+              {
+                header: 'Authorization',
+                value: `Bearer ${apiToken}`,
+              },
+            ]}
+          />
+        )}
         {currentPrediction &&
           currentPrediction.predictions &&
           currentPrediction.predictions.map((p) => (
