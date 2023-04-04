@@ -432,6 +432,21 @@ export const actions = {
       },
     };
   }),
+  displayAreaTooLargeModalDialog: assign((context) => {
+    const aoiArea = context.currentAoi.area;
+    const formattedAoiArea = formatThousands(aoiArea / 1e6, { decimals: 1 });
+    const maxArea = context.apiLimits.live_inference / 1e6;
+
+    return {
+      aoiModalDialog: {
+        revealed: true,
+        proceedAnywayButton: true,
+        headline: 'Save Area For Batch Prediction',
+        content: `The AOI area is ${formattedAoiArea} km², please select an
+        area smaller than ${maxArea} km².`,
+      },
+    };
+  }),
   closeAoiModalDialog: assign(() => ({
     aoiModalDialog: {
       revealed: false,

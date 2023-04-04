@@ -16,6 +16,7 @@ export const AoiModalDialog = () => {
     selectors.aoiModalDialog
   );
 
+  // TODO there is a regression in the styles for this modal
   return (
     <Modal
       id='aoi-modal-dialog'
@@ -36,7 +37,7 @@ export const AoiModalDialog = () => {
               variation='base-plain'
               data-cy='proceed-anyway-button'
               onClick={() =>
-                actorRef.send({ type: 'Process anyway button pressed' })
+                actorRef.send({ type: 'Proceed anyway button pressed' })
               }
             >
               Proceed anyway
