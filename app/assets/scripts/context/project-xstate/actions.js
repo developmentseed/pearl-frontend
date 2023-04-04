@@ -69,10 +69,12 @@ export const actions = {
     currentModel: event.data.model,
   })),
   setCurrentAoi: assign((context, event) => ({
-    currentAoi: event.data.aoi,
+    currentAoi: { ...event.data.aoi },
+  })),
+  setFirstAoiActionButtons: assign(() => ({
     aoiActionButtons: {
-      ...context.aoiActionButtons,
-      deleteAoi: true,
+      drawNewAoi: true,
+      uploadAoi: true,
     },
   })),
   clearCurrentAoi: assign((context) => {
@@ -110,7 +112,6 @@ export const actions = {
       aoiActionButtons: {
         addNewAoi: true,
         uploadAoi: true,
-        deleteAoi: true,
       },
     };
   }),
@@ -139,7 +140,6 @@ export const actions = {
       aoiActionButtons: {
         addNewAoi: true,
         uploadAoi: true,
-        deleteAoi: true,
       },
     };
   }),
@@ -326,7 +326,6 @@ export const actions = {
       rectangleAoi: null,
       aoiStatusMessage: 'Drag on map to select area',
       aoiActionButtons: {
-        confirmAoiDraw: true,
         cancelAoiDraw: true,
       },
       mapEventHandlers: {

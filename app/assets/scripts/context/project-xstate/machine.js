@@ -5,7 +5,7 @@ import { services } from './services';
 
 export const projectMachine = createMachine(
   {
-    /** @xstate-layout N4IgpgJg5mDOIC5QAcBOB7AVmAxgFwFoBbAQxwAsBLAOzADoAFEmAAkthaPQFdq9IAxACU46ADYA3MCxLc85MH0o4SeSumoBtAAwBdRCnSxKajQZAAPRAQCMNgMwB2OnYCcAVkcAOLwDYnvl7uADQgAJ6INv50jo6uAEwevq7JTu4ALAC+maFoWLiEpBQ09Eys7CyoYCQQYQI6+kggyEYm6tTmVgi2dvF06Tbu2jZ+2unu7l6hEQgOrl50vgPa9qtj2omu2bkY2PjEZFS0jMzSFVU1dZo2jYbGph1NXbau6XSuTjba-l7aXq4JaaRdLabT9D7-eLxEGOfzbZq7AoHYrHMpnDgXWr1eK3ZqtB6dSLxGx0ezpeJxbSuUHUrzxIGzEHufqTeK+CkJeITezwvJ7QqHEp0ADCChwAGsaFA2AAzFjcWBgVBsDiyeSKNQqfgQep6cwte7tQndXpgjIg75-dy+CYM9L2Zn+dzxS2+bQZFa8xH7IpHeii3CS6jSyhyhVKlUyOQKJRawTXXEGtpmJ7WLyOZk2dI2uKODYZ1Z2h2LB0ut1uj08nII-I+wXHACifCVUpYtAA7iw+QU2yQiGABABlMB4Lve0fUPtgBr6-FG1MmuzM9x2G2g3xuxw2Bk2RzjfpWr5uexRLLV7t1lH0AAiYBlJTY1DaJDELAAggB5ACSAgYVVgioQCwECoCQnYdu+34sAARnIeAaDOTRJgSC4EPYwy+HQwxDP86TLAMDKrLuWH2FyJ5Zv8GZerWApXnQt73rQj7Pq+n4-n+cCAfKyBiOgNSQV+MFwQhepIXOKagM8UQjDEVJeF8fjZgM6QMlCFIxPYrgUekjj2JujjUfyyJ+iKFxqMGnAkMgAgALJWZGOBmZAiF3MmjySdYdjaM4WZRB4DikQWDIfGCYxumk1oTHC57jsZQoAOokG0FkyugyogcwLBpSwKjUDgYBiLZ9lcOGEDoO2Wiia5KEed0J7uK4LgJH8BbyQ6viEeMmE+NajjxIpAxOIZSK+glSXmdKqXpaB0rZbl+WFRxAGQDlJB5QVAnAaBnawXg8GVYm4nuZY1gun4JYeNSenxHpHXhIgZLEu8fzpPM3x0p4Z47DRcXHNe22tmxMFhFtzBQFKRXIJwPCKlwUguXihoSSddXps45LpF4J6ggMSwqfdCCkc6Lh9f81LOoEGTDZeJn-WBgNQdBIMZVA4PBpD0PhtwyAI8h861WhW6NaCUT9TYCRtfYqmBGC3jsnu4w4-E1O0bTAMWUDTOg6zENLVx80bUDGU7cJB2zkjx3PA69gLPMZJ40sbJ3TMJ56SyWkJK4sRBLCKu-fQABiNDsOQwF3sHGuMzw1AQLAAhlccNASOg4r0BeqtCkHT6wKHEDh0+keCdB0exwgSfoFq7QNLzR3GgQxIgjEvh2OhIJ4ckqk+M4G4N9yelaQZMU-aNxwByOFDMWoL7AaoJDxxo9Dl6ndDp-7dBj3gE-B1Pr4QLPZfUMnlciboNcW3XvT2HQ1qvaCGwDBTDJ5n0W6DOypHfPMX01kZI+B+Podt6UGnnvPAc8lQYFQCvMQqgppEBXrFP+68AGT2Abvfe5dj4HTPm5OuuE6Aug9lCVYzUpgE0mCSYkelYgrC9rCLwfskEcQgMoB4lRqhYj-JQfsQk9oaDHJxZyVVEa4IXBSRI7wbDElhPaTS0IpYEyhMTLweEnAAiZFSRh9ZShVBYfgdo7DLjCDAAAR24HAUcRsCojmnMIvmyMuifCwpuPwWYPDrjtCkMEgxJi5lhIkLRdFmGsIMZiOoesVoQU1qbHBNUUarBdDENkLoP6aXNKpBwCw-AAhtGWcY0JAkmWCfo-hYTjFmIsStIGsB2wmAoLE-m8SnB9BurENkfwliOCLIMOgPUGrUi3P8QpQomz8GVGgSAITSm8F1Idc+C4bQLC+NCIWww4j9VUhmbx8wvb+FIrfdwwzGzNnGboqZ1BKgzITObURtVFkuHvqs3cEtO4JHeGybwFJ0I+BsEc+goyIwTL0Ww1AVycQ3LiV0e5yydLizWS8gm6FEmeHTFyEYAIJiHKHr-bRplqgTQEvPROh8U5p0Qbi4UZkGZfgPkfVQVc9ANIcZEN0fRb6kR+emZ0ncMikipFEfw9o4gMOxSNXFIgKmwAJTQKVa18pEsXiS5eq8kESvMVK1sMqwHrVpRXelJ8mWW0QFQsE1DXhY0mGFBRMxNiYRSYEG60JXhDVFTTIUaqLGauoLK9aAgIFpWgbAtK8CVXitMeq6V3rtX5V1Vg6udja5iIcKa3wcRMYOl+Nma1xqnBX08M3W+7JorfRxXRIQvAC7SiBecgQXA86FVlXgBU7D8qUCkBAQ1xpoRfF6buVc3gUiU1eY1IIZIsx4SzN5P5dBy3UErQI4F7RjGtvbTlMU4oWg0DwJ2sRAwFhclHQ4bMsRXCdxWDEak7jvKxGUtO2d87q0lOoMusAbaVpqH7DKUC-Yd21WhE9G0yRYSvAahkbNCAKTeSSSolYlo-BUVdRnY497WyPoeC+t9QE0MGLyFAf8sBf0oxuumXp6YBie2dOMaWdhFg2ghEBl0gw70VtQ2cp9Ag3zF1QKOUFZsxLzL-eMRqpF2QghbsSL2qkVyOhWDpWR1tfDMbnaxyZ7Hikgt4CwdsJBVRce1IRroTsR1kmvcSChbJVIfEws3akNoRh2Fwkph9bH0PqdCZp7THAcDoCIDxGxHaE0CaIxuYzMI+qDHkhZxFKw+iBEGIkc0QQsUlrFXRSl+LWM0QVXQJeZLh4UqpRZdOsb9XYMC7clGXxvDX1fq9IV4j6SKL6tZzw3ypF7iiNOgAMnxICMD+BSsJQZ41sQSTi2Ickf4GQyEzFFmykYfhEgqPtHYadAA1F8lBQHSGNhctisyIWNKtpjfd-wRYbjwhkVSUIFh9SGBkWEKKxjrc29t0GFUhs3EO8yuq4sSThZWP3LG6jrt4WcbpLyboVsvbEFt1QO3tp7e-NiOZFXngfJJPMNk1pVgnkW6pUsMR5KKzkoNadALlSTMsVBOtA43wQCAqQKGYApB8BYOQNaEAxBKgI+VyF1hNJg5wnIl0cltyKLq9fZIUjNJrCiIPFLbq-rsB4iQEG5kQZA206geddaXwCAANJgDAMzlhBLdr7QEctALqP+fdAGOpUd6FPY2xUTuLutHgdLDSd8KsiukP-LN9SjjUFvM64jJ57WMAbffaNXVV4bx3RsgCF7CEXTFE+DBP1b4zd+rY6COToPhcQ+CXyicyMLNo-Dfj8WAKTg9xqXdOnm1dIR19oFZm2Ifuf6pZMg2Iv0p9sRKAkDA2r4Lcn1j3Xa2tssZKSUk7SzAJZI5hPE6G2yWe9K8D8lQfyPh+bW89Qe8qAiC8P2tXtC7gbbvDnw7ckG4pOxAIYpXcqLxi-MQ2va8KuYFhFbNzLxPxEDHroVAAKo8S9YrQSCvabT3jc6X7drWY9xiy7irD4w2q6RXyvR0hKJ6TX53p3j-ihxAxdbsB4AHb8Zo7WDNyOhRABCtZtzgZtxvCvRLYjArAUyEFfpwAkFQRkFSr1BfZUF24EDNzOA0gNQO4jByaERaQyapo4FOCYxZjk4WC74trapQDc6bTGzQx5yUHVRHanS4y0bsioFYEYHGqBCYRjBOryS+Tkjd6hppYaD3hQDcCoCthRLI42RGBJQ4CRiKjc74BCK27GHdDZ6yy3S3wDwUghAEwgjyTPSkxbiOyBDTrChuGUAeFeEWQ+E-hfikAwCoAgywA8CoD5RBHWKhEx4iERH1yt4ELnYAhUhd6ER5jeLLJjDkh0jjAK5b4B4ijZG5HeFgCdj7Z+H1rVEhH6Z84NGtLOA3RZgriMblhWGEydEuDLJgZaTEgir+5rxZHH45GeFjETHI4epSpVJQQ1J1LkCIHX6hToQbA3RaTyTeR2gjA+RSLyFSIrJbBf5ILHHuFnH5HjGEpXHU6CT1o2KIF56LD9S6SbARYbEwixbNIug6S-AoqZEjFgnSgFG-heE8IT4XITLW7wk3QELInZh3yUZfG15si-BkRY6KZAm4pvjIA8T-4WRgDqEarF4JyKrJzKrkp0Rck8mtj8nkHUolYPDxrhE-ZoRvAsk3bkwywbB2hZqkh9SaT5gngJDTq3jc4EoymCl74-jCk5ZKp5alq0zWJmkCkEpsTykMqnzzHKlfCvSkgRarBYxkRch2hQiYTki0hch4R+AHGDFrxQk3EwmOkDiX5+RjaDSUwnjLAJEzBtyZgwZmaTC0jsmHGqrhqVIj5QSwn8BCFKlx62A2G9rLbLZewODN6IDkjqR9rULpjkTfwuG0y-5q4sAwKoCsCj7ZGn6lb6H65G4m4sBU6thklW6ASX57rMgWqBAeCjB6Q7jAb9B5jpit4OhjCb59lCg-6wCq4gzDmjmh7jmkBsKgHEkVzG5ARrRhDaYgyLkUnLmem1nYx9Cy6pr+CTY7lvKQZ6TeSrgurVjUDoB5zwBITil+hT6oQP7Mg3T4HZhfCvCnoExoRXwN7e5UiQX8q9lIVChoiRglTNgQAoUCx2BSKkgggDJHjrhZmIDX4aRLAPbeTSJMYclBKnCRhhJ0Uow9CcUAh9RUiia4WzZ-BXwbjiyeD9S4yYyZHrqaphiKjKgVBqgxiajw60X1Fel9qIkqGwpYXi4uzoSkjyLOjoG0jOHkXHJjLnFjg0S9j9iiVSQUS9pDA7GYyBU7hDBXzUjQjX7rJAWAnFlhosJVD4AsDwTs4+bSDICnDeU0GkSkiUy-Byz2YzZtmrC6nywbDzBbgOjGn5xnBPg7wCQZWLhFW6TkbkZ4zsWzApDMich4SvCAYDCZGFbShM71U9Cgj9DE6rAnrmGNYzAwa9JDBdT+A4w+DTqJQaFTTaxZTKhj7DVfLOCvBmbvxLB+CESJCYTX7e59HeSaTGnqyWnAxR5SjDU2x-CkgqIQVkici6SES+XdkrLrD7JOX5Z0RZwhxhyMTUowQlwIVGHKkNwLANSkRpLJ4KybKeD9CiyvH+D7XTobxbw1VoIzxgLDUtwSEfA2wfAwiiwMhRQEJHp2CjbUh9UCVFIuahIcIzAw1x4BBXx0juj0HDDLatkIADDVZexTbeSp4VXM0jLl7YbTLHT2Jc0+C9Jr4ODYVRnOzGopALDJBY6rAUzKzS3HDpb0qFz1Vq2NRuhYyKWtb2w8qxYdLW3MlImEGSqRo+r5Tm3dkuBkgqLizsgpCWa-AEIVjEaJDuhOYqaLrIyK1doBAELX5ER7i5Ka2Ex3ySINQFqshtT9UZZFbjj1VBCYRsmuw+DzD+CbLQjvC9QwZYwqJsjda9ZDnw6DZsQ7U0Yu5yxDCblZjBXzAxBybsjOj0LOgw5w78DvZI5fhPVbGI1li9A3xtVqShl0apoJB7grjk7l5U6bS07DXkjEQYU2hYVUivSqQWivXtleRSLOgnnOU3gDnq40Ca5QTa665wUvhPXWhsqcG4RCwZBL2wYlivEU3OgJaF4aFt3GV-n4II3rDsj-B4yWbFgKwuiTAqIqLGmP0AGQHAE04f1iA7VbimorhXWsmpqbJYykgAhshzB5jWjcHEGbQCF4DDVcr9BHWbmwh2BonfDMh9T2jNwqJppYxqEaHxVaE6FGzbT6FgBEMnh7kdL2inUgbSyYzXw6R5j9zImdZG3+j4l5GEkQlQOc11xcgZgHh+CUY9WdJyFch8pBABl9TEgjDTqSliC8nSjmkunfg7W33PQ3SJ0U1BBFicURmeBrKJBS0xV0QmkjjSnOnUrE3Z7PRCPkidGsjBnDD9CJCDA0KgjRmnnIalnXHlkJmmlyPQPmDwTIBtm8VmVv6ghbieChDc4yisORFjASEZjeCcFey+KhDFx8JEBtlSJgiiaNOQUtMgBeFQDkAdMvDqTeRPYOj9PpihC1IQDyBEjaChAKA5HzNtlkLo5dNYQ9O-CrMZjrOJH1MTO9NTMDFFMP0Xl-7N0jnSBjknETkPkENPXhW9KwY9SfBKWqSA4h1BA0NBAcjsnZBAA */
+    /** @xstate-layout N4IgpgJg5mDOIC5QAcBOB7AVmAxgFwFoBbAQxwAsBLAOzADoAFEmAAkthaPQFdq9IAxACU46ADYA3MCxLc85MH0o4SeSumoBtAAwBdRCnSxKajQZAAPRAQCMNgMwB2OnYCcAVkcAOLwDYnvl7uADQgAJ6INv50jo6uAEwevq7JTu4ALAC+maFoWLiEpBQ09Eys7CyoYCQQYQI6+kggyEYm6tTmVgi2dvF06Tbu2jZ+2unu7l6hEQgOrl50vgPa9qtj2omu2bkY2PjEZFS0jMzSFVU1dZo2jYbGph1NXbau6XSuTjba-l7aXq4JaaRdLabT9D7-eLxEGOfzbZq7AoHYrHMpnDgXWr1eK3ZqtB6dSLxGx0ezpeJxbSuUHUrzxIGzEHufqTeK+CkJeITezwvJ7QqHEp0ADCChwAGsaFA2AAzFjcWBgVBsDiyeSKNQqfgQep6cwte7tQndXpgjIg75-dy+CYM9L2Zn+dzxS2+bQZFa8xH7IpHeii3CS6jSyhyhVKlUyOQKJRawTXXEGtpmJ7WLyOZk2dI2uKODYZ1Z2h2LB0ut1uj08nII-I+wXHACifCVUpYtAA7iw+QU2yQiGABABlMB4Lve0fUPtgBr6-FG1MmuzM9x2G2g3xuxw2Bk2RzjfpWr5uexRLLV7t1lH0AAiYBlJRY99QsFHAEEAPIASQEDCqsEVEAsBAqAkJ2HYsB+n4sAARnIeAaDOTRJgSC4EPYwy+HQwxDP86TLAMDKrLuWH2FyJ5Zv8GZerWApXnQt73rQj6UM+b5fj+f4AfKyBiOgNQQV+MFwQhepIXOKagM8UQjDEVJeF8fjZgM6QMlCFIxPYrgUekjj2JujjUfyyJ+iKFxqMGnAkMgAgALJWZGOBmZAiF3MmjySdYdjaM4WZRB4DikQWDIfGCYxumk1oTHC57jsZQoAOokG0FkyugyrAcwLBpSwKjUDgYBiLZ9lcOGEDoO2Wiia5KEed0J7uK4LgJH8BbyQ6viEeMmE+NajjxIpAxOIZSK+glSXmdKqXpSB0rZbl+WFb+cBcfNBUCVBGWdrBeDwZVibie5ljWC6fglh41J6fEekdeEiBksS7x-Ok8zfHSnhnjsNFxcciXJZN2UZbNyqrYtnGQDlJB5WtkFASBW3CVoNyzoaElHd0V2aTEriwtC8xLH4qmBMyz10lC7h6eTw2XiZ15w62MPQWEsPMFAUpFcgnA8IqXBSC5eIo4dzz2OmzjkukXgnqCAxLCpt0IKRzouH1-zUs6RMfTWRmjcctOgfTgmM8zUCs8G7Oc+G3DIHzyHzrVaFbo1oJRP1NgJG19iE78MR+BSeFDGM8RU7RNN0xZDNM4DJtQBxy3gyD63M-DO0iftAvGmh5MLPMZIy0sbI3TMJ56SyWkJNj3ieL4QfffQABiNDsOQQF3g3YcGzw1AQLAAhlccNASOg4r0BewdCvX1CN83jH61B0Ed13CD9+gWrtA01sHenxIgjEvh2OhIJ4ckqk+M4G5b9yelaQZMVfdrdcjhQbAT2oJBiEBqgkD3Gj0EvQ90CPNc6C1wfk3BuL834QA-ovagA8V4p3XmnVCvR7B0GtM9UEGwBhqwZHmPoW5BjslIt8eYGsAF3yASAp+bRX7vzwJ-JUGBUD-zEKoKaRB-6xXIcAvAj8wGUBoZAuh0DYGqFXnoBBbl064ToC6UuUJVjNSmHLSYJJiR6ViCscugRq7kKWhAZQDxKjVCxL+Sg-YhLJ2oGOWOEAJE1TRhSRI7wbDElhPaTS0IPZyzJn0LweEnAAiZFSHR9ZShVH0fgdoRjLjCDAAAR24HANiG0CojmnFVfmkiFyfCwpuPwWYPDrjtCkMEgxJi5hxlsG+WtQmMHCQYqJmI6hLX-ODcCDMEZ2NtmjVYLoYhshdEQzS5pVIOAWH4AENoyzjGhCEuieiGkaGiViEQCSkngxhrAdsJgKBdNRl0VYfUZFOD6m6RSjgiyDDoD1Bq1Itz-DmSZJs-BlRoEgIsqxqBeC6lTlk2qNoFhfGhA7YYcR+qqQzKU+Y2N-CkXQe4R5QpnkRjeREwxXzqD1CRmJRB-zJguEwSC3cbtj4JHeGybwFJ0I+BsIixszZXn1MiUsjF2Jfn2K6ACglwLXagpJXLdCfTPDpi5CMAEEwEXVJGrU4UZkZ5fz7jAwew9OEyrlW3T8wjl6iPgRkm2+zIhuj6Og0iNL0zOmPhkUkVIoj+HtHELwdL6CrMSS+VsNAXyQ3ygqn+Sq-5kNqS6pJ7rqCeqhlquBe09mC0QGosE6jXgS0mGFLxMxNiYUGYEK6uN7VOroEGt1FkPV0KhgIBhaVmGsLSuwgNdEC0TSfmG-KEadVRr1RvBccbSS+DiOLB0vxsyptjU4FBlcCnfDZFWT6NS628AnhZVFHyBBcAgAVAQnq8AKiMflSgUhbHttxQ45Y1zdyrm8CkImpLGpBDJFmPCWZvJ5qEHO1si7mWYpEDuvdOUxTihaDQPA0bjTQhklyG9DhsyxFcMfFYWMqT+1iHuLMT6X0LqZQ8WJX7wZqH7DKEC-YgOdvJCSG0yRYSvAahkIdCAKTeX6X4lYlo-BUSldTIUz7qDzulG+jDn6wC7vBjxqJeQoCcUI7VK66ZrnpgGGXZ04xCZ2EWDaCEZGXSDBQ5x196H2gCFfHPVAo4MXiaPQ1UkAyQR72JNjVSK5HQrB0u4h0elNNcesWi3TCz32VF4CwdsJBVQGe1CZro+dr1km8n1QY8k2SqQ+JhXe1IbQjDsLhVz2n3nvpjh5llvn-McBwOgIgPE0n7vZd00LG5wswiiyo2LAqVh9ECIMRI5ogiSundKuisrqgNpHj6ugv8VW3zVb17TNEW0PDXgev5aMvjeFQfg569rHH0m8acxYnhqUuKQ1XVjo9jgABk+KARYfwF860fnI1m6F2IJJXbyOSP8DISiZjO2NSMH2JD7R2DzQANVfpQQR0hNpWMgldnFN3rBkh8DI-4TsNx+1lmmqECw+pDAyLCYVYx-uA+B4nMH7EEzXY5dD12JIosrEvhLQJqloRvG+LpLybofu47EED1QIO4aE+-JoHEJOKvHR7SSeYbJrSrBPD7VSpZvZZn9iQhwebkXKneckzmq69MQEAqQDmYApB8BYOQSGEAxBKlgCF6Hrw3g4Q8S6OS25vHLdQckFxmk1hRGvp1tjOt2A8RIEzcyTMYb+dQG5ldr8BAAGkwBgF1-oht21drWNaWVgXBrugDHUje9CZdhZ+J3CfZTNOljDO+FOzWXWnnx-lTDQroeIz5aNjAVPkPSd1St1hNWARsYQgud4nwYJ+rfF3v1MXQQlfV41XpwS+UGWRkjs5Gbbe0IfEzBL2I5IoTuj72muk17T22oHbEcvtaq9-Uuy0ritevVrUTynNPMa6qZ3eBLJSSl85xYBLJHMJ4nTCw6xXt7vQA2JPtKODpfhsjPhoE+EQBYrtBbk-sLC-jnIfOSBuLZrEHDksLuCKuMLSvtoAteL7iwmEK2JbLxPxDDOHoVAAKo8QnbgwSB44Jz3im4IEEAgYJZnwuy7irDI6xq6QoIkxqTkw2gn6qp1p3h-hNwwyHbsB4AQ7VSC7dC7yOhRABBbYHzUYHxvDPSJDyS-Clh7Ze4HbOpSFwAyGCRyEvhYrlbp4EC7zOA0gNSZ4jCOaERaT2Y9okxODizIYEHkINgWDn5VD4CQxQCm4JybTq4DjsGcHKbsg8GCH8E0aBCYQBwkx2DKRXR5rCjQGUBQDcCoCtjtLsQ2RGBJQ4CRiKim74CL52GP4cG-Bgi6SI7UhXwUghBywgjySPTKxbh5zaIBEyr5GFHFEWSlHfifikAwCoBMywA8CoD5TVGpJ1Et5KH2Gj6NR25+TtHH6ER5ilJApjDkh0jjCe6AGmEiijFFElFgCdjg7lGrpvwVA1EFD1EP6bwnLHJy4uIYTfApFOCgguBApUZaTEiOrDHdY3HjHSiTGxJrIviQFQRbI7LkBxHkyhToQbBXRaTyTeR2gjA+QuKeEuLApVImGAJ5HUD3hjF3EPHsT1pRGpL8BxGj6LD9S6SbDRYpEwhNZOBb46S-DCq5Ewn0kX7FHmJ35WJvIp5slXQyJcnZgYLyaEnFguKBAbDkyi7GGXGAKvjIA8SkEWRgDBGFpgHsS9y+oDz+oSEmQGlGmtimnyEzyTZiK6DsFkjXI4n9SqyakbB2iDqkh9SaT5gngJB5q3im4NrOnmmXZWmDZ+rDYzo0wslOlmkNqQRum6oNHpxfDPSkjRarASxkRch2hQiYTki0hch4R+CQmUnkL1rInNzRmxFL7KG2Au4uCDREwnjLBdEzAHyZgMbEgTDw5+BPrxKurajMmtm2GfFIJpEnp+Lix4TYwOA76ICb4+RbjqLpjkSkJ2lChEGwB+5MwsKoCsC175GoCkCGLUFR4x5x7n7SnJ4ATsEDBBDXLtTPajB6Q7jkb9B5jph74OhjAAGn7HnEH+4sAXlXlQE0ksR3lRIPm-jLwx6ASQxhD+ZMyvmynvntn2GSx9Bu49r+BPYAVkq0Z6TeSrhDTwjUDoCrrwBIRHm0ALl2xoHMgYw2jZhfCvDQZyxoQoJ7gQiSZjAjBkh5poiRglTNgQAcVow9AuKkggh3JHjrgDmIDkwaRLCY7eSuIaZQkmQyXnDGIzAbGNFLgoIAh9RUjsjPQ7h-AoIbiuyeD9TSziy5G-ruphiKjKgVBqgxiaic4KWt4dl2Bbgcl+E6RZi7wO6FzoTmb2jOh8G0jiEjZ0TK7ikjy9j9iKVSQUQnpDCgmrn55yyDCwbUjQjkxgpkUUl6mNnvKhGjjwSG5FbSDICnAFXWD+AkVEy-DeC7wGFFgoIBC0b6G7kQVsU3gtxMRPgXaQQ9WLirAaSyayYyxaWzApDMichrnZhoL4ENmjaiIWQ67LU9DAkxWHJxCJFrYzAMbXJDBdT+BSw+B5q-QNpTRGxZTAw35iAXVUrOCvCjmEL4wFx3SJCYSiH2hnHeSaSRmhwWmzwRwzRRwXXCx-Ckh+I0Vkici6SERFX7nArrBwoZUpljwNywBNyrrTwaowTzwsWWWbxFUNSkTDKTp7gpGdGizOw4n+Ag15rcK8LPz8IQIfwXV7xOEfDCwfAwjOwMhRQyIQaRUgoDDSU6YsrmXLUBAoJ0jujqHDArmbkIADALbYzPbeQ94OhK5z5Ca5aHT6qP557fnSSSx4wEzeIpALDJCi6rBqyBzGVCg9anXI3LUOCuyLDOWuVbY5yWpNZ-CBCXRZrpiTmIkNrFo37h37kuAw4bVQ1xZexsjuiSaJDujpZoaZb2JO3AYBAyLkxER7hTIQ3ywYLOINS7zjB0htS5HqrcbjjLVBCYQ6lFw+B4zUaOJvBJDeA9HCxoF5rHb8RnZJLrSA1Ka55DVDAeDyQpGDDzAxCObsjOiwhBCB3HV0QA7s746g6r3hVEWHHmZELxVch6V05sj9AqY9oJB7gri20vIsCq4JwrpgAXXEbOA8UZC7xUiOWO7Alz1QheQuLOjTWZU0zQUB40BB6CQh5h5MWvwY3WjGorCTCvAOwZBbWDJgivVQhy3OitYT7n5LV32NGy3W4hQgjsj-AyxxbFhc0uiTB+J+KRnoNkH0GUGCTUGA1bjxorjw1kQpAm0UgSykgAhshzB5jWiTl4YWEJzWF4AXXmof3izb2whZF2jfDMh9T2jDU6SJrk2V5IrBENotXhGREwzRHANSMnhAWJ32hQ0UaEziyoI6R5iXxclRCimIV0kTH3G33M2oRcgZgHh+DyavCI4m0eLMjUqTCBQIMjB5oOliDGnSixmZlfiA3IOPRXQN1y1BBFg6U1meCgqJA21B06xpkmkZkzyS1D6PQ2O0buh0jlnDD9CJCDAaKgj1mNWBpTnrKATuMskgPMPmDwTIBbkGXRU4GghbieChCm4yj6PoxjBOEZjeDEPYzlKhBzzJxEBbl-GbNnO0W7MgDFFQDkCHMvDqTeTY4OgXPpihDbIQDyBEjaChAKAFHvNblKLPAug6RYSnOGENQZj-PdEbMOVbNPMXGQU+6nkkGwUkCXnSDXmIW3mtrq74PLOoRwrMiGF-A3r4IeCqRU4yJEyqOn23XZDZBAA */
     predictableActionArguments: true,
     id: 'project-machine',
     initial: 'Page is mounted',
@@ -24,7 +24,6 @@ export const projectMachine = createMachine(
       sessionStatusMessage: 'Loading...',
       aoiStatusMessage: 'Loading...',
       aoiActionButtons: {
-        addNewAoi: true,
         drawNewAoi: true,
         confirmAoiDraw: false,
         cancelAoiDraw: false,
@@ -78,7 +77,7 @@ export const projectMachine = createMachine(
             target: 'Load latest AOI',
             cond: 'hasAois',
           },
-          'Define initial AOI',
+          'Define first AOI',
         ],
 
         entry: 'disableGlobalLoading',
@@ -97,7 +96,7 @@ export const projectMachine = createMachine(
       'Entering new project name': {
         on: {
           'Set project name': {
-            target: 'Define initial AOI',
+            target: 'Define first AOI',
             actions: 'setProjectName',
           },
         },
@@ -107,8 +106,8 @@ export const projectMachine = createMachine(
 
       'Redirect to home page': {},
 
-      'Define initial AOI': {
-        entry: 'initializeAoiList',
+      'Define first AOI': {
+        entry: ['initializeAoiList', 'setFirstAoiActionButtons'],
 
         on: {
           'Pressed draw new AOI button': {
@@ -139,7 +138,10 @@ export const projectMachine = createMachine(
             actions: ['startNewRectangleAoiDraw'],
           },
 
-          'Pressed cancel AOI draw button': 'Requested AOI delete',
+          'Pressed cancel AOI draw button': [
+            { target: 'Define first AOI', cond: 'isFirstAoi' },
+            { target: 'Requested AOI delete' },
+          ],
         },
       },
 
@@ -156,7 +158,7 @@ export const projectMachine = createMachine(
             actions: ['endNewRectangleAoiDraw'],
           },
           'Pressed cancel AOI draw button': {
-            target: 'Define initial AOI',
+            target: 'Define first AOI',
             actions: 'resetMapEventHandlers',
           },
         },
@@ -351,7 +353,7 @@ export const projectMachine = createMachine(
             internal: true,
           },
 
-          'Pressed AOI cancel button': 'Define initial AOI',
+          'Pressed AOI cancel button': 'Define first AOI',
           'Pressed AOI confirm button': 'Exiting rectangle AOI draw mode',
         },
       },
@@ -376,7 +378,7 @@ export const projectMachine = createMachine(
             cond: 'hasAois',
             actions: 'loadLatestAoi',
           },
-          'Define initial AOI',
+          'Define first AOI',
         ],
       },
 
@@ -475,6 +477,7 @@ export const projectMachine = createMachine(
   {
     guards: {
       isProjectNew: (c) => c.project.id === 'new',
+      isFirstAoi: (c) => c.aoisList?.length === 0,
       isAoiNew: ({ currentAoi }) => !currentAoi || !currentAoi.id,
       isAuthenticated: (c) => c.isAuthenticated,
       isAoiTooTiny: (c) => c.currentAoi.area < config.minimumAoiArea,

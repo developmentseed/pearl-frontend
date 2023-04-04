@@ -55,7 +55,7 @@ export function AoiActionButtons({ setAoiIdToDelete }) {
 
       {addNewAoi && (
         <ActionButton
-          useIcon='pencil'
+          useIcon='plus'
           onClick={() => actorRef.send({ type: 'Pressed new AOI button' })}
           data-cy='add-aoi-button'
           title='Draw new AOI'
