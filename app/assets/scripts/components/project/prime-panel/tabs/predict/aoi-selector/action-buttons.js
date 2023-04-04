@@ -1,8 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
+import { themeVal } from '@devseed-ui/theme-provider';
+
 import { ProjectMachineContext } from '../../../../../../context/project-xstate';
 
 import { ActionButton } from '../../../../../../styles/button';
+
+const Separator = styled.span`
+  color: ${themeVal('color.baseAlphaD')};
+`;
 
 const selectors = {
   aoiActionButtons: (state) => state.context.aoiActionButtons,
@@ -28,23 +35,27 @@ export function AoiActionButtons({ setAoiIdToDelete }) {
   return (
     <>
       {uploadAoi && (
-        <ActionButton
-          title='Upload AOI GeoJSON'
-          data-cy='upload-aoi-button'
-          id='upload-aoi-button'
-          useIcon='upload'
-          onClick={() => {
-            actorRef.send({
-              type: 'Pressed upload AOI button',
-            });
-          }}
-        >
-          Upload AOI
-        </ActionButton>
+        <>
+          <ActionButton
+            title='Upload AOI GeoJSON'
+            data-cy='upload-aoi-button'
+            id='upload-aoi-button'
+            useIcon='upload'
+            onClick={() => {
+              actorRef.send({
+                type: 'Pressed upload AOI button',
+              });
+            }}
+          >
+            Upload AOI
+          </ActionButton>
+          <Separator>|</Separator>
+        </>
       )}
+
       {addNewAoi && (
         <ActionButton
-          useIcon='plus'
+          useIcon='pencil'
           onClick={() => actorRef.send({ type: 'Pressed new AOI button' })}
           data-cy='add-aoi-button'
           title='Draw new AOI'
