@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import SizeAwareElement from '../../common/size-aware-element';
-import { ImageOverlay, MapContainer } from 'react-leaflet';
+import { ImageOverlay, MapContainer, TileLayer } from 'react-leaflet';
 
 import {
   MAX_BASE_MAP_ZOOM_LEVEL,
@@ -56,6 +56,7 @@ const selectors = {
   mapEventHandlers: (state) => state.context.mapEventHandlers,
   currentPrediction: (state) => state.context.currentPrediction,
   currentTilejson: (state) => get(state, 'context.currentTimeframe.tilejson'),
+  mosaicTileUrl: (state) => get(state, 'context.currentMosaic.tileUrl'),
 };
 
 function Map() {
@@ -73,6 +74,9 @@ function Map() {
   );
   const currentTilejson = ProjectMachineContext.useSelector(
     selectors.currentTilejson
+  );
+  const mosaicTileUrl = ProjectMachineContext.useSelector(
+    selectors.mosaicTileUrl
   );
 
   const handleMouseDown = useCallback(
@@ -192,6 +196,8 @@ function Map() {
         }}
       >
         <BaseMapLayer />
+        {mosaicTileUrl && <TileLayer url={mosaicTileUrl} opacity={0.8} />}
+
         {currentTilejson && (
           <TileLayerWithHeaders
             url={currentTilejson.tiles[0]}

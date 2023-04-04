@@ -6,6 +6,7 @@ import { delay } from '../../utils/utils';
 import { WebsocketClient } from './websocket-client';
 import logger from '../../utils/logger';
 import toasts from '../../components/common/toasts';
+import { getMosaicTileUrl } from './helpers';
 
 export const services = {
   fetchInitialData: async (context) => {
@@ -93,7 +94,10 @@ export const services = {
       currentAoi,
       currentTimeframe,
       currentImagerySource,
-      currentMosaic,
+      currentMosaic: {
+        ...currentMosaic,
+        tileUrl: getMosaicTileUrl(currentMosaic),
+      },
       currentModel,
     };
   },

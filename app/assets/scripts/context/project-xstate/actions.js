@@ -7,6 +7,7 @@ import toasts from '../../components/common/toasts';
 import { BOUNDS_PADDING } from '../../components/common/map/constants';
 import { formatThousands } from '../../utils/format';
 import config from '../../config';
+import { getMosaicTileUrl } from './helpers';
 
 export const actions = {
   setInitialContext: assign((context, event) => {
@@ -61,8 +62,9 @@ export const actions = {
   }),
   setCurrentMosaic: assign((context, event) => {
     const { mosaic } = event.data;
+
     return {
-      currentMosaic: mosaic,
+      currentMosaic: { ...mosaic, tileUrl: getMosaicTileUrl(mosaic) },
     };
   }),
   setCurrentModel: assign((context, event) => ({
