@@ -516,7 +516,7 @@ export const actions = {
       },
     };
   }),
-  disableGlobalLoading: assign(() => ({
+  hideGlobalLoading: assign(() => ({
     globalLoading: {
       disabled: true,
     },
