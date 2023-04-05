@@ -12,6 +12,7 @@ import { ProjectMachineContext } from '../../context/project-xstate';
 
 import { Modal } from '../common/custom-modal';
 import get from 'lodash.get';
+import { useHistory } from 'react-router';
 
 const Wrapper = styled.div`
   flex: 1;
@@ -93,6 +94,7 @@ const selectors = {
 };
 
 function ProjectPageHeader() {
+  const history = useHistory();
   const [localProjectName, setLocalProjectName] = useState(null);
   const actorRef = ProjectMachineContext.useActorRef();
   const displayProjectNameModal = ProjectMachineContext.useSelector(
