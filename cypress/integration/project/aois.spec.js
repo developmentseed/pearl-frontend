@@ -14,7 +14,7 @@ describe('Loads AOIs', () => {
     cy.get('[data-cy=create-project-button]').click({ force: true });
   });
 
-  it('Can draw an aoi on new project', () => {
+  it('First AOI draw', () => {
     map = Cypress.map;
     map.setZoom(14);
 
@@ -104,6 +104,102 @@ describe('Loads AOIs', () => {
     cy.get('[data-cy=delete-current-aoi-button]').should('not.exist');
     cy.get('[data-cy=confirm-aoi-draw-button]').should('not.exist');
     cy.get('[data-cy=cancel-aoi-draw-button]').should('exist');
+
+    // Draw again
+    cy.get('#map')
+      .trigger('mousedown', 150, 150)
+      .trigger('mousemove', 300, 300)
+      .trigger('mouseup');
+    cy.wait('@reverseGeocodeCity');
+    cy.get('[data-cy=selected-aoi-header]').contains('Judiciary Square');
+
+    // Should have property data-disabled equal to true
+    cy.get('[data-cy=prime-button]').should(
+      'have.attr',
+      'data-disabled',
+      'true'
+    );
+
+    // Session status should be 'Select Imagery and Model'
+    cy.get('[data-cy=session-status]').contains('Select Imagery Source');
+
+    // Select imagery source
+    cy.get('[data-cy=imagery-selector-label]').should('exist').click();
+    cy.get('[data-cy=select-imagery-2-card]').should('exist').click();
+    cy.get('[data-cy=imagery-selector-label]').should(
+      'have.text',
+      'Sentinel-2'
+    );
+    cy.get('[data-cy=mosaic-selector-label]').should('exist').click();
+    cy.get('[data-cy=select-mosaic-2849689f57f1b3b9c1f725abb75aa411-card]')
+      .should('exist')
+      .click();
+    cy.get('[data-cy=select-model-label]').should('exist').click();
+    cy.get('[data-cy=select-model-1-card]').should('exist').click();
+
+    // Prime button should be enabled
+    cy.get('[data-cy=prime-button]').should('not.be.disabled');
+  });
+
+  it('Deleting first AOI should clear panel', () => {
+    map = Cypress.map;
+    map.setZoom(14);
+
+    // Draw first AOI
+    cy.get('[data-cy=draw-first-aoi-button]').click();
+    cy.get('#map')
+      .trigger('mousedown', 150, 150)
+      .trigger('mousemove', 300, 300)
+      .trigger('mouseup');
+    cy.wait('@reverseGeocodeCity');
+    cy.get('[data-cy=selected-aoi-header]').contains('Judiciary Square');
+
+    // Select imagery, mosaic, model
+    cy.get('[data-cy=imagery-selector-label]').should('exist').click();
+    cy.get('[data-cy=select-imagery-2-card]').should('exist').click();
+    cy.get('[data-cy=imagery-selector-label]').should(
+      'have.text',
+      'Sentinel-2'
+    );
+    cy.get('[data-cy=mosaic-selector-label]').should('exist').click();
+    cy.get('[data-cy=select-mosaic-2849689f57f1b3b9c1f725abb75aa411-card]')
+      .should('exist')
+      .click();
+    cy.get('[data-cy=select-model-label]').should('exist').click();
+    cy.get('[data-cy=select-model-1-card]').should('exist').click();
+
+    // Prime button should be enabled
+    cy.get('[data-cy=prime-button]').should('not.be.disabled');
+
+    // Deleting the AOI should disable the prime button and clear selectors
+    cy.get('[data-cy=delete-current-aoi-button]').click();
+    cy.get('[data-cy=confirm-aoi-delete]').click();
+    cy.get('[data-cy=prime-button]').should(
+      'have.attr',
+      'data-disabled',
+      'true'
+    );
+    cy.get('[data-cy=imagery-selector-label]').should(
+      'have.text',
+      'Select Imagery Source'
+    );
+    cy.get('[data-cy=mosaic-selector-label]').should(
+      'have.text',
+      'Select Mosaic'
+    );
+    cy.get('[data-cy=select-model-label]').should('have.text', 'Select Model');
+
+    // Session status should be 'Select AOI'
+    cy.get('[data-cy=session-status]').contains('Set AOI');
+
+    // Upload and draw first AOI button should be visible
+    cy.get('[data-cy=upload-aoi-button]').should('exist');
+    cy.get('[data-cy=draw-first-aoi-button]').should('exist');
+    cy.get('[data-cy=add-new-aoi-button]').should('not.exist');
+    cy.get('[data-cy=edit-current-aoi-button]').should('not.exist');
+    cy.get('[data-cy=delete-current-aoi-button]').should('not.exist');
+    cy.get('[data-cy=confirm-aoi-draw-button]').should('not.exist');
+    cy.get('[data-cy=cancel-aoi-draw-button]').should('not.exist');
   });
 
   it('Try to draw a tiny AOI and check if alert modal is visible', () => {

@@ -94,7 +94,18 @@ export const actions = {
       currentAoi.shape.remove();
     }
 
-    return { currentAoi: null, currentPrediction: null };
+    const isFirstAoi = context.aoisList.length === 0;
+    if (isFirstAoi) {
+      // If first AOI is being deleted, reset all AOI-related context
+      return {
+        currentAoi: null,
+        currentImagerySource: null,
+        currentMosaic: null,
+        currentModel: null,
+      };
+    } else {
+      return { currentAoi: null, currentPrediction: null };
+    }
   }),
   prependAoisList: assign((context, event) => {
     const { aoisList } = context;
@@ -208,6 +219,32 @@ export const actions = {
   setCurrentTimeframe: assign((context, event) => ({
     currentTimeframe: event.data,
   })),
+  refreshSessionStatusMessage: assign((context) => {
+    let sessionStatusMessage;
+
+    const isFirstAoi = context.aoisList.length === 0;
+
+    if (!get(context, 'project.name')) {
+      sessionStatusMessage = 'Set Project Name';
+    } else if (!context.currentAoi) {
+      sessionStatusMessage = 'Select AOI';
+    } else if (!context.currentImagerySource) {
+      sessionStatusMessage = 'Select Imagery Source';
+    } else if (!context.currentMosaic) {
+      sessionStatusMessage = 'Select Mosaic';
+    } else if (!context.currentModel) {
+      sessionStatusMessage = 'Select Model';
+    } else if (isFirstAoi) {
+      sessionStatusMessage = 'Ready for prediction run';
+    } else {
+      // Keep existing message if none of the above conditions are met
+      sessionStatusMessage = context.sessionStatusMessage;
+    }
+
+    return {
+      sessionStatusMessage,
+    };
+  }),
   refreshPredictionTab: assign((context) => {
     const {
       currentImagerySource,
@@ -221,16 +258,16 @@ export const actions = {
     return {
       imagerySourceSelector: {
         disabled: false,
-        placeholderLabel: 'Select imagery source',
+        placeholderLabel: 'Select Imagery Source',
       },
       mosaicSelector: {
         disabled: !currentImagerySource,
-        placeholderLabel: 'Select mosaic',
+        placeholderLabel: 'Select Mosaic',
       },
       modelSelector: {
         hidden: isExistingProject,
         disabled: !currentImagerySource,
-        placeholderLabel: 'Select model',
+        placeholderLabel: 'Select Model',
       },
       primeButton: {
         disabled: !currentImagerySource || !currentMosaic || !currentModel,
