@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { useFocus } from '../../utils/use-focus';
 
@@ -13,6 +14,17 @@ import { ProjectMachineContext } from '../../context/project-xstate';
 import { Modal } from '../common/custom-modal';
 import get from 'lodash.get';
 import { useHistory } from 'react-router';
+import {
+  Dropdown,
+  DropdownBody,
+  DropdownHeader,
+  DropdownItem,
+  DropdownTrigger,
+} from '../../styles/dropdown';
+
+import copyTextToClipboard from '../../utils/copy-text-to-clipboard';
+import toasts from '../common/toasts';
+import logger from '../../utils/logger';
 
 const Wrapper = styled.div`
   flex: 1;
@@ -38,6 +50,32 @@ const StatusHeading = styled(Heading)`
     display: none;
   `}
 `;
+
+const FormInputGroup = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 2.125rem;
+  input {
+    display: none;
+    ${media.mediumUp`
+      display: revert;
+    `};
+  }
+  > :first-child:not(:last-child) {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  > :last-child:not(:first-child) {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+
+  .form__control::selection {
+    background-color: unset;
+    color: unset;
+  }
+`;
+
 const ProjectHeading = styled.div`
   display: flex;
   flex-flow: row nowrap;
@@ -91,9 +129,10 @@ const selectors = {
   projectName: (state) => get(state, 'context.project.name', ''),
   sessionStatusMessage: (state) =>
     get(state, 'context.sessionStatusMessage', {}),
+  currentShareURL: (state) => get(state, 'context.currentShareURL'),
 };
 
-function ProjectPageHeader() {
+function ProjectPageHeader({ isMediumDown }) {
   const history = useHistory();
   const [localProjectName, setLocalProjectName] = useState(null);
   const actorRef = ProjectMachineContext.useActorRef();
@@ -104,6 +143,20 @@ function ProjectPageHeader() {
   const sessionStatusMessage = ProjectMachineContext.useSelector(
     selectors.sessionStatusMessage
   );
+  const currentShareURL = ProjectMachineContext.useSelector(
+    selectors.currentShareURL
+  );
+
+  const copyTilesLink = () => {
+    copyTextToClipboard(currentShareURL).then((result) => {
+      if (result) {
+        toasts.success('URL copied to clipboard');
+      } else {
+        logger('Failed to copy', result);
+        toasts.error('Failed to copy URL to clipboard');
+      }
+    });
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -183,10 +236,71 @@ function ProjectPageHeader() {
           </ModalForm>
         }
       />
+
+      <Dropdown
+        alignment='right'
+        direction='down'
+        triggerElement={(props) => (
+          <DropdownTrigger
+            variation='primary-raised-dark'
+            title='Export map'
+            id='export-options-trigger'
+            size='medium'
+            useIcon='share'
+            {...props}
+            hideText={isMediumDown}
+          >
+            Export
+          </DropdownTrigger>
+        )}
+        className='global__dropdown'
+      >
+        <>
+          <DropdownHeader>
+            <p>Export Options</p>
+          </DropdownHeader>
+          <DropdownBody>
+            <li>
+              <DropdownItem
+                useIcon='link'
+                onClick={
+                  !currentShareURL
+                    ? () => actorRef.send('Requested AOI share URL')
+                    : copyTilesLink
+                }
+              >
+                {currentShareURL ? 'Copy Share URL' : 'Create Share URL'}
+              </DropdownItem>
+              {currentShareURL && (
+                <DropdownItem nonhoverable={!currentShareURL}>
+                  <FormInputGroup>
+                    <FormInput
+                      readOnly
+                      value={currentShareURL}
+                      disabled={!currentShareURL}
+                      size='small'
+                    />
+                    <Button
+                      variation='primary-plain'
+                      useIcon='clipboard'
+                      hideText
+                      disabled={!currentShareURL}
+                      title='Copy link to clipboard'
+                      onClick={currentShareURL && copyTilesLink}
+                    />
+                  </FormInputGroup>
+                </DropdownItem>
+              )}
+            </li>
+          </DropdownBody>
+        </>
+      </Dropdown>
     </Wrapper>
   );
 }
 
-ProjectPageHeader.propTypes = {};
+ProjectPageHeader.propTypes = {
+  isMediumDown: PropTypes.bool,
+};
 
 export default ProjectPageHeader;

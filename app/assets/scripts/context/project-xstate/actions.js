@@ -527,4 +527,27 @@ export const actions = {
       abortButton: true,
     },
   })),
+  enterCreatingShareUrl: assign(() => ({
+    globalLoading: {
+      disabled: false,
+      message: 'Creating share URL',
+    },
+  })),
+  onCreateShareUrlSuccess: assign((context, event) => {
+    const { shareUrl } = event.data;
+    return {
+      globalLoading: {
+        disabled: true,
+      },
+      currentShareUrl: shareUrl,
+    };
+  }),
+  onCreateShareUrlError: assign(() => {
+    toasts.error('Could not create share URL, please try again later.');
+    return {
+      globalLoading: {
+        disabled: true,
+      },
+    };
+  }),
 };
