@@ -90,7 +90,7 @@ export function ImagerySourceSelectorModal({
             data={availableImagerySources}
             renderCard={(imagerySource) => (
               <Card
-                data-cy={`select-model-${imagerySource.id}-card`}
+                data-cy={`select-imagery-${imagerySource.id}-card`}
                 key={imagerySource.id}
                 title={imagerySource.name}
                 details={{

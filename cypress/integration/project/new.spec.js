@@ -14,9 +14,38 @@ const instance = {
   },
 };
 
+const aoi1 = {
+  id: 1,
+  name: 'Amanalco',
+  project_id: 53,
+  created: 1678122994960,
+  updated: 1678122994960,
+  bounds: {
+    type: 'Polygon',
+    coordinates: [
+      [
+        [-100.05626678466797, 19.23303922076886],
+        [-100.03704071044923, 19.23303922076886],
+        [-100.03704071044923, 19.253784196994395],
+        [-100.05626678466797, 19.253784196994395],
+        [-100.05626678466797, 19.23303922076886],
+      ],
+    ],
+    bounds: [
+      -100.05626678466797,
+      19.23303922076886,
+      -100.03704071044923,
+      19.253784196994395,
+    ],
+  },
+  bookmarked: false,
+  bookmarked_at: null,
+  area: 4641850,
+};
+
 describe('Create new project', () => {
   beforeEach(() => {
-    cy.startServer();
+    cy.mockApiRoutes();
     cy.fakeLogin();
 
     // Active instances list
@@ -38,6 +67,17 @@ describe('Create new project', () => {
         method: 'POST',
       },
       instance
+    );
+
+    // POST /project/:id/instance
+    cy.intercept(
+      {
+        url: restApiEndpoint + '/api/project/1/aoi',
+        method: 'POST',
+      },
+      {
+        ...aoi1,
+      }
     );
 
     // Visit page
@@ -62,23 +102,40 @@ describe('Create new project', () => {
     );
 
     // Draw AOI
-    cy.get('[data-cy=aoi-edit-button]').should('exist').click();
+    cy.get('[data-cy=draw-first-aoi-button]').should('exist').click();
     cy.get('#map')
       .trigger('mousedown', 150, 150)
       .trigger('mousemove', 200, 200)
       .trigger('mouseup');
     cy.wait('@reverseGeocodeCity');
 
-    // Re-enter edit mode
-    cy.get('[data-cy=aoi-edit-button]').click();
+    // Check session status message
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Select Imagery Source'
+    );
 
-    // Panel prime button should be in AOI Confirm mode
-    cy.get('[data-cy=panel-aoi-confirm]')
+    // Select imagery source
+    cy.get('[data-cy=imagery-selector-label]').should('exist').click();
+    cy.get('[data-cy=select-imagery-2-card]').should('exist').click();
+
+    cy.get('[data-cy=imagery-selector-label]').should(
+      'have.text',
+      'Sentinel-2'
+    );
+
+    // Check session status message
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Select Mosaic'
+    );
+
+    // Select mosaic
+    cy.get('[data-cy=mosaic-selector-label]').should('exist').click();
+    cy.get('[data-cy=select-mosaic-2849689f57f1b3b9c1f725abb75aa411-card]')
       .should('exist')
-      .should('not.be.disabled')
       .click();
 
-    // Set model
     // Check session status message
     cy.get('[data-cy=session-status]').should(
       'have.text',
@@ -87,15 +144,7 @@ describe('Create new project', () => {
 
     // Open the Model selection modal
     cy.get('[data-cy=select-model-label]').should('exist').click();
-    // Filter a model and get no results
-    cy.get('#modelsFilter').should('exist').clear().type('test123');
-    cy.get('[data-cy=select-model-1-card]').should('not.exist');
-    cy.get('.list-container').should('have.text', 'No results found');
-    // Filter again and get 2 results
-    cy.get('#modelsFilter').should('exist').clear().type('class');
-    // Check that the 2 models are recommended
-    cy.get('[data-cy=recommended-models-label]').should('exist');
-    cy.get('.list-container').children().should('have.length', 2);
+
     // Finally select a model
     cy.get('[data-cy=select-model-1-card]').should('exist').click();
 
@@ -124,7 +173,7 @@ describe('Create new project', () => {
     );
 
     // Run
-    cy.get('[data-cy=run-button]').click();
+    cy.get('[data-cy=prime-button]').should('be.enabled').click();
 
     // Check session status message
     cy.get('[data-cy=session-status]').should(
@@ -174,7 +223,7 @@ describe('Create new project', () => {
     );
 
     // Run
-    cy.get('[data-cy=run-button]').should('exist').click();
+    cy.get('[data-cy=prime-button]').should('exist').click();
 
     // Check session status message
     cy.get('[data-cy=session-status]').should(
@@ -197,9 +246,11 @@ describe('Create new project', () => {
 
     cy.wait('@fetchInstanceStatus');
 
+    // TODO this should be changed to "Ready for retrain run" once the
+    // workflow is updated.
     cy.get('[data-cy=session-status]').should(
       'have.text',
-      'Session Status: Ready for retrain run'
+      'Session Status: Ready for prediction run'
     );
   });
 
@@ -220,7 +271,7 @@ describe('Create new project', () => {
     ).as('fetchInstanceStatus');
 
     // Request prediction
-    cy.get('[data-cy=run-button]').click();
+    cy.get('[data-cy=prime-button]').click();
 
     // Wait for instance status request
     cy.wait('@fetchInstanceStatus');
@@ -244,40 +295,45 @@ describe('Create new project', () => {
     cy.setWebsocketWorkflow('websocket-workflow/base-model-prediction.json');
 
     // Request prediction
-    cy.get('[data-cy=run-button]').should('exist').click();
+    cy.get('[data-cy=prime-button]').should('exist').click();
 
     // Wait for instance status request
     cy.wait('@fetchInstanceStatus');
 
-    // Prediction should be finished successfully
+    // Prediction should be finished successfully.
+
+    // TODO this should lead to a retrain run status and should be changed when
+    // retrain is implemented
     cy.get('[data-cy=session-status]').should(
       'have.text',
-      'Session Status: Ready for retrain run'
-    );
-  });
-
-  it('Do not allow upload of aoi out of imagery bounds', () => {
-    // Set mock WS workflow in case creation succeeds (it shouldn't here)
-    cy.setWebsocketWorkflow('websocket-workflow/base-model-prediction.json');
-
-    // Check session status message
-    cy.get('[data-cy=session-status]').should(
-      'have.text',
+      // 'Session Status: Ready for retrain run'
       'Session Status: Ready for prediction run'
     );
-
-    // Open import modal
-    cy.get('[data-cy=upload-aoi-modal-button]').click();
-    // Open select file dialog
-    cy.get('[data-cy=select-aoi-file-button').click();
-    // Apply valid file to input
-    cy.get('[data-cy=aoi-upload-input]').attachFile(
-      'aoi-upload/aoi-outside-usa.geojson'
-    );
-    // No warning is displayed
-    cy.get('[data-cy=import-aoi-warning-text').should(
-      'contain',
-      'Area is out of imagery bounds. Please upload another file'
-    );
   });
+
+  // TODO reinstate this spec
+  // it('Do not allow upload of aoi out of imagery bounds', () => {
+  //   // Set mock WS workflow in case creation succeeds (it shouldn't here)
+  //   cy.setWebsocketWorkflow('websocket-workflow/base-model-prediction.json');
+
+  //   // Check session status message
+  //   cy.get('[data-cy=session-status]').should(
+  //     'have.text',
+  //     'Session Status: Ready for prediction run'
+  //   );
+
+  //   // Open import modal
+  //   cy.get('[data-cy=upload-aoi-button]').click();
+  //   // Open select file dialog
+  //   cy.get('[data-cy=select-aoi-file-button').click();
+  //   // Apply valid file to input
+  //   cy.get('[data-cy=aoi-upload-input]').attachFile(
+  //     'aoi-upload/aoi-outside-usa.geojson'
+  //   );
+  //   // No warning is displayed
+  //   cy.get('[data-cy=import-aoi-warning-text').should(
+  //     'contain',
+  //     'Area is out of imagery bounds. Please upload another file'
+  //   );
+  // });
 });

@@ -3,7 +3,7 @@ const restApiEndpoint = Cypress.config('restApiEndpoint');
 /**
  * Mock a project scenario: an instance is running with checkpoint 2 and AOI 2 applied.
  */
-export default function () {
+export function addProjectEndpoints() {
   /**
    * POST /project
    */
@@ -110,6 +110,7 @@ export default function () {
             id: 1,
             name: 'Seneca Rocks',
             bookmarked: true,
+            area: 10489000,
             bounds: {
               type: 'Polygon',
               coordinates: [
@@ -149,6 +150,7 @@ export default function () {
             id: 2,
             name: 'Seneca Rocks #1',
             bookmarked: true,
+            area: 10489000,
             bounds: {
               type: 'Polygon',
               coordinates: [
@@ -225,7 +227,7 @@ export default function () {
    */
   cy.intercept(
     {
-      url: restApiEndpoint + '/api/project/1/instance/?status=active&type=cpu',
+      url: restApiEndpoint + '/api/project/1/instance/?status=active*',
     },
     {
       total: 1,
@@ -252,7 +254,7 @@ export default function () {
     {
       id: 1,
       project_id: 1,
-      aoi_id: 2,
+      timeframe_id: 2,
       checkpoint_id: 2,
       last_update: '2021-07-12T09:59:04.442Z',
       created: '2021-07-12T09:58:57.459Z',
@@ -599,6 +601,66 @@ export default function () {
       },
 
       shares: [],
+    }
+  );
+
+  cy.intercept(
+    {
+      url: restApiEndpoint + '/api/project/1/aoi/*/timeframe',
+    },
+
+    {
+      total: 2,
+      timeframes: [
+        {
+          id: 1,
+          checkpoint_id: 1,
+          created: 1678182035141,
+          storage: false,
+          bookmarked: false,
+          patches: [],
+          px_stats: {},
+          bookmarked_at: null,
+          classes: [
+            { name: 'Bosque', color: '#6CA966' },
+            { name: 'Selvas', color: '#D0F3AB' },
+            { name: 'Pastos', color: '#D2AD74' },
+            { name: 'Agricultura', color: '#486DA2' },
+            { name: 'Urbano', color: '#F10100' },
+            { name: 'Sin vegetación aparente', color: '#FFC300' },
+            { name: 'Agua', color: '#FF5733' },
+            { name: 'Suelo desnudo', color: '#48F374' },
+          ],
+          mosaic: '2849689f57f1b3b9c1f725abb75aa411',
+          checkpoint_name: 'Villa de Allende',
+          shares: [],
+        },
+        {
+          id: 2,
+          checkpoint_id: 1,
+          created: 1678182006648,
+          storage: false,
+          bookmarked: false,
+          patches: [],
+          px_stats: {},
+          bookmarked_at: null,
+          classes: [
+            { name: 'Bosque', color: '#6CA966' },
+            { name: 'Selvas', color: '#D0F3AB' },
+            { name: 'Pastos', color: '#D2AD74' },
+            { name: 'Agricultura', color: '#486DA2' },
+            { name: 'Urbano', color: '#F10100' },
+            { name: 'Sin vegetación aparente', color: '#FFC300' },
+            { name: 'Agua', color: '#FF5733' },
+            { name: 'Suelo desnudo', color: '#48F374' },
+          ],
+          mosaic: '2849689f57f1b3b9c1f725abb75aa411',
+          checkpoint_name: 'Villa de Allende',
+          shares: [],
+        },
+      ],
+      project_id: 1,
+      aoi_id: 1,
     }
   );
 

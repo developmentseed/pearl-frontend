@@ -9,15 +9,18 @@
   },
   {
     "type": "client",
-    "payload": {"action":"model#aoi", "data":{"id":2}}
+    "payload": { "action": "model#timeframe", "data": { "id": 2 } }
   },
   {
     "type": "server",
-    "payload": {"message": "model#aoi#progress", "data": {"aoi": 2, "processed": 0, "total": 1}}
+    "payload": {
+      "message": "model#timeframe#progress",
+      "data": { "aoi": 2, "processed": 0, "total": 1 }
+    }
   },
   {
     "type": "server",
-    "payload": {"message": "model#aoi#complete", "data": {"aoi": 2}}
+    "payload": { "message": "model#timeframe#complete", "data": { "aoi": 2 } }
   },
   {
     "type": "client",

@@ -16,7 +16,7 @@ const instance = {
 
 describe('Test running GPUs', () => {
   it('Run project on GPU', () => {
-    cy.startServer();
+    cy.mockApiRoutes();
     cy.fakeLogin('user', { gpu: true });
 
     // Active instances list
@@ -82,7 +82,7 @@ describe('Test running GPUs', () => {
     // Check session status message
     cy.get('[data-cy=session-status]').should(
       'have.text',
-      'Session Status: Select Model'
+      'Session Status: Select Mosaic & Model'
     );
 
     // Open the Model selection modal

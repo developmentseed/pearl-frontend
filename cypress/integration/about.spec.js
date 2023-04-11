@@ -1,6 +1,6 @@
 describe('The About Page', () => {
   it('successfully loads', () => {
-    cy.startServer();
+    cy.mockApiRoutes();
     cy.visit('/about');
     cy.get('body');
     cy.get('header');

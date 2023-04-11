@@ -144,7 +144,7 @@ const SecondarySection = styled.div`
   grid-template-columns: min-content min-content;
 `;
 
-function PageHeader(props) {
+function PageHeader({ children, hideLongAppTitle }) {
   return (
     <PageHead role='banner'>
       <PageHeadInner>
@@ -161,14 +161,12 @@ function PageHeader(props) {
                     <span>Microsoft</span>
                     {appTitle}
                   </strong>
-                  {location.pathname.split('/')[1] !== 'project' && (
-                    <sub>{appLongTitle}</sub>
-                  )}
+                  {!hideLongAppTitle && <sub>{appLongTitle}</sub>}
                 </PageTitlePrimeLink>
               </li>
             </GlobalMenu>
-            {props.children ? (
-              <PageSpecificControls>{props.children}</PageSpecificControls>
+            {children ? (
+              <PageSpecificControls>{children}</PageSpecificControls>
             ) : (
               // Default controls when no children is passed
               <PageSpecificControls>
@@ -208,6 +206,7 @@ function PageHeader(props) {
 
 PageHeader.propTypes = {
   children: T.node,
+  hideLongAppTitle: T.bool,
 };
 
 export default PageHeader;

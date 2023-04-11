@@ -48,6 +48,8 @@ import {
 import { isRectangle } from '../../utils/is-rectangle';
 import { useImagerySource } from '../imagery-sources';
 import sortBy from 'lodash.sortby';
+import { useMosaics } from '../global';
+import { ExploreMachineContext } from '../explore-machine';
 
 export { sessionModes };
 /**
@@ -59,14 +61,18 @@ export function ExploreProvider(props) {
   const history = useHistory();
   let { projectId } = useParams();
 
+  const exploreActor = ExploreMachineContext.useActorRef();
+
   const isInitialized = useRef(false);
 
+  /**
+   * Tour steps state
+   */
   const [tourStep, setTourStep] = useState(
     localStorage.getItem('site-tour')
       ? Number(localStorage.getItem('site-tour'))
       : null
   );
-
   useEffect(() => {
     localStorage.setItem('site-tour', tourStep);
   }, [tourStep]);
@@ -100,9 +106,17 @@ export function ExploreProvider(props) {
     aoiArea,
     setAoiArea,
   } = useAoi();
+  const [timeframes, setTimeframes] = useState(null);
+  const [selectedTimeframe, setSelectedTimeframe] = useState(null);
   const { predictions, dispatchPredictions } = usePredictions();
   const { selectedModel, setSelectedModel } = useModel();
-  const { selectedMosaic } = useImagerySource();
+  const { mosaics, imagerySources } = useMosaics();
+  const {
+    selectedMosaic,
+    setSelectedMosaic,
+    setSelectedImagerySource,
+  } = useImagerySource();
+
   const {
     currentCheckpoint,
     dispatchCurrentCheckpoint,
@@ -128,7 +142,7 @@ export function ExploreProvider(props) {
   const [currentInstance, setCurrentInstance] = useState(null);
   const {
     initInstance,
-    loadAoiOnInstance,
+    loadAoiTimeframeOnInstance,
     getRunningBatch,
     instanceType,
   } = useInstance();
@@ -196,11 +210,13 @@ export function ExploreProvider(props) {
   }, [isInitialized.current, dispatchShortcutState]);
 
   async function loadInitialData() {
+    exploreActor.send('Project fetch start');
     showGlobalLoadingMessage('Loading configuration...');
 
     // Update session status
     if (projectId === 'new') {
       setSessionStatusMode(sessionModes.SET_PROJECT_NAME);
+      exploreActor.send('Project fetch end');
       hideGlobalLoading();
       return; // Bypass loading project when new
     } else {
@@ -231,7 +247,9 @@ export function ExploreProvider(props) {
     } catch (error) {
       hideGlobalLoading();
       logger(error);
-      toasts.error('Project not found.');
+      toasts.error(
+        'Could not load project at the moment, please try again later.'
+      );
       history.push('/profile/projects');
       return;
     }
@@ -249,12 +267,45 @@ export function ExploreProvider(props) {
       setAoiList(existingAois);
 
       if (existingAois.length > 0) {
-        latestAoi = sortBy(existingAois, 'updated', 'desc')[0];
+        let latestAoi = sortBy(existingAois, 'updated', 'desc')[0];
+        setCurrentAoi(latestAoi);
         const { timeframes: existingTimeframes } = await restApiClient.get(
           `project/${project.id}/aoi/${latestAoi.id}/timeframe`
         );
-        setCurrentAoi(latestAoi);
         setTimeframes(existingTimeframes);
+
+        const latestTimeframe = existingTimeframes[0];
+        const latestTimeframeMosaic = mosaics.data.find(
+          (m) => m.id === latestTimeframe.mosaic
+        );
+        const latestTimeframeImagerySource = imagerySources.data.find(
+          (s) => s.id === latestTimeframeMosaic.imagery_source_id
+        );
+
+        setSelectedImagerySource(latestTimeframeImagerySource);
+        setSelectedMosaic(latestTimeframeMosaic);
+        setSelectedTimeframe(latestTimeframe);
+
+        showGlobalLoadingMessage('Fetching checkpoints...');
+        const { checkpoints } = await loadCheckpointList(projectId);
+        const checkpoint = checkpoints[0];
+
+        const initializingInstanceMessage =
+          instanceType === 'cpu'
+            ? 'Initializing CPU instance...'
+            : `Initializing GPU instance, this may take up to ${formatDuration({
+                minutes: config.instanceCreationTimeout / (60 * 60 * 1000),
+              })}...`;
+        showGlobalLoadingMessage(initializingInstanceMessage);
+        const instance = await initInstance(
+          project.id,
+          checkpoint && checkpoint.id,
+          latestTimeframe && latestTimeframe.id
+        );
+
+        loadAoiTimeframe(project, latestAoi, latestTimeframe, true, true);
+
+        setCurrentInstance(instance);
       } else {
         // Project has no timeframes and needs to run a first prediction
         setTimeframes([]);
@@ -262,31 +313,6 @@ export function ExploreProvider(props) {
         hideGlobalLoading();
         return;
       }
-
-      showGlobalLoadingMessage('Fetching checkpoints...');
-      const { checkpoints } = await loadCheckpointList(projectId);
-      const checkpoint = checkpoints[0];
-      let latestAoi;
-      if (aoiReq.total > 0) {
-        latestAoi = aois.find((a) => Number(a.checkpoint_id) === checkpoint.id);
-      }
-
-      const initializingInstanceMessage =
-        instanceType === 'cpu'
-          ? 'Initializing CPU instance...'
-          : `Initializing GPU instance, this may take up to ${formatDuration({
-              minutes: config.instanceCreationTimeout / (60 * 60 * 1000),
-            })}...`;
-      showGlobalLoadingMessage(initializingInstanceMessage);
-      const instance = await initInstance(
-        project.id,
-        checkpoint && checkpoint.id,
-        latestAoi && latestAoi.id
-      );
-
-      loadAoi(project, latestAoi, true, true);
-
-      setCurrentInstance(instance);
     } catch (error) {
       logger(error);
       toasts.error(
@@ -296,12 +322,21 @@ export function ExploreProvider(props) {
     }
   }
 
+  const isPageReady = ExploreMachineContext.useSelector((s) =>
+    s.matches('Page is ready')
+  );
   // Load project meta on load and api client ready
   useEffect(() => {
-    if (!authIsLoading && restApiClient && instanceType) {
+    if (
+      isPageReady &&
+      !authIsLoading &&
+      restApiClient &&
+      instanceType &&
+      mosaics.status === 'success'
+    ) {
       loadInitialData();
     }
-  }, [authIsLoading, restApiClient, instanceType]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isPageReady, authIsLoading, restApiClient, instanceType, mosaics]);
 
   useEffect(() => {
     if (predictions.status === 'running') {
@@ -464,7 +499,7 @@ export function ExploreProvider(props) {
         (aoi) => Number(aoi.checkpoint_id) === Number(currentCheckpoint.id)
       );
       if (aoi) {
-        loadAoi(currentProject, aoi, true);
+        loadAoiTimeframe(currentProject, aoi, true);
       }
     }
   }, [aoiList, checkId]);
@@ -478,10 +513,11 @@ export function ExploreProvider(props) {
    *                  AOI listing endpoint
    */
 
-  async function loadAoi(
+  async function loadAoiTimeframe(
     project,
     aoiObject,
-    aoiMatchesCheckpoint,
+    aoiTimeframe,
+    aoiTimeframeMatchesCheckpoint,
     noLoadOnInst
   ) {
     if (!aoiObject) {
@@ -522,7 +558,7 @@ export function ExploreProvider(props) {
 
     setAoiIsRectangle(isRectangle(aoi.bounds));
 
-    if (!aoiMatchesCheckpoint) {
+    if (!aoiTimeframeMatchesCheckpoint) {
       toasts.error(
         'Tiles do not exist for this AOI and this checkpoint. Treating as geometry only'
       );
@@ -537,14 +573,16 @@ export function ExploreProvider(props) {
         setSessionStatusMode(sessionModes.PREDICTION_READY);
       }
       setCurrentAoi(null);
+      exploreActor.send('Project fetch end');
       hideGlobalLoading();
     } else {
       setCurrentAoi(aoi);
 
-      // Only load AOI   on instance if storage is true
+      // Only load AOI on instance if storage is true
       if (currentInstance && !noLoadOnInst && aoiObject.storage) {
-        loadAoiOnInstance(aoi.id);
+        loadAoiTimeframeOnInstance(aoiTimeframe.id);
       } else {
+        exploreActor.send('Project fetch end');
         hideGlobalLoading();
       }
 
@@ -672,7 +710,10 @@ export function ExploreProvider(props) {
         aoiBounds,
         setAoiBounds,
 
-        loadAoi,
+        loadAoiTimeframe,
+
+        timeframes,
+        selectedTimeframe,
 
         currentInstance,
         setCurrentInstance,
@@ -730,7 +771,7 @@ export const useAoiMeta = () => {
     setAoiBounds,
     aoiArea,
     aoiList,
-    loadAoi,
+    loadAoiTimeframe,
     createNewAoi,
   } = useExploreContext('useAoiMeta');
 
@@ -741,10 +782,27 @@ export const useAoiMeta = () => {
       aoiArea,
       aoiList,
 
-      loadAoi,
+      loadAoiTimeframe,
       createNewAoi,
     }),
-    [aoiBounds, aoiArea, aoiList, loadAoi, createNewAoi]
+    [aoiBounds, aoiArea, aoiList, loadAoiTimeframe, createNewAoi]
+  );
+};
+
+export const useTimeframes = () => {
+  const {
+    timeframes,
+    selectedTimeframe,
+    setSelectedTimeframe,
+  } = useExploreContext('useTimeframes');
+
+  return useMemo(
+    () => ({
+      timeframes,
+      selectedTimeframe,
+      setSelectedTimeframe,
+    }),
+    [timeframes, selectedTimeframe, setSelectedTimeframe]
   );
 };
 

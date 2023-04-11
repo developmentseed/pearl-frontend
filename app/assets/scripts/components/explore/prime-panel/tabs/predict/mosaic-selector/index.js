@@ -40,6 +40,11 @@ export function MosaicSelector() {
         enabled: false,
         label: 'Login to select model',
       };
+    } else if (selectedMosaic) {
+      return {
+        enabled: true,
+        label: selectedMosaic.name,
+      };
     } else if (!mosaics.isReady) {
       return {
         enabled: false,
@@ -60,15 +65,10 @@ export function MosaicSelector() {
         enabled: false,
         label: 'No mosaics available',
       };
-    } else if (!selectedMosaic) {
-      return {
-        enabled: true,
-        label: 'Select a mosaic',
-      };
     } else {
       return {
         enabled: true,
-        label: selectedMosaic.name,
+        label: 'Select a mosaic',
       };
     }
   }, [
@@ -92,7 +92,10 @@ export function MosaicSelector() {
           <Subheading>Base Mosaic</Subheading>
         </HeadOptionHeadline>
         <SubheadingStrong
-          onClick={() => {}}
+          data-cy='mosaic-selector-label'
+          onClick={() =>
+            selectorState.enabled && setShowSelectMosaicModal(true)
+          }
           title={aoiGeometry ? 'Select Imagery Mosaic' : 'An AOI is required'}
           disabled={!aoiGeometry}
         >

@@ -36,6 +36,10 @@ export function ModelSelector() {
     } else if (!models.isReady) {
       // Model list is loading
       return { enabled: false, label: 'Loading...' };
+    } else if (!selectedImagerySource) {
+      return { enabled: false, label: 'Please select an imagery source first' };
+    } else if (!selectedMosaic) {
+      return { enabled: false, label: 'Please select a mosaic first' };
     } else if (
       models.status === 'success' &&
       models.data &&
@@ -54,10 +58,6 @@ export function ModelSelector() {
       };
     } else if (!aoiGeometry) {
       return { enabled: false, label: 'Please define an AOI first' };
-    } else if (!selectedImagerySource) {
-      return { enabled: false, label: 'Please select an imagery source first' };
-    } else if (!selectedMosaic) {
-      return { enabled: false, label: 'Please select a mosaic first' };
     } else {
       // No models available/applicable
       return { enabled: false, label: 'No models available' };

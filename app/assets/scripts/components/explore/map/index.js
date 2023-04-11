@@ -441,23 +441,32 @@ function Map() {
   }, [mapState.mode, shortcutState.escapePressed, mapRef?.polygonDraw]);
 
   const selectedMosaicUrl = useMemo(() => {
-    if (!selectedMosaic || !selectedMosaic.ui_params) return;
+    // The mosaic object has two properties that can be user to build a mosaic
+    // URL: 'ui_params' and 'params'. The first one is intended to be used in
+    // the interface, the second to run inferences. The front-end will use
+    // 'ui_params' if available and 'params' as a fallback.
+    const mosaicParams = selectedMosaic?.ui_params || selectedMosaic?.params;
 
-    const { assets, ...otherParams } = selectedMosaic.ui_params;
+    if (!mosaicParams) return;
+
+    const { assets, ...otherParams } = mosaicParams;
 
     let params = [];
 
     // The tiler doesn't support array[] notation in the querystring, this will
     // generate a custom notation like 'asset=a&asset=b&asset=c'
-    assets.forEach((a) => params.push(`assets=${a}`));
+    if (Array.isArray(assets)) {
+      assets.forEach((a) => params.push(`assets=${a}`));
+    } else {
+      params.push(`assets=${assets}`);
+    }
 
     // Serialize remaining params
     for (var p in otherParams) params.push(p + '=' + otherParams[p]);
 
-    // Join all
-    params = params.join('&');
-
-    return `https://planetarycomputer.microsoft.com/api/data/v1/mosaic/tiles/${selectedMosaic.id}/{z}/{x}/{y}?${params}`;
+    return `https://planetarycomputer.microsoft.com/api/data/v1/mosaic/tiles/${
+      selectedMosaic.id
+    }/{z}/{x}/{y}?${params.join('&')}`;
   }, [selectedMosaic]);
 
   const displayMap = useMemo(() => {
@@ -520,7 +529,7 @@ function Map() {
 
         <BaseMapLayer />
 
-        {selectedMosaic && (
+        {selectedMosaic && selectedMosaicUrl && (
           <TileLayer
             key={selectedMosaic.id}
             attribution='&copy; NAIP'

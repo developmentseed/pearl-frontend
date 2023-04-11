@@ -1,4 +1,3 @@
-import bboxPolygon from '@turf/bbox-polygon';
 import booleanWithin from '@turf/boolean-within';
 import React, { useMemo, useState } from 'react';
 import { useAoi } from '../../../../../../context/aoi';
@@ -35,12 +34,20 @@ export function ImagerySourceSelector() {
         enabled: false,
         label: 'Login to select imagery source',
       };
-    } else if (!imagerySources.isReady) {
+    } else if (selectedImagerySource) {
+      return {
+        enabled: true,
+        label: selectedImagerySource.name,
+      };
+    } else if (imagerySources.status === 'loading') {
       return {
         enabled: false,
         label: 'Loading...',
       };
-    } else if (imagerySources.data.length === 0) {
+    } else if (
+      imagerySources.status === 'error' ||
+      (imagerySources.status === 'success' && imagerySources.data.length === 0)
+    ) {
       return {
         enabled: false,
         label: 'No imagery sources available.',
@@ -50,15 +57,10 @@ export function ImagerySourceSelector() {
         enabled: false,
         label: 'Please define an AOI first',
       };
-    } else if (!selectedImagerySource) {
-      return {
-        enabled: true,
-        label: 'Select an imagery source',
-      };
     } else {
       return {
         enabled: true,
-        label: selectedImagerySource.name,
+        label: 'Select an imagery source',
       };
     }
   }, [isAuthenticated, imagerySources, aoiGeometry, selectedImagerySource]);
@@ -90,7 +92,10 @@ export function ImagerySourceSelector() {
           <Subheading>Imagery Source</Subheading>
         </HeadOptionHeadline>
         <SubheadingStrong
-          onClick={() => {}}
+          data-cy='imagery-selector-label'
+          onClick={() =>
+            selectorState.enabled && setShowSelectImagerySourceModal(true)
+          }
           title={aoiGeometry ? 'Select Imagery Source' : 'An AOI is required'}
           disabled={!aoiGeometry}
         >

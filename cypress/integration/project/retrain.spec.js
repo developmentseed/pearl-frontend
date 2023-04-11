@@ -3,7 +3,7 @@ const restApiEndpoint = Cypress.config('restApiEndpoint');
 const instance = {
   id: 1,
   project_id: 1,
-  aoi_id: 2,
+  timeframe_id: 2,
   checkpoint_id: 2,
   last_update: '2021-07-12T09:59:04.442Z',
   created: '2021-07-12T09:58:57.459Z',
@@ -17,7 +17,7 @@ const instance = {
 
 describe('Retrain existing project', () => {
   beforeEach(() => {
-    cy.startServer();
+    cy.mockApiRoutes();
     cy.fakeLogin();
 
     /**
@@ -94,9 +94,6 @@ describe('Retrain existing project', () => {
 
     cy.visit('/project/1');
 
-    // Wait for data loading
-    cy.wait(['@fetchAoi2', '@fetchCheckpoint2']);
-
     // Check ready for retrain status
     cy.get('[data-cy=session-status]').should(
       'have.text',
@@ -106,7 +103,11 @@ describe('Retrain existing project', () => {
     cy.get('[data-cy=global-loading]').should('not.exist');
 
     // Check if retrain button panel is disabled (no samples added yet)
-    cy.get('[data-cy=run-button]').should('have.attr', 'data-disabled', 'true');
+    cy.get('[data-cy=prime-button]').should(
+      'have.attr',
+      'data-disabled',
+      'true'
+    );
 
     // Save checkpoint is enabled
     cy.get('[data-cy=save-checkpoint-button]').should('not.be.disabled');
@@ -138,7 +139,7 @@ describe('Retrain existing project', () => {
       .trigger('mouseup', ...feature1[3]);
 
     // Check if retrain button panel is enabled after a sampled is added
-    cy.get('[data-cy=run-button]').should(
+    cy.get('[data-cy=prime-button]').should(
       'have.attr',
       'data-disabled',
       'false'
@@ -266,7 +267,7 @@ describe('Retrain existing project', () => {
     ).as('fetchAvailableInstancesCount');
 
     // Request model run
-    cy.get('[data-cy=run-button]').click();
+    cy.get('[data-cy=prime-button]').click();
 
     // Wait for outbound request
     cy.wait('@fetchAvailableInstancesCount');
@@ -307,7 +308,7 @@ describe('Retrain existing project', () => {
     );
 
     // Request model run
-    cy.get('[data-cy=run-button]').click();
+    cy.get('[data-cy=prime-button]').click();
 
     // Wait for outbound request
     cy.wait('@fetchAvailableInstancesCount');
@@ -365,9 +366,6 @@ describe('Retrain existing project', () => {
 
     cy.visit('/project/1');
 
-    // Wait for data loading
-    cy.wait(['@fetchAoi2', '@fetchCheckpoint2']);
-
     // Check ready for retrain status
     cy.get('[data-cy=session-status]').should(
       'have.text',
@@ -397,7 +395,7 @@ describe('Retrain existing project', () => {
     ).as('fetchAvailableInstancesCount');
 
     // Request model run
-    cy.get('[data-cy=run-button]').should('exist').click();
+    cy.get('[data-cy=prime-button]').should('exist').click();
 
     // Prediction is halted
     cy.get('[data-cy=session-status]').should(
@@ -406,7 +404,7 @@ describe('Retrain existing project', () => {
     );
 
     // Abort
-    cy.get('[data-cy=abort-run-button]').should('exist').click();
+    cy.get('[data-cy=abort-prime-button]').should('exist').click();
 
     // Reset WS workflow
     cy.setWebsocketWorkflow(
@@ -424,7 +422,7 @@ describe('Retrain existing project', () => {
     cy.get('#app-container').click(...pointSample);
 
     // Request model run
-    cy.get('[data-cy=run-button]').click();
+    cy.get('[data-cy=prime-button]').click();
 
     // Prediction is halted
     cy.get('[data-cy=session-status]').should(
@@ -450,7 +448,7 @@ describe('Retrain existing project', () => {
     ).as('fetchAvailableInstancesCount');
 
     // Abort
-    cy.get('[data-cy=abort-run-button]').should('exist').click();
+    cy.get('[data-cy=abort-prime-button]').should('exist').click();
 
     cy.location().should((loc) => {
       expect(loc.pathname).to.eq('/profile/projects/1');
@@ -459,9 +457,6 @@ describe('Retrain existing project', () => {
 
   it('load existing checkpoint, can predict new AOI', () => {
     cy.visit('/project/1');
-
-    // Wait for data loading
-    cy.wait(['@fetchAoi2', '@fetchCheckpoint2']);
 
     // Check ready for retrain status
     cy.get('[data-cy=session-status]').should(
@@ -480,6 +475,6 @@ describe('Retrain existing project', () => {
     cy.wait('@reverseGeocodeCity');
     cy.get('[data-cy=selected-aoi-header]').contains('Judiciary Square');
 
-    cy.get('[data-cy=run-button]').should('be.enabled');
+    cy.get('[data-cy=prime-button]').should('be.enabled');
   });
 });

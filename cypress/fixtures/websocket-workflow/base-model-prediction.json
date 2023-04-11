@@ -18,7 +18,7 @@
       "data": {
         "is_aborting": false,
         "processing": false,
-        "aoi": false,
+        "timeframe": false,
         "checkpoint": false
       }
     }
@@ -27,28 +27,14 @@
     "type": "client",
     "payload": {
       "action": "model#prediction",
-      "data": {
-        "name": "Judiciary Square",
-        "polygon": {
-          "type": "Polygon",
-          "coordinates": [
-            [
-              [-77.0632553100586, 38.91694866167228],
-              [-77.0460891723633, 38.91694866167228],
-              [-77.0460891723633, 38.93030364446068],
-              [-77.0632553100586, 38.93030364446068],
-              [-77.0632553100586, 38.91694866167228]
-            ]
-          ]
-        }
-      }
+      "data": { "aoi_id": 1, "mosaic": "2849689f57f1b3b9c1f725abb75aa411" }
     }
   },
   {
     "type": "server",
     "payload": {
       "message": "model#checkpoint",
-      "data": { "name": "Judiciary Square", "id": 1 }
+      "data": { "name": "Amanalco", "id": 1 }
     }
   },
   {
@@ -58,11 +44,11 @@
   {
     "type": "server",
     "payload": {
-      "message": "model#aoi",
+      "message": "model#timeframe",
       "data": {
         "id": 1,
         "live": true,
-        "name": "Judiciary Square",
+        "name": "Amanalco",
         "checkpoint_id": 1,
         "bounds": [
           -77.06085205078125,
@@ -91,7 +77,7 @@
     "payload": {
       "message": "model#prediction",
       "data": {
-        "aoi": 1,
+        "timeframe": 1,
         "bounds": [
           -77.047119140625,
           38.901720914997945,
@@ -112,7 +98,7 @@
     "payload": {
       "message": "model#prediction",
       "data": {
-        "aoi": 1,
+        "timeframe": 1,
         "bounds": [
           -77.047119140625,
           38.89958342598271,
@@ -134,7 +120,7 @@
     "payload": {
       "message": "model#prediction",
       "data": {
-        "aoi": 1,
+        "timeframe": 1,
         "bounds": [
           -77.04437255859375,
           38.901720914997945,
@@ -156,7 +142,7 @@
     "payload": {
       "message": "model#prediction",
       "data": {
-        "aoi": 1,
+        "timeframe": 1,
         "bounds": [
           -77.04437255859375,
           38.89958342598271,
@@ -177,7 +163,7 @@
     "payload": {
       "message": "model#prediction",
       "data": {
-        "aoi": 1,
+        "timeframe": 1,
         "bounds": [
           -77.0416259765625,
           38.901720914997945,
@@ -198,7 +184,7 @@
     "payload": {
       "message": "model#prediction",
       "data": {
-        "aoi": 1,
+        "timeframe": 1,
         "bounds": [
           -77.0416259765625,
           38.89958342598271,
@@ -217,7 +203,10 @@
 
   {
     "type": "server",
-    "payload": { "message": "model#prediction#complete", "data": { "aoi": 1 } }
+    "payload": {
+      "message": "model#prediction#complete",
+      "data": { "timeframe": 1 }
+    }
   },
   {
     "type": "client",

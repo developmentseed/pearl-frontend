@@ -103,7 +103,7 @@ function AoiSelection() {
   const [aoiToSwitch, setAoiToSwitch] = useState();
 
   const { currentAoi, aoiList, aoiName, setAoiList } = useAoi();
-  const { aoiArea, loadAoi, createNewAoi } = useAoiMeta();
+  const { aoiArea, loadAoiTimeframe, createNewAoi } = useAoiMeta();
 
   const { restApiClient } = useAuth();
 
@@ -174,7 +174,7 @@ function AoiSelection() {
 
       if (aoiReq.aois.length) {
         const { aois } = aoiReq;
-        loadAoi(
+        loadAoiTimeframe(
           currentProject,
           aois[aois.length - 1],
           aois[aois.length - 1].checkpoint_id === currentCheckpoint?.id
@@ -198,9 +198,10 @@ function AoiSelection() {
       return;
     }
     const relevantAoi = findCompatibleAoi(aoi, aoiList, currentCheckpoint);
-    loadAoi(
+    loadAoiTimeframe(
       currentProject,
       relevantAoi || aoi,
+      null,
       relevantAoi || false
     ).then((bounds) => mapRef.fitBounds(bounds, { padding: BOUNDS_PADDING }));
   };
@@ -331,9 +332,10 @@ function AoiSelection() {
                   aoiList,
                   currentCheckpoint
                 );
-                loadAoi(
+                loadAoiTimeframe(
                   currentProject,
                   relevantAoi || aoiToSwitch,
+                  null,
                   relevantAoi || false
                 ).then((bounds) =>
                   mapRef.fitBounds(bounds, {

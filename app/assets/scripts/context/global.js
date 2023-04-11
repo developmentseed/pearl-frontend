@@ -12,6 +12,8 @@ const GlobalContext = createContext({});
 
 export function GlobalContextProvider(props) {
   const [tourStep, setTourStep] = useState(0);
+  // TODO This is a hardcoded mosaic used in edit/upload AOI logic. It should be
+  // replaced by the selected mosaic
   const mosaicMeta = useFetch('mosaic/naip.latest');
 
   const apiLimits = useFetch('', {
