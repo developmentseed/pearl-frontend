@@ -13,6 +13,7 @@ import { ProjectMachineContext } from '../../../context/project-xstate';
 import get from 'lodash.get';
 import { useAuth } from '../../../context/auth';
 import TileLayerWithHeaders from '../../common/map/tile-layer';
+import config from '../../../config';
 
 const center = [19.22819, -99.995841];
 const zoom = 12;
@@ -109,6 +110,7 @@ function Map() {
     [actorRef]
   );
 
+  // Call event when map is created
   useEffect(() => {
     if (isLoadingMap && mapRef) {
       actorRef.send({
@@ -164,6 +166,8 @@ function Map() {
     }
   }, [mapRef, mapEventHandlers.mousemove]);
 
+  const timeframeTilejsonUrl = get(currentTilejson, 'tiles[0]');
+
   return (
     <SizeAwareElement
       element={Container}
@@ -198,9 +202,9 @@ function Map() {
         <BaseMapLayer />
         {mosaicTileUrl && <TileLayer url={mosaicTileUrl} opacity={0.8} />}
 
-        {currentTilejson && (
+        {timeframeTilejsonUrl && (
           <TileLayerWithHeaders
-            url={currentTilejson.tiles[0]}
+            url={`${config.restApiEndpoint}${timeframeTilejsonUrl}`}
             headers={[
               {
                 header: 'Authorization',
