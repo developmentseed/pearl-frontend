@@ -294,7 +294,7 @@ export const services = {
         case 'model#timeframe':
           callback({
             type: 'Received timeframe',
-            data,
+            data: { timeframe: data },
           });
           break;
         case 'model#prediction':

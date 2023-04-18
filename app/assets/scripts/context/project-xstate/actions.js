@@ -217,7 +217,7 @@ export const actions = {
     currentCheckpoint: event.data,
   })),
   setCurrentTimeframe: assign((context, event) => ({
-    currentTimeframe: event.data,
+    currentTimeframe: event.data.timeframe,
   })),
   refreshSessionStatusMessage: assign((context) => {
     let sessionStatusMessage;
