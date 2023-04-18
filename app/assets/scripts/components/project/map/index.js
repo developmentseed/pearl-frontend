@@ -121,6 +121,17 @@ function Map() {
   // Keyboard event handlers
   const onKeyDown = useCallback(
     (e) => {
+      // Check if the event target is an input or other focusable element.
+      if (
+        e.target.tagName === 'INPUT' ||
+        e.target.tagName === 'TEXTAREA' ||
+        e.target.tagName === 'SELECT' ||
+        e.target.isContentEditable
+      ) {
+        // If it's an input, textarea, select or contentEditable element, ignore the event.
+        return;
+      }
+
       if (e.key === 'a') {
         // On "a" key press, reduce opacity to zero
         setPredictionsOpacity(0);
@@ -144,6 +155,15 @@ function Map() {
     [mapRef, currentAoi]
   );
 
+  // Set keyboard listeners and their cleanup
+  useEffect(() => {
+    document.addEventListener('keydown', onKeyDown);
+
+    return () => {
+      document.removeEventListener('keydown', onKeyDown);
+    };
+  }, [onKeyDown]);
+
   // Call event when map is created, set keyboard listeners
   useEffect(() => {
     if (isLoadingMap && mapRef) {
@@ -155,15 +175,6 @@ function Map() {
       });
     }
   }, [mapRef, isLoadingMap]);
-
-  // Set keyboard listeners and their cleanup
-  useEffect(() => {
-    document.addEventListener('keydown', onKeyDown);
-
-    return () => {
-      document.removeEventListener('keydown', onKeyDown);
-    };
-  }, [onKeyDown]);
 
   // Enable/disable map drag
   useEffect(() => {
