@@ -7,6 +7,13 @@ export default () => css`
     width: 30px;
   }
 
+  .leaflet-control-attribution {
+    a,
+    a:visited {
+      color: ${themeVal('color.baseDark')};
+    }
+  }
+
   .leaflet-control-geosearch {
     & form {
       border-radius: 4px;
