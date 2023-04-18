@@ -25,6 +25,7 @@ import {
 import copyTextToClipboard from '../../utils/copy-text-to-clipboard';
 import toasts from '../common/toasts';
 import logger from '../../utils/logger';
+import { ShortcutHelp } from './shortcut-help';
 
 const Wrapper = styled.div`
   flex: 1;
@@ -236,6 +237,8 @@ function ProjectPageHeader({ isMediumDown }) {
           </ModalForm>
         }
       />
+
+      <ShortcutHelp />
 
       <Dropdown
         alignment='right'

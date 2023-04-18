@@ -55,6 +55,7 @@ function getEventLatLng(event) {
 const selectors = {
   isLoadingMap: (state) => state.matches('Creating map'),
   mapEventHandlers: (state) => state.context.mapEventHandlers,
+  currentAoi: (state) => state.context.currentAoi,
   currentPrediction: (state) => state.context.currentPrediction,
   currentTilejson: (state) => get(state, 'context.currentTimeframe.tilejson'),
   mosaicTileUrl: (state) => get(state, 'context.currentMosaic.tileUrl'),
@@ -62,7 +63,12 @@ const selectors = {
 
 function Map() {
   const { apiToken } = useAuth();
+
+  // Local state
   const [mapRef, setMapRef] = useState();
+  const [predictionsOpacity, setPredictionsOpacity] = useState(0.5);
+
+  // FSM listeners
   const actorRef = ProjectMachineContext.useActorRef();
   const isLoadingMap = ProjectMachineContext.useSelector(
     selectors.isLoadingMap
@@ -70,6 +76,7 @@ function Map() {
   const mapEventHandlers = ProjectMachineContext.useSelector(
     selectors.mapEventHandlers
   );
+  const currentAoi = ProjectMachineContext.useSelector(selectors.currentAoi);
   const currentPrediction = ProjectMachineContext.useSelector(
     selectors.currentPrediction
   );
@@ -80,6 +87,7 @@ function Map() {
     selectors.mosaicTileUrl
   );
 
+  // Event handlers
   const handleMouseDown = useCallback(
     (e) => {
       actorRef.send({
@@ -110,7 +118,33 @@ function Map() {
     [actorRef]
   );
 
-  // Call event when map is created
+  // Keyboard event handlers
+  const onKeyDown = useCallback(
+    (e) => {
+      if (e.key === 'a') {
+        // On "a" key press, reduce opacity to zero
+        setPredictionsOpacity(0);
+      } else if (e.key === 's') {
+        // On "s" key press, reduce opacity by 10%
+        setPredictionsOpacity((prev) => prev - 0.1);
+      } else if (e.key === 'd') {
+        // On "d" key press, increase opacity by 10%
+        setPredictionsOpacity((prev) => prev + 0.1);
+      } else if (e.key === 'f') {
+        // On "f" key press, increase opacity to 100%
+        setPredictionsOpacity(1);
+      } else if (e.key === ' ' || e.code === 'Space') {
+        // On space keypress, pan map to current aoi bounds
+        const aoiShape = currentAoi?.shape;
+        if (aoiShape) {
+          mapRef.fitBounds(aoiShape.getBounds());
+        }
+      }
+    },
+    [mapRef, currentAoi]
+  );
+
+  // Call event when map is created, set keyboard listeners
   useEffect(() => {
     if (isLoadingMap && mapRef) {
       actorRef.send({
@@ -121,6 +155,15 @@ function Map() {
       });
     }
   }, [mapRef, isLoadingMap]);
+
+  // Set keyboard listeners and their cleanup
+  useEffect(() => {
+    document.addEventListener('keydown', onKeyDown);
+
+    return () => {
+      document.removeEventListener('keydown', onKeyDown);
+    };
+  }, [onKeyDown]);
 
   // Enable/disable map drag
   useEffect(() => {
@@ -211,6 +254,7 @@ function Map() {
                 value: `Bearer ${apiToken}`,
               },
             ]}
+            opacity={predictionsOpacity}
           />
         )}
         {currentPrediction &&
