@@ -53,7 +53,7 @@ function ImportGeojsonModal({ revealed, setRevealed }) {
       }
 
       // Drop the crs property if it exists. This will prevent the GeoJSON from
-      // being rejected by the API. All geojson should be considered as using the
+      // being rejected. All geojson should be considered as using the
       // default CRS (WGS84).
       if (geojson.crs) {
         delete geojson.crs;
