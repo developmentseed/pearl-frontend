@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from '@devseed-ui/button';
-import { Modal } from '../common/custom-modal';
+import { Modal } from '../../common/custom-modal';
 
 import styled from 'styled-components';
 

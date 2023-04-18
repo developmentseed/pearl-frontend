@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { useFocus } from '../../utils/use-focus';
+import { useFocus } from '../../../utils/use-focus';
 
 import { themeVal, glsp, media, truncated } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
@@ -9,9 +9,9 @@ import { Form } from '@devseed-ui/form';
 import { Button } from '@devseed-ui/button';
 import { FormInput } from '@devseed-ui/form';
 
-import { ProjectMachineContext } from '../../context/project-xstate';
+import { ProjectMachineContext } from '../../../context/project-xstate';
 
-import { Modal } from '../common/custom-modal';
+import { Modal } from '../../common/custom-modal';
 import get from 'lodash.get';
 import { useHistory } from 'react-router';
 import {
@@ -20,11 +20,11 @@ import {
   DropdownHeader,
   DropdownItem,
   DropdownTrigger,
-} from '../../styles/dropdown';
+} from '../../../styles/dropdown';
 
-import copyTextToClipboard from '../../utils/copy-text-to-clipboard';
-import toasts from '../common/toasts';
-import logger from '../../utils/logger';
+import copyTextToClipboard from '../../../utils/copy-text-to-clipboard';
+import toasts from '../../common/toasts';
+import logger from '../../../utils/logger';
 import { ShortcutHelp } from './shortcut-help';
 
 const Wrapper = styled.div`
