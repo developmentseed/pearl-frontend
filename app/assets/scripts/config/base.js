@@ -23,5 +23,7 @@ module.exports = {
     instanceCreationTimeout: 10 * 60 * 60 * 1000,
     instanceCreationCheckInterval: 5000,
     minimumAoiArea: 1000000,
+    mapboxAccessToken:
+      'pk.eyJ1IjoiZGV2c2VlZCIsImEiOiJjbGdtajZjMXgwNjczM3JvZTg4bm42bjNtIn0.MJclBE_ARI264ZaotMoEjw',
   },
 };
