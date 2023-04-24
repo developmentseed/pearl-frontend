@@ -361,6 +361,10 @@ export const actions = {
       currentAoi.shape.remove();
     }
 
+    if (context.rectangleAoi?.shape) {
+      context.rectangleAoi.shape.remove();
+    }
+
     return {
       currentAoi: null,
       currentPrediction: null,
@@ -490,8 +494,9 @@ export const actions = {
       },
     };
   }),
-  closeAoiModalDialog: assign(() => ({
+  closeAoiModalDialog: assign((c) => ({
     aoiModalDialog: {
+      ...c.aoiModalDialog, // keep other properties to avoid flickering
       revealed: false,
     },
   })),

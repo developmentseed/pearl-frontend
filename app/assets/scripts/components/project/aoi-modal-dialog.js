@@ -48,10 +48,10 @@ export const AoiModalDialog = () => {
             data-cy='keep-editing-button'
             variation='primary-plain'
             onClick={() =>
-              actorRef.send({ type: 'Keep editing button pressed' })
+              actorRef.send({ type: 'Restart drawing button pressed' })
             }
           >
-            Keep editing
+            Restart drawing
           </Button>
         </ModalFooter>
       )}
