@@ -488,7 +488,7 @@ export const actions = {
       aoiModalDialog: {
         revealed: true,
         proceedAnywayButton: true,
-        headline: 'Save Area For Batch Prediction',
+        headline: 'Area too large',
         content: `The AOI area is ${formattedAoiArea} km², please select an
         area smaller than ${maxArea} km².`,
       },
