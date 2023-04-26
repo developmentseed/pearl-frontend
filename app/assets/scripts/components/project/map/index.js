@@ -18,6 +18,9 @@ import config from '../../../config';
 const center = [19.22819, -99.995841];
 const zoom = 12;
 
+const DEFAULT_PREDICTION_LAYER_OPACITY = 0.7;
+const MOSAIC_LAYER_OPACITY = 0.8;
+
 const Container = styled.div`
   height: 100%;
   z-index: 1;
@@ -66,7 +69,9 @@ function Map() {
 
   // Local state
   const [mapRef, setMapRef] = useState();
-  const [predictionsOpacity, setPredictionsOpacity] = useState(0.5);
+  const [predictionsOpacity, setPredictionsOpacity] = useState(
+    DEFAULT_PREDICTION_LAYER_OPACITY
+  );
 
   // FSM listeners
   const actorRef = ProjectMachineContext.useActorRef();
@@ -254,7 +259,9 @@ function Map() {
         }}
       >
         <BaseMapLayer />
-        {mosaicTileUrl && <TileLayer url={mosaicTileUrl} opacity={0.8} />}
+        {mosaicTileUrl && (
+          <TileLayer url={mosaicTileUrl} opacity={MOSAIC_LAYER_OPACITY} />
+        )}
 
         {timeframeTilejsonUrl && (
           <TileLayerWithHeaders
@@ -271,7 +278,12 @@ function Map() {
         {currentPrediction &&
           currentPrediction.predictions &&
           currentPrediction.predictions.map((p) => (
-            <ImageOverlay key={p.key} url={p.image} bounds={p.bounds} />
+            <ImageOverlay
+              key={p.key}
+              url={p.image}
+              bounds={p.bounds}
+              opacity={predictionsOpacity}
+            />
           ))}
       </MapContainer>
     </SizeAwareElement>
