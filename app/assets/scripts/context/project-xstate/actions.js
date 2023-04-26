@@ -466,39 +466,11 @@ export const actions = {
       },
     };
   }),
-  displayAreaTooTinyModalDialog: assign((context) => {
-    const aoiArea = context.currentAoi.area;
-    const formattedAoiArea = formatThousands(aoiArea / 1e6, { decimals: 1 });
-
-    return {
-      aoiModalDialog: {
-        revealed: true,
-        headline: 'Area is too tiny',
-        content: `The AOI area is ${formattedAoiArea} km², please select an
-        area greater than ${config.minimumAoiArea / 1e6} km².`,
-      },
-    };
-  }),
-  displayAreaTooLargeModalDialog: assign((context) => {
-    const aoiArea = context.currentAoi.area;
-    const formattedAoiArea = formatThousands(aoiArea / 1e6, { decimals: 1 });
-    const maxArea = context.apiLimits.live_inference / 1e6;
-
-    return {
-      aoiModalDialog: {
-        revealed: true,
-        proceedAnywayButton: true,
-        headline: 'Area too large',
-        content: `The AOI area is ${formattedAoiArea} km², please select an
-        area smaller than ${maxArea} km².`,
-      },
-    };
-  }),
-  closeAoiModalDialog: assign((c) => ({
-    aoiModalDialog: {
-      ...c.aoiModalDialog, // keep other properties to avoid flickering
-      revealed: false,
-    },
+  displayAoiAreaModalDialog: assign(() => ({
+    aoiAreaModalDialogRevealed: true,
+  })),
+  closeAoiAreaModalDialog: assign(() => ({
+    aoiAreaModalDialogRevealed: false,
   })),
   toggleUploadAoiModal: assign((context) => ({
     uploadAoiModal: {
