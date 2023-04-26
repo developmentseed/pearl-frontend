@@ -31,27 +31,15 @@ export const AoiModalDialog = () => {
       content={<div>{aoiModalDialog.content}</div>}
       renderFooter={() => (
         <ModalFooter>
-          {aoiModalDialog.proceedAnywayButton && (
-            <Button
-              size='xlarge'
-              variation='base-plain'
-              data-cy='proceed-anyway-button'
-              onClick={() =>
-                actorRef.send({ type: 'Proceed anyway button pressed' })
-              }
-            >
-              Proceed anyway
-            </Button>
-          )}
           <Button
             size='xlarge'
             data-cy='keep-editing-button'
             variation='primary-plain'
             onClick={() =>
-              actorRef.send({ type: 'Keep editing button pressed' })
+              actorRef.send({ type: 'Restart drawing button pressed' })
             }
           >
-            Keep editing
+            Restart drawing
           </Button>
         </ModalFooter>
       )}

@@ -361,6 +361,10 @@ export const actions = {
       currentAoi.shape.remove();
     }
 
+    if (context.rectangleAoi?.shape) {
+      context.rectangleAoi.shape.remove();
+    }
+
     return {
       currentAoi: null,
       currentPrediction: null,
@@ -484,14 +488,15 @@ export const actions = {
       aoiModalDialog: {
         revealed: true,
         proceedAnywayButton: true,
-        headline: 'Save Area For Batch Prediction',
+        headline: 'Area too large',
         content: `The AOI area is ${formattedAoiArea} km², please select an
         area smaller than ${maxArea} km².`,
       },
     };
   }),
-  closeAoiModalDialog: assign(() => ({
+  closeAoiModalDialog: assign((c) => ({
     aoiModalDialog: {
+      ...c.aoiModalDialog, // keep other properties to avoid flickering
       revealed: false,
     },
   })),
