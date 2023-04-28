@@ -219,6 +219,9 @@ export const actions = {
   setCurrentTimeframe: assign((context, event) => ({
     currentTimeframe: event.data.timeframe,
   })),
+  setCurrentBatchPrediction: assign((context, event) => ({
+    currentBatchPrediction: event.data.batchPrediction,
+  })),
   refreshSessionStatusMessage: assign((context) => {
     let sessionStatusMessage;
 
@@ -268,10 +271,6 @@ export const actions = {
         hidden: isExistingProject,
         disabled: !currentImagerySource,
         placeholderLabel: 'Select Model',
-      },
-      primeButton: {
-        disabled: !currentImagerySource || !currentMosaic || !currentModel,
-        label: 'Ready for prediction run',
       },
     };
   }),
@@ -331,20 +330,12 @@ export const actions = {
   }),
   enablePredictionRun: assign(() => ({
     sessionStatusMessage: 'Ready for prediction run',
-    primeButton: {
-      disabled: false,
-      label: 'Run Prediction',
-    },
   })),
   enterPredictionRun: assign(() => ({
     sessionStatusMessage: 'Running prediction',
     globalLoading: {
       disabled: false,
       message: 'Running prediction',
-    },
-    primeButton: {
-      disabled: false,
-      label: 'Run Prediction',
     },
   })),
   resetMapEventHandlers: assign(() => {
