@@ -82,13 +82,13 @@ const AOI_HEADERS = [
 // Render single AOI row
 function renderRow(share, { restApiClient }) {
   const shareLink = `${window.location.origin}/share/${share.uuid}/map`;
-  const { aoi, timeframe } = share;
+  const { aoi, timeframe, mosaic } = share;
 
   return (
     <TableRow key={aoi.id}>
       <TableCell>{aoi.name}</TableCell>
       <TableCell>{formatThousands(tArea(aoi.bounds) / 1e6)}</TableCell>
-      <TableCell>{timeframe.mosaic}</TableCell>
+      <TableCell>{mosaic?.name}</TableCell>
       <TableCell>{timeframe.checkpoint_id}</TableCell>
       <TableCell>{timeframe.classes.length}</TableCell>
       <TableCell>{formatDateTime(timeframe.created)}</TableCell>
