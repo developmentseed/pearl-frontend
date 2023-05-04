@@ -3,8 +3,8 @@ import { Button } from '@devseed-ui/button';
 import styled from 'styled-components';
 import { Spinner } from '../../common/global-loading/styles';
 import { ProjectMachineContext } from '../../../context/project-xstate';
-import { useParams } from 'react-router';
 import { useAuth } from '../../../context/auth';
+import logger from '../../../utils/logger';
 
 const ProgressButtonWrapper = styled.div`
   display: flex;
@@ -18,31 +18,38 @@ const ProgressButtonWrapper = styled.div`
 `;
 
 const selectors = {
+  projectId: ({ context }) => context.project?.id,
   currentBatchPrediction: ({ context }) => context.currentBatchPrediction,
 };
 
 export function BatchPredictionPanel() {
-  const { projectId } = useParams();
   const { restApiClient } = useAuth();
   const currentBatchPrediction = ProjectMachineContext.useSelector(
     selectors.currentBatchPrediction
   );
+  const projectId = ProjectMachineContext.useSelector(selectors.projectId);
   const [batchPredictionStatus, setBatchPredictionStatus] = useState(null);
   const intervalRef = useRef();
 
   // if currentBatchPrediction has a value, start a recurring request to get the
   // batch prediction status
   const getRunningBatchPredictionStatus = useCallback(async () => {
-    const status = await restApiClient.get(
-      `project/${projectId}/batch/${currentBatchPrediction.id}}`
-    );
-    setBatchPredictionStatus(status);
+    if (!projectId) return;
+    try {
+      const status = await restApiClient.get(
+        `project/${projectId}/batch/${currentBatchPrediction.id}`
+      );
+      setBatchPredictionStatus(status);
+    } catch (error) {
+      logger(error);
+    }
   }, [currentBatchPrediction, restApiClient, projectId]);
 
   useEffect(() => {
     // Create a new interval if none is running and there is a
     // currentBatchPrediction
     if (
+      projectId?.id !== 'new' &&
       currentBatchPrediction &&
       !intervalRef.current &&
       !batchPredictionStatus
@@ -59,6 +66,7 @@ export function BatchPredictionPanel() {
       clearInterval(intervalRef.current);
     }
   }, [
+    projectId,
     currentBatchPrediction,
     intervalRef,
     batchPredictionStatus,
