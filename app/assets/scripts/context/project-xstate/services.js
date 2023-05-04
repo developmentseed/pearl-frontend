@@ -20,11 +20,13 @@ export const services = {
     let aoisList = [];
     let timeframesList = [];
     let checkpointList = [];
+    let sharesList = [];
     let currentAoi;
     let currentTimeframe;
     let currentImagerySource;
     let currentMosaic;
     let currentModel;
+    let currentShare;
 
     // Fetch lists
     const { mosaics: mosaicsList } = await apiClient.get('mosaic');
@@ -80,6 +82,12 @@ export const services = {
       // Get project's checkpoints
       checkpointList = (await apiClient.get(`project/${projectId}/checkpoint`))
         .checkpoints;
+
+      sharesList = (await apiClient.get(`project/${projectId}/share`)).shares;
+
+      currentShare = sharesList.find(
+        (share) => share.mosaic?.id === currentMosaic?.id
+      );
     }
 
     return {
@@ -91,6 +99,7 @@ export const services = {
       aoisList,
       checkpointList,
       timeframesList,
+      sharesList,
       currentAoi,
       currentTimeframe,
       currentImagerySource,
@@ -99,6 +108,7 @@ export const services = {
         tileUrl: getMosaicTileUrl(currentMosaic),
       },
       currentModel,
+      currentShare,
     };
   },
   geocodeAoi: async (context) => {

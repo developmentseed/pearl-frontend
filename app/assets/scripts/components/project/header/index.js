@@ -22,10 +22,11 @@ import {
   DropdownTrigger,
 } from '../../../styles/dropdown';
 
-import copyTextToClipboard from '../../../utils/copy-text-to-clipboard';
-import toasts from '../../common/toasts';
-import logger from '../../../utils/logger';
 import { ShortcutHelp } from './shortcut-help';
+import {
+  copyShareUrlToClipboard,
+  getShareLink,
+} from '../../../utils/share-link';
 
 const Wrapper = styled.div`
   flex: 1;
@@ -130,7 +131,7 @@ const selectors = {
   projectName: (state) => get(state, 'context.project.name', ''),
   sessionStatusMessage: (state) =>
     get(state, 'context.sessionStatusMessage', {}),
-  currentShareURL: (state) => get(state, 'context.currentShareURL'),
+  currentShare: (state) => get(state, 'context.currentShare'),
 };
 
 function ProjectPageHeader({ isMediumDown }) {
@@ -144,20 +145,9 @@ function ProjectPageHeader({ isMediumDown }) {
   const sessionStatusMessage = ProjectMachineContext.useSelector(
     selectors.sessionStatusMessage
   );
-  const currentShareURL = ProjectMachineContext.useSelector(
-    selectors.currentShareURL
+  const currentShare = ProjectMachineContext.useSelector(
+    selectors.currentShare
   );
-
-  const copyTilesLink = () => {
-    copyTextToClipboard(currentShareURL).then((result) => {
-      if (result) {
-        toasts.success('URL copied to clipboard');
-      } else {
-        logger('Failed to copy', result);
-        toasts.error('Failed to copy URL to clipboard');
-      }
-    });
-  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -267,29 +257,31 @@ function ProjectPageHeader({ isMediumDown }) {
               <DropdownItem
                 useIcon='link'
                 onClick={
-                  !currentShareURL
+                  !currentShare
                     ? () => actorRef.send('Requested AOI share URL')
-                    : copyTilesLink
+                    : () => copyShareUrlToClipboard(currentShare)
                 }
               >
-                {currentShareURL ? 'Copy Share URL' : 'Create Share URL'}
+                {currentShare ? 'Copy Share URL' : 'Create Share URL'}
               </DropdownItem>
-              {currentShareURL && (
-                <DropdownItem nonhoverable={!currentShareURL}>
+              {currentShare && (
+                <DropdownItem nonhoverable={!currentShare}>
                   <FormInputGroup>
                     <FormInput
                       readOnly
-                      value={currentShareURL}
-                      disabled={!currentShareURL}
+                      value={getShareLink(currentShare)}
+                      disabled={!currentShare}
                       size='small'
                     />
                     <Button
                       variation='primary-plain'
                       useIcon='clipboard'
                       hideText
-                      disabled={!currentShareURL}
+                      disabled={!currentShare}
                       title='Copy link to clipboard'
-                      onClick={currentShareURL && copyTilesLink}
+                      onClick={() =>
+                        currentShare && copyShareUrlToClipboard(currentShare)
+                      }
                     />
                   </FormInputGroup>
                 </DropdownItem>
