@@ -32,8 +32,8 @@ import Paginator from '../../common/paginator';
 import ProjectCard from './project-card';
 import copyTextToClipboard from '../../../utils/copy-text-to-clipboard';
 import logger from '../../../utils/logger';
-import { downloadGeotiff } from '../../../utils/map';
 import BatchList from './batch-list';
+import { downloadShareGeotiff } from '../../../utils/share-link';
 
 // Controls the size of each page
 const AOIS_PER_PAGE = 20;
@@ -117,22 +117,7 @@ function renderRow(share, { restApiClient }) {
           variation='primary-plain'
           useIcon='download'
           hideText
-          onClick={async () => {
-            try {
-              showGlobalLoadingMessage('Preparing GeoTIFF...');
-              const arrayBuffer = await restApiClient.get(
-                `share/${share.uuid}/download/color`,
-                'binary'
-              );
-              const filename = `${aoi.id}.tiff`;
-              downloadGeotiff(arrayBuffer, filename);
-            } catch (err) {
-              logger('Failed to download geotiff', err);
-              toasts.error('Failed to download GeoTIFF');
-              hideGlobalLoading();
-            }
-            hideGlobalLoading();
-          }}
+          onClick={() => downloadShareGeotiff(restApiClient, share)}
         />
       </TableCell>
     </TableRow>
