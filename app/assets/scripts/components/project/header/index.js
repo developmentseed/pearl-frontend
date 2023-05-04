@@ -25,8 +25,10 @@ import {
 import { ShortcutHelp } from './shortcut-help';
 import {
   copyShareUrlToClipboard,
+  downloadShareGeotiff,
   getShareLink,
 } from '../../../utils/share-link';
+import { useAuth } from '../../../context/auth';
 
 const Wrapper = styled.div`
   flex: 1;
@@ -136,6 +138,7 @@ const selectors = {
 
 function ProjectPageHeader({ isMediumDown }) {
   const history = useHistory();
+  const { restApiClient } = useAuth();
   const [localProjectName, setLocalProjectName] = useState(null);
   const actorRef = ProjectMachineContext.useActorRef();
   const displayProjectNameModal = ProjectMachineContext.useSelector(
@@ -253,6 +256,16 @@ function ProjectPageHeader({ isMediumDown }) {
             <p>Export Options</p>
           </DropdownHeader>
           <DropdownBody>
+            <li>
+              <DropdownItem
+                useIcon='download-2'
+                onClick={() =>
+                  downloadShareGeotiff(restApiClient, currentShare)
+                }
+              >
+                Download .geotiff
+              </DropdownItem>
+            </li>
             <li>
               <DropdownItem
                 useIcon='link'
