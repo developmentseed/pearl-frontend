@@ -21,7 +21,7 @@ export function PrimeButton() {
 
   const buttonLabel = isLargeAoi
     ? 'Run Batch Prediction'
-    : 'Run live prediction';
+    : 'Run Live Prediction';
 
   return (
     <InfoButton

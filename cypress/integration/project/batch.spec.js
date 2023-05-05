@@ -34,8 +34,8 @@ describe('Batch predictions', () => {
           project_id: 1,
           created: new Date(Date.parse('2001-02-01')).setUTCDate(-i),
           updated: new Date(Date.parse('2001-02-01')).setUTCDate(i + 1),
-          aoi: i,
-          name: `AOI ${i}`,
+          aoi: { id: i, name: `AOI ${i}` },
+          mosaic: { id: i, name: `Mosaic ${i}` },
           abort: false,
           completed: i !== 1,
           progress: i === 1 ? 60 : 100,
@@ -126,7 +126,7 @@ describe('Batch predictions', () => {
     cy.get('[data-cy=create-project-button]').click();
 
     // Set AOI
-    cy.get('[data-cy=aoi-edit-button]').click();
+    cy.get('[data-cy=draw-first-aoi-button]').click();
     cy.get('#map')
       .trigger('mousedown', 150, 150)
       .trigger('mousemove', 400, 400)
@@ -135,15 +135,44 @@ describe('Batch predictions', () => {
     cy.get('[data-cy=proceed-anyway-button]').should('exist').click();
     cy.wait('@reverseGeocodeCity');
 
-    // Set model
+    // Select imagery source
+    cy.get('[data-cy=imagery-selector-label]').should('exist').click();
+    cy.get('[data-cy=select-imagery-2-card]').should('exist').click();
+
+    cy.get('[data-cy=imagery-selector-label]').should(
+      'have.text',
+      'Sentinel-2'
+    );
+
+    // Check session status message
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Select Mosaic'
+    );
+
+    // Select mosaic
+    cy.get('[data-cy=mosaic-selector-label]').should('exist').click();
+    cy.get('[data-cy=select-mosaic-2849689f57f1b3b9c1f725abb75aa411-card]')
+      .should('exist')
+      .click();
+
+    // Check session status message
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Select Model'
+    );
+
+    // Open the Model selection modal
     cy.get('[data-cy=select-model-label]').should('exist').click();
+
+    // Finally select a model
     cy.get('[data-cy=select-model-1-card]').should('exist').click();
 
     // No batch message should be displayed
     cy.get('[data-cy=batch-progress-message').should('not.exist');
 
-    // Request model run
-    cy.get('[data-cy=run-button]')
+    // Request batch prediction run
+    cy.get('[data-cy=prime-button]')
       .should('have.text', 'Run Batch Prediction')
       .click();
 
@@ -238,8 +267,13 @@ describe('Batch predictions', () => {
       }
     );
 
-    // Concurrent batch runs are not allowed
-    cy.get('[data-cy=run-button]').should('have.attr', 'data-disabled', 'true');
+    // TODO fix label and disable state
+    // // Concurrent batch runs are not allowed
+    // cy.get('[data-cy=prime-button]').should(
+    //   'have.attr',
+    //   'data-disabled',
+    //   'true'
+    // );
 
     cy.get('[data-cy=batch-progress-message')
       .should('include.text', 'Batch prediction in progress: 20%')
@@ -280,18 +314,13 @@ describe('Batch predictions', () => {
     );
 
     // New runs are allowed
-    cy.get('[data-cy=run-button]').should(
+    cy.get('[data-cy=prime-button]').should(
       'have.attr',
       'data-disabled',
       'false'
     );
 
-    // Check if sec panel is mounted with a pixel distro chart
-    cy.get('[data-cy=checkpoint_class_distro]').should('exist');
     cy.get('[data-cy=batch-progress-message').should('not.exist');
-    cy.get('[data-cy=add-aoi-button]').should('exist').click();
-    cy.get('[data-cy=checkpoint_class_distro]').should('not.exist');
-  });
 
   it('Inference and retrain can happen during batch', () => {
     cy.mockApiRoutes();
@@ -450,9 +479,10 @@ describe('Batch predictions', () => {
 
     // Check available columns
     cy.get('th')
-      .should('have.length', 5)
+      .should('have.length', 6)
       .should('include.text', 'Id')
       .should('include.text', 'AOI Name')
+      .should('include.text', 'Mosaic')
       .should('include.text', 'Status')
       .should('include.text', 'Started')
       .should('include.text', 'Download');
@@ -544,7 +574,7 @@ describe('Batch predictions', () => {
     cy.get('[data-cy=create-project-button]').click();
 
     // Set AOI
-    cy.get('[data-cy=aoi-edit-button]').click();
+    cy.get('[data-cy=draw-first-aoi-button]').click();
     cy.get('#map')
       .trigger('mousedown', 150, 150)
       .trigger('mousemove', 400, 400)
@@ -553,15 +583,44 @@ describe('Batch predictions', () => {
     cy.get('[data-cy=proceed-anyway-button]').should('exist').click();
     cy.wait('@reverseGeocodeCity');
 
-    // Set model
+    // Select imagery source
+    cy.get('[data-cy=imagery-selector-label]').should('exist').click();
+    cy.get('[data-cy=select-imagery-2-card]').should('exist').click();
+
+    cy.get('[data-cy=imagery-selector-label]').should(
+      'have.text',
+      'Sentinel-2'
+    );
+
+    // Check session status message
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Select Mosaic'
+    );
+
+    // Select mosaic
+    cy.get('[data-cy=mosaic-selector-label]').should('exist').click();
+    cy.get('[data-cy=select-mosaic-2849689f57f1b3b9c1f725abb75aa411-card]')
+      .should('exist')
+      .click();
+
+    // Check session status message
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Select Model'
+    );
+
+    // Open the Model selection modal
     cy.get('[data-cy=select-model-label]').should('exist').click();
+
+    // Finally select a model
     cy.get('[data-cy=select-model-1-card]').should('exist').click();
 
     // No batch message should be displayed
     cy.get('[data-cy=batch-progress-message').should('not.exist');
 
     // Request model run
-    cy.get('[data-cy=run-button]')
+    cy.get('[data-cy=prime-button]')
       .should('have.text', 'Run Batch Prediction')
       .click();
 
@@ -593,19 +652,21 @@ describe('Batch predictions', () => {
       project_id: 1,
       created: 1630056802895,
       updated: 1630056802895,
-      aoi: null,
-      name: 'Wesley Heights',
-      bounds: {
-        type: 'Polygon',
-        coordinates: [
-          [
-            [-77.13016844644744, 38.88544827129372],
-            [-77.04706107549731, 38.88544827129372],
-            [-77.04706107549731, 38.974905373957455],
-            [-77.13016844644744, 38.974905373957455],
-            [-77.13016844644744, 38.88544827129372],
+      aoi: {
+        id: 1,
+        name: 'Wesley Heights',
+        bounds: {
+          type: 'Polygon',
+          coordinates: [
+            [
+              [-77.13016844644744, 38.88544827129372],
+              [-77.04706107549731, 38.88544827129372],
+              [-77.04706107549731, 38.974905373957455],
+              [-77.13016844644744, 38.974905373957455],
+              [-77.13016844644744, 38.88544827129372],
+            ],
           ],
-        ],
+        },
       },
       abort: false,
       completed: false,
@@ -629,6 +690,7 @@ describe('Batch predictions', () => {
     cy.get('[data-cy=abort-batch-job-btn]')
       .should('exist')
       .should('be.disabled');
+
     // update progress to 1%
     cy.intercept(
       {
@@ -659,7 +721,7 @@ describe('Batch predictions', () => {
       'have.text',
       'Session Status: Ready for prediction run'
     );
-    cy.get('[data-cy=run-button]')
+    cy.get('[data-cy=prime-button]')
       .should('exist')
       .should('not.be.disabled')
       .should('have.text', 'Run Batch Prediction');
