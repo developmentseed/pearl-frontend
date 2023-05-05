@@ -6,7 +6,6 @@
   "retries": 1,
   "testFiles": "**/!(stress-live-api.spec.js)",
   "ignoreTestFiles": [
-    "**/batch.spec.js",
     "**/gpu.spec.js",
     "**/keyboard-shortcuts.spec.js",
     "**/layers-panel.spec.js",
