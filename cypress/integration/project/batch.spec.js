@@ -4,20 +4,6 @@ const format = require('date-fns/format').default;
 
 const restApiEndpoint = Cypress.config('restApiEndpoint');
 
-const instance = {
-  id: 1,
-  project_id: 1,
-  aoi_id: 2088,
-  checkpoint_id: 2,
-  last_update: '2021-07-12T09:59:04.442Z',
-  created: '2021-07-12T09:58:57.459Z',
-  active: true,
-  token: 'app_client',
-  status: {
-    phase: 'Running',
-  },
-};
-
 describe('Batch predictions', () => {
   beforeEach(() => {
     cy.mockApiRoutes();
@@ -333,6 +319,19 @@ describe('Batch predictions', () => {
   // TODO Edit AOI and retrain are not enabled. The following test should be
   // reinstated when they are.
   // it('Inference and retrain can happen during batch', () => {
+  // const instance = {
+  //   id: 1,
+  //   project_id: 1,
+  //   aoi_id: 2088,
+  //   checkpoint_id: 2,
+  //   last_update: '2021-07-12T09:59:04.442Z',
+  //   created: '2021-07-12T09:58:57.459Z',
+  //   active: true,
+  //   token: 'app_client',
+  //   status: {
+  //     phase: 'Running',
+  //   },
+  // };
   //   cy.mockApiRoutes();
   //   /**
   //    * GET /project/:id/instance/:id

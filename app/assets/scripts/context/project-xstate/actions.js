@@ -5,8 +5,6 @@ import turfBboxPolygon from '@turf/bbox-polygon';
 import turfArea from '@turf/area';
 import toasts from '../../components/common/toasts';
 import { BOUNDS_PADDING } from '../../components/common/map/constants';
-import { formatThousands } from '../../utils/format';
-import config from '../../config';
 import { getMosaicTileUrl } from './helpers';
 
 export const actions = {
@@ -249,12 +247,7 @@ export const actions = {
     };
   }),
   refreshPredictionTab: assign((context) => {
-    const {
-      currentImagerySource,
-      currentMosaic,
-      currentModel,
-      project,
-    } = context;
+    const { currentImagerySource, project } = context;
 
     const isExistingProject = project?.id !== 'new';
 
