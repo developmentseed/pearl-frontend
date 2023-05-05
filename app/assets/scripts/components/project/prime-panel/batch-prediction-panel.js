@@ -44,16 +44,19 @@ const selectors = {
 function BatchPredictionProgressModal({
   runningBatch,
   revealed,
-  disableAbortBtn,
   onCloseClick,
 }) {
   // Calculate AOI Area
   let batchAoiArea;
   try {
-    batchAoiArea = formatThousands(tArea(runningBatch.bounds) / 1e6);
+    batchAoiArea = runningBatch?.bounds
+      ? formatThousands(tArea(runningBatch.bounds) / 1e6)
+      : 'N/A';
   } catch (error) {
     logger(error);
   }
+
+  const abortButtonDisabled = runningBatch?.progress === 0;
 
   return (
     <Modal
@@ -81,12 +84,12 @@ function BatchPredictionProgressModal({
             <AbortBatchJobButton
               projectId={runningBatch.project_id}
               batchId={runningBatch.id}
-              disabled={disableAbortBtn}
+              disabled={abortButtonDisabled}
               afterOnClickFn={async () => {
                 onCloseClick();
               }}
             />
-            {disableAbortBtn && (
+            {abortButtonDisabled && (
               <StyledTooltip id='batch-starting-tooltip'>
                 It will be possible to abort the job when it starts running
               </StyledTooltip>
@@ -101,7 +104,6 @@ function BatchPredictionProgressModal({
 BatchPredictionProgressModal.propTypes = {
   runningBatch: T.object,
   revealed: T.bool,
-  disableAbortBtn: T.bool,
   onCloseClick: T.func,
 };
 
@@ -167,15 +169,15 @@ export function BatchPredictionPanel() {
   if (
     batchPredictionStatus.completed ||
     batchPredictionStatus.error ||
-    batchPredictionStatus.aborted
+    batchPredictionStatus.abort
   )
     return null;
 
   return (
     <>
-      {currentBatchPrediction && (
+      {batchPredictionStatus && (
         <BatchPredictionProgressModal
-          runningBatch={currentBatchPrediction}
+          runningBatch={batchPredictionStatus}
           revealed={modalRevealed}
           onCloseClick={() => setModalRevealed(false)}
         />

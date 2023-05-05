@@ -20,7 +20,7 @@ export function PrimeButton() {
   const isLargeAoi = ProjectMachineContext.useSelector(selectors.isLargeAoi);
 
   const buttonLabel = isLargeAoi
-    ? 'Run batch prediction'
+    ? 'Run Batch Prediction'
     : 'Run live prediction';
 
   return (
