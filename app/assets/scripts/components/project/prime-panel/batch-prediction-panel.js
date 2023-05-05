@@ -47,11 +47,6 @@ function BatchPredictionProgressModal({
   disableAbortBtn,
   onCloseClick,
 }) {
-  // const { runningBatch } = useInstance();
-  // const { setSessionStatusMode } = useSessionStatus();
-
-  console.log(runningBatch);
-
   // Calculate AOI Area
   let batchAoiArea;
   try {
@@ -87,8 +82,7 @@ function BatchPredictionProgressModal({
               projectId={runningBatch.project_id}
               batchId={runningBatch.id}
               disabled={disableAbortBtn}
-              afterOnClickFn={() => {
-                // setSessionStatusMode(sessionModes.PREDICTION_READY);
+              afterOnClickFn={async () => {
                 onCloseClick();
               }}
             />
@@ -152,8 +146,9 @@ export function BatchPredictionPanel() {
     // Clear interval if status is errored or aborted
     if (
       batchPredictionStatus &&
-      !batchPredictionStatus.completed &&
-      (batchPredictionStatus.error || batchPredictionStatus.abort)
+      (batchPredictionStatus.completed ||
+        batchPredictionStatus.error ||
+        batchPredictionStatus.abort)
     ) {
       clearInterval(intervalRef.current);
     }
@@ -169,7 +164,12 @@ export function BatchPredictionPanel() {
   if (!currentBatchPrediction || !batchPredictionStatus) return null;
 
   // Prediction is not errored or aborted
-  if (batchPredictionStatus.error || batchPredictionStatus.aborted) return null;
+  if (
+    batchPredictionStatus.completed ||
+    batchPredictionStatus.error ||
+    batchPredictionStatus.aborted
+  )
+    return null;
 
   return (
     <>
