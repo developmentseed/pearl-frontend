@@ -322,153 +322,170 @@ describe('Batch predictions', () => {
 
     cy.get('[data-cy=batch-progress-message').should('not.exist');
 
-  it('Inference and retrain can happen during batch', () => {
-    cy.mockApiRoutes();
-    /**
-     * GET /project/:id/instance/:id
-     */
-    cy.intercept(
-      {
-        url: restApiEndpoint + '/api/project/1/instance/1',
-      },
-      instance
-    );
-
-    cy.intercept(
-      {
-        url: restApiEndpoint + '/api/project/1/aoi',
-      },
-      {
-        fixture: 'aois-with-batch.json',
-      }
-    ).as('loadAoisWithBatch');
-    cy.intercept(
-      {
-        url: restApiEndpoint + '/api/project/1/aoi/2088',
-      },
-      {
-        fixture: 'aoi-2088.json',
-      }
-    ).as('batchAoi');
-
-    cy.fakeLogin();
-
-    cy.visit('/project/1');
-    cy.wait('@loadAoisWithBatch');
-    cy.wait(['@batchAoi', '@fetchCheckpoint2']);
-
-    cy.get('[data-cy=predict-tab]').click();
-    // Edit AOI to treat as new one
-    cy.get('[data-cy=aoi-edit-button]').should('exist').click();
-    cy.get('[data-cy=aoi-edit-confirm-button]').should('exist').click();
-
-    cy.get('[data-cy=proceed-anyway-button]').should('exist').click();
-    cy.wait('@reverseGeocodeCity');
-
-    // Ready to run batch prediction
-    cy.get('[data-cy=run-button]').should('have.text', 'Run Batch Prediction');
-
-    // Mock batch list
-    cy.intercept(
-      {
-        url: restApiEndpoint + '/api/project/1/batch*',
-        method: 'GET',
-      },
-      {
-        total: 1,
-        batch: [
-          {
-            id: 1,
-            created: 1630056802895,
-            updated: 1630056976364,
-            aoi: 1,
-            name: 'Wesley Heights',
-            abort: false,
-            completed: false,
-            progress: 0,
-          },
-        ],
-      }
-    ).as('batchList1');
-
-    // Mock batch job
-    const batchJob = {
-      id: 1,
-      uid: 1,
-      project_id: 1,
-      created: 1630056802895,
-      updated: 1630056802895,
-      aoi: null,
-      name: 'Wesley Heights',
-      bounds: {
-        type: 'Polygon',
-        coordinates: [
-          [
-            [-77.13016844644744, 38.88544827129372],
-            [-77.04706107549731, 38.88544827129372],
-            [-77.04706107549731, 38.974905373957455],
-            [-77.13016844644744, 38.974905373957455],
-            [-77.13016844644744, 38.88544827129372],
-          ],
-        ],
-      },
-      abort: false,
-      completed: false,
-      progress: 0,
-      instance: 1,
-    };
-
-    // Mock batch start
-    cy.intercept(
-      {
-        url: restApiEndpoint + '/api/project/1/batch/1',
-        method: 'GET',
-      },
-      batchJob
-    ).as('batch0');
-
-    // Run job
-    cy.get('[data-cy=run-button]').click();
-
-    // Wait for requests executed on batch prediction start
-    cy.wait('@postBatch');
-    cy.wait('@batchList1');
-    cy.wait('@batch0');
-
-    // Update progress in batch request mock
-    cy.intercept(
-      {
-        url: restApiEndpoint + '/api/project/1/batch/1',
-        method: 'GET',
-      },
-      {
-        ...batchJob,
-        progress: 10,
-      }
-    ).as('batch10');
-    cy.wait('@batch10');
-
-    // Only one batch operation allowed at a time
-    cy.get('[data-cy=run-button]').should('have.attr', 'data-disabled', 'true');
-
-    cy.get('[data-cy=add-aoi-button]').should('exist').click();
-
-    cy.get('#map')
-      .trigger('mousedown', 150, 150)
-      .trigger('mousemove', 400, 400)
-      .trigger('mouseup');
-    cy.get('[data-cy=proceed-anyway-button]').should('exist').click();
-    cy.wait('@reverseGeocodeCity');
-
-    // Should be able to run inference on non batch AOI
-    cy.get('.listed-aoi').contains('Rockville').click();
-    cy.get('[data-cy=confirm-clear-aoi]').should('exist').click();
-    cy.get('[data-cy=run-button]').should(
-      'have.attr',
-      'data-disabled',
-      'false'
-    );
+    // TODO secondary panel was disabled and need to be reinstated
+    // // Check if sec panel is mounted with a pixel distro chart
+    // cy.get('[data-cy=checkpoint_class_distro]').should('exist');
+    // cy.get('[data-cy=batch-progress-message').should('not.exist');
+    // cy.get('[data-cy=add-aoi-button]').should('exist').click();
+    // cy.get('[data-cy=checkpoint_class_distro]').should('not.exist');
   });
+
+  // TODO Edit AOI and retrain are not enabled. The following test should be
+  // reinstated when they are.
+  // it('Inference and retrain can happen during batch', () => {
+  //   cy.mockApiRoutes();
+  //   /**
+  //    * GET /project/:id/instance/:id
+  //    */
+  //   cy.intercept(
+  //     {
+  //       url: restApiEndpoint + '/api/project/1/instance/1',
+  //     },
+  //     instance
+  //   );
+
+  //   cy.intercept(
+  //     {
+  //       url: restApiEndpoint + '/api/project/1/aoi',
+  //     },
+  //     {
+  //       fixture: 'aois-with-batch.json',
+  //     }
+  //   ).as('loadAoisWithBatch');
+  //   cy.intercept(
+  //     {
+  //       url: restApiEndpoint + '/api/project/1/aoi/2088',
+  //     },
+  //     {
+  //       fixture: 'aoi-2088.json',
+  //     }
+  //   ).as('batchAoi');
+
+  //   cy.fakeLogin();
+
+  //   cy.visit('/project/1');
+  //   cy.wait('@loadAoisWithBatch');
+  //   cy.wait(['@batchAoi', '@fetchCheckpoint2']);
+
+  //   cy.get('[data-cy=predict-tab]').click();
+  //   // Edit AOI to treat as new one
+  //   cy.get('[data-cy=aoi-edit-button]').should('exist').click();
+  //   cy.get('[data-cy=aoi-edit-confirm-button]').should('exist').click();
+
+  //   cy.get('[data-cy=proceed-anyway-button]').should('exist').click();
+  //   cy.wait('@reverseGeocodeCity');
+
+  //   // Ready to Run Batch Prediction
+  //   cy.get('[data-cy=prime-button]').should(
+  //     'have.text',
+  //     'Run Batch Prediction'
+  //   );
+
+  //   // Mock batch list
+  //   cy.intercept(
+  //     {
+  //       url: restApiEndpoint + '/api/project/1/batch*',
+  //       method: 'GET',
+  //     },
+  //     {
+  //       total: 1,
+  //       batch: [
+  //         {
+  //           id: 1,
+  //           created: 1630056802895,
+  //           updated: 1630056976364,
+  //           aoi: 1,
+  //           name: 'Wesley Heights',
+  //           abort: false,
+  //           completed: false,
+  //           progress: 0,
+  //         },
+  //       ],
+  //     }
+  //   ).as('batchList1');
+
+  //   // Mock batch job
+  //   const batchJob = {
+  //     id: 1,
+  //     uid: 1,
+  //     project_id: 1,
+  //     created: 1630056802895,
+  //     updated: 1630056802895,
+  //     aoi: null,
+  //     name: 'Wesley Heights',
+  //     bounds: {
+  //       type: 'Polygon',
+  //       coordinates: [
+  //         [
+  //           [-77.13016844644744, 38.88544827129372],
+  //           [-77.04706107549731, 38.88544827129372],
+  //           [-77.04706107549731, 38.974905373957455],
+  //           [-77.13016844644744, 38.974905373957455],
+  //           [-77.13016844644744, 38.88544827129372],
+  //         ],
+  //       ],
+  //     },
+  //     abort: false,
+  //     completed: false,
+  //     progress: 0,
+  //     instance: 1,
+  //   };
+
+  //   // Mock batch start
+  //   cy.intercept(
+  //     {
+  //       url: restApiEndpoint + '/api/project/1/batch/1',
+  //       method: 'GET',
+  //     },
+  //     batchJob
+  //   ).as('batch0');
+
+  //   // Run job
+  //   cy.get('[data-cy=prime-button]').click();
+
+  //   // Wait for requests executed on batch prediction start
+  //   cy.wait('@postBatch');
+  //   cy.wait('@batchList1');
+  //   cy.wait('@batch0');
+
+  //   // Update progress in batch request mock
+  //   cy.intercept(
+  //     {
+  //       url: restApiEndpoint + '/api/project/1/batch/1',
+  //       method: 'GET',
+  //     },
+  //     {
+  //       ...batchJob,
+  //       progress: 10,
+  //     }
+  //   ).as('batch10');
+  //   cy.wait('@batch10');
+
+  //   // Only one batch operation allowed at a time
+  //   cy.get('[data-cy=prime-button]').should(
+  //     'have.attr',
+  //     'data-disabled',
+  //     'true'
+  //   );
+
+  //   cy.get('[data-cy=add-aoi-button]').should('exist').click();
+
+  //   cy.get('#map')
+  //     .trigger('mousedown', 150, 150)
+  //     .trigger('mousemove', 400, 400)
+  //     .trigger('mouseup');
+  //   cy.get('[data-cy=proceed-anyway-button]').should('exist').click();
+  //   cy.wait('@reverseGeocodeCity');
+
+  //   // Should be able to run inference on non batch AOI
+  //   cy.get('.listed-aoi').contains('Rockville').click();
+  //   cy.get('[data-cy=confirm-clear-aoi]').should('exist').click();
+  //   cy.get('[data-cy=prime-button]').should(
+  //     'have.attr',
+  //     'data-disabled',
+  //     'false'
+  //   );
+  // });
 
   it('in project page, display completed and running batch jobs', () => {
     cy.fakeLogin();
