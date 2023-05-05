@@ -49,8 +49,8 @@ function BatchPredictionProgressModal({
   // Calculate AOI Area
   let batchAoiArea;
   try {
-    batchAoiArea = runningBatch?.bounds
-      ? formatThousands(tArea(runningBatch.bounds) / 1e6)
+    batchAoiArea = runningBatch?.aoi?.bounds
+      ? `${formatThousands(tArea(runningBatch.aoi.bounds) / 1e6)} km²`
       : 'N/A';
   } catch (error) {
     logger(error);
@@ -76,8 +76,8 @@ function BatchPredictionProgressModal({
           <DetailsList
             details={{
               'Started at': formatDateTime(runningBatch.created),
-              'AOI Name': runningBatch.name,
-              'AOI Size': `${batchAoiArea} km²` || 'Unknown',
+              'AOI Name': runningBatch?.aoi?.name || 'N/A',
+              'AOI Size': batchAoiArea,
             }}
           />
           <Block data-tip data-for='batch-starting-tooltip'>
