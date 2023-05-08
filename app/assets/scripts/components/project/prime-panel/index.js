@@ -15,9 +15,9 @@ import {
 
 import TabbedBlock from '../../common/tabbed-block-body';
 import Predict from './tabs/predict';
-import InfoButton from '../../common/info-button';
-import { ProjectMachineContext } from '../../../context/project-xstate';
 import { UploadAoiModal } from './upload-aoi-modal';
+import { PrimeButton } from './prime-button';
+import { BatchPredictionPanel } from './batch-prediction-panel';
 
 const StyledPanelBlock = styled(PanelBlock)`
   ${media.largeUp`
@@ -37,16 +37,8 @@ const PanelControls = styled(PanelBlockFooter)`
     `}
 `;
 
-const selectors = {
-  primeButton: (state) => state.context.primeButton,
-  uploadAoiModal: (state) => state.context.UploadAoiModal,
-};
-
 export function PrimePanel() {
   const [activeTab] = useState(0);
-
-  const actorRef = ProjectMachineContext.useActorRef();
-  const primeButton = ProjectMachineContext.useSelector(selectors.primeButton);
 
   return (
     <>
@@ -71,23 +63,8 @@ export function PrimePanel() {
               </TabbedBlock>
             </PanelBlockBody>
             <PanelControls>
-              <InfoButton
-                data-cy='prime-button'
-                data-disabled={primeButton.disabled}
-                variation='primary-raised-dark'
-                size='medium'
-                useIcon='tick--small'
-                style={{
-                  gridColumn: '1 / -1',
-                }}
-                onClick={() =>
-                  !primeButton.disabled && actorRef.send('Prime button pressed')
-                }
-                visuallyDisabled={primeButton.disabled}
-                id='apply-button-trigger'
-              >
-                {primeButton.label}
-              </InfoButton>
+              <PrimeButton />
+              <BatchPredictionPanel />
             </PanelControls>
           </StyledPanelBlock>
         }

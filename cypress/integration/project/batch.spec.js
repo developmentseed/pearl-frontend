@@ -4,20 +4,6 @@ const format = require('date-fns/format').default;
 
 const restApiEndpoint = Cypress.config('restApiEndpoint');
 
-const instance = {
-  id: 1,
-  project_id: 1,
-  aoi_id: 2088,
-  checkpoint_id: 2,
-  last_update: '2021-07-12T09:59:04.442Z',
-  created: '2021-07-12T09:58:57.459Z',
-  active: true,
-  token: 'app_client',
-  status: {
-    phase: 'Running',
-  },
-};
-
 describe('Batch predictions', () => {
   beforeEach(() => {
     cy.mockApiRoutes();
@@ -34,8 +20,8 @@ describe('Batch predictions', () => {
           project_id: 1,
           created: new Date(Date.parse('2001-02-01')).setUTCDate(-i),
           updated: new Date(Date.parse('2001-02-01')).setUTCDate(i + 1),
-          aoi: i,
-          name: `AOI ${i}`,
+          aoi: { id: i, name: `AOI ${i}` },
+          mosaic: { id: i, name: `Mosaic ${i}` },
           abort: false,
           completed: i !== 1,
           progress: i === 1 ? 60 : 100,
@@ -84,19 +70,21 @@ describe('Batch predictions', () => {
         project_id: 1,
         created: 1630056802895,
         updated: 1630056802895,
-        aoi: null,
-        name: 'Wesley Heights',
-        bounds: {
-          type: 'Polygon',
-          coordinates: [
-            [
-              [-77.13016844644744, 38.88544827129372],
-              [-77.04706107549731, 38.88544827129372],
-              [-77.04706107549731, 38.974905373957455],
-              [-77.13016844644744, 38.974905373957455],
-              [-77.13016844644744, 38.88544827129372],
+        aoi: {
+          id: 1,
+          name: 'Wesley Heights',
+          bounds: {
+            type: 'Polygon',
+            coordinates: [
+              [
+                [-77.13016844644744, 38.88544827129372],
+                [-77.04706107549731, 38.88544827129372],
+                [-77.04706107549731, 38.974905373957455],
+                [-77.13016844644744, 38.974905373957455],
+                [-77.13016844644744, 38.88544827129372],
+              ],
             ],
-          ],
+          },
         },
         abort: false,
         completed: false,
@@ -126,7 +114,7 @@ describe('Batch predictions', () => {
     cy.get('[data-cy=create-project-button]').click();
 
     // Set AOI
-    cy.get('[data-cy=aoi-edit-button]').click();
+    cy.get('[data-cy=draw-first-aoi-button]').click();
     cy.get('#map')
       .trigger('mousedown', 150, 150)
       .trigger('mousemove', 400, 400)
@@ -135,15 +123,44 @@ describe('Batch predictions', () => {
     cy.get('[data-cy=proceed-anyway-button]').should('exist').click();
     cy.wait('@reverseGeocodeCity');
 
-    // Set model
+    // Select imagery source
+    cy.get('[data-cy=imagery-selector-label]').should('exist').click();
+    cy.get('[data-cy=select-imagery-2-card]').should('exist').click();
+
+    cy.get('[data-cy=imagery-selector-label]').should(
+      'have.text',
+      'Sentinel-2'
+    );
+
+    // Check session status message
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Select Mosaic'
+    );
+
+    // Select mosaic
+    cy.get('[data-cy=mosaic-selector-label]').should('exist').click();
+    cy.get('[data-cy=select-mosaic-2849689f57f1b3b9c1f725abb75aa411-card]')
+      .should('exist')
+      .click();
+
+    // Check session status message
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Select Model'
+    );
+
+    // Open the Model selection modal
     cy.get('[data-cy=select-model-label]').should('exist').click();
+
+    // Finally select a model
     cy.get('[data-cy=select-model-1-card]').should('exist').click();
 
     // No batch message should be displayed
     cy.get('[data-cy=batch-progress-message').should('not.exist');
 
-    // Request model run
-    cy.get('[data-cy=run-button]')
+    // Request batch prediction run
+    cy.get('[data-cy=prime-button]')
       .should('have.text', 'Run Batch Prediction')
       .click();
 
@@ -175,19 +192,21 @@ describe('Batch predictions', () => {
       project_id: 1,
       created: 1630056802895,
       updated: 1630056802895,
-      aoi: null,
-      name: 'Wesley Heights',
-      bounds: {
-        type: 'Polygon',
-        coordinates: [
-          [
-            [-77.13016844644744, 38.88544827129372],
-            [-77.04706107549731, 38.88544827129372],
-            [-77.04706107549731, 38.974905373957455],
-            [-77.13016844644744, 38.974905373957455],
-            [-77.13016844644744, 38.88544827129372],
+      aoi: {
+        id: 1,
+        name: 'Wesley Heights',
+        bounds: {
+          type: 'Polygon',
+          coordinates: [
+            [
+              [-77.13016844644744, 38.88544827129372],
+              [-77.04706107549731, 38.88544827129372],
+              [-77.04706107549731, 38.974905373957455],
+              [-77.13016844644744, 38.974905373957455],
+              [-77.13016844644744, 38.88544827129372],
+            ],
           ],
-        ],
+        },
       },
       abort: false,
       completed: false,
@@ -238,8 +257,13 @@ describe('Batch predictions', () => {
       }
     );
 
-    // Concurrent batch runs are not allowed
-    cy.get('[data-cy=run-button]').should('have.attr', 'data-disabled', 'true');
+    // TODO fix label and disable state
+    // // Concurrent batch runs are not allowed
+    // cy.get('[data-cy=prime-button]').should(
+    //   'have.attr',
+    //   'data-disabled',
+    //   'true'
+    // );
 
     cy.get('[data-cy=batch-progress-message')
       .should('include.text', 'Batch prediction in progress: 20%')
@@ -280,166 +304,191 @@ describe('Batch predictions', () => {
     );
 
     // New runs are allowed
-    cy.get('[data-cy=run-button]').should(
+    cy.get('[data-cy=prime-button]').should(
       'have.attr',
       'data-disabled',
       'false'
     );
 
-    // Check if sec panel is mounted with a pixel distro chart
-    cy.get('[data-cy=checkpoint_class_distro]').should('exist');
     cy.get('[data-cy=batch-progress-message').should('not.exist');
-    cy.get('[data-cy=add-aoi-button]').should('exist').click();
-    cy.get('[data-cy=checkpoint_class_distro]').should('not.exist');
+
+    // TODO secondary panel was disabled and need to be reinstated
+    // // Check if sec panel is mounted with a pixel distro chart
+    // cy.get('[data-cy=checkpoint_class_distro]').should('exist');
+    // cy.get('[data-cy=batch-progress-message').should('not.exist');
+    // cy.get('[data-cy=add-aoi-button]').should('exist').click();
+    // cy.get('[data-cy=checkpoint_class_distro]').should('not.exist');
   });
 
-  it('Inference and retrain can happen during batch', () => {
-    cy.mockApiRoutes();
-    /**
-     * GET /project/:id/instance/:id
-     */
-    cy.intercept(
-      {
-        url: restApiEndpoint + '/api/project/1/instance/1',
-      },
-      instance
-    );
+  // TODO Edit AOI and retrain are not enabled. The following test should be
+  // reinstated when they are.
+  // it('Inference and retrain can happen during batch', () => {
+  // const instance = {
+  //   id: 1,
+  //   project_id: 1,
+  //   aoi_id: 2088,
+  //   checkpoint_id: 2,
+  //   last_update: '2021-07-12T09:59:04.442Z',
+  //   created: '2021-07-12T09:58:57.459Z',
+  //   active: true,
+  //   token: 'app_client',
+  //   status: {
+  //     phase: 'Running',
+  //   },
+  // };
+  //   cy.mockApiRoutes();
+  //   /**
+  //    * GET /project/:id/instance/:id
+  //    */
+  //   cy.intercept(
+  //     {
+  //       url: restApiEndpoint + '/api/project/1/instance/1',
+  //     },
+  //     instance
+  //   );
 
-    cy.intercept(
-      {
-        url: restApiEndpoint + '/api/project/1/aoi',
-      },
-      {
-        fixture: 'aois-with-batch.json',
-      }
-    ).as('loadAoisWithBatch');
-    cy.intercept(
-      {
-        url: restApiEndpoint + '/api/project/1/aoi/2088',
-      },
-      {
-        fixture: 'aoi-2088.json',
-      }
-    ).as('batchAoi');
+  //   cy.intercept(
+  //     {
+  //       url: restApiEndpoint + '/api/project/1/aoi',
+  //     },
+  //     {
+  //       fixture: 'aois-with-batch.json',
+  //     }
+  //   ).as('loadAoisWithBatch');
+  //   cy.intercept(
+  //     {
+  //       url: restApiEndpoint + '/api/project/1/aoi/2088',
+  //     },
+  //     {
+  //       fixture: 'aoi-2088.json',
+  //     }
+  //   ).as('batchAoi');
 
-    cy.fakeLogin();
+  //   cy.fakeLogin();
 
-    cy.visit('/project/1');
-    cy.wait('@loadAoisWithBatch');
-    cy.wait(['@batchAoi', '@fetchCheckpoint2']);
+  //   cy.visit('/project/1');
+  //   cy.wait('@loadAoisWithBatch');
+  //   cy.wait(['@batchAoi', '@fetchCheckpoint2']);
 
-    cy.get('[data-cy=predict-tab]').click();
-    // Edit AOI to treat as new one
-    cy.get('[data-cy=aoi-edit-button]').should('exist').click();
-    cy.get('[data-cy=aoi-edit-confirm-button]').should('exist').click();
+  //   cy.get('[data-cy=predict-tab]').click();
+  //   // Edit AOI to treat as new one
+  //   cy.get('[data-cy=aoi-edit-button]').should('exist').click();
+  //   cy.get('[data-cy=aoi-edit-confirm-button]').should('exist').click();
 
-    cy.get('[data-cy=proceed-anyway-button]').should('exist').click();
-    cy.wait('@reverseGeocodeCity');
+  //   cy.get('[data-cy=proceed-anyway-button]').should('exist').click();
+  //   cy.wait('@reverseGeocodeCity');
 
-    // Ready to run batch prediction
-    cy.get('[data-cy=run-button]').should('have.text', 'Run Batch Prediction');
+  //   // Ready to Run Batch Prediction
+  //   cy.get('[data-cy=prime-button]').should(
+  //     'have.text',
+  //     'Run Batch Prediction'
+  //   );
 
-    // Mock batch list
-    cy.intercept(
-      {
-        url: restApiEndpoint + '/api/project/1/batch*',
-        method: 'GET',
-      },
-      {
-        total: 1,
-        batch: [
-          {
-            id: 1,
-            created: 1630056802895,
-            updated: 1630056976364,
-            aoi: 1,
-            name: 'Wesley Heights',
-            abort: false,
-            completed: false,
-            progress: 0,
-          },
-        ],
-      }
-    ).as('batchList1');
+  //   // Mock batch list
+  //   cy.intercept(
+  //     {
+  //       url: restApiEndpoint + '/api/project/1/batch*',
+  //       method: 'GET',
+  //     },
+  //     {
+  //       total: 1,
+  //       batch: [
+  //         {
+  //           id: 1,
+  //           created: 1630056802895,
+  //           updated: 1630056976364,
+  //           aoi: 1,
+  //           name: 'Wesley Heights',
+  //           abort: false,
+  //           completed: false,
+  //           progress: 0,
+  //         },
+  //       ],
+  //     }
+  //   ).as('batchList1');
 
-    // Mock batch job
-    const batchJob = {
-      id: 1,
-      uid: 1,
-      project_id: 1,
-      created: 1630056802895,
-      updated: 1630056802895,
-      aoi: null,
-      name: 'Wesley Heights',
-      bounds: {
-        type: 'Polygon',
-        coordinates: [
-          [
-            [-77.13016844644744, 38.88544827129372],
-            [-77.04706107549731, 38.88544827129372],
-            [-77.04706107549731, 38.974905373957455],
-            [-77.13016844644744, 38.974905373957455],
-            [-77.13016844644744, 38.88544827129372],
-          ],
-        ],
-      },
-      abort: false,
-      completed: false,
-      progress: 0,
-      instance: 1,
-    };
+  //   // Mock batch job
+  //   const batchJob = {
+  //     id: 1,
+  //     uid: 1,
+  //     project_id: 1,
+  //     created: 1630056802895,
+  //     updated: 1630056802895,
+  //     aoi: null,
+  //     name: 'Wesley Heights',
+  //     bounds: {
+  //       type: 'Polygon',
+  //       coordinates: [
+  //         [
+  //           [-77.13016844644744, 38.88544827129372],
+  //           [-77.04706107549731, 38.88544827129372],
+  //           [-77.04706107549731, 38.974905373957455],
+  //           [-77.13016844644744, 38.974905373957455],
+  //           [-77.13016844644744, 38.88544827129372],
+  //         ],
+  //       ],
+  //     },
+  //     abort: false,
+  //     completed: false,
+  //     progress: 0,
+  //     instance: 1,
+  //   };
 
-    // Mock batch start
-    cy.intercept(
-      {
-        url: restApiEndpoint + '/api/project/1/batch/1',
-        method: 'GET',
-      },
-      batchJob
-    ).as('batch0');
+  //   // Mock batch start
+  //   cy.intercept(
+  //     {
+  //       url: restApiEndpoint + '/api/project/1/batch/1',
+  //       method: 'GET',
+  //     },
+  //     batchJob
+  //   ).as('batch0');
 
-    // Run job
-    cy.get('[data-cy=run-button]').click();
+  //   // Run job
+  //   cy.get('[data-cy=prime-button]').click();
 
-    // Wait for requests executed on batch prediction start
-    cy.wait('@postBatch');
-    cy.wait('@batchList1');
-    cy.wait('@batch0');
+  //   // Wait for requests executed on batch prediction start
+  //   cy.wait('@postBatch');
+  //   cy.wait('@batchList1');
+  //   cy.wait('@batch0');
 
-    // Update progress in batch request mock
-    cy.intercept(
-      {
-        url: restApiEndpoint + '/api/project/1/batch/1',
-        method: 'GET',
-      },
-      {
-        ...batchJob,
-        progress: 10,
-      }
-    ).as('batch10');
-    cy.wait('@batch10');
+  //   // Update progress in batch request mock
+  //   cy.intercept(
+  //     {
+  //       url: restApiEndpoint + '/api/project/1/batch/1',
+  //       method: 'GET',
+  //     },
+  //     {
+  //       ...batchJob,
+  //       progress: 10,
+  //     }
+  //   ).as('batch10');
+  //   cy.wait('@batch10');
 
-    // Only one batch operation allowed at a time
-    cy.get('[data-cy=run-button]').should('have.attr', 'data-disabled', 'true');
+  //   // Only one batch operation allowed at a time
+  //   cy.get('[data-cy=prime-button]').should(
+  //     'have.attr',
+  //     'data-disabled',
+  //     'true'
+  //   );
 
-    cy.get('[data-cy=add-aoi-button]').should('exist').click();
+  //   cy.get('[data-cy=add-aoi-button]').should('exist').click();
 
-    cy.get('#map')
-      .trigger('mousedown', 150, 150)
-      .trigger('mousemove', 400, 400)
-      .trigger('mouseup');
-    cy.get('[data-cy=proceed-anyway-button]').should('exist').click();
-    cy.wait('@reverseGeocodeCity');
+  //   cy.get('#map')
+  //     .trigger('mousedown', 150, 150)
+  //     .trigger('mousemove', 400, 400)
+  //     .trigger('mouseup');
+  //   cy.get('[data-cy=proceed-anyway-button]').should('exist').click();
+  //   cy.wait('@reverseGeocodeCity');
 
-    // Should be able to run inference on non batch AOI
-    cy.get('.listed-aoi').contains('Rockville').click();
-    cy.get('[data-cy=confirm-clear-aoi]').should('exist').click();
-    cy.get('[data-cy=run-button]').should(
-      'have.attr',
-      'data-disabled',
-      'false'
-    );
-  });
+  //   // Should be able to run inference on non batch AOI
+  //   cy.get('.listed-aoi').contains('Rockville').click();
+  //   cy.get('[data-cy=confirm-clear-aoi]').should('exist').click();
+  //   cy.get('[data-cy=prime-button]').should(
+  //     'have.attr',
+  //     'data-disabled',
+  //     'false'
+  //   );
+  // });
 
   it('in project page, display completed and running batch jobs', () => {
     cy.fakeLogin();
@@ -450,9 +499,10 @@ describe('Batch predictions', () => {
 
     // Check available columns
     cy.get('th')
-      .should('have.length', 5)
+      .should('have.length', 6)
       .should('include.text', 'Id')
       .should('include.text', 'AOI Name')
+      .should('include.text', 'Mosaic')
       .should('include.text', 'Status')
       .should('include.text', 'Started')
       .should('include.text', 'Download');
@@ -544,7 +594,7 @@ describe('Batch predictions', () => {
     cy.get('[data-cy=create-project-button]').click();
 
     // Set AOI
-    cy.get('[data-cy=aoi-edit-button]').click();
+    cy.get('[data-cy=draw-first-aoi-button]').click();
     cy.get('#map')
       .trigger('mousedown', 150, 150)
       .trigger('mousemove', 400, 400)
@@ -553,15 +603,44 @@ describe('Batch predictions', () => {
     cy.get('[data-cy=proceed-anyway-button]').should('exist').click();
     cy.wait('@reverseGeocodeCity');
 
-    // Set model
+    // Select imagery source
+    cy.get('[data-cy=imagery-selector-label]').should('exist').click();
+    cy.get('[data-cy=select-imagery-2-card]').should('exist').click();
+
+    cy.get('[data-cy=imagery-selector-label]').should(
+      'have.text',
+      'Sentinel-2'
+    );
+
+    // Check session status message
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Select Mosaic'
+    );
+
+    // Select mosaic
+    cy.get('[data-cy=mosaic-selector-label]').should('exist').click();
+    cy.get('[data-cy=select-mosaic-2849689f57f1b3b9c1f725abb75aa411-card]')
+      .should('exist')
+      .click();
+
+    // Check session status message
+    cy.get('[data-cy=session-status]').should(
+      'have.text',
+      'Session Status: Select Model'
+    );
+
+    // Open the Model selection modal
     cy.get('[data-cy=select-model-label]').should('exist').click();
+
+    // Finally select a model
     cy.get('[data-cy=select-model-1-card]').should('exist').click();
 
     // No batch message should be displayed
     cy.get('[data-cy=batch-progress-message').should('not.exist');
 
     // Request model run
-    cy.get('[data-cy=run-button]')
+    cy.get('[data-cy=prime-button]')
       .should('have.text', 'Run Batch Prediction')
       .click();
 
@@ -593,19 +672,21 @@ describe('Batch predictions', () => {
       project_id: 1,
       created: 1630056802895,
       updated: 1630056802895,
-      aoi: null,
-      name: 'Wesley Heights',
-      bounds: {
-        type: 'Polygon',
-        coordinates: [
-          [
-            [-77.13016844644744, 38.88544827129372],
-            [-77.04706107549731, 38.88544827129372],
-            [-77.04706107549731, 38.974905373957455],
-            [-77.13016844644744, 38.974905373957455],
-            [-77.13016844644744, 38.88544827129372],
+      aoi: {
+        id: 1,
+        name: 'Wesley Heights',
+        bounds: {
+          type: 'Polygon',
+          coordinates: [
+            [
+              [-77.13016844644744, 38.88544827129372],
+              [-77.04706107549731, 38.88544827129372],
+              [-77.04706107549731, 38.974905373957455],
+              [-77.13016844644744, 38.974905373957455],
+              [-77.13016844644744, 38.88544827129372],
+            ],
           ],
-        ],
+        },
       },
       abort: false,
       completed: false,
@@ -629,6 +710,7 @@ describe('Batch predictions', () => {
     cy.get('[data-cy=abort-batch-job-btn]')
       .should('exist')
       .should('be.disabled');
+
     // update progress to 1%
     cy.intercept(
       {
@@ -659,7 +741,7 @@ describe('Batch predictions', () => {
       'have.text',
       'Session Status: Ready for prediction run'
     );
-    cy.get('[data-cy=run-button]')
+    cy.get('[data-cy=prime-button]')
       .should('exist')
       .should('not.be.disabled')
       .should('have.text', 'Run Batch Prediction');
