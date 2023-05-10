@@ -211,7 +211,7 @@ describe('Loads AOIs', () => {
       .trigger('mousedown', 150, 150)
       .trigger('mousemove', 170, 170)
       .trigger('mouseup');
-    cy.get('#aoi-modal-dialog').contains('Area is too tiny');
+    cy.get('#aoi-modal-dialog').contains('Area is too small');
     cy.get('[data-cy=proceed-anyway-button]').should('not.exist');
     cy.get('[data-cy=keep-editing-button]').should('exist').click();
   });

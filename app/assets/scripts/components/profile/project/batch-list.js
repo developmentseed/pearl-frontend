@@ -19,7 +19,14 @@ import logger from '../../../utils/logger';
 import useFetch from '../../../utils/use-fetch';
 
 const TABLE_PAGE_SIZE = 5;
-const TABLE_HEADERS = ['Id', 'AOI Name', 'Status', 'Started', 'Download'];
+const TABLE_HEADERS = [
+  'Id',
+  'AOI Name',
+  'Mosaic',
+  'Status',
+  'Started',
+  'Download',
+];
 
 const ProgressText = styled.span`
   padding-right: 0.5rem;
@@ -70,20 +77,22 @@ DownloadAoiButton.propTypes = {
   children: T.node,
 };
 
-function getStatus(completed, abort) {
+function getStatus(completed, abort, error) {
+  if (error) return 'Errored';
   if (!completed && abort) return 'Aborted';
   if (completed) return 'Completed';
   return 'Processing';
 }
 
 const BatchRow = ({ batch, projectId }) => {
-  const { id, aoi, name, completed, abort, progress, created } = batch;
-  const [status, setStatus] = useState(getStatus(completed, abort));
+  const { id, aoi, mosaic, completed, abort, error, progress, created } = batch;
+  const [status, setStatus] = useState(getStatus(completed, abort, error));
 
   return (
     <TableRow key={id}>
       <TableCell>{id}</TableCell>
-      <TableCell>{name}</TableCell>
+      <TableCell>{aoi?.name}</TableCell>
+      <TableCell>{mosaic?.name}</TableCell>
       <TableCell>
         {status === 'Processing' ? (
           <>

@@ -27,6 +27,7 @@ export const services = {
     let currentMosaic;
     let currentModel;
     let currentShare;
+    let currentBatchPrediction;
 
     // Fetch lists
     const { mosaics: mosaicsList } = await apiClient.get('mosaic');
@@ -88,6 +89,18 @@ export const services = {
       currentShare = sharesList.find(
         (share) => share.mosaic?.id === currentMosaic?.id
       );
+
+      // Get running batch predictions
+      const { batch: batchPredictions } = await apiClient.get(
+        `project/${projectId}/batch?completed=false&order=desc`
+      );
+
+      // If there are running batch predictions, get the first one that is not errored or aborted
+      if (batchPredictions.length > 0) {
+        currentBatchPrediction = batchPredictions.find(
+          ({ error, aborted }) => !error && !aborted
+        );
+      }
     }
 
     return {
@@ -109,6 +122,7 @@ export const services = {
       },
       currentModel,
       currentShare,
+      currentBatchPrediction,
     };
   },
   geocodeAoi: async (context) => {
@@ -338,5 +352,21 @@ export const services = {
     );
 
     return { shareUrl };
+  },
+  requestBatchPrediction: async (context) => {
+    const { apiClient } = context;
+    const projectId = context.project?.id;
+    const aoi = context.currentAoi?.id;
+    const mosaic = context.currentMosaic?.id;
+
+    const batchPrediction = await apiClient.post(
+      `/project/${projectId}/batch`,
+      {
+        mosaic,
+        aoi,
+      }
+    );
+
+    return { batchPrediction };
   },
 };

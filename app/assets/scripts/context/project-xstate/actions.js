@@ -5,8 +5,6 @@ import turfBboxPolygon from '@turf/bbox-polygon';
 import turfArea from '@turf/area';
 import toasts from '../../components/common/toasts';
 import { BOUNDS_PADDING } from '../../components/common/map/constants';
-import { formatThousands } from '../../utils/format';
-import config from '../../config';
 import { getMosaicTileUrl } from './helpers';
 
 export const actions = {
@@ -219,6 +217,9 @@ export const actions = {
   setCurrentTimeframe: assign((context, event) => ({
     currentTimeframe: event.data.timeframe,
   })),
+  setCurrentBatchPrediction: assign((context, event) => ({
+    currentBatchPrediction: event.data.batchPrediction,
+  })),
   refreshSessionStatusMessage: assign((context) => {
     let sessionStatusMessage;
 
@@ -246,12 +247,7 @@ export const actions = {
     };
   }),
   refreshPredictionTab: assign((context) => {
-    const {
-      currentImagerySource,
-      currentMosaic,
-      currentModel,
-      project,
-    } = context;
+    const { currentImagerySource, project } = context;
 
     const isExistingProject = project?.id !== 'new';
 
@@ -268,10 +264,6 @@ export const actions = {
         hidden: isExistingProject,
         disabled: !currentImagerySource,
         placeholderLabel: 'Select Model',
-      },
-      primeButton: {
-        disabled: !currentImagerySource || !currentMosaic || !currentModel,
-        label: 'Ready for prediction run',
       },
     };
   }),
@@ -331,20 +323,12 @@ export const actions = {
   }),
   enablePredictionRun: assign(() => ({
     sessionStatusMessage: 'Ready for prediction run',
-    primeButton: {
-      disabled: false,
-      label: 'Run Prediction',
-    },
   })),
   enterPredictionRun: assign(() => ({
     sessionStatusMessage: 'Running prediction',
     globalLoading: {
       disabled: false,
       message: 'Running prediction',
-    },
-    primeButton: {
-      disabled: false,
-      label: 'Run Prediction',
     },
   })),
   resetMapEventHandlers: assign(() => {
@@ -466,39 +450,11 @@ export const actions = {
       },
     };
   }),
-  displayAreaTooTinyModalDialog: assign((context) => {
-    const aoiArea = context.currentAoi.area;
-    const formattedAoiArea = formatThousands(aoiArea / 1e6, { decimals: 1 });
-
-    return {
-      aoiModalDialog: {
-        revealed: true,
-        headline: 'Area is too tiny',
-        content: `The AOI area is ${formattedAoiArea} km², please select an
-        area greater than ${config.minimumAoiArea / 1e6} km².`,
-      },
-    };
-  }),
-  displayAreaTooLargeModalDialog: assign((context) => {
-    const aoiArea = context.currentAoi.area;
-    const formattedAoiArea = formatThousands(aoiArea / 1e6, { decimals: 1 });
-    const maxArea = context.apiLimits.live_inference / 1e6;
-
-    return {
-      aoiModalDialog: {
-        revealed: true,
-        proceedAnywayButton: true,
-        headline: 'Area too large',
-        content: `The AOI area is ${formattedAoiArea} km², please select an
-        area smaller than ${maxArea} km².`,
-      },
-    };
-  }),
-  closeAoiModalDialog: assign((c) => ({
-    aoiModalDialog: {
-      ...c.aoiModalDialog, // keep other properties to avoid flickering
-      revealed: false,
-    },
+  displayAoiAreaModalDialog: assign(() => ({
+    aoiAreaModalDialogRevealed: true,
+  })),
+  closeAoiAreaModalDialog: assign(() => ({
+    aoiAreaModalDialogRevealed: false,
   })),
   toggleUploadAoiModal: assign((context) => ({
     uploadAoiModal: {
