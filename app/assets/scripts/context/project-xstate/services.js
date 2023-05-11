@@ -179,6 +179,7 @@ export const services = {
   fetchAoi: async (context, event) => {
     const { apiClient, mosaicsList } = context;
     const { id: projectId } = context.project;
+    const sharesList = context.sharesList || [];
     const aoiId = event.data?.aoiId || context.currentAoi?.id;
 
     const aoi = await apiClient.get(`/project/${projectId}/aoi/${aoiId}`);
@@ -211,6 +212,7 @@ export const services = {
       aoi,
       timeframe: latestTimeframe,
       mosaic: latestMosaic,
+      share: sharesList.find((s) => s.timeframe?.id === latestTimeframe?.id),
     };
   },
   requestInstance: async (context) => {

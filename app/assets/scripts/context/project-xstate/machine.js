@@ -427,6 +427,7 @@ export const projectMachine = createMachine(
               'setCurrentAoi',
               'setCurrentMosaic',
               'setCurrentTimeframe',
+              'setCurrentShare',
               'updateAoiLayer',
               'refreshPredictionTab',
             ],
