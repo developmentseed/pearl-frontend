@@ -87,7 +87,17 @@ function getStatus(completed, abort, error) {
 }
 
 const BatchRow = ({ batch, projectId }) => {
-  const { id, aoi, mosaic, completed, abort, error, progress, created } = batch;
+  const {
+    id,
+    aoi,
+    mosaic,
+    timeframe,
+    completed,
+    abort,
+    error,
+    progress,
+    created,
+  } = batch;
   const [status, setStatus] = useState(getStatus(completed, abort, error));
 
   return (
@@ -114,8 +124,9 @@ const BatchRow = ({ batch, projectId }) => {
       <TableCell>{formatDateTime(created)}</TableCell>
       <TableCell>
         <DownloadAoiButton
-          aoi={aoi}
+          aoi={aoi?.id}
           projectId={projectId}
+          timeframeId={timeframe?.id}
           disabled={!completed}
         />
       </TableCell>
