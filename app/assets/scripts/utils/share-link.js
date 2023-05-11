@@ -21,7 +21,7 @@ export const copyShareUrlToClipboard = (share) => {
   });
 };
 
-function downloadGeotiff(arrayBuffer, filename) {
+export function downloadGeotiff(arrayBuffer, filename) {
   var blob = new Blob([arrayBuffer], {
     type: 'application/x-geotiff',
   });

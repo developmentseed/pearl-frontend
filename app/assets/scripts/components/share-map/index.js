@@ -101,9 +101,14 @@ function ShareMap() {
         logger(error);
         toasts.error('There was an error loading AOI map tiles.');
       });
-    restApiClient.getAOIFromUUID(uuid).then((aoiData) => {
+
+    restApiClient.get(`share/${uuid}`).then((aoiData) => {
       setClasses(aoiData.classes);
-      setAoiInfo({ id: aoiData.aoi_id, projectId: aoiData.project_id });
+      setAoiInfo({
+        id: aoiData.aoi_id,
+        projectId: aoiData.project_id,
+        timeframe: aoiData.timeframe_id,
+      });
       if (aoiData.bounds && aoiData.bounds.coordinates) {
         const bounds = [
           aoiData.bounds.coordinates[0][0].reverse(),
@@ -123,6 +128,7 @@ function ShareMap() {
         <DownloadAoiButton
           aoi={aoiInfo.id}
           projectId={aoiInfo.projectId}
+          timeframeId={aoiInfo?.timeframe}
           uuid={uuid}
           variation='primary-raised-dark'
         >

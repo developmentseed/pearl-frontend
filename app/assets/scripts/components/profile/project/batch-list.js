@@ -14,9 +14,9 @@ import toasts from '../../common/toasts';
 import { AbortBatchJobButton } from '../../common/abort-batch-button';
 import { useAuth } from '../../../context/auth';
 import { formatDateTime } from '../../../utils/format';
-import { downloadGeotiff } from '../../../utils/map';
 import logger from '../../../utils/logger';
 import useFetch from '../../../utils/use-fetch';
+import { downloadGeotiff } from '../../../utils/share-link';
 
 const TABLE_PAGE_SIZE = 5;
 const TABLE_HEADERS = [
@@ -35,13 +35,14 @@ const ProgressText = styled.span`
 export function DownloadAoiButton({
   disabled = false,
   projectId,
+  timeframeId,
   aoi,
   uuid,
   children,
 }) {
   const { restApiClient, isAuthenticated } = useAuth();
   const url = isAuthenticated
-    ? `project/${projectId}/aoi/${aoi}/download/color`
+    ? `project/${projectId}/aoi/${aoi}/timeframe/${timeframeId}/download/color`
     : `share/${uuid}/download/color`;
   return (
     <Button
@@ -73,6 +74,7 @@ DownloadAoiButton.propTypes = {
   disabled: T.bool,
   projectId: T.number,
   aoi: T.number,
+  timeframeId: T.number,
   uuid: T.string,
   children: T.node,
 };
