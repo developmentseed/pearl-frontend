@@ -87,7 +87,7 @@ export const services = {
       sharesList = (await apiClient.get(`project/${projectId}/share`)).shares;
 
       currentShare = sharesList.find(
-        (share) => share.mosaic?.id === currentMosaic?.id
+        (share) => share.timeframe?.id === currentTimeframe?.id
       );
 
       // Get running batch predictions
