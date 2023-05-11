@@ -341,17 +341,18 @@ export const services = {
     });
     return () => websocket.close();
   },
-  createShareUrl: async (context) => {
+  createShare: async (context) => {
     const { apiClient } = context;
     const projectId = context.project?.id;
     const aoiId = context.currentAoi?.id;
     const timeframeId = context.currentTimeframe?.id;
+    const sharesList = context.sharesList || [];
 
-    const shareUrl = await apiClient.post(
+    const share = await apiClient.post(
       `/project/${projectId}/aoi/${aoiId}/timeframe/${timeframeId}/share`
     );
 
-    return { shareUrl };
+    return { share, sharesList: sharesList.concat(share) };
   },
   requestBatchPrediction: async (context) => {
     const { apiClient } = context;
