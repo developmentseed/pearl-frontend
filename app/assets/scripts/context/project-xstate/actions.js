@@ -82,7 +82,6 @@ export const actions = {
       uploadAoi: true,
       addNewAoi: true,
       deleteAoi: true,
-      editAoi: true,
     },
   })),
   clearCurrentAoi: assign((context) => {
