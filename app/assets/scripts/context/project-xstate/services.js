@@ -216,7 +216,7 @@ export const services = {
     };
   },
   requestInstance: async (context) => {
-    const { apiClient } = context;
+    const { apiClient, currentInstanceType } = context;
     const { id: projectId } = context.project;
 
     let instance;
@@ -230,10 +230,15 @@ export const services = {
     if (activeInstances.total > 0) {
       const { id: instanceId } = activeInstances.instances[0];
       instance = await apiClient.get(
-        `/project/${projectId}/instance/${instanceId}`
+        `/project/${projectId}/instance/${instanceId}`,
+        {
+          type: currentInstanceType,
+        }
       );
     } else {
-      instance = await apiClient.post(`/project/${projectId}/instance`);
+      instance = await apiClient.post(`/project/${projectId}/instance`, {
+        type: currentInstanceType,
+      });
     }
 
     // Confirm instance has running status
