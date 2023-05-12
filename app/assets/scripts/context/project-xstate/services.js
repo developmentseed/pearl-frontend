@@ -223,17 +223,14 @@ export const services = {
 
     // Fetch active instances for this project
     const activeInstances = await apiClient.get(
-      `/project/${projectId}/instance/?status=active`
+      `/project/${projectId}/instance/?status=active&type=${currentInstanceType}`
     );
 
     // Reuse existing instance if available
     if (activeInstances.total > 0) {
       const { id: instanceId } = activeInstances.instances[0];
       instance = await apiClient.get(
-        `/project/${projectId}/instance/${instanceId}`,
-        {
-          type: currentInstanceType,
-        }
+        `/project/${projectId}/instance/${instanceId}`
       );
     } else {
       instance = await apiClient.post(`/project/${projectId}/instance`, {
