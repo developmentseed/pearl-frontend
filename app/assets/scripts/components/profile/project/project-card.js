@@ -5,6 +5,7 @@ import ProjectMap from './project-map';
 import { media } from '@devseed-ui/theme-provider';
 import { formatDateTime } from '../../../utils/format';
 import T from 'prop-types';
+import get from 'lodash.get';
 
 const ProjectContainer = styled.div`
   display: grid;
@@ -19,29 +20,25 @@ const ProjectContainer = styled.div`
   `}
 `;
 
-function getDetails(project, aois) {
-  if (!project) {
-    return {};
-  }
-  return {
-    Created: formatDateTime(project.created),
-    Model: project.model_name,
-    'Last Checkpoint':
-      project.checkpoints.length > 0
-        ? project.checkpoints[0].name
-        : 'No checkpoints',
-    AOIS: aois.length,
-    'AOI Name': aois.length > 0 ? aois[0].name : '',
-  };
-}
+function ProjectCard({ project, shares }) {
+  const bounds = get(shares, '[0].aoi.bounds');
 
-function ProjectCard({ project, aois }) {
-  const hasAoi = aois.length > 0;
-  const bounds = hasAoi ? aois[0].bounds : null;
-  const details = getDetails(project, aois);
+  let details = {};
+
+  if (project) {
+    details = {
+      Created: formatDateTime(project.created),
+      Model: project.model_name,
+      'Last Checkpoint':
+        project.checkpoints.length > 0
+          ? project.checkpoints[0].name
+          : 'No checkpoints',
+      'Exported Maps': shares.length || 'None',
+    };
+  }
   return (
     <ProjectContainer>
-      {hasAoi ? <ProjectMap bounds={bounds} /> : null}
+      {bounds ? <ProjectMap bounds={bounds} /> : null}
       <DetailsList details={details} />
     </ProjectContainer>
   );
@@ -49,7 +46,7 @@ function ProjectCard({ project, aois }) {
 
 ProjectCard.propTypes = {
   project: T.object,
-  aois: T.array,
+  shares: T.array,
 };
 
 export default ProjectCard;

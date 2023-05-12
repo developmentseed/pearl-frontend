@@ -275,6 +275,19 @@ export function addProjectEndpoints() {
   );
 
   /**
+   * GET /project/1/share
+   */
+  cy.intercept(
+    {
+      url: restApiEndpoint + '/api/project/1/share',
+    },
+    {
+      total: 0,
+      shares: [],
+    }
+  );
+
+  /**
    * GET /project/:id/instance
    */
   cy.intercept(

@@ -20,11 +20,13 @@ export const services = {
     let aoisList = [];
     let timeframesList = [];
     let checkpointList = [];
+    let sharesList = [];
     let currentAoi;
     let currentTimeframe;
     let currentImagerySource;
     let currentMosaic;
     let currentModel;
+    let currentShare;
     let currentBatchPrediction;
 
     // Fetch lists
@@ -82,6 +84,12 @@ export const services = {
       checkpointList = (await apiClient.get(`project/${projectId}/checkpoint`))
         .checkpoints;
 
+      sharesList = (await apiClient.get(`project/${projectId}/share`)).shares;
+
+      currentShare = sharesList.find(
+        (share) => share.timeframe?.id === currentTimeframe?.id
+      );
+
       // Get running batch predictions
       const { batch: batchPredictions } = await apiClient.get(
         `project/${projectId}/batch?completed=false&order=desc`
@@ -104,6 +112,7 @@ export const services = {
       aoisList,
       checkpointList,
       timeframesList,
+      sharesList,
       currentAoi,
       currentTimeframe,
       currentImagerySource,
@@ -112,6 +121,7 @@ export const services = {
         tileUrl: getMosaicTileUrl(currentMosaic),
       },
       currentModel,
+      currentShare,
       currentBatchPrediction,
     };
   },
@@ -169,6 +179,7 @@ export const services = {
   fetchAoi: async (context, event) => {
     const { apiClient, mosaicsList } = context;
     const { id: projectId } = context.project;
+    const sharesList = context.sharesList || [];
     const aoiId = event.data?.aoiId || context.currentAoi?.id;
 
     const aoi = await apiClient.get(`/project/${projectId}/aoi/${aoiId}`);
@@ -201,6 +212,7 @@ export const services = {
       aoi,
       timeframe: latestTimeframe,
       mosaic: latestMosaic,
+      share: sharesList.find((s) => s.timeframe?.id === latestTimeframe?.id),
     };
   },
   requestInstance: async (context) => {
@@ -331,17 +343,18 @@ export const services = {
     });
     return () => websocket.close();
   },
-  createShareUrl: async (context) => {
+  createShare: async (context) => {
     const { apiClient } = context;
     const projectId = context.project?.id;
     const aoiId = context.currentAoi?.id;
     const timeframeId = context.currentTimeframe?.id;
+    const sharesList = context.sharesList || [];
 
-    const shareUrl = await apiClient.post(
+    const share = await apiClient.post(
       `/project/${projectId}/aoi/${aoiId}/timeframe/${timeframeId}/share`
     );
 
-    return { shareUrl };
+    return { share, sharesList: sharesList.concat(share) };
   },
   requestBatchPrediction: async (context) => {
     const { apiClient } = context;

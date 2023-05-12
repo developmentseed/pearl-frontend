@@ -22,10 +22,13 @@ import {
   DropdownTrigger,
 } from '../../../styles/dropdown';
 
-import copyTextToClipboard from '../../../utils/copy-text-to-clipboard';
-import toasts from '../../common/toasts';
-import logger from '../../../utils/logger';
 import { ShortcutHelp } from './shortcut-help';
+import {
+  copyShareUrlToClipboard,
+  downloadShareGeotiff,
+  getShareLink,
+} from '../../../utils/share-link';
+import { useAuth } from '../../../context/auth';
 
 const Wrapper = styled.div`
   flex: 1;
@@ -130,11 +133,12 @@ const selectors = {
   projectName: (state) => get(state, 'context.project.name', ''),
   sessionStatusMessage: (state) =>
     get(state, 'context.sessionStatusMessage', {}),
-  currentShareURL: (state) => get(state, 'context.currentShareURL'),
+  currentShare: (state) => get(state, 'context.currentShare'),
 };
 
 function ProjectPageHeader({ isMediumDown }) {
   const history = useHistory();
+  const { restApiClient } = useAuth();
   const [localProjectName, setLocalProjectName] = useState(null);
   const actorRef = ProjectMachineContext.useActorRef();
   const displayProjectNameModal = ProjectMachineContext.useSelector(
@@ -144,20 +148,9 @@ function ProjectPageHeader({ isMediumDown }) {
   const sessionStatusMessage = ProjectMachineContext.useSelector(
     selectors.sessionStatusMessage
   );
-  const currentShareURL = ProjectMachineContext.useSelector(
-    selectors.currentShareURL
+  const currentShare = ProjectMachineContext.useSelector(
+    selectors.currentShare
   );
-
-  const copyTilesLink = () => {
-    copyTextToClipboard(currentShareURL).then((result) => {
-      if (result) {
-        toasts.success('URL copied to clipboard');
-      } else {
-        logger('Failed to copy', result);
-        toasts.error('Failed to copy URL to clipboard');
-      }
-    });
-  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -265,31 +258,43 @@ function ProjectPageHeader({ isMediumDown }) {
           <DropdownBody>
             <li>
               <DropdownItem
-                useIcon='link'
-                onClick={
-                  !currentShareURL
-                    ? () => actorRef.send('Requested AOI share URL')
-                    : copyTilesLink
+                useIcon='download-2'
+                onClick={() =>
+                  downloadShareGeotiff(restApiClient, currentShare)
                 }
               >
-                {currentShareURL ? 'Copy Share URL' : 'Create Share URL'}
+                Download .geotiff
               </DropdownItem>
-              {currentShareURL && (
-                <DropdownItem nonhoverable={!currentShareURL}>
+            </li>
+            <li>
+              <DropdownItem
+                useIcon='link'
+                onClick={
+                  !currentShare
+                    ? () => actorRef.send('Requested AOI share URL')
+                    : () => copyShareUrlToClipboard(currentShare)
+                }
+              >
+                {currentShare ? 'Copy Share URL' : 'Create Share URL'}
+              </DropdownItem>
+              {currentShare && (
+                <DropdownItem nonhoverable={!currentShare}>
                   <FormInputGroup>
                     <FormInput
                       readOnly
-                      value={currentShareURL}
-                      disabled={!currentShareURL}
+                      value={getShareLink(currentShare)}
+                      disabled={!currentShare}
                       size='small'
                     />
                     <Button
                       variation='primary-plain'
                       useIcon='clipboard'
                       hideText
-                      disabled={!currentShareURL}
+                      disabled={!currentShare}
                       title='Copy link to clipboard'
-                      onClick={currentShareURL && copyTilesLink}
+                      onClick={() =>
+                        currentShare && copyShareUrlToClipboard(currentShare)
+                      }
                     />
                   </FormInputGroup>
                 </DropdownItem>
