@@ -14,6 +14,7 @@ import Prose from '../../../styles/type/prose';
 import DetailsList from '../../common/details-list';
 import { AbortBatchJobButton } from '../../common/abort-batch-button';
 import { StyledTooltip } from '../../common/tooltip';
+import get from 'lodash.get';
 
 const ProgressButtonWrapper = styled.div`
   display: flex;
@@ -111,6 +112,7 @@ export default BatchPredictionProgressModal;
 
 export function BatchPredictionPanel() {
   const { restApiClient } = useAuth();
+  const actorRef = ProjectMachineContext.useActorRef();
   const currentBatchPrediction = ProjectMachineContext.useSelector(
     selectors.currentBatchPrediction
   );
@@ -127,6 +129,31 @@ export function BatchPredictionPanel() {
       const status = await restApiClient.get(
         `project/${projectId}/batch/${currentBatchPrediction.id}`
       );
+
+      // If the batch prediction is completed, get the tilejson
+      if (status.completed) {
+        const aoiId = get(status, 'aoi.id');
+        const timeframeId = get(status, 'timeframe.id');
+        // Confirm that the aoi and timeframe are available
+        if (aoiId && timeframeId) {
+          // Get the tilejson
+          const tiles = await restApiClient.get(
+            `project/${projectId}/aoi/${aoiId}/timeframe/${timeframeId}/tiles`
+          );
+
+          // Update the timeframe with the tilejson
+          status.timeframe.tilejson = tiles;
+
+          // Send a message to the project machine
+          actorRef.send({
+            type: 'Batch prediction completed',
+            data: {
+              timeframe: status.timeframe,
+            },
+          });
+        }
+      }
+
       setBatchPredictionStatus(status);
     } catch (error) {
       logger(error);

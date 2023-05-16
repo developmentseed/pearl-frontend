@@ -200,6 +200,11 @@ export const projectMachine = createMachine(
             internal: true,
             actions: 'setCurrentInstanceType',
           },
+          'Batch prediction completed': {
+            target: 'Prediction ready',
+            internal: true,
+            actions: 'setCurrentTimeframe',
+          },
         },
       },
 
