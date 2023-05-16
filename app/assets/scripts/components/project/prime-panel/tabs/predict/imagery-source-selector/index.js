@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ProjectMachineContext } from '../../../../../../context/project-xstate';
+import { ProjectMachineContext } from '../../../../../../fsm/project';
 import { EditButton } from '../../../../../../styles/button';
 import {
   HeadOption,

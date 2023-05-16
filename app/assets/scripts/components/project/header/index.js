@@ -9,7 +9,7 @@ import { Form } from '@devseed-ui/form';
 import { Button } from '@devseed-ui/button';
 import { FormInput } from '@devseed-ui/form';
 
-import { ProjectMachineContext } from '../../../context/project-xstate';
+import { ProjectMachineContext } from '../../../fsm/project';
 
 import { Modal } from '../../common/custom-modal';
 import get from 'lodash.get';

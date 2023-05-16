@@ -4,7 +4,7 @@ import { useAuth } from '../../context/auth';
 import {
   ProjectMachineContext,
   ProjectMachineProvider,
-} from '../../context/project-xstate';
+} from '../../fsm/project';
 import { PageBody } from '../../styles/page';
 
 import theme from '../../styles/theme';

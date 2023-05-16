@@ -6,7 +6,7 @@ import { glsp } from '@devseed-ui/theme-provider';
 import { Button } from '@devseed-ui/button';
 import { Heading } from '@devseed-ui/typography';
 import CardList, { Card } from '../../../../../common/card-list';
-import { ProjectMachineContext } from '../../../../../../context/project-xstate';
+import { ProjectMachineContext } from '../../../../../../fsm/project';
 import { imagerySourceSelectors } from '.';
 
 const ModalHeader = styled.header`

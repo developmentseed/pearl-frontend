@@ -9,7 +9,7 @@ import {
 } from '../../common/map/base-map-layer';
 
 import { themeVal, multiply } from '@devseed-ui/theme-provider';
-import { ProjectMachineContext } from '../../../context/project-xstate';
+import { ProjectMachineContext } from '../../../fsm/project';
 import get from 'lodash.get';
 import { useAuth } from '../../../context/auth';
 import TileLayerWithHeaders from '../../common/map/tile-layer';

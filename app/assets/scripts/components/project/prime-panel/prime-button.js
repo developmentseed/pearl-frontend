@@ -1,6 +1,6 @@
 import React from 'react';
 import InfoButton from '../../common/info-button';
-import { ProjectMachineContext } from '../../../context/project-xstate';
+import { ProjectMachineContext } from '../../../fsm/project';
 
 const selectors = {
   isPredictionReady: ({

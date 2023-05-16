@@ -5,7 +5,7 @@ import { Heading } from '@devseed-ui/typography';
 import { Button } from '@devseed-ui/button';
 import { Modal } from '@devseed-ui/modal';
 
-import { ProjectMachineContext } from '../../../../../../context/project-xstate';
+import { ProjectMachineContext } from '../../../../../../fsm/project';
 import { modelSelectors } from '.';
 import CardList from '../../../../../common/card-list';
 import { ModelCard } from './model-card';

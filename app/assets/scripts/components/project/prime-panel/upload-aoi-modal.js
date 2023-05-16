@@ -13,7 +13,7 @@ import logger from '../../../utils/logger';
 import { inRange } from '../../../utils/utils';
 import getFeatureArea from '@turf/area';
 import get from 'lodash.get';
-import { ProjectMachineContext } from '../../../context/project-xstate';
+import { ProjectMachineContext } from '../../../fsm/project';
 
 const Wrapper = styled.div`
   display: grid;

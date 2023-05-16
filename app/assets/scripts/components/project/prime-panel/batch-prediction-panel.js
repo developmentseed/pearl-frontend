@@ -3,7 +3,7 @@ import T from 'prop-types';
 import { Button } from '@devseed-ui/button';
 import styled from 'styled-components';
 import { Spinner } from '../../common/global-loading/styles';
-import { ProjectMachineContext } from '../../../context/project-xstate';
+import { ProjectMachineContext } from '../../../fsm/project';
 import { useAuth } from '../../../context/auth';
 import logger from '../../../utils/logger';
 

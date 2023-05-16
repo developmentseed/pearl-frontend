@@ -14,7 +14,7 @@ import { Subheading } from '../../../../../../styles/type/heading';
 import ShadowScrollbar from '../../../../../common/shadow-scrollbar';
 
 import { EditButton } from '../../../../../../styles/button';
-import { ProjectMachineContext } from '../../../../../../context/project-xstate';
+import { ProjectMachineContext } from '../../../../../../fsm/project';
 import { SelectorHeadOption, SelectorOption } from '../../../selection-styles';
 import { formatThousands } from '../../../../../../utils/format';
 import { ConfirmAoiChangeModal } from './modals/confirm-aoi-change';

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { themeVal } from '@devseed-ui/theme-provider';
 
-import { ProjectMachineContext } from '../../../../../../context/project-xstate';
+import { ProjectMachineContext } from '../../../../../../fsm/project';
 
 import { ActionButton } from '../../../../../../styles/button';
 

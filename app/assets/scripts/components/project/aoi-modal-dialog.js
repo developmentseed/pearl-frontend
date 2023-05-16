@@ -1,5 +1,5 @@
 import React from 'react';
-import { ProjectMachineContext } from '../../context/project-xstate';
+import { ProjectMachineContext } from '../../fsm/project';
 
 import { Button } from '@devseed-ui/button';
 import { Modal, ModalHeadline } from '@devseed-ui/modal';
