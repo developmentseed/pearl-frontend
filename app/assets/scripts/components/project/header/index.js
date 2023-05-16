@@ -134,11 +134,13 @@ const selectors = {
   sessionStatusMessage: (state) =>
     get(state, 'context.sessionStatusMessage', {}),
   currentShare: (state) => get(state, 'context.currentShare'),
+  currentInstanceType: (state) =>
+    get(state, 'context.currentInstanceType', 'cpu'),
 };
 
 function ProjectPageHeader({ isMediumDown }) {
   const history = useHistory();
-  const { restApiClient } = useAuth();
+  const { restApiClient, user } = useAuth();
   const [localProjectName, setLocalProjectName] = useState(null);
   const actorRef = ProjectMachineContext.useActorRef();
   const displayProjectNameModal = ProjectMachineContext.useSelector(
@@ -151,6 +153,10 @@ function ProjectPageHeader({ isMediumDown }) {
   const currentShare = ProjectMachineContext.useSelector(
     selectors.currentShare
   );
+  const currentInstanceType = ProjectMachineContext.useSelector(
+    selectors.currentInstanceType
+  );
+  const nextInstanceType = currentInstanceType === 'cpu' ? 'gpu' : 'cpu';
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -230,6 +236,24 @@ function ProjectPageHeader({ isMediumDown }) {
           </ModalForm>
         }
       />
+
+      {user?.flags?.gpu && (
+        <Button
+          data-cy='toggle-instance-type-button'
+          variation='primary-plain'
+          title={`Click to switch to ${nextInstanceType.toUpperCase()} instance`}
+          onClick={() => {
+            actorRef.send({
+              type: 'Switch current instance type',
+              data: {
+                instanceType: nextInstanceType,
+              },
+            });
+          }}
+        >
+          {currentInstanceType.toUpperCase()}
+        </Button>
+      )}
 
       <ShortcutHelp />
 

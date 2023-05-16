@@ -204,6 +204,9 @@ export const actions = {
   setCurrentInstance: assign((context, event) => ({
     currentInstance: event.data.instance,
   })),
+  setCurrentInstanceType: assign((context, event) => ({
+    currentInstanceType: event.data.instanceType,
+  })),
   setCurrentInstanceStatus: assign((context, event) => ({
     currentInstance: {
       ...context.currentInstance,
