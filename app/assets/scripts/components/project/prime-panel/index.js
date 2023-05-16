@@ -14,10 +14,12 @@ import {
 } from '../../common/panel-block';
 
 import TabbedBlock from '../../common/tabbed-block-body';
-import Predict from './tabs/predict';
+import PredictTab from './tabs/predict';
+import RetrainTab from './tabs/retrain';
 import { UploadAoiModal } from './upload-aoi-modal';
 import { PrimeButton } from './prime-button';
 import { BatchPredictionPanel } from './batch-prediction-panel';
+import { ProjectMachineContext } from '../../../fsm/project';
 
 const StyledPanelBlock = styled(PanelBlock)`
   ${media.largeUp`
@@ -37,8 +39,12 @@ const PanelControls = styled(PanelBlockFooter)`
     `}
 `;
 
+const PREDICT_TAB_INDEX = 0;
+const RETRAIN_TAB_INDEX = 1;
+
 export function PrimePanel() {
-  const [activeTab] = useState(0);
+  const [activeTab, setActiveTab] = useState(PREDICT_TAB_INDEX);
+  const actorRef = ProjectMachineContext.useActorRef();
 
   return (
     <>
@@ -55,10 +61,29 @@ export function PrimePanel() {
           <StyledPanelBlock>
             <PanelBlockBody>
               <TabbedBlock activeTab={activeTab}>
-                <Predict
+                <PredictTab
                   name='predict'
                   className='predict-model'
                   tabId='predict-tab-trigger'
+                  onTabClick={() => {
+                    setActiveTab(PREDICT_TAB_INDEX);
+                    actorRef.send({
+                      type: 'Switch to predict mode',
+                      data: { sessionMode: 'predict' },
+                    });
+                  }}
+                />
+                <RetrainTab
+                  name='retrain'
+                  className='retrain-model'
+                  tabId='retrain-tab-trigger'
+                  onTabClick={() => {
+                    setActiveTab(RETRAIN_TAB_INDEX);
+                    actorRef.send({
+                      type: 'Switch to retrain mode',
+                      data: { sessionMode: 'retrain' },
+                    });
+                  }}
                 />
               </TabbedBlock>
             </PanelBlockBody>

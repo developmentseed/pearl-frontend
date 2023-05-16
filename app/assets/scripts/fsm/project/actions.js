@@ -222,6 +222,9 @@ export const actions = {
   setCurrentBatchPrediction: assign((context, event) => ({
     currentBatchPrediction: event.data.batchPrediction,
   })),
+  setSessionMode: assign((context, event) => ({
+    sessionMode: event.data.sessionMode,
+  })),
   refreshSessionStatusMessage: assign((context) => {
     let sessionStatusMessage;
 
