@@ -306,6 +306,9 @@ export const actions = {
   setMapRef: assign((context, event) => ({
     mapRef: event.data.mapRef,
   })),
+  setMapMode: assign((context, event) => ({
+    mapMode: event.data.mapMode,
+  })),
   setProject: assign((context, event) => ({
     project: event.data.project,
   })),

@@ -19,6 +19,7 @@ import InfoButton from '../../../../common/info-button';
 import { Dropdown, DropdownTrigger } from '../../../../../styles/dropdown';
 import { ProjectMachineContext } from '../../../../../fsm/project';
 import get from 'lodash.get';
+import { MAP_MODES } from '../../../../../fsm/project/constants';
 
 // import InfoButton from '../../../common/info-button';
 // import { PlaceholderMessage } from '../../../../styles/placeholder.js';
@@ -341,23 +342,15 @@ export const ClassThumbnail = styled.div`
     `};
 `;
 
-const MAP_MODES = {
-  BROWSE: 'BROWSE',
-  ADD_POINT: 'ADD_POINT',
-  ADD_POLYGON: 'ADD_POLYGON',
-  ADD_FREEHAND: 'ADD_FREEHAND',
-  REMOVE_SAMPLE: 'REMOVE_SAMPLE',
-  DELETE_SAMPLES: 'DELETE_SAMPLES',
-};
-
 const selectors = {
   currentClasses: (state) => state.context.currentClasses,
+  mapMode: (state) => state.context.mapMode,
 };
 
 function RetrainTab({ className }) {
   // const { className, placeholderMessage } = props;
   // const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
-  // const { setMapMode, mapModes, mapState } = useMapState();
+  // const { setCurrentMapMode, mapModes, mapState } = useMapState();
   // const { sessionStatus } = useSessionStatus();
   // const { mapRef } = useMapRef();
   // const isLoading = ['loading-project', 'retraining'].includes(
@@ -375,16 +368,31 @@ function RetrainTab({ className }) {
   // const isBatchArea =
   //   aoiArea && apiLimits && aoiArea > apiLimits['live_inference'];
 
+  const actorRef = ProjectMachineContext.useActorRef();
   const currentClasses = ProjectMachineContext.useSelector(
     selectors.currentClasses
   );
+  const currentMapMode = ProjectMachineContext.useSelector(selectors.mapMode);
 
   const [activeClass, setActiveClass] = useState(null);
-  const [currentMapMode, setCurrentMapMode] = useState(null);
 
   const isBatchArea = false;
   const isLoading = false;
-  const currentCheckpoint = null;
+
+  // Helper function to switch between map modes
+  function toggleMapMode(mode) {
+    // Do nothing if no class is selected
+    if (!activeClass) return;
+
+    // Switch between selected mode and browse mode
+    const nextMapMode = currentMapMode === mode ? MAP_MODES.BROWSE : mode;
+
+    // Send the event to the machine
+    actorRef.send({
+      type: 'Toggle map mode',
+      data: { mapMode: nextMapMode },
+    });
+  }
 
   return (
     <ToolsWrapper className={className}>
@@ -413,16 +421,7 @@ function RetrainTab({ className }) {
               useIcon='polygon'
               visuallyDisabled={!activeClass}
               info={!activeClass && 'No class selected'}
-              onClick={() => {
-                if (activeClass && currentMapMode !== MAP_MODES.ADD_POLYGON) {
-                  setCurrentMapMode(MAP_MODES.ADD_POLYGON);
-                } else if (
-                  currentMapMode === MAP_MODES.ADD_POLYGON &&
-                  activeClass
-                ) {
-                  setCurrentMapMode(MAP_MODES.BROWSE);
-                }
-              }}
+              onClick={() => toggleMapMode(MAP_MODES.ADD_POLYGON)}
               className={currentMapMode == MAP_MODES.ADD_POLYGON && 'active'}
             >
               Polygon
@@ -439,13 +438,7 @@ function RetrainTab({ className }) {
               useIcon='pencil'
               visuallyDisabled={!activeClass}
               info={!activeClass && 'Select a class first'}
-              onClick={() => {
-                if (activeClass && currentMapMode !== MAP_MODES.ADD_FREEHAND) {
-                  setCurrentMapMode(MAP_MODES.ADD_FREEHAND);
-                } else if (currentMapMode === MAP_MODES.ADD_FREEHAND) {
-                  setCurrentMapMode(MAP_MODES.BROWSE_MODE);
-                }
-              }}
+              onClick={() => toggleMapMode(MAP_MODES.ADD_FREEHAND)}
               className={currentMapMode == MAP_MODES.ADD_FREEHAND && 'active'}
             >
               Freehand
@@ -462,13 +455,7 @@ function RetrainTab({ className }) {
               useIcon='crosshair'
               visuallyDisabled={!activeClass}
               info={!activeClass && 'Select a class first'}
-              onClick={() => {
-                if (activeClass && currentMapMode !== MAP_MODES.ADD_POINT) {
-                  setCurrentMapMode(MAP_MODES.ADD_POINT);
-                } else if (currentMapMode === MAP_MODES.ADD_POINT) {
-                  setCurrentMapMode(MAP_MODES.BROWSE_MODE);
-                }
-              }}
+              onClick={() => toggleMapMode(MAP_MODES.ADD_POINT)}
               className={currentMapMode == MAP_MODES.ADD_POINT && 'active'}
             >
               Point
@@ -492,16 +479,7 @@ function RetrainTab({ className }) {
                   ? 'Select a class first'
                   : 'Draw to erase, click to delete'
               }
-              onClick={() => {
-                if (
-                  activeClass &&
-                  currentMapMode !== MAP_MODES.DELETE_SAMPLES
-                ) {
-                  setCurrentMapMode(MAP_MODES.DELETE_SAMPLES);
-                } else if (currentMapMode === MAP_MODES.DELETE_SAMPLES) {
-                  setCurrentMapMode(MAP_MODES.BROWSE_MODE);
-                }
-              }}
+              onClick={() => toggleMapMode(MAP_MODES.DELETE_SAMPLES)}
               className={
                 currentMapMode === MAP_MODES.DELETE_SAMPLES && 'active'
               }
