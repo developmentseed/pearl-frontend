@@ -123,10 +123,10 @@ export const services = {
       currentModel,
       currentShare,
       currentBatchPrediction,
-      currentClasses: currentTimeframe?.classes
-        ? {
-            ...currentTimeframe.classes,
-          }
+      retrainClasses: currentTimeframe?.classes
+        ? Object.keys(currentTimeframe.classes).map((key) => ({
+            ...currentTimeframe.classes[key],
+          }))
         : [],
     };
   },

@@ -1,4 +1,5 @@
 import get from 'lodash.get';
+import set from 'lodash.set';
 import { assign } from 'xstate';
 import L from 'leaflet';
 import turfBboxPolygon from '@turf/bbox-polygon';
@@ -306,9 +307,27 @@ export const actions = {
   setMapRef: assign((context, event) => ({
     mapRef: event.data.mapRef,
   })),
-  setMapMode: assign((context, event) => ({
-    mapMode: event.data.mapMode,
+  setRetrainMapMode: assign((context, event) => ({
+    retrainMapMode: event.data.retrainMapMode,
   })),
+  setRetrainActiveClass: assign((context, event) => ({
+    retrainActiveClass: event.data.retrainActiveClass,
+  })),
+  addRetrainSample: assign((context, event) => {
+    const { retrainSamples, retrainActiveClass } = context;
+
+    // Create a shallow copy of the sample
+    const sample = {
+      ...event.data.sample,
+    };
+
+    // Apply current retrain class to the sample
+    set(sample, 'properties.class', retrainActiveClass);
+
+    return {
+      retrainSamples: retrainSamples.concat(sample),
+    };
+  }),
   setProject: assign((context, event) => ({
     project: event.data.project,
   })),

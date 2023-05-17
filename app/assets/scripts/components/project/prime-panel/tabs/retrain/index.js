@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import T from 'prop-types';
 import styled, { css } from 'styled-components';
 import { glsp, themeVal, truncated } from '@devseed-ui/theme-provider';
@@ -19,7 +19,7 @@ import InfoButton from '../../../../common/info-button';
 import { Dropdown, DropdownTrigger } from '../../../../../styles/dropdown';
 import { ProjectMachineContext } from '../../../../../fsm/project';
 import get from 'lodash.get';
-import { MAP_MODES } from '../../../../../fsm/project/constants';
+import { RETRAIN_MAP_MODES } from '../../../../../fsm/project/constants';
 
 // import InfoButton from '../../../common/info-button';
 // import { PlaceholderMessage } from '../../../../styles/placeholder.js';
@@ -343,14 +343,15 @@ export const ClassThumbnail = styled.div`
 `;
 
 const selectors = {
-  currentClasses: (state) => state.context.currentClasses,
-  mapMode: (state) => state.context.mapMode,
+  retrainClasses: (state) => state.context.retrainClasses,
+  retrainMapMode: (state) => state.context.retrainMapMode,
+  retrainActiveClass: (state) => state.context.retrainActiveClass,
 };
 
 function RetrainTab({ className }) {
   // const { className, placeholderMessage } = props;
   // const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
-  // const { setCurrentMapMode, mapModes, mapState } = useMapState();
+  // const { setretrainMapMode, mapModes, mapState } = useMapState();
   // const { sessionStatus } = useSessionStatus();
   // const { mapRef } = useMapRef();
   // const isLoading = ['loading-project', 'retraining'].includes(
@@ -369,12 +370,15 @@ function RetrainTab({ className }) {
   //   aoiArea && apiLimits && aoiArea > apiLimits['live_inference'];
 
   const actorRef = ProjectMachineContext.useActorRef();
-  const currentClasses = ProjectMachineContext.useSelector(
-    selectors.currentClasses
+  const retrainClasses = ProjectMachineContext.useSelector(
+    selectors.retrainClasses
   );
-  const currentMapMode = ProjectMachineContext.useSelector(selectors.mapMode);
-
-  const [activeClass, setActiveClass] = useState(null);
+  const retrainMapMode = ProjectMachineContext.useSelector(
+    selectors.retrainMapMode
+  );
+  const retrainActiveClass = ProjectMachineContext.useSelector(
+    selectors.retrainActiveClass
+  );
 
   const isBatchArea = false;
   const isLoading = false;
@@ -382,21 +386,22 @@ function RetrainTab({ className }) {
   // Helper function to switch between map modes
   function toggleMapMode(mode) {
     // Do nothing if no class is selected
-    if (!activeClass) return;
+    if (!retrainActiveClass) return;
 
     // Switch between selected mode and browse mode
-    const nextMapMode = currentMapMode === mode ? MAP_MODES.BROWSE : mode;
+    const nextMapMode =
+      retrainMapMode === mode ? RETRAIN_MAP_MODES.BROWSE : mode;
 
     // Send the event to the machine
     actorRef.send({
-      type: 'Toggle map mode',
-      data: { mapMode: nextMapMode },
+      type: 'Set retrain map mode',
+      data: { retrainMapMode: nextMapMode },
     });
   }
 
   return (
     <ToolsWrapper className={className}>
-      {!isBatchArea && !isLoading && currentClasses && (
+      {!isBatchArea && !isLoading && retrainClasses && (
         <>
           <ToolBox>
             {/* <ImportGeojsonModal
@@ -411,7 +416,7 @@ function RetrainTab({ className }) {
             <InfoButton
               data-cy='retrain-draw-polygon'
               variation={
-                currentMapMode === MAP_MODES.ADD_POLYGON
+                retrainMapMode === RETRAIN_MAP_MODES.ADD_POLYGON
                   ? 'primary-raised-dark'
                   : 'primary-plain'
               }
@@ -419,44 +424,50 @@ function RetrainTab({ className }) {
               radius='ellipsoid'
               useLocalButton
               useIcon='polygon'
-              visuallyDisabled={!activeClass}
-              info={!activeClass && 'No class selected'}
-              onClick={() => toggleMapMode(MAP_MODES.ADD_POLYGON)}
-              className={currentMapMode == MAP_MODES.ADD_POLYGON && 'active'}
+              visuallyDisabled={!retrainActiveClass}
+              info={!retrainActiveClass && 'No class selected'}
+              onClick={() => toggleMapMode(RETRAIN_MAP_MODES.ADD_POLYGON)}
+              className={
+                retrainMapMode == RETRAIN_MAP_MODES.ADD_POLYGON && 'active'
+              }
             >
               Polygon
             </InfoButton>
             <InfoButton
               data-cy='retrain-draw-freehand'
               variation={
-                currentMapMode === MAP_MODES.ADD_FREEHAND
+                retrainMapMode === RETRAIN_MAP_MODES.ADD_FREEHAND
                   ? 'primary-raised-dark'
                   : 'primary-plain'
               }
               size='small'
               radius='ellipsoid'
               useIcon='pencil'
-              visuallyDisabled={!activeClass}
-              info={!activeClass && 'Select a class first'}
-              onClick={() => toggleMapMode(MAP_MODES.ADD_FREEHAND)}
-              className={currentMapMode == MAP_MODES.ADD_FREEHAND && 'active'}
+              visuallyDisabled={!retrainActiveClass}
+              info={!retrainActiveClass && 'Select a class first'}
+              onClick={() => toggleMapMode(RETRAIN_MAP_MODES.ADD_FREEHAND)}
+              className={
+                retrainMapMode == RETRAIN_MAP_MODES.ADD_FREEHAND && 'active'
+              }
             >
               Freehand
             </InfoButton>
             <InfoButton
               data-cy='add-point-sample-button'
               variation={
-                currentMapMode === MAP_MODES.ADD_POINT
+                retrainMapMode === RETRAIN_MAP_MODES.ADD_POINT
                   ? 'primary-raised-dark'
                   : 'primary-plain'
               }
               size='small'
               radius='ellipsoid'
               useIcon='crosshair'
-              visuallyDisabled={!activeClass}
-              info={!activeClass && 'Select a class first'}
-              onClick={() => toggleMapMode(MAP_MODES.ADD_POINT)}
-              className={currentMapMode == MAP_MODES.ADD_POINT && 'active'}
+              visuallyDisabled={!retrainActiveClass}
+              info={!retrainActiveClass && 'Select a class first'}
+              onClick={() => toggleMapMode(RETRAIN_MAP_MODES.ADD_POINT)}
+              className={
+                retrainMapMode == RETRAIN_MAP_MODES.ADD_POINT && 'active'
+              }
             >
               Point
             </InfoButton>
@@ -464,7 +475,7 @@ function RetrainTab({ className }) {
             <InfoButton
               data-cy='eraser-button'
               variation={
-                currentMapMode === MAP_MODES.DELETE_SAMPLES
+                retrainMapMode === RETRAIN_MAP_MODES.DELETE_SAMPLES
                   ? 'primary-raised-dark'
                   : 'primary-plain'
               }
@@ -473,15 +484,15 @@ function RetrainTab({ className }) {
               useLocalButton
               useIcon='eraser'
               id='eraser-button'
-              visuallyDisabled={!activeClass}
+              visuallyDisabled={!retrainActiveClass}
               info={
-                !activeClass
+                !retrainActiveClass
                   ? 'Select a class first'
                   : 'Draw to erase, click to delete'
               }
-              onClick={() => toggleMapMode(MAP_MODES.DELETE_SAMPLES)}
+              onClick={() => toggleMapMode(RETRAIN_MAP_MODES.DELETE_SAMPLES)}
               className={
-                currentMapMode === MAP_MODES.DELETE_SAMPLES && 'active'
+                retrainMapMode === RETRAIN_MAP_MODES.DELETE_SAMPLES && 'active'
               }
             >
               Erase
@@ -498,7 +509,7 @@ function RetrainTab({ className }) {
               radius='ellipsoid'
               useLocalButton
               useIcon='upload'
-              // visuallyDisabled={!activeClass}
+              // visuallyDisabled={!retrainActiveClass}
               info='Import samples from GeoJSON file'
               // onClick={() => {
               //   setImportSamplesModalRevealed(true);
@@ -517,7 +528,7 @@ function RetrainTab({ className }) {
               useLocalButton
               useIcon='brand-osm'
               // visuallyDisabled={
-              //   !activeClass || !selectedModel.osmtag_id
+              //   !retrainActiveClass || !selectedModel.osmtag_id
               // }
               // info={
               //   !selectedModel.osmtag_id
@@ -533,7 +544,7 @@ function RetrainTab({ className }) {
           </ToolBox>
           <ClassList>
             <Subheading>Classes</Subheading>
-            {Object.values(currentClasses).map((c) => {
+            {retrainClasses.map((c) => {
               let polygons = get(c, 'polygons.length');
               let points = get(c, 'points.coordinates.length');
               return (
@@ -541,9 +552,12 @@ function RetrainTab({ className }) {
                   key={c.name}
                   data-cy={`${c.name}-class-button`}
                   onClick={() => {
-                    setActiveClass(c.name);
+                    actorRef.send({
+                      type: 'Set retrain active class',
+                      data: { retrainActiveClass: c.name },
+                    });
                   }}
-                  selected={activeClass === c.name}
+                  selected={retrainActiveClass === c.name}
                 >
                   <ClassThumbnail color={c.color} />
                   <ClassInfoWrapper>
@@ -573,8 +587,8 @@ function RetrainTab({ className }) {
                       info='Clear class samples drawn since last retrain or save'
                       id='reset-button-trigger'
                       hideText
-                      disabled={activeClass !== c.name}
-                      visuallyDisabled={activeClass !== c.name}
+                      disabled={retrainActiveClass !== c.name}
+                      visuallyDisabled={retrainActiveClass !== c.name}
                       // onClick={() => {
                       //   dispatchCurrentCheckpoint({
                       //     type: actions.CLEAR_CLASS_SAMPLES,

@@ -20,6 +20,7 @@ import { UploadAoiModal } from './upload-aoi-modal';
 import { PrimeButton } from './prime-button';
 import { BatchPredictionPanel } from './batch-prediction-panel';
 import { ProjectMachineContext } from '../../../fsm/project';
+import { SESSION_MODES } from '../../../fsm/project/constants';
 
 const StyledPanelBlock = styled(PanelBlock)`
   ${media.largeUp`
@@ -60,7 +61,7 @@ export function PrimePanel() {
           <StyledPanelBlock>
             <PanelBlockBody>
               <TabbedBlock
-                activeTab={['predict', 'retrain'].indexOf(sessionMode)}
+                activeTab={Object.values(SESSION_MODES).indexOf(sessionMode)}
               >
                 <PredictTab
                   name='predict'
@@ -69,7 +70,7 @@ export function PrimePanel() {
                   onTabClick={() =>
                     actorRef.send({
                       type: 'Switch to predict mode',
-                      data: { sessionMode: 'predict' },
+                      data: { sessionMode: SESSION_MODES.PREDICT },
                     })
                   }
                 />
@@ -80,7 +81,7 @@ export function PrimePanel() {
                   onTabClick={() =>
                     actorRef.send({
                       type: 'Switch to retrain mode',
-                      data: { sessionMode: 'retrain' },
+                      data: { sessionMode: SESSION_MODES.RETRAIN },
                     })
                   }
                 />

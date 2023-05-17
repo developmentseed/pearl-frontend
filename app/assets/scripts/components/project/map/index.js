@@ -1,7 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import SizeAwareElement from '../../common/size-aware-element';
-import { ImageOverlay, MapContainer, TileLayer } from 'react-leaflet';
+import {
+  ImageOverlay,
+  MapContainer,
+  TileLayer,
+  useMapEvent,
+} from 'react-leaflet';
 
 import {
   MAX_BASE_MAP_ZOOM_LEVEL,
@@ -14,6 +19,8 @@ import get from 'lodash.get';
 import { useAuth } from '../../../context/auth';
 import TileLayerWithHeaders from '../../common/map/tile-layer';
 import config from '../../../config';
+import { RETRAIN_MAP_MODES } from '../../../fsm/project/constants';
+import { RetrainSamples } from './retrain-samples';
 
 const center = [19.22819, -99.995841];
 const zoom = 12;
@@ -48,6 +55,13 @@ const Container = styled.div`
   }
 `;
 
+// This component is used to add event handlers to the map
+function ModalMapEvent(props) {
+  const { event, func } = props;
+  useMapEvent(event, func);
+  return null;
+}
+
 function getEventLatLng(event) {
   const {
     latlng: { lng, lat },
@@ -57,6 +71,10 @@ function getEventLatLng(event) {
 
 const selectors = {
   isLoadingMap: (state) => state.matches('Creating map'),
+  sessionMode: (state) => state.context.sessionMode,
+  retrainMapMode: (state) => state.context.retrainMapMode,
+  retrainClasses: (state) => state.context.retrainClasses,
+  retrainSamples: (state) => state.context.retrainSamples,
   mapEventHandlers: (state) => state.context.mapEventHandlers,
   currentAoi: (state) => state.context.currentAoi,
   currentPrediction: (state) => state.context.currentPrediction,
@@ -77,6 +95,9 @@ function Map() {
   const actorRef = ProjectMachineContext.useActorRef();
   const isLoadingMap = ProjectMachineContext.useSelector(
     selectors.isLoadingMap
+  );
+  const retrainMapMode = ProjectMachineContext.useSelector(
+    selectors.retrainMapMode
   );
   const mapEventHandlers = ProjectMachineContext.useSelector(
     selectors.mapEventHandlers
@@ -258,7 +279,34 @@ function Map() {
           }
         }}
       >
+        {retrainMapMode === RETRAIN_MAP_MODES.ADD_POINT && (
+          <ModalMapEvent
+            event='click'
+            func={(e) => {
+              if (retrainMapMode !== RETRAIN_MAP_MODES.ADD_POINT) {
+                return;
+              }
+              const { lat, lng } = e.latlng;
+
+              actorRef.send({
+                type: 'Add retrain sample',
+                data: {
+                  sample: {
+                    type: 'Feature',
+                    properties: {},
+                    geometry: {
+                      coordinates: [lng, lat],
+                      type: 'Point',
+                    },
+                  },
+                },
+              });
+            }}
+          />
+        )}
+
         <BaseMapLayer />
+
         {mosaicTileUrl && (
           <TileLayer url={mosaicTileUrl} opacity={MOSAIC_LAYER_OPACITY} />
         )}
@@ -275,6 +323,7 @@ function Map() {
             opacity={predictionsOpacity}
           />
         )}
+
         {currentPrediction &&
           currentPrediction.predictions &&
           currentPrediction.predictions.map((p) => (
@@ -285,6 +334,8 @@ function Map() {
               opacity={predictionsOpacity}
             />
           ))}
+
+        <RetrainSamples />
       </MapContainer>
     </SizeAwareElement>
   );

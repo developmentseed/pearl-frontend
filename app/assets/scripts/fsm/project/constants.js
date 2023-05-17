@@ -1,7 +1,15 @@
 /**
- * Map modes
+ * Session modes
  */
-export const MAP_MODES = {
+export const SESSION_MODES = {
+  PREDICT: 'PREDICT',
+  RETRAIN: 'RETRAIN',
+};
+
+/**
+ * Retrain map modes
+ */
+export const RETRAIN_MAP_MODES = {
   BROWSE: 'BROWSE',
   ADD_POINT: 'ADD_POINT',
   ADD_POLYGON: 'ADD_POLYGON',
