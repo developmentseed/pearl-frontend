@@ -123,6 +123,11 @@ export const services = {
       currentModel,
       currentShare,
       currentBatchPrediction,
+      currentClasses: currentTimeframe?.classes
+        ? {
+            ...currentTimeframe.classes,
+          }
+        : [],
     };
   },
   geocodeAoi: async (context) => {
