@@ -1,16 +1,7 @@
 import React from 'react';
 import InfoButton from '../../common/info-button';
 import { ProjectMachineContext } from '../../../fsm/project';
-
-const selectors = {
-  isPredictionReady: ({
-    context: { currentImagerySource, currentMosaic, currentModel, currentAoi },
-  }) =>
-    !!currentAoi && !!currentImagerySource && !!currentMosaic && !!currentModel,
-  isLargeAoi: ({ context: { currentAoi, apiLimits } }) => {
-    return currentAoi?.area > apiLimits?.live_inference;
-  },
-};
+import selectors from '../../../fsm/project/selectors';
 
 export function PrimeButton() {
   const actorRef = ProjectMachineContext.useActorRef();
