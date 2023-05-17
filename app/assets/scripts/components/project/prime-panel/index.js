@@ -21,6 +21,7 @@ import { PrimeButton } from './prime-button';
 import { BatchPredictionPanel } from './batch-prediction-panel';
 import { ProjectMachineContext } from '../../../fsm/project';
 import { SESSION_MODES } from '../../../fsm/project/constants';
+import selectors from '../../../fsm/project/selectors';
 
 const StyledPanelBlock = styled(PanelBlock)`
   ${media.largeUp`
@@ -40,11 +41,11 @@ const PanelControls = styled(PanelBlockFooter)`
     `}
 `;
 
-const sessionModeSelector = (state) => state.context.sessionMode;
-
 export function PrimePanel() {
   const actorRef = ProjectMachineContext.useActorRef();
-  const sessionMode = ProjectMachineContext.useSelector(sessionModeSelector);
+  const sessionMode = ProjectMachineContext.useSelector(selectors.sessionMode);
+  const isLargeAoi = ProjectMachineContext.useSelector(selectors.isLargeAoi);
+  const currentAoi = ProjectMachineContext.useSelector(selectors.currentAoi);
 
   return (
     <>
@@ -78,6 +79,12 @@ export function PrimePanel() {
                   name='retrain'
                   className='retrain-model'
                   tabId='retrain-tab-trigger'
+                  tabTooltip={
+                    isLargeAoi
+                      ? 'Retrain is not available for large areas'
+                      : 'Retrain is not available until model has been run over AOI.'
+                  }
+                  disabled={isLargeAoi || !currentAoi}
                   onTabClick={() =>
                     actorRef.send({
                       type: 'Switch to retrain mode',

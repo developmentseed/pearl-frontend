@@ -2,6 +2,8 @@
  * Reusable selectors for the project FSM
  */
 export const selectors = {
+  sessionMode: (state) => state.context.sessionMode,
+  currentAoi: (state) => state.context.currentAoi,
   isPredictionReady: ({
     context: { currentImagerySource, currentMosaic, currentModel, currentAoi },
   }) =>
