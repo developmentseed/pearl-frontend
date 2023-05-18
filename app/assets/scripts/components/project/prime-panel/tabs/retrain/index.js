@@ -21,39 +21,6 @@ import { ProjectMachineContext } from '../../../../../fsm/project';
 import get from 'lodash.get';
 import { RETRAIN_MAP_MODES } from '../../../../../fsm/project/constants';
 
-// import InfoButton from '../../../common/info-button';
-// import { PlaceholderMessage } from '../../../../styles/placeholder.js';
-// import { actions, useCheckpoint } from '../../../../context/checkpoint.js';
-// import { useMapState } from '../../../../context/explore';
-// import { useSessionStatus } from '../../../../context/explore';
-// import { useMapRef } from '../../../../context/map';
-
-// import { Dropdown, DropdownTrigger } from '../../../../styles/dropdown';
-// import {
-//   ToolsWrapper,
-//   ClassList,
-//   Class,
-//   Thumbnail as ClassThumbnail,
-//   ClassInfoWrapper,
-//   ClassHeading,
-//   ClassSamples,
-//   ToolBox as RetrainTools,
-//   AddClassButton,
-// } from './retrain-refine-styles';
-
-// import { Subheading } from '../../../../styles/type/heading';
-// import { useAoi } from '../../../../context/aoi';
-// import { useApiLimits } from '../../../../context/global';
-// import { useModel } from '../../../../context/model';
-// import EditClass from './edit-class';
-// import ImportGeojsonModal from './retrain/import-geojson-modal';
-// import ApplyOsmModal from './retrain/apply-osm-modal';
-
-/*
- * Retrain Model
- * @param ready - true when checkpoint exists and we are in RETRAIN mode
- */
-
 export const ToolsWrapper = styled.div`
   display: grid;
   grid-gap: ${glsp()};
@@ -349,26 +316,6 @@ const selectors = {
 };
 
 function RetrainTab({ className }) {
-  // const { className, placeholderMessage } = props;
-  // const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
-  // const { setretrainMapMode, mapModes, mapState } = useMapState();
-  // const { sessionStatus } = useSessionStatus();
-  // const { mapRef } = useMapRef();
-  // const isLoading = ['loading-project', 'retraining'].includes(
-  //   sessionStatus.mode
-  // );
-
-  // const [importSamplesModalRevealed, setImportSamplesModalRevealed] = useState(
-  //   false
-  // );
-  // const [osmModalRevealed, setOsmModalRevealed] = useState(false);
-  // const { aoiArea } = useAoi();
-  // const { apiLimits } = useApiLimits();
-  // const { selectedModel } = useModel();
-
-  // const isBatchArea =
-  //   aoiArea && apiLimits && aoiArea > apiLimits['live_inference'];
-
   const actorRef = ProjectMachineContext.useActorRef();
   const retrainClasses = ProjectMachineContext.useSelector(
     selectors.retrainClasses
@@ -404,14 +351,6 @@ function RetrainTab({ className }) {
       {!isBatchArea && !isLoading && retrainClasses && (
         <>
           <ToolBox>
-            {/* <ImportGeojsonModal
-                setRevealed={setImportSamplesModalRevealed}
-                revealed={importSamplesModalRevealed}
-              /> */}
-            {/* <ApplyOsmModal
-                setRevealed={setOsmModalRevealed}
-                revealed={osmModalRevealed}
-              /> */}
             <Subheading>Sample Selection Tools</Subheading>
             <InfoButton
               data-cy='retrain-draw-polygon'
@@ -496,50 +435,6 @@ function RetrainTab({ className }) {
               }
             >
               Erase
-            </InfoButton>
-            <InfoButton
-              id='open-import-samples-modal-button'
-              data-cy='open-import-samples-modal-button'
-              // variation={
-              //   importSamplesModalRevealed
-              //     ? 'primary-raised-dark'
-              //     : 'primary-plain'
-              // }
-              size='small'
-              radius='ellipsoid'
-              useLocalButton
-              useIcon='upload'
-              // visuallyDisabled={!retrainActiveClass}
-              info='Import samples from GeoJSON file'
-              // onClick={() => {
-              //   setImportSamplesModalRevealed(true);
-              // }}
-            >
-              Import
-            </InfoButton>
-            <InfoButton
-              id='open-osm-modal-button'
-              data-cy='open-osm-modal-button'
-              // variation={
-              //   osmModalRevealed ? 'primary-raised-dark' : 'primary-plain'
-              // }
-              size='small'
-              radius='ellipsoid'
-              useLocalButton
-              useIcon='brand-osm'
-              // visuallyDisabled={
-              //   !retrainActiveClass || !selectedModel.osmtag_id
-              // }
-              // info={
-              //   !selectedModel.osmtag_id
-              //     ? 'OpenStreetMap features are not available for this model'
-              //     : 'Apply OpenStreetMap features as samples'
-              // }
-              // onClick={() => {
-              //   setOsmModalRevealed(true);
-              // }}
-            >
-              Use OSM
             </InfoButton>
           </ToolBox>
           <ClassList>
