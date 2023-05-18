@@ -10,7 +10,6 @@
     "**/keyboard-shortcuts.spec.js",
     "**/layers-panel.spec.js",
     "**/panel.spec.js",
-    "**/retrain.spec.js",
     "**/sec-panel.spec.js"
   ]
 }
