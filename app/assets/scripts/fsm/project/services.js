@@ -7,7 +7,7 @@ import { WebsocketClient } from './websocket-client';
 import logger from '../../utils/logger';
 import toasts from '../../components/common/toasts';
 import { getMosaicTileUrl } from './helpers';
-import history from '../../history';
+import { SESSION_MODES } from './constants';
 
 export const services = {
   fetchInitialData: async (context) => {
@@ -30,6 +30,7 @@ export const services = {
     let currentModel;
     let currentShare;
     let currentBatchPrediction;
+    let sessionMode = SESSION_MODES.PREDICT;
 
     // Fetch lists
     const { mosaics: mosaicsList } = await apiClient.get('mosaic');
@@ -80,6 +81,7 @@ export const services = {
             (imagerySource) =>
               imagerySource.id === currentMosaic.imagery_source_id
           );
+          sessionMode = SESSION_MODES.RETRAIN;
 
           // Fetch timeframe tilejson
           try {
@@ -118,6 +120,7 @@ export const services = {
 
     return {
       apiLimits,
+      sessionMode,
       mosaicsList,
       imagerySourcesList,
       modelsList,

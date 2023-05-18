@@ -8,6 +8,7 @@ import toasts from '../../components/common/toasts';
 import { BOUNDS_PADDING } from '../../components/common/map/constants';
 import { getMosaicTileUrl } from './helpers';
 import history from '../../history';
+import { SESSION_MODES } from './constants';
 
 export const actions = {
   setInitialContext: assign((context, event) => {
@@ -228,6 +229,7 @@ export const actions = {
     sessionMode: event.data.sessionMode,
   })),
   refreshSessionStatusMessage: assign((context) => {
+    const { sessionMode } = context;
     let sessionStatusMessage;
 
     const isFirstAoi = context.aoisList.length === 0;
@@ -244,6 +246,8 @@ export const actions = {
       sessionStatusMessage = 'Select Model';
     } else if (isFirstAoi) {
       sessionStatusMessage = 'Ready for prediction run';
+    } else if (sessionMode === SESSION_MODES.RETRAIN) {
+      sessionStatusMessage = 'Ready for retrain run';
     } else {
       // Keep existing message if none of the above conditions are met
       sessionStatusMessage = context.sessionStatusMessage;
