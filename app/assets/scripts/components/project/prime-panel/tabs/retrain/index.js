@@ -2,7 +2,6 @@ import React from 'react';
 import T from 'prop-types';
 import styled, { css } from 'styled-components';
 import { glsp, themeVal, truncated } from '@devseed-ui/theme-provider';
-// import get from 'lodash.get';
 
 // Styles
 import { Heading } from '@devseed-ui/typography';

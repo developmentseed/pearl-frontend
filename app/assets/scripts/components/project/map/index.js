@@ -21,6 +21,7 @@ import TileLayerWithHeaders from '../../common/map/tile-layer';
 import config from '../../../config';
 import { RETRAIN_MAP_MODES } from '../../../fsm/project/constants';
 import { RetrainSamples } from './retrain-samples';
+import FreehandDrawControl from '../prime-panel/tabs/retrain/freehand-draw-control';
 
 const center = [19.22819, -99.995841];
 const zoom = 12;
@@ -267,6 +268,24 @@ function Map() {
         boxZoom={false}
         style={{ height: '100%' }}
         whenCreated={(m) => {
+          const freehandDraw = new FreehandDrawControl(m, {
+            onUpdate: (retrainClass, samples) => {
+              // Apply class to samples and send to actor
+              actorRef.send({
+                type: 'Update retrain class samples',
+                data: {
+                  retrainClass,
+                  samples: samples.map((s) => ({
+                    ...s,
+                    properties: { class: retrainClass },
+                  })),
+                },
+              });
+            },
+          });
+
+          m.freehandDraw = freehandDraw;
+
           // Add map to state
           setMapRef(m);
 

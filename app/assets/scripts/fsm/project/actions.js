@@ -8,7 +8,7 @@ import toasts from '../../components/common/toasts';
 import { BOUNDS_PADDING } from '../../components/common/map/constants';
 import { getMosaicTileUrl } from './helpers';
 import history from '../../history';
-import { SESSION_MODES } from './constants';
+import { RETRAIN_MAP_MODES, SESSION_MODES } from './constants';
 
 export const actions = {
   setInitialContext: assign((context, event) => {
@@ -312,12 +312,44 @@ export const actions = {
   setMapRef: assign((context, event) => ({
     mapRef: event.data.mapRef,
   })),
-  setRetrainMapMode: assign((context, event) => ({
-    retrainMapMode: event.data.retrainMapMode,
-  })),
-  setRetrainActiveClass: assign((context, event) => ({
-    retrainActiveClass: event.data.retrainActiveClass,
-  })),
+  setRetrainMapMode: assign((context, event) => {
+    const { retrainMapMode } = event.data;
+    const {
+      retrainClasses,
+      mapRef: { freehandDraw },
+    } = context;
+
+    // Ensure that the freehand draw layers are set
+    freehandDraw.setLayers(retrainClasses);
+
+    // Enable freehand draw for the active class
+    switch (retrainMapMode) {
+      case RETRAIN_MAP_MODES.ADD_FREEHAND:
+        freehandDraw.enableAdd(context.retrainActiveClass);
+        break;
+
+      default:
+        freehandDraw.disable();
+        break;
+    }
+
+    return {
+      retrainMapMode: event.data.retrainMapMode,
+    };
+  }),
+  setRetrainActiveClass: assign((context, event) => {
+    const { retrainMapMode } = context;
+    const { retrainActiveClass } = event.data;
+
+    // Enable freehand draw for the active class
+    if (retrainMapMode === RETRAIN_MAP_MODES.ADD_FREEHAND) {
+      context.mapRef.freehandDraw.enableAdd(retrainActiveClass);
+    }
+
+    return {
+      retrainActiveClass: event.data.retrainActiveClass,
+    };
+  }),
   addRetrainSample: assign((context, event) => {
     const { retrainSamples, retrainActiveClass } = context;
 
@@ -331,6 +363,18 @@ export const actions = {
 
     return {
       retrainSamples: retrainSamples.concat(sample),
+    };
+  }),
+  updateRetrainClassSamples: assign((context, event) => {
+    const { retrainClass, samples } = event.data;
+    const { retrainSamples } = context;
+
+    // Because of the way the freehand draw layer works, we need samples in
+    // batches
+    return {
+      retrainSamples: retrainSamples
+        .filter((s) => s.properties.class !== retrainClass)
+        .concat(samples),
     };
   }),
   setProject: assign((context, event) => ({
