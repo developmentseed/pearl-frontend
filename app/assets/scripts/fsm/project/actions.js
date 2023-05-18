@@ -7,6 +7,7 @@ import turfArea from '@turf/area';
 import toasts from '../../components/common/toasts';
 import { BOUNDS_PADDING } from '../../components/common/map/constants';
 import { getMosaicTileUrl } from './helpers';
+import history from '../../history';
 
 export const actions = {
   setInitialContext: assign((context, event) => {
@@ -538,5 +539,9 @@ export const actions = {
     return {
       sharesList: event.data.sharesList,
     };
+  }),
+  redirectToProjectProfilePage: assign((context) => {
+    const projectId = context.project.id;
+    history.push(`/profile/projects/${projectId}`);
   }),
 };

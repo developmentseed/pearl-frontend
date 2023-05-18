@@ -7,12 +7,14 @@ import { WebsocketClient } from './websocket-client';
 import logger from '../../utils/logger';
 import toasts from '../../components/common/toasts';
 import { getMosaicTileUrl } from './helpers';
+import history from '../../history';
 
 export const services = {
   fetchInitialData: async (context) => {
     const {
       apiClient,
       project: { id: projectId },
+      currentInstanceType,
     } = context;
 
     // Initialize project and aois
@@ -36,8 +38,19 @@ export const services = {
     );
     const { models: modelsList } = await apiClient.get('model');
 
-    // Fetch api limits
-    const { limits: apiLimits } = await apiClient.get('');
+    // Fetch api limits and available instances
+    const {
+      limits: apiLimits,
+      availableInstances,
+    } = await apiClient.getApiMeta();
+
+    if (availableInstances[currentInstanceType] === 0) {
+      toasts.error('No instances available, please try again later.', {
+        autoClose: false,
+        toastId: 'no-instance-available-error',
+      });
+      throw new Error('No instances available');
+    }
 
     // If project is not new, fetch project data
     if (projectId !== 'new') {
