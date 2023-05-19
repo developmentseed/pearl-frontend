@@ -21,7 +21,7 @@ import TileLayerWithHeaders from '../../common/map/tile-layer';
 import config from '../../../config';
 import { RETRAIN_MAP_MODES } from '../../../fsm/project/constants';
 import { RetrainSamples } from './retrain-samples';
-import FreehandDrawControl from '../prime-panel/tabs/retrain/freehand-draw-control';
+import FreehandDrawControl from './freehand-draw-control';
 
 const center = [19.22819, -99.995841];
 const zoom = 12;
