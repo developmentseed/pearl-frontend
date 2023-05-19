@@ -210,6 +210,9 @@ export const actions = {
   setCurrentInstanceType: assign((context, event) => ({
     currentInstanceType: event.data.instanceType,
   })),
+  setCurrentInstanceWebsocket: assign((context, event) => ({
+    currentInstanceWebsocket: event.data.instanceWebsocket,
+  })),
   setCurrentInstanceStatus: assign((context, event) => ({
     currentInstance: {
       ...context.currentInstance,

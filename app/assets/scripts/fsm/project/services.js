@@ -295,6 +295,11 @@ export const services = {
     const { token } = context.currentInstance;
     const websocket = new WebsocketClient(token);
 
+    callback({
+      type: 'Created instance websocket',
+      data: { instanceWebsocket: websocket },
+    });
+
     onReceive((event) => {
       if (event.type === 'Abort run') {
         websocket.sendMessage({

@@ -8,7 +8,6 @@ import {
 import { PageBody } from '../../styles/page';
 
 import theme from '../../styles/theme';
-import Composer from '../../utils/compose-components';
 import App from '../common/app';
 import { Button } from '@devseed-ui/button';
 import {
@@ -21,19 +20,16 @@ import SizeAwareElement from '../common/size-aware-element';
 import ProjectPageHeader from './header';
 import ProjectPageMain from './main';
 import { AoiModalDialog } from './aoi-modal-dialog';
+import selectors from '../../fsm/project/selectors';
 
 export const ProjectPage = () => {
   return (
     <App pageTitle='Project'>
-      <Composer components={[ProjectMachineProvider]}>
+      <ProjectMachineProvider>
         <ProjectPageInner />
-      </Composer>
+      </ProjectMachineProvider>
     </App>
   );
-};
-
-const selectors = {
-  globalLoading: (state) => state.context.globalLoading,
 };
 
 const ProjectPageInner = () => {
@@ -46,6 +42,9 @@ const ProjectPageInner = () => {
   };
   const globalLoading = ProjectMachineContext.useSelector(
     selectors.globalLoading
+  );
+  const currentInstanceWebsocket = ProjectMachineContext.useSelector(
+    selectors.currentInstanceWebsocket
   );
 
   // After authentication is resolved, send machine event
@@ -82,6 +81,20 @@ const ProjectPageInner = () => {
       showGlobalLoading();
     }
   }, [globalLoading]);
+
+  useEffect(() => {
+    return () => {
+      // On umount, send terminate message and close websocket connection if it
+      // exists
+      if (currentInstanceWebsocket) {
+        currentInstanceWebsocket.sendMessage({
+          action: 'instance#terminate',
+        });
+
+        currentInstanceWebsocket.close();
+      }
+    };
+  }, [currentInstanceWebsocket]);
 
   return (
     <>

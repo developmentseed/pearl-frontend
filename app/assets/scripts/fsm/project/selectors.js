@@ -2,6 +2,7 @@
  * Reusable selectors for the project FSM
  */
 export const selectors = {
+  globalLoading: (state) => state.context.globalLoading,
   sessionMode: (state) => state.context.sessionMode,
   currentAoi: (state) => state.context.currentAoi,
   isPredictionReady: ({
@@ -13,6 +14,7 @@ export const selectors = {
   isLargeAoi: ({ context: { currentAoi, apiLimits } }) => {
     return currentAoi?.area > apiLimits?.live_inference;
   },
+  currentInstanceWebsocket: (state) => state.context.currentInstanceWebsocket,
 };
 
 export default selectors;
