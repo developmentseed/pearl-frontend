@@ -10,7 +10,6 @@ module.exports = defineConfig({
   experimentalFetchPolyfill: true,
   chromeWebSecurity: false,
   defaultCommandTimeout: 7000,
-  retries: 1,
   e2e: {
     baseUrl: 'http://localhost:9000/',
     excludeSpecPattern: [

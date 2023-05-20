@@ -400,7 +400,7 @@ describe('Can delete AOIs', () => {
 
     cy.get('[data-cy=session-status]').should(
       'have.text',
-      'Session Status: Ready for prediction run'
+      'Session Status: Ready for retrain run'
     );
 
     cy.intercept(
@@ -438,9 +438,9 @@ describe('Can delete AOIs', () => {
         fixture: 'aois.0.json',
       }
     ).as('loadAois0');
-    cy.get('[data-cy=predict-tab]').click();
+    cy.get('[data-cy=predict-tab]').should('exist').click();
 
-    cy.get('[data-cy=delete-current-aoi-button]').click();
+    cy.get('[data-cy=delete-current-aoi-button]').should('exist').click();
     cy.get('[data-cy=confirm-delete-aoi-modal]').should('exist');
     cy.get('[data-cy=confirm-aoi-delete]').should('exist').click();
   });
