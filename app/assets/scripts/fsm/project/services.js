@@ -273,7 +273,7 @@ export const services = {
       const instancePhase = get(instanceStatus, 'status.phase');
 
       // Process status
-      if (instancePhase === 'Running') {
+      if (instancePhase === 'Running' && instanceStatus.active) {
         break;
       } else if (instancePhase === 'Failed') {
         throw new Error('Instance creation failed');
@@ -366,6 +366,166 @@ export const services = {
 
         default:
           logger('Unhandled websocket message', message, data);
+          break;
+      }
+    });
+    return () => websocket.close();
+  },
+  runRetrain: (context) => (callback, onReceive) => {
+    const { retrainClasses, retrainSamples, currentTimeframe } = context;
+
+    const retrainPayload = {
+      name: context.currentAoi.name,
+      classes: retrainClasses.map((c) => ({
+        ...c,
+        geometry: {
+          type: 'FeatureCollection',
+          features: retrainSamples.filter((s) => s.properties.class === c.name),
+        },
+      })),
+    };
+
+    const { token } = context.currentInstance;
+    const websocket = new WebsocketClient(token);
+
+    /**
+     * Ping pong logic
+     */
+    let pingCount = 0;
+    let lastPintCount;
+    let pingPongInterval;
+    websocket.addEventListener('open', () => {
+      // Send first ping
+      websocket.send(`ping#${pingCount}`);
+
+      // Check for pong messages every interval
+      pingPongInterval = setInterval(() => {
+        if (lastPintCount === pingCount) {
+          pingCount = pingCount + 1;
+          websocket.send(`ping#${pingCount}`);
+        } else {
+          // Pong didn't happened, reconnect
+          websocket.reconnect();
+        }
+      }, config.websocketPingPongInterval);
+    });
+    websocket.addEventListener('close', () => {
+      if (pingPongInterval) {
+        clearInterval(pingPongInterval);
+      }
+    });
+
+    /**
+     * Handle events received from the machine
+     */
+    onReceive((event) => {
+      if (event.type === 'Abort retrain') {
+        websocket.sendMessage({
+          action: 'instance#terminate',
+        });
+        // Ideally we should thrown an error here to make the service
+        // execute the 'onError' event, but XState doesn't support errors
+        // thrown inside onReceive. A fix is planned for XState v5, more
+        // here: https://github.com/statelyai/xstate/issues/3279
+        callback({ type: 'Retrain was aborted' });
+      }
+    });
+
+    /**
+     * Handle events received from the websocket
+     */
+    let isStarted = false;
+    websocket.addEventListener('message', (e) => {
+      // Update ping count on pong
+      if (e.data.startsWith('pong#')) {
+        lastPintCount = parseInt(e.data.split('#')[1], 10);
+        return;
+      }
+
+      const { message, data } = JSON.parse(e.data);
+
+      switch (message) {
+        case 'info#connected':
+          // After connection, send a message to the server to request
+          // model status
+          websocket.sendMessage({
+            action: 'model#status',
+          });
+          break;
+        case 'info#disconnected':
+          // After connection, send a message to the server to request
+          // model status
+          websocket.sendMessage({
+            action: 'model#status',
+          });
+          break;
+        case 'model#status':
+          if (!isStarted && data.processing) {
+            // Send terminate message to stop orphaned retrain
+            websocket.sendMessage({
+              action: 'instance#terminate',
+            });
+            callback({
+              type: 'Retrain has errored',
+              data: { error: data.error },
+            });
+          } else if (!isStarted && !data.processing) {
+            isStarted = true;
+            if (data.timeframe?.id !== currentTimeframe.id) {
+              websocket.sendMessage({
+                action: 'model#timeframe',
+                data: {
+                  id: context.currentTimeframe.id,
+                },
+              });
+            } else {
+              websocket.sendMessage({
+                action: 'model#retrain',
+                data: retrainPayload,
+              });
+            }
+          }
+          break;
+        case 'model#checkpoint':
+          callback({
+            type: 'Received checkpoint',
+            data: { currentCheckpoint: data },
+          });
+          websocket.sendMessage({
+            action: 'model#status',
+          });
+          break;
+        case 'model#timeframe':
+          callback({
+            type: 'Received timeframe',
+            data: { timeframe: data },
+          });
+          break;
+        case 'model#timeframe#progress':
+          callback({
+            type: 'Received prediction progress',
+            data,
+          });
+          websocket.sendMessage({
+            action: 'model#status',
+          });
+          break;
+        case 'model#timeframe#complete':
+          callback({
+            type: 'Prediction run was completed',
+            data,
+          });
+          break;
+
+        default:
+          if (data?.error) {
+            callback({
+              type: 'Retrain has errored',
+              data: { error: data.error },
+            });
+          } else {
+            logger('Unhandled websocket message', message, data);
+          }
           break;
       }
     });

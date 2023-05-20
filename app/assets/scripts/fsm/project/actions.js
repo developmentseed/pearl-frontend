@@ -563,6 +563,14 @@ export const actions = {
       },
     };
   }),
+  handleRetrainError: assign(() => {
+    toasts.error('An unexpected error occurred, please try again later.');
+    return {
+      globalLoading: {
+        disabled: true,
+      },
+    };
+  }),
   hideGlobalLoading: assign(() => ({
     globalLoading: {
       disabled: true,

@@ -38,7 +38,17 @@ export function PrimeButton() {
       style={{
         gridColumn: '1 / -1',
       }}
-      onClick={() => !buttonDisabled && actorRef.send('Prime button pressed')}
+      onClick={() => {
+        // Do nothing if button is disabled
+        if (buttonDisabled) return;
+
+        // Send the appropriate event to the FSM
+        if (sessionMode === SESSION_MODES.PREDICT) {
+          actorRef.send('Prime button pressed');
+        } else if (sessionMode === SESSION_MODES.RETRAIN) {
+          actorRef.send('Retrain requested');
+        }
+      }}
       visuallyDisabled={buttonDisabled}
       info={buttonTooltip}
     >
