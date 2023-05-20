@@ -22,6 +22,7 @@ import config from '../../../config';
 import { RETRAIN_MAP_MODES } from '../../../fsm/project/constants';
 import { RetrainSamples } from './retrain-samples';
 import FreehandDrawControl from './freehand-draw-control';
+import PolygonDrawControl from './polygon-draw-control';
 
 const center = [19.22819, -99.995841];
 const zoom = 12;
@@ -268,7 +269,7 @@ function Map() {
         boxZoom={false}
         style={{ height: '100%' }}
         whenCreated={(m) => {
-          const freehandDraw = new FreehandDrawControl(m, {
+          m.freehandDraw = new FreehandDrawControl(m, {
             onUpdate: (retrainClass, samples) => {
               // Apply class to samples and send to actor
               actorRef.send({
@@ -284,7 +285,17 @@ function Map() {
             },
           });
 
-          m.freehandDraw = freehandDraw;
+          m.polygonDraw = new PolygonDrawControl({
+            map: m,
+            onDrawFinish: (newPolygon) => {
+              actorRef.send({
+                type: 'Add retrain sample',
+                data: {
+                  sample: newPolygon,
+                },
+              });
+            },
+          });
 
           // Add map to state
           setMapRef(m);

@@ -11,7 +11,6 @@ class FreehandDrawControl {
 
     this.onUpdate = events.onUpdate;
     this.addLayer = this.addLayer.bind(this);
-    this.setLayerPolygons = this.setLayerPolygons.bind(this);
     this.manualMode = false;
   }
 
@@ -100,31 +99,6 @@ class FreehandDrawControl {
     };
 
     this._group.addLayer(drawer);
-  }
-
-  /*
-   * Function to add polygons to layers without user input
-   * used when restoring from history using UNDO
-   */
-  setLayerPolygons(layerPolygons) {
-    const idMap = Object.entries(this._group._layers).reduce(
-      (accum, [id, { category }]) => ({
-        ...accum,
-        [category]: id,
-      }),
-      {}
-    );
-    Object.entries(layerPolygons).forEach(([layerName, { polygons }]) => {
-      const layer = this._group.getLayer(idMap[layerName]);
-      this.manualMode = true;
-
-      layer.clearLayers();
-      polygons.forEach((poly) => {
-        const latlngs = [poly.coordinates[0].map(([lon, lat]) => [lat, lon])];
-        layer.addPolygon(latlngs, true, true, true);
-      });
-      this.manualMode = false;
-    });
   }
 
   enableAdd(layerName) {
