@@ -253,11 +253,18 @@ export const services = {
         `/project/${projectId}/instance/${instanceId}`
       );
     } else {
-      instance = await apiClient.post(`/project/${projectId}/instance`, {
+      const createInstancePayload = {
         type: currentInstanceType,
-        timeframe_id: currentTimeframe?.id || null,
-        checkpoint_id: currentTimeframe?.checkpoint_id || null,
-      });
+        ...(currentTimeframe?.id && { timeframe_id: currentTimeframe.id }),
+        ...(currentTimeframe?.checkpoint_id && {
+          checkpoint_id: currentTimeframe.checkpoint_id,
+        }),
+      };
+
+      instance = await apiClient.post(
+        `/project/${projectId}/instance`,
+        createInstancePayload
+      );
     }
 
     // Confirm instance has running status
