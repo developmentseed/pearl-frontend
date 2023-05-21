@@ -81,7 +81,6 @@ export const services = {
             (imagerySource) =>
               imagerySource.id === currentMosaic.imagery_source_id
           );
-          sessionMode = SESSION_MODES.RETRAIN;
 
           // Fetch timeframe tilejson
           try {
@@ -301,7 +300,7 @@ export const services = {
     });
 
     onReceive((event) => {
-      if (event.type === 'Abort run') {
+      if (event.type === 'Abort button pressed') {
         websocket.sendMessage({
           action: 'instance#terminate',
         });

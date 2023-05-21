@@ -3,11 +3,14 @@ import InfoButton from '../../common/info-button';
 import { ProjectMachineContext } from '../../../fsm/project';
 import selectors from '../../../fsm/project/selectors';
 import { SESSION_MODES } from '../../../fsm/project/constants';
+import guards from '../../../fsm/project/guards';
 
 export function PrimeButton() {
   const actorRef = ProjectMachineContext.useActorRef();
   const sessionMode = ProjectMachineContext.useSelector(selectors.sessionMode);
-  const isLargeAoi = ProjectMachineContext.useSelector(selectors.isLargeAoi);
+  const isLargeAoi = ProjectMachineContext.useSelector((s) =>
+    guards.isLargeAoi(s.context)
+  );
   const isPredictionReady = ProjectMachineContext.useSelector(
     selectors.isPredictionReady
   );

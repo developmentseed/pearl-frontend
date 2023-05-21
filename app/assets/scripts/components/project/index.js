@@ -70,9 +70,11 @@ const ProjectPageInner = () => {
               data-cy='abort-run-button'
               style={{ display: 'block', margin: '1rem auto 0' }}
               variation='danger-raised-dark'
-              onClick={() => projectActor.send({ type: 'Abort run' })}
+              onClick={() =>
+                projectActor.send({ type: 'Abort button pressed' })
+              }
             >
-              Abort Run
+              Abort
             </Button>
           )}
         </>

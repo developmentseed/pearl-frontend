@@ -408,13 +408,38 @@ export const actions = {
     };
   }),
   enablePredictionRun: assign(() => ({
+    sessionMode: SESSION_MODES.PREDICT,
     sessionStatusMessage: 'Ready for prediction run',
+  })),
+  enterRetrainMode: assign(() => ({
+    sessionMode: SESSION_MODES.RETRAIN,
+    sessionStatusMessage: 'Ready for retrain run',
   })),
   enterPredictionRun: assign(() => ({
     sessionStatusMessage: 'Running prediction',
     globalLoading: {
       disabled: false,
       message: 'Running prediction',
+    },
+  })),
+  enterRequestingInstance: assign(() => ({
+    sessionStatusMessage: 'Starting retrain run',
+    globalLoading: {
+      disabled: false,
+      message: 'Awaiting instance',
+    },
+  })),
+  enterRetrainRun: assign(() => ({
+    sessionStatusMessage: 'Running retrain',
+    globalLoading: {
+      disabled: false,
+      message: 'Awaiting predictions',
+      abortButton: true,
+    },
+  })),
+  exitRetrainRun: assign(() => ({
+    globalLoading: {
+      disabled: true,
     },
   })),
   resetMapEventHandlers: assign(() => {

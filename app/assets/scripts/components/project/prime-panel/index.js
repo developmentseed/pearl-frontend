@@ -22,6 +22,7 @@ import { BatchPredictionPanel } from './batch-prediction-panel';
 import { ProjectMachineContext } from '../../../fsm/project';
 import { SESSION_MODES } from '../../../fsm/project/constants';
 import selectors from '../../../fsm/project/selectors';
+import guards from '../../../fsm/project/guards';
 
 const StyledPanelBlock = styled(PanelBlock)`
   ${media.largeUp`
@@ -44,7 +45,9 @@ const PanelControls = styled(PanelBlockFooter)`
 export function PrimePanel() {
   const actorRef = ProjectMachineContext.useActorRef();
   const sessionMode = ProjectMachineContext.useSelector(selectors.sessionMode);
-  const isLargeAoi = ProjectMachineContext.useSelector(selectors.isLargeAoi);
+  const isLargeAoi = ProjectMachineContext.useSelector((s) =>
+    guards.isLargeAoi(s.context)
+  );
   const currentAoi = ProjectMachineContext.useSelector(selectors.currentAoi);
 
   return (
