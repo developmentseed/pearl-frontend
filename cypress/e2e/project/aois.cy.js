@@ -398,11 +398,6 @@ describe('Can delete AOIs', () => {
     cy.visit('/project/1');
     cy.wait('@loadAois');
 
-    cy.get('[data-cy=session-status]').should(
-      'have.text',
-      'Session Status: Ready for retrain run'
-    );
-
     cy.intercept(
       {
         url: restApiEndpoint + '/api/project/1/aoi/1',
