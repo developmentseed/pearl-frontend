@@ -236,7 +236,7 @@ export const services = {
     };
   },
   requestInstance: async (context) => {
-    const { apiClient, currentInstanceType } = context;
+    const { apiClient, currentInstanceType, currentTimeframe } = context;
     const { id: projectId } = context.project;
 
     let instance;
@@ -255,6 +255,8 @@ export const services = {
     } else {
       instance = await apiClient.post(`/project/${projectId}/instance`, {
         type: currentInstanceType,
+        timeframe_id: currentTimeframe?.id || null,
+        checkpoint_id: currentTimeframe?.checkpoint_id || null,
       });
     }
 
@@ -444,6 +446,18 @@ export const services = {
       const { message, data } = JSON.parse(e.data);
 
       switch (message) {
+        case 'error':
+          // Send terminate message to errored instance
+          websocket.sendMessage({
+            action: 'instance#terminate',
+          });
+
+          // Send error message to the machine
+          callback({
+            type: 'Retrain has errored',
+            data: { error: data.error },
+          });
+          break;
         case 'info#connected':
           // After connection, send a message to the server to request
           // model status
@@ -470,7 +484,7 @@ export const services = {
             });
           } else if (!isStarted && !data.processing) {
             isStarted = true;
-            if (data.timeframe?.id !== currentTimeframe.id) {
+            if (data.timeframe !== currentTimeframe.id) {
               websocket.sendMessage({
                 action: 'model#timeframe',
                 data: {

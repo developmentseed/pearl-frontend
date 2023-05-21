@@ -411,10 +411,6 @@ export const actions = {
     sessionMode: SESSION_MODES.PREDICT,
     sessionStatusMessage: 'Ready for prediction run',
   })),
-  enterRetrainMode: assign(() => ({
-    sessionMode: SESSION_MODES.RETRAIN,
-    sessionStatusMessage: 'Ready for retrain run',
-  })),
   enterPredictionRun: assign(() => ({
     sessionStatusMessage: 'Running prediction',
     globalLoading: {
@@ -423,17 +419,19 @@ export const actions = {
     },
   })),
   enterRequestingInstance: assign(() => ({
-    sessionStatusMessage: 'Starting retrain run',
     globalLoading: {
       disabled: false,
-      message: 'Awaiting instance',
+      message: 'Awaiting instance...',
     },
+  })),
+  enterRetrainMode: assign(() => ({
+    sessionMode: SESSION_MODES.RETRAIN,
+    sessionStatusMessage: 'Ready for retrain run',
   })),
   enterRetrainRun: assign(() => ({
     sessionStatusMessage: 'Running retrain',
     globalLoading: {
       disabled: false,
-      message: 'Awaiting predictions',
       abortButton: true,
     },
   })),

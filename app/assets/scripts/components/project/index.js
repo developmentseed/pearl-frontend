@@ -82,7 +82,11 @@ const ProjectPageInner = () => {
     } else {
       showGlobalLoading();
     }
-  }, [globalLoading]);
+  }, [
+    globalLoading.disabled,
+    globalLoading.message,
+    globalLoading.abortButton,
+  ]);
 
   useEffect(() => {
     return () => {
