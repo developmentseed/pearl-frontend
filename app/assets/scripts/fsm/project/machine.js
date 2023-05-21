@@ -295,7 +295,10 @@ export const projectMachine = createMachine(
           'Abort button pressed': {
             target: 'Running prediction',
             internal: true,
-            actions: send({ type: 'Abort run' }, { to: 'websocket' }),
+            actions: send(
+              { type: 'Abort button pressed' },
+              { to: 'websocket' }
+            ),
           },
           'Prediction run was aborted': {
             target: 'Prediction ready',

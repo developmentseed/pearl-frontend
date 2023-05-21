@@ -306,7 +306,6 @@ describe('Create new project', () => {
     // retrain is implemented
     cy.get('[data-cy=session-status]').should(
       'have.text',
-      // 'Session Status: Ready for retrain run'
       'Session Status: Ready for prediction run'
     );
   });
