@@ -263,8 +263,8 @@ export const services = {
         );
       } else {
         instance = await apiClient.post(
-          `/project/${projectId}/instance`,
-          instanceConfig
+          `/project/${projectId}/instance`
+          // instanceConfig
         );
       }
 
@@ -303,7 +303,6 @@ export const services = {
 
       callback({
         type: 'Instance is running',
-        data: { instance, instanceWebsocket: websocket },
       });
 
       websocket.addEventListener('message', (e) => {
@@ -317,8 +316,8 @@ export const services = {
             });
             break;
           case 'info#connected':
-            // After connection, send a message to the server to request
-            // model status
+          case 'model#timeframe#complete':
+            // After connection, request status
             websocket.sendMessage({
               action: 'model#status',
             });
@@ -331,25 +330,32 @@ export const services = {
             });
             break;
           case 'model#status':
-            if (
-              data.processing &&
-              instanceConfig.timeframe_id !== data.timeframe_id
-            ) {
-              websocket.sendMessage({
-                action: 'model#abort',
-              });
-            } else if (instanceConfig.timeframe_id !== data.timeframe_id) {
-              websocket.sendMessage({
-                action: 'model#timeframe',
-                timeframe_id: instanceConfig.timeframe_id,
-              });
+            if (data.processing) {
+              // Instance is processing a different timeframe, abort it
+              if (instanceConfig.timeframe_id !== data.timeframe) {
+                websocket.sendMessage({
+                  action: 'model#abort',
+                });
+              }
             } else {
-              callback({
-                type: 'Instance is ready',
-              });
+              // Apply current timeframe to instance
+              if (instanceConfig.timeframe_id !== data.timeframe) {
+                websocket.sendMessage({
+                  action: 'model#timeframe',
+                  data: {
+                    id: instanceConfig.timeframe_id,
+                  },
+                });
+              } else {
+                // Instance has the same timeframe and is not processing, it should be ready
+                callback({
+                  type: 'Instance is ready',
+                  data: { instance },
+                });
+                websocket.close();
+              }
             }
             break;
-
           default:
             logger('Unhandled websocket message', message, data);
             break;
