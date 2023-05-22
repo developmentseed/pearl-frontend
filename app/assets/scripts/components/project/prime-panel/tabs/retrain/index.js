@@ -351,7 +351,7 @@ function RetrainTab({ className }) {
         <>
           <ToolBox>
             <Subheading>Sample Selection Tools</Subheading>
-            <InfoButton
+            {/* <InfoButton
               data-cy='retrain-draw-polygon'
               variation={
                 retrainMapMode === RETRAIN_MAP_MODES.ADD_POLYGON
@@ -370,7 +370,7 @@ function RetrainTab({ className }) {
               }
             >
               Polygon
-            </InfoButton>
+            </InfoButton> */}
             <InfoButton
               data-cy='retrain-draw-freehand'
               variation={
@@ -390,7 +390,7 @@ function RetrainTab({ className }) {
             >
               Freehand
             </InfoButton>
-            <InfoButton
+            {/* <InfoButton
               data-cy='add-point-sample-button'
               variation={
                 retrainMapMode === RETRAIN_MAP_MODES.ADD_POINT
@@ -408,7 +408,7 @@ function RetrainTab({ className }) {
               }
             >
               Point
-            </InfoButton>
+            </InfoButton> */}
 
             <InfoButton
               data-cy='eraser-button'
