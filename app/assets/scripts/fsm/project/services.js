@@ -235,25 +235,14 @@ export const services = {
       share: sharesList.find((s) => s.timeframe?.id === latestTimeframe?.id),
     };
   },
-  requestInstance: async (context) => {
-    const { apiClient, currentInstanceType, currentTimeframe } = context;
-    const { id: projectId } = context.project;
+  activateInstance: (context) => async (callback) => {
+    {
+      const { apiClient, currentInstanceType, currentTimeframe } = context;
+      const { id: projectId } = context.project;
 
-    let instance;
+      let instance;
 
-    // Fetch active instances for this project
-    const activeInstances = await apiClient.get(
-      `/project/${projectId}/instance/?status=active&type=${currentInstanceType}`
-    );
-
-    // Reuse existing instance if available
-    if (activeInstances.total > 0) {
-      const { id: instanceId } = activeInstances.instances[0];
-      instance = await apiClient.get(
-        `/project/${projectId}/instance/${instanceId}`
-      );
-    } else {
-      const createInstancePayload = {
+      const instanceConfig = {
         type: currentInstanceType,
         ...(currentTimeframe?.id && { timeframe_id: currentTimeframe.id }),
         ...(currentTimeframe?.checkpoint_id && {
@@ -261,43 +250,112 @@ export const services = {
         }),
       };
 
-      instance = await apiClient.post(
-        `/project/${projectId}/instance`,
-        createInstancePayload
+      // Fetch active instances for this project
+      const activeInstances = await apiClient.get(
+        `/project/${projectId}/instance/?status=active&type=${currentInstanceType}`
       );
-    }
 
-    // Confirm instance has running status
-    let instanceStatus;
-    let creationDuration = 0;
-    while (
-      !instanceStatus ||
-      creationDuration < config.instanceCreationTimeout
-    ) {
-      // Get instance status
-      instanceStatus = await apiClient.get(
-        `project/${projectId}/instance/${instance.id}`
-      );
-      const instancePhase = get(instanceStatus, 'status.phase');
-
-      // Process status
-      if (instancePhase === 'Running' && instanceStatus.active) {
-        break;
-      } else if (instancePhase === 'Failed') {
-        throw new Error('Instance creation failed');
+      // Reuse existing instance if available
+      if (activeInstances.total > 0) {
+        const { id: instanceId } = activeInstances.instances[0];
+        instance = await apiClient.get(
+          `/project/${projectId}/instance/${instanceId}`
+        );
+      } else {
+        instance = await apiClient.post(
+          `/project/${projectId}/instance`,
+          instanceConfig
+        );
       }
 
-      // Update timer
-      await delay(config.instanceCreationCheckInterval);
-      creationDuration += config.instanceCreationCheckInterval;
+      // Confirm instance has running status
+      let instanceStatus;
+      let creationDuration = 0;
+      while (
+        !instanceStatus ||
+        creationDuration < config.instanceCreationTimeout
+      ) {
+        // Get instance status
+        instanceStatus = await apiClient.get(
+          `project/${projectId}/instance/${instance.id}`
+        );
+        const instancePhase = get(instanceStatus, 'status.phase');
 
-      // Check timeout
-      if (creationDuration >= config.instanceCreationTimeout) {
-        throw new Error('Instance creation timeout');
+        // Process status
+        if (instancePhase === 'Running' && instanceStatus.active) {
+          break;
+        } else if (instancePhase === 'Failed') {
+          throw new Error('Instance creation failed');
+        }
+
+        // Update timer
+        await delay(config.instanceCreationCheckInterval);
+        creationDuration += config.instanceCreationCheckInterval;
+
+        // Check timeout
+        if (creationDuration >= config.instanceCreationTimeout) {
+          throw new Error('Instance creation timeout');
+        }
       }
-    }
 
-    return { instance };
+      const { token } = instance;
+      const websocket = new WebsocketClient(token);
+
+      callback({
+        type: 'Instance is running',
+        data: { instance, instanceWebsocket: websocket },
+      });
+
+      websocket.addEventListener('message', (e) => {
+        const { message, data } = JSON.parse(e.data);
+
+        switch (message) {
+          case 'error':
+            callback({
+              type: 'Activation has errored',
+              data: { error: data.error },
+            });
+            break;
+          case 'info#connected':
+            // After connection, send a message to the server to request
+            // model status
+            websocket.sendMessage({
+              action: 'model#status',
+            });
+            break;
+          case 'info#disconnected':
+            // After connection, send a message to the server to request
+            // model status
+            websocket.sendMessage({
+              action: 'model#status',
+            });
+            break;
+          case 'model#status':
+            if (
+              data.processing &&
+              instanceConfig.timeframe_id !== data.timeframe_id
+            ) {
+              websocket.sendMessage({
+                action: 'model#abort',
+              });
+            } else if (instanceConfig.timeframe_id !== data.timeframe_id) {
+              websocket.sendMessage({
+                action: 'model#timeframe',
+                timeframe_id: instanceConfig.timeframe_id,
+              });
+            } else {
+              callback({
+                type: 'Instance is ready',
+              });
+            }
+            break;
+
+          default:
+            logger('Unhandled websocket message', message, data);
+            break;
+        }
+      });
+    }
   },
   runPrediction: (context) => (callback, onReceive) => {
     const { token } = context.currentInstance;

@@ -411,6 +411,12 @@ export const actions = {
     sessionMode: SESSION_MODES.PREDICT,
     sessionStatusMessage: 'Ready for prediction run',
   })),
+  enterActivatingInstance: assign(() => ({
+    globalLoading: {
+      disabled: false,
+      message: 'Activating instance...',
+    },
+  })),
   enterPredictionRun: assign(() => ({
     sessionStatusMessage: 'Running prediction',
     globalLoading: {
