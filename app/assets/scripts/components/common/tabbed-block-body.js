@@ -123,7 +123,6 @@ function TabbedBlock(props) {
                   data-cy={`${name}-tab`}
                   active={ind === activeTab}
                   useIcon={icon}
-                  title='Show menu'
                   size='small'
                   visuallyDisabled={disabled}
                   info={disabled ? tabTooltip : null}

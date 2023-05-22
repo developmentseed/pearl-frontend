@@ -22,7 +22,7 @@ import { BatchPredictionPanel } from './batch-prediction-panel';
 import { ProjectMachineContext } from '../../../fsm/project';
 import { SESSION_MODES } from '../../../fsm/project/constants';
 import selectors from '../../../fsm/project/selectors';
-import guards from '../../../fsm/project/guards';
+import * as guards from '../../../fsm/project/guards';
 
 const StyledPanelBlock = styled(PanelBlock)`
   ${media.largeUp`
@@ -48,7 +48,9 @@ export function PrimePanel() {
   const isLargeAoi = ProjectMachineContext.useSelector((s) =>
     guards.isLargeAoi(s.context)
   );
-  const currentAoi = ProjectMachineContext.useSelector(selectors.currentAoi);
+  const retrainModeEnabled = ProjectMachineContext.useSelector(({ context }) =>
+    guards.retrainModeEnabled(context)
+  );
 
   return (
     <>
@@ -87,7 +89,7 @@ export function PrimePanel() {
                       ? 'Retrain is not available for large areas'
                       : 'Retrain is not available until model has been run over AOI.'
                   }
-                  disabled={isLargeAoi || !currentAoi}
+                  disabled={!retrainModeEnabled}
                   onTabClick={() =>
                     actorRef.send({
                       type: 'Switch to retrain mode',
