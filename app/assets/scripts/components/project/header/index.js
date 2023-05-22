@@ -136,6 +136,8 @@ const selectors = {
   currentShare: (state) => get(state, 'context.currentShare'),
   currentInstanceType: (state) =>
     get(state, 'context.currentInstanceType', 'cpu'),
+  canSwitchInstanceType: (state) =>
+    state.matches('Prediction ready') || state.matches('Retrain ready'),
 };
 
 function ProjectPageHeader({ isMediumDown }) {
@@ -155,6 +157,9 @@ function ProjectPageHeader({ isMediumDown }) {
   );
   const currentInstanceType = ProjectMachineContext.useSelector(
     selectors.currentInstanceType
+  );
+  const canSwitchInstanceType = ProjectMachineContext.useSelector(
+    selectors.canSwitchInstanceType
   );
   const nextInstanceType = currentInstanceType === 'cpu' ? 'gpu' : 'cpu';
 
@@ -241,14 +246,16 @@ function ProjectPageHeader({ isMediumDown }) {
         <Button
           data-cy='toggle-instance-type-button'
           variation='primary-plain'
+          disabled={!canSwitchInstanceType}
           title={`Click to switch to ${nextInstanceType.toUpperCase()} instance`}
           onClick={() => {
-            actorRef.send({
-              type: 'Switch current instance type',
-              data: {
-                instanceType: nextInstanceType,
-              },
-            });
+            canSwitchInstanceType &&
+              actorRef.send({
+                type: 'Switch current instance type',
+                data: {
+                  instanceType: nextInstanceType,
+                },
+              });
           }}
         >
           {currentInstanceType.toUpperCase()}
