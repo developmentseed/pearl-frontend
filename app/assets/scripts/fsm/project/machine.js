@@ -339,7 +339,11 @@ export const projectMachine = createMachine(
             target: 'Retrain ready',
             cond: 'retrainModeEnabled',
           },
-          'Prediction ready',
+          {
+            target: 'Prediction ready',
+            cond: 'isPredictionReady',
+          },
+          'Configuring new AOI',
         ],
       },
 

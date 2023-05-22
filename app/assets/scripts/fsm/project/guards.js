@@ -15,6 +15,18 @@ export const isRetrainReady = (context) => {
   );
 };
 
+export const isPredictionReady = (context) => {
+  const {
+    currentImagerySource,
+    currentMosaic,
+    currentModel,
+    currentAoi,
+  } = context;
+  return (
+    !!currentAoi && !!currentImagerySource && !!currentMosaic && !!currentModel
+  );
+};
+
 export const isProjectNew = (c) => c.project.id === 'new';
 export const isFirstAoi = (c) => c.aoisList?.length === 0;
 export const isAoiNew = ({ currentAoi }) => !currentAoi || !currentAoi.id;

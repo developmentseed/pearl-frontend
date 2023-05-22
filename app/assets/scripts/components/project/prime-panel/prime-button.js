@@ -11,8 +11,8 @@ export function PrimeButton() {
   const isLargeAoi = ProjectMachineContext.useSelector((s) =>
     guards.isLargeAoi(s.context)
   );
-  const isPredictionReady = ProjectMachineContext.useSelector(
-    selectors.isPredictionReady
+  const isPredictionReady = ProjectMachineContext.useSelector(({ context }) =>
+    guards.isPredictionReady(context)
   );
   const isRetrainReady = ProjectMachineContext.useSelector(
     selectors.isRetrainReady
