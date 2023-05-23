@@ -434,6 +434,19 @@ export const actions = {
     sessionMode: SESSION_MODES.RETRAIN,
     sessionStatusMessage: 'Ready for retrain run',
   })),
+  exitRetrainMode: assign((context) => {
+    const { freehandDraw, polygonDraw } = context.mapRef;
+
+    // Disable all draw modes
+    freehandDraw.clearLayers();
+    freehandDraw.disable();
+    polygonDraw.disable();
+
+    return {
+      retrainSamples: [],
+      retrainMapMode: RETRAIN_MAP_MODES.BROWSE,
+    };
+  }),
   enterRetrainRun: assign(() => ({
     sessionStatusMessage: 'Running retrain',
     globalLoading: {
@@ -600,6 +613,11 @@ export const actions = {
       },
     };
   }),
+  setGlobalLoading: assign((context, event) => ({
+    globalLoading: {
+      ...event.data.globalLoading,
+    },
+  })),
   hideGlobalLoading: assign(() => ({
     globalLoading: {
       disabled: true,

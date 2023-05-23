@@ -8,6 +8,7 @@ import logger from '../../utils/logger';
 import toasts from '../../components/common/toasts';
 import { getMosaicTileUrl } from './helpers';
 import { SESSION_MODES } from './constants';
+import { round } from '../../utils/format';
 
 export const services = {
   fetchInitialData: async (context) => {
@@ -263,8 +264,8 @@ export const services = {
         );
       } else {
         instance = await apiClient.post(
-          `/project/${projectId}/instance`
-          // instanceConfig
+          `/project/${projectId}/instance`,
+          instanceConfig
         );
       }
 
@@ -375,7 +376,7 @@ export const services = {
     onReceive((event) => {
       if (event.type === 'Abort button pressed') {
         websocket.sendMessage({
-          action: 'instance#terminate',
+          action: 'model#abort',
         });
         // Ideally we should thrown an error here to make the service
         // execute the 'onError' event, but XState doesn't support errors
@@ -518,9 +519,9 @@ export const services = {
 
       switch (message) {
         case 'error':
-          // Send terminate message to errored instance
+          // Send abort message to errored instance
           websocket.sendMessage({
-            action: 'instance#terminate',
+            action: 'model#abort',
           });
 
           // Send error message to the machine
@@ -587,8 +588,16 @@ export const services = {
           break;
         case 'model#timeframe#progress':
           callback({
-            type: 'Received prediction progress',
-            data,
+            type: 'Received timeframe progress',
+            data: {
+              globalLoading: {
+                disabled: false,
+                message: `Loading timeframe progress: ${round(
+                  (data.processed / data.total) * 100,
+                  0
+                )}%`,
+              },
+            },
           });
           websocket.sendMessage({
             action: 'model#status',
@@ -596,8 +605,39 @@ export const services = {
           break;
         case 'model#timeframe#complete':
           callback({
-            type: 'Prediction run was completed',
-            data,
+            type: 'Timeframe was applied to the instance',
+            data: {
+              globalLoading: {
+                disabled: false,
+                message: `Timeframe was loaded`,
+              },
+            },
+          });
+          break;
+        case 'model#retrain#progress': {
+          callback({
+            type: 'Received retrain progress',
+            data: {
+              globalLoading: {
+                disabled: false,
+                message: `Retrain progress: ${round(
+                  (data.processed / data.total) * 100,
+                  0
+                )}%`,
+              },
+            },
+          });
+          break;
+        }
+        case 'model#retrain#complete':
+          callback({
+            type: 'Received retrain progress',
+            data: {
+              globalLoading: {
+                disabled: false,
+                message: `Retrain was finished, loading predictions...`,
+              },
+            },
           });
           break;
 
