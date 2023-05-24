@@ -25,6 +25,7 @@ export const services = {
     let checkpointList = [];
     let sharesList = [];
     let currentAoi;
+    let currentCheckpoint;
     let currentTimeframe;
     let currentImagerySource;
     let currentMosaic;
@@ -99,6 +100,12 @@ export const services = {
       checkpointList = (await apiClient.get(`project/${projectId}/checkpoint`))
         .checkpoints;
 
+      if (currentTimeframe) {
+        currentCheckpoint = await apiClient.get(
+          `project/${projectId}/checkpoint/${currentTimeframe.checkpoint_id}`
+        );
+      }
+
       sharesList = (await apiClient.get(`project/${projectId}/share`)).shares;
 
       currentShare = sharesList.find(
@@ -131,6 +138,7 @@ export const services = {
       sharesList,
       currentAoi,
       currentTimeframe,
+      currentCheckpoint,
       currentImagerySource,
       currentMosaic: {
         ...currentMosaic,
