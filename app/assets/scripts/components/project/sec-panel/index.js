@@ -71,8 +71,6 @@ function SecPanel() {
     <Panel
       collapsible
       direction='right'
-      overrideControl
-      revealed={true}
       initialState={currentCheckpoint.classes ? true : false}
       bodyContent={
         <PanelBlock>

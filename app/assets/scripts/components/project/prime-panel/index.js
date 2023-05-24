@@ -58,8 +58,6 @@ export function PrimePanel() {
       <Panel
         data-cy='primary-panel'
         collapsible
-        overrideControl
-        revealed={true}
         direction='left'
         initialState={true}
         fitContent
