@@ -19,11 +19,14 @@ export function MosaicSelector() {
   const mosaicSelector = ProjectMachineContext.useSelector(
     selectors.mosaicSelectorStatus
   );
+  const currentImagerySource = ProjectMachineContext.useSelector(
+    selectors.currentImagerySource
+  );
   const currentMosaic = ProjectMachineContext.useSelector(
     selectors.currentMosaic
   );
 
-  const { disabled } = mosaicSelector;
+  const disabled = mosaicSelector?.disabled || !currentImagerySource;
 
   const label = currentMosaic?.name || mosaicSelector.placeholderLabel;
 
@@ -42,19 +45,21 @@ export function MosaicSelector() {
         >
           {label}
         </SubheadingStrong>
-        <HeadOptionToolbar>
-          <EditButton
-            useIcon='swap-horizontal'
-            id='select-mosaic-trigger'
-            disabled={disabled}
-            onClick={() => {
-              !disabled && setShowModal(true);
-            }}
-            title='Select Imagery Mosaic'
-          >
-            Edit Mosaic Selection
-          </EditButton>
-        </HeadOptionToolbar>
+        {!disabled && (
+          <HeadOptionToolbar>
+            <EditButton
+              useIcon='swap-horizontal'
+              id='select-mosaic-trigger'
+              disabled={disabled}
+              onClick={() => {
+                !disabled && setShowModal(true);
+              }}
+              title='Select Imagery Mosaic'
+            >
+              Edit Mosaic Selection
+            </EditButton>
+          </HeadOptionToolbar>
+        )}
       </HeadOption>
     </>
   );

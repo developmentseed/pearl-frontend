@@ -45,17 +45,19 @@ export function ImagerySourceSelector() {
         >
           {label}
         </SubheadingStrong>
-        <HeadOptionToolbar>
-          <EditButton
-            useIcon='swap-horizontal'
-            id='select-mosaic-trigger'
-            disabled={disabled}
-            onClick={() => setShowModal(true)}
-            title='Select Imagery ImagerySource'
-          >
-            Edit Imagery ImagerySource Selection
-          </EditButton>
-        </HeadOptionToolbar>
+        {!disabled && (
+          <HeadOptionToolbar>
+            <EditButton
+              useIcon='swap-horizontal'
+              id='select-mosaic-trigger'
+              disabled={disabled}
+              onClick={() => setShowModal(true)}
+              title='Select Imagery ImagerySource'
+            >
+              Edit Imagery ImagerySource Selection
+            </EditButton>
+          </HeadOptionToolbar>
+        )}
       </HeadOption>
     </>
   );

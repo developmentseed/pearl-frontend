@@ -46,6 +46,13 @@ export function MosaicSelectorModal({ showModal, setShowModal }) {
   const currentMosaic = ProjectMachineContext.useSelector(
     selectors.currentMosaic
   );
+  const currentImagerySource = ProjectMachineContext.useSelector(
+    selectors.currentImagerySource
+  );
+
+  const selectableMosaics = mosaicsList.filter(
+    (mosaic) => mosaic.imagery_source_id === currentImagerySource?.id
+  );
 
   return (
     <Modal
@@ -84,7 +91,7 @@ export function MosaicSelectorModal({ showModal, setShowModal }) {
           <CardList
             nonScrolling
             numColumns={2}
-            data={mosaicsList}
+            data={selectableMosaics}
             renderCard={(mosaic) => {
               const {
                 id,
