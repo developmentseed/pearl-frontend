@@ -15,6 +15,7 @@ import DetailsList from '../../common/details-list';
 import { AbortBatchJobButton } from '../../common/abort-batch-button';
 import { StyledTooltip } from '../../common/tooltip';
 import get from 'lodash.get';
+import selectors from '../../../fsm/project/selectors';
 
 const ProgressButtonWrapper = styled.div`
   display: flex;
@@ -36,11 +37,6 @@ const Block = styled.div`
   display: block;
   padding-top: 1rem;
 `;
-
-const selectors = {
-  projectId: ({ context }) => context.project?.id,
-  currentBatchPrediction: ({ context }) => context.currentBatchPrediction,
-};
 
 function BatchPredictionProgressModal({
   runningBatch,

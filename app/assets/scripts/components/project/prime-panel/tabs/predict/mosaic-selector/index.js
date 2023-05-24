@@ -11,21 +11,16 @@ import {
   SubheadingStrong,
 } from '../../../../../../styles/type/heading';
 import { MosaicSelectorModal } from './modal';
-
-export const mosaicsSelectors = {
-  selectorStatus: (state) => state.context.mosaicSelector,
-  currentMosaic: (state) => state.context.currentMosaic,
-  mosaicsList: (state) => state.context.mosaicsList,
-};
+import selectors from '../../../../../../fsm/project/selectors';
 
 export function MosaicSelector() {
   const [showModal, setShowModal] = useState(false);
 
   const mosaicSelector = ProjectMachineContext.useSelector(
-    mosaicsSelectors.selectorStatus
+    selectors.mosaicSelectorStatus
   );
   const currentMosaic = ProjectMachineContext.useSelector(
-    mosaicsSelectors.currentMosaic
+    selectors.currentMosaic
   );
 
   const { disabled } = mosaicSelector;

@@ -14,6 +14,7 @@ import { inRange } from '../../../utils/utils';
 import getFeatureArea from '@turf/area';
 import get from 'lodash.get';
 import { ProjectMachineContext } from '../../../fsm/project';
+import selectors from '../../../fsm/project/selectors';
 
 const Wrapper = styled.div`
   display: grid;
@@ -29,11 +30,6 @@ const Wrapper = styled.div`
   }
   grid-gap: 1rem;
 `;
-
-const selectors = {
-  uploadAoiModal: (state) => state.context.uploadAoiModal,
-  apiLimits: (state) => state.context.apiLimits,
-};
 
 function UploadAoiModal() {
   const actorRef = ProjectMachineContext.useActorRef();

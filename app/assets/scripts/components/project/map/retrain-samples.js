@@ -4,12 +4,7 @@ import L from 'leaflet';
 import GeoJSONLayer from '../../common/map/geojson-layer';
 import { SESSION_MODES } from '../../../fsm/project/constants';
 import { ProjectMachineContext } from '../../../fsm/project';
-
-const selectors = {
-  sessionMode: (state) => state.context.sessionMode,
-  retrainSamples: (state) => state.context.retrainSamples,
-  retrainClasses: (state) => state.context.retrainClasses,
-};
+import selectors from '../../../fsm/project/selectors';
 
 export function RetrainSamples() {
   const sessionMode = ProjectMachineContext.useSelector(selectors.sessionMode);

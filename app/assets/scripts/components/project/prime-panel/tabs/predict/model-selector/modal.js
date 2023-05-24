@@ -6,9 +6,9 @@ import { Button } from '@devseed-ui/button';
 import { Modal } from '@devseed-ui/modal';
 
 import { ProjectMachineContext } from '../../../../../../fsm/project';
-import { modelSelectors } from '.';
 import CardList from '../../../../../common/card-list';
 import { ModelCard } from './model-card';
+import selectors from '../../../../../../fsm/project/selectors';
 
 const ModalContent = styled.div`
   display: block;
@@ -25,11 +25,9 @@ export function ModelSelectorModal({ showModal, setShowModal }) {
   const [modelFilter, setModelFilter] = useState('');
 
   const actorRef = ProjectMachineContext.useActorRef();
-  const modelsList = ProjectMachineContext.useSelector(
-    modelSelectors.modelsList
-  );
+  const modelsList = ProjectMachineContext.useSelector(selectors.modelsList);
   const currentModel = ProjectMachineContext.useSelector(
-    modelSelectors.currentModel
+    selectors.currentModel
   );
 
   return (

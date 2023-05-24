@@ -12,7 +12,6 @@ import { FormInput } from '@devseed-ui/form';
 import { ProjectMachineContext } from '../../../fsm/project';
 
 import { Modal } from '../../common/custom-modal';
-import get from 'lodash.get';
 import { useHistory } from 'react-router';
 import {
   Dropdown,
@@ -29,6 +28,7 @@ import {
   getShareLink,
 } from '../../../utils/share-link';
 import { useAuth } from '../../../context/auth';
+import selectors from '../../../fsm/project/selectors';
 
 const Wrapper = styled.div`
   flex: 1;
@@ -126,19 +126,6 @@ const ModalForm = styled(Form)`
   display: grid;
   grid-gap: ${glsp(1)};
 `;
-
-const selectors = {
-  displayProjectNameModal: (state) =>
-    state.matches('Entering new project name'),
-  projectName: (state) => get(state, 'context.project.name', ''),
-  sessionStatusMessage: (state) =>
-    get(state, 'context.sessionStatusMessage', {}),
-  currentShare: (state) => get(state, 'context.currentShare'),
-  currentInstanceType: (state) =>
-    get(state, 'context.currentInstanceType', 'cpu'),
-  canSwitchInstanceType: (state) =>
-    state.matches('Prediction ready') || state.matches('Retrain ready'),
-};
 
 function ProjectPageHeader({ isMediumDown }) {
   const history = useHistory();

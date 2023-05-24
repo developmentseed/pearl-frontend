@@ -6,15 +6,11 @@ import { themeVal } from '@devseed-ui/theme-provider';
 import { ProjectMachineContext } from '../../../../../../fsm/project';
 
 import { ActionButton } from '../../../../../../styles/button';
+import selectors from '../../../../../../fsm/project/selectors';
 
 const Separator = styled.span`
   color: ${themeVal('color.baseAlphaD')};
 `;
-
-const selectors = {
-  aoiActionButtons: (state) => state.context.aoiActionButtons,
-  currentAoi: (state) => state.context.currentAoi,
-};
 
 export function AoiActionButtons({ setAoiIdToDelete }) {
   const actorRef = ProjectMachineContext.useActorRef();

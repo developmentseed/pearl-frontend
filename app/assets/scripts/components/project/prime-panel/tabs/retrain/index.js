@@ -19,6 +19,7 @@ import { Dropdown, DropdownTrigger } from '../../../../../styles/dropdown';
 import { ProjectMachineContext } from '../../../../../fsm/project';
 import get from 'lodash.get';
 import { RETRAIN_MAP_MODES } from '../../../../../fsm/project/constants';
+import selectors from '../../../../../fsm/project/selectors';
 
 export const ToolsWrapper = styled.div`
   display: grid;
@@ -307,12 +308,6 @@ export const ClassThumbnail = styled.div`
       }
     `};
 `;
-
-const selectors = {
-  retrainClasses: (state) => state.context.retrainClasses,
-  retrainMapMode: (state) => state.context.retrainMapMode,
-  retrainActiveClass: (state) => state.context.retrainActiveClass,
-};
 
 function RetrainTab({ className }) {
   const actorRef = ProjectMachineContext.useActorRef();

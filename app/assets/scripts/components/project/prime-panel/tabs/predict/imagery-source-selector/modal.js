@@ -7,7 +7,7 @@ import { Button } from '@devseed-ui/button';
 import { Heading } from '@devseed-ui/typography';
 import CardList, { Card } from '../../../../../common/card-list';
 import { ProjectMachineContext } from '../../../../../../fsm/project';
-import { imagerySourceSelectors } from '.';
+import selectors from '../../../../../../fsm/project/selectors';
 
 const ModalHeader = styled.header`
   padding: ${glsp(2)} ${glsp(2)} 0;
@@ -43,10 +43,10 @@ const HeadingWrapper = styled.div`
 export function ImagerySourceSelectorModal({ showModal, setShowModal }) {
   const actorRef = ProjectMachineContext.useActorRef();
   const imagerySourcesList = ProjectMachineContext.useSelector(
-    imagerySourceSelectors.imagerySourcesList
+    selectors.imagerySourcesList
   );
   const currentImagerySource = ProjectMachineContext.useSelector(
-    imagerySourceSelectors.currentImagerySource
+    selectors.currentImagerySource
   );
 
   return (

@@ -23,6 +23,7 @@ import { RETRAIN_MAP_MODES } from '../../../fsm/project/constants';
 import { RetrainSamples } from './retrain-samples';
 import FreehandDrawControl from './freehand-draw-control';
 import PolygonDrawControl from './polygon-draw-control';
+import selectors from '../../../fsm/project/selectors';
 
 const center = [19.22819, -99.995841];
 const zoom = 12;
@@ -70,19 +71,6 @@ function getEventLatLng(event) {
   } = event;
   return [lat, lng];
 }
-
-const selectors = {
-  isLoadingMap: (state) => state.matches('Creating map'),
-  sessionMode: (state) => state.context.sessionMode,
-  retrainMapMode: (state) => state.context.retrainMapMode,
-  retrainClasses: (state) => state.context.retrainClasses,
-  retrainSamples: (state) => state.context.retrainSamples,
-  mapEventHandlers: (state) => state.context.mapEventHandlers,
-  currentAoi: (state) => state.context.currentAoi,
-  currentPrediction: (state) => state.context.currentPrediction,
-  currentTilejson: (state) => get(state, 'context.currentTimeframe.tilejson'),
-  mosaicTileUrl: (state) => get(state, 'context.currentMosaic.tileUrl'),
-};
 
 function Map() {
   const { apiToken } = useAuth();

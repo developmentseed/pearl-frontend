@@ -11,21 +11,15 @@ import {
   SubheadingStrong,
 } from '../../../../../../styles/type/heading';
 import { ModelSelectorModal } from './modal';
-
-export const modelSelectors = {
-  selectorStatus: (state) => state.context.modelSelector,
-  currentModel: (state) => state.context.currentModel,
-  currentImagerySource: (state) => state.context.currentImagerySource,
-  modelsList: (state) => state.context.modelsList,
-};
+import selectors from '../../../../../../fsm/project/selectors';
 
 export function ModelSelector() {
   const [showModal, setShowModal] = useState(false);
   const modelSelector = ProjectMachineContext.useSelector(
-    modelSelectors.selectorStatus
+    selectors.modelSelectorStatus
   );
   const currentModel = ProjectMachineContext.useSelector(
-    modelSelectors.currentModel
+    selectors.currentModel
   );
 
   const { disabled, hidden } = modelSelector;

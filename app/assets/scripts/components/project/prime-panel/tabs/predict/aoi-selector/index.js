@@ -3,7 +3,6 @@ import T from 'prop-types';
 import styled, { css } from 'styled-components';
 import { glsp } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
-import get from 'lodash.get';
 
 import { AoiActionButtons } from './action-buttons';
 import {
@@ -19,6 +18,7 @@ import { SelectorHeadOption, SelectorOption } from '../../../selection-styles';
 import { formatThousands } from '../../../../../../utils/format';
 import { ConfirmAoiChangeModal } from './modals/confirm-aoi-change';
 import { ConfirmAoiDeleteModal } from './modals/confirm-aoi-delete';
+import selectors from '../../../../../../fsm/project/selectors';
 
 const AoiOption = styled(SelectorOption)`
   grid-template-columns: auto min-content;
@@ -71,12 +71,6 @@ const ActiveAoiOption = ({ label, area }) => {
 ActiveAoiOption.propTypes = {
   label: T.string,
   area: T.number,
-};
-
-const selectors = {
-  aoiStatusMessage: (state) => state.context.aoiStatusMessage,
-  currentAoi: (state) => state.context.currentAoi,
-  aoisList: (state) => get(state, 'context.aoisList', []),
 };
 
 export function AoiSelector() {

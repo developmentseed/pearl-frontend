@@ -7,7 +7,7 @@ import { Button } from '@devseed-ui/button';
 import { Heading } from '@devseed-ui/typography';
 import CardList, { Card } from '../../../../../common/card-list';
 import { ProjectMachineContext } from '../../../../../../fsm/project';
-import { mosaicsSelectors } from '.';
+import selectors from '../../../../../../fsm/project/selectors';
 
 const ModalHeader = styled.header`
   padding: ${glsp(2)} ${glsp(2)} 0;
@@ -42,11 +42,9 @@ const HeadingWrapper = styled.div`
 
 export function MosaicSelectorModal({ showModal, setShowModal }) {
   const actorRef = ProjectMachineContext.useActorRef();
-  const mosaicsList = ProjectMachineContext.useSelector(
-    mosaicsSelectors.mosaicsList
-  );
+  const mosaicsList = ProjectMachineContext.useSelector(selectors.mosaicsList);
   const currentMosaic = ProjectMachineContext.useSelector(
-    mosaicsSelectors.currentMosaic
+    selectors.currentMosaic
   );
 
   return (

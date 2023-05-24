@@ -11,20 +11,15 @@ import {
   SubheadingStrong,
 } from '../../../../../../styles/type/heading';
 import { ImagerySourceSelectorModal } from './modal';
-
-export const imagerySourceSelectors = {
-  selectorStatus: (state) => state.context.imagerySourceSelector,
-  currentImagerySource: (state) => state.context.currentImagerySource,
-  imagerySourcesList: (state) => state.context.imagerySourcesList,
-};
+import selectors from '../../../../../../fsm/project/selectors';
 
 export function ImagerySourceSelector() {
   const [showModal, setShowModal] = useState(false);
   const imagerySourceSelector = ProjectMachineContext.useSelector(
-    imagerySourceSelectors.selectorStatus
+    selectors.imagerySourceSelectorStatus
   );
   const currentImagerySource = ProjectMachineContext.useSelector(
-    imagerySourceSelectors.currentImagerySource
+    selectors.currentImagerySource
   );
 
   const { disabled } = imagerySourceSelector;
