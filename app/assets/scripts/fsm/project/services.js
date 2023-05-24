@@ -347,8 +347,12 @@ export const services = {
                 });
               }
             } else {
-              // Apply current timeframe to instance
-              if (instanceConfig.timeframe_id !== data.timeframe) {
+              // If a timeframe is specified and it is different from the
+              // current timeframe, request it
+              if (
+                instanceConfig.timeframe_id &&
+                instanceConfig.timeframe_id !== data.timeframe
+              ) {
                 websocket.sendMessage({
                   action: 'model#timeframe',
                   data: {
