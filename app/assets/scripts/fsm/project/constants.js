@@ -2,6 +2,7 @@
  * Session modes
  */
 export const SESSION_MODES = {
+  LOADING: 'LOADING',
   PREDICT: 'PREDICT',
   RETRAIN: 'RETRAIN',
 };

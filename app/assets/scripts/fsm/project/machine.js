@@ -23,7 +23,7 @@ export const projectMachine = createMachine(
       },
       project: {},
       sessionStatusMessage: 'Loading...',
-      sessionMode: SESSION_MODES.PREDICT,
+      sessionMode: SESSION_MODES.LOADING,
       aoiStatusMessage: 'Loading...',
       aoiActionButtons: {
         uploadAoi: true,

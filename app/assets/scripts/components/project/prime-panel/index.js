@@ -42,6 +42,13 @@ const PanelControls = styled(PanelBlockFooter)`
     `}
 `;
 
+// Map session mode to selected tab index
+const tabIndexes = {
+  [SESSION_MODES.LOADING]: 0,
+  [SESSION_MODES.PREDICT]: 0,
+  [SESSION_MODES.RETRAIN]: 1,
+};
+
 export function PrimePanel() {
   const actorRef = ProjectMachineContext.useActorRef();
   const sessionMode = ProjectMachineContext.useSelector(selectors.sessionMode);
@@ -64,9 +71,7 @@ export function PrimePanel() {
         bodyContent={
           <StyledPanelBlock>
             <PanelBlockBody>
-              <TabbedBlock
-                activeTab={Object.values(SESSION_MODES).indexOf(sessionMode)}
-              >
+              <TabbedBlock activeTab={tabIndexes[sessionMode]}>
                 <PredictTab
                   name='predict'
                   className='predict-model'
