@@ -220,11 +220,21 @@ export const actions = {
     },
   })),
   setCurrentCheckpoint: assign((context, event) => ({
-    currentCheckpoint: event.data,
+    currentCheckpoint: event.data.checkpoint,
   })),
-  setCurrentTimeframe: assign((context, event) => ({
-    currentTimeframe: event.data.timeframe,
-  })),
+  setCurrentTimeframe: assign((context, event) => {
+    const newTimeframe = event.data.timeframe;
+
+    // Apply new timeframe and (re-)initialize retrain classes
+    return {
+      currentTimeframe: { ...newTimeframe },
+      retrainClasses: newTimeframe.classes
+        ? Object.keys(newTimeframe.classes).map((key) => ({
+            ...newTimeframe.classes[key],
+          }))
+        : [],
+    };
+  }),
   setCurrentBatchPrediction: assign((context, event) => ({
     currentBatchPrediction: event.data.batchPrediction,
   })),
@@ -281,17 +291,17 @@ export const actions = {
       },
     };
   }),
-  updateCurrentPrediction: assign((context, { data }) => {
+  updateCurrentPrediction: assign((context, { data: { prediction } }) => {
     let predictions = get(context, 'currentPrediction.predictions', []);
 
     // Add prediction to the list if bounds exists
-    if (data.bounds) {
-      const [minX, minY, maxX, maxY] = data.bounds;
+    if (prediction.bounds) {
+      const [minX, minY, maxX, maxY] = prediction.bounds;
 
       // Build prediction object
       predictions = predictions.concat({
         key: predictions.length + 1,
-        image: `data:image/png;base64,${data.image}`,
+        image: `data:image/png;base64,${prediction.image}`,
         bounds: [
           [minY, minX],
           [maxY, maxX],
@@ -300,11 +310,11 @@ export const actions = {
     }
 
     return {
-      sessionStatusMessage: `Received image ${data.processed} of ${data.total}...`,
+      sessionStatusMessage: `Received image ${prediction.processed} of ${prediction.total}...`,
       currentPrediction: {
         ...context.currentPrediction,
-        processed: data.processed,
-        total: data.total,
+        processed: prediction.processed,
+        total: prediction.total,
         predictions,
       },
     };

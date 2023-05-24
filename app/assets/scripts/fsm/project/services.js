@@ -245,138 +245,137 @@ export const services = {
     };
   },
   activateInstance: (context) => async (callback) => {
-    {
-      const { apiClient, currentInstanceType, currentTimeframe } = context;
-      const { id: projectId } = context.project;
+    const { apiClient, currentInstanceType, currentTimeframe } = context;
+    const { id: projectId } = context.project;
 
-      let instance;
+    let instance;
 
-      const instanceConfig = {
-        type: currentInstanceType,
-        ...(currentTimeframe?.id && { timeframe_id: currentTimeframe.id }),
-        ...(currentTimeframe?.checkpoint_id && {
-          checkpoint_id: currentTimeframe.checkpoint_id,
-        }),
-      };
+    const instanceConfig = {
+      type: currentInstanceType,
+      ...(currentTimeframe?.id && { timeframe_id: currentTimeframe.id }),
+      ...(currentTimeframe?.checkpoint_id && {
+        checkpoint_id: currentTimeframe.checkpoint_id,
+      }),
+    };
 
-      // Fetch active instances for this project
-      const activeInstances = await apiClient.get(
-        `/project/${projectId}/instance/?status=active&type=${currentInstanceType}`
+    // Fetch active instances for this project
+    const activeInstances = await apiClient.get(
+      `/project/${projectId}/instance/?status=active&type=${currentInstanceType}`
+    );
+
+    // Reuse existing instance if available
+    if (activeInstances.total > 0) {
+      const { id: instanceId } = activeInstances.instances[0];
+      instance = await apiClient.get(
+        `/project/${projectId}/instance/${instanceId}`
       );
-
-      // Reuse existing instance if available
-      if (activeInstances.total > 0) {
-        const { id: instanceId } = activeInstances.instances[0];
-        instance = await apiClient.get(
-          `/project/${projectId}/instance/${instanceId}`
-        );
-      } else {
-        instance = await apiClient.post(
-          `/project/${projectId}/instance`,
-          instanceConfig
-        );
-      }
-
-      // Confirm instance has running status
-      let instanceStatus;
-      let creationDuration = 0;
-      while (
-        !instanceStatus ||
-        creationDuration < config.instanceCreationTimeout
-      ) {
-        // Get instance status
-        instanceStatus = await apiClient.get(
-          `project/${projectId}/instance/${instance.id}`
-        );
-        const instancePhase = get(instanceStatus, 'status.phase');
-
-        // Process status
-        if (instancePhase === 'Running' && instanceStatus.active) {
-          break;
-        } else if (instancePhase === 'Failed') {
-          throw new Error('Instance creation failed');
-        }
-
-        // Update timer
-        await delay(config.instanceCreationCheckInterval);
-        creationDuration += config.instanceCreationCheckInterval;
-
-        // Check timeout
-        if (creationDuration >= config.instanceCreationTimeout) {
-          throw new Error('Instance creation timeout');
-        }
-      }
-
-      const { token } = instance;
-      const websocket = new WebsocketClient(token);
-
-      callback({
-        type: 'Instance is running',
-      });
-
-      websocket.addEventListener('message', (e) => {
-        const { message, data } = JSON.parse(e.data);
-
-        switch (message) {
-          case 'error':
-            callback({
-              type: 'Activation has errored',
-              data: { error: data.error },
-            });
-            break;
-          case 'info#connected':
-          case 'model#timeframe#complete':
-            // After connection, request status
-            websocket.sendMessage({
-              action: 'model#status',
-            });
-            break;
-          case 'info#disconnected':
-            // After connection, send a message to the server to request
-            // model status
-            websocket.sendMessage({
-              action: 'model#status',
-            });
-            break;
-          case 'model#status':
-            if (data.processing) {
-              // Instance is processing a different timeframe, abort it
-              if (instanceConfig.timeframe_id !== data.timeframe) {
-                websocket.sendMessage({
-                  action: 'model#abort',
-                });
-              }
-            } else {
-              // If a timeframe is specified and it is different from the
-              // current timeframe, request it
-              if (
-                instanceConfig.timeframe_id &&
-                instanceConfig.timeframe_id !== data.timeframe
-              ) {
-                websocket.sendMessage({
-                  action: 'model#timeframe',
-                  data: {
-                    id: instanceConfig.timeframe_id,
-                  },
-                });
-              } else {
-                // Instance has the same timeframe and is not processing, it should be ready
-                callback({
-                  type: 'Instance is ready',
-                  data: { instance },
-                });
-                websocket.close();
-              }
-            }
-            break;
-          default:
-            logger('Unhandled websocket message', message, data);
-            break;
-        }
-      });
+    } else {
+      instance = await apiClient.post(
+        `/project/${projectId}/instance`,
+        instanceConfig
+      );
     }
+
+    // Confirm instance has running status
+    let instanceStatus;
+    let creationDuration = 0;
+    while (
+      !instanceStatus ||
+      creationDuration < config.instanceCreationTimeout
+    ) {
+      // Get instance status
+      instanceStatus = await apiClient.get(
+        `project/${projectId}/instance/${instance.id}`
+      );
+      const instancePhase = get(instanceStatus, 'status.phase');
+
+      // Process status
+      if (instancePhase === 'Running' && instanceStatus.active) {
+        break;
+      } else if (instancePhase === 'Failed') {
+        throw new Error('Instance creation failed');
+      }
+
+      // Update timer
+      await delay(config.instanceCreationCheckInterval);
+      creationDuration += config.instanceCreationCheckInterval;
+
+      // Check timeout
+      if (creationDuration >= config.instanceCreationTimeout) {
+        throw new Error('Instance creation timeout');
+      }
+    }
+
+    const { token } = instance;
+    const websocket = new WebsocketClient(token);
+
+    callback({
+      type: 'Instance is running',
+    });
+
+    websocket.addEventListener('message', (e) => {
+      const { message, data } = JSON.parse(e.data);
+
+      switch (message) {
+        case 'error':
+          callback({
+            type: 'Activation has errored',
+            data: { error: data.error },
+          });
+          break;
+        case 'info#connected':
+        case 'model#timeframe#complete':
+          // After connection, request status
+          websocket.sendMessage({
+            action: 'model#status',
+          });
+          break;
+        case 'info#disconnected':
+          // After connection, send a message to the server to request
+          // model status
+          websocket.sendMessage({
+            action: 'model#status',
+          });
+          break;
+        case 'model#status':
+          if (data.processing) {
+            // Instance is processing a different timeframe, abort it
+            if (instanceConfig.timeframe_id !== data.timeframe) {
+              websocket.sendMessage({
+                action: 'model#abort',
+              });
+            }
+          } else {
+            // If a timeframe is specified and it is different from the
+            // current timeframe, request it
+            if (
+              instanceConfig.timeframe_id &&
+              instanceConfig.timeframe_id !== data.timeframe
+            ) {
+              websocket.sendMessage({
+                action: 'model#timeframe',
+                data: {
+                  id: instanceConfig.timeframe_id,
+                },
+              });
+            } else {
+              // Instance has the same timeframe and is not processing, it should be ready
+              callback({
+                type: 'Instance is ready',
+                data: { instance },
+              });
+              websocket.close();
+            }
+          }
+          break;
+        default:
+          logger('Unhandled websocket message', message, data);
+          break;
+      }
+    });
   },
   runPrediction: (context) => (callback, onReceive) => {
+    const { apiClient, project, currentAoi } = context;
     const { token } = context.currentInstance;
     const websocket = new WebsocketClient(token);
 
@@ -402,6 +401,12 @@ export const services = {
       const { message, data } = JSON.parse(e.data);
 
       switch (message) {
+        case 'error':
+          callback({
+            type: 'Prediction has failed',
+            data: { error: data.error },
+          });
+          break;
         case 'info#connected':
           // After connection, send a message to the server to request
           // model status
@@ -423,23 +428,57 @@ export const services = {
           break;
         case 'model#checkpoint':
           callback({
-            type: 'Received checkpoint',
-            data: { currentCheckpoint: data },
+            type: 'Received checkpoint id',
           });
+
+          // Fetch full checkpoint data
+          apiClient.get(`/project/${project.id}/checkpoint/${data.id}`).then(
+            (checkpoint) => {
+              callback({
+                type: 'Received checkpoint',
+                data: { checkpoint },
+              });
+            },
+            (error) => {
+              callback({
+                type: 'Prediction has failed',
+                data: { error },
+              });
+            }
+          );
           websocket.sendMessage({
             action: 'model#status',
           });
           break;
         case 'model#timeframe':
           callback({
-            type: 'Received timeframe',
-            data: { timeframe: data },
+            type: 'Received timeframe id',
           });
+
+          // Fetch full timeframe data
+          apiClient
+            .get(
+              `/project/${project.id}/aoi/${currentAoi.id}/timeframe/${data.id}`
+            )
+            .then(
+              (timeframe) => {
+                callback({
+                  type: 'Received timeframe',
+                  data: { timeframe },
+                });
+              },
+              (error) => {
+                callback({
+                  type: 'Prediction has failed',
+                  data: { error },
+                });
+              }
+            );
           break;
         case 'model#prediction':
           callback({
             type: 'Received prediction progress',
-            data,
+            data: { prediction: data },
           });
           break;
         case 'model#prediction#complete':
@@ -457,7 +496,14 @@ export const services = {
     return () => websocket.close();
   },
   runRetrain: (context) => (callback, onReceive) => {
-    const { retrainClasses, retrainSamples, currentTimeframe } = context;
+    const {
+      apiClient,
+      project,
+      retrainClasses,
+      retrainSamples,
+      currentTimeframe,
+      currentAoi,
+    } = context;
 
     const retrainPayload = {
       name: context.currentAoi.name,
@@ -585,18 +631,52 @@ export const services = {
           break;
         case 'model#checkpoint':
           callback({
-            type: 'Received checkpoint',
-            data: { currentCheckpoint: data },
+            type: 'Received checkpoint id',
           });
+
+          // Fetch full checkpoint data
+          apiClient.get(`/project/${project.id}/checkpoint/${data.id}`).then(
+            (checkpoint) => {
+              callback({
+                type: 'Received checkpoint',
+                data: { checkpoint },
+              });
+            },
+            (error) => {
+              callback({
+                type: 'Prediction has failed',
+                data: { error },
+              });
+            }
+          );
           websocket.sendMessage({
             action: 'model#status',
           });
           break;
         case 'model#timeframe':
           callback({
-            type: 'Received timeframe',
-            data: { timeframe: data },
+            type: 'Received timeframe id',
           });
+
+          // Fetch full timeframe data
+          apiClient
+            .get(
+              `/project/${project.id}/aoi/${currentAoi.id}/timeframe/${data.id}`
+            )
+            .then(
+              (timeframe) => {
+                callback({
+                  type: 'Received timeframe',
+                  data: { timeframe },
+                });
+              },
+              (error) => {
+                callback({
+                  type: 'Prediction has failed',
+                  data: { error },
+                });
+              }
+            );
           break;
         case 'model#timeframe#progress':
           callback({
@@ -628,7 +708,7 @@ export const services = {
           break;
         case 'model#retrain#progress': {
           callback({
-            type: 'Received retrain progress',
+            type: 'Received retrain#progress',
             data: {
               globalLoading: {
                 disabled: false,
@@ -643,13 +723,34 @@ export const services = {
         }
         case 'model#retrain#complete':
           callback({
-            type: 'Received retrain progress',
+            type: 'Received retrain#progress',
             data: {
               globalLoading: {
                 disabled: false,
-                message: `Retrain was finished, loading predictions...`,
+                message: `Retrain was finished, awaiting predictions...`,
               },
             },
+          });
+          break;
+        case 'model#prediction':
+          callback({
+            type: 'Received prediction progress',
+            data: {
+              prediction: data,
+              globalLoading: {
+                disabled: false,
+                message: `Prediction progress: ${round(
+                  (data.processed / data.total) * 100,
+                  0
+                )}%`,
+              },
+            },
+          });
+          break;
+        case 'model#prediction#complete':
+          callback({
+            type: 'Retrain run was completed',
+            data,
           });
           break;
 
