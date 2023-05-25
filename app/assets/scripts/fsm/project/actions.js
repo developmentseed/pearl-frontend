@@ -423,6 +423,12 @@ export const actions = {
         .concat(samples),
     };
   }),
+  clearRetrainSamples: assign((context) => {
+    context.mapRef.freehandDraw.clearLayers();
+    return {
+      retrainSamples: [],
+    };
+  }),
   setProject: assign((context, event) => ({
     project: event.data.project,
   })),
