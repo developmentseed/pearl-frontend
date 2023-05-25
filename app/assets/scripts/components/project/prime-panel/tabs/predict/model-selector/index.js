@@ -22,11 +22,16 @@ export function ModelSelector() {
   const currentModel = ProjectMachineContext.useSelector(
     selectors.currentModel
   );
+  const modelsList = ProjectMachineContext.useSelector(selectors.modelsList);
   const currentImagerySource = ProjectMachineContext.useSelector(
     selectors.currentImagerySource
   );
   const isProjectNew = ProjectMachineContext.useSelector((s) =>
     guards.isProjectNew(s.context)
+  );
+
+  const selectableModels = modelsList.filter(
+    (model) => model.imagery_source_id === currentImagerySource?.id
   );
 
   let label;
@@ -42,8 +47,13 @@ export function ModelSelector() {
       label = 'Define Imagery Source';
       disabled = true;
     } else if (!currentModel) {
-      label = 'Select Model';
-      disabled = false;
+      if (selectableModels.length > 0) {
+        label = 'Select Model';
+        disabled = false;
+      } else {
+        label = 'No models available for this imagery source';
+        disabled = true;
+      }
     } else {
       label = currentModel.name;
       disabled = false;

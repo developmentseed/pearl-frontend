@@ -29,6 +29,12 @@ export function ModelSelectorModal({ showModal, setShowModal }) {
   const currentModel = ProjectMachineContext.useSelector(
     selectors.currentModel
   );
+  const currentImagerySource = ProjectMachineContext.useSelector(
+    selectors.currentImagerySource
+  );
+  const selectableModels = modelsList.filter(
+    (model) => model.imagery_source_id === currentImagerySource?.id
+  );
 
   return (
     <Modal
@@ -36,7 +42,7 @@ export function ModelSelectorModal({ showModal, setShowModal }) {
       revealed={showModal}
       onOverlayClick={() => setShowModal(false)}
       closeButton={false}
-      data={modelsList}
+      data={selectableModels}
       content={
         <ModalContent>
           <HeadingWrapper>
