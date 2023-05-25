@@ -298,10 +298,6 @@ export const actions = {
     const { currentImagerySource } = context;
 
     return {
-      imagerySourceSelector: {
-        disabled: false,
-        placeholderLabel: 'Select Imagery Source',
-      },
       mosaicSelector: {
         disabled: !currentImagerySource,
         placeholderLabel: 'Select Mosaic',
@@ -420,10 +416,6 @@ export const actions = {
   initializeNewProject: assign(() => {
     return {
       sessionStatusMessage: 'Set Project Name',
-      imagerySourceSelector: {
-        disabled: true,
-        placeholderLabel: 'Define first AOI',
-      },
       mosaicSelector: {
         disabled: true,
         placeholderLabel: 'Define first AOI',

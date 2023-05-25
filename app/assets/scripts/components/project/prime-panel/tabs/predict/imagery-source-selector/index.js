@@ -12,20 +12,39 @@ import {
 } from '../../../../../../styles/type/heading';
 import { ImagerySourceSelectorModal } from './modal';
 import selectors from '../../../../../../fsm/project/selectors';
+import * as guards from '../../../../../../fsm/project/guards';
+import { SESSION_MODES } from '../../../../../../fsm/project/constants';
 
 export function ImagerySourceSelector() {
   const [showModal, setShowModal] = useState(false);
-  const imagerySourceSelector = ProjectMachineContext.useSelector(
-    selectors.imagerySourceSelectorStatus
-  );
+  const sessionMode = ProjectMachineContext.useSelector(selectors.sessionMode);
+  const currentAoi = ProjectMachineContext.useSelector(selectors.currentAoi);
   const currentImagerySource = ProjectMachineContext.useSelector(
     selectors.currentImagerySource
   );
+  const isProjectNew = ProjectMachineContext.useSelector((s) =>
+    guards.isProjectNew(s.context)
+  );
 
-  const { disabled } = imagerySourceSelector;
-
-  const label =
-    currentImagerySource?.name || imagerySourceSelector.placeholderLabel;
+  let label;
+  let disabled = true;
+  if (sessionMode === SESSION_MODES.LOADING) {
+    label = 'Loading...';
+    disabled = true;
+  } else if (isProjectNew) {
+    if (!currentAoi) {
+      label = 'Define first AOI';
+      disabled = true;
+    } else {
+      label = !currentImagerySource
+        ? 'Select Imagery Source'
+        : currentImagerySource.name;
+      disabled = false;
+    }
+  } else {
+    label = currentImagerySource.name;
+    disabled = true;
+  }
 
   return (
     <>
@@ -50,11 +69,10 @@ export function ImagerySourceSelector() {
             <EditButton
               useIcon='swap-horizontal'
               id='select-mosaic-trigger'
-              disabled={disabled}
               onClick={() => setShowModal(true)}
               title='Select Imagery ImagerySource'
             >
-              Edit Imagery ImagerySource Selection
+              Edit Imagery Source Selection
             </EditButton>
           </HeadOptionToolbar>
         )}

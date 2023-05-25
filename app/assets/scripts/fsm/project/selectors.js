@@ -28,7 +28,6 @@ export const selectors = {
   displayProjectNameModal: (state) =>
     state.matches('Entering new project name'),
   globalLoading: (state) => state.context.globalLoading,
-  imagerySourceSelectorStatus: (state) => state.context.imagerySourceSelector,
   imagerySourcesList: (state) => state.context.imagerySourcesList,
   isLoadingMap: (state) => state.matches('Creating map'),
   isRetrainReady: ({ context: { retrainClasses, retrainSamples } }) =>
