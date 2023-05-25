@@ -35,10 +35,6 @@ export const projectMachine = createMachine(
       uploadAoiModal: {
         revealed: false,
       },
-      mosaicSelector: {
-        placeholderLabel: 'Loading...',
-        disabled: true,
-      },
       primeButton: {
         label: 'Ready for prediction run',
         disabled: true,
