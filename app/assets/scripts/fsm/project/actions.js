@@ -307,16 +307,6 @@ export const actions = {
       sessionStatusMessage,
     };
   }),
-  refreshPredictionTab: assign((context) => {
-    const { currentImagerySource } = context;
-
-    return {
-      mosaicSelector: {
-        disabled: !currentImagerySource,
-        placeholderLabel: 'Select Mosaic',
-      },
-    };
-  }),
   updateCurrentPrediction: assign((context, { data: { prediction } }) => {
     let predictions = get(context, 'currentPrediction.predictions', []);
 
@@ -435,10 +425,6 @@ export const actions = {
   initializeNewProject: assign(() => {
     return {
       sessionStatusMessage: 'Set Project Name',
-      mosaicSelector: {
-        disabled: true,
-        placeholderLabel: 'Define first AOI',
-      },
     };
   }),
   enablePredictionRun: assign(() => ({

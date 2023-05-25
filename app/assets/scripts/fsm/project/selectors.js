@@ -37,7 +37,6 @@ export const selectors = {
   mapEventHandlers: (state) => state.context.mapEventHandlers,
   maxInferenceArea: (state) => state.context.apiLimits?.max_inference,
   modelsList: (state) => state.context.modelsList,
-  mosaicSelectorStatus: (state) => state.context.mosaicSelector,
   mosaicsList: (state) => state.context.mosaicsList,
   mosaicTileUrl: (state) => get(state, 'context.currentMosaic.tileUrl'),
   projectId: ({ context }) => context.project?.id,

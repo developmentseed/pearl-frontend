@@ -35,10 +35,6 @@ export const projectMachine = createMachine(
       uploadAoiModal: {
         revealed: false,
       },
-      imagerySourceSelector: {
-        placeholderLabel: 'Loading...',
-        disabled: true,
-      },
       mosaicSelector: {
         placeholderLabel: 'Loading...',
         disabled: true,
@@ -331,13 +327,13 @@ export const projectMachine = createMachine(
           src: 'createProject',
           onDone: {
             target: 'Creating AOI',
-            actions: ['setProject', 'refreshPredictionTab'],
+            actions: ['setProject'],
           },
         },
       },
 
       'Load latest AOI': {
-        entry: ['refreshPredictionTab', 'showExistingAoisActionButtons'],
+        entry: ['showExistingAoisActionButtons'],
         always: [
           {
             target: 'Retrain ready',
@@ -395,37 +391,25 @@ export const projectMachine = createMachine(
       },
 
       'Configuring new AOI': {
-        entry: ['refreshPredictionTab', 'refreshSessionStatusMessage'],
+        entry: ['refreshSessionStatusMessage'],
 
         on: {
           'Mosaic is selected': {
             target: 'Configuring new AOI',
             internal: true,
-            actions: [
-              'setCurrentMosaic',
-              'refreshPredictionTab',
-              'refreshSessionStatusMessage',
-            ],
+            actions: ['setCurrentMosaic', 'refreshSessionStatusMessage'],
           },
 
           'Imagery source is selected': {
             target: 'Configuring new AOI',
             internal: true,
-            actions: [
-              'setCurrentImagerySource',
-              'refreshPredictionTab',
-              'refreshSessionStatusMessage',
-            ],
+            actions: ['setCurrentImagerySource', 'refreshSessionStatusMessage'],
           },
 
           'Model is selected': {
             target: 'Configuring new AOI',
             internal: true,
-            actions: [
-              'setCurrentModel',
-              'refreshPredictionTab',
-              'refreshSessionStatusMessage',
-            ],
+            actions: ['setCurrentModel', 'refreshSessionStatusMessage'],
           },
 
           'Requested AOI switch': 'Applying existing AOI',
@@ -456,7 +440,6 @@ export const projectMachine = createMachine(
               'setCurrentTimeframe',
               'setCurrentShare',
               'updateAoiLayer',
-              'refreshPredictionTab',
             ],
           },
         },
@@ -479,7 +462,7 @@ export const projectMachine = createMachine(
           {
             target: 'Refresh AOI List',
             cond: 'isAoiNew',
-            actions: ['clearCurrentAoi', 'refreshPredictionTab'],
+            actions: ['clearCurrentAoi'],
           },
           'Deleting existing AOI',
         ],

@@ -11,14 +11,18 @@ import {
   SubheadingStrong,
 } from '../../../../../../styles/type/heading';
 import { MosaicSelectorModal } from './modal';
+import { SESSION_MODES } from '../../../../../../fsm/project/constants';
 import selectors from '../../../../../../fsm/project/selectors';
+import * as guards from '../../../../../../fsm/project/guards';
 
 export function MosaicSelector() {
   const [showModal, setShowModal] = useState(false);
 
-  const mosaicSelector = ProjectMachineContext.useSelector(
-    selectors.mosaicSelectorStatus
+  const sessionMode = ProjectMachineContext.useSelector(selectors.sessionMode);
+  const isProjectNew = ProjectMachineContext.useSelector((s) =>
+    guards.isProjectNew(s.context)
   );
+  const currentAoi = ProjectMachineContext.useSelector(selectors.currentAoi);
   const currentImagerySource = ProjectMachineContext.useSelector(
     selectors.currentImagerySource
   );
@@ -26,9 +30,25 @@ export function MosaicSelector() {
     selectors.currentMosaic
   );
 
-  const disabled = mosaicSelector?.disabled || !currentImagerySource;
-
-  const label = currentMosaic?.name || mosaicSelector.placeholderLabel;
+  let label;
+  let disabled = true;
+  if (sessionMode === SESSION_MODES.LOADING) {
+    label = 'Loading...';
+  } else if (isProjectNew) {
+    if (!currentAoi) {
+      label = 'Define first AOI';
+    } else if (!currentImagerySource) {
+      label = 'Define Imagery Source';
+    } else if (!currentMosaic) {
+      label = 'Select Mosaic';
+      disabled = false;
+    } else {
+      label = currentMosaic.name;
+      disabled = false;
+    }
+  } else {
+    label = currentMosaic.name;
+  }
 
   return (
     <>
