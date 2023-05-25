@@ -43,7 +43,7 @@ export const actions = {
     };
   }),
   setCurrentImagerySource: assign((context, event) => {
-    const { currentImagerySource } = context;
+    const { currentImagerySource, currentModel, currentMosaic } = context;
     const { imagerySource } = event.data;
 
     // Bypass if imagery source is already selected and hasn't changed
@@ -55,10 +55,23 @@ export const actions = {
       return {};
     }
 
-    // Apply new imagery source and reset mosaic
-    return {
+    const nextContext = {
       currentImagerySource: imagerySource,
-      currentMosaic: null,
+    };
+
+    // Reset model if imagery source is not applicable
+    if (currentModel && currentModel.imagery_source_id !== imagerySource.id) {
+      nextContext.currentModel = null;
+    }
+
+    // Reset mosaic if imagery source is not applicable
+    if (currentMosaic && currentMosaic.imagery_source_id !== imagerySource.id) {
+      nextContext.currentMosaic = null;
+    }
+
+    // Apply new context
+    return {
+      ...nextContext,
     };
   }),
   setCurrentMosaic: assign((context, event) => {
