@@ -37,7 +37,6 @@ export const selectors = {
   liveInferenceArea: (state) => state.context.apiLimits?.live_inference,
   mapEventHandlers: (state) => state.context.mapEventHandlers,
   maxInferenceArea: (state) => state.context.apiLimits?.max_inference,
-  modelSelectorStatus: (state) => state.context.modelSelector,
   modelsList: (state) => state.context.modelsList,
   mosaicSelectorStatus: (state) => state.context.mosaicSelector,
   mosaicsList: (state) => state.context.mosaicsList,

@@ -68,9 +68,33 @@ export const actions = {
       currentMosaic: { ...mosaic, tileUrl: getMosaicTileUrl(mosaic) },
     };
   }),
-  setCurrentModel: assign((context, event) => ({
-    currentModel: event.data.model,
-  })),
+  setCurrentModel: assign((context, event) => {
+    const { currentModel, currentImagerySource } = context;
+    const { model } = event.data;
+
+    // Bypass if model is already selected and hasn't changed
+    if (currentModel && currentModel.id === model.id) {
+      return {};
+    }
+
+    // Reset imagery source and mosaic if model does not support to them
+    const modelImagerySourceId = get(event, 'data.model.imagery_source_id');
+    if (
+      currentImagerySource &&
+      currentImagerySource.id !== modelImagerySourceId
+    ) {
+      return {
+        currentImagerySource: null,
+        currentMosaic: null,
+        currentModel: event.data.model,
+      };
+    }
+
+    // If all conditions are met, apply new model
+    return {
+      currentModel: event.data.model,
+    };
+  }),
   setCurrentAoi: assign((context, event) => ({
     currentAoi: { ...event.data.aoi },
   })),
@@ -271,9 +295,7 @@ export const actions = {
     };
   }),
   refreshPredictionTab: assign((context) => {
-    const { currentImagerySource, project } = context;
-
-    const isExistingProject = project?.id !== 'new';
+    const { currentImagerySource } = context;
 
     return {
       imagerySourceSelector: {
@@ -283,11 +305,6 @@ export const actions = {
       mosaicSelector: {
         disabled: !currentImagerySource,
         placeholderLabel: 'Select Mosaic',
-      },
-      modelSelector: {
-        hidden: isExistingProject,
-        disabled: !currentImagerySource,
-        placeholderLabel: 'Select Model',
       },
     };
   }),
@@ -405,15 +422,11 @@ export const actions = {
       sessionStatusMessage: 'Set Project Name',
       imagerySourceSelector: {
         disabled: true,
-        placeholderLabel: 'Define AOI first',
+        placeholderLabel: 'Define first AOI',
       },
       mosaicSelector: {
         disabled: true,
-        placeholderLabel: 'Define AOI first',
-      },
-      modelSelector: {
-        disabled: true,
-        placeholderLabel: 'Define AOI first',
+        placeholderLabel: 'Define first AOI',
       },
     };
   }),

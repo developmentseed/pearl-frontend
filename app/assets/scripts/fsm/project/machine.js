@@ -43,10 +43,6 @@ export const projectMachine = createMachine(
         placeholderLabel: 'Loading...',
         disabled: true,
       },
-      modelSelector: {
-        placeholderLabel: 'Loading...',
-        disabled: true,
-      },
       primeButton: {
         label: 'Ready for prediction run',
         disabled: true,
