@@ -14,7 +14,7 @@
       "data": {
         "is_aborting": false,
         "processing": false,
-        "timeframe": 2,
+        "timeframe": 1,
         "checkpoint": 2
       }
     }

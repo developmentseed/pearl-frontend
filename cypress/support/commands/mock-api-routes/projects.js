@@ -279,7 +279,7 @@ export function addProjectEndpoints() {
    */
   cy.intercept(
     {
-      url: restApiEndpoint + '/api/project/1/share',
+      url: restApiEndpoint + '/api/project/1/share*',
     },
     {
       total: 0,
@@ -726,6 +726,35 @@ export function addProjectEndpoints() {
       ],
       project_id: 1,
       aoi_id: 1,
+    }
+  );
+
+  cy.intercept(
+    {
+      url: restApiEndpoint + '/api/project/1/aoi/*/timeframe/*',
+    },
+    {
+      id: 1,
+      checkpoint_id: 1,
+      created: 1678182035141,
+      storage: false,
+      bookmarked: false,
+      patches: [],
+      px_stats: {},
+      bookmarked_at: null,
+      classes: [
+        { name: 'Bosque', color: '#6CA966' },
+        { name: 'Selvas', color: '#D0F3AB' },
+        { name: 'Pastos', color: '#D2AD74' },
+        { name: 'Agricultura', color: '#486DA2' },
+        { name: 'Urbano', color: '#F10100' },
+        { name: 'Sin vegetación aparente', color: '#FFC300' },
+        { name: 'Agua', color: '#FF5733' },
+        { name: 'Suelo desnudo', color: '#48F374' },
+      ],
+      mosaic: '2849689f57f1b3b9c1f725abb75aa411',
+      checkpoint_name: 'Villa de Allende',
+      shares: [],
     }
   );
 

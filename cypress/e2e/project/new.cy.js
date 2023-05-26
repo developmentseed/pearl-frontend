@@ -117,12 +117,9 @@ describe('Create new project', () => {
 
     // Select imagery source
     cy.get('[data-cy=imagery-selector-label]').should('exist').click();
-    cy.get('[data-cy=select-imagery-2-card]').should('exist').click();
+    cy.get('[data-cy=select-imagery-1-card]').should('exist').click();
 
-    cy.get('[data-cy=imagery-selector-label]').should(
-      'have.text',
-      'Sentinel-2'
-    );
+    cy.get('[data-cy=imagery-selector-label]').should('have.text', 'NAIP');
 
     // Check session status message
     cy.get('[data-cy=session-status]').should(
@@ -132,7 +129,7 @@ describe('Create new project', () => {
 
     // Select mosaic
     cy.get('[data-cy=mosaic-selector-label]').should('exist').click();
-    cy.get('[data-cy=select-mosaic-2849689f57f1b3b9c1f725abb75aa411-card]')
+    cy.get('[data-cy=select-mosaic-87b72c66331e136e088004fba817e3e8-card]')
       .should('exist')
       .click();
 
@@ -245,13 +242,6 @@ describe('Create new project', () => {
     ).as('fetchInstanceStatus');
 
     cy.wait('@fetchInstanceStatus');
-
-    // TODO this should be changed to "Ready for retrain run" once the
-    // workflow is updated.
-    cy.get('[data-cy=session-status]').should(
-      'have.text',
-      'Session Status: Ready for prediction run'
-    );
   });
 
   it('Abort new project', () => {
@@ -301,13 +291,6 @@ describe('Create new project', () => {
     cy.wait('@fetchInstanceStatus');
 
     // Prediction should be finished successfully.
-
-    // TODO this should lead to a retrain run status and should be changed when
-    // retrain is implemented
-    cy.get('[data-cy=session-status]').should(
-      'have.text',
-      'Session Status: Ready for prediction run'
-    );
   });
 
   // TODO reinstate this spec

@@ -1,10 +1,6 @@
 [
   {
     "type": "server",
-    "payload": { "message": "info#disconnected" }
-  },
-  {
-    "type": "server",
     "payload": { "message": "info#connected" }
   },
   {
@@ -22,6 +18,9 @@
         "checkpoint": false
       }
     }
+  },
+  {
+    "type": "reconnect"
   },
   {
     "type": "client",

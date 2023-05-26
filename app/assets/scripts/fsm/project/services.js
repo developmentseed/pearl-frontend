@@ -293,7 +293,9 @@ export const services = {
       if (instancePhase === 'Running' && instanceStatus.active) {
         break;
       } else if (instancePhase === 'Failed') {
-        throw new Error('Instance creation failed');
+        callback({
+          type: 'Instance activation has failed',
+        });
       }
 
       // Update timer
@@ -302,7 +304,9 @@ export const services = {
 
       // Check timeout
       if (creationDuration >= config.instanceCreationTimeout) {
-        throw new Error('Instance creation timeout');
+        callback({
+          type: 'Instance activation has failed',
+        });
       }
     }
 
@@ -319,7 +323,7 @@ export const services = {
       switch (message) {
         case 'error':
           callback({
-            type: 'Activation has errored',
+            type: 'Instance activation has failed',
             data: { error: data.error },
           });
           break;

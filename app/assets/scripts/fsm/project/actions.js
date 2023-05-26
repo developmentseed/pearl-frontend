@@ -437,6 +437,18 @@ export const actions = {
       message: 'Activating instance...',
     },
   })),
+  displayInstanceActivationError: assign(() => {
+    toasts.error(
+      'Could not start instance at the moment, please try again later.'
+    );
+
+    return {
+      globalLoading: {
+        disabled: true,
+      },
+    };
+  }),
+
   enterPredictionRun: assign(() => ({
     sessionStatusMessage: 'Running prediction',
     globalLoading: {
