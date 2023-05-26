@@ -181,13 +181,16 @@ describe('Loads AOIs', () => {
     );
     cy.get('[data-cy=imagery-selector-label]').should(
       'have.text',
-      'Select Imagery Source'
+      'Define first AOI'
     );
     cy.get('[data-cy=mosaic-selector-label]').should(
       'have.text',
-      'Select Mosaic'
+      'Define first AOI'
     );
-    cy.get('[data-cy=select-model-label]').should('have.text', 'Select Model');
+    cy.get('[data-cy=select-model-label]').should(
+      'have.text',
+      'Define first AOI'
+    );
 
     // Session status should be 'Select AOI'
     cy.get('[data-cy=session-status]').contains('Set AOI');
@@ -351,6 +354,7 @@ describe('Load AOIs and draw a third one', () => {
     // Load project
     cy.visit('/project/1');
     cy.wait('@loadAois');
+
     cy.get('[data-cy=global-loading]').should('not.exist');
 
     // go to the Predict tab
@@ -398,11 +402,6 @@ describe('Can delete AOIs', () => {
     cy.visit('/project/1');
     cy.wait('@loadAois');
 
-    cy.get('[data-cy=session-status]').should(
-      'have.text',
-      'Session Status: Ready for prediction run'
-    );
-
     cy.intercept(
       {
         url: restApiEndpoint + '/api/project/1/aoi/1',
@@ -424,6 +423,7 @@ describe('Can delete AOIs', () => {
     ).as('loadAois1');
 
     cy.get('[data-cy=predict-tab]').click();
+
     cy.get('[data-cy=delete-current-aoi-button]');
     cy.get('[data-cy=delete-current-aoi-button]').click();
     cy.get('[data-cy=confirm-delete-aoi-modal]').should('exist');
@@ -438,9 +438,9 @@ describe('Can delete AOIs', () => {
         fixture: 'aois.0.json',
       }
     ).as('loadAois0');
-    cy.get('[data-cy=predict-tab]').click();
+    cy.get('[data-cy=predict-tab]').should('exist').click();
 
-    cy.get('[data-cy=delete-current-aoi-button]').click();
+    cy.get('[data-cy=delete-current-aoi-button]').should('exist').click();
     cy.get('[data-cy=confirm-delete-aoi-modal]').should('exist');
     cy.get('[data-cy=confirm-aoi-delete]').should('exist').click();
   });

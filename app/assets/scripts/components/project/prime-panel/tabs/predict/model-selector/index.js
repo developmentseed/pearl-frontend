@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ProjectMachineContext } from '../../../../../../context/project-xstate';
+import { ProjectMachineContext } from '../../../../../../fsm/project';
 import { EditButton } from '../../../../../../styles/button';
 import {
   HeadOption,
@@ -11,26 +11,57 @@ import {
   SubheadingStrong,
 } from '../../../../../../styles/type/heading';
 import { ModelSelectorModal } from './modal';
-
-export const modelSelectors = {
-  selectorStatus: (state) => state.context.modelSelector,
-  currentModel: (state) => state.context.currentModel,
-  currentImagerySource: (state) => state.context.currentImagerySource,
-  modelsList: (state) => state.context.modelsList,
-};
+import selectors from '../../../../../../fsm/project/selectors';
+import * as guards from '../../../../../../fsm/project/guards';
+import { SESSION_MODES } from '../../../../../../fsm/project/constants';
 
 export function ModelSelector() {
   const [showModal, setShowModal] = useState(false);
-  const modelSelector = ProjectMachineContext.useSelector(
-    modelSelectors.selectorStatus
-  );
+  const sessionMode = ProjectMachineContext.useSelector(selectors.sessionMode);
+  const currentAoi = ProjectMachineContext.useSelector(selectors.currentAoi);
   const currentModel = ProjectMachineContext.useSelector(
-    modelSelectors.currentModel
+    selectors.currentModel
+  );
+  const modelsList = ProjectMachineContext.useSelector(selectors.modelsList);
+  const currentImagerySource = ProjectMachineContext.useSelector(
+    selectors.currentImagerySource
+  );
+  const isProjectNew = ProjectMachineContext.useSelector((s) =>
+    guards.isProjectNew(s.context)
   );
 
-  const { disabled, hidden } = modelSelector;
+  const selectableModels = modelsList.filter(
+    (model) => model.imagery_source_id === currentImagerySource?.id
+  );
 
-  const label = currentModel?.name || modelSelector.placeholderLabel;
+  let label;
+  let disabled = true;
+  if (sessionMode === SESSION_MODES.LOADING) {
+    label = 'Loading...';
+    disabled = true;
+  } else if (isProjectNew) {
+    if (!currentAoi) {
+      label = 'Define first AOI';
+      disabled = true;
+    } else if (!currentImagerySource) {
+      label = 'Define Imagery Source';
+      disabled = true;
+    } else if (!currentModel) {
+      if (selectableModels.length > 0) {
+        label = 'Select Model';
+        disabled = false;
+      } else {
+        label = 'No models available for this imagery source';
+        disabled = true;
+      }
+    } else {
+      label = currentModel.name;
+      disabled = false;
+    }
+  } else {
+    label = currentModel?.name;
+    disabled = true;
+  }
 
   return (
     <>
@@ -47,13 +78,12 @@ export function ModelSelector() {
         >
           {label}
         </SubheadingStrong>
-        {!hidden && (
+        {!disabled && (
           <HeadOptionToolbar>
             <EditButton
               data-cy='show-select-model-button'
               useIcon='swap-horizontal'
               id='select-model-trigger'
-              disabled={disabled}
               onClick={() => {
                 setShowModal(true);
               }}

@@ -1,20 +1,15 @@
 import React, { useEffect } from 'react';
 import T from 'prop-types';
 import { withRouter } from 'react-router';
-
 import MetaTags from './meta-tags';
 import SizeAwareElement from './size-aware-element';
-
 import { Page } from '../../styles/page';
-
 import config from '../../config';
 import checkApiHealth from '../../utils/api-health';
-import { withAITracking } from '@microsoft/applicationinsights-react-js';
-import { reactPlugin } from '../../utils/azure-app-insights';
 
 const { appTitle, appDescription, environment } = config;
 
-function App(props) {
+const App = (props) => {
   const { location, pageTitle, children, hideFooter } = props;
   const title = pageTitle ? `${pageTitle} — ` : '';
 
@@ -34,7 +29,7 @@ function App(props) {
       {children}
     </SizeAwareElement>
   );
-}
+};
 
 App.propTypes = {
   children: T.node,
@@ -43,12 +38,16 @@ App.propTypes = {
   pageTitle: T.string,
 };
 
-let thisApp;
-if (environment === 'production' || environment === 'staging') {
-  // staging and production uses Azure App Insights
-  thisApp = withRouter(withAITracking(reactPlugin, App));
-} else {
-  thisApp = withRouter(App);
-}
+const AppWrapper = (InnerApp) => {
+  // Avoid importing Application Insights in development
+  if (environment === 'production' || environment === 'staging') {
+    const withAITracking = require('@microsoft/applicationinsights-react-js')
+      .withAITracking;
+    const reactPlugin = require('../../utils/azure-app-insights').reactPlugin;
+    return withRouter(withAITracking(reactPlugin, InnerApp));
+  }
 
-export default thisApp;
+  return withRouter(InnerApp);
+};
+
+export default AppWrapper(App);

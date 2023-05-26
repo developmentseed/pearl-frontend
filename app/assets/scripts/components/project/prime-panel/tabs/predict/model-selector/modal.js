@@ -5,10 +5,10 @@ import { Heading } from '@devseed-ui/typography';
 import { Button } from '@devseed-ui/button';
 import { Modal } from '@devseed-ui/modal';
 
-import { ProjectMachineContext } from '../../../../../../context/project-xstate';
-import { modelSelectors } from '.';
+import { ProjectMachineContext } from '../../../../../../fsm/project';
 import CardList from '../../../../../common/card-list';
 import { ModelCard } from './model-card';
+import selectors from '../../../../../../fsm/project/selectors';
 
 const ModalContent = styled.div`
   display: block;
@@ -25,11 +25,15 @@ export function ModelSelectorModal({ showModal, setShowModal }) {
   const [modelFilter, setModelFilter] = useState('');
 
   const actorRef = ProjectMachineContext.useActorRef();
-  const modelsList = ProjectMachineContext.useSelector(
-    modelSelectors.modelsList
-  );
+  const modelsList = ProjectMachineContext.useSelector(selectors.modelsList);
   const currentModel = ProjectMachineContext.useSelector(
-    modelSelectors.currentModel
+    selectors.currentModel
+  );
+  const currentImagerySource = ProjectMachineContext.useSelector(
+    selectors.currentImagerySource
+  );
+  const selectableModels = modelsList.filter(
+    (model) => model.imagery_source_id === currentImagerySource?.id
   );
 
   return (
@@ -38,7 +42,7 @@ export function ModelSelectorModal({ showModal, setShowModal }) {
       revealed={showModal}
       onOverlayClick={() => setShowModal(false)}
       closeButton={false}
-      data={modelsList}
+      data={selectableModels}
       content={
         <ModalContent>
           <HeadingWrapper>

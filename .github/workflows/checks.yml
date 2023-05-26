@@ -85,7 +85,7 @@ jobs:
         run: yarn install
 
       - name: Test End-to-end
-        uses: cypress-io/github-action@v2
+        uses: cypress-io/github-action@v5
         env:
           NODE_ENV: cypress
         with:

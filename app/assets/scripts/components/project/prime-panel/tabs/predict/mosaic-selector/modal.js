@@ -6,8 +6,8 @@ import { glsp } from '@devseed-ui/theme-provider';
 import { Button } from '@devseed-ui/button';
 import { Heading } from '@devseed-ui/typography';
 import CardList, { Card } from '../../../../../common/card-list';
-import { ProjectMachineContext } from '../../../../../../context/project-xstate';
-import { mosaicsSelectors } from '.';
+import { ProjectMachineContext } from '../../../../../../fsm/project';
+import selectors from '../../../../../../fsm/project/selectors';
 
 const ModalHeader = styled.header`
   padding: ${glsp(2)} ${glsp(2)} 0;
@@ -42,11 +42,16 @@ const HeadingWrapper = styled.div`
 
 export function MosaicSelectorModal({ showModal, setShowModal }) {
   const actorRef = ProjectMachineContext.useActorRef();
-  const mosaicsList = ProjectMachineContext.useSelector(
-    mosaicsSelectors.mosaicsList
-  );
+  const mosaicsList = ProjectMachineContext.useSelector(selectors.mosaicsList);
   const currentMosaic = ProjectMachineContext.useSelector(
-    mosaicsSelectors.currentMosaic
+    selectors.currentMosaic
+  );
+  const currentImagerySource = ProjectMachineContext.useSelector(
+    selectors.currentImagerySource
+  );
+
+  const selectableMosaics = mosaicsList.filter(
+    (mosaic) => mosaic.imagery_source_id === currentImagerySource?.id
   );
 
   return (
@@ -86,7 +91,7 @@ export function MosaicSelectorModal({ showModal, setShowModal }) {
           <CardList
             nonScrolling
             numColumns={2}
-            data={mosaicsList}
+            data={selectableMosaics}
             renderCard={(mosaic) => {
               const {
                 id,

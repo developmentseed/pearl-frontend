@@ -1,5 +1,5 @@
 import React from 'react';
-import { ProjectMachineContext } from '../../context/project-xstate';
+import { ProjectMachineContext } from '../../fsm/project';
 
 import { Button } from '@devseed-ui/button';
 import { Modal, ModalHeadline } from '@devseed-ui/modal';
@@ -7,14 +7,7 @@ import { Modal, ModalHeadline } from '@devseed-ui/modal';
 import { ModalFooter } from '../common/custom-modal';
 import config from '../../config';
 import { formatThousands } from '../../utils/format';
-
-const selectors = {
-  isRevealed: (state) => state.context.aoiAreaModalDialogRevealed,
-  aoiArea: (state) => state.context.currentAoi?.area,
-  maxInferenceArea: (state) => state.context.apiLimits?.max_inference,
-  liveInferenceArea: (state) => state.context.apiLimits?.live_inference,
-  apiLimits: (state) => state.context.apiLimits,
-};
+import selectors from '../../fsm/project/selectors';
 
 export const AoiModalDialog = () => {
   const actorRef = ProjectMachineContext.useActorRef();

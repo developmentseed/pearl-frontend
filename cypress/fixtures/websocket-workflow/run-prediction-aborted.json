@@ -1,7 +1,26 @@
 [
   {
     "type": "server",
-    "payload": { "message": "info#disconnected" }
+    "payload": { "message": "info#connected" }
+  },
+  {
+    "type": "client",
+    "payload": { "action": "model#status" }
+  },
+  {
+    "type": "server",
+    "payload": {
+      "message": "model#status",
+      "data": {
+        "is_aborting": false,
+        "processing": false,
+        "timeframe": false,
+        "checkpoint": false
+      }
+    }
+  },
+  {
+    "type": "reconnect"
   },
   {
     "type": "server",
@@ -27,7 +46,7 @@
     "type": "client",
     "payload": {
       "action": "model#prediction",
-      "data": { "aoi_id": 1, "mosaic": "2849689f57f1b3b9c1f725abb75aa411" }
+      "data": { "aoi_id": 1, "mosaic": "87b72c66331e136e088004fba817e3e8" }
     }
   },
   {
@@ -135,9 +154,5 @@
         "processed": 3
       }
     }
-  },
-  {
-    "type": "client",
-    "payload": { "action": "instance#terminate" }
   }
 ]

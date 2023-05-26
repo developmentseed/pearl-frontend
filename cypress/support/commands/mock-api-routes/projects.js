@@ -110,7 +110,7 @@ export function addProjectEndpoints() {
             id: 1,
             name: 'Seneca Rocks',
             bookmarked: true,
-            area: 10489000,
+            area: 3060131,
             bounds: {
               type: 'Polygon',
               coordinates: [
@@ -150,7 +150,7 @@ export function addProjectEndpoints() {
             id: 2,
             name: 'Seneca Rocks #1',
             bookmarked: true,
-            area: 10489000,
+            area: 3060131,
             bounds: {
               type: 'Polygon',
               coordinates: [
@@ -279,7 +279,7 @@ export function addProjectEndpoints() {
    */
   cy.intercept(
     {
-      url: restApiEndpoint + '/api/project/1/share',
+      url: restApiEndpoint + '/api/project/1/share*',
     },
     {
       total: 0,
@@ -729,12 +729,41 @@ export function addProjectEndpoints() {
     }
   );
 
+  cy.intercept(
+    {
+      url: restApiEndpoint + '/api/project/1/aoi/*/timeframe/*',
+    },
+    {
+      id: 1,
+      checkpoint_id: 1,
+      created: 1678182035141,
+      storage: false,
+      bookmarked: false,
+      patches: [],
+      px_stats: {},
+      bookmarked_at: null,
+      classes: [
+        { name: 'Bosque', color: '#6CA966' },
+        { name: 'Selvas', color: '#D0F3AB' },
+        { name: 'Pastos', color: '#D2AD74' },
+        { name: 'Agricultura', color: '#486DA2' },
+        { name: 'Urbano', color: '#F10100' },
+        { name: 'Sin vegetación aparente', color: '#FFC300' },
+        { name: 'Agua', color: '#FF5733' },
+        { name: 'Suelo desnudo', color: '#48F374' },
+      ],
+      mosaic: '2849689f57f1b3b9c1f725abb75aa411',
+      checkpoint_name: 'Villa de Allende',
+      shares: [],
+    }
+  );
+
   //
   // GET /project/1/aoi/*/tiles
   //
   cy.intercept(
     {
-      url: restApiEndpoint + '/api/project/1/aoi/*/tiles',
+      url: restApiEndpoint + '/api/project/1/aoi/*/timeframe/*/tiles',
     },
     {
       tilejson: '2.2.0',
@@ -742,7 +771,7 @@ export function addProjectEndpoints() {
       version: '1.0.0',
       schema: 'xyz',
       tiles: [
-        '/api/project/1/aoi/1/tiles/{z}/{x}/{y}?colormap=%7B%220%22%3A%22%23486DA2%22%2C%221%22%3A%22%236CA966%22%2C%222%22%3A%22%23D0F3AB%22%2C%223%22%3A%22%23BFB5B5%22%7D',
+        '/api/project/1/aoi/1/timeframe/*/tiles/{z}/{x}/{y}?colormap=%7B%220%22%3A%22%23486DA2%22%2C%221%22%3A%22%236CA966%22%2C%222%22%3A%22%23D0F3AB%22%2C%223%22%3A%22%23BFB5B5%22%7D',
       ],
       minzoom: 15,
       maxzoom: 17,
@@ -757,11 +786,11 @@ export function addProjectEndpoints() {
   );
 
   //
-  // GET /project/1/aoi/*/tiles/**
+  // GET /project/1/aoi/*/timeframe/*/tiles/**
   //
   cy.intercept(
     {
-      url: restApiEndpoint + '/api/project/1/aoi/*/tiles/**',
+      url: restApiEndpoint + '/api/project/*/aoi/*/timeframe/*/tiles/**',
     },
     { fixture: 'tiles/png-tile.png' }
   );

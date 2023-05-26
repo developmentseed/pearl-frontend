@@ -9,10 +9,9 @@ import { Form } from '@devseed-ui/form';
 import { Button } from '@devseed-ui/button';
 import { FormInput } from '@devseed-ui/form';
 
-import { ProjectMachineContext } from '../../../context/project-xstate';
+import { ProjectMachineContext } from '../../../fsm/project';
 
 import { Modal } from '../../common/custom-modal';
-import get from 'lodash.get';
 import { useHistory } from 'react-router';
 import {
   Dropdown,
@@ -29,6 +28,7 @@ import {
   getShareLink,
 } from '../../../utils/share-link';
 import { useAuth } from '../../../context/auth';
+import selectors from '../../../fsm/project/selectors';
 
 const Wrapper = styled.div`
   flex: 1;
@@ -127,17 +127,6 @@ const ModalForm = styled(Form)`
   grid-gap: ${glsp(1)};
 `;
 
-const selectors = {
-  displayProjectNameModal: (state) =>
-    state.matches('Entering new project name'),
-  projectName: (state) => get(state, 'context.project.name', ''),
-  sessionStatusMessage: (state) =>
-    get(state, 'context.sessionStatusMessage', {}),
-  currentShare: (state) => get(state, 'context.currentShare'),
-  currentInstanceType: (state) =>
-    get(state, 'context.currentInstanceType', 'cpu'),
-};
-
 function ProjectPageHeader({ isMediumDown }) {
   const history = useHistory();
   const { restApiClient, user } = useAuth();
@@ -155,6 +144,9 @@ function ProjectPageHeader({ isMediumDown }) {
   );
   const currentInstanceType = ProjectMachineContext.useSelector(
     selectors.currentInstanceType
+  );
+  const canSwitchInstanceType = ProjectMachineContext.useSelector(
+    selectors.canSwitchInstanceType
   );
   const nextInstanceType = currentInstanceType === 'cpu' ? 'gpu' : 'cpu';
 
@@ -241,14 +233,16 @@ function ProjectPageHeader({ isMediumDown }) {
         <Button
           data-cy='toggle-instance-type-button'
           variation='primary-plain'
+          disabled={!canSwitchInstanceType}
           title={`Click to switch to ${nextInstanceType.toUpperCase()} instance`}
           onClick={() => {
-            actorRef.send({
-              type: 'Switch current instance type',
-              data: {
-                instanceType: nextInstanceType,
-              },
-            });
+            canSwitchInstanceType &&
+              actorRef.send({
+                type: 'Switch current instance type',
+                data: {
+                  instanceType: nextInstanceType,
+                },
+              });
           }}
         >
           {currentInstanceType.toUpperCase()}

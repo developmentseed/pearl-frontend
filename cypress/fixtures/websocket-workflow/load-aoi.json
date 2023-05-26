@@ -8,6 +8,18 @@
     "payload": { "action": "model#status" }
   },
   {
+    "type": "server",
+    "payload": {
+      "message": "model#status",
+      "data": {
+        "is_aborting": false,
+        "processing": false,
+        "timeframe": 1,
+        "checkpoint": 2
+      }
+    }
+  },
+  {
     "type": "client",
     "payload": { "action": "model#timeframe", "data": { "id": 2 } }
   },

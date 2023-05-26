@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ProjectMachineContext } from '../../../../../../context/project-xstate';
+import { ProjectMachineContext } from '../../../../../../fsm/project';
 import { EditButton } from '../../../../../../styles/button';
 import {
   HeadOption,
@@ -11,26 +11,40 @@ import {
   SubheadingStrong,
 } from '../../../../../../styles/type/heading';
 import { ImagerySourceSelectorModal } from './modal';
-
-export const imagerySourceSelectors = {
-  selectorStatus: (state) => state.context.imagerySourceSelector,
-  currentImagerySource: (state) => state.context.currentImagerySource,
-  imagerySourcesList: (state) => state.context.imagerySourcesList,
-};
+import selectors from '../../../../../../fsm/project/selectors';
+import * as guards from '../../../../../../fsm/project/guards';
+import { SESSION_MODES } from '../../../../../../fsm/project/constants';
 
 export function ImagerySourceSelector() {
   const [showModal, setShowModal] = useState(false);
-  const imagerySourceSelector = ProjectMachineContext.useSelector(
-    imagerySourceSelectors.selectorStatus
-  );
+  const sessionMode = ProjectMachineContext.useSelector(selectors.sessionMode);
+  const currentAoi = ProjectMachineContext.useSelector(selectors.currentAoi);
   const currentImagerySource = ProjectMachineContext.useSelector(
-    imagerySourceSelectors.currentImagerySource
+    selectors.currentImagerySource
+  );
+  const isProjectNew = ProjectMachineContext.useSelector((s) =>
+    guards.isProjectNew(s.context)
   );
 
-  const { disabled } = imagerySourceSelector;
-
-  const label =
-    currentImagerySource?.name || imagerySourceSelector.placeholderLabel;
+  let label;
+  let disabled = true;
+  if (sessionMode === SESSION_MODES.LOADING) {
+    label = 'Loading...';
+    disabled = true;
+  } else if (isProjectNew) {
+    if (!currentAoi) {
+      label = 'Define first AOI';
+      disabled = true;
+    } else {
+      label = !currentImagerySource
+        ? 'Select Imagery Source'
+        : currentImagerySource.name;
+      disabled = false;
+    }
+  } else {
+    label = currentImagerySource.name;
+    disabled = true;
+  }
 
   return (
     <>
@@ -50,17 +64,18 @@ export function ImagerySourceSelector() {
         >
           {label}
         </SubheadingStrong>
-        <HeadOptionToolbar>
-          <EditButton
-            useIcon='swap-horizontal'
-            id='select-mosaic-trigger'
-            disabled={disabled}
-            onClick={() => setShowModal(true)}
-            title='Select Imagery ImagerySource'
-          >
-            Edit Imagery ImagerySource Selection
-          </EditButton>
-        </HeadOptionToolbar>
+        {!disabled && (
+          <HeadOptionToolbar>
+            <EditButton
+              useIcon='swap-horizontal'
+              id='select-mosaic-trigger'
+              onClick={() => setShowModal(true)}
+              title='Select Imagery ImagerySource'
+            >
+              Edit Imagery Source Selection
+            </EditButton>
+          </HeadOptionToolbar>
+        )}
       </HeadOption>
     </>
   );

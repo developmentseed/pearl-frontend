@@ -1,4 +1,5 @@
 import get from 'lodash.get';
+import set from 'lodash.set';
 import { assign } from 'xstate';
 import L from 'leaflet';
 import turfBboxPolygon from '@turf/bbox-polygon';
@@ -6,6 +7,8 @@ import turfArea from '@turf/area';
 import toasts from '../../components/common/toasts';
 import { BOUNDS_PADDING } from '../../components/common/map/constants';
 import { getMosaicTileUrl } from './helpers';
+import history from '../../history';
+import { RETRAIN_MAP_MODES, SESSION_MODES } from './constants';
 
 export const actions = {
   setInitialContext: assign((context, event) => {
@@ -40,7 +43,7 @@ export const actions = {
     };
   }),
   setCurrentImagerySource: assign((context, event) => {
-    const { currentImagerySource } = context;
+    const { currentImagerySource, currentModel, currentMosaic } = context;
     const { imagerySource } = event.data;
 
     // Bypass if imagery source is already selected and hasn't changed
@@ -52,10 +55,23 @@ export const actions = {
       return {};
     }
 
-    // Apply new imagery source and reset mosaic
-    return {
+    const nextContext = {
       currentImagerySource: imagerySource,
-      currentMosaic: null,
+    };
+
+    // Reset model if imagery source is not applicable
+    if (currentModel && currentModel.imagery_source_id !== imagerySource.id) {
+      nextContext.currentModel = null;
+    }
+
+    // Reset mosaic if imagery source is not applicable
+    if (currentMosaic && currentMosaic.imagery_source_id !== imagerySource.id) {
+      nextContext.currentMosaic = null;
+    }
+
+    // Apply new context
+    return {
+      ...nextContext,
     };
   }),
   setCurrentMosaic: assign((context, event) => {
@@ -65,9 +81,33 @@ export const actions = {
       currentMosaic: { ...mosaic, tileUrl: getMosaicTileUrl(mosaic) },
     };
   }),
-  setCurrentModel: assign((context, event) => ({
-    currentModel: event.data.model,
-  })),
+  setCurrentModel: assign((context, event) => {
+    const { currentModel, currentImagerySource } = context;
+    const { model } = event.data;
+
+    // Bypass if model is already selected and hasn't changed
+    if (currentModel && currentModel.id === model.id) {
+      return {};
+    }
+
+    // Reset imagery source and mosaic if model does not support to them
+    const modelImagerySourceId = get(event, 'data.model.imagery_source_id');
+    if (
+      currentImagerySource &&
+      currentImagerySource.id !== modelImagerySourceId
+    ) {
+      return {
+        currentImagerySource: null,
+        currentMosaic: null,
+        currentModel: event.data.model,
+      };
+    }
+
+    // If all conditions are met, apply new model
+    return {
+      currentModel: event.data.model,
+    };
+  }),
   setCurrentAoi: assign((context, event) => ({
     currentAoi: { ...event.data.aoi },
   })),
@@ -207,6 +247,9 @@ export const actions = {
   setCurrentInstanceType: assign((context, event) => ({
     currentInstanceType: event.data.instanceType,
   })),
+  setCurrentInstanceWebsocket: assign((context, event) => ({
+    currentInstanceWebsocket: event.data.instanceWebsocket,
+  })),
   setCurrentInstanceStatus: assign((context, event) => ({
     currentInstance: {
       ...context.currentInstance,
@@ -214,15 +257,29 @@ export const actions = {
     },
   })),
   setCurrentCheckpoint: assign((context, event) => ({
-    currentCheckpoint: event.data,
+    currentCheckpoint: event.data.checkpoint,
   })),
-  setCurrentTimeframe: assign((context, event) => ({
-    currentTimeframe: event.data.timeframe,
-  })),
+  setCurrentTimeframe: assign((context, event) => {
+    const newTimeframe = event.data.timeframe;
+
+    // Apply new timeframe and (re-)initialize retrain classes
+    return {
+      currentTimeframe: { ...newTimeframe },
+      retrainClasses: newTimeframe.classes
+        ? Object.keys(newTimeframe.classes).map((key) => ({
+            ...newTimeframe.classes[key],
+          }))
+        : [],
+    };
+  }),
   setCurrentBatchPrediction: assign((context, event) => ({
     currentBatchPrediction: event.data.batchPrediction,
   })),
+  setSessionMode: assign((context, event) => ({
+    sessionMode: event.data.sessionMode,
+  })),
   refreshSessionStatusMessage: assign((context) => {
+    const { sessionMode } = context;
     let sessionStatusMessage;
 
     const isFirstAoi = context.aoisList.length === 0;
@@ -239,6 +296,8 @@ export const actions = {
       sessionStatusMessage = 'Select Model';
     } else if (isFirstAoi) {
       sessionStatusMessage = 'Ready for prediction run';
+    } else if (sessionMode === SESSION_MODES.RETRAIN) {
+      sessionStatusMessage = 'Ready for retrain run';
     } else {
       // Keep existing message if none of the above conditions are met
       sessionStatusMessage = context.sessionStatusMessage;
@@ -248,38 +307,17 @@ export const actions = {
       sessionStatusMessage,
     };
   }),
-  refreshPredictionTab: assign((context) => {
-    const { currentImagerySource, project } = context;
-
-    const isExistingProject = project?.id !== 'new';
-
-    return {
-      imagerySourceSelector: {
-        disabled: false,
-        placeholderLabel: 'Select Imagery Source',
-      },
-      mosaicSelector: {
-        disabled: !currentImagerySource,
-        placeholderLabel: 'Select Mosaic',
-      },
-      modelSelector: {
-        hidden: isExistingProject,
-        disabled: !currentImagerySource,
-        placeholderLabel: 'Select Model',
-      },
-    };
-  }),
-  updateCurrentPrediction: assign((context, { data }) => {
+  updateCurrentPrediction: assign((context, { data: { prediction } }) => {
     let predictions = get(context, 'currentPrediction.predictions', []);
 
     // Add prediction to the list if bounds exists
-    if (data.bounds) {
-      const [minX, minY, maxX, maxY] = data.bounds;
+    if (prediction.bounds) {
+      const [minX, minY, maxX, maxY] = prediction.bounds;
 
       // Build prediction object
       predictions = predictions.concat({
         key: predictions.length + 1,
-        image: `data:image/png;base64,${data.image}`,
+        image: `data:image/png;base64,${prediction.image}`,
         bounds: [
           [minY, minX],
           [maxY, maxX],
@@ -288,11 +326,11 @@ export const actions = {
     }
 
     return {
-      sessionStatusMessage: `Received image ${data.processed} of ${data.total}...`,
+      sessionStatusMessage: `Received image ${prediction.processed} of ${prediction.total}...`,
       currentPrediction: {
         ...context.currentPrediction,
-        processed: data.processed,
-        total: data.total,
+        processed: prediction.processed,
+        total: prediction.total,
         predictions,
       },
     };
@@ -303,34 +341,154 @@ export const actions = {
   setMapRef: assign((context, event) => ({
     mapRef: event.data.mapRef,
   })),
+  setRetrainMapMode: assign((context, event) => {
+    const {
+      retrainClasses,
+      retrainActiveClass,
+      mapRef: { freehandDraw, polygonDraw },
+    } = context;
+    const { retrainMapMode } = event.data;
+
+    // Ensure that the freehand draw layers are set
+    freehandDraw.setLayers(retrainClasses);
+
+    // Toggle freehand draw
+    if (retrainMapMode !== RETRAIN_MAP_MODES.ADD_FREEHAND) {
+      freehandDraw.disable();
+    } else {
+      freehandDraw.enableAdd(retrainActiveClass);
+    }
+
+    // Toggle polygon draw
+    if (retrainMapMode !== RETRAIN_MAP_MODES.ADD_POLYGON) {
+      polygonDraw.disable();
+    } else {
+      polygonDraw.enable();
+    }
+
+    return {
+      retrainMapMode: event.data.retrainMapMode,
+    };
+  }),
+  setRetrainActiveClass: assign((context, event) => {
+    const { retrainMapMode } = context;
+    const { retrainActiveClass } = event.data;
+
+    // Enable freehand draw for the active class
+    if (retrainMapMode === RETRAIN_MAP_MODES.ADD_FREEHAND) {
+      context.mapRef.freehandDraw.enableAdd(retrainActiveClass);
+    }
+
+    return {
+      retrainActiveClass: event.data.retrainActiveClass,
+    };
+  }),
+  addRetrainSample: assign((context, event) => {
+    const { retrainSamples, retrainActiveClass } = context;
+
+    // Create a shallow copy of the sample
+    const sample = {
+      ...event.data.sample,
+    };
+
+    // Apply current retrain class to the sample
+    set(sample, 'properties.class', retrainActiveClass);
+
+    // Append sample to the list
+    const newRetrainSamples = retrainSamples.concat(sample);
+
+    return {
+      retrainSamples: newRetrainSamples,
+    };
+  }),
+  updateRetrainClassSamples: assign((context, event) => {
+    const { retrainClass, samples } = event.data;
+    const { retrainSamples } = context;
+
+    // Because of the way the freehand draw layer works, we need samples in
+    // batches
+    return {
+      retrainSamples: retrainSamples
+        .filter((s) => s.properties.class !== retrainClass)
+        .concat(samples),
+    };
+  }),
+  clearRetrainSamples: assign((context) => {
+    context.mapRef.freehandDraw.clearLayers();
+    return {
+      retrainSamples: [],
+    };
+  }),
   setProject: assign((context, event) => ({
     project: event.data.project,
   })),
   initializeNewProject: assign(() => {
     return {
       sessionStatusMessage: 'Set Project Name',
-      imagerySourceSelector: {
-        disabled: true,
-        placeholderLabel: 'Define AOI first',
-      },
-      mosaicSelector: {
-        disabled: true,
-        placeholderLabel: 'Define AOI first',
-      },
-      modelSelector: {
-        disabled: true,
-        placeholderLabel: 'Define AOI first',
-      },
     };
   }),
   enablePredictionRun: assign(() => ({
+    sessionMode: SESSION_MODES.PREDICT,
     sessionStatusMessage: 'Ready for prediction run',
   })),
+  enterActivatingInstance: assign(() => ({
+    globalLoading: {
+      disabled: false,
+      message: 'Activating instance...',
+    },
+  })),
+  displayInstanceActivationError: assign(() => {
+    toasts.error(
+      'Could not start instance at the moment, please try again later.'
+    );
+
+    return {
+      globalLoading: {
+        disabled: true,
+      },
+    };
+  }),
+
   enterPredictionRun: assign(() => ({
     sessionStatusMessage: 'Running prediction',
     globalLoading: {
       disabled: false,
       message: 'Running prediction',
+    },
+  })),
+  enterRequestingInstance: assign(() => ({
+    globalLoading: {
+      disabled: false,
+      message: 'Awaiting instance...',
+    },
+  })),
+  enterRetrainMode: assign(() => ({
+    sessionMode: SESSION_MODES.RETRAIN,
+    sessionStatusMessage: 'Ready for retrain run',
+  })),
+  exitRetrainMode: assign((context) => {
+    const { freehandDraw, polygonDraw } = context.mapRef;
+
+    // Disable all draw modes
+    freehandDraw.clearLayers();
+    freehandDraw.disable();
+    polygonDraw.disable();
+
+    return {
+      retrainSamples: [],
+      retrainMapMode: RETRAIN_MAP_MODES.BROWSE,
+    };
+  }),
+  enterRetrainRun: assign(() => ({
+    sessionStatusMessage: 'Running retrain',
+    globalLoading: {
+      disabled: false,
+      abortButton: true,
+    },
+  })),
+  exitRetrainRun: assign(() => ({
+    globalLoading: {
+      disabled: true,
     },
   })),
   resetMapEventHandlers: assign(() => {
@@ -479,6 +637,19 @@ export const actions = {
       },
     };
   }),
+  handleRetrainError: assign(() => {
+    toasts.error('An unexpected error occurred, please try again later.');
+    return {
+      globalLoading: {
+        disabled: true,
+      },
+    };
+  }),
+  setGlobalLoading: assign((context, event) => ({
+    globalLoading: {
+      ...event.data.globalLoading,
+    },
+  })),
   hideGlobalLoading: assign(() => ({
     globalLoading: {
       disabled: true,
@@ -513,5 +684,9 @@ export const actions = {
     return {
       sharesList: event.data.sharesList,
     };
+  }),
+  redirectToProjectProfilePage: assign((context) => {
+    const projectId = context.project.id;
+    history.push(`/profile/projects/${projectId}`);
   }),
 };

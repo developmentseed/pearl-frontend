@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Button } from '@devseed-ui/button';
 import { Modal } from '@devseed-ui/modal';
-import { ProjectMachineContext } from '../../../../../../../context/project-xstate';
+import { ProjectMachineContext } from '../../../../../../../fsm/project';
 import { ModalWrapper } from '../../../../../../common/modal-wrapper';
 
 export function ConfirmAoiDeleteModal({ aoiId, setAoiIdToDelete }) {

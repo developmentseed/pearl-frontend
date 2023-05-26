@@ -4,11 +4,10 @@ import { useAuth } from '../../context/auth';
 import {
   ProjectMachineContext,
   ProjectMachineProvider,
-} from '../../context/project-xstate';
+} from '../../fsm/project';
 import { PageBody } from '../../styles/page';
 
 import theme from '../../styles/theme';
-import Composer from '../../utils/compose-components';
 import App from '../common/app';
 import { Button } from '@devseed-ui/button';
 import {
@@ -21,19 +20,16 @@ import SizeAwareElement from '../common/size-aware-element';
 import ProjectPageHeader from './header';
 import ProjectPageMain from './main';
 import { AoiModalDialog } from './aoi-modal-dialog';
+import selectors from '../../fsm/project/selectors';
 
 export const ProjectPage = () => {
   return (
     <App pageTitle='Project'>
-      <Composer components={[ProjectMachineProvider]}>
+      <ProjectMachineProvider>
         <ProjectPageInner />
-      </Composer>
+      </ProjectMachineProvider>
     </App>
   );
-};
-
-const selectors = {
-  globalLoading: (state) => state.context.globalLoading,
 };
 
 const ProjectPageInner = () => {
@@ -46,6 +42,9 @@ const ProjectPageInner = () => {
   };
   const globalLoading = ProjectMachineContext.useSelector(
     selectors.globalLoading
+  );
+  const currentInstanceWebsocket = ProjectMachineContext.useSelector(
+    selectors.currentInstanceWebsocket
   );
 
   // After authentication is resolved, send machine event
@@ -71,9 +70,11 @@ const ProjectPageInner = () => {
               data-cy='abort-run-button'
               style={{ display: 'block', margin: '1rem auto 0' }}
               variation='danger-raised-dark'
-              onClick={() => projectActor.send({ type: 'Abort run' })}
+              onClick={() =>
+                projectActor.send({ type: 'Abort button pressed' })
+              }
             >
-              Abort Run
+              Abort
             </Button>
           )}
         </>
@@ -81,7 +82,25 @@ const ProjectPageInner = () => {
     } else {
       showGlobalLoading();
     }
-  }, [globalLoading]);
+  }, [
+    globalLoading.disabled,
+    globalLoading.message,
+    globalLoading.abortButton,
+  ]);
+
+  useEffect(() => {
+    return () => {
+      // On umount, send terminate message and close websocket connection if it
+      // exists
+      if (currentInstanceWebsocket) {
+        currentInstanceWebsocket.sendMessage({
+          action: 'instance#terminate',
+        });
+
+        currentInstanceWebsocket.close();
+      }
+    };
+  }, [currentInstanceWebsocket]);
 
   return (
     <>

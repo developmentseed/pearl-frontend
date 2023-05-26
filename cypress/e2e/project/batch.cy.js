@@ -154,7 +154,7 @@ describe('Batch predictions', () => {
     cy.get('[data-cy=select-model-label]').should('exist').click();
 
     // Finally select a model
-    cy.get('[data-cy=select-model-1-card]').should('exist').click();
+    cy.get('[data-cy=select-model-2-card]').should('exist').click();
 
     // No batch message should be displayed
     cy.get('[data-cy=batch-progress-message').should('not.exist');
@@ -634,7 +634,7 @@ describe('Batch predictions', () => {
     cy.get('[data-cy=select-model-label]').should('exist').click();
 
     // Finally select a model
-    cy.get('[data-cy=select-model-1-card]').should('exist').click();
+    cy.get('[data-cy=select-model-2-card]').should('exist').click();
 
     // No batch message should be displayed
     cy.get('[data-cy=batch-progress-message').should('not.exist');
