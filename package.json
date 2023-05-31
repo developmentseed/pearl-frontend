@@ -23,6 +23,7 @@
     "serve:testing": "NODE_ENV=testing gulp serve",
     "build": "NODE_ENV=production gulp",
     "build:reforestamos": "NODE_ENV=reforestamos gulp",
+    "build:reforestamos:prod": "NODE_ENV=reforestamos-prod gulp",
     "stage": "NODE_ENV=staging gulp",
     "lint": "eslint app/assets/scripts/ cypress/ --ext .js",
     "lint:css": "stylelint 'app/assets/styles/**/**' 'app/assets/scripts/**/*.js'",
