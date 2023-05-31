@@ -83,17 +83,20 @@ function CheckpointSelector() {
     selectors.currentModel
   );
 
+  function getCheckpointLabel(c) {
+    return c.parent
+      ? `${c.name} (${c.id})`
+      : `${currentModel.name} (Base Model)`;
+  }
+
   let selectedOptionLabel;
 
   if (sessionMode === sessionModes.LOADING_PROJECT) {
     selectedOptionLabel = 'Loading...';
   } else if (!checkpointList || checkpointList?.length === 0) {
     selectedOptionLabel = 'Run model to create first checkpoint';
-  } else if (currentCheckpoint?.name) {
-    selectedOptionLabel = `${currentCheckpoint.name} (${currentCheckpoint.id})`;
-    if (!currentCheckpoint.parent) {
-      selectedOptionLabel = `${selectedOptionLabel} (Base Model)`;
-    }
+  } else {
+    selectedOptionLabel = getCheckpointLabel(currentCheckpoint);
   }
 
   return (
@@ -118,23 +121,19 @@ function CheckpointSelector() {
           </CheckpointOption>
           {checkpointList?.length &&
             checkpointList
-              .filter((checkpoint) => checkpoint.id != currentCheckpoint?.id)
-              .map((checkpoint) => (
+              .filter((c) => c.id != currentCheckpoint?.id)
+              .map((c) => (
                 <CheckpointOption
-                  key={checkpoint.id}
+                  key={c.id}
                   // disabled={disabled}
                   onClick={async () => {
                     actorRef.send({
                       type: 'Apply checkpoint',
-                      data: { checkpoint: { ...checkpoint } },
+                      data: { checkpoint: { ...c } },
                     });
                   }}
                 >
-                  <Heading size='xsmall'>
-                    {checkpoint.parent
-                      ? `${checkpoint.name} (${checkpoint.id})`
-                      : `${currentModel.name} (Base Model)`}
-                  </Heading>
+                  <Heading size='xsmall'>{getCheckpointLabel(c)}</Heading>
                 </CheckpointOption>
               ))}
         </ShadowScrollbar>
