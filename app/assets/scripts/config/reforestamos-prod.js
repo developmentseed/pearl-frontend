@@ -2,8 +2,8 @@
 module.exports = {
   default: {
     environment: 'production',
-    restApiEndpoint: 'https://api.reforestamos.ds.io/api/',
-    websocketEndpoint: 'wss://socket.reforestamos-staging.ds.io',
+    restApiEndpoint: 'https://api.reforestamos.ds.io',
+    websocketEndpoint: 'wss://socket.reforestamos.ds.io',
     auth0Domain: 'pearl-landcover.us.auth0.com',
     auth0ClientId: 'mXokXsHo1eabFlWuJyQPpzErqOX3wZ87',
     tileUrlTemplate:
