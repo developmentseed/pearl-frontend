@@ -466,6 +466,12 @@ export const actions = {
     sessionMode: SESSION_MODES.RETRAIN,
     sessionStatusMessage: 'Ready for retrain run',
   })),
+  enterApplyCheckpoint: assign(() => ({
+    sessionStatusMessage: 'Applying checkpoint',
+    globalLoading: {
+      disabled: false,
+    },
+  })),
   exitRetrainMode: assign((context) => {
     const { freehandDraw, polygonDraw } = context.mapRef;
 

@@ -71,6 +71,7 @@ const CheckpointOption = styled(Option)`
 `;
 
 function CheckpointSelector() {
+  const actorRef = ProjectMachineContext.useActorRef();
   const sessionMode = ProjectMachineContext.useSelector(selectors.sessionMode);
   const checkpointList = ProjectMachineContext.useSelector(
     selectors.checkpointList
@@ -88,12 +89,11 @@ function CheckpointSelector() {
     selectedOptionLabel = 'Loading...';
   } else if (!checkpointList || checkpointList?.length === 0) {
     selectedOptionLabel = 'Run model to create first checkpoint';
-  } else if (currentCheckpoint?.bookmarked) {
+  } else if (currentCheckpoint?.name) {
     selectedOptionLabel = `${currentCheckpoint.name} (${currentCheckpoint.id})`;
-  } else if (currentCheckpoint?.parent) {
-    selectedOptionLabel = 'Current checkpoint (Unsaved)';
-  } else {
-    selectedOptionLabel = `${currentModel.name} (Base Model)`;
+    if (!currentCheckpoint.parent) {
+      selectedOptionLabel = `${selectedOptionLabel} (Base Model)`;
+    }
   }
 
   return (
@@ -118,21 +118,21 @@ function CheckpointSelector() {
           </CheckpointOption>
           {checkpointList?.length &&
             checkpointList
-              .filter((ckpt) => ckpt.id != currentCheckpoint?.id)
-              .map((ckpt) => (
+              .filter((checkpoint) => checkpoint.id != currentCheckpoint?.id)
+              .map((checkpoint) => (
                 <CheckpointOption
-                  key={ckpt.id}
+                  key={checkpoint.id}
                   // disabled={disabled}
-                  // onClick={async () => {
-                  //   if (disabled) {
-                  //     return;
-                  //   }
-                  //   await applyCheckpoint(currentProject.id, ckpt.id);
-                  // }}
+                  onClick={async () => {
+                    actorRef.send({
+                      type: 'Apply checkpoint',
+                      data: { checkpoint: { ...checkpoint } },
+                    });
+                  }}
                 >
                   <Heading size='xsmall'>
-                    {ckpt.parent
-                      ? `${ckpt.name} (${ckpt.id})`
+                    {checkpoint.parent
+                      ? `${checkpoint.name} (${checkpoint.id})`
                       : `${currentModel.name} (Base Model)`}
                   </Heading>
                 </CheckpointOption>
