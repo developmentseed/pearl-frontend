@@ -8,10 +8,10 @@ import {
   HeadOptionHeadline,
   HeadOptionToolbar,
 } from '../../../../../styles/panel';
-import { sessionModes } from '../../../../../context/explore/session-status';
 import selectors from '../../../../../fsm/project/selectors';
 import { ProjectMachineContext } from '../../../../../fsm/project';
 import { Subheading } from '../../../../../styles/type/heading';
+import { SESSION_MODES } from '../../../../../fsm/project/constants';
 
 export const Option = styled.div`
   display: grid;
@@ -91,7 +91,7 @@ function CheckpointSelector() {
 
   let selectedOptionLabel;
 
-  if (sessionMode === sessionModes.LOADING_PROJECT) {
+  if (sessionMode === SESSION_MODES.LOADING) {
     selectedOptionLabel = 'Loading...';
   } else if (!checkpointList || checkpointList?.length === 0) {
     selectedOptionLabel = 'Run model to create first checkpoint';
@@ -119,7 +119,7 @@ function CheckpointSelector() {
           <CheckpointOption selected data-cy='selected-checkpoint-header'>
             <Heading size='xsmall'>{selectedOptionLabel}</Heading>
           </CheckpointOption>
-          {checkpointList?.length &&
+          {!!checkpointList?.length &&
             checkpointList
               .filter((c) => c.id != currentCheckpoint?.id)
               .map((c) => (

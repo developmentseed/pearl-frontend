@@ -487,6 +487,17 @@ export const services = {
               });
             }
           );
+
+          // Update checkpoint list
+          apiClient
+            .get(`/project/${project.id}/checkpoint`)
+            .then((checkpointList) => {
+              callback({
+                type: 'Received checkpoint list',
+                data: { checkpointList },
+              });
+            });
+
           websocket.sendMessage({
             action: 'model#status',
           });
@@ -676,20 +687,25 @@ export const services = {
           });
 
           // Fetch full checkpoint data
-          apiClient.get(`/project/${project.id}/checkpoint/${data.id}`).then(
-            (checkpoint) => {
+          apiClient
+            .get(`/project/${project.id}/checkpoint/${data.id}`)
+            .then((checkpoint) => {
               callback({
                 type: 'Received checkpoint',
                 data: { checkpoint },
               });
-            },
-            (error) => {
+            });
+
+          // Update checkpoint list
+          apiClient
+            .get(`/project/${project.id}/checkpoint`)
+            .then((checkpointList) => {
               callback({
-                type: 'Prediction has failed',
-                data: { error },
+                type: 'Received checkpoint list',
+                data: { checkpointList },
               });
-            }
-          );
+            });
+
           websocket.sendMessage({
             action: 'model#status',
           });

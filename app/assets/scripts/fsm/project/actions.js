@@ -691,6 +691,11 @@ export const actions = {
       sharesList: event.data.sharesList,
     };
   }),
+  setCheckpointList: assign((context, event) => {
+    return {
+      checkpointList: event.data.checkpointList,
+    };
+  }),
   redirectToProjectProfilePage: assign((context) => {
     const projectId = context.project.id;
     history.push(`/profile/projects/${projectId}`);
