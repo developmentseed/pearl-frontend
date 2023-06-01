@@ -141,7 +141,12 @@ export const actions = {
         currentModel: null,
       };
     } else {
-      return { currentAoi: null, currentPrediction: null };
+      return {
+        currentAoi: null,
+        currentPrediction: null,
+        currentShare: null,
+        currentTimeframe: null,
+      };
     }
   }),
   prependAoisList: assign((context, event) => {
@@ -523,6 +528,7 @@ export const actions = {
 
     return {
       currentAoi: null,
+      currentTimeframe: null,
       currentPrediction: null,
       rectangleAoi: null,
       aoiStatusMessage: 'Drag on map to select area',
