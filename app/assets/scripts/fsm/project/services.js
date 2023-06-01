@@ -704,7 +704,7 @@ export const services = {
           // Update checkpoint list
           apiClient
             .get(`/project/${project.id}/checkpoint`)
-            .then((checkpointList) => {
+            .then(({ checkpoints: checkpointList }) => {
               callback({
                 type: 'Received checkpoint list',
                 data: { checkpointList },

@@ -84,7 +84,7 @@ function CheckpointSelector() {
   );
 
   function getCheckpointLabel(c) {
-    return c.parent
+    return c?.parent
       ? `${c.name} (${c.id})`
       : `${currentModel.name} (Base Model)`;
   }
