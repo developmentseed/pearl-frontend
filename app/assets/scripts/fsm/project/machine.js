@@ -188,7 +188,7 @@ export const projectMachine = createMachine(
           'Prime button pressed': 'Enter prediction run',
           'Pressed upload AOI button': {
             target: 'Displaying upload AOI modal',
-            actions: ['clearCurrentAoi', 'toggleUploadAoiModal'],
+            actions: ['toggleUploadAoiModal'],
           },
           'Request AOI delete': 'Requested AOI delete',
           'Pressed new AOI button': 'Waiting for drag or cancel',

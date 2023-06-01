@@ -133,7 +133,11 @@ function UploadAoiModal() {
       size='small'
       revealed={uploadAoiModal.revealed}
       title='Upload an AOI'
-      onCloseClick={() => actorRef.send('Close upload AOI modal')}
+      onCloseClick={() => {
+        actorRef.send('Close upload AOI modal');
+        setFile(null);
+        setWarning(null);
+      }}
       content={
         <Wrapper>
           {!file && (
@@ -201,7 +205,7 @@ function UploadAoiModal() {
             visuallyDisabled={!file}
             disabled={!file}
             style={{ gridColumn: '1 / -1' }}
-            onClick={() =>
+            onClick={() => {
               actorRef.send({
                 type: 'Uploaded valid AOI file',
                 data: {
@@ -211,8 +215,10 @@ function UploadAoiModal() {
                     geojson: file.aoiGeometry,
                   },
                 },
-              })
-            }
+              });
+              setFile(null);
+              setWarning(null);
+            }}
           >
             Import
           </Button>
