@@ -200,7 +200,7 @@ export const services = {
 
     const aoi = await apiClient.post(`/project/${projectId}/aoi`, {
       name: name,
-      bounds: geojson.geometry,
+      bounds: geojson.geometry || geojson,
     });
 
     return { aoi };
