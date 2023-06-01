@@ -20,6 +20,8 @@ module.exports = defineConfig({
       '**/panel.cy.js',
       '**/retrain.cy.js',
       '**/sec-panel.cy.js',
+      '**/aois.cy.js',
+      '**/new.cy.js',
     ],
     setupNodeEvents(on, cypressConfig) {
       startMockWsServer(cypressConfig);
