@@ -104,11 +104,13 @@ function UploadAoiModal() {
       ) {
         // If area is bigger than apiLimits.live_inference, show warning and proceed import
         setWarning('Due to area size live inference will not be available.');
-      } else if (
-        geojson.features.length !== 1 ||
-        !geojsonValidation.isPolygon(aoiGeometry)
-      ) {
-        setWarning(`GeoJSON file must contain a single Polygon.`);
+      } else if (geojson.features.length > 1) {
+        setWarning(`GeoJSON file must contain a single feature.`);
+        return;
+      } else if (!geojsonValidation.isPolygon(aoiGeometry)) {
+        setWarning(
+          `GeoJSON file must contain a feature of type 'Polygon' (MultiPolygon and other types are not supported).`
+        );
         return;
       } else {
         // Area is ok, clear warning
