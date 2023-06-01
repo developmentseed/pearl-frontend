@@ -42,7 +42,7 @@ export function ImagerySourceSelector() {
       disabled = false;
     }
   } else {
-    label = currentImagerySource.name;
+    label = currentImagerySource?.name || '';
     disabled = true;
   }
 

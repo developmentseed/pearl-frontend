@@ -104,11 +104,13 @@ function UploadAoiModal() {
       ) {
         // If area is bigger than apiLimits.live_inference, show warning and proceed import
         setWarning('Due to area size live inference will not be available.');
-      } else if (
-        geojson.features.length !== 1 ||
-        !geojsonValidation.isPolygon(aoiGeometry)
-      ) {
-        setWarning(`GeoJSON file must contain a single Polygon.`);
+      } else if (geojson.features.length > 1) {
+        setWarning(`GeoJSON file must contain a single feature.`);
+        return;
+      } else if (!geojsonValidation.isPolygon(aoiGeometry)) {
+        setWarning(
+          `GeoJSON file must contain a feature of type 'Polygon' (MultiPolygon and other types are not supported).`
+        );
         return;
       } else {
         // Area is ok, clear warning
@@ -131,7 +133,11 @@ function UploadAoiModal() {
       size='small'
       revealed={uploadAoiModal.revealed}
       title='Upload an AOI'
-      onCloseClick={() => actorRef.send('Close upload AOI modal')}
+      onCloseClick={() => {
+        actorRef.send('Close upload AOI modal');
+        setFile(null);
+        setWarning(null);
+      }}
       content={
         <Wrapper>
           {!file && (
@@ -199,7 +205,7 @@ function UploadAoiModal() {
             visuallyDisabled={!file}
             disabled={!file}
             style={{ gridColumn: '1 / -1' }}
-            onClick={() =>
+            onClick={() => {
               actorRef.send({
                 type: 'Uploaded valid AOI file',
                 data: {
@@ -209,8 +215,10 @@ function UploadAoiModal() {
                     geojson: file.aoiGeometry,
                   },
                 },
-              })
-            }
+              });
+              setFile(null);
+              setWarning(null);
+            }}
           >
             Import
           </Button>

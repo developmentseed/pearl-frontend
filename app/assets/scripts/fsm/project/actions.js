@@ -272,6 +272,12 @@ export const actions = {
         : [],
     };
   }),
+  setCurrentTimeframeTilejson: assign((context, event) => ({
+    currentTimeframe: {
+      ...context.currentTimeframe,
+      tilejson: event.data.tilejson,
+    },
+  })),
   setCurrentBatchPrediction: assign((context, event) => ({
     currentBatchPrediction: event.data.batchPrediction,
   })),
@@ -465,6 +471,12 @@ export const actions = {
   enterRetrainMode: assign(() => ({
     sessionMode: SESSION_MODES.RETRAIN,
     sessionStatusMessage: 'Ready for retrain run',
+  })),
+  enterApplyCheckpoint: assign(() => ({
+    sessionStatusMessage: 'Applying checkpoint',
+    globalLoading: {
+      disabled: false,
+    },
   })),
   exitRetrainMode: assign((context) => {
     const { freehandDraw, polygonDraw } = context.mapRef;
@@ -683,6 +695,11 @@ export const actions = {
   setSharesList: assign((context, event) => {
     return {
       sharesList: event.data.sharesList,
+    };
+  }),
+  setCheckpointList: assign((context, event) => {
+    return {
+      checkpointList: event.data.checkpointList,
     };
   }),
   redirectToProjectProfilePage: assign((context) => {

@@ -200,7 +200,7 @@ export const services = {
 
     const aoi = await apiClient.post(`/project/${projectId}/aoi`, {
       name: name,
-      bounds: geojson.geometry,
+      bounds: geojson.geometry || geojson,
     });
 
     return { aoi };
@@ -245,7 +245,12 @@ export const services = {
     };
   },
   activateInstance: (context) => async (callback) => {
-    const { apiClient, currentInstanceType, currentTimeframe } = context;
+    const {
+      apiClient,
+      currentInstanceType,
+      currentTimeframe,
+      currentCheckpoint,
+    } = context;
     const { id: projectId } = context.project;
 
     let instance;
@@ -254,13 +259,13 @@ export const services = {
       type: currentInstanceType,
       ...(currentTimeframe?.id && { timeframe_id: currentTimeframe.id }),
       ...(currentTimeframe?.checkpoint_id && {
-        checkpoint_id: currentTimeframe.checkpoint_id,
+        checkpoint_id: currentCheckpoint?.id || currentTimeframe.checkpoint_id,
       }),
     };
 
     // Fetch active instances for this project
     const activeInstances = await apiClient.get(
-      `/project/${projectId}/instance/?status=active&type=${currentInstanceType}`
+      `/project/${projectId}/instance`
     );
 
     // Reuse existing instance if available
@@ -328,12 +333,34 @@ export const services = {
           });
           break;
         case 'info#connected':
+        case 'model#checkpoint#progress':
+        case 'model#timeframe#progress':
         case 'model#timeframe#complete':
           // After connection, request status
           websocket.sendMessage({
             action: 'model#status',
           });
           break;
+        case 'model#checkpoint#complete':
+          apiClient
+            .get(`/project/${projectId}/checkpoint/${data.checkpoint}`)
+            .then((checkpoint) => {
+              callback({
+                type: 'Checkpoint was applied',
+                data: { checkpoint },
+              });
+              websocket.sendMessage({
+                action: 'model#status',
+              });
+            })
+            .catch((error) => {
+              callback({
+                type: 'Instance activation has failed',
+                data: { error },
+              });
+            });
+          break;
+
         case 'info#disconnected':
           // After connection, send a message to the server to request
           // model status
@@ -360,6 +387,16 @@ export const services = {
                 action: 'model#timeframe',
                 data: {
                   id: instanceConfig.timeframe_id,
+                },
+              });
+            } else if (
+              instanceConfig.checkpoint_id &&
+              instanceConfig.checkpoint_id !== data.checkpoint
+            ) {
+              websocket.sendMessage({
+                action: 'model#checkpoint',
+                data: {
+                  id: instanceConfig.checkpoint_id,
                 },
               });
             } else {
@@ -450,6 +487,17 @@ export const services = {
               });
             }
           );
+
+          // Update checkpoint list
+          apiClient
+            .get(`/project/${project.id}/checkpoint`)
+            .then(({ checkpoints: checkpointList }) => {
+              callback({
+                type: 'Received checkpoint list',
+                data: { checkpointList },
+              });
+            });
+
           websocket.sendMessage({
             action: 'model#status',
           });
@@ -464,20 +512,12 @@ export const services = {
             .get(
               `/project/${project.id}/aoi/${currentAoi.id}/timeframe/${data.id}`
             )
-            .then(
-              (timeframe) => {
-                callback({
-                  type: 'Received timeframe',
-                  data: { timeframe },
-                });
-              },
-              (error) => {
-                callback({
-                  type: 'Prediction has failed',
-                  data: { error },
-                });
-              }
-            );
+            .then((timeframe) => {
+              callback({
+                type: 'Received timeframe',
+                data: { timeframe },
+              });
+            });
           break;
         case 'model#prediction':
           callback({
@@ -486,10 +526,23 @@ export const services = {
           });
           break;
         case 'model#prediction#complete':
-          callback({
-            type: 'Prediction run was completed',
-            data,
-          });
+          apiClient
+            .get(
+              `project/${project.id}/aoi/${currentAoi.id}/timeframe/${data.timeframe}/tiles`
+            )
+            .then((tilejson) => {
+              callback({
+                type: 'Prediction run was completed',
+                data: { tilejson },
+              });
+            })
+            .catch((error) => {
+              callback({
+                type: 'Prediction has failed',
+                data: { error },
+              });
+            });
+
           break;
 
         default:
@@ -639,20 +692,25 @@ export const services = {
           });
 
           // Fetch full checkpoint data
-          apiClient.get(`/project/${project.id}/checkpoint/${data.id}`).then(
-            (checkpoint) => {
+          apiClient
+            .get(`/project/${project.id}/checkpoint/${data.id}`)
+            .then((checkpoint) => {
               callback({
                 type: 'Received checkpoint',
                 data: { checkpoint },
               });
-            },
-            (error) => {
+            });
+
+          // Update checkpoint list
+          apiClient
+            .get(`/project/${project.id}/checkpoint`)
+            .then((checkpointList) => {
               callback({
-                type: 'Prediction has failed',
-                data: { error },
+                type: 'Received checkpoint list',
+                data: { checkpointList },
               });
-            }
-          );
+            });
+
           websocket.sendMessage({
             action: 'model#status',
           });
@@ -709,6 +767,9 @@ export const services = {
               },
             },
           });
+          websocket.sendMessage({
+            action: 'model#status',
+          });
           break;
         case 'model#retrain#progress': {
           callback({
@@ -752,10 +813,23 @@ export const services = {
           });
           break;
         case 'model#prediction#complete':
-          callback({
-            type: 'Retrain run was completed',
-            data,
-          });
+          apiClient
+            .get(
+              `project/${project.id}/aoi/${currentAoi.id}/timeframe/${data.timeframe}/tiles`
+            )
+            .then((tilejson) => {
+              callback({
+                type: 'Retrain run was completed',
+                data: { tilejson },
+              });
+            })
+            .catch((error) => {
+              callback({
+                type: 'Retrain has errored',
+                data: { error },
+              });
+            });
+
           break;
 
         default:
@@ -800,5 +874,132 @@ export const services = {
     );
 
     return { batchPrediction };
+  },
+  applyCheckpoint: (context) => (callback, onReceive) => {
+    const { currentCheckpoint } = context;
+
+    const { token } = context.currentInstance;
+    const websocket = new WebsocketClient(token);
+
+    /**
+     * Ping pong logic
+     */
+    let pingCount = 0;
+    let lastPintCount;
+    let pingPongInterval;
+    websocket.addEventListener('open', () => {
+      // Send first ping
+      websocket.send(`ping#${pingCount}`);
+
+      // Check for pong messages every interval
+      pingPongInterval = setInterval(() => {
+        if (lastPintCount === pingCount) {
+          pingCount = pingCount + 1;
+          websocket.send(`ping#${pingCount}`);
+        } else {
+          // Pong didn't happened, reconnect
+          websocket.reconnect();
+        }
+      }, config.websocketPingPongInterval);
+    });
+    websocket.addEventListener('close', () => {
+      if (pingPongInterval) {
+        clearInterval(pingPongInterval);
+      }
+    });
+
+    /**
+     * Handle events received from the machine
+     */
+    onReceive((event) => {
+      if (event.type === 'Abort retrain') {
+        websocket.sendMessage({
+          action: 'model#abort',
+        });
+        // Ideally we should thrown an error here to make the service
+        // execute the 'onError' event, but XState doesn't support errors
+        // thrown inside onReceive. A fix is planned for XState v5, more
+        // here: https://github.com/statelyai/xstate/issues/3279
+        callback({ type: 'Retrain was aborted' });
+      }
+    });
+
+    /**
+     * Handle events received from the websocket
+     */
+    let isStarted = false;
+    websocket.addEventListener('message', (e) => {
+      // Update ping count on pong
+      if (e.data.startsWith('pong#')) {
+        lastPintCount = parseInt(e.data.split('#')[1], 10);
+        return;
+      }
+
+      const { message, data } = JSON.parse(e.data);
+
+      switch (message) {
+        case 'error':
+          // Send abort message to errored instance
+          websocket.sendMessage({
+            action: 'model#abort',
+          });
+
+          // Send error message to the machine
+          callback({
+            type: 'Instance has errored',
+            data: { error: data.error },
+          });
+          break;
+        case 'info#connected':
+        case 'info#disconnected':
+        case 'model#checkpoint#progress':
+          // After connection, send a message to the server to request
+          // model status
+          websocket.sendMessage({
+            action: 'model#status',
+          });
+          break;
+        case 'model#status':
+          if (!isStarted && data.processing) {
+            // Send abort message to stop previous process
+            websocket.sendMessage({
+              action: 'instance#abort',
+            });
+            callback({
+              type: 'Instance has errored',
+              data: { error: data.error },
+            });
+          } else if (!isStarted && !data.processing) {
+            isStarted = true;
+            if (data.checkpoint !== currentCheckpoint.id) {
+              websocket.sendMessage({
+                action: 'model#checkpoint',
+                data: {
+                  id: context.currentCheckpoint.id,
+                },
+              });
+            }
+          }
+          break;
+        case 'model#checkpoint#complete':
+          callback({
+            type: 'Checkpoint was applied',
+            data,
+          });
+          break;
+
+        default:
+          if (data?.error) {
+            callback({
+              type: 'Retrain has errored',
+              data: { error: data.error },
+            });
+          } else {
+            logger('Unhandled websocket message', message, data);
+          }
+          break;
+      }
+    });
+    return () => websocket.close();
   },
 };

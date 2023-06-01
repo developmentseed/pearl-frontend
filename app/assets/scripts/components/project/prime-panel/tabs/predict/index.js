@@ -8,6 +8,7 @@ import { AoiSelector } from './aoi-selector';
 import { ImagerySourceSelector } from './imagery-source-selector';
 import { MosaicSelector } from './mosaic-selector';
 import { ModelSelector } from './model-selector';
+import CheckpointSelector from './checkpoint-selector';
 
 export const ToolsWrapper = styled.div`
   display: grid;
@@ -46,6 +47,7 @@ function Header() {
       <ImagerySourceSelector />
       <MosaicSelector />
       <ModelSelector />
+      <CheckpointSelector />
     </PanelBlockHeader>
   );
 }
