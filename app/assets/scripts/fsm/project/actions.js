@@ -272,6 +272,12 @@ export const actions = {
         : [],
     };
   }),
+  setCurrentTimeframeTilejson: assign((context, event) => ({
+    currentTimeframe: {
+      ...context.currentTimeframe,
+      tilejson: event.data.tilejson,
+    },
+  })),
   setCurrentBatchPrediction: assign((context, event) => ({
     currentBatchPrediction: event.data.batchPrediction,
   })),

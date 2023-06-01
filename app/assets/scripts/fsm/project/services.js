@@ -491,7 +491,7 @@ export const services = {
           // Update checkpoint list
           apiClient
             .get(`/project/${project.id}/checkpoint`)
-            .then((checkpointList) => {
+            .then(({ checkpoints: checkpointList }) => {
               callback({
                 type: 'Received checkpoint list',
                 data: { checkpointList },
@@ -512,20 +512,12 @@ export const services = {
             .get(
               `/project/${project.id}/aoi/${currentAoi.id}/timeframe/${data.id}`
             )
-            .then(
-              (timeframe) => {
-                callback({
-                  type: 'Received timeframe',
-                  data: { timeframe },
-                });
-              },
-              (error) => {
-                callback({
-                  type: 'Prediction has failed',
-                  data: { error },
-                });
-              }
-            );
+            .then((timeframe) => {
+              callback({
+                type: 'Received timeframe',
+                data: { timeframe },
+              });
+            });
           break;
         case 'model#prediction':
           callback({
@@ -534,10 +526,23 @@ export const services = {
           });
           break;
         case 'model#prediction#complete':
-          callback({
-            type: 'Prediction run was completed',
-            data,
-          });
+          apiClient
+            .get(
+              `project/${project.id}/aoi/${currentAoi.id}/timeframe/${data.timeframe}/tiles`
+            )
+            .then((tilejson) => {
+              callback({
+                type: 'Prediction run was completed',
+                data: { tilejson },
+              });
+            })
+            .catch((error) => {
+              callback({
+                type: 'Prediction has failed',
+                data: { error },
+              });
+            });
+
           break;
 
         default:
@@ -808,10 +813,23 @@ export const services = {
           });
           break;
         case 'model#prediction#complete':
-          callback({
-            type: 'Retrain run was completed',
-            data,
-          });
+          apiClient
+            .get(
+              `project/${project.id}/aoi/${currentAoi.id}/timeframe/${data.timeframe}/tiles`
+            )
+            .then((tilejson) => {
+              callback({
+                type: 'Retrain run was completed',
+                data: { tilejson },
+              });
+            })
+            .catch((error) => {
+              callback({
+                type: 'Retrain has errored',
+                data: { error },
+              });
+            });
+
           break;
 
         default:
