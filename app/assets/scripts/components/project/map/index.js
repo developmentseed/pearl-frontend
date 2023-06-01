@@ -326,7 +326,11 @@ function Map() {
         <BaseMapLayer />
 
         {mosaicTileUrl && (
-          <TileLayer url={mosaicTileUrl} opacity={MOSAIC_LAYER_OPACITY} />
+          <TileLayer
+            key={mosaicTileUrl}
+            url={mosaicTileUrl}
+            opacity={MOSAIC_LAYER_OPACITY}
+          />
         )}
 
         {timeframeTilejsonUrl && (
