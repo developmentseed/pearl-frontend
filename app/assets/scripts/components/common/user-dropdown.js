@@ -85,11 +85,6 @@ function UserDropdown() {
             </DropdownHeader>
             <DropdownBody>
               <li>
-                <DropdownItem as={StyledLink} to='/project/new' useIcon='globe'>
-                  New Project
-                </DropdownItem>
-              </li>
-              <li>
                 <DropdownItem
                   as={StyledLink}
                   to='/profile/projects'
