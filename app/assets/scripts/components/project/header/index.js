@@ -274,16 +274,18 @@ function ProjectPageHeader({ isMediumDown }) {
             <p>Export Options</p>
           </DropdownHeader>
           <DropdownBody>
-            <li>
-              <DropdownItem
-                useIcon='download-2'
-                onClick={() =>
-                  downloadShareGeotiff(restApiClient, currentShare)
-                }
-              >
-                Download .geotiff
-              </DropdownItem>
-            </li>
+            {currentShare && (
+              <li>
+                <DropdownItem
+                  useIcon='download-2'
+                  onClick={() =>
+                    downloadShareGeotiff(restApiClient, currentShare)
+                  }
+                >
+                  Download .geotiff
+                </DropdownItem>
+              </li>
+            )}
             <li>
               <DropdownItem
                 useIcon='link'
