@@ -245,175 +245,183 @@ export const services = {
     };
   },
   activateInstance: (context) => async (callback) => {
-    const {
-      apiClient,
-      currentInstanceType,
-      currentTimeframe,
-      currentCheckpoint,
-    } = context;
-    const { id: projectId } = context.project;
+    try {
+      const {
+        apiClient,
+        currentInstanceType,
+        currentTimeframe,
+        currentCheckpoint,
+      } = context;
+      const { id: projectId } = context.project;
 
-    let instance;
+      let instance;
 
-    const instanceConfig = {
-      type: currentInstanceType,
-      ...(currentTimeframe?.id && { timeframe_id: currentTimeframe.id }),
-      ...(currentTimeframe?.checkpoint_id && {
-        checkpoint_id: currentCheckpoint?.id || currentTimeframe.checkpoint_id,
-      }),
-    };
+      const instanceConfig = {
+        type: currentInstanceType,
+        ...(currentTimeframe?.id && { timeframe_id: currentTimeframe.id }),
+        ...(currentTimeframe?.checkpoint_id && {
+          checkpoint_id:
+            currentCheckpoint?.id || currentTimeframe.checkpoint_id,
+        }),
+      };
 
-    // Fetch active instances for this project
-    const activeInstances = await apiClient.get(
-      `/project/${projectId}/instance`
-    );
-
-    // Reuse existing instance if available
-    if (activeInstances.total > 0) {
-      const { id: instanceId } = activeInstances.instances[0];
-      instance = await apiClient.get(
-        `/project/${projectId}/instance/${instanceId}`
+      // Fetch active instances for this project
+      const activeInstances = await apiClient.get(
+        `project/${projectId}/instance?active=true&type=cpu`
       );
-    } else {
-      instance = await apiClient.post(
-        `/project/${projectId}/instance`,
-        instanceConfig
-      );
-    }
 
-    // Confirm instance has running status
-    let instanceStatus;
-    let creationDuration = 0;
-    while (
-      !instanceStatus ||
-      creationDuration < config.instanceCreationTimeout
-    ) {
-      // Get instance status
-      instanceStatus = await apiClient.get(
-        `project/${projectId}/instance/${instance.id}`
-      );
-      const instancePhase = get(instanceStatus, 'status.phase');
-
-      // Process status
-      if (instancePhase === 'Running' && instanceStatus.active) {
-        break;
-      } else if (instancePhase === 'Failed') {
-        callback({
-          type: 'Instance activation has failed',
-        });
+      // Reuse existing instance if available
+      if (activeInstances.total > 0) {
+        const { id: instanceId } = activeInstances.instances[0];
+        instance = await apiClient.get(
+          `project/${projectId}/instance/${instanceId}`
+        );
+      } else {
+        instance = await apiClient.post(
+          `project/${projectId}/instance`,
+          instanceConfig
+        );
       }
 
-      // Update timer
-      await delay(config.instanceCreationCheckInterval);
-      creationDuration += config.instanceCreationCheckInterval;
+      // Confirm instance has running status
+      let instanceStatus;
+      let creationDuration = 0;
+      while (
+        !instanceStatus ||
+        creationDuration < config.instanceCreationTimeout
+      ) {
+        // Get instance status
+        instanceStatus = await apiClient.get(
+          `project/${projectId}/instance/${instance.id}`
+        );
+        const instancePhase = get(instanceStatus, 'status.phase');
 
-      // Check timeout
-      if (creationDuration >= config.instanceCreationTimeout) {
-        callback({
-          type: 'Instance activation has failed',
-        });
-      }
-    }
-
-    const { token } = instance;
-    const websocket = new WebsocketClient(token);
-
-    callback({
-      type: 'Instance is running',
-    });
-
-    websocket.addEventListener('message', (e) => {
-      const { message, data } = JSON.parse(e.data);
-
-      switch (message) {
-        case 'error':
+        // Process status
+        if (instancePhase === 'Running' && instanceStatus.active) {
+          break;
+        } else if (instancePhase === 'Failed') {
           callback({
             type: 'Instance activation has failed',
-            data: { error: data.error },
           });
-          break;
-        case 'info#connected':
-        case 'model#checkpoint#progress':
-        case 'model#timeframe#progress':
-        case 'model#timeframe#complete':
-          // After connection, request status
-          websocket.sendMessage({
-            action: 'model#status',
-          });
-          break;
-        case 'model#checkpoint#complete':
-          apiClient
-            .get(`project/${projectId}/checkpoint/${data.checkpoint}`)
-            .then((checkpoint) => {
-              callback({
-                type: 'Checkpoint was applied',
-                data: { checkpoint },
-              });
-              websocket.sendMessage({
-                action: 'model#status',
-              });
-            })
-            .catch((error) => {
-              callback({
-                type: 'Instance activation has failed',
-                data: { error },
-              });
-            });
-          break;
+        }
 
-        case 'info#disconnected':
-          // After connection, send a message to the server to request
-          // model status
-          websocket.sendMessage({
-            action: 'model#status',
+        // Update timer
+        await delay(config.instanceCreationCheckInterval);
+        creationDuration += config.instanceCreationCheckInterval;
+
+        // Check timeout
+        if (creationDuration >= config.instanceCreationTimeout) {
+          callback({
+            type: 'Instance activation has failed',
           });
-          break;
-        case 'model#status':
-          if (data.processing) {
-            // Instance is processing a different timeframe, abort it
-            if (instanceConfig.timeframe_id !== data.timeframe) {
-              websocket.sendMessage({
-                action: 'model#abort',
-              });
-            }
-          } else {
-            // If a timeframe is specified and it is different from the
-            // current timeframe, request it
-            if (
-              instanceConfig.timeframe_id &&
-              instanceConfig.timeframe_id !== data.timeframe
-            ) {
-              websocket.sendMessage({
-                action: 'model#timeframe',
-                data: {
-                  id: instanceConfig.timeframe_id,
-                },
-              });
-            } else if (
-              instanceConfig.checkpoint_id &&
-              instanceConfig.checkpoint_id !== data.checkpoint
-            ) {
-              websocket.sendMessage({
-                action: 'model#checkpoint',
-                data: {
-                  id: instanceConfig.checkpoint_id,
-                },
-              });
-            } else {
-              // Instance has the same timeframe and is not processing, it should be ready
-              callback({
-                type: 'Instance is ready',
-                data: { instance },
-              });
-              websocket.close();
-            }
-          }
-          break;
-        default:
-          logger('Unhandled websocket message', message, data);
-          break;
+        }
       }
-    });
+
+      const { token } = instance;
+      const websocket = new WebsocketClient(token);
+
+      callback({
+        type: 'Instance is running',
+      });
+
+      websocket.addEventListener('message', (e) => {
+        const { message, data } = JSON.parse(e.data);
+
+        switch (message) {
+          case 'error':
+            callback({
+              type: 'Instance activation has failed',
+              data: { error: data.error },
+            });
+            break;
+          case 'info#connected':
+          case 'model#checkpoint#progress':
+          case 'model#timeframe#progress':
+          case 'model#timeframe#complete':
+            // After connection, request status
+            websocket.sendMessage({
+              action: 'model#status',
+            });
+            break;
+          case 'model#checkpoint#complete':
+            apiClient
+              .get(`project/${projectId}/checkpoint/${data.checkpoint}`)
+              .then((checkpoint) => {
+                callback({
+                  type: 'Checkpoint was applied',
+                  data: { checkpoint },
+                });
+                websocket.sendMessage({
+                  action: 'model#status',
+                });
+              })
+              .catch((error) => {
+                callback({
+                  type: 'Instance activation has failed',
+                  data: { error },
+                });
+              });
+            break;
+
+          case 'info#disconnected':
+            // After connection, send a message to the server to request
+            // model status
+            websocket.sendMessage({
+              action: 'model#status',
+            });
+            break;
+          case 'model#status':
+            if (data.processing) {
+              // Instance is processing a different timeframe, abort it
+              if (instanceConfig.timeframe_id !== data.timeframe) {
+                websocket.sendMessage({
+                  action: 'model#abort',
+                });
+              }
+            } else {
+              // If a timeframe is specified and it is different from the
+              // current timeframe, request it
+              if (
+                instanceConfig.timeframe_id &&
+                instanceConfig.timeframe_id !== data.timeframe
+              ) {
+                websocket.sendMessage({
+                  action: 'model#timeframe',
+                  data: {
+                    id: instanceConfig.timeframe_id,
+                  },
+                });
+              } else if (
+                instanceConfig.checkpoint_id &&
+                instanceConfig.checkpoint_id !== data.checkpoint
+              ) {
+                websocket.sendMessage({
+                  action: 'model#checkpoint',
+                  data: {
+                    id: instanceConfig.checkpoint_id,
+                  },
+                });
+              } else {
+                // Instance has the same timeframe and is not processing, it should be ready
+                callback({
+                  type: 'Instance is ready',
+                  data: { instance },
+                });
+                websocket.close();
+              }
+            }
+            break;
+          default:
+            logger('Unhandled websocket message', message, data);
+            break;
+        }
+      });
+    } catch (error) {
+      callback({
+        type: 'Instance activation has failed',
+        data: { error },
+      });
+    }
   },
   runPrediction: (context) => (callback, onReceive) => {
     const { apiClient, project, currentAoi } = context;
