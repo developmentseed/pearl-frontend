@@ -211,10 +211,10 @@ export const services = {
     const sharesList = context.sharesList || [];
     const aoiId = event.data?.aoiId || context.currentAoi?.id;
 
-    const aoi = await apiClient.get(`/project/${projectId}/aoi/${aoiId}`);
+    const aoi = await apiClient.get(`project/${projectId}/aoi/${aoiId}`);
 
     const timeframesList = (
-      await apiClient.get(`/project/${projectId}/aoi/${aoi.id}/timeframe`)
+      await apiClient.get(`project/${projectId}/aoi/${aoi.id}/timeframe`)
     ).timeframes;
 
     let latestTimeframe;
@@ -343,7 +343,7 @@ export const services = {
           break;
         case 'model#checkpoint#complete':
           apiClient
-            .get(`/project/${projectId}/checkpoint/${data.checkpoint}`)
+            .get(`project/${projectId}/checkpoint/${data.checkpoint}`)
             .then((checkpoint) => {
               callback({
                 type: 'Checkpoint was applied',
@@ -473,7 +473,7 @@ export const services = {
           });
 
           // Fetch full checkpoint data
-          apiClient.get(`/project/${project.id}/checkpoint/${data.id}`).then(
+          apiClient.get(`project/${project.id}/checkpoint/${data.id}`).then(
             (checkpoint) => {
               callback({
                 type: 'Received checkpoint',
@@ -490,7 +490,7 @@ export const services = {
 
           // Update checkpoint list
           apiClient
-            .get(`/project/${project.id}/checkpoint`)
+            .get(`project/${project.id}/checkpoint`)
             .then(({ checkpoints: checkpointList }) => {
               callback({
                 type: 'Received checkpoint list',
@@ -693,7 +693,7 @@ export const services = {
 
           // Fetch full checkpoint data
           apiClient
-            .get(`/project/${project.id}/checkpoint/${data.id}`)
+            .get(`project/${project.id}/checkpoint/${data.id}`)
             .then((checkpoint) => {
               callback({
                 type: 'Received checkpoint',
@@ -703,7 +703,7 @@ export const services = {
 
           // Update checkpoint list
           apiClient
-            .get(`/project/${project.id}/checkpoint`)
+            .get(`project/${project.id}/checkpoint`)
             .then(({ checkpoints: checkpointList }) => {
               callback({
                 type: 'Received checkpoint list',
