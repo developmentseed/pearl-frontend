@@ -510,7 +510,7 @@ export const services = {
           // Fetch full timeframe data
           apiClient
             .get(
-              `/project/${project.id}/aoi/${currentAoi.id}/timeframe/${data.id}`
+              `project/${project.id}/aoi/${currentAoi.id}/timeframe/${data.id}`
             )
             .then((timeframe) => {
               callback({
@@ -723,7 +723,7 @@ export const services = {
           // Fetch full timeframe data
           apiClient
             .get(
-              `/project/${project.id}/aoi/${currentAoi.id}/timeframe/${data.id}`
+              `project/${project.id}/aoi/${currentAoi.id}/timeframe/${data.id}`
             )
             .then(
               (timeframe) => {
