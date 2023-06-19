@@ -125,13 +125,11 @@ export function MosaicSelectorModal({ showModal, setShowModal, isProjectNew }) {
                           data: { mosaic },
                         });
                       }
-                    } else {
-                      if (currentMosaic?.id !== mosaic.id) {
-                        actorRef.send({
-                          type: 'Mosaic was changed',
-                          data: { mosaic },
-                        });
-                      }
+                    } else if (currentMosaic?.id !== mosaic.id) {
+                      actorRef.send({
+                        type: 'Mosaic was changed',
+                        data: { mosaic },
+                      });
                     }
                     setShowModal(false);
                   }}
