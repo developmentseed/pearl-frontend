@@ -267,7 +267,7 @@ export const services = {
 
       // Fetch active instances for this project
       const activeInstances = await apiClient.get(
-        `project/${projectId}/instance?active=true&type=cpu`
+        `project/${projectId}/instance?status=active&type=${currentInstanceType}`
       );
 
       // Reuse existing instance if available

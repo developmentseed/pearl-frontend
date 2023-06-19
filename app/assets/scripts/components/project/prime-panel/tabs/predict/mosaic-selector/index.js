@@ -48,11 +48,16 @@ export function MosaicSelector() {
     }
   } else {
     label = currentMosaic.name;
+    disabled = false;
   }
 
   return (
     <>
-      <MosaicSelectorModal showModal={showModal} setShowModal={setShowModal} />
+      <MosaicSelectorModal
+        showModal={showModal}
+        setShowModal={setShowModal}
+        isProjectNew={isProjectNew}
+      />
       <HeadOption>
         <HeadOptionHeadline usePadding>
           <Subheading>Base Mosaic</Subheading>

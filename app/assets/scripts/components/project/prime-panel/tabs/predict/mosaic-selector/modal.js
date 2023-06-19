@@ -40,7 +40,7 @@ const HeadingWrapper = styled.div`
   align-items: baseline;
 `;
 
-export function MosaicSelectorModal({ showModal, setShowModal }) {
+export function MosaicSelectorModal({ showModal, setShowModal, isProjectNew }) {
   const actorRef = ProjectMachineContext.useActorRef();
   const mosaicsList = ProjectMachineContext.useSelector(selectors.mosaicsList);
   const currentMosaic = ProjectMachineContext.useSelector(
@@ -118,10 +118,21 @@ export function MosaicSelectorModal({ showModal, setShowModal }) {
                   borderlessMedia
                   selected={currentMosaic && currentMosaic.id === mosaic.id}
                   onClick={() => {
-                    actorRef.send({
-                      type: 'Mosaic is selected',
-                      data: { mosaic },
-                    });
+                    if (isProjectNew) {
+                      if (!currentMosaic || currentMosaic.id !== mosaic.id) {
+                        actorRef.send({
+                          type: 'Mosaic was selected',
+                          data: { mosaic },
+                        });
+                      }
+                    } else {
+                      if (currentMosaic?.id !== mosaic.id) {
+                        actorRef.send({
+                          type: 'Mosaic was changed',
+                          data: { mosaic },
+                        });
+                      }
+                    }
                     setShowModal(false);
                   }}
                 />
@@ -135,6 +146,7 @@ export function MosaicSelectorModal({ showModal, setShowModal }) {
 }
 
 MosaicSelectorModal.propTypes = {
+  isProjectNew: T.bool,
   showModal: T.bool,
   setShowModal: T.func.isRequired,
 };
