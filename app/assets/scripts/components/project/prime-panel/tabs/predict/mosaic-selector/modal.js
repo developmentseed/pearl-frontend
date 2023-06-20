@@ -8,6 +8,7 @@ import { Heading } from '@devseed-ui/typography';
 import CardList, { Card } from '../../../../../common/card-list';
 import { ProjectMachineContext } from '../../../../../../fsm/project';
 import selectors from '../../../../../../fsm/project/selectors';
+import { formatDateTime } from '../../../../../../utils/format';
 
 const ModalHeader = styled.header`
   padding: ${glsp(2)} ${glsp(2)} 0;
@@ -93,14 +94,7 @@ export function MosaicSelectorModal({ showModal, setShowModal }) {
             numColumns={2}
             data={selectableMosaics}
             renderCard={(mosaic) => {
-              const {
-                id,
-                name,
-                created,
-                updated,
-                mosaic_ts_end,
-                mosaic_ts_start,
-              } = mosaic;
+              const { name, mosaic_ts_end, mosaic_ts_start } = mosaic;
 
               return (
                 <Card
@@ -108,12 +102,13 @@ export function MosaicSelectorModal({ showModal, setShowModal }) {
                   key={mosaic.id}
                   title={mosaic.name}
                   details={{
-                    id,
                     name,
-                    created,
-                    updated,
-                    mosaic_ts_end,
-                    mosaic_ts_start,
+                    'Mosaic Start Date': mosaic_ts_start
+                      ? formatDateTime(mosaic_ts_start)
+                      : 'N/A',
+                    'Mosaic End Date': mosaic_ts_end
+                      ? formatDateTime(mosaic_ts_end)
+                      : 'N/A',
                   }}
                   borderlessMedia
                   selected={currentMosaic && currentMosaic.id === mosaic.id}
