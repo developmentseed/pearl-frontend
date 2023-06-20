@@ -5,7 +5,6 @@ import L from 'leaflet';
 import turfBboxPolygon from '@turf/bbox-polygon';
 import turfArea from '@turf/area';
 import toasts from '../../components/common/toasts';
-import { BOUNDS_PADDING } from '../../components/common/map/constants';
 import { getMosaicTileUrl } from './helpers';
 import history from '../../history';
 import { RETRAIN_MAP_MODES, SESSION_MODES } from './constants';
@@ -164,10 +163,7 @@ export const actions = {
 
     // Add latest AOI to the map
     if (latestAoi && latestAoi.bounds) {
-      aoiShape = L.geoJSON(latestAoi.bounds).addTo(mapRef);
-      mapRef.fitBounds(aoiShape.getBounds(), {
-        padding: BOUNDS_PADDING,
-      });
+      aoiShape = mapRef.setAoiShapeFromGeojson(latestAoi.bounds);
     }
 
     return {
@@ -192,10 +188,7 @@ export const actions = {
     // Add AOI to the map
     let aoiShape;
     if (aoi && aoi.bounds) {
-      aoiShape = L.geoJSON(aoi.bounds).addTo(mapRef);
-      mapRef.fitBounds(aoiShape.getBounds(), {
-        padding: BOUNDS_PADDING,
-      });
+      aoiShape = mapRef.setAoiShapeFromGeojson(aoi.bounds);
     }
 
     return {
@@ -219,10 +212,7 @@ export const actions = {
     // Add new layer from geojson, if exists
     let aoiShape;
     if (geojson) {
-      aoiShape = L.geoJSON(geojson).addTo(mapRef);
-      mapRef.fitBounds(aoiShape.getBounds(), {
-        padding: BOUNDS_PADDING,
-      });
+      aoiShape = mapRef.setAoiShapeFromGeojson(geojson);
     }
 
     return {
