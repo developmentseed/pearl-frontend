@@ -22,7 +22,6 @@ import { useAuth } from '../../../context/auth';
 import TileLayerWithHeaders from '../../common/map/tile-layer';
 import config from '../../../config';
 import { RETRAIN_MAP_MODES } from '../../../fsm/project/constants';
-import { RetrainSamples } from './retrain-samples';
 import FreehandDrawControl from './freehand-draw-control';
 import PolygonDrawControl from './polygon-draw-control';
 import selectors from '../../../fsm/project/selectors';
@@ -368,8 +367,6 @@ function Map() {
               opacity={predictionsOpacity}
             />
           ))}
-
-        <RetrainSamples />
       </MapContainer>
     </SizeAwareElement>
   );
