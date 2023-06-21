@@ -277,9 +277,19 @@ export const actions = {
         : [],
     };
   }),
-  clearCurrentTimeframe: assign(() => ({
-    currentTimeframe: null,
+  setTimeframesList: assign((context, event) => ({
+    timeframesList: event.data.timeframesList,
   })),
+  loadLatestMosaicTimeframe: assign((context) => {
+    const { currentMosaic, timeframesList } = context;
+    const latestTimeframe = timeframesList
+      .filter((timeframe) => timeframe.mosaic === currentMosaic.id)
+      .sort((a, b) => b.created_at - a.created_at)[0];
+
+    return {
+      currentTimeframe: latestTimeframe,
+    };
+  }),
   setCurrentTimeframeTilejson: assign((context, event) => ({
     currentTimeframe: {
       ...context.currentTimeframe,

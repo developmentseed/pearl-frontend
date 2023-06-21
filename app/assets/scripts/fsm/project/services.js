@@ -242,6 +242,7 @@ export const services = {
       timeframe: latestTimeframe,
       mosaic: latestMosaic,
       share: sharesList.find((s) => s.timeframe?.id === latestTimeframe?.id),
+      timeframesList,
     };
   },
   activateInstance: (context) => async (callback) => {
