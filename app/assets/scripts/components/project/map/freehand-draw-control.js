@@ -49,7 +49,7 @@ class FreehandDrawControl {
       polygon: {
         color: color,
         fillColor: color,
-        fillOpacity: 0.5,
+        fillOpacity: 0.8,
         weight: 3,
         smoothFactor: 1,
       },
