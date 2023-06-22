@@ -281,13 +281,21 @@ export const actions = {
     timeframesList: event.data.timeframesList,
   })),
   loadLatestMosaicTimeframe: assign((context) => {
-    const { currentMosaic, timeframesList } = context;
+    const { currentMosaic, timeframesList, sharesList } = context;
     const latestTimeframe = timeframesList
       .filter((timeframe) => timeframe.mosaic === currentMosaic.id)
       .sort((a, b) => b.created_at - a.created_at)[0];
 
+    let currentShare;
+    if (latestTimeframe) {
+      currentShare = sharesList.find(
+        (share) => share.id === latestTimeframe.share
+      );
+    }
+
     return {
       currentTimeframe: latestTimeframe,
+      currentShare,
     };
   }),
   setCurrentTimeframeTilejson: assign((context, event) => ({

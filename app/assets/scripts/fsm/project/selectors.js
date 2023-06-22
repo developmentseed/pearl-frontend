@@ -11,6 +11,9 @@ export const selectors = {
   apiLimits: (state) => state.context.apiLimits,
   canSwitchInstanceType: (state) =>
     state.matches('Prediction ready') || state.matches('Retrain ready'),
+  canExport: (state) =>
+    state.context.currentTimeframe &&
+    (state.matches('Prediction ready') || state.matches('Retrain ready')),
   checkpointList: (state) => state.context.checkpointList,
   currentAoi: (state) => state.context.currentAoi,
   currentTimeframe: (state) => state.context.currentTimeframe,

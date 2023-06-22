@@ -136,6 +136,7 @@ function ProjectPageHeader({ isMediumDown }) {
     selectors.displayProjectNameModal
   );
   const projectName = ProjectMachineContext.useSelector(selectors.projectName);
+  const canExport = ProjectMachineContext.useSelector(selectors.canExport);
   const sessionStatusMessage = ProjectMachineContext.useSelector(
     selectors.sessionStatusMessage
   );
@@ -263,6 +264,7 @@ function ProjectPageHeader({ isMediumDown }) {
             useIcon='share'
             {...props}
             hideText={isMediumDown}
+            disabled={!canExport}
           >
             Export
           </DropdownTrigger>
