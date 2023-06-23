@@ -5,7 +5,6 @@ import L from 'leaflet';
 import turfBboxPolygon from '@turf/bbox-polygon';
 import turfArea from '@turf/area';
 import toasts from '../../components/common/toasts';
-import { BOUNDS_PADDING } from '../../components/common/map/constants';
 import { getMosaicTileUrl } from './helpers';
 import history from '../../history';
 import { RETRAIN_MAP_MODES, SESSION_MODES } from './constants';
@@ -164,10 +163,7 @@ export const actions = {
 
     // Add latest AOI to the map
     if (latestAoi && latestAoi.bounds) {
-      aoiShape = L.geoJSON(latestAoi.bounds).addTo(mapRef);
-      mapRef.fitBounds(aoiShape.getBounds(), {
-        padding: BOUNDS_PADDING,
-      });
+      aoiShape = mapRef.setAoiShapeFromGeojson(latestAoi.bounds);
     }
 
     return {
@@ -192,10 +188,7 @@ export const actions = {
     // Add AOI to the map
     let aoiShape;
     if (aoi && aoi.bounds) {
-      aoiShape = L.geoJSON(aoi.bounds).addTo(mapRef);
-      mapRef.fitBounds(aoiShape.getBounds(), {
-        padding: BOUNDS_PADDING,
-      });
+      aoiShape = mapRef.setAoiShapeFromGeojson(aoi.bounds);
     }
 
     return {
@@ -219,10 +212,7 @@ export const actions = {
     // Add new layer from geojson, if exists
     let aoiShape;
     if (geojson) {
-      aoiShape = L.geoJSON(geojson).addTo(mapRef);
-      mapRef.fitBounds(aoiShape.getBounds(), {
-        padding: BOUNDS_PADDING,
-      });
+      aoiShape = mapRef.setAoiShapeFromGeojson(geojson);
     }
 
     return {
@@ -355,22 +345,31 @@ export const actions = {
   setMapRef: assign((context, event) => ({
     mapRef: event.data.mapRef,
   })),
-  setRetrainMapMode: assign((context, event) => {
+  updateRetrainMapMode: assign((context, event) => {
     const {
       retrainClasses,
-      retrainActiveClass,
       mapRef: { freehandDraw, polygonDraw },
     } = context;
-    const { retrainMapMode } = event.data;
+
+    const retrainMapMode =
+      event?.data?.retrainMapMode || context.retrainMapMode;
+
+    const retrainActiveClass =
+      event?.data?.retrainActiveClass || context.retrainActiveClass;
 
     // Ensure that the freehand draw layers are set
     freehandDraw.setLayers(retrainClasses);
 
-    // Toggle freehand draw
-    if (retrainMapMode !== RETRAIN_MAP_MODES.ADD_FREEHAND) {
+    // Toggle freehand draw modes
+    if (
+      retrainMapMode !== RETRAIN_MAP_MODES.ADD_FREEHAND &&
+      retrainMapMode !== RETRAIN_MAP_MODES.DELETE_SAMPLES
+    ) {
       freehandDraw.disable();
-    } else {
+    } else if (retrainMapMode === RETRAIN_MAP_MODES.ADD_FREEHAND) {
       freehandDraw.enableAdd(retrainActiveClass);
+    } else if (retrainMapMode === RETRAIN_MAP_MODES.DELETE_SAMPLES) {
+      freehandDraw.enableSubtract(retrainActiveClass);
     }
 
     // Toggle polygon draw
@@ -381,22 +380,11 @@ export const actions = {
     }
 
     return {
-      retrainMapMode: event.data.retrainMapMode,
+      retrainMapMode,
+      retrainActiveClass,
     };
   }),
-  setRetrainActiveClass: assign((context, event) => {
-    const { retrainMapMode } = context;
-    const { retrainActiveClass } = event.data;
 
-    // Enable freehand draw for the active class
-    if (retrainMapMode === RETRAIN_MAP_MODES.ADD_FREEHAND) {
-      context.mapRef.freehandDraw.enableAdd(retrainActiveClass);
-    }
-
-    return {
-      retrainActiveClass: event.data.retrainActiveClass,
-    };
-  }),
   addRetrainSample: assign((context, event) => {
     const { retrainSamples, retrainActiveClass } = context;
 

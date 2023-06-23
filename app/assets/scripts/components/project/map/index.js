@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
+import L from 'leaflet';
+
 import SizeAwareElement from '../../common/size-aware-element';
 import {
   ImageOverlay,
@@ -20,10 +22,10 @@ import { useAuth } from '../../../context/auth';
 import TileLayerWithHeaders from '../../common/map/tile-layer';
 import config from '../../../config';
 import { RETRAIN_MAP_MODES } from '../../../fsm/project/constants';
-import { RetrainSamples } from './retrain-samples';
 import FreehandDrawControl from './freehand-draw-control';
 import PolygonDrawControl from './polygon-draw-control';
 import selectors from '../../../fsm/project/selectors';
+import { BOUNDS_PADDING } from '../../common/map/constants';
 
 const center = [19.22819, -99.995841];
 const zoom = 12;
@@ -285,6 +287,15 @@ function Map() {
             },
           });
 
+          m.setAoiShapeFromGeojson = (geojson) => {
+            const aoiShape = L.geoJSON(geojson, { fillOpacity: 0 });
+            aoiShape.addTo(m);
+            m.fitBounds(aoiShape.getBounds(), {
+              padding: BOUNDS_PADDING,
+            });
+            return aoiShape;
+          };
+
           // Add map to state
           setMapRef(m);
 
@@ -356,8 +367,6 @@ function Map() {
               opacity={predictionsOpacity}
             />
           ))}
-
-        <RetrainSamples />
       </MapContainer>
     </SizeAwareElement>
   );
