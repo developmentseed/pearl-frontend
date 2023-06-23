@@ -61,6 +61,10 @@ export const services = {
 
       currentModel = modelsList.find((model) => model.id === project.model_id);
 
+      currentImagerySource = imagerySourcesList.find(
+        (imagery) => imagery.id === currentModel.imagery_source_id
+      );
+
       // Fetch project aois
       aoisList = (await apiClient.get(`project/${projectId}/aoi`)).aois;
 
@@ -79,10 +83,8 @@ export const services = {
           currentMosaic = mosaicsList.find(
             (mosaic) => mosaic.id === currentTimeframe.mosaic
           );
-          currentImagerySource = imagerySourcesList.find(
-            (imagerySource) =>
-              imagerySource.id === currentMosaic.imagery_source_id
-          );
+
+          currentMosaic.tileUrl = getMosaicTileUrl(currentMosaic);
 
           // Fetch timeframe tilejson
           try {
@@ -104,6 +106,8 @@ export const services = {
         currentCheckpoint = await apiClient.get(
           `project/${projectId}/checkpoint/${currentTimeframe.checkpoint_id}`
         );
+      } else if (checkpointList.length > 0) {
+        currentCheckpoint = checkpointList[0];
       }
 
       sharesList = (await apiClient.get(`project/${projectId}/share`)).shares;
@@ -140,10 +144,7 @@ export const services = {
       currentTimeframe,
       currentCheckpoint,
       currentImagerySource,
-      currentMosaic: {
-        ...currentMosaic,
-        tileUrl: getMosaicTileUrl(currentMosaic),
-      },
+      currentMosaic,
       currentModel,
       currentShare,
       currentBatchPrediction,

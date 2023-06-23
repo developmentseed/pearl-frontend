@@ -84,9 +84,7 @@ function CheckpointSelector() {
   );
 
   function getCheckpointLabel(c) {
-    return c?.parent
-      ? `${c.name} (${c.id})`
-      : `${currentModel.name} (Base Model)`;
+    return `${c?.name || currentModel.name} (${c?.id || '(Base Model)'})`;
   }
 
   let selectedOptionLabel;

@@ -36,9 +36,8 @@ class FreehandDrawControl {
   setLayers(layers) {
     const currentLayers = new Set();
     this._group.eachLayer((l) => currentLayers.add(l.category));
-
-    Object.entries(layers).forEach(([name, layer]) => {
-      if (!currentLayers.has(name)) {
+    layers.forEach((layer) => {
+      if (!currentLayers.has(layer.name)) {
         this.addLayer(layer);
       }
     });
@@ -50,7 +49,7 @@ class FreehandDrawControl {
       polygon: {
         color: color,
         fillColor: color,
-        fillOpacity: 0.5,
+        fillOpacity: 0.8,
         weight: 3,
         smoothFactor: 1,
       },
@@ -86,18 +85,6 @@ class FreehandDrawControl {
       }
     });
 
-    /*
-     * Override default functionality of freehand shapes
-     * Default functionality dictates that polygonClick only fires a remove event when in delete mode.
-     * Here it it firest the event only when in subtract mode so as to allow draw erase and click delete
-     * without changing tools
-     */
-    drawer.polygonClick = (polygon) => {
-      if (drawer.mode === 'subtract') {
-        drawer.removeLayer(polygon);
-      }
-    };
-
     this._group.addLayer(drawer);
   }
 
@@ -105,11 +92,9 @@ class FreehandDrawControl {
     let present;
     this._group.eachLayer(function (layer) {
       if (layer.category === layerName) {
-        // enable drawing tool for type
         layer.setMode('add');
         present = true;
       } else {
-        // disables other freehand instances
         layer.setMode('view');
       }
     });
@@ -118,9 +103,13 @@ class FreehandDrawControl {
     }
   }
 
-  enableSubtract() {
+  enableSubtract(layerName) {
     this._group.eachLayer(function (layer) {
-      layer.setMode('subtract');
+      if (layer.category === layerName) {
+        layer.setMode('subtract');
+      } else {
+        layer.setMode('view');
+      }
     });
   }
 

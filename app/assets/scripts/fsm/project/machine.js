@@ -219,7 +219,7 @@ export const projectMachine = createMachine(
             actions: 'setCurrentCheckpoint',
           },
 
-          'Mosaic was changed': {
+          'Mosaic was selected': {
             target: 'Prediction ready',
             internal: true,
             actions: [
@@ -566,7 +566,7 @@ export const projectMachine = createMachine(
           'Set retrain map mode': {
             target: 'Retrain ready',
             internal: true,
-            actions: 'setRetrainMapMode',
+            actions: 'updateRetrainMapMode',
           },
 
           'Add retrain sample': {
@@ -578,7 +578,7 @@ export const projectMachine = createMachine(
           'Set retrain active class': {
             target: 'Retrain ready',
             internal: true,
-            actions: 'setRetrainActiveClass',
+            actions: 'updateRetrainMapMode',
           },
 
           'Update retrain class samples': {

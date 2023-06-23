@@ -421,7 +421,7 @@ function RetrainTab({ className }) {
               info={
                 !retrainActiveClass
                   ? 'Select a class first'
-                  : 'Draw to erase, click to delete'
+                  : 'Draw to trim sample shapes'
               }
               onClick={() => toggleMapMode(RETRAIN_MAP_MODES.DELETE_SAMPLES)}
               className={
