@@ -8,6 +8,7 @@ import { Heading } from '@devseed-ui/typography';
 import CardList, { Card } from '../../../../../common/card-list';
 import { ProjectMachineContext } from '../../../../../../fsm/project';
 import selectors from '../../../../../../fsm/project/selectors';
+import { formatDateTime } from '../../../../../../utils/format';
 
 const ModalHeader = styled.header`
   padding: ${glsp(2)} ${glsp(2)} 0;
@@ -40,7 +41,7 @@ const HeadingWrapper = styled.div`
   align-items: baseline;
 `;
 
-export function MosaicSelectorModal({ showModal, setShowModal }) {
+export function MosaicSelectorModal({ showModal, setShowModal, isProjectNew }) {
   const actorRef = ProjectMachineContext.useActorRef();
   const mosaicsList = ProjectMachineContext.useSelector(selectors.mosaicsList);
   const currentMosaic = ProjectMachineContext.useSelector(
@@ -93,14 +94,7 @@ export function MosaicSelectorModal({ showModal, setShowModal }) {
             numColumns={2}
             data={selectableMosaics}
             renderCard={(mosaic) => {
-              const {
-                id,
-                name,
-                created,
-                updated,
-                mosaic_ts_end,
-                mosaic_ts_start,
-              } = mosaic;
+              const { name, mosaic_ts_end, mosaic_ts_start } = mosaic;
 
               return (
                 <Card
@@ -108,20 +102,30 @@ export function MosaicSelectorModal({ showModal, setShowModal }) {
                   key={mosaic.id}
                   title={mosaic.name}
                   details={{
-                    id,
                     name,
-                    created,
-                    updated,
-                    mosaic_ts_end,
-                    mosaic_ts_start,
+                    'Mosaic Start Date': mosaic_ts_start
+                      ? formatDateTime(mosaic_ts_start)
+                      : 'N/A',
+                    'Mosaic End Date': mosaic_ts_end
+                      ? formatDateTime(mosaic_ts_end)
+                      : 'N/A',
                   }}
                   borderlessMedia
                   selected={currentMosaic && currentMosaic.id === mosaic.id}
                   onClick={() => {
-                    actorRef.send({
-                      type: 'Mosaic is selected',
-                      data: { mosaic },
-                    });
+                    if (isProjectNew) {
+                      if (!currentMosaic || currentMosaic.id !== mosaic.id) {
+                        actorRef.send({
+                          type: 'Mosaic was selected',
+                          data: { mosaic },
+                        });
+                      }
+                    } else if (currentMosaic?.id !== mosaic.id) {
+                      actorRef.send({
+                        type: 'Mosaic was selected',
+                        data: { mosaic },
+                      });
+                    }
                     setShowModal(false);
                   }}
                 />
@@ -135,6 +139,7 @@ export function MosaicSelectorModal({ showModal, setShowModal }) {
 }
 
 MosaicSelectorModal.propTypes = {
+  isProjectNew: T.bool,
   showModal: T.bool,
   setShowModal: T.func.isRequired,
 };

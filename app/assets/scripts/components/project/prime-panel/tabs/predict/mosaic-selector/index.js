@@ -34,25 +34,22 @@ export function MosaicSelector() {
   let disabled = true;
   if (sessionMode === SESSION_MODES.LOADING) {
     label = 'Loading...';
-  } else if (isProjectNew) {
-    if (!currentAoi) {
-      label = 'Define first AOI';
-    } else if (!currentImagerySource) {
-      label = 'Define Imagery Source';
-    } else if (!currentMosaic) {
-      label = 'Select Mosaic';
-      disabled = false;
-    } else {
-      label = currentMosaic.name;
-      disabled = false;
-    }
+  } else if (!currentAoi || !currentAoi.name) {
+    label = 'Define first AOI';
+  } else if (!currentImagerySource) {
+    label = 'Define Imagery Source';
   } else {
-    label = currentMosaic.name;
+    label = currentMosaic?.name || 'Select Mosaic';
+    disabled = false;
   }
 
   return (
     <>
-      <MosaicSelectorModal showModal={showModal} setShowModal={setShowModal} />
+      <MosaicSelectorModal
+        showModal={showModal}
+        setShowModal={setShowModal}
+        isProjectNew={isProjectNew}
+      />
       <HeadOption>
         <HeadOptionHeadline usePadding>
           <Subheading>Base Mosaic</Subheading>

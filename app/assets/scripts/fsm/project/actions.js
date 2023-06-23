@@ -267,6 +267,9 @@ export const actions = {
         : [],
     };
   }),
+  clearCurrentTimeframe: assign(() => ({
+    currentTimeframe: null,
+  })),
   setCurrentTimeframeTilejson: assign((context, event) => ({
     currentTimeframe: {
       ...context.currentTimeframe,

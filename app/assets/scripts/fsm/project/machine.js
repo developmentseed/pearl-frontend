@@ -186,10 +186,12 @@ export const projectMachine = createMachine(
 
         on: {
           'Prime button pressed': 'Enter prediction run',
+
           'Pressed upload AOI button': {
             target: 'Displaying upload AOI modal',
             actions: ['toggleUploadAoiModal'],
           },
+
           'Request AOI delete': 'Requested AOI delete',
           'Pressed new AOI button': 'Waiting for drag or cancel',
           'Requested AOI switch': 'Applying existing AOI',
@@ -215,6 +217,16 @@ export const projectMachine = createMachine(
           'Apply checkpoint': {
             target: 'Applying checkpoint',
             actions: 'setCurrentCheckpoint',
+          },
+
+          'Mosaic was selected': {
+            target: 'Prediction ready',
+            internal: true,
+            actions: [
+              'setCurrentMosaic',
+              'clearCurrentTimeframe',
+              'clearCurrentPrediction',
+            ],
           },
         },
       },
@@ -259,7 +271,7 @@ export const projectMachine = createMachine(
             actions: ['setCurrentInstance', 'setCurrentInstanceWebsocket'],
           },
           'Instance activation has failed': {
-            target: 'Prediction ready',
+            target: 'Redirect to project profile page',
             actions: 'displayInstanceActivationError',
           },
         },
@@ -413,7 +425,7 @@ export const projectMachine = createMachine(
         entry: ['refreshSessionStatusMessage'],
 
         on: {
-          'Mosaic is selected': {
+          'Mosaic was selected': {
             target: 'Configuring new AOI',
             internal: true,
             actions: ['setCurrentMosaic', 'refreshSessionStatusMessage'],
@@ -683,8 +695,9 @@ export const projectMachine = createMachine(
               'setCurrentInstanceWebsocket',
             ],
           },
-          'Activation has errored': {
+          'Instance activation has failed': {
             target: 'Redirect to project profile page',
+            actions: 'displayInstanceActivationError',
           },
         },
 

@@ -8,6 +8,7 @@ import { Heading } from '@devseed-ui/typography';
 import CardList, { Card } from '../../../../../common/card-list';
 import { ProjectMachineContext } from '../../../../../../fsm/project';
 import selectors from '../../../../../../fsm/project/selectors';
+import { formatDateTime } from '../../../../../../utils/format';
 
 const ModalHeader = styled.header`
   padding: ${glsp(2)} ${glsp(2)} 0;
@@ -94,8 +95,8 @@ export function ImagerySourceSelectorModal({ showModal, setShowModal }) {
                 title={imagerySource.name}
                 details={{
                   name: imagerySource.name,
-                  created: imagerySource.created,
-                  updated: imagerySource.updated,
+                  created: formatDateTime(imagerySource.created),
+                  updated: formatDateTime(imagerySource.updated),
                 }}
                 borderlessMedia
                 selected={
