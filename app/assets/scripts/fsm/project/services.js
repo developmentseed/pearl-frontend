@@ -246,6 +246,36 @@ export const services = {
       timeframesList,
     };
   },
+  fetchLatestMosaicTimeframe: async (context) => {
+    const {
+      currentMosaic,
+      timeframesList,
+      sharesList,
+      apiClient,
+      project,
+      currentAoi,
+    } = context;
+
+    let currentTimeframe = timeframesList
+      .filter((timeframe) => timeframe.mosaic === currentMosaic.id)
+      .sort((a, b) => b.created_at - a.created_at)[0];
+
+    let currentShare;
+
+    if (currentTimeframe) {
+      currentTimeframe.tilejson = await apiClient.get(
+        `project/${project.id}/aoi/${currentAoi.id}/timeframe/${currentTimeframe.id}/tiles`
+      );
+      currentShare = sharesList.find(
+        (share) => share.id === currentTimeframe.share
+      );
+    }
+
+    return {
+      timeframe: currentTimeframe,
+      share: currentShare,
+    };
+  },
   activateInstance: (context) => async (callback) => {
     try {
       const {
@@ -535,15 +565,19 @@ export const services = {
             data: { prediction: data },
           });
           break;
-        case 'model#prediction#complete':
-          apiClient
-            .get(
+        case 'model#prediction#complete': {
+          Promise.all([
+            apiClient.get(
+              `project/${project.id}/aoi/${currentAoi.id}/timeframe`
+            ),
+            apiClient.get(
               `project/${project.id}/aoi/${currentAoi.id}/timeframe/${data.timeframe}/tiles`
-            )
-            .then((tilejson) => {
+            ),
+          ])
+            .then(([{ timeframes: timeframesList }, tilejson]) => {
               callback({
                 type: 'Prediction run was completed',
-                data: { tilejson },
+                data: { tilejson, timeframesList },
               });
             })
             .catch((error) => {
@@ -554,6 +588,7 @@ export const services = {
             });
 
           break;
+        }
 
         default:
           logger('Unhandled websocket message', message, data);

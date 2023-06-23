@@ -255,39 +255,22 @@ export const actions = {
     currentCheckpoint: event.data.checkpoint,
   })),
   setCurrentTimeframe: assign((context, event) => {
+    const { currentCheckpoint } = context;
     const newTimeframe = event.data.timeframe;
+
+    const retrainClasses =
+      newTimeframe?.classes || currentCheckpoint?.classes || [];
 
     // Apply new timeframe and (re-)initialize retrain classes
     return {
       currentTimeframe: { ...newTimeframe },
-      retrainClasses: newTimeframe.classes
-        ? Object.keys(newTimeframe.classes).map((key) => ({
-            ...newTimeframe.classes[key],
-          }))
-        : [],
+      retrainClasses,
     };
   }),
   setTimeframesList: assign((context, event) => ({
     timeframesList: event.data.timeframesList,
   })),
-  loadLatestMosaicTimeframe: assign((context) => {
-    const { currentMosaic, timeframesList, sharesList } = context;
-    const latestTimeframe = timeframesList
-      .filter((timeframe) => timeframe.mosaic === currentMosaic.id)
-      .sort((a, b) => b.created_at - a.created_at)[0];
 
-    let currentShare;
-    if (latestTimeframe) {
-      currentShare = sharesList.find(
-        (share) => share.id === latestTimeframe.share
-      );
-    }
-
-    return {
-      currentTimeframe: latestTimeframe,
-      currentShare,
-    };
-  }),
   setCurrentTimeframeTilejson: assign((context, event) => ({
     currentTimeframe: {
       ...context.currentTimeframe,
