@@ -342,22 +342,31 @@ export const actions = {
   setMapRef: assign((context, event) => ({
     mapRef: event.data.mapRef,
   })),
-  setRetrainMapMode: assign((context, event) => {
+  updateRetrainMapMode: assign((context, event) => {
     const {
       retrainClasses,
-      retrainActiveClass,
       mapRef: { freehandDraw, polygonDraw },
     } = context;
-    const { retrainMapMode } = event.data;
+
+    const retrainMapMode =
+      event?.data?.retrainMapMode || context.retrainMapMode;
+
+    const retrainActiveClass =
+      event?.data?.retrainActiveClass || context.retrainActiveClass;
 
     // Ensure that the freehand draw layers are set
     freehandDraw.setLayers(retrainClasses);
 
-    // Toggle freehand draw
-    if (retrainMapMode !== RETRAIN_MAP_MODES.ADD_FREEHAND) {
+    // Toggle freehand draw modes
+    if (
+      retrainMapMode !== RETRAIN_MAP_MODES.ADD_FREEHAND &&
+      retrainMapMode !== RETRAIN_MAP_MODES.DELETE_SAMPLES
+    ) {
       freehandDraw.disable();
-    } else {
+    } else if (retrainMapMode === RETRAIN_MAP_MODES.ADD_FREEHAND) {
       freehandDraw.enableAdd(retrainActiveClass);
+    } else if (retrainMapMode === RETRAIN_MAP_MODES.DELETE_SAMPLES) {
+      freehandDraw.enableSubtract(retrainActiveClass);
     }
 
     // Toggle polygon draw
@@ -368,22 +377,11 @@ export const actions = {
     }
 
     return {
-      retrainMapMode: event.data.retrainMapMode,
+      retrainMapMode,
+      retrainActiveClass,
     };
   }),
-  setRetrainActiveClass: assign((context, event) => {
-    const { retrainMapMode } = context;
-    const { retrainActiveClass } = event.data;
 
-    // Enable freehand draw for the active class
-    if (retrainMapMode === RETRAIN_MAP_MODES.ADD_FREEHAND) {
-      context.mapRef.freehandDraw.enableAdd(retrainActiveClass);
-    }
-
-    return {
-      retrainActiveClass: event.data.retrainActiveClass,
-    };
-  }),
   addRetrainSample: assign((context, event) => {
     const { retrainSamples, retrainActiveClass } = context;
 
