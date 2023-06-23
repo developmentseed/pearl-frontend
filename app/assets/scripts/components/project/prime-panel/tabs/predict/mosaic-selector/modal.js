@@ -122,7 +122,7 @@ export function MosaicSelectorModal({ showModal, setShowModal, isProjectNew }) {
                       }
                     } else if (currentMosaic?.id !== mosaic.id) {
                       actorRef.send({
-                        type: 'Mosaic was changed',
+                        type: 'Mosaic was selected',
                         data: { mosaic },
                       });
                     }
