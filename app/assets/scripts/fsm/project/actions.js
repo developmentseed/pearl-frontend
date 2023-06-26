@@ -255,21 +255,22 @@ export const actions = {
     currentCheckpoint: event.data.checkpoint,
   })),
   setCurrentTimeframe: assign((context, event) => {
+    const { currentCheckpoint } = context;
     const newTimeframe = event.data.timeframe;
+
+    const retrainClasses =
+      newTimeframe?.classes || currentCheckpoint?.classes || [];
 
     // Apply new timeframe and (re-)initialize retrain classes
     return {
       currentTimeframe: { ...newTimeframe },
-      retrainClasses: newTimeframe.classes
-        ? Object.keys(newTimeframe.classes).map((key) => ({
-            ...newTimeframe.classes[key],
-          }))
-        : [],
+      retrainClasses,
     };
   }),
-  clearCurrentTimeframe: assign(() => ({
-    currentTimeframe: null,
+  setTimeframesList: assign((context, event) => ({
+    timeframesList: event.data.timeframesList,
   })),
+
   setCurrentTimeframeTilejson: assign((context, event) => ({
     currentTimeframe: {
       ...context.currentTimeframe,
