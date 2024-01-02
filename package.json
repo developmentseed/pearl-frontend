@@ -32,7 +32,7 @@
     "cy:run": "NODE_ENV=cypress cypress run --e2e --browser electron"
   },
   "engines": {
-    "node": "14.x"
+    "node": "18.x"
   },
   "browserify": {
     "transform": [
