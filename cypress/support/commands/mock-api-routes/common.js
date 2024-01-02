@@ -1,15 +1,6 @@
 const restApiEndpoint = Cypress.config('restApiEndpoint');
 
-const { addModelEndpoints } = require('./models');
-const { addProjectEndpoints } = require('./projects');
-
-/**
- * This mocks API routes required by the specs
- */
-Cypress.Commands.add('mockApiRoutes', () => {
-  addProjectEndpoints();
-  addModelEndpoints();
-
+Cypress.Commands.add('mockCommonApiEndpoints', () => {
   cy.intercept(
     {
       hostname: 'dc.services.visualstudio.com',

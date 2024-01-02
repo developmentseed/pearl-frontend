@@ -3,7 +3,7 @@ const restApiEndpoint = Cypress.config('restApiEndpoint');
 /**
  * Mock a project scenario: an instance is running with checkpoint 2 and AOI 2 applied.
  */
-export function addProjectEndpoints() {
+Cypress.Commands.add('mockProjectEndpoints', () => {
   /**
    * POST /project
    */
@@ -804,4 +804,4 @@ export function addProjectEndpoints() {
       body: {},
     }
   ).as('deleteProject');
-}
+});

@@ -1,12 +1,14 @@
 import { sortBy } from 'lodash';
-import { getQueryElement } from '../../support/commands/api-endpoints/utils';
+import { getQueryElement } from '../../support/commands/mock-api-routes/utils';
 const format = require('date-fns/format').default;
 
 const restApiEndpoint = Cypress.config('restApiEndpoint');
 
 describe('Batch predictions', () => {
   beforeEach(() => {
-    cy.mockApiRoutes();
+    cy.mockCommonApiEndpoints();
+    cy.mockModelEndpoints();
+    cy.mockProjectEndpoints();
 
     const paginatedBatchList = (req) => {
       let total = 25;
@@ -336,7 +338,7 @@ describe('Batch predictions', () => {
   //     phase: 'Running',
   //   },
   // };
-  //   cy.mockApiRoutes();
+  //   cy.mockCommonApiEndpoints();
   //   /**
   //    * GET /project/:id/instance/:id
   //    */

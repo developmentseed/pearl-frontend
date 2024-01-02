@@ -102,7 +102,7 @@ const model2 = {
   storage: true,
 };
 
-export function addModelEndpoints() {
+Cypress.Commands.add('mockModelEndpoints', () => {
   // Models
   cy.intercept(
     {
@@ -135,4 +135,4 @@ export function addModelEndpoints() {
       },
     }
   );
-}
+});

@@ -1,10 +1,10 @@
 const restApiEndpoint = Cypress.config('restApiEndpoint');
 
-import { paginatedList } from '../support/commands/api-endpoints/utils';
+import { paginatedList } from '../support/commands/mock-api-routes/utils';
 
 describe('The app header', () => {
   beforeEach(() => {
-    cy.mockApiRoutes();
+    cy.mockCommonApiEndpoints();
   });
 
   it('shows the account button when logged in', () => {

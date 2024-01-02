@@ -2,7 +2,7 @@ const restApiEndpoint = Cypress.config('restApiEndpoint');
 
 describe('The app header', () => {
   beforeEach(() => {
-    cy.mockApiRoutes();
+    cy.mockCommonApiEndpoints();
   });
 
   it('shows the account button when logged in', () => {

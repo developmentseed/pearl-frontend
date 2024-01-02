@@ -17,7 +17,7 @@ const instance = {
 
 describe('Retrain existing project', () => {
   beforeEach(() => {
-    cy.mockApiRoutes();
+    cy.mockCommonApiEndpoints();
     cy.fakeLogin();
 
     /**

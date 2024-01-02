@@ -45,7 +45,7 @@ const aoi1 = {
 
 describe('Create new project', () => {
   beforeEach(() => {
-    cy.mockApiRoutes();
+    cy.mockCommonApiEndpoints();
     cy.fakeLogin();
 
     // Active instances list
