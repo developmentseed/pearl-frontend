@@ -1,6 +1,6 @@
 const restApiEndpoint = Cypress.config('restApiEndpoint');
 
-import { paginatedList } from '../support/commands/mock-api-routes/utils';
+import { paginatedList } from '../support/commands/api-endpoints/utils';
 
 describe('The app header', () => {
   beforeEach(() => {

@@ -19,7 +19,7 @@ import { addCommand } from 'cypress-websocket-server';
 addCommand();
 
 require('./commands/fake-login');
-require('./commands/mock-api-routes');
+require('./commands/api-endpoints');
 
 //
 // Uncomment next block to stop testing on first failure

@@ -1,5 +1,5 @@
 import { sortBy } from 'lodash';
-import { getQueryElement } from '../../support/commands/mock-api-routes/utils';
+import { getQueryElement } from '../../support/commands/api-endpoints/utils';
 const format = require('date-fns/format').default;
 
 const restApiEndpoint = Cypress.config('restApiEndpoint');
