@@ -1,7 +1,7 @@
 describe('Delete a project', () => {
   beforeEach(() => {
-    cy.mockCommonApiEndpoints();
-    cy.mockModelEndpoints();
+    cy.mockCommonApiRoutes();
+    cy.mockModelApiRoutes();
     cy.mockProjectEndpoints();
     cy.fakeLogin();
     cy.visit('/profile/projects/1');

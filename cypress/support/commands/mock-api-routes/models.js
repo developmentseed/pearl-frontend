@@ -102,7 +102,7 @@ const model2 = {
   storage: true,
 };
 
-Cypress.Commands.add('mockModelEndpoints', () => {
+Cypress.Commands.add('mockModelApiRoutes', () => {
   // Models
   cy.intercept(
     {

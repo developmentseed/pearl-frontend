@@ -1,6 +1,6 @@
 describe('Open existing project', () => {
   beforeEach(() => {
-    cy.mockCommonApiEndpoints();
+    cy.mockCommonApiRoutes();
   });
 
   it('successfully loads', () => {

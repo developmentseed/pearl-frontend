@@ -22,6 +22,9 @@ require('./commands/fake-login');
 require('./commands/mock-api-routes/common');
 require('./commands/mock-api-routes/models');
 require('./commands/mock-api-routes/projects');
+require('./commands/start-new-project');
+require('./commands/load-existing-project');
+require('./commands/aoi');
 
 //
 // Uncomment next block to stop testing on first failure

@@ -6,8 +6,8 @@ const restApiEndpoint = Cypress.config('restApiEndpoint');
 
 describe('Batch predictions', () => {
   beforeEach(() => {
-    cy.mockCommonApiEndpoints();
-    cy.mockModelEndpoints();
+    cy.mockCommonApiRoutes();
+    cy.mockModelApiRoutes();
     cy.mockProjectEndpoints();
 
     const paginatedBatchList = (req) => {
@@ -338,7 +338,7 @@ describe('Batch predictions', () => {
   //     phase: 'Running',
   //   },
   // };
-  //   cy.mockCommonApiEndpoints();
+  //   cy.mockCommonApiRoutes();
   //   /**
   //    * GET /project/:id/instance/:id
   //    */

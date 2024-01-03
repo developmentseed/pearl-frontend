@@ -1,6 +1,6 @@
 const restApiEndpoint = Cypress.config('restApiEndpoint');
 
-Cypress.Commands.add('mockCommonApiEndpoints', () => {
+Cypress.Commands.add('mockCommonApiRoutes', () => {
   cy.intercept(
     {
       hostname: 'dc.services.visualstudio.com',

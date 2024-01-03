@@ -16,7 +16,7 @@ const instance = {
 
 describe('Panel functions', () => {
   beforeEach(() => {
-    cy.mockCommonApiEndpoints();
+    cy.mockCommonApiRoutes();
     cy.fakeLogin();
     cy.setWebsocketWorkflow('websocket-workflow/retrain.json');
 

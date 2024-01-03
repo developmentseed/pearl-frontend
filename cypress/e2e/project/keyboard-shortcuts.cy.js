@@ -18,7 +18,7 @@ const instance = {
 
 describe('Test keyboard shortcuts', () => {
   beforeEach(() => {
-    cy.mockCommonApiEndpoints();
+    cy.mockCommonApiRoutes();
     cy.fakeLogin();
     cy.setWebsocketWorkflow('websocket-workflow/retrain.json');
 
