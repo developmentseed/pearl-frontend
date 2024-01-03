@@ -1,0 +1,77 @@
+{
+  "body": {
+    "total": 2,
+    "mosaics": [
+      {
+        "id": "87b72c66331e136e088004fba817e3e8",
+        "name": "naip.latest",
+        "params": {
+          "assets": "image",
+          "asset_bidx": "image|1,2,3,4",
+          "collection": "naip"
+        },
+        "imagery_source_id": 1,
+        "created": 1677597442954,
+        "updated": 1677597442954,
+        "mosaic_ts_start": null,
+        "mosaic_ts_end": null
+      },
+      {
+        "id": "2849689f57f1b3b9c1f725abb75aa411",
+        "name": "Sentinel-2 Dec 2019 - March 2020",
+        "params": {
+          "assets": ["B04", "B03", "B02"],
+          "collection": "sentinel-2-l2a",
+          "color_formula": "Gamma+RGB+3.2+Saturation+0.8+Sigmoidal+RGB+25+0.35"
+        },
+        "imagery_source_id": 2,
+        "created": 1677597442954,
+        "updated": 1677597442954,
+        "mosaic_ts_start": 1575158400000,
+        "mosaic_ts_end": 1585612800000
+      },
+      {
+        "id": "dce67bf58e5c9dbcf9393776f13f9ebd",
+        "name": "Sentinel-2 Dec 2020 - March 2021",
+        "params": {
+          "assets": ["B04", "B03", "B02"],
+          "collection": "sentinel-2-l2a",
+          "color_formula": "Gamma+RGB+3.2+Saturation+0.8+Sigmoidal+RGB+25+0.35"
+        },
+        "imagery_source_id": 2,
+        "created": 1677597442954,
+        "updated": 1677597442954,
+        "mosaic_ts_start": 1606780800000,
+        "mosaic_ts_end": 1617148800000
+      },
+      {
+        "id": "da05434b9b6a177a6999078221e19481",
+        "name": "Sentinel-2 Dec 2021 - March 2022",
+        "params": {
+          "assets": ["B04", "B03", "B02"],
+          "collection": "sentinel-2-l2a",
+          "color_formula": "Gamma+RGB+3.2+Saturation+0.8+Sigmoidal+RGB+25+0.35"
+        },
+        "imagery_source_id": 2,
+        "created": 1677597442954,
+        "updated": 1677597442954,
+        "mosaic_ts_start": 1638316800000,
+        "mosaic_ts_end": 1648684800000
+      },
+      {
+        "id": "9406dbfba1d5416dc521857008180079",
+        "name": "Sentinel-2 Dec 2022 - Feb 2023",
+        "params": {
+          "assets": ["B04", "B03", "B02"],
+          "collection": "sentinel-2-l2a",
+          "color_formula": "Gamma+RGB+3.2+Saturation+0.8+Sigmoidal+RGB+25+0.35"
+        },
+        "imagery_source_id": 2,
+        "created": 1677597442954,
+        "updated": 1677597442954,
+        "mosaic_ts_start": 1669852800000,
+        "mosaic_ts_end": 1677542400000
+      }
+    ]
+  }
+}

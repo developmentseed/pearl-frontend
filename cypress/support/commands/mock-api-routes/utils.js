@@ -2,13 +2,21 @@ import sortBy from 'lodash.sortby';
 
 const restApiEndpoint = Cypress.config('restApiEndpoint');
 
-export const interceptApiRoute = (path, method, response, alias) => {
-  const url = `${restApiEndpoint}/api/${path}`;
+export const interceptHostname = (hostname, response) => {
+  cy.intercept({ hostname }, response);
+};
+
+export const interceptUrl = (url, method, response, alias) => {
   if (alias) {
     cy.intercept({ url, method }, response).as(alias);
   } else {
     cy.intercept({ url, method }, response);
   }
+};
+
+export const interceptApiRoute = (path, method, response, alias) => {
+  const url = `${restApiEndpoint}/api/${path}`;
+  interceptUrl(url, method, response, alias);
 };
 
 // Get key/values from query string
