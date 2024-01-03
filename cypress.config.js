@@ -11,6 +11,7 @@ module.exports = defineConfig({
   chromeWebSecurity: false,
   defaultCommandTimeout: 7000,
   video: false,
+  viewportHeight: 800,
   e2e: {
     baseUrl: 'http://localhost:9000/',
     excludeSpecPattern: [
