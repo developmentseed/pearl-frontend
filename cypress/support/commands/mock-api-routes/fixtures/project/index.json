@@ -1,0 +1,23 @@
+{
+  "total": 2,
+  "projects": [
+    {
+      "id": 1,
+      "name": "Untitled",
+      "model_id": 1,
+      "mosaic": "naip.latest",
+      "created": "2021-03-19T12:47:07.838Z",
+      "checkpoints": [],
+      "aois": []
+    },
+    {
+      "id": 2,
+      "name": "Project 2",
+      "model_id": 1,
+      "mosaic": "naip.latest",
+      "created": "2021-03-20T12:47:07.838Z",
+      "checkpoints": [],
+      "aois": []
+    }
+  ]
+}

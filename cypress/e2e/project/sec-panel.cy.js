@@ -52,7 +52,7 @@ const aoiNoStats = {
 
 describe('Panel functions', () => {
   beforeEach(() => {
-    cy.mockApiRoutes();
+    cy.mockCommonApiRoutes();
     cy.fakeLogin();
     cy.setWebsocketWorkflow('websocket-workflow/retrain.json');
 

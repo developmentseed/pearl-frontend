@@ -4,7 +4,7 @@ describe('Loads AOIs', () => {
   let map;
 
   beforeEach(() => {
-    cy.mockApiRoutes();
+    cy.mockCommonApiRoutes();
     cy.fakeLogin();
     cy.visit('/project/new');
 
@@ -344,7 +344,7 @@ describe('Loads AOIs', () => {
 
 describe('Load AOIs and draw a third one', () => {
   beforeEach(() => {
-    cy.mockApiRoutes();
+    cy.mockCommonApiRoutes();
   });
 
   it('Should show the confirmation modal if switching to another AOI before running prediction', () => {
@@ -392,7 +392,7 @@ describe('Load AOIs and draw a third one', () => {
 
 describe('Can delete AOIs', () => {
   beforeEach(() => {
-    cy.mockApiRoutes();
+    cy.mockCommonApiRoutes();
   });
 
   it('Displays delete button on header', () => {
