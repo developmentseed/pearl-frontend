@@ -164,7 +164,7 @@ function Map() {
         setPredictionsOpacity(1);
       } else if (e.key === ' ' || e.code === 'Space') {
         // On space keypress, pan map to current aoi bounds
-        const aoiShape = currentAoi?.shape;
+        const aoiShape = currentAoiShape;
         if (aoiShape) {
           mapRef.fitBounds(aoiShape.getBounds());
         }

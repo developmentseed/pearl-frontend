@@ -480,7 +480,7 @@ export const projectMachine = createMachine(
           src: 'deleteAoi',
           onDone: {
             target: 'Refresh AOI List',
-            actions: 'onAoiDeletedSuccess',
+            actions: ['clearCurrentAoi', 'onAoiDeletedSuccess'],
           },
         },
       },
