@@ -27,7 +27,6 @@ export const projectMachine = createMachine(
       aoiStatusMessage: 'Loading...',
       aoiActionButtons: {
         uploadAoi: true,
-        drawFirstAoi: true,
       },
       aoiModalDialog: {
         revealed: false,
