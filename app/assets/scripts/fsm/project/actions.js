@@ -128,25 +128,14 @@ export const actions = {
 
     currentAoiShape?.remove();
 
-    const isFirstAoi = context.aoisList.length === 0;
-    if (isFirstAoi) {
-      // If first AOI is being deleted, reset all AOI-related context
-      return {
-        currentAoi: null,
-        currentAoiShape: null,
-        currentImagerySource: null,
-        currentMosaic: null,
-        currentModel: null,
-      };
-    } else {
-      return {
-        currentAoi: null,
-        currentAoiShape: null,
-        currentPrediction: null,
-        currentShare: null,
-        currentTimeframe: null,
-      };
-    }
+    return {
+      currentAoi: null,
+      currentAoiShape: null,
+      currentPrediction: null,
+      currentMosaic: null,
+      currentShare: null,
+      currentTimeframe: null,
+    };
   }),
   prependAoisList: assign((context, event) => {
     const { aoisList } = context;
