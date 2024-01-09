@@ -60,7 +60,9 @@ export function AoiActionButtons({ setAoiIdToDelete }) {
           Add AOI
         </ActionButton>
       )}
-      {(uploadAoi || addNewAoi) && <Separator>|</Separator>}
+      {(uploadAoi || addNewAoi) && (drawFirstAoi || deleteAoi || editAoi) && (
+        <Separator>|</Separator>
+      )}
       {drawFirstAoi && (
         <ActionButton
           useIcon='pencil'
