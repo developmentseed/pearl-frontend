@@ -16,6 +16,7 @@ export const selectors = {
     (state.matches('Prediction ready') || state.matches('Retrain ready')),
   checkpointList: (state) => state.context.checkpointList,
   currentAoi: (state) => state.context.currentAoi,
+  currentAoiShape: (state) => state.context.currentAoiShape,
   currentAoiIsNew: ({ context: { currentAoi } }) =>
     currentAoi && !currentAoi.id,
   currentTimeframe: (state) => state.context.currentTimeframe,

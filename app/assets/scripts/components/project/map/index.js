@@ -95,6 +95,9 @@ function Map() {
     selectors.mapEventHandlers
   );
   const currentAoi = ProjectMachineContext.useSelector(selectors.currentAoi);
+  const currentAoiShape = ProjectMachineContext.useSelector(
+    selectors.currentAoiShape
+  );
   const currentPrediction = ProjectMachineContext.useSelector(
     selectors.currentPrediction
   );
