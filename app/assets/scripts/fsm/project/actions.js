@@ -597,7 +597,6 @@ export const actions = {
       aoiActionButtons: {
         uploadAoi: true,
         addNewAoi: !isFirstAoi,
-        editAoi: true,
         deleteAoi: true,
       },
       mapEventHandlers: {
