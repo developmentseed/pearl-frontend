@@ -680,4 +680,13 @@ export const actions = {
     const projectId = context.project.id;
     history.push(`/profile/projects/${projectId}`);
   }),
+  onPredictionComplete: assign(() => {
+    return {
+      aoiActionButtons: {
+        addNewAoi: true,
+        uploadAoi: true,
+        deleteAoi: true,
+      },
+    };
+  }),
 };
