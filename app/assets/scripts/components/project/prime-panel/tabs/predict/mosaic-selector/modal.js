@@ -6,6 +6,7 @@ import { glsp } from '@devseed-ui/theme-provider';
 import { Button } from '@devseed-ui/button';
 import { Heading } from '@devseed-ui/typography';
 import { ExistingMosaicsSection } from './sections/list-mosaics';
+import { CreateMosaicSection } from './sections/create-mosaic';
 
 const ModalHeader = styled.header`
   padding: ${glsp(2)} ${glsp(2)} 0;
@@ -60,6 +61,7 @@ export function MosaicSelectorModal({ showModal, setShowModal }) {
       )}
       content={
         <ModalContent>
+          <CreateMosaicSection setShowModal={setShowModal} />
           <ExistingMosaicsSection setShowModal={setShowModal} />
         </ModalContent>
       }
