@@ -4,11 +4,11 @@ import styled from 'styled-components';
 
 import { ProjectMachineContext } from '../../../../../../../fsm/project';
 import selectors from '../../../../../../../fsm/project/selectors';
-import { formatDateTime } from '../../../../../../../utils/format';
 import * as guards from '../../../../../../../fsm/project/guards';
 
 import { Heading } from '@devseed-ui/typography';
 import CardList, { Card } from '../../../../../../common/card-list';
+import { formatTimestampToSimpleUTC } from '../../../../../../../utils/dates';
 
 const HeadingWrapper = styled.div`
   display: flex;
@@ -55,11 +55,11 @@ export const ExistingMosaicsSection = ({ setShowModal }) => {
               title={mosaic.name}
               details={{
                 name,
-                'Mosaic Start Date': mosaic_ts_start
-                  ? formatDateTime(mosaic_ts_start)
+                'Start Time': mosaic_ts_start
+                  ? formatTimestampToSimpleUTC(mosaic_ts_start)
                   : 'N/A',
-                'Mosaic End Date': mosaic_ts_end
-                  ? formatDateTime(mosaic_ts_end)
+                'End Time': mosaic_ts_end
+                  ? formatTimestampToSimpleUTC(mosaic_ts_end)
                   : 'N/A',
               }}
               borderlessMedia
@@ -83,7 +83,7 @@ export const ExistingMosaicsSection = ({ setShowModal }) => {
             />
           );
         }}
-      />{' '}
+      />
     </>
   );
 };
