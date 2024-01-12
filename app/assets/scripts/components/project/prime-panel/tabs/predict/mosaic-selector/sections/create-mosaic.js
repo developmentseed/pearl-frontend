@@ -3,6 +3,7 @@ import { Heading } from '@devseed-ui/typography';
 import { formatTimestampToSimpleUTC } from '../../../../../../../utils/dates';
 import { ProjectMachineContext } from '../../../../../../../fsm/project';
 import selectors from '../../../../../../../fsm/project/selectors';
+import toasts from '../../../../../../common/toasts';
 
 const baseSentinelMosaic = {
   params: {
@@ -25,14 +26,15 @@ export const CreateMosaicSection = () => {
   const currentImagerySource = ProjectMachineContext.useSelector(
     selectors.currentImagerySource
   );
+  const apiClient = ProjectMachineContext.useSelector(
+    ({ context }) => context.apiClient
+  );
 
   const handleDateChange = (event) => {
     setSelectedDate(event.target.value);
 
-    // const selectedDateUTCStart = new Date(Date.UTC(year, month - 1, day));
-    const selectedDateUTCStart = new Date(event.target.value);
-    const selectedDateUTCEnd =
-      selectedDateUTCStart.getTime() + 90 * 24 * 60 * 60 * 1000;
+    const selectedDateUTCStart = new Date(event.target.value).getTime();
+    const selectedDateUTCEnd = selectedDateUTCStart + 90 * 24 * 60 * 60 * 1000;
 
     setSelectedTimeframe({
       start: selectedDateUTCStart,
@@ -40,7 +42,7 @@ export const CreateMosaicSection = () => {
     });
   };
 
-  const handleMosaicCreate = () => {
+  const handleMosaicCreate = async () => {
     if (!selectedTimeframe) {
       alert('Select a date!');
       return;
@@ -54,7 +56,12 @@ export const CreateMosaicSection = () => {
       mosaic_ts_end: selectedTimeframe.end,
     };
 
-    alert(JSON.stringify(newMosaic, null, 2));
+    try {
+      const mosaic = await apiClient.post('mosaic', newMosaic);
+      alert(JSON.stringify(mosaic, null, 2));
+    } catch (error) {
+      toasts.error('Error creating mosaic');
+    }
   };
 
   return (
