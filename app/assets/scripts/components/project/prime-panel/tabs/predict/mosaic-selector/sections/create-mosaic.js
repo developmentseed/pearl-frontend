@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import { Heading } from '@devseed-ui/typography';
 import { formatTimestampToSimpleUTC } from '../../../../../../../utils/dates';
 import { ProjectMachineContext } from '../../../../../../../fsm/project';
@@ -109,4 +110,8 @@ export const CreateMosaicSection = ({ setShowModal }) => {
       </div>
     </>
   );
+};
+
+CreateMosaicSection.propTypes = {
+  setShowModal: PropTypes.func.isRequired,
 };
