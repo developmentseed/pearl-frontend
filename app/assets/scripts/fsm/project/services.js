@@ -93,7 +93,12 @@ export const services = {
             );
           } catch (error) {
             logger('Error fetching tilejson');
-            toasts.error('There was an error fetching the prediction layer.');
+
+            currentTimeframe = undefined;
+            currentMosaic = undefined;
+            toasts.error(
+              'There was an error loading the prediction for the latest AOI timeframe, please run a prediction again.'
+            );
           }
         }
       }
@@ -407,7 +412,10 @@ export const services = {
               // Instance is processing a different timeframe, abort it
               if (instanceConfig.timeframe_id !== data.timeframe) {
                 websocket.sendMessage({
-                  action: 'model#abort',
+                  action: 'instance#terminate',
+                });
+                callback({
+                  type: 'Instance activation has failed',
                 });
               }
             } else {
