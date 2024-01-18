@@ -81,7 +81,7 @@ export function ImagerySourceSelectorModal({ showModal, setShowModal }) {
         <ModalContent>
           <HeadingWrapper>
             <Heading size='small' as='h4'>
-              Available mosaics for the AOI
+              Imagery sources available for the selected AOI
             </Heading>
           </HeadingWrapper>
           <CardList

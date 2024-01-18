@@ -38,7 +38,7 @@ export const ExistingMosaicsSection = ({ setShowModal }) => {
     <>
       <HeadingWrapper>
         <Heading size='small' as='h4'>
-          Available mosaics for the AOI
+          Mosaics availble for your selected AOI
         </Heading>
       </HeadingWrapper>
       <CardList

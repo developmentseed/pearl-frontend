@@ -14,7 +14,9 @@ const ModalHeader = styled.header`
 `;
 
 const ModalContent = styled.div`
-  display: block;
+  display: flex;
+  flex-flow: column;
+  height: 60vh;
 `;
 
 const Headline = styled.div`
