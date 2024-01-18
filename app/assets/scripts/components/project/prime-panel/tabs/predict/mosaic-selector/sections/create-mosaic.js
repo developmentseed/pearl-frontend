@@ -4,6 +4,7 @@ import { formatTimestampToSimpleUTC } from '../../../../../../../utils/dates';
 import { ProjectMachineContext } from '../../../../../../../fsm/project';
 import selectors from '../../../../../../../fsm/project/selectors';
 import toasts from '../../../../../../common/toasts';
+import { format, subDays } from 'date-fns';
 
 const baseSentinelMosaic = {
   params: {
@@ -19,9 +20,14 @@ const baseSentinelMosaic = {
   },
 };
 
-export const CreateMosaicSection = () => {
+const MOSAIC_DATE_RANGE_IN_DAYS = 90;
+
+export const CreateMosaicSection = ({ setShowModal }) => {
+  const actorRef = ProjectMachineContext.useActorRef();
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedTimeframe, setSelectedTimeframe] = useState(null);
+
+  const maxDate = subDays(new Date(), MOSAIC_DATE_RANGE_IN_DAYS);
 
   const currentImagerySource = ProjectMachineContext.useSelector(
     selectors.currentImagerySource
@@ -51,14 +57,20 @@ export const CreateMosaicSection = () => {
     const newMosaic = {
       ...baseSentinelMosaic,
       imagery_source_id: currentImagerySource.id,
-      name: `Sentinel-2 ${selectedDate}`,
+      name: `Sentinel-2 Level-2A ${formatTimestampToSimpleUTC(
+        selectedTimeframe.start
+      )} - ${formatTimestampToSimpleUTC(selectedTimeframe.end)}`,
       mosaic_ts_start: selectedTimeframe.start,
       mosaic_ts_end: selectedTimeframe.end,
     };
 
     try {
       const mosaic = await apiClient.post('mosaic', newMosaic);
-      alert(JSON.stringify(mosaic, null, 2));
+      setShowModal(false);
+      actorRef.send({
+        type: 'Mosaic was selected',
+        data: { mosaic },
+      });
     } catch (error) {
       toasts.error('Error creating mosaic');
     }
@@ -71,7 +83,12 @@ export const CreateMosaicSection = () => {
       </Heading>
       <div>
         Selected date:{' '}
-        <input type='date' value={selectedDate} onChange={handleDateChange} />
+        <input
+          type='date'
+          value={selectedDate}
+          max={format(maxDate, 'yyyy-MM-dd')}
+          onChange={handleDateChange}
+        />
       </div>
       <div>
         Start timestamp:{' '}
