@@ -73,12 +73,12 @@ export const actions = {
       ...nextContext,
     };
   }),
-  setCurrentMosaic: assign((context, event) => {
-    const { mosaic } = event.data;
+  setCurrentMosaic: assign((_, event) => {
+    const { mosaic, mosaicsList } = event.data;
+    const currentMosaic = { ...mosaic, tileUrl: getMosaicTileUrl(mosaic) };
 
-    return {
-      currentMosaic: { ...mosaic, tileUrl: getMosaicTileUrl(mosaic) },
-    };
+    // Optionally update mosaic list if provided
+    return mosaicsList ? { mosaicsList, currentMosaic } : { currentMosaic };
   }),
   setCurrentModel: assign((context, event) => {
     const { currentModel, currentImagerySource } = context;

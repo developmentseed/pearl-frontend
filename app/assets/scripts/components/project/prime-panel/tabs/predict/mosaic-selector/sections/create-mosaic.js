@@ -10,7 +10,7 @@ import { generateSentinel2L2AMosaic } from '../../../../../../../utils/mosaics';
 
 const MOSAIC_DATE_RANGE_IN_DAYS = 90;
 
-export const CreateMosaicSection = ({ setShowModal, className }) => {
+export const CreateMosaicSection = ({ onMosaicCreated, className }) => {
   const actorRef = ProjectMachineContext.useActorRef();
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedTimeframe, setSelectedTimeframe] = useState(null);
@@ -50,10 +50,11 @@ export const CreateMosaicSection = ({ setShowModal, className }) => {
 
     try {
       const mosaic = await apiClient.post('mosaic', newMosaic);
-      setShowModal(false);
+      const { mosaics: mosaicsList } = await apiClient.get('mosaic');
+      onMosaicCreated();
       actorRef.send({
         type: 'Mosaic was selected',
-        data: { mosaic },
+        data: { mosaic, mosaicsList },
       });
     } catch (error) {
       toasts.error('Error creating mosaic');
@@ -96,6 +97,6 @@ export const CreateMosaicSection = ({ setShowModal, className }) => {
 };
 
 CreateMosaicSection.propTypes = {
-  setShowModal: PropTypes.func.isRequired,
+  onMosaicCreated: PropTypes.func.isRequired,
   className: PropTypes.string,
 };

@@ -79,7 +79,10 @@ export function MosaicSelectorModal({ showModal, setShowModal }) {
               className='create-mosaic'
               tabId='create-mosaic-tab-trigger'
               onTabClick={() => setActiveTab(1)}
-              setShowModal={setShowModal}
+              onMosaicCreated={() => {
+                setActiveTab(0);
+                setShowModal(false);
+              }}
             />
           </TabbedBlock>
         </ModalContent>
