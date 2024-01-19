@@ -6,20 +6,7 @@ import { ProjectMachineContext } from '../../../../../../../fsm/project';
 import selectors from '../../../../../../../fsm/project/selectors';
 import toasts from '../../../../../../common/toasts';
 import { format, subDays } from 'date-fns';
-
-const baseSentinelMosaic = {
-  params: {
-    assets: ['B04', 'B03', 'B02', 'B08'],
-    rescale: '0,10000',
-    collection: 'sentinel-2-l2a',
-  },
-  imagery_source_id: 2,
-  ui_params: {
-    assets: ['B04', 'B03', 'B02'],
-    collection: 'sentinel-2-l2a',
-    color_formula: 'Gamma+RGB+3.2+Saturation+0.8+Sigmoidal+RGB+25+0.35',
-  },
-};
+import { generateSentinel2L2AMosaic } from '../../../../../../../utils/mosaics';
 
 const MOSAIC_DATE_RANGE_IN_DAYS = 90;
 
@@ -55,15 +42,11 @@ export const CreateMosaicSection = ({ setShowModal, className }) => {
       return;
     }
 
-    const newMosaic = {
-      ...baseSentinelMosaic,
-      imagery_source_id: currentImagerySource.id,
-      name: `Sentinel-2 Level-2A ${formatTimestampToSimpleUTC(
-        selectedTimeframe.start
-      )} - ${formatTimestampToSimpleUTC(selectedTimeframe.end)}`,
-      mosaic_ts_start: selectedTimeframe.start,
-      mosaic_ts_end: selectedTimeframe.end,
-    };
+    const newMosaic = await generateSentinel2L2AMosaic({
+      startTime: selectedTimeframe.start,
+      endTime: selectedTimeframe.end,
+      imagerySourceId: currentImagerySource?.id,
+    });
 
     try {
       const mosaic = await apiClient.post('mosaic', newMosaic);
