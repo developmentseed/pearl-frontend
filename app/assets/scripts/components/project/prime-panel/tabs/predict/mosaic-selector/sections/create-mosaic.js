@@ -23,7 +23,7 @@ const baseSentinelMosaic = {
 
 const MOSAIC_DATE_RANGE_IN_DAYS = 90;
 
-export const CreateMosaicSection = ({ setShowModal }) => {
+export const CreateMosaicSection = ({ setShowModal, className }) => {
   const actorRef = ProjectMachineContext.useActorRef();
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedTimeframe, setSelectedTimeframe] = useState(null);
@@ -78,7 +78,7 @@ export const CreateMosaicSection = ({ setShowModal }) => {
   };
 
   return (
-    <>
+    <div className={className}>
       <Heading size='small' as='h4'>
         Create a new mosaic
       </Heading>
@@ -108,10 +108,11 @@ export const CreateMosaicSection = ({ setShowModal }) => {
           Create
         </button>
       </div>
-    </>
+    </div>
   );
 };
 
 CreateMosaicSection.propTypes = {
   setShowModal: PropTypes.func.isRequired,
+  className: PropTypes.string,
 };

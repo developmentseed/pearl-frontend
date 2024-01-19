@@ -17,7 +17,7 @@ const HeadingWrapper = styled.div`
   align-items: baseline;
 `;
 
-export const ExistingMosaicsSection = ({ setShowModal }) => {
+export const ExistingMosaicsSection = ({ setShowModal, className }) => {
   const actorRef = ProjectMachineContext.useActorRef();
   const isProjectNew = ProjectMachineContext.useSelector((s) =>
     guards.isProjectNew(s.context)
@@ -35,7 +35,7 @@ export const ExistingMosaicsSection = ({ setShowModal }) => {
   );
 
   return (
-    <>
+    <div className={className}>
       <HeadingWrapper>
         <Heading size='small' as='h4'>
           Mosaics availble for your selected AOI
@@ -84,10 +84,11 @@ export const ExistingMosaicsSection = ({ setShowModal }) => {
           );
         }}
       />
-    </>
+    </div>
   );
 };
 
 ExistingMosaicsSection.propTypes = {
   setShowModal: PropTypes.func.isRequired,
+  className: PropTypes.string,
 };
