@@ -153,7 +153,6 @@ function TabbedBlock(props) {
             <>
               {React.cloneElement(child, {
                 active: active,
-                //style: active ? {} : { display: 'none' },
                 className: active ? className : `${className} inactive-panel`,
               })}
             </>
