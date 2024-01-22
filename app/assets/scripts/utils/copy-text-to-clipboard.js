@@ -1,6 +1,6 @@
 import logger from './logger';
 
-export default async function updateClipboard(newClip) {
+export default async function copyTextToClipboard(newClip) {
   const success = await navigator.clipboard.writeText(newClip).then(
     function () {
       /* clipboard successfully set */

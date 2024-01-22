@@ -168,17 +168,6 @@ class RestApiClient {
     return this.post(`project/${projectId}/aoi/${aoiId}/share`);
   }
 
-  downloadGeotiff(projectId, aoiId) {
-    return this.get(
-      `project/${projectId}/aoi/${aoiId}/download/color`,
-      'binary'
-    );
-  }
-
-  getAOIFromUUID(uuid) {
-    return this.get(`share/${uuid}`);
-  }
-
   patchAoi(projectId, aoiId, patches) {
     return this.patch(`project/${projectId}/aoi/${aoiId}`, {
       patches,

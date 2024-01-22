@@ -32,8 +32,8 @@ import Paginator from '../../common/paginator';
 import ProjectCard from './project-card';
 import copyTextToClipboard from '../../../utils/copy-text-to-clipboard';
 import logger from '../../../utils/logger';
-import { downloadGeotiff } from '../../../utils/map';
 import BatchList from './batch-list';
+import { downloadShareGeotiff } from '../../../utils/share-link';
 
 // Controls the size of each page
 const AOIS_PER_PAGE = 20;
@@ -71,6 +71,7 @@ const FormInputGroup = styled.div`
 const AOI_HEADERS = [
   'AOI Name',
   'AOI Size (Km2)',
+  'Mosaic',
   'Checkpoint',
   'Classes',
   'Created',
@@ -79,100 +80,44 @@ const AOI_HEADERS = [
 ];
 
 // Render single AOI row
-function renderRow(aoi, { project, restApiClient, aois, setAois }) {
-  const shareUUID = aoi.shares.length > 0 ? aoi.shares[0].uuid : null;
-  const shareLink = shareUUID
-    ? `${window.location.origin}/share/${shareUUID}/map`
-    : null;
+function renderRow(share, { restApiClient }) {
+  const shareLink = `${window.location.origin}/share/${share.uuid}/map`;
+  const { aoi, timeframe, mosaic } = share;
 
   return (
     <TableRow key={aoi.id}>
       <TableCell>{aoi.name}</TableCell>
       <TableCell>{formatThousands(tArea(aoi.bounds) / 1e6)}</TableCell>
-      <TableCell>{aoi.checkpoint_name}</TableCell>
-      <TableCell>{aoi.classes.length}</TableCell>
-      <TableCell>{formatDateTime(aoi.created)}</TableCell>
+      <TableCell>{mosaic?.name}</TableCell>
+      <TableCell>{timeframe.checkpoint_id}</TableCell>
+      <TableCell>{timeframe.classes.length}</TableCell>
+      <TableCell>{formatDateTime(timeframe.created)}</TableCell>
       <TableCell>
-        {shareUUID ? (
-          <FormInputGroup>
-            <FormInput readOnly value={shareLink} size='small' />
-            <Button
-              variation='primary-plain'
-              useIcon='clipboard'
-              hideText
-              onClick={() => {
-                copyTextToClipboard(shareLink).then((result) => {
-                  if (result) {
-                    toasts.success('URL copied to clipboard');
-                  } else {
-                    logger('Failed to copy', result);
-                    toasts.error('Failed to copy URL to clipboard');
-                  }
-                });
-              }}
-            />
-          </FormInputGroup>
-        ) : (
+        <FormInputGroup>
+          <FormInput readOnly value={shareLink} size='small' />
           <Button
             variation='primary-plain'
-            useIcon='link'
-            onClick={async () => {
-              let share;
-              showGlobalLoadingMessage('Creating Shareable Link...');
-              try {
-                share = await restApiClient.createShare(project.id, aoi.id);
-              } catch (err) {
-                logger('Failed to create share', err);
-                hideGlobalLoading();
-                toasts.error('Failed to create Share URL.');
-                return;
-              }
-              hideGlobalLoading();
-              const updatedAois = aois.map((a) => {
-                let shares;
-                if (a.id === aoi.id) {
-                  shares = [
-                    {
-                      uuid: share.uuid,
-                    },
-                  ];
+            useIcon='clipboard'
+            hideText
+            onClick={() => {
+              copyTextToClipboard(shareLink).then((result) => {
+                if (result) {
+                  toasts.success('URL copied to clipboard');
+                } else {
+                  logger('Failed to copy', result);
+                  toasts.error('Failed to copy URL to clipboard');
                 }
-                const ret = {
-                  ...a,
-                };
-                if (shares) {
-                  ret.shares = shares;
-                }
-                return ret;
               });
-              setAois(updatedAois);
             }}
-          >
-            Create share URL
-          </Button>
-        )}
+          />
+        </FormInputGroup>
       </TableCell>
       <TableCell>
         <Button
           variation='primary-plain'
           useIcon='download'
           hideText
-          onClick={async () => {
-            try {
-              showGlobalLoadingMessage('Preparing GeoTIFF...');
-              const arrayBuffer = await restApiClient.downloadGeotiff(
-                project.id,
-                aoi.id
-              );
-              const filename = `${aoi.id}.tiff`;
-              downloadGeotiff(arrayBuffer, filename);
-            } catch (err) {
-              logger('Failed to download geotiff', err);
-              toasts.error('Failed to download GeoTIFF');
-              hideGlobalLoading();
-            }
-            hideGlobalLoading();
-          }}
+          onClick={() => downloadShareGeotiff(restApiClient, share)}
         />
       </TableCell>
     </TableRow>
@@ -185,7 +130,7 @@ function Project() {
   const { projectId } = useParams();
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(null);
-  const [aois, setAois] = useState([]);
+  const [shares, setShares] = useState([]);
   const [isProjectLoading, setIsProjectLoading] = useState(true);
   const [isAoisLoading, setIsAoisLoading] = useState(true);
   const [project, setProject] = useState(null);
@@ -221,13 +166,11 @@ function Project() {
       if (apiToken) {
         setIsAoisLoading(true);
         try {
-          const aoisData = await restApiClient.get(
-            `project/${projectId}/aoi?bookmarked=true&page=${
-              page - 1
-            }&limit=${AOIS_PER_PAGE}`
+          const sharesData = await restApiClient.get(
+            `project/${projectId}/share?page=${page - 1}&limit=${AOIS_PER_PAGE}`
           );
-          setTotal(aoisData.total);
-          setAois(aoisData.aois);
+          setTotal(sharesData.total);
+          setShares(sharesData.shares);
         } catch (err) {
           toasts.error('Failed to fetch AOIs for Project');
           setIsAoisLoading(false);
@@ -331,25 +274,25 @@ function Project() {
               <ProjectCard
                 restApiClient={restApiClient}
                 project={project}
-                aois={aois}
+                shares={shares}
               />
             ) : null}
             <BatchList projectId={projectId} />
-            {aois &&
-              (aois.length ? (
+            {shares &&
+              (shares.length ? (
                 <>
                   <Heading size='small'>
                     {project ? 'Exported Maps' : 'Loading Project...'}
                   </Heading>
                   <Table
                     headers={AOI_HEADERS}
-                    data={aois}
+                    data={shares}
                     renderRow={renderRow}
                     extraData={{
                       project,
                       restApiClient,
-                      aois,
-                      setAois,
+                      shares,
+                      setShares,
                     }}
                   />
                   <Paginator

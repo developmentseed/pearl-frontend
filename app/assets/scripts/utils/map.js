@@ -1,7 +1,6 @@
 import tArea from '@turf/area';
 import tBboxPolygon from '@turf/bbox-polygon';
 import booleanIntersects from '@turf/boolean-intersects';
-import { saveAs } from 'file-saver';
 
 /**
  * Get area from bbox
@@ -11,13 +10,6 @@ import { saveAs } from 'file-saver';
 export function areaFromBounds(bbox) {
   const poly = tBboxPolygon(bbox);
   return tArea(poly);
-}
-
-export function downloadGeotiff(arrayBuffer, filename) {
-  var blob = new Blob([arrayBuffer], {
-    type: 'application/x-geotiff',
-  });
-  saveAs(blob, filename);
 }
 
 /**

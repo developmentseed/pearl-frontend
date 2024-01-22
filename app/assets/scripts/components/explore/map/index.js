@@ -61,10 +61,11 @@ import toasts from '../../common/toasts';
 import logger from '../../../utils/logger';
 import PolygonDrawControl from './polygon-draw-control';
 import OsmQaLayer from '../../common/map/osm-qa-layer';
-import booleanWithin from '@turf/boolean-within';
-import bboxPolygon from '@turf/bbox-polygon';
+import turfArea from '@turf/area';
+import turfBboxPolygon from '@turf/bbox-polygon';
+import { useImagerySource } from '../../../context/imagery-sources';
 
-const center = [38.889805, -77.009056];
+const center = [19.22819, -99.995841];
 const zoom = 12;
 
 const MIN = 4;
@@ -118,6 +119,7 @@ function Map() {
     currentAoi,
     setActiveModal,
     setCurrentAoi,
+    setAoiGeometry,
   } = useAoi();
   const { updateAoiName } = useAoiName();
 
@@ -135,6 +137,7 @@ function Map() {
   const { userLayers, setUserLayers } = useUserLayers();
 
   const { mosaics, mosaicMeta } = useMosaics();
+  const { selectedMosaic } = useImagerySource();
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
   const [mostRecentClass, setMostRecentClass] = useState(null);
 
@@ -292,16 +295,8 @@ function Map() {
           setAoiArea(areaFromBounds(bbox));
         },
         onDrawEnd: (bbox, shape) => {
-          const area = areaFromBounds(bbox);
-          const aoiBboxPoly = bboxPolygon(bbox);
-
-          if (
-            mosaicMeta.data?.bounds &&
-            !booleanWithin(aoiBboxPoly, bboxPolygon(mosaicMeta.data.bounds))
-          ) {
-            setActiveModal('area-out-of-bounds');
-            return;
-          }
+          const bboxPolygon = turfBboxPolygon(bbox);
+          const area = turfArea(bboxPolygon);
 
           if (area < config.minimumAoiArea) {
             setActiveModal('area-too-tiny');
@@ -315,6 +310,7 @@ function Map() {
             updateAoiName(bounds);
 
             setAoiRef(shape);
+            setAoiGeometry(bboxPolygon);
             //Current AOI should only be set after AOI has been sent to the api
             setCurrentAoi(null);
           } else if (apiLimits.max_inference > area) {
@@ -444,6 +440,35 @@ function Map() {
     }
   }, [mapState.mode, shortcutState.escapePressed, mapRef?.polygonDraw]);
 
+  const selectedMosaicUrl = useMemo(() => {
+    // The mosaic object has two properties that can be user to build a mosaic
+    // URL: 'ui_params' and 'params'. The first one is intended to be used in
+    // the interface, the second to run inferences. The front-end will use
+    // 'ui_params' if available and 'params' as a fallback.
+    const mosaicParams = selectedMosaic?.ui_params || selectedMosaic?.params;
+
+    if (!mosaicParams) return;
+
+    const { assets, ...otherParams } = mosaicParams;
+
+    let params = [];
+
+    // The tiler doesn't support array[] notation in the querystring, this will
+    // generate a custom notation like 'asset=a&asset=b&asset=c'
+    if (Array.isArray(assets)) {
+      assets.forEach((a) => params.push(`assets=${a}`));
+    } else {
+      params.push(`assets=${assets}`);
+    }
+
+    // Serialize remaining params
+    for (var p in otherParams) params.push(p + '=' + otherParams[p]);
+
+    return `https://planetarycomputer.microsoft.com/api/data/v1/mosaic/tiles/${
+      selectedMosaic.id
+    }/{z}/{x}/{y}?${params.join('&')}`;
+  }, [selectedMosaic]);
+
   const displayMap = useMemo(() => {
     return (
       <MapContainer
@@ -504,30 +529,29 @@ function Map() {
 
         <BaseMapLayer />
 
-        {mosaics &&
-          mosaics.map((layer) => (
-            <TileLayer
-              key={layer}
-              attribution='&copy; NAIP'
-              url={config.tileUrlTemplate.replace('{LAYER_NAME}', layer)}
-              minZoom={12}
-              maxZoom={20}
-              pane='tilePane'
-              eventHandlers={{
-                add: (v) => {
-                  setMapLayers({
-                    ...mapLayers,
-                    [layer]: {
-                      layer: v.target,
-                      active: true,
-                      name: layer,
-                      opacity: 1,
-                    },
-                  });
-                },
-              }}
-            />
-          ))}
+        {selectedMosaic && selectedMosaicUrl && (
+          <TileLayer
+            key={selectedMosaic.id}
+            attribution='&copy; NAIP'
+            url={selectedMosaicUrl}
+            minZoom={12}
+            maxZoom={20}
+            pane='tilePane'
+            eventHandlers={{
+              add: (v) => {
+                setMapLayers({
+                  ...mapLayers,
+                  [selectedMosaic.id]: {
+                    layer: v.target,
+                    active: true,
+                    name: selectedMosaic.name,
+                    opacity: 1,
+                  },
+                });
+              },
+            }}
+          />
+        )}
 
         {predictions &&
           predictions.data &&
@@ -733,6 +757,7 @@ function Map() {
     aoiPatchList,
     tileUrl,
     shortcutState,
+    selectedMosaic,
   ]);
 
   return (

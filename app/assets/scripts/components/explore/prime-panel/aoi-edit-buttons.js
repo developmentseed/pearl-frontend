@@ -34,6 +34,7 @@ import config from '../../../config';
 import { UploadAoiModal } from './upload-aoi-modal';
 import booleanWithin from '@turf/boolean-within';
 import bboxPolygon from '@turf/bbox-polygon';
+import { useImagerySource } from '../../../context/imagery-sources';
 
 const ModalFooter = styled(BaseModalFooter)`
   padding: ${glsp(2)} 0 0 0;
@@ -116,6 +117,7 @@ export function AoiEditButtons(props) {
     setAoiIsRectangle,
     aoiIsRectangle,
   } = useAoi();
+  const { setSelectedImagerySource } = useImagerySource();
 
   const { aoiArea, aoiBounds, setAoiBounds, createNewAoi } = useAoiMeta();
   const { mapRef } = useMapRef();
@@ -332,6 +334,9 @@ export function AoiEditButtons(props) {
               setAoiBounds(null);
               setAoiArea(null);
               setAoiName(null);
+              setAoiGeometry(null);
+              setSelectedImagerySource(null);
+              setSessionStatusMode(sessionModes.SET_AOI);
             }}
             title='Delete current AOI'
             id='delete-aoi'

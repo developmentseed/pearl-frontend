@@ -23,15 +23,16 @@
     "serve:testing": "NODE_ENV=testing gulp serve",
     "build": "NODE_ENV=production gulp",
     "build:reforestamos": "NODE_ENV=reforestamos gulp",
+    "build:reforestamos:prod": "NODE_ENV=reforestamos-prod gulp",
     "stage": "NODE_ENV=staging gulp",
     "lint": "eslint app/assets/scripts/ cypress/ --ext .js",
     "lint:css": "stylelint 'app/assets/styles/**/**' 'app/assets/scripts/**/*.js'",
-    "cy:open": "NODE_ENV=cypress cypress open",
+    "cy:open": "NODE_ENV=cypress cypress open --e2e --browser electron",
     "cy:open:stress": "NODE_ENV=testing cypress open --config-file cypress-stress.json",
-    "cy:run": "NODE_ENV=cypress cypress run --browser chrome"
+    "cy:run": "NODE_ENV=cypress cypress run --e2e --browser electron"
   },
   "engines": {
-    "node": "14.x"
+    "node": "18.x"
   },
   "browserify": {
     "transform": [
@@ -65,7 +66,7 @@
     "browser-sync": "^2.26.13",
     "browserify": "^17.0.0",
     "collecticons-processor": "^4.1.0",
-    "cypress": "^9.3.1",
+    "cypress": "^10.11.0",
     "cypress-file-upload": "^5.0.8",
     "cypress-websocket-server": "^0.1.2",
     "del": "^6.0.0",
@@ -93,7 +94,6 @@
     "gulp-sourcemaps": "^3.0.0",
     "gulp-terser": "^1.4.1",
     "gulp-useref": "^5.0.0",
-    "lodash.sortby": "^4.7.0",
     "prettier": "^2.1.2",
     "require-globify": "^1.4.1",
     "stylelint": "^13.7.2",
@@ -127,6 +127,7 @@
     "@turf/boolean-within": "^6.5.0",
     "@turf/centroid": "^6.3.0",
     "@turf/helpers": "^6.5.0",
+    "@xstate/react": "^3.2.1",
     "babel-preset-env": "^1.7.0",
     "chart.js": "^2.9.4",
     "date-fns": "^2.20.3",
@@ -145,6 +146,8 @@
     "lodash.differencewith": "^4.5.0",
     "lodash.get": "^4.4.2",
     "lodash.isequal": "^4.5.0",
+    "lodash.set": "^4.3.2",
+    "lodash.sortby": "^4.7.0",
     "lodash.throttle": "^4.1.1",
     "lodash.uniq": "^4.5.0",
     "lodash.uniqwith": "^4.5.0",
@@ -168,6 +171,7 @@
     "request-promise": "^4.2.6",
     "resize-observer": "^1.0.2",
     "styled-components": "^5.2.1",
+    "xstate": "^4.37.0",
     "yup": "^0.32.11"
   }
 }

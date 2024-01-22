@@ -26,12 +26,12 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@v2
-        
-      - name: Use Node.js 14
+
+      - name: Use Node.js 18
         uses: actions/setup-node@v1
         with:
-          node-version: 14
-      
+          node-version: 18
+
       - name: Cache node modules
         id: cache-node-modules
         uses: actions/cache@v2
@@ -44,7 +44,7 @@ jobs:
             ${{ runner.os }}-build-${{ env.cache-name }}-
             ${{ runner.os }}-build-
             ${{ runner.os }}-
-            
+
       - name: Install
         if: steps.cache-node-modules.outputs.cache-hit != 'true'
         run: yarn install
@@ -59,7 +59,7 @@ jobs:
       - name: Build Prod
         if: github.ref == 'refs/heads/main'
         run: yarn build
-        
+
       - name: Azure Login
         if: github.ref == 'refs/heads/develop'
         uses: azure/login@v1
@@ -72,21 +72,19 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS_PRODUCTION }}
 
-
       - name: Upload to blob storage
         if: github.ref == 'refs/heads/develop'
         uses: azure/CLI@v1
         with:
           inlineScript: |
-              az storage blob upload-batch --account-name $STAGING_STORAGE_ACCOUNT_NAME --overwrite -d '$web' -s ./dist
+            az storage blob upload-batch --account-name $STAGING_STORAGE_ACCOUNT_NAME --overwrite -d '$web' -s ./dist
 
       - name: Upload to blob storage
         if: github.ref == 'refs/heads/main'
         uses: azure/CLI@v1
         with:
           inlineScript: |
-              az storage blob upload-batch --account-name $PRODUCTION_STORAGE_ACCOUNT_NAME --overwrite -d '$web' -s ./dist
-
+            az storage blob upload-batch --account-name $PRODUCTION_STORAGE_ACCOUNT_NAME --overwrite -d '$web' -s ./dist
 
       - name: Purge CDN endpoint
         if: github.ref == 'refs/heads/develop'
@@ -101,7 +99,6 @@ jobs:
         with:
           inlineScript: |
             az cdn endpoint purge --content-paths  "/*" --profile-name $PRODUCTION_CDN_PROFILE_NAME --name $PRODUCTION_CDN_ENDPOINT --resource-group $PRODUCTION_RESOURCE_GROUP
-
 
       - name: Azure Logout
         run: az logout

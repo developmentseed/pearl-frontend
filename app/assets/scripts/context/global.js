@@ -12,6 +12,8 @@ const GlobalContext = createContext({});
 
 export function GlobalContextProvider(props) {
   const [tourStep, setTourStep] = useState(0);
+  // TODO This is a hardcoded mosaic used in edit/upload AOI logic. It should be
+  // replaced by the selected mosaic
   const mosaicMeta = useFetch('mosaic/naip.latest');
 
   const apiLimits = useFetch('', {
@@ -21,7 +23,10 @@ export function GlobalContextProvider(props) {
     },
   });
 
-  const mosaicList = useFetch('mosaic', { mutator: (body) => body.mosaics });
+  const imagerySources = useFetch('imagery', {
+    mutator: (body) => body.imagery_sources,
+  });
+  const mosaics = useFetch('mosaic', { mutator: (body) => body.mosaics });
 
   useEffect(() => {
     const visited = localStorage.getItem('site-tour');
@@ -37,8 +42,9 @@ export function GlobalContextProvider(props) {
           apiLimits:
             apiLimits.isReady && !apiLimits.hasError ? apiLimits.data : null,
 
-          mosaics:
-            mosaicList.isReady && !mosaicList.hasError ? mosaicList.data : [],
+          mosaics,
+
+          imagerySources,
 
           tourStep,
           setTourStep,
@@ -81,14 +87,17 @@ export const useApiLimits = () => {
 };
 
 export const useMosaics = () => {
-  const { mosaics, mosaicMeta } = useGlobalContext('useMosaics');
+  const { mosaics, mosaicMeta, imagerySources } = useGlobalContext(
+    'useMosaics'
+  );
 
   return useMemo(
     () => ({
+      imagerySources,
       mosaics,
       mosaicMeta,
     }),
-    [mosaics, mosaicMeta]
+    [imagerySources, mosaics, mosaicMeta]
   );
 };
 

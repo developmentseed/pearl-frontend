@@ -14,7 +14,7 @@
       "data": {
         "is_aborting": false,
         "processing": false,
-        "aoi": 2,
+        "timeframe": 2,
         "checkpoint": 2
       }
     }
@@ -37,7 +37,7 @@
       "data": {
         "is_aborting": false,
         "processing": false,
-        "aoi": 2,
+        "timeframe": 2,
         "checkpoint": 2
       }
     }
@@ -47,7 +47,7 @@
     "payload": {
       "action": "model#retrain",
       "data": {
-        "name": "Seneca Rocks #1",
+        "name": "Seneca Rocks",
         "classes": [
           {
             "name": "Water / Wetland",
@@ -85,7 +85,7 @@
                   "properties": {},
                   "geometry": {
                     "type": "MultiPoint",
-                    "coordinates": [[-79.3850612640381, 38.84067698741475]]
+                    "coordinates": [[-79.3890953063965, 38.84425352847781]]
                   }
                 }
               ]
@@ -125,7 +125,7 @@
       "data": {
         "is_aborting": false,
         "processing": true,
-        "aoi": 2,
+        "timeframe": 2,
         "checkpoint": 2
       }
     }
@@ -144,7 +144,7 @@
   {
     "type": "server",
     "payload": {
-      "message": "model#aoi",
+      "message": "model#timeframe",
       "data": {
         "id": 3,
         "live": true,
@@ -167,7 +167,7 @@
       "data": {
         "is_aborting": false,
         "processing": true,
-        "aoi": 3,
+        "timeframe": 3,
         "checkpoint": 3
       }
     }
@@ -177,7 +177,7 @@
     "payload": {
       "message": "model#prediction",
       "data": {
-        "aoi": 3,
+        "timeframe": 3,
         "bounds": [
           -77.047119140625,
           38.901720914997945,
@@ -198,7 +198,7 @@
     "payload": {
       "message": "model#prediction",
       "data": {
-        "aoi": 3,
+        "timeframe": 3,
         "bounds": [
           -77.047119140625,
           38.89958342598271,
@@ -219,7 +219,7 @@
     "payload": {
       "message": "model#prediction",
       "data": {
-        "aoi": 3,
+        "timeframe": 3,
         "bounds": [
           -77.04437255859375,
           38.901720914997945,
@@ -241,7 +241,7 @@
     "payload": {
       "message": "model#prediction",
       "data": {
-        "aoi": 3,
+        "timeframe": 3,
         "bounds": [
           -77.04437255859375,
           38.89958342598271,

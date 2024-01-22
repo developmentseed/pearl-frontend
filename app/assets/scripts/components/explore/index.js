@@ -15,6 +15,8 @@ import { InstanceProvider } from '../../context/instance';
 import { PredictionsProvider } from '../../context/predictions';
 import { ModelProvider } from '../../context/model';
 import Composer from '../../utils/compose-components';
+import { ImagerySourceProvider } from '../../context/imagery-sources';
+import { ExploreMachineProvider } from '../../context/explore-machine';
 
 function Explore() {
   const [isMediumDown, setIsMediumDown] = useState(false);
@@ -30,9 +32,11 @@ function Explore() {
           CheckpointProvider,
           AoiProvider,
           ModelProvider,
+          ImagerySourceProvider,
           ProjectProvider,
           PredictionsProvider,
           InstanceProvider,
+          ExploreMachineProvider,
           ExploreProvider,
           MapProvider,
         ]}
@@ -42,7 +46,7 @@ function Explore() {
           className='header'
           onChange={resizeListener}
         >
-          <PageHeader>
+          <PageHeader hideLongAppTitle>
             <ExploreHeader isMediumDown={isMediumDown} />
           </PageHeader>
         </SizeAwareElement>

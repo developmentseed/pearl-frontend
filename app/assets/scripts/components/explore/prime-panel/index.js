@@ -1,14 +1,9 @@
 import React, { useEffect, useState, useContext } from 'react';
 import styled from 'styled-components';
-import { Heading } from '@devseed-ui/typography';
-import { Button } from '@devseed-ui/button';
 import { media, glsp } from '@devseed-ui/theme-provider';
 
 import Panel from '../../common/panel';
 import { PanelBlock, PanelBlockBody } from '../../common/panel-block';
-import SelectModal from '../../common/select-modal';
-import AutoFocusFormInput from '../../common/auto-focus-form-input';
-import ModelCard from './model-card';
 import { useMapRef } from '../../../context/map';
 import {
   ExploreContext,
@@ -34,36 +29,11 @@ import { usePredictions } from '../../../context/predictions';
 import { useApiLimits } from '../../../context/global';
 import ClearSamplesModal from './clear-samples-modal';
 import { actions as shortcutActions } from '../../../context/explore/shortcuts';
-import { bboxIntersectsMapBounds } from '../../../utils/map';
 
 const StyledPanelBlock = styled(PanelBlock)`
   ${media.largeUp`
     width: ${glsp(24)};
   `}
-`;
-
-const ModalHeader = styled.header`
-  padding: ${glsp(2)} ${glsp(2)} 0;
-`;
-
-const Headline = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  padding-bottom: ${glsp(1)};
-
-  h1 {
-    margin: 0;
-  }
-
-  ${Button} {
-    height: min-content;
-    align-self: center;
-  }
-`;
-
-const FilterSection = styled.div`
-  padding-bottom: ${glsp(1)};
 `;
 
 const TABS = [0, 1, 2];
@@ -77,19 +47,17 @@ function PrimePanel() {
 
   const { updateCheckpointName } = useContext(ExploreContext);
 
-  const { aoiBounds, setAoiBounds, aoiArea } = useAoiMeta();
+  const { setAoiBounds, aoiArea } = useAoiMeta();
 
   const { aoiRef, currentAoi } = useAoi();
 
   const { currentCheckpoint, dispatchCurrentCheckpoint } = useCheckpoint();
 
-  const { models, selectedModel, setSelectedModel } = useModel();
+  const { selectedModel } = useModel();
 
   const { predictions } = usePredictions();
 
-  const [showSelectModelModal, setShowSelectModelModal] = useState(false);
   const [showClearSamplesModal, setShowClearSamplesModal] = useState(null);
-  const [modelFilter, setModelFilter] = useState('');
 
   const [localCheckpointName, setLocalCheckpointName] = useState(
     (currentCheckpoint &&
@@ -164,7 +132,6 @@ function PrimePanel() {
                   className='predict-model'
                   tabId='predict-tab-trigger'
                   checkpointHasSamples={checkpointHasSamples}
-                  setShowSelectModelModal={setShowSelectModelModal}
                   onTabClick={() => {
                     function onContinue() {
                       setActiveTab(PREDICT_TAB_INDEX);
@@ -312,65 +279,6 @@ function PrimePanel() {
             />
           </StyledPanelBlock>
         }
-      />
-      <SelectModal
-        id='select-model-modal'
-        revealed={showSelectModelModal}
-        onOverlayClick={() => setShowSelectModelModal(false)}
-        data={
-          models.isReady && !models.hasError
-            ? models.data.map((model) => {
-                model.overlapsAoi = bboxIntersectsMapBounds(
-                  model.bounds,
-                  aoiBounds
-                );
-                return model;
-              })
-            : []
-        }
-        renderHeader={() => (
-          <ModalHeader>
-            <Headline>
-              {' '}
-              <Heading>Starter Models</Heading>
-              <Button
-                hideText
-                variation='base-plain'
-                size='small'
-                useIcon='xmark'
-                onClick={() => {
-                  setShowSelectModelModal(false);
-                  setModelFilter('');
-                }}
-              >
-                Close modal
-              </Button>
-            </Headline>
-            <FilterSection>
-              <AutoFocusFormInput
-                inputId='modelsFilter'
-                value={modelFilter}
-                setValue={setModelFilter}
-                placeholder='Search models by name'
-              />
-            </FilterSection>
-          </ModalHeader>
-        )}
-        filterCard={(card) =>
-          card.name.toLowerCase().includes(modelFilter.toLowerCase())
-        }
-        renderCard={(model) => (
-          <ModelCard
-            key={model.name}
-            model={model}
-            onClick={() => {
-              setShowSelectModelModal(false);
-              setSelectedModel(model.id);
-            }}
-            selected={model.overlapsAoi}
-          />
-        )}
-        nonScrolling
       />
       <ClearSamplesModal
         revealed={showClearSamplesModal !== null}

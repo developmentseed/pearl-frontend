@@ -37,6 +37,7 @@ import { delay } from '../../utils/utils';
 import { actions as instanceActions, useInstanceReducer } from './reducer';
 import { aoiBoundsToArray } from '../../utils/map';
 import { round } from '../../utils/format';
+import { useImagerySource } from '../imagery-sources';
 
 const BATCH_REFRESH_INTERVAL = 4000;
 
@@ -75,6 +76,7 @@ const InstanceContext = createContext(null);
 export function InstanceProvider(props) {
   const history = useHistory();
   const { restApiClient } = useAuth();
+  const { selectedMosaic } = useImagerySource();
 
   const {
     currentCheckpoint,
@@ -247,16 +249,16 @@ export function InstanceProvider(props) {
       loadCheckpointList(currentProject.id).then((list) => {
         // Find base checkpoint which has no parent
         const base = list.checkpoints.find((c) => c.parent === null);
-        // New AOI, base checkpoint, do not need to verify if the AOI matches the checkpointk
+        // New AOI, base checkpoint, do not need to verify if the AOI matches the checkpoint
         fetchCheckpoint(currentProject.id, base.id, null, true);
       });
 
-      // Completed batch has n been procesesd, this block should not run again for this batch
+      // Completed batch has n been processed, this block should not run again for this batch
       setBatchReady(false);
     }
   }, [batchReady, currentAoi, currentProject]);
 
-  async function initInstance(projectId, checkpointId, aoiId) {
+  async function initInstance(projectId, checkpointId, timeframeId) {
     // Close existing websocket
     if (websocketClient) {
       websocketClient.close();
@@ -290,7 +292,7 @@ export function InstanceProvider(props) {
       instance = await restApiClient.createInstance(projectId, {
         type: instanceType,
         checkpoint_id: checkpointId,
-        aoi_id: aoiId,
+        timeframe_id: timeframeId,
       });
     } else {
       instance = await restApiClient.createInstance(projectId, {
@@ -348,25 +350,24 @@ export function InstanceProvider(props) {
         fetchCheckpoint(
           projectId,
           checkpointId,
-          aoiId ? checkpointModes.RETRAIN : checkpointModes.RUN,
+          timeframeId ? checkpointModes.RETRAIN : checkpointModes.RUN,
           true
         );
       }
     }
 
-    // Apply AOI when set
-    if (aoiId && aoiId !== instance.aoi_id) {
-      doHideGlobalLoading = false; // globalLoading will be hidden once checkpoint is in
-      dispatchMessageQueue({
-        type: messageQueueActionTypes.ADD,
-        data: {
-          action: 'model#aoi',
-          data: {
-            id: aoiId,
-          },
-        },
-      });
-    }
+    // TODO this should be revisited as we need a wait to load an existing
+    // timeframe, not an AOI
+    //
+    // Apply AOI when set if (aoiId && aoiId !== instance.aoi_id) {
+    // doHideGlobalLoading = false; // globalLoading will be hidden once
+    // checkpoint is in dispatchMessageQueue({ type:
+    // messageQueueActionTypes.ADD, data: { action: 'model#timeframe', data: {
+    // id: aoiId,
+    //       },
+    //     },
+    //   });
+    // }
 
     // Use a Promise to stand by for GPU connection
     return new Promise((resolve, reject) => {
@@ -492,12 +493,12 @@ export function InstanceProvider(props) {
         gpuMessage: message,
       }),
     initInstance,
-    loadAoiOnInstance: (id) => {
+    loadAoiTimeframeOnInstance: (id) => {
       showGlobalLoadingMessage('Loading AOI on Instance...');
       dispatchMessageQueue({
         type: messageQueueActionTypes.ADD_EXPRESS,
         data: {
-          action: 'model#aoi',
+          action: 'model#timeframe',
           data: {
             id,
           },
@@ -508,13 +509,14 @@ export function InstanceProvider(props) {
     runningBatch,
     runPrediction: async ({ onAbort }) => {
       let project = currentProject;
+      let aoi = currentAoi;
 
       if (!project) {
         try {
           showGlobalLoadingMessage('Creating project...');
           project = await restApiClient.createProject({
             model_id: selectedModel.id,
-            mosaic: 'naip.latest',
+            mosaic: selectedMosaic.id,
             name: projectName,
           });
           setCurrentProject(project);
@@ -523,6 +525,22 @@ export function InstanceProvider(props) {
           logger(error);
           hideGlobalLoading();
           toasts.error('Could not create project, please try again later.');
+          return; // abort inference run
+        }
+      }
+
+      if (!currentAoi) {
+        try {
+          showGlobalLoadingMessage('Creating AOI...');
+          aoi = await restApiClient.post(`/project/${project.id}/aoi`, {
+            name: aoiName,
+            bounds: aoiGeometry?.geometry || aoiGeometry,
+          });
+          setCurrentAoi(aoi);
+        } catch (error) {
+          logger(error);
+          hideGlobalLoading();
+          toasts.error('Could not create project AOI, please try again later.');
           return; // abort inference run
         }
       }
@@ -552,7 +570,7 @@ export function InstanceProvider(props) {
       await initInstance(
         project.id,
         currentCheckpoint && currentCheckpoint.id,
-        currentAoi && currentAoi.id
+        aoi.id
       );
 
       showGlobalLoadingMessage(
@@ -600,10 +618,8 @@ export function InstanceProvider(props) {
           data: {
             action: 'model#prediction',
             data: {
-              name: aoiName,
-              polygon: aoiIsRectangle
-                ? aoiBoundsToPolygon(aoiRef.getBounds())
-                : aoiGeometry,
+              aoi_id: aoi.id,
+              mosaic: selectedMosaic.id,
             },
           },
         });
@@ -625,7 +641,7 @@ export function InstanceProvider(props) {
             showGlobalLoadingMessage('Creating project...');
             project = await restApiClient.createProject({
               model_id: selectedModel.id,
-              mosaic: 'naip.latest',
+              mosaic: selectedMosaic.id,
               name: projectName,
             });
             setCurrentProject(project);
@@ -959,14 +975,14 @@ export const useInstance = () => {
     retrain,
     refine,
     applyCheckpoint,
-    loadAoiOnInstance,
+    loadAoiTimeframeOnInstance,
   } = useCheckContext(InstanceContext);
   return useMemo(
     () => ({
       instanceType,
       setInstanceType,
       instance,
-      loadAoiOnInstance,
+      loadAoiTimeframeOnInstance,
       setInstanceStatusMessage,
       getRunningBatch,
       runningBatch,
@@ -1080,7 +1096,7 @@ export class WebsocketClient extends ReconnectingWebsocket {
             // Request new status update after abort is confirmed
             this.sendMessage({ action: 'model#status' });
             break;
-          case 'model#aoi':
+          case 'model#timeframe':
             dispatchCurrentCheckpoint({
               type: checkpointActions.RECEIVE_CHECKPOINT,
               data: {
@@ -1088,16 +1104,16 @@ export class WebsocketClient extends ReconnectingWebsocket {
               },
             });
             dispatchPredictions({
-              type: predictionsActions.RECEIVE_AOI_META,
+              type: predictionsActions.RECEIVE_TIMEFRAME_META,
               data: {
                 id: data.id,
               },
             });
             break;
-          case 'model#aoi#progress':
+          case 'model#timeframe#progress':
             showGlobalLoadingMessage('Loading AOI...');
             break;
-          case 'model#aoi#complete':
+          case 'model#timeframe#complete':
             hideGlobalLoading();
             this.sendMessage({ action: 'model#status' });
             break;

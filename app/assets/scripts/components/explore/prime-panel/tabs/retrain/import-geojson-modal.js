@@ -52,14 +52,11 @@ function ImportGeojsonModal({ revealed, setRevealed }) {
         return;
       }
 
-      // According to the latest GeoJSON spec, alternative coordinate systems
-      // should not be used unless in very exceptional cases. See:
-      // https://datatracker.ietf.org/doc/html/rfc7946#section-4
+      // Drop the crs property if it exists. This will prevent the GeoJSON from
+      // being rejected. All geojson should be considered as using the
+      // default CRS (WGS84).
       if (geojson.crs) {
-        setWarning(
-          `GeoJSON 'crs' property is not supported, please remove it and use WGS 84 coordinate reference system.`
-        );
-        return;
+        delete geojson.crs;
       }
 
       // Init import payload

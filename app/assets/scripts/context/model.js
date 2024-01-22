@@ -1,13 +1,11 @@
 import React, { useContext, useMemo, createContext, useState } from 'react';
 import T from 'prop-types';
-import { useAuth } from '../context/auth';
 import useFetch from '../utils/use-fetch';
-import logger from '../utils/logger';
 
 const ModelContext = createContext(null);
 
 export function ModelProvider(props) {
-  const { restApiClient } = useAuth();
+  // Disable models fetch temporarily
   const models = useFetch('model', {
     mutator: (body) => (body ? body.models : []),
   });
@@ -17,15 +15,7 @@ export function ModelProvider(props) {
   const value = {
     models,
     selectedModel,
-    setSelectedModel: async function (modelId) {
-      try {
-        const model = await restApiClient.getModel(modelId);
-        setSelectedModel(model);
-      } catch (error) {
-        logger(`Could not fetch model ${modelId}`);
-        logger(error);
-      }
-    },
+    setSelectedModel,
   };
 
   return (
@@ -63,6 +53,6 @@ export const useModel = () => {
       selectedModel,
       setSelectedModel,
     }),
-    [selectedModel, models]
+    [selectedModel, models, setSelectedModel]
   );
 };

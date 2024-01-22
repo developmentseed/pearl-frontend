@@ -30,6 +30,7 @@ import ViewModel from './components/admin/models/view';
 import NewModel from './components/admin/models/new';
 import UploadModel from './components/admin/models/upload';
 import UserIndex from './components/admin/users';
+import { ProjectPage } from './components/project';
 
 installResizeObserver();
 
@@ -61,8 +62,12 @@ function Root() {
                 <Route exact path='/' component={Home} />
                 <Route exact path='/share/:uuid/map' component={ShareMap} />
                 <ProtectedRoute
-                  path='/project/:projectId'
+                  path='/project-old/:projectId'
                   component={Explore}
+                />
+                <ProtectedRoute
+                  path='/project/:projectId'
+                  component={ProjectPage}
                 />
                 <ProtectedRoute exact path='/profile/maps' component={Maps} />
                 <ProtectedRoute

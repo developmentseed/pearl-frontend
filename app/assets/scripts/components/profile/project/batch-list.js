@@ -14,12 +14,19 @@ import toasts from '../../common/toasts';
 import { AbortBatchJobButton } from '../../common/abort-batch-button';
 import { useAuth } from '../../../context/auth';
 import { formatDateTime } from '../../../utils/format';
-import { downloadGeotiff } from '../../../utils/map';
 import logger from '../../../utils/logger';
 import useFetch from '../../../utils/use-fetch';
+import { downloadGeotiff } from '../../../utils/share-link';
 
 const TABLE_PAGE_SIZE = 5;
-const TABLE_HEADERS = ['Id', 'AOI Name', 'Status', 'Started', 'Download'];
+const TABLE_HEADERS = [
+  'Id',
+  'AOI Name',
+  'Mosaic',
+  'Status',
+  'Started',
+  'Download',
+];
 
 const ProgressText = styled.span`
   padding-right: 0.5rem;
@@ -28,13 +35,14 @@ const ProgressText = styled.span`
 export function DownloadAoiButton({
   disabled = false,
   projectId,
+  timeframeId,
   aoi,
   uuid,
   children,
 }) {
   const { restApiClient, isAuthenticated } = useAuth();
   const url = isAuthenticated
-    ? `project/${projectId}/aoi/${aoi}/download/color`
+    ? `project/${projectId}/aoi/${aoi}/timeframe/${timeframeId}/download/color`
     : `share/${uuid}/download/color`;
   return (
     <Button
@@ -66,24 +74,37 @@ DownloadAoiButton.propTypes = {
   disabled: T.bool,
   projectId: T.number,
   aoi: T.number,
+  timeframeId: T.number,
   uuid: T.string,
   children: T.node,
 };
 
-function getStatus(completed, abort) {
+function getStatus(completed, abort, error) {
+  if (error) return 'Errored';
   if (!completed && abort) return 'Aborted';
   if (completed) return 'Completed';
   return 'Processing';
 }
 
 const BatchRow = ({ batch, projectId }) => {
-  const { id, aoi, name, completed, abort, progress, created } = batch;
-  const [status, setStatus] = useState(getStatus(completed, abort));
+  const {
+    id,
+    aoi,
+    mosaic,
+    timeframe,
+    completed,
+    abort,
+    error,
+    progress,
+    created,
+  } = batch;
+  const [status, setStatus] = useState(getStatus(completed, abort, error));
 
   return (
     <TableRow key={id}>
       <TableCell>{id}</TableCell>
-      <TableCell>{name}</TableCell>
+      <TableCell>{aoi?.name}</TableCell>
+      <TableCell>{mosaic?.name}</TableCell>
       <TableCell>
         {status === 'Processing' ? (
           <>
@@ -103,8 +124,9 @@ const BatchRow = ({ batch, projectId }) => {
       <TableCell>{formatDateTime(created)}</TableCell>
       <TableCell>
         <DownloadAoiButton
-          aoi={aoi}
+          aoi={aoi?.id}
           projectId={projectId}
+          timeframeId={timeframe?.id}
           disabled={!completed}
         />
       </TableCell>

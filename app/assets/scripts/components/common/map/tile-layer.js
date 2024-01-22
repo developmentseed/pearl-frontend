@@ -77,7 +77,7 @@ function TileLayerWithHeaders({
       layer.remove();
     }
 
-    if (options.bounds) {
+    if (options?.bounds) {
       const [minX, minY, maxX, maxY] = tBbox(options.bounds);
       options.bounds = [
         [minY, minX],
@@ -89,7 +89,7 @@ function TileLayerWithHeaders({
     l.on('add', () => {
       setLayer(l);
       // Call event add handler on mount
-      if (eventHandlers.add) {
+      if (eventHandlers?.add) {
         eventHandlers.add();
       }
     });
@@ -102,14 +102,14 @@ function TileLayerWithHeaders({
   }, [url]);
 
   useEffect(() => {
-    if (layer) {
+    if (layer && eventHandlers) {
       Object.entries(eventHandlers).forEach(([event, func]) => {
         layer.on(event, func);
       });
     }
 
     return () => {
-      if (layer) {
+      if (layer && eventHandlers) {
         Object.entries(eventHandlers).forEach(([event, func]) => {
           layer.off(event, func);
         });

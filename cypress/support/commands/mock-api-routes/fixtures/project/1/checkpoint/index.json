@@ -1,0 +1,22 @@
+{
+  "total": 2,
+  "project_id": 1,
+  "checkpoints": [
+    {
+      "id": 2,
+      "parent": 1,
+      "name": "Seneca Rocks",
+      "created": "2021-04-30T18:11:51.509Z",
+      "storage": true,
+      "bookmarked": true
+    },
+    {
+      "id": 1,
+      "parent": null,
+      "name": "Seneca Rocks",
+      "created": "2021-04-30T18:05:26.176Z",
+      "storage": true,
+      "bookmarked": true
+    }
+  ]
+}

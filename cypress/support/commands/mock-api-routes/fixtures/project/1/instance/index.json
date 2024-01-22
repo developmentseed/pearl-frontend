@@ -1,0 +1,13 @@
+{
+  "total": 1,
+  "instances": [
+    {
+      "id": 1,
+      "uid": 123,
+      "active": true,
+      "created": "2021-03-18T18:42:42.224Z",
+      "token": "app_client",
+      "type": "cpu"
+    }
+  ]
+}

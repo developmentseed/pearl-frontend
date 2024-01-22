@@ -65,7 +65,7 @@ export const actions = {
   START_PREDICTION: 'START_PREDICTION',
   RECEIVE_RETRAIN_PROGRESS: 'RECEIVE_RETRAIN_PROGRESS',
   RECEIVE_PREDICTION: 'RECEIVE_PREDICTION',
-  RECEIVE_AOI_META: 'RECEIVE_AOI_META',
+  RECEIVE_TIMEFRAME_META: 'RECEIVE_TIMEFRAME_META',
   COMPLETE_PREDICTION: 'COMPLETE_PREDICTION',
   FAILED_PREDICTION: 'FAILED_PREDICTION',
   CLEAR_PREDICTION: 'CLEAR_PREDICTION',
@@ -84,17 +84,17 @@ export function predictionsReducer(state, action) {
         retrainProgress: 0,
         data: {
           predictions: [],
-          aoiId: null,
+          timeframeId: null,
           type: data.type,
         },
       };
       break;
-    case actions.RECEIVE_AOI_META:
+    case actions.RECEIVE_TIMEFRAME_META:
       newState = {
         ...state,
         data: {
           ...state.data,
-          aoiId: data.id,
+          timeframeId: data.id,
         },
       };
       break;
@@ -106,11 +106,11 @@ export function predictionsReducer(state, action) {
       break;
     case actions.RECEIVE_PREDICTION: {
       // Get bounds
-      const predictionAoiId = data.aoi;
-      const currentAoiId = state.data.aoiId;
+      const predictionTimeframeId = data.timeframe;
+      const currentTimeframeId = state.data.timeframeId;
 
       // only process prediction if AOI ID matches current AOI ID
-      if (predictionAoiId === currentAoiId) {
+      if (predictionTimeframeId === currentTimeframeId) {
         let predictions = state.data.predictions || [];
 
         // Extract geo-located image from message
