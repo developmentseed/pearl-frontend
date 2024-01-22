@@ -1,5 +1,7 @@
 import { formatTimestampToSimpleUTC } from './dates';
 
+const MAX_CLOUD_COVER_PERCENTAGE = 10;
+
 /**
  * Get the tile url for a mosaic.
  * @param {object} mosaic
@@ -60,7 +62,13 @@ export async function getSentinel2PCSearchId({ start, end }) {
                 { interval: [start.toISOString(), end.toISOString()] },
               ],
             },
-            { op: '<=', args: [{ property: 'eo:cloud_cover' }, 50] },
+            {
+              op: '<=',
+              args: [
+                { property: 'eo:cloud_cover' },
+                MAX_CLOUD_COVER_PERCENTAGE,
+              ],
+            },
           ],
         },
         sortby: [{ field: 'datetime', direction: 'desc' }],
