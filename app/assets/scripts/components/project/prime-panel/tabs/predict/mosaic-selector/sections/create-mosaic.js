@@ -125,7 +125,7 @@ const MosaicPreviewMap = ({
         </MapContainer>
       ) : (
         <MapPreviewPlaceholder>
-          <span>Pica a date to display map preview</span>
+          <span>Pick date to display map preview</span>
         </MapPreviewPlaceholder>
       )}
     </PanelWrapper>
