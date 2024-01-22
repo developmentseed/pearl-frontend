@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { MapContainer, TileLayer } from 'react-leaflet';
 
 import { Heading } from '@devseed-ui/typography';
-import { formatTimestampToSimpleUTC } from '../../../../../../../utils/dates';
+import { formatTimestampToSimpleUTCDate } from '../../../../../../../utils/dates';
 import { ProjectMachineContext } from '../../../../../../../fsm/project';
 import selectors from '../../../../../../../fsm/project/selectors';
 import toasts from '../../../../../../common/toasts';
@@ -58,10 +58,11 @@ const CreateMosaicForm = ({ setNewMosaic, handleMosaicCreation }) => {
   return (
     <PanelWrapper>
       <Heading size='small' as='h4'>
-        Create a new mosaic
+        Custom mosaic filters
       </Heading>
+
       <div>
-        Selected date:{' '}
+        Start date:{' '}
         <input
           type='date'
           value={selectedDate}
@@ -70,16 +71,16 @@ const CreateMosaicForm = ({ setNewMosaic, handleMosaicCreation }) => {
         />
       </div>
       <div>
-        Start timestamp:{' '}
-        {selectedTimeframe?.start
-          ? formatTimestampToSimpleUTC(selectedTimeframe.start)
-          : '-'}
-      </div>
-      <div>
         End date:{' '}
-        {selectedTimeframe?.end
-          ? formatTimestampToSimpleUTC(selectedTimeframe.end)
-          : '-'}
+        <input
+          type='date'
+          value={
+            selectedTimeframe?.end
+              ? formatTimestampToSimpleUTCDate(selectedTimeframe.end)
+              : ''
+          }
+          disabled
+        />
       </div>
       <div>
         <button type='button' onClick={handleMosaicCreation}>
@@ -122,7 +123,7 @@ const MosaicPreviewMap = ({
 };
 
 MosaicPreviewMap.propTypes = {
-  mosaicTileUrl: PropTypes.object,
+  mosaicTileUrl: PropTypes.string,
   initialMapZoom: PropTypes.number,
   initialMapCenter: PropTypes.array,
 };
