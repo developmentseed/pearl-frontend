@@ -6,7 +6,7 @@ import { delay } from '../../utils/utils';
 import { WebsocketClient } from './websocket-client';
 import logger from '../../utils/logger';
 import toasts from '../../components/common/toasts';
-import { getMosaicTileUrl } from './helpers';
+import { getMosaicTileUrl } from '../../utils/mosaics';
 import { SESSION_MODES } from './constants';
 import { round } from '../../utils/format';
 

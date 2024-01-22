@@ -5,7 +5,7 @@ import L from 'leaflet';
 import turfBboxPolygon from '@turf/bbox-polygon';
 import turfArea from '@turf/area';
 import toasts from '../../components/common/toasts';
-import { getMosaicTileUrl } from './helpers';
+import { getMosaicTileUrl } from '../../utils/mosaics';
 import history from '../../history';
 import { RETRAIN_MAP_MODES, SESSION_MODES } from './constants';
 
