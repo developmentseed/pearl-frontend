@@ -5,6 +5,16 @@ import styled from 'styled-components';
 import { MapContainer, TileLayer } from 'react-leaflet';
 
 import { Heading } from '@devseed-ui/typography';
+import {
+  Form,
+  FormGroup,
+  FormGroupHeader,
+  FormGroupBody,
+  FormLabel,
+  FormInput,
+} from '@devseed-ui/form';
+import { Button } from '@devseed-ui/button';
+import { glsp, themeVal, rgba } from '@devseed-ui/theme-provider';
 import { formatTimestampToSimpleUTCDate } from '../../../../../../../utils/dates';
 import { ProjectMachineContext } from '../../../../../../../fsm/project';
 import selectors from '../../../../../../../fsm/project/selectors';
@@ -21,6 +31,7 @@ const MOSAIC_DATE_RANGE_IN_DAYS = 90;
 const SectionWrapper = styled.div`
   display: flex;
   justify-content: space-evenly;
+  gap: ${glsp()};
   height: 100%;
 `;
 
@@ -32,6 +43,9 @@ const MapPreviewPlaceholder = styled.div`
   height: 100%;
   display: flex;
   align-items: center;
+  border: ${themeVal('layout.border')} solid
+    ${rgba(themeVal('color.base'), 0.16)};
+  border-radius: ${themeVal('shape.rounded')};
   justify-content: center;
 `;
 
@@ -64,36 +78,51 @@ const CreateMosaicForm = ({ setNewMosaic, handleMosaicCreation }) => {
 
   return (
     <PanelWrapper>
-      <Heading size='small' as='h4'>
-        Custom mosaic filters
-      </Heading>
+      <Form>
+        <Heading size='small' as='h4'>
+          Custom mosaic filters
+        </Heading>
 
-      <div>
-        Start date:{' '}
-        <input
-          type='date'
-          value={selectedDate}
-          max={format(maxDate, 'yyyy-MM-dd')}
-          onChange={handleDateChange}
-        />
-      </div>
-      <div>
-        End date:{' '}
-        <input
-          type='date'
-          value={
-            selectedTimeframe?.end
-              ? formatTimestampToSimpleUTCDate(selectedTimeframe.end)
-              : ''
-          }
-          disabled
-        />
-      </div>
-      <div>
-        <button type='button' onClick={handleMosaicCreation}>
-          Create
-        </button>
-      </div>
+        <FormGroup>
+          <FormGroupHeader>
+            <FormLabel>Start date:</FormLabel>{' '}
+          </FormGroupHeader>
+          <FormGroupBody>
+            <FormInput
+              type='date'
+              value={selectedDate}
+              max={format(maxDate, 'yyyy-MM-dd')}
+              onChange={handleDateChange}
+            />
+          </FormGroupBody>
+        </FormGroup>
+        <FormGroup>
+          <FormGroupHeader>
+            <FormLabel>End date:</FormLabel>{' '}
+          </FormGroupHeader>
+          <FormInput
+            type='date'
+            value={
+              selectedTimeframe?.end
+                ? formatTimestampToSimpleUTCDate(selectedTimeframe.end)
+                : ''
+            }
+            disabled
+          />
+        </FormGroup>
+        <Button
+          variation='primary-raised-dark'
+          size='medium'
+          useIcon='tick--small'
+          type='button'
+          onClick={handleMosaicCreation}
+          style={{
+            gridColumn: '1 / -1',
+          }}
+        >
+          Create Mosaic
+        </Button>
+      </Form>
     </PanelWrapper>
   );
 };
@@ -125,7 +154,7 @@ const MosaicPreviewMap = ({
         </MapContainer>
       ) : (
         <MapPreviewPlaceholder>
-          <span>Pick date to display map preview</span>
+          <span>Set date to display map preview</span>
         </MapPreviewPlaceholder>
       )}
     </PanelWrapper>

@@ -61,7 +61,7 @@ export function MosaicSelectorModal({ showModal, setShowModal }) {
       renderHeader={() => (
         <ModalHeader>
           <Headline>
-            <Heading>Set mosaic</Heading>
+            <Heading>Set Mosaic Date Range</Heading>
             <Button
               hideText
               variation='base-plain'
@@ -78,7 +78,7 @@ export function MosaicSelectorModal({ showModal, setShowModal }) {
       )}
       content={
         <ModalContent>
-          <TabbedBlock activeTab={activeTab}>
+          <TabbedBlock activeTab={activeTab} leftAligned={true}>
             <ExistingMosaicsSection
               name='Select Preset'
               className='select-preset-mosaic'

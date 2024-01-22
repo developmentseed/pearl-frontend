@@ -7,6 +7,7 @@ import selectors from '../../../../../../../fsm/project/selectors';
 import * as guards from '../../../../../../../fsm/project/guards';
 
 import { Heading } from '@devseed-ui/typography';
+import { glsp } from '@devseed-ui/theme-provider';
 import CardList, { Card } from '../../../../../../common/card-list';
 import { formatTimestampToSimpleUTC } from '../../../../../../../utils/dates';
 
@@ -15,6 +16,11 @@ const HeadingWrapper = styled.div`
   flex-flow: row nowrap;
   justify-content: space-between;
   align-items: baseline;
+`;
+const ModalInnerContent = styled.div`
+  display: flex;
+  flex-flow: column;
+  gap: ${glsp()};
 `;
 
 export const ExistingMosaicsSection = ({ setShowModal, className }) => {
@@ -35,7 +41,7 @@ export const ExistingMosaicsSection = ({ setShowModal, className }) => {
   );
 
   return (
-    <div className={className}>
+    <ModalInnerContent className={className}>
       <HeadingWrapper>
         <Heading size='small' as='h4'>
           Mosaics availble for your selected AOI
@@ -84,7 +90,7 @@ export const ExistingMosaicsSection = ({ setShowModal, className }) => {
           );
         }}
       />
-    </div>
+    </ModalInnerContent>
   );
 };
 
