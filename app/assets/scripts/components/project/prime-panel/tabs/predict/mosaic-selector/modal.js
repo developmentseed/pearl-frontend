@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import T from 'prop-types';
 import styled from 'styled-components';
 import { Modal } from '@devseed-ui/modal';
