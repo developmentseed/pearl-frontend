@@ -95,30 +95,44 @@ CreateMosaicForm.propTypes = {
   handleMosaicCreation: PropTypes.func.isRequired,
 };
 
-const MosaicPreviewMap = ({ mosaicTileUrl }) => {
-  const center = [19.22819, -99.995841];
-  const zoom = 12;
-
+const MosaicPreviewMap = ({
+  mosaicTileUrl,
+  initialMapCenter,
+  initialMapZoom,
+}) => {
   return (
     <PanelWrapper>
-      <MapContainer center={center} zoom={zoom} style={{ height: '100%' }}>
-        {mosaicTileUrl && (
-          <TileLayer
-            key={mosaicTileUrl}
-            url={mosaicTileUrl}
-            opacity={MOSAIC_LAYER_OPACITY}
-          />
-        )}
-      </MapContainer>
+      {initialMapZoom && initialMapCenter && (
+        <MapContainer
+          center={initialMapCenter}
+          zoom={initialMapZoom}
+          style={{ height: '100%' }}
+        >
+          {mosaicTileUrl && (
+            <TileLayer
+              key={mosaicTileUrl}
+              url={mosaicTileUrl}
+              opacity={MOSAIC_LAYER_OPACITY}
+            />
+          )}
+        </MapContainer>
+      )}
     </PanelWrapper>
   );
 };
 
 MosaicPreviewMap.propTypes = {
   mosaicTileUrl: PropTypes.object,
+  initialMapZoom: PropTypes.number,
+  initialMapCenter: PropTypes.array,
 };
 
-export const CreateMosaicSection = ({ onMosaicCreated, className }) => {
+export const CreateMosaicSection = ({
+  onMosaicCreated,
+  className,
+  initialMapZoom,
+  initialMapCenter,
+}) => {
   const [newMosaic, setNewMosaic] = useState(null);
 
   const actorRef = ProjectMachineContext.useActorRef();
@@ -152,6 +166,8 @@ export const CreateMosaicSection = ({ onMosaicCreated, className }) => {
         handleMosaicCreation={handleMosaicCreation}
       />
       <MosaicPreviewMap
+        initialMapZoom={initialMapZoom}
+        initialMapCenter={initialMapCenter}
         mosaicTileUrl={newMosaic && getMosaicTileUrl(newMosaic)}
       />
     </SectionWrapper>
@@ -161,4 +177,6 @@ export const CreateMosaicSection = ({ onMosaicCreated, className }) => {
 CreateMosaicSection.propTypes = {
   onMosaicCreated: PropTypes.func.isRequired,
   className: PropTypes.string,
+  initialMapZoom: PropTypes.number,
+  initialMapCenter: PropTypes.array,
 };

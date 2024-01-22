@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import T from 'prop-types';
 import styled from 'styled-components';
 import { Modal } from '@devseed-ui/modal';
@@ -8,6 +8,7 @@ import { Heading } from '@devseed-ui/typography';
 import { ExistingMosaicsSection } from './sections/list-mosaics';
 import { CreateMosaicSection } from './sections/create-mosaic';
 import TabbedBlock from '../../../../../common/tabbed-block-body';
+import { ProjectMachineContext } from '../../../../../../fsm/project';
 
 const ModalHeader = styled.header`
   padding: ${glsp(2)} ${glsp(2)} 0;
@@ -37,6 +38,17 @@ const Headline = styled.div`
 
 export function MosaicSelectorModal({ showModal, setShowModal }) {
   const [activeTab, setActiveTab] = React.useState(0);
+
+  const mapRef = ProjectMachineContext.useSelector(
+    ({ context }) => context.mapRef
+  );
+
+  // Get the current map zoom and center on modal open
+  const [mapZoom, mapCenter] = useMemo(() => {
+    if (!showModal || !mapRef) return [null, null];
+    const { lng, lat } = mapRef.getCenter();
+    return [mapRef.getZoom(), [lat, lng]];
+  }, [mapRef, showModal]);
 
   return (
     <Modal
@@ -78,6 +90,8 @@ export function MosaicSelectorModal({ showModal, setShowModal }) {
               name='Create Mosaic'
               className='create-mosaic'
               tabId='create-mosaic-tab-trigger'
+              initialMapZoom={mapZoom}
+              initialMapCenter={mapCenter}
               onTabClick={() => setActiveTab(1)}
               onMosaicCreated={() => {
                 setActiveTab(0);
