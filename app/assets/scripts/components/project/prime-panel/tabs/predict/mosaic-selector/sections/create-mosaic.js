@@ -120,6 +120,7 @@ const MosaicPreviewMap = ({
             key={mosaicTileUrl}
             url={mosaicTileUrl}
             opacity={MOSAIC_LAYER_OPACITY}
+            attribution='&copy; Copernicus Sentinel'
           />
         </MapContainer>
       ) : (
