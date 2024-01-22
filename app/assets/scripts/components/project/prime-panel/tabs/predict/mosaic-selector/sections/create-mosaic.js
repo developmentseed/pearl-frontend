@@ -28,6 +28,13 @@ const PanelWrapper = styled.div`
   width: 100%;
 `;
 
+const MapPreviewPlaceholder = styled.div`
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
 const CreateMosaicForm = ({ setNewMosaic, handleMosaicCreation }) => {
   const currentImagerySource = ProjectMachineContext.useSelector(
     selectors.currentImagerySource
@@ -103,20 +110,22 @@ const MosaicPreviewMap = ({
 }) => {
   return (
     <PanelWrapper>
-      {initialMapZoom && initialMapCenter && (
+      {mosaicTileUrl && initialMapZoom && initialMapCenter ? (
         <MapContainer
           center={initialMapCenter}
           zoom={initialMapZoom}
           style={{ height: '100%' }}
         >
-          {mosaicTileUrl && (
-            <TileLayer
-              key={mosaicTileUrl}
-              url={mosaicTileUrl}
-              opacity={MOSAIC_LAYER_OPACITY}
-            />
-          )}
+          <TileLayer
+            key={mosaicTileUrl}
+            url={mosaicTileUrl}
+            opacity={MOSAIC_LAYER_OPACITY}
+          />
         </MapContainer>
+      ) : (
+        <MapPreviewPlaceholder>
+          <span>Pica a date to display map preview</span>
+        </MapPreviewPlaceholder>
       )}
     </PanelWrapper>
   );
