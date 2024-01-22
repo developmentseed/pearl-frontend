@@ -35,7 +35,11 @@ const SectionWrapper = styled.div`
   height: 100%;
 `;
 
-const PanelWrapper = styled.div`
+const FormWrapper = styled.div`
+  width: 300px;
+`;
+
+const MapPreviewWrapper = styled.div`
   width: 100%;
 `;
 
@@ -77,7 +81,7 @@ const CreateMosaicForm = ({ setNewMosaic, handleMosaicCreation }) => {
   };
 
   return (
-    <PanelWrapper>
+    <FormWrapper>
       <Form>
         <Heading size='small' as='h4'>
           Custom mosaic filters
@@ -123,7 +127,7 @@ const CreateMosaicForm = ({ setNewMosaic, handleMosaicCreation }) => {
           Create Mosaic
         </Button>
       </Form>
-    </PanelWrapper>
+    </FormWrapper>
   );
 };
 
@@ -138,7 +142,7 @@ const MosaicPreviewMap = ({
   initialMapZoom,
 }) => {
   return (
-    <PanelWrapper>
+    <MapPreviewWrapper>
       {mosaicTileUrl && initialMapZoom && initialMapCenter ? (
         <MapContainer
           center={initialMapCenter}
@@ -157,7 +161,7 @@ const MosaicPreviewMap = ({
           <span>Set date to display map preview</span>
         </MapPreviewPlaceholder>
       )}
-    </PanelWrapper>
+    </MapPreviewWrapper>
   );
 };
 
