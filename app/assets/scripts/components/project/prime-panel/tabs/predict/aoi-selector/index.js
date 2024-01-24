@@ -82,6 +82,13 @@ export function AoiSelector() {
     selectors.aoiStatusMessage
   );
   const currentAoi = ProjectMachineContext.useSelector(selectors.currentAoi);
+  const currentAoiIsNew = ProjectMachineContext.useSelector(
+    selectors.currentAoiIsNew
+  );
+  const currentAoiLabel = currentAoi?.name
+    ? `${currentAoi?.name}${currentAoiIsNew ? ' (new)' : ''}`
+    : aoiStatusMessage;
+
   const aoisList = ProjectMachineContext.useSelector(selectors.aoisList);
 
   const nonSelectedAois = aoisList.filter((aoi) => aoi.id !== currentAoi?.id);
@@ -111,10 +118,7 @@ export function AoiSelector() {
           }}
           data-cy='aoi-list'
         >
-          <ActiveAoiOption
-            label={currentAoi?.name || aoiStatusMessage}
-            area={currentAoi?.area}
-          />
+          <ActiveAoiOption label={currentAoiLabel} area={currentAoi?.area} />
           {
             // Remainder of list
             nonSelectedAois.map((aoi) => (
