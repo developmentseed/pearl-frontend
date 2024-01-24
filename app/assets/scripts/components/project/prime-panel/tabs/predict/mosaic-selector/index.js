@@ -52,7 +52,7 @@ export function MosaicSelector() {
       />
       <HeadOption>
         <HeadOptionHeadline usePadding>
-          <Subheading>Base Mosaic</Subheading>
+          <Subheading>Imagery Mosaic Date Range</Subheading>
         </HeadOptionHeadline>
         <SubheadingStrong
           data-cy='mosaic-selector-label'

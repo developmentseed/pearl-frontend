@@ -59,7 +59,7 @@ export function MosaicSelectorModal({
         <ModalHeader>
           <Headline>
             {' '}
-            <Heading>Select an base mosaic</Heading>
+            <Heading>Select a base mosaic</Heading>
             <Button
               hideText
               variation='base-plain'

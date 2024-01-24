@@ -1,21 +1,23 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import T from 'prop-types';
 import styled from 'styled-components';
 import { Modal } from '@devseed-ui/modal';
 import { glsp } from '@devseed-ui/theme-provider';
 import { Button } from '@devseed-ui/button';
 import { Heading } from '@devseed-ui/typography';
-import CardList, { Card } from '../../../../../common/card-list';
+import { ExistingMosaicsSection } from './sections/list-mosaics';
+import { CreateMosaicSection } from './sections/create-mosaic';
+import TabbedBlock from '../../../../../common/tabbed-block-body';
 import { ProjectMachineContext } from '../../../../../../fsm/project';
-import selectors from '../../../../../../fsm/project/selectors';
-import { formatDateTime } from '../../../../../../utils/format';
 
 const ModalHeader = styled.header`
   padding: ${glsp(2)} ${glsp(2)} 0;
 `;
 
 const ModalContent = styled.div`
-  display: block;
+  display: flex;
+  flex-flow: column;
+  height: 60vh;
 `;
 
 const Headline = styled.div`
@@ -34,26 +36,19 @@ const Headline = styled.div`
   }
 `;
 
-const HeadingWrapper = styled.div`
-  display: flex;
-  flex-flow: row nowrap;
-  justify-content: space-between;
-  align-items: baseline;
-`;
+export function MosaicSelectorModal({ showModal, setShowModal }) {
+  const [activeTab, setActiveTab] = React.useState(0);
 
-export function MosaicSelectorModal({ showModal, setShowModal, isProjectNew }) {
-  const actorRef = ProjectMachineContext.useActorRef();
-  const mosaicsList = ProjectMachineContext.useSelector(selectors.mosaicsList);
-  const currentMosaic = ProjectMachineContext.useSelector(
-    selectors.currentMosaic
-  );
-  const currentImagerySource = ProjectMachineContext.useSelector(
-    selectors.currentImagerySource
+  const mapRef = ProjectMachineContext.useSelector(
+    ({ context }) => context.mapRef
   );
 
-  const selectableMosaics = mosaicsList.filter(
-    (mosaic) => mosaic.imagery_source_id === currentImagerySource?.id
-  );
+  // Get the current map zoom and center on modal open
+  const [mapZoom, mapCenter] = useMemo(() => {
+    if (!showModal || !mapRef) return [null, null];
+    const { lng, lat } = mapRef.getCenter();
+    return [mapRef.getZoom(), [lat, lng]];
+  }, [mapRef, showModal]);
 
   return (
     <Modal
@@ -66,8 +61,7 @@ export function MosaicSelectorModal({ showModal, setShowModal, isProjectNew }) {
       renderHeader={() => (
         <ModalHeader>
           <Headline>
-            {' '}
-            <Heading>Select an base mosaic</Heading>
+            <Heading>Set Mosaic Date Range</Heading>
             <Button
               hideText
               variation='base-plain'
@@ -84,54 +78,27 @@ export function MosaicSelectorModal({ showModal, setShowModal, isProjectNew }) {
       )}
       content={
         <ModalContent>
-          <HeadingWrapper>
-            <Heading size='small' as='h4'>
-              Available mosaics for the AOI
-            </Heading>
-          </HeadingWrapper>
-          <CardList
-            nonScrolling
-            numColumns={2}
-            data={selectableMosaics}
-            renderCard={(mosaic) => {
-              const { name, mosaic_ts_end, mosaic_ts_start } = mosaic;
-
-              return (
-                <Card
-                  data-cy={`select-mosaic-${mosaic.id}-card`}
-                  key={mosaic.id}
-                  title={mosaic.name}
-                  details={{
-                    name,
-                    'Mosaic Start Date': mosaic_ts_start
-                      ? formatDateTime(mosaic_ts_start)
-                      : 'N/A',
-                    'Mosaic End Date': mosaic_ts_end
-                      ? formatDateTime(mosaic_ts_end)
-                      : 'N/A',
-                  }}
-                  borderlessMedia
-                  selected={currentMosaic && currentMosaic.id === mosaic.id}
-                  onClick={() => {
-                    if (isProjectNew) {
-                      if (!currentMosaic || currentMosaic.id !== mosaic.id) {
-                        actorRef.send({
-                          type: 'Mosaic was selected',
-                          data: { mosaic },
-                        });
-                      }
-                    } else if (currentMosaic?.id !== mosaic.id) {
-                      actorRef.send({
-                        type: 'Mosaic was selected',
-                        data: { mosaic },
-                      });
-                    }
-                    setShowModal(false);
-                  }}
-                />
-              );
-            }}
-          />
+          <TabbedBlock activeTab={activeTab} leftAligned={true}>
+            <ExistingMosaicsSection
+              name='Select Preset'
+              className='select-preset-mosaic'
+              tabId='select-preset-mosaic-tab-trigger'
+              onTabClick={() => setActiveTab(0)}
+              setShowModal={setShowModal}
+            />
+            <CreateMosaicSection
+              name='Create Mosaic'
+              className='create-mosaic'
+              tabId='create-mosaic-tab-trigger'
+              initialMapZoom={mapZoom}
+              initialMapCenter={mapCenter}
+              onTabClick={() => setActiveTab(1)}
+              onMosaicCreated={() => {
+                setActiveTab(0);
+                setShowModal(false);
+              }}
+            />
+          </TabbedBlock>
         </ModalContent>
       }
     />
@@ -139,7 +106,6 @@ export function MosaicSelectorModal({ showModal, setShowModal, isProjectNew }) {
 }
 
 MosaicSelectorModal.propTypes = {
-  isProjectNew: T.bool,
   showModal: T.bool,
   setShowModal: T.func.isRequired,
 };

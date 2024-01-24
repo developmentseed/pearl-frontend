@@ -172,6 +172,7 @@ Card.propTypes = {
 
 const CardListContainer = styled.ol`
   display: grid;
+  height: min-content;
   grid-template-columns: ${({ numColumns }) => {
     if (numColumns) {
       return css`repeat(${numColumns}, 1fr)`;
@@ -185,7 +186,7 @@ const CardListScroll = styled(ShadowScrollbar)`
   flex: 1;
 `;
 const CardListWrapper = styled(PanelBlockBody)`
-  height: 100%;
+  height: min-content;
   ${({ nonScrolling }) =>
     nonScrolling &&
     css`

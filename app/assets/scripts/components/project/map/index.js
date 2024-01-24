@@ -25,13 +25,15 @@ import { RETRAIN_MAP_MODES } from '../../../fsm/project/constants';
 import FreehandDrawControl from './freehand-draw-control';
 import PolygonDrawControl from './polygon-draw-control';
 import selectors from '../../../fsm/project/selectors';
-import { BOUNDS_PADDING } from '../../common/map/constants';
+import {
+  BOUNDS_PADDING,
+  MOSAIC_LAYER_OPACITY,
+} from '../../common/map/constants';
 
 const center = [19.22819, -99.995841];
 const zoom = 12;
 
 const DEFAULT_PREDICTION_LAYER_OPACITY = 0.7;
-const MOSAIC_LAYER_OPACITY = 0.8;
 
 const Container = styled.div`
   height: 100%;

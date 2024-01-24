@@ -5,7 +5,7 @@ import L from 'leaflet';
 import turfBboxPolygon from '@turf/bbox-polygon';
 import turfArea from '@turf/area';
 import toasts from '../../components/common/toasts';
-import { getMosaicTileUrl } from './helpers';
+import { getMosaicTileUrl } from '../../utils/mosaics';
 import history from '../../history';
 import { RETRAIN_MAP_MODES, SESSION_MODES } from './constants';
 
@@ -73,12 +73,12 @@ export const actions = {
       ...nextContext,
     };
   }),
-  setCurrentMosaic: assign((context, event) => {
-    const { mosaic } = event.data;
+  setCurrentMosaic: assign((_, event) => {
+    const { mosaic, mosaicsList } = event.data;
+    const currentMosaic = { ...mosaic, tileUrl: getMosaicTileUrl(mosaic) };
 
-    return {
-      currentMosaic: { ...mosaic, tileUrl: getMosaicTileUrl(mosaic) },
-    };
+    // Optionally update mosaic list if provided
+    return mosaicsList ? { mosaicsList, currentMosaic } : { currentMosaic };
   }),
   setCurrentModel: assign((context, event) => {
     const { currentModel, currentImagerySource } = context;
