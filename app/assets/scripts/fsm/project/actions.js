@@ -124,29 +124,18 @@ export const actions = {
     },
   })),
   clearCurrentAoi: assign((context) => {
-    const { currentAoi } = context;
+    const { currentAoiShape } = context;
 
-    if (currentAoi?.shape) {
-      currentAoi.shape.remove();
-    }
+    currentAoiShape?.remove();
 
-    const isFirstAoi = context.aoisList.length === 0;
-    if (isFirstAoi) {
-      // If first AOI is being deleted, reset all AOI-related context
-      return {
-        currentAoi: null,
-        currentImagerySource: null,
-        currentMosaic: null,
-        currentModel: null,
-      };
-    } else {
-      return {
-        currentAoi: null,
-        currentPrediction: null,
-        currentShare: null,
-        currentTimeframe: null,
-      };
-    }
+    return {
+      currentAoi: null,
+      currentAoiShape: null,
+      currentPrediction: null,
+      currentMosaic: null,
+      currentShare: null,
+      currentTimeframe: null,
+    };
   }),
   prependAoisList: assign((context, event) => {
     const { aoisList } = context;
@@ -159,15 +148,17 @@ export const actions = {
     const { aoisList, mapRef } = context;
     const latestAoi = aoisList[aoisList.length - 1];
 
-    let aoiShape;
+    // Remove the current AOI shape from the map, if it exists
+    context.currentAoiShape?.remove();
 
-    // Add latest AOI to the map
-    if (latestAoi && latestAoi.bounds) {
-      aoiShape = mapRef.setAoiShapeFromGeojson(latestAoi.bounds);
-    }
+    // Add the latest AOI to the map, if available
+    const aoiShape = latestAoi?.bounds
+      ? mapRef.setAoiShapeFromGeojson(latestAoi.bounds)
+      : null;
 
     return {
-      currentAoi: { ...latestAoi, shape: aoiShape },
+      currentAoi: latestAoi ? { ...latestAoi } : null,
+      currentAoiShape: aoiShape,
       aoiActionButtons: {
         addNewAoi: true,
         uploadAoi: true,
@@ -175,24 +166,22 @@ export const actions = {
     };
   }),
   applyExistingAoi: assign((context, event) => {
-    const { mapRef, currentAoi, aoisList } = context;
+    const { mapRef, aoisList } = context;
     const { aoiId } = event.data;
 
-    const aoi = aoisList.find((aoi) => aoi.id === aoiId);
+    const selectedAoi = aoisList.find((aoi) => aoi.id === aoiId);
 
-    // Clear existing AOI layer
-    if (currentAoi?.shape) {
-      currentAoi.shape.remove();
+    if (!selectedAoi) {
+      throw new Error(`AOI with id ${aoiId} not found`);
     }
 
-    // Add AOI to the map
-    let aoiShape;
-    if (aoi && aoi.bounds) {
-      aoiShape = mapRef.setAoiShapeFromGeojson(aoi.bounds);
-    }
+    context.currentAoiShape?.remove();
+
+    const aoiShape = mapRef.setAoiShapeFromGeojson(selectedAoi.bounds);
 
     return {
-      currentAoi: { ...aoi, shape: aoiShape },
+      currentAoi: { ...selectedAoi },
+      currentAoiShape: aoiShape,
       aoiActionButtons: {
         addNewAoi: true,
         uploadAoi: true,
@@ -200,16 +189,12 @@ export const actions = {
     };
   }),
   updateAoiLayer: assign((context) => {
-    const { mapRef, currentAoi } = context;
+    const { mapRef, currentAoi, currentAoiShape } = context;
 
-    // Remove AOI layer, if exists
-    if (currentAoi?.shape) {
-      currentAoi.shape.remove();
-    }
+    currentAoiShape?.remove();
 
     const geojson = currentAoi.geojson || currentAoi.bounds;
 
-    // Add new layer from geojson, if exists
     let aoiShape;
     if (geojson) {
       aoiShape = mapRef.setAoiShapeFromGeojson(geojson);
@@ -218,21 +203,15 @@ export const actions = {
     return {
       currentAoi: {
         ...currentAoi,
-        shape: aoiShape,
       },
+      currentAoiShape: aoiShape,
     };
   }),
   onAoiDeletedSuccess: assign((context, event) => {
-    const { currentAoi, aoisList } = context;
+    const { aoisList } = context;
     const { aoiId } = event.data;
 
-    // Remove AOI layer
-    if (currentAoi?.shape) {
-      currentAoi?.shape.remove();
-    }
-
     return {
-      currentAoi: null,
       aoisList: aoisList.filter((aoi) => aoi.id !== aoiId),
     };
   }),
@@ -508,11 +487,9 @@ export const actions = {
     };
   }),
   setupNewRectangleAoiDraw: assign((context) => {
-    const { currentAoi } = context;
+    const { currentAoiShape } = context;
 
-    if (currentAoi?.shape) {
-      currentAoi.shape.remove();
-    }
+    currentAoiShape?.remove();
 
     if (context.rectangleAoi?.shape) {
       context.rectangleAoi.shape.remove();
@@ -609,7 +586,6 @@ export const actions = {
       aoiActionButtons: {
         uploadAoi: true,
         addNewAoi: !isFirstAoi,
-        editAoi: true,
         deleteAoi: true,
       },
       mapEventHandlers: {
@@ -703,5 +679,14 @@ export const actions = {
   redirectToProjectProfilePage: assign((context) => {
     const projectId = context.project.id;
     history.push(`/profile/projects/${projectId}`);
+  }),
+  onPredictionComplete: assign(() => {
+    return {
+      aoiActionButtons: {
+        addNewAoi: true,
+        uploadAoi: true,
+        deleteAoi: true,
+      },
+    };
   }),
 };
