@@ -17,7 +17,6 @@ import ShareMap from './components/share-map';
 import About from './components/about';
 import UhOh from './components/uhoh';
 import Projects from './components/profile/projects';
-import Maps from './components/profile/maps';
 
 import { GlobalContextProvider } from './context/global';
 import { CollecticonsGlobalStyle } from '@devseed-ui/collecticons';
@@ -69,7 +68,6 @@ function Root() {
                   path='/project/:projectId'
                   component={ProjectPage}
                 />
-                <ProtectedRoute exact path='/profile/maps' component={Maps} />
                 <ProtectedRoute
                   exact
                   path='/profile/projects'
