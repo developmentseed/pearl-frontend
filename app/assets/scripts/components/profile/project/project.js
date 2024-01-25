@@ -18,7 +18,7 @@ import {
 import { ProjectsBody as ProjectBody } from '../projects/projects';
 import { media } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
-import { FormInput } from '@devseed-ui/form';
+import { FormInput, FormSwitch } from '@devseed-ui/form';
 import { StyledLink } from '../../../styles/links';
 import toasts from '../../common/toasts';
 import { useAuth } from '../../../context/auth';
@@ -77,12 +77,14 @@ const AOI_HEADERS = [
   'Created',
   'Link',
   'Download',
+  'Published',
 ];
 
-// Render single AOI row
-function renderRow(share, { restApiClient }) {
+function RenderRow(share, { restApiClient, project }) {
   const shareLink = `${window.location.origin}/share/${share.uuid}/map`;
   const { aoi, timeframe, mosaic } = share;
+
+  const [isPublished, setIsPublished] = useState(share.published);
 
   return (
     <TableRow key={aoi.id}>
@@ -119,6 +121,36 @@ function renderRow(share, { restApiClient }) {
           hideText
           onClick={() => downloadShareGeotiff(restApiClient, share)}
         />
+      </TableCell>
+      <TableCell>
+        <FormInputGroup>
+          <FormSwitch
+            checked={isPublished}
+            onChange={async () => {
+              const newIsPublished = !isPublished;
+              setIsPublished(newIsPublished);
+
+              try {
+                await restApiClient.patch(
+                  `project/${project.id}/aoi/${aoi.id}/timeframe/${timeframe.id}/share/${share.uuid}`,
+                  {
+                    published: false,
+                  }
+                );
+                setIsPublished(newIsPublished);
+              } catch (err) {
+                setIsPublished(!newIsPublished);
+                logger(
+                  'There was an unexpected error updating the exported map.',
+                  err
+                );
+                toasts.error(
+                  'There was an unexpected error updating the exported map.'
+                );
+              }
+            }}
+          />
+        </FormInputGroup>
       </TableCell>
     </TableRow>
   );
@@ -287,7 +319,7 @@ function Project() {
                   <Table
                     headers={AOI_HEADERS}
                     data={shares}
-                    renderRow={renderRow}
+                    renderRow={RenderRow}
                     extraData={{
                       project,
                       restApiClient,
