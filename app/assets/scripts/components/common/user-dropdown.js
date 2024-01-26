@@ -94,8 +94,12 @@ function UserDropdown() {
                 </DropdownItem>
               </li>
               <li>
-                <DropdownItem as={StyledLink} to='/all-maps' useIcon='folder'>
-                  All Maps
+                <DropdownItem
+                  as={StyledLink}
+                  to='/public-maps'
+                  useIcon='folder'
+                >
+                  Public Maps
                 </DropdownItem>
               </li>
               {userAccessLevel === 'admin' && (

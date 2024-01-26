@@ -22,7 +22,6 @@ import {
   InpageBody,
   InpageBodyInner,
 } from '../../styles/inpage';
-import { StyledNavLink } from '../../styles/links';
 
 import App from '../common/app';
 import PageHeader from '../common/page-header';
@@ -167,17 +166,7 @@ function ExportedMapsList() {
         <InpageHeader>
           <InpageHeaderInner>
             <SharesHeadline>
-              <InpageTitle>Shares</InpageTitle>
-              <Button
-                forwardedAs={StyledNavLink}
-                to='/project/new'
-                variation='primary-plain'
-                size='large'
-                useIcon='plus'
-                title='Start a new project'
-              >
-                New Project
-              </Button>
+              <InpageTitle>Public Maps</InpageTitle>
             </SharesHeadline>
           </InpageHeaderInner>
         </InpageHeader>
@@ -186,9 +175,6 @@ function ExportedMapsList() {
             {shares &&
               (shares.length ? (
                 <>
-                  <Heading size='small'>
-                    {!isLoading ? 'Exported Maps' : 'Loading...'}
-                  </Heading>
                   <Table
                     headers={HEADERS}
                     data={shares}
