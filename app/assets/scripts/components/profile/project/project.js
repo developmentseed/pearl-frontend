@@ -80,7 +80,7 @@ const AOI_HEADERS = [
   'Published',
 ];
 
-function RenderRow(share, { restApiClient, project }) {
+function RenderRow(share, { restApiClient }) {
   const shareLink = `${window.location.origin}/share/${share.uuid}/map`;
   const { aoi, timeframe, mosaic } = share;
 
@@ -131,12 +131,9 @@ function RenderRow(share, { restApiClient, project }) {
               setIsPublished(newIsPublished);
 
               try {
-                await restApiClient.patch(
-                  `project/${project.id}/aoi/${aoi.id}/timeframe/${timeframe.id}/share/${share.uuid}`,
-                  {
-                    published: false,
-                  }
-                );
+                await restApiClient.patch(`share/${share.uuid}`, {
+                  published: newIsPublished,
+                });
                 setIsPublished(newIsPublished);
               } catch (err) {
                 setIsPublished(!newIsPublished);
