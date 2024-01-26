@@ -6,7 +6,7 @@ import { media } from '@devseed-ui/theme-provider';
 import { Button } from '@devseed-ui/button';
 import { glsp } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
-import { FormInput, FormCheckable } from '@devseed-ui/form';
+import { FormInput } from '@devseed-ui/form';
 
 import { useAuth } from '../../context/auth';
 import { formatDateTime, formatThousands } from '../../utils/format';
@@ -85,7 +85,6 @@ const HEADERS = [
   'Created',
   'Link',
   'Download',
-  'Compare',
 ];
 
 function RenderRow(share, { restApiClient }) {
@@ -127,11 +126,6 @@ function RenderRow(share, { restApiClient }) {
           hideText
           onClick={() => downloadShareGeotiff(restApiClient, share)}
         />
-      </TableCell>
-      <TableCell>
-        <FormInputGroup>
-          <FormCheckable />
-        </FormInputGroup>
       </TableCell>
     </TableRow>
   );
