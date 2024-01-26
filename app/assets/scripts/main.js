@@ -13,7 +13,7 @@ import theme from './styles/theme';
 
 import Home from './components/home';
 import Explore from './components/explore';
-import ExportedMaps from './components/exported-maps';
+import AllMaps from './components/all-maps';
 import ShareMap from './components/share-map';
 import About from './components/about';
 import UhOh from './components/uhoh';
@@ -61,7 +61,7 @@ function Root() {
               <Switch>
                 <Route exact path='/' component={Home} />
                 <Route exact path='/share/:uuid/map' component={ShareMap} />
-                <Route exact path='/exported-maps' component={ExportedMaps} />
+                <Route exact path='/all-maps' component={AllMaps} />
                 <ProtectedRoute
                   path='/project-old/:projectId'
                   component={Explore}
