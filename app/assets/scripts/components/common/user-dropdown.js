@@ -94,11 +94,7 @@ function UserDropdown() {
                 </DropdownItem>
               </li>
               <li>
-                <DropdownItem
-                  as={StyledLink}
-                  to='/public-maps'
-                  useIcon='folder'
-                >
+                <DropdownItem as={StyledLink} to='/public-maps' useIcon='map'>
                   Public Maps
                 </DropdownItem>
               </li>
