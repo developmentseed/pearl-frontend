@@ -71,6 +71,19 @@ const CreateMosaicForm = ({
   const currentImagerySource = ProjectMachineContext.useSelector(
     selectors.currentImagerySource
   );
+
+  const mosaicPresetsOptions = collection.mosaicPresets
+    .map((m) => {
+      return {
+        value: m.name,
+        label: m.name,
+      };
+    })
+    .concat({
+      value: 'custom',
+      label: 'Custom date range',
+    });
+
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedTimeframe, setSelectedTimeframe] = useState(null);
 
@@ -100,21 +113,14 @@ const CreateMosaicForm = ({
         <Heading size='small' as='h4'>
           Custom mosaic filters
         </Heading>
-
         <FormGroup>
           <FormGroupHeader>
             <FormLabel>Select date range</FormLabel>
           </FormGroupHeader>
-
           <FormGroupBody>
             <InputSelect
               id='date-range-preset'
-              options={collection.mosaicPresets.map((m) => {
-                return {
-                  value: m.name,
-                  label: m.name,
-                };
-              })}
+              options={mosaicPresetsOptions}
             />
           </FormGroupBody>
 
