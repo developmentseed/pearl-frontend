@@ -49,6 +49,7 @@ export function MosaicSelector() {
         showModal={showModal}
         setShowModal={setShowModal}
         isProjectNew={isProjectNew}
+        imagerySource={currentImagerySource}
       />
       <HeadOption>
         <HeadOptionHeadline usePadding>

@@ -25,6 +25,8 @@ import {
   getMosaicTileUrl,
 } from '../../../../../../../utils/mosaics';
 import { MOSAIC_LAYER_OPACITY } from '../../../../../../../fsm/project/constants';
+import { InputSelect } from '../../../../../../common/forms/input-select';
+import { StacMosaicPropTypes } from '../../../../../../../../prop-types';
 
 const MOSAIC_DATE_RANGE_IN_DAYS = 90;
 
@@ -36,7 +38,7 @@ const SectionWrapper = styled.div`
 `;
 
 const FormWrapper = styled.div`
-  width: 300px;
+  width: 500px;
 `;
 
 const MapPreviewWrapper = styled.div`
@@ -53,7 +55,11 @@ const MapPreviewPlaceholder = styled.div`
   justify-content: center;
 `;
 
-const CreateMosaicForm = ({ setNewMosaic, handleMosaicCreation }) => {
+const CreateMosaicForm = ({
+  mosaicPresets,
+  setNewMosaic,
+  handleMosaicCreation,
+}) => {
   const currentImagerySource = ProjectMachineContext.useSelector(
     selectors.currentImagerySource
   );
@@ -88,6 +94,22 @@ const CreateMosaicForm = ({ setNewMosaic, handleMosaicCreation }) => {
         </Heading>
 
         <FormGroup>
+          <FormGroupHeader>
+            <FormLabel>Select date range</FormLabel>
+          </FormGroupHeader>
+
+          <FormGroupBody>
+            <InputSelect
+              id='date-range-preset'
+              options={mosaicPresets.map((m) => {
+                return {
+                  value: m.cql,
+                  label: m.name,
+                };
+              })}
+            />
+          </FormGroupBody>
+
           <FormGroupHeader>
             <FormLabel>Start date:</FormLabel>{' '}
           </FormGroupHeader>
@@ -134,6 +156,7 @@ const CreateMosaicForm = ({ setNewMosaic, handleMosaicCreation }) => {
 CreateMosaicForm.propTypes = {
   setNewMosaic: PropTypes.func.isRequired,
   handleMosaicCreation: PropTypes.func.isRequired,
+  mosaicPresets: PropTypes.arrayOf(StacMosaicPropTypes),
 };
 
 const MosaicPreviewMap = ({
@@ -176,6 +199,7 @@ export const CreateMosaicSection = ({
   className,
   initialMapZoom,
   initialMapCenter,
+  mosaicPresets,
 }) => {
   const [newMosaic, setNewMosaic] = useState(null);
 
@@ -205,6 +229,7 @@ export const CreateMosaicSection = ({
   return (
     <SectionWrapper className={className}>
       <CreateMosaicForm
+        mosaicPresets={mosaicPresets}
         onMosaicCreated={onMosaicCreated}
         setNewMosaic={setNewMosaic}
         handleMosaicCreation={handleMosaicCreation}
@@ -223,4 +248,5 @@ CreateMosaicSection.propTypes = {
   className: PropTypes.string,
   initialMapZoom: PropTypes.number,
   initialMapCenter: PropTypes.array,
+  mosaicPresets: PropTypes.arrayOf(StacMosaicPropTypes).isRequired,
 };
