@@ -26,7 +26,8 @@ import {
 } from '../../../../../../../utils/mosaics';
 import { MOSAIC_LAYER_OPACITY } from '../../../../../../../fsm/project/constants';
 import { InputSelect } from '../../../../../../common/forms/input-select';
-import { StacMosaicPropTypes } from '../../../../../../../../prop-types';
+import { StacCollectionType } from '../../../../../../../../types';
+import { usePlanetaryComputerCollection } from '../../../../../../../utils/use-pc-collection';
 
 const MOSAIC_DATE_RANGE_IN_DAYS = 90;
 
@@ -55,8 +56,15 @@ const MapPreviewPlaceholder = styled.div`
   justify-content: center;
 `;
 
+const LoadingWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+`;
+
 const CreateMosaicForm = ({
-  mosaicPresets,
+  collection,
   setNewMosaic,
   handleMosaicCreation,
 }) => {
@@ -101,9 +109,9 @@ const CreateMosaicForm = ({
           <FormGroupBody>
             <InputSelect
               id='date-range-preset'
-              options={mosaicPresets.map((m) => {
+              options={collection.mosaicPresets.map((m) => {
                 return {
-                  value: m.cql,
+                  value: m.name,
                   label: m.name,
                 };
               })}
@@ -156,7 +164,7 @@ const CreateMosaicForm = ({
 CreateMosaicForm.propTypes = {
   setNewMosaic: PropTypes.func.isRequired,
   handleMosaicCreation: PropTypes.func.isRequired,
-  mosaicPresets: PropTypes.arrayOf(StacMosaicPropTypes),
+  collection: StacCollectionType.isRequired,
 };
 
 const MosaicPreviewMap = ({
@@ -199,8 +207,17 @@ export const CreateMosaicSection = ({
   className,
   initialMapZoom,
   initialMapCenter,
-  mosaicPresets,
 }) => {
+  const currentImagerySource = ProjectMachineContext.useSelector(
+    selectors.currentImagerySource
+  );
+
+  const {
+    data: collection,
+    isLoading,
+    hasError,
+  } = usePlanetaryComputerCollection(currentImagerySource?.name);
+
   const [newMosaic, setNewMosaic] = useState(null);
 
   const actorRef = ProjectMachineContext.useActorRef();
@@ -226,10 +243,18 @@ export const CreateMosaicSection = ({
     }
   };
 
-  return (
+  return isLoading ? (
+    <LoadingWrapper>
+      <span>Loading...</span>
+    </LoadingWrapper>
+  ) : hasError ? (
+    <LoadingWrapper>
+      <span>Error loading collection</span>
+    </LoadingWrapper>
+  ) : (
     <SectionWrapper className={className}>
       <CreateMosaicForm
-        mosaicPresets={mosaicPresets}
+        collection={collection}
         onMosaicCreated={onMosaicCreated}
         setNewMosaic={setNewMosaic}
         handleMosaicCreation={handleMosaicCreation}
@@ -248,5 +273,4 @@ CreateMosaicSection.propTypes = {
   className: PropTypes.string,
   initialMapZoom: PropTypes.number,
   initialMapCenter: PropTypes.array,
-  mosaicPresets: PropTypes.arrayOf(StacMosaicPropTypes).isRequired,
 };
