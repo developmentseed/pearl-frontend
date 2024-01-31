@@ -12,7 +12,6 @@ import {
   FormInput,
   FormLabel,
 } from '@devseed-ui/form';
-import { Heading } from '@devseed-ui/typography';
 
 import {
   generateQuartersInBetweenDates,
@@ -100,9 +99,7 @@ export const CreateMosaicForm = ({
       <Formik initialValues={initialFormValues}>
         {({ setFieldValue, values }) => (
           <Form>
-            <Heading size='small' as='h4'>
-              Custom mosaic filters
-            </Heading>
+            <div>All mosaics from Planetary Computer, &lt;10% cloud cover</div>
             <FormGroup>
               <FormGroupHeader>
                 <FormLabel>Select date range</FormLabel>
