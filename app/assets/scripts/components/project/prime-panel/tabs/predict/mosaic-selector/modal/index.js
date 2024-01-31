@@ -7,9 +7,8 @@ import { glsp } from '@devseed-ui/theme-provider';
 import { Button } from '@devseed-ui/button';
 import { Heading } from '@devseed-ui/typography';
 
-import { CreateMosaicSection } from './sections/create-mosaic';
-import { ProjectMachineContext } from '../../../../../../fsm/project';
-import { usePlanetaryComputerCollection } from '../../../../../../utils/use-pc-collection';
+import { CreateMosaicSection } from './create-mosaic';
+import { ProjectMachineContext } from '../../../../../../../fsm/project';
 
 const ModalHeader = styled.header`
   padding: ${glsp(2)} ${glsp(2)} 0;
