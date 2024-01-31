@@ -35,8 +35,8 @@ export function generateQuartersInBetweenDates(startDate1, startDate2) {
     // Create quarter object with label and timestamps
     const quarter = {
       label: `${format(start, 'MMM')} - ${format(endOfQuarter, 'MMM, yyyy')}`,
-      startTimestamp: start.getTime(),
-      endTimestamp: endOfQuarter.getTime(),
+      startTimestamp: start.toISOString(),
+      endTimestamp: endOfQuarter.toISOString(),
     };
     // Add the quarter object to the list
     quarters.push(quarter);
