@@ -14,12 +14,6 @@ const ModalHeader = styled.header`
   padding: ${glsp(2)} ${glsp(2)} 0;
 `;
 
-const ModalContent = styled.div`
-  display: flex;
-  flex-flow: column;
-  height: 60vh;
-`;
-
 const Headline = styled.div`
   display: flex;
   flex-direction: row;
@@ -75,16 +69,14 @@ export function MosaicSelectorModal({ showModal, setShowModal }) {
         </ModalHeader>
       )}
       content={
-        <ModalContent>
-          <MosaicContentInner
-            name='Create Mosaic'
-            initialMapZoom={mapZoom}
-            initialMapCenter={mapCenter}
-            onMosaicCreated={() => {
-              setShowModal(false);
-            }}
-          />
-        </ModalContent>
+        <MosaicContentInner
+          name='Create Mosaic'
+          initialMapZoom={mapZoom}
+          initialMapCenter={mapCenter}
+          onMosaicCreated={() => {
+            setShowModal(false);
+          }}
+        />
       }
     />
   );

@@ -23,6 +23,7 @@ import { ProjectMachineContext } from '../../../../../../../fsm/project';
 import selectors from '../../../../../../../fsm/project/selectors';
 
 import { InputSelect } from '../../../../../../common/forms/input-select';
+import FormGroupStructure from '../../../../../../common/forms/form-group-structure';
 
 const FormWrapper = styled.div`
   width: 500px;
@@ -132,7 +133,9 @@ export const CreateMosaicForm = ({
                   }}
                 />
               </FormGroupBody>
-
+            </FormGroup>
+            <p style={{ textAlign: 'center' }}>Or</p>
+            <FormGroup>
               <FormGroupHeader>
                 <FormLabel>Start date:</FormLabel>{' '}
               </FormGroupHeader>
@@ -157,24 +160,27 @@ export const CreateMosaicForm = ({
               </FormGroupBody>
             </FormGroup>
             <FormGroup>
-              <FormGroupHeader>
-                <FormLabel>End date:</FormLabel>{' '}
-              </FormGroupHeader>
-              <FormInput
-                type='date'
-                id='endDate'
-                name='endDate'
-                value={values.endDate}
-                onChange={(e) => {
-                  const { value } = e.target;
-                  setFieldValue('endDate', value);
-                  setFieldValue('dateRange', 'custom');
-                  handleDateChange(
-                    new Date(values.startDate).getTime(),
-                    new Date(value).getTime()
-                  );
-                }}
-              />
+              <FormGroupStructure
+                label='End Date:'
+                description='End date automatically set to 90 days following start date'
+              >
+                <FormInput
+                  type='date'
+                  id='endDate'
+                  name='endDate'
+                  disabled
+                  value={values.endDate}
+                  onChange={(e) => {
+                    const { value } = e.target;
+                    setFieldValue('endDate', value);
+                    setFieldValue('dateRange', 'custom');
+                    handleDateChange(
+                      new Date(values.startDate).getTime(),
+                      new Date(value).getTime()
+                    );
+                  }}
+                />
+              </FormGroupStructure>
             </FormGroup>
             <Button
               variation='primary-raised-dark'

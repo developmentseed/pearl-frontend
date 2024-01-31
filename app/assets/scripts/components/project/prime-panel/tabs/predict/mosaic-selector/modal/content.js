@@ -12,10 +12,11 @@ import { CreateMosaicForm } from './form';
 import { MosaicMapPreview } from './map-preview';
 
 const SectionWrapper = styled.div`
-  display: flex;
-  justify-content: space-evenly;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: ${glsp()};
   height: 100%;
+  min-height: 38rem;
 `;
 
 const LoadingWrapper = styled.div`
