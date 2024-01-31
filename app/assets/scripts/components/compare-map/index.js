@@ -28,6 +28,7 @@ import { Subheading } from '../../styles/type/heading';
 import { DownloadAoiButton } from '../profile/project/batch-list';
 import LayersPanel from './layers-control';
 import GenericControl from '../common/map/generic-control';
+import SideBySideTileLayer from './SideBySideTileLayer';
 
 const { restApiEndpoint, tileUrlTemplate } = config;
 
@@ -78,58 +79,70 @@ const INITIAL_MAP_LAYERS = {
   },
 };
 
-function ShareMap() {
-  const { uuid } = useParams();
+function CompareMap() {
+  const { leftUUID, rightUUID } = useParams();
   const [mapRef, setMapRef] = useState(null);
   const { restApiClient } = useAuth();
-  const [tileUrl, setTileUrl] = useState(null);
+  // const [tileUrls, setTileUrls] = useState([]);
+  const [leftTileUrl, setLeftTileUrl] = useState(null);
+  const [rightTileUrl, setRightTileUrl] = useState(null);
+  const tileUrlSetters = [setLeftTileUrl, setRightTileUrl];
   const [mapLayers, setMapLayers] = useState(INITIAL_MAP_LAYERS);
   const [showLayersControl, setShowLayersControl] = useState(false);
   const [classes, setClasses] = useState([]);
-  const [aoiInfo, setAoiInfo] = useState({ id: null, projectId: null });
+  const [aoiInfo, setAoiInfo] = useState([]);
   const { mosaics } = useMosaics();
   const mosaic = mosaics && mosaics.length > 0 ? mosaics[0] : null;
 
   useEffect(() => {
     if (!mapRef) return;
-    restApiClient
-      .getTileJSONFromUUID(uuid)
-      .then((tileJSON) => {
-        setTileUrl(`${restApiEndpoint}${tileJSON.tiles[0]}`);
-      })
-      .catch((error) => {
-        logger(error);
-        toasts.error('There was an error loading AOI map tiles.');
-      });
 
-    restApiClient.get(`share/${uuid}`).then((aoiData) => {
-      setClasses(aoiData.classes);
-      setAoiInfo({
-        id: aoiData.aoi_id,
-        projectId: aoiData.project_id,
-        timeframe: aoiData.timeframe_id,
-      });
-      if (aoiData.bounds && aoiData.bounds.coordinates) {
-        const bounds = [
-          aoiData.bounds.coordinates[0][0].reverse(),
-          aoiData.bounds.coordinates[0][2].reverse(),
-        ];
-        mapRef.fitBounds(bounds, {
-          padding: BOUNDS_PADDING,
-          maxZoom: MAX_BASE_MAP_ZOOM_LEVEL,
+    [leftUUID, rightUUID].map((uuid, i) => {
+      restApiClient
+        .getTileJSONFromUUID(uuid)
+        .then((tileJSON) => {
+          // tileUrlSetters[i]([...tileUrls, nextUrl]);
+          tileUrlSetters[i](`${restApiEndpoint}${tileJSON.tiles[0]}`);
+        })
+        .catch((error) => {
+          logger(error);
+          toasts.error('There was an error loading AOI map tiles.');
         });
-      }
     });
-  }, [uuid, mapRef]);
+
+    [leftUUID, rightUUID].map((uuid, i) => {
+      restApiClient.get(`share/${uuid}`).then((aoiData) => {
+        setClasses([...classes, [aoiData.classes]]);
+        setAoiInfo([
+          ...aoiInfo,
+          {
+            id: aoiData.aoi_id,
+            projectId: aoiData.project_id,
+            timeframe: aoiData.timeframe_id,
+          },
+        ]);
+        if (aoiData.bounds && aoiData.bounds.coordinates) {
+          const bounds = [
+            aoiData.bounds.coordinates[0][0].reverse(),
+            aoiData.bounds.coordinates[0][2].reverse(),
+          ];
+          mapRef.fitBounds(bounds, {
+            padding: BOUNDS_PADDING,
+            maxZoom: MAX_BASE_MAP_ZOOM_LEVEL,
+          });
+        }
+      });
+    });
+  }, [leftUUID, rightUUID, mapRef]);
 
   return (
-    <App pageTitle='AOI Map'>
+    <App pageTitle='Compare AOI Maps'>
       <PageHeader>
         <DownloadAoiButton
           aoi={aoiInfo.id}
           projectId={aoiInfo.projectId}
           timeframeId={aoiInfo?.timeframe}
-          uuid={uuid}
+          uuid={leftUUID}
           variation='primary-raised-dark'
         >
           Download map
@@ -152,17 +165,24 @@ function ShareMap() {
               opacity={mapLayers.mosaic.visible ? mapLayers.mosaic.opacity : 0}
             />
           )}
-          {tileUrl && (
-            <TileLayer
-              url={tileUrl}
-              minZoom={12}
-              maxZoom={20}
-              zIndex={3}
-              opacity={
-                mapLayers.predictions.visible
-                  ? mapLayers.predictions.opacity
-                  : 0
-              }
+          {leftTileUrl && rightTileUrl && (
+            // <TileLayer
+            //   url={tileUrl}
+            //   minZoom={12}
+            //   maxZoom={20}
+            //   zIndex={3}
+            //   opacity={
+            //     mapLayers.predictions.visible
+            //       ? mapLayers.predictions.opacity
+            //       : 0
+            //   }
+            // />
+            <SideBySideTileLayer
+              leftTile={{ url: leftTileUrl, attr: '' }}
+              rightTile={{
+                url: rightTileUrl,
+                attr: '',
+              }}
             />
           )}
           <FeatureGroup>
@@ -185,27 +205,29 @@ function ShareMap() {
         />
         <ClassLegend>
           <Subheading>LULC Classes</Subheading>
-          {classes.length > 1
-            ? classes.map((c) => (
-                <Class key={c.name} noHover>
-                  <ClassThumbnail color={c.color} />
-                  <ClassHeading size='xsmall'>{c.name}</ClassHeading>
-                </Class>
-              ))
-            : [1, 2, 3].map((i) => (
-                <Class
-                  key={i}
-                  placeholder={+true}
-                  className='placeholder-class'
-                >
-                  <ClassThumbnail />
-                  <ClassHeading size='xsmall' placeholder={+true} />
-                </Class>
-              ))}
+          {classes.map((sideClasses) => {
+            sideClasses.length > 1
+              ? sideClasses.map((c) => (
+                  <Class key={c.name} noHover>
+                    <ClassThumbnail color={c.color} />
+                    <ClassHeading size='xsmall'>{c.name}</ClassHeading>
+                  </Class>
+                ))
+              : [1, 2, 3].map((i) => (
+                  <Class
+                    key={i}
+                    placeholder={+true}
+                    className='placeholder-class'
+                  >
+                    <ClassThumbnail />
+                    <ClassHeading size='xsmall' placeholder={+true} />
+                  </Class>
+                ));
+          })}
         </ClassLegend>
       </PageBody>
     </App>
   );
 }
 
-export default ShareMap;
+export default CompareMap;

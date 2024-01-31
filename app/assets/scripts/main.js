@@ -14,6 +14,7 @@ import theme from './styles/theme';
 import Home from './components/home';
 import Explore from './components/explore';
 import ShareMap from './components/share-map';
+import CompareMap from './components/compare-map';
 import About from './components/about';
 import UhOh from './components/uhoh';
 import Projects from './components/profile/projects';
@@ -61,6 +62,11 @@ function Root() {
               <Switch>
                 <Route exact path='/' component={Home} />
                 <Route exact path='/share/:uuid/map' component={ShareMap} />
+                <Route
+                  exact
+                  path='/compare/:leftUUID/:rightUUID'
+                  component={CompareMap}
+                />
                 <ProtectedRoute
                   path='/project-old/:projectId'
                   component={Explore}
