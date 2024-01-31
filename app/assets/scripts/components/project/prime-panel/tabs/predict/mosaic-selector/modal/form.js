@@ -12,22 +12,22 @@ import {
   FormInput,
 } from '@devseed-ui/form';
 import { Button } from '@devseed-ui/button';
-import { formatTimestampToSimpleUTCDate } from '../../../../../../../utils/dates';
+import {
+  formatTimestampToSimpleUTCDate,
+  getDatePartFromISOString,
+} from '../../../../../../../utils/dates';
 import { ProjectMachineContext } from '../../../../../../../fsm/project';
 import selectors from '../../../../../../../fsm/project/selectors';
-import { format, subDays } from 'date-fns';
 import { generateSentinel2L2AMosaic } from '../../../../../../../utils/mosaics';
 import { InputSelect } from '../../../../../../common/forms/input-select';
-import { StacCollectionType } from '../../../../../../../../types';
-
-const MOSAIC_DATE_RANGE_IN_DAYS = 90;
 
 const FormWrapper = styled.div`
   width: 500px;
 `;
 
 export const CreateMosaicForm = ({
-  collection,
+  acquisitionStart,
+  acquisitionEnd,
   setNewMosaic,
   handleMosaicCreation,
 }) => {
@@ -35,22 +35,16 @@ export const CreateMosaicForm = ({
     selectors.currentImagerySource
   );
 
-  const mosaicPresetsOptions = collection.mosaicPresets
-    .map((m) => {
-      return {
-        value: m.name,
-        label: m.name,
-      };
-    })
-    .concat({
+  const mosaicPresetsOptions = [
+    {
       value: 'custom',
       label: 'Custom date range',
-    });
+    },
+  ];
 
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedTimeframe, setSelectedTimeframe] = useState(null);
 
-  const maxDate = subDays(new Date(), MOSAIC_DATE_RANGE_IN_DAYS);
   const handleDateChange = async (event) => {
     setSelectedDate(event.target.value);
 
@@ -94,7 +88,8 @@ export const CreateMosaicForm = ({
             <FormInput
               type='date'
               value={selectedDate}
-              max={format(maxDate, 'yyyy-MM-dd')}
+              min={getDatePartFromISOString(acquisitionStart)}
+              max={getDatePartFromISOString(acquisitionEnd)}
               onChange={handleDateChange}
             />
           </FormGroupBody>
@@ -133,5 +128,6 @@ export const CreateMosaicForm = ({
 CreateMosaicForm.propTypes = {
   setNewMosaic: PropTypes.func.isRequired,
   handleMosaicCreation: PropTypes.func.isRequired,
-  collection: StacCollectionType.isRequired,
+  acquisitionStart: PropTypes.string.isRequired,
+  acquisitionEnd: PropTypes.string.isRequired,
 };

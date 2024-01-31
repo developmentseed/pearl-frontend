@@ -77,7 +77,8 @@ export const CreateMosaicSection = ({
   ) : (
     <SectionWrapper className={className}>
       <CreateMosaicForm
-        collection={collection}
+        acquisitionStart={collection.acquisitionStart}
+        acquisitionEnd={collection.acquisitionEnd}
         onMosaicCreated={onMosaicCreated}
         setNewMosaic={setNewMosaic}
         handleMosaicCreation={handleMosaicCreation}

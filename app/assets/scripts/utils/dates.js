@@ -11,6 +11,10 @@ export function formatTimestampToSimpleUTC(timestamp) {
 
 export function formatTimestampToSimpleUTCDate(timestamp) {
   const isoString = new Date(timestamp).toISOString();
-  const datePart = isoString.split('T')[0];
+  const datePart = getDatePartFromISOString(isoString);
   return `${datePart}`;
+}
+
+export function getDatePartFromISOString(isoString) {
+  return isoString.split('T')[0];
 }
