@@ -25,7 +25,7 @@ const LoadingWrapper = styled.div`
   height: 100%;
 `;
 
-export const CreateMosaicSection = ({
+export const MosaicContentInner = ({
   onMosaicCreated,
   className,
   initialMapZoom,
@@ -77,8 +77,8 @@ export const CreateMosaicSection = ({
   ) : (
     <SectionWrapper className={className}>
       <CreateMosaicForm
-        acquisitionStart={collection.acquisitionStart}
-        acquisitionEnd={collection.acquisitionEnd}
+        acquisitionStart={collection?.acquisitionStart}
+        acquisitionEnd={collection?.acquisitionEnd}
         onMosaicCreated={onMosaicCreated}
         setNewMosaic={setNewMosaic}
         handleMosaicCreation={handleMosaicCreation}
@@ -92,7 +92,7 @@ export const CreateMosaicSection = ({
   );
 };
 
-CreateMosaicSection.propTypes = {
+MosaicContentInner.propTypes = {
   onMosaicCreated: PropTypes.func.isRequired,
   className: PropTypes.string,
   initialMapZoom: PropTypes.number,

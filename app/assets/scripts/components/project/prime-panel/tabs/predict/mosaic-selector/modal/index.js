@@ -7,7 +7,7 @@ import { glsp } from '@devseed-ui/theme-provider';
 import { Button } from '@devseed-ui/button';
 import { Heading } from '@devseed-ui/typography';
 
-import { CreateMosaicSection } from './content';
+import { MosaicContentInner } from './content';
 import { ProjectMachineContext } from '../../../../../../../fsm/project';
 
 const ModalHeader = styled.header`
@@ -76,10 +76,8 @@ export function MosaicSelectorModal({ showModal, setShowModal }) {
       )}
       content={
         <ModalContent>
-          <CreateMosaicSection
+          <MosaicContentInner
             name='Create Mosaic'
-            className='create-mosaic'
-            tabId='create-mosaic-tab-trigger'
             initialMapZoom={mapZoom}
             initialMapCenter={mapCenter}
             onMosaicCreated={() => {
