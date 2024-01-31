@@ -2,16 +2,14 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-import { MapContainer, TileLayer } from 'react-leaflet';
-
-import { glsp, themeVal, rgba } from '@devseed-ui/theme-provider';
+import { glsp } from '@devseed-ui/theme-provider';
 import { ProjectMachineContext } from '../../../../../../../fsm/project';
 import selectors from '../../../../../../../fsm/project/selectors';
 import toasts from '../../../../../../common/toasts';
 import { getMosaicTileUrl } from '../../../../../../../utils/mosaics';
-import { MOSAIC_LAYER_OPACITY } from '../../../../../../../fsm/project/constants';
 import { usePlanetaryComputerCollection } from '../../../../../../../utils/use-pc-collection';
 import { CreateMosaicForm } from './form';
+import { MosaicMapPreview } from './map-preview';
 
 const SectionWrapper = styled.div`
   display: flex;
@@ -20,61 +18,12 @@ const SectionWrapper = styled.div`
   height: 100%;
 `;
 
-const MapPreviewWrapper = styled.div`
-  width: 100%;
-`;
-
-const MapPreviewPlaceholder = styled.div`
-  height: 100%;
-  display: flex;
-  align-items: center;
-  border: ${themeVal('layout.border')} solid
-    ${rgba(themeVal('color.base'), 0.16)};
-  border-radius: ${themeVal('shape.rounded')};
-  justify-content: center;
-`;
-
 const LoadingWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
   height: 100%;
 `;
-
-const MosaicPreviewMap = ({
-  mosaicTileUrl,
-  initialMapCenter,
-  initialMapZoom,
-}) => {
-  return (
-    <MapPreviewWrapper>
-      {mosaicTileUrl && initialMapZoom && initialMapCenter ? (
-        <MapContainer
-          center={initialMapCenter}
-          zoom={initialMapZoom}
-          style={{ height: '100%' }}
-        >
-          <TileLayer
-            key={mosaicTileUrl}
-            url={mosaicTileUrl}
-            opacity={MOSAIC_LAYER_OPACITY}
-            attribution='&copy; Copernicus Sentinel'
-          />
-        </MapContainer>
-      ) : (
-        <MapPreviewPlaceholder>
-          <span>Set date to display map preview</span>
-        </MapPreviewPlaceholder>
-      )}
-    </MapPreviewWrapper>
-  );
-};
-
-MosaicPreviewMap.propTypes = {
-  mosaicTileUrl: PropTypes.string,
-  initialMapZoom: PropTypes.number,
-  initialMapCenter: PropTypes.array,
-};
 
 export const CreateMosaicSection = ({
   onMosaicCreated,
@@ -133,7 +82,7 @@ export const CreateMosaicSection = ({
         setNewMosaic={setNewMosaic}
         handleMosaicCreation={handleMosaicCreation}
       />
-      <MosaicPreviewMap
+      <MosaicMapPreview
         initialMapZoom={initialMapZoom}
         initialMapCenter={initialMapCenter}
         mosaicTileUrl={newMosaic && getMosaicTileUrl(newMosaic)}
