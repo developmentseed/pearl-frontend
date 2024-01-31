@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { Formik } from 'formik';
@@ -84,6 +84,16 @@ export const CreateMosaicForm = ({
     });
     setNewMosaic(newMosaic);
   };
+
+  // Generate first map preview on mount
+  useEffect(() => {
+    if (defaultQuarter) {
+      handleDateChange(
+        defaultQuarter.startTimestamp,
+        defaultQuarter.endTimestamp
+      );
+    }
+  }, []);
 
   return (
     <FormWrapper>
