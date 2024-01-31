@@ -7,7 +7,7 @@ import { glsp } from '@devseed-ui/theme-provider';
 import { Button } from '@devseed-ui/button';
 import { Heading } from '@devseed-ui/typography';
 
-import { CreateMosaicSection } from './create-mosaic';
+import { CreateMosaicSection } from './content';
 import { ProjectMachineContext } from '../../../../../../../fsm/project';
 
 const ModalHeader = styled.header`
