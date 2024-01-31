@@ -14,6 +14,7 @@ import {
 import { Button } from '@devseed-ui/button';
 import {
   formatTimestampToSimpleUTCDate,
+  generateQuartersInBetweenDates,
   getDatePartFromISOString,
 } from '../../../../../../../utils/dates';
 import { ProjectMachineContext } from '../../../../../../../fsm/project';
@@ -35,7 +36,16 @@ export const CreateMosaicForm = ({
     selectors.currentImagerySource
   );
 
+  const availableQuarters = generateQuartersInBetweenDates(
+    acquisitionStart,
+    acquisitionEnd
+  );
+
   const mosaicPresetsOptions = [
+    ...availableQuarters.reverse().map(({ label }) => ({
+      value: label,
+      label: `${label}`,
+    })),
     {
       value: 'custom',
       label: 'Custom date range',

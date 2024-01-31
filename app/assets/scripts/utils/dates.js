@@ -1,3 +1,5 @@
+import { format, addMonths, isBefore } from 'date-fns';
+
 /**
  * This function formats a timestamp to a simple UTC string, generally used
  * for displaying timestamps for mosaics.
@@ -17,4 +19,30 @@ export function formatTimestampToSimpleUTCDate(timestamp) {
 
 export function getDatePartFromISOString(isoString) {
   return isoString.split('T')[0];
+}
+
+// This function generates an array of quarters between two dates, starting from
+// March.
+export function generateQuartersInBetweenDates(startDate1, startDate2) {
+  // Ensure startDate1 is the earlier date
+  let start = new Date(startDate1 < startDate2 ? startDate1 : startDate2);
+  const end = new Date(startDate1 < startDate2 ? startDate2 : startDate1);
+
+  const quarters = [];
+  while (isBefore(start, end)) {
+    // Calculate the end of the quarter
+    const endOfQuarter = addMonths(start, 2);
+    // Create quarter object with label and timestamps
+    const quarter = {
+      label: `${format(start, 'MMM')} - ${format(endOfQuarter, 'MMM, yyyy')}`,
+      startTimestamp: start.getTime(),
+      endTimestamp: endOfQuarter.getTime(),
+    };
+    // Add the quarter object to the list
+    quarters.push(quarter);
+    // Move to the next quarter by setting start to the month after endOfQuarter
+    start = addMonths(start, 3);
+  }
+
+  return quarters;
 }
