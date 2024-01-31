@@ -59,14 +59,14 @@ export const CreateMosaicForm = ({
       };
 
   const mosaicPresetsOptions = [
-    ...availableQuarters.map(({ label }) => ({
-      value: label,
-      label: `${label}`,
-    })),
     {
       value: 'custom',
       label: 'Custom date range',
     },
+    ...availableQuarters.map(({ label }) => ({
+      value: label,
+      label: `${label}`,
+    })),
   ];
 
   const handleDateChange = async (startDate, endDate) => {
