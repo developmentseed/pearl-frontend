@@ -13,11 +13,11 @@ import theme from './styles/theme';
 
 import Home from './components/home';
 import Explore from './components/explore';
+import PublicMaps from './components/public-maps';
 import ShareMap from './components/share-map';
 import About from './components/about';
 import UhOh from './components/uhoh';
 import Projects from './components/profile/projects';
-import Maps from './components/profile/maps';
 
 import { GlobalContextProvider } from './context/global';
 import { CollecticonsGlobalStyle } from '@devseed-ui/collecticons';
@@ -62,6 +62,11 @@ function Root() {
                 <Route exact path='/' component={Home} />
                 <Route exact path='/share/:uuid/map' component={ShareMap} />
                 <ProtectedRoute
+                  exact
+                  path='/public-maps'
+                  component={PublicMaps}
+                />
+                <ProtectedRoute
                   path='/project-old/:projectId'
                   component={Explore}
                 />
@@ -69,7 +74,6 @@ function Root() {
                   path='/project/:projectId'
                   component={ProjectPage}
                 />
-                <ProtectedRoute exact path='/profile/maps' component={Maps} />
                 <ProtectedRoute
                   exact
                   path='/profile/projects'
