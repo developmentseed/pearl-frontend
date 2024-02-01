@@ -3,8 +3,8 @@ on:
   push:
     branches:
       - 'develop'
-      - 'main'
-      - 'add/select-mosaic'
+      - 'v2'
+      - 'test-trigger'
 jobs:
   trigger-deploy:
     runs-on: ubuntu-latest
@@ -15,6 +15,6 @@ jobs:
       with:
         workflow: frontend-staging.yml
         repo: developmentseed/pearl-reforestamos-deploy
-        inputs: '{ "commit": "${{ github.event.after }}" }'
+        inputs: '{ "commit": "${{ github.event.after }}", "branch": "${{ github.ref }}" }'
         ref: main
         token: ${{ secrets.PAT }}
