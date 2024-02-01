@@ -17,35 +17,51 @@ import config from '../../config';
 import { useAuth } from '../../context/auth';
 import logger from '../../utils/logger';
 import {
-  ClassList,
   Class,
   Thumbnail as ClassThumbnail,
   ClassHeading,
 } from '../explore/prime-panel/tabs/retrain-refine-styles';
 import { themeVal, glsp } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
+import { Button } from '@devseed-ui/button';
 import { Subheading } from '../../styles/type/heading';
-import { DownloadAoiButton } from '../profile/project/batch-list';
-import LayersPanel from './layers-control';
+import LayersPanel from '../share-map/layers-control';
 import GenericControl from '../common/map/generic-control';
 import SideBySideTileLayer from './SideBySideTileLayer';
+import DetailsList from '../common/details-list';
+import { toTitleCase } from '../../utils/format';
+import { downloadShareGeotiff, getShareLink } from '../../utils/share-link';
+import {
+  PanelBlock,
+  PanelBlockHeader,
+  PanelBlockFooter,
+  PanelBlockBody,
+} from '../common/panel-block';
 
 const { restApiEndpoint, tileUrlTemplate } = config;
 
-const ClassLegend = styled(ClassList)`
+const AOIPanel = styled(PanelBlock)`
   background: ${themeVal('color.surface')};
   position: absolute;
   bottom: ${glsp(2)};
   right: ${glsp(2)};
-  padding: ${glsp(1.5)};
-  grid-gap: ${glsp(0.25)};
+  left: ${({ leftPanel }) => leftPanel && glsp(2)};
+  padding: ${glsp()} ${glsp(1.5)};
+  gap: ${glsp(0.5)};
   z-index: 401;
-  width: 16rem;
+  width: 22rem;
   overflow: hidden;
-
-  > ${Heading} {
+  ${PanelBlockHeader} {
     padding: 0;
-    margin: 0;
+  }
+  ${PanelBlockFooter} {
+    padding: 0;
+    display: flex;
+    justify-content: space-between;
+    gap: ${glsp()};
+    > * {
+      flex: 1;
+    }
   }
   ${Class} {
     grid-template-columns: 1rem minmax(10px, 1fr);
@@ -56,8 +72,8 @@ const ClassLegend = styled(ClassList)`
     white-space: normal;
   }
   ${ClassThumbnail} {
-    width: ${glsp()};
-    height: ${glsp()};
+    width: ${glsp(0.875)};
+    height: ${glsp(0.875)};
     border: 1px solid ${themeVal('color.baseAlphaD')};
   }
 `;
@@ -79,48 +95,49 @@ const INITIAL_MAP_LAYERS = {
   },
 };
 
+const composeMosaicName = (start, end) =>
+  `${new Date(start).toLocaleString('default', {
+    month: 'short',
+  })} - ${new Date(end).toLocaleString('default', {
+    month: 'short',
+    year: 'numeric',
+  })}`;
+
 function CompareMap() {
   const { leftUUID, rightUUID } = useParams();
   const [mapRef, setMapRef] = useState(null);
   const { restApiClient } = useAuth();
-  // const [tileUrls, setTileUrls] = useState([]);
-  const [leftTileUrl, setLeftTileUrl] = useState(null);
-  const [rightTileUrl, setRightTileUrl] = useState(null);
-  const tileUrlSetters = [setLeftTileUrl, setRightTileUrl];
+  const [tileUrls, setTileUrls] = useState([]);
   const [mapLayers, setMapLayers] = useState(INITIAL_MAP_LAYERS);
   const [showLayersControl, setShowLayersControl] = useState(false);
-  const [classes, setClasses] = useState([]);
-  const [aoiInfo, setAoiInfo] = useState([]);
+  const [aoiClasses, setAoiClasses] = useState([]);
+  const [aoisInfo, setAoisInfo] = useState([]);
   const { mosaics } = useMosaics();
   const mosaic = mosaics && mosaics.length > 0 ? mosaics[0] : null;
 
   useEffect(() => {
     if (!mapRef) return;
+    const fetchDataForUUID = async (uuid) => {
+      try {
+        const [tileJSON, aoiData] = await Promise.all([
+          restApiClient.getTileJSONFromUUID(uuid),
+          restApiClient.get(`share/${uuid}`),
+        ]);
 
-    [leftUUID, rightUUID].map((uuid, i) => {
-      restApiClient
-        .getTileJSONFromUUID(uuid)
-        .then((tileJSON) => {
-          // tileUrlSetters[i]([...tileUrls, nextUrl]);
-          tileUrlSetters[i](`${restApiEndpoint}${tileJSON.tiles[0]}`);
-        })
-        .catch((error) => {
-          logger(error);
-          toasts.error('There was an error loading AOI map tiles.');
-        });
-    });
-
-    [leftUUID, rightUUID].map((uuid, i) => {
-      restApiClient.get(`share/${uuid}`).then((aoiData) => {
-        setClasses([...classes, [aoiData.classes]]);
-        setAoiInfo([
-          ...aoiInfo,
+        const tileUrl = `${restApiEndpoint}${tileJSON.tiles[0]}`;
+        setTileUrls((prevTileUrls) => [...prevTileUrls, tileUrl]);
+        setAoiClasses((prevClasses) => [...prevClasses, aoiData.classes]);
+        setAoisInfo((prevAoiInfo) => [
+          ...prevAoiInfo,
           {
             id: aoiData.aoi_id,
+            name: aoiData.aoi.name,
             projectId: aoiData.project_id,
             timeframe: aoiData.timeframe_id,
+            ...aoiData,
           },
         ]);
+
         if (aoiData.bounds && aoiData.bounds.coordinates) {
           const bounds = [
             aoiData.bounds.coordinates[0][0].reverse(),
@@ -131,23 +148,18 @@ function CompareMap() {
             maxZoom: MAX_BASE_MAP_ZOOM_LEVEL,
           });
         }
-      });
-    });
+      } catch (error) {
+        logger(error);
+        toasts.error('There was an error loading AOI map tiles.');
+      }
+    };
+
+    [leftUUID, rightUUID].forEach(fetchDataForUUID);
   }, [leftUUID, rightUUID, mapRef]);
 
   return (
     <App pageTitle='Compare AOI Maps'>
-      <PageHeader>
-        <DownloadAoiButton
-          aoi={aoiInfo.id}
-          projectId={aoiInfo.projectId}
-          timeframeId={aoiInfo?.timeframe}
-          uuid={leftUUID}
-          variation='primary-raised-dark'
-        >
-          Download map
-        </DownloadAoiButton>
-      </PageHeader>
+      <PageHeader />
       <PageBody role='main'>
         <MapContainer
           style={{ height: '100%' }}
@@ -165,24 +177,21 @@ function CompareMap() {
               opacity={mapLayers.mosaic.visible ? mapLayers.mosaic.opacity : 0}
             />
           )}
-          {leftTileUrl && rightTileUrl && (
-            // <TileLayer
-            //   url={tileUrl}
-            //   minZoom={12}
-            //   maxZoom={20}
-            //   zIndex={3}
-            //   opacity={
-            //     mapLayers.predictions.visible
-            //       ? mapLayers.predictions.opacity
-            //       : 0
-            //   }
-            // />
+          {tileUrls[0] && tileUrls[1] && (
             <SideBySideTileLayer
-              leftTile={{ url: leftTileUrl, attr: '' }}
+              leftTile={{ url: tileUrls[0], attr: '' }}
               rightTile={{
-                url: rightTileUrl,
+                url: tileUrls[1],
                 attr: '',
               }}
+              minZoom={12}
+              maxZoom={20}
+              zIndex={3}
+              opacity={
+                mapLayers.predictions.visible
+                  ? mapLayers.predictions.opacity
+                  : 0
+              }
             />
           )}
           <FeatureGroup>
@@ -203,28 +212,67 @@ function CompareMap() {
           mapLayers={mapLayers}
           setMapLayers={setMapLayers}
         />
-        <ClassLegend>
-          <Subheading>LULC Classes</Subheading>
-          {classes.map((sideClasses) => {
-            sideClasses.length > 1
-              ? sideClasses.map((c) => (
-                  <Class key={c.name} noHover>
-                    <ClassThumbnail color={c.color} />
-                    <ClassHeading size='xsmall'>{c.name}</ClassHeading>
-                  </Class>
-                ))
-              : [1, 2, 3].map((i) => (
-                  <Class
-                    key={i}
-                    placeholder={+true}
-                    className='placeholder-class'
-                  >
-                    <ClassThumbnail />
-                    <ClassHeading size='xsmall' placeholder={+true} />
-                  </Class>
-                ));
-          })}
-        </ClassLegend>
+        {aoisInfo &&
+          aoisInfo.map((aoi, i) => (
+            <AOIPanel key={aoi.uuid} leftPanel={i === 0}>
+              <PanelBlockHeader>
+                <Heading size='small'>{aoi.name}</Heading>
+                <DetailsList
+                  details={{
+                    'Imagery source': toTitleCase(
+                      aoi.mosaic.params.collection.replace('-', ' ')
+                    ),
+                    Mosaic: composeMosaicName(
+                      aoi.mosaic.mosaic_ts_start,
+                      aoi.mosaic.mosaic_ts_end
+                    ),
+                    Model: 'model name here',
+                    Checkpoint: aoi.timeframe.checkpoint_id,
+                  }}
+                />
+              </PanelBlockHeader>
+              <PanelBlockBody>
+                <Subheading>LULC Classes</Subheading>
+                {aoiClasses[i].length > 1
+                  ? aoiClasses[i].map((c) => (
+                      <Class key={c.name} noHover>
+                        <ClassThumbnail color={c.color} />
+                        <ClassHeading size='xsmall'>{c.name}</ClassHeading>
+                      </Class>
+                    ))
+                  : [1, 2, 3].map((a) => (
+                      <Class
+                        key={a}
+                        placeholder={+true}
+                        className='placeholder-class'
+                      >
+                        <ClassThumbnail />
+                        <ClassHeading size='xsmall' placeholder={+true} />
+                      </Class>
+                    ))}
+              </PanelBlockBody>
+              <PanelBlockFooter>
+                <Button
+                  variation='primary-raised-dark'
+                  onClick={() => downloadShareGeotiff(restApiClient, aoi)}
+                  useIcon={['download-2', 'after']}
+                  title='Download geotiff'
+                >
+                  Download
+                </Button>
+                <Button
+                  forwardedAs='a'
+                  href={getShareLink(aoi)}
+                  target='_blank'
+                  variation='achromic-plain'
+                  useIcon={['expand-top-right', 'after']}
+                  title='Visit share'
+                >
+                  View
+                </Button>
+              </PanelBlockFooter>
+            </AOIPanel>
+          ))}
       </PageBody>
     </App>
   );
