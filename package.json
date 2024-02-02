@@ -172,6 +172,7 @@
     "request-promise": "^4.2.6",
     "resize-observer": "^1.0.2",
     "styled-components": "^5.2.1",
+    "swr": "^2.2.4",
     "xstate": "^4.37.0",
     "yup": "^0.32.11"
   }

@@ -93,6 +93,11 @@ function UserDropdown() {
                   My Projects
                 </DropdownItem>
               </li>
+              <li>
+                <DropdownItem as={StyledLink} to='/public-maps' useIcon='map'>
+                  Public Maps
+                </DropdownItem>
+              </li>
               {userAccessLevel === 'admin' && (
                 <>
                   <li>

@@ -1,23 +1,17 @@
 import React, { useMemo } from 'react';
 import T from 'prop-types';
 import styled from 'styled-components';
+
 import { Modal } from '@devseed-ui/modal';
 import { glsp } from '@devseed-ui/theme-provider';
 import { Button } from '@devseed-ui/button';
 import { Heading } from '@devseed-ui/typography';
-import { ExistingMosaicsSection } from './sections/list-mosaics';
-import { CreateMosaicSection } from './sections/create-mosaic';
-import TabbedBlock from '../../../../../common/tabbed-block-body';
-import { ProjectMachineContext } from '../../../../../../fsm/project';
+
+import { MosaicContentInner } from './content';
+import { ProjectMachineContext } from '../../../../../../../fsm/project';
 
 const ModalHeader = styled.header`
   padding: ${glsp(2)} ${glsp(2)} 0;
-`;
-
-const ModalContent = styled.div`
-  display: flex;
-  flex-flow: column;
-  height: 60vh;
 `;
 
 const Headline = styled.div`
@@ -37,8 +31,6 @@ const Headline = styled.div`
 `;
 
 export function MosaicSelectorModal({ showModal, setShowModal }) {
-  const [activeTab, setActiveTab] = React.useState(0);
-
   const mapRef = ProjectMachineContext.useSelector(
     ({ context }) => context.mapRef
   );
@@ -77,29 +69,14 @@ export function MosaicSelectorModal({ showModal, setShowModal }) {
         </ModalHeader>
       )}
       content={
-        <ModalContent>
-          <TabbedBlock activeTab={activeTab} leftAligned={true}>
-            <ExistingMosaicsSection
-              name='Select Preset'
-              className='select-preset-mosaic'
-              tabId='select-preset-mosaic-tab-trigger'
-              onTabClick={() => setActiveTab(0)}
-              setShowModal={setShowModal}
-            />
-            <CreateMosaicSection
-              name='Create Mosaic'
-              className='create-mosaic'
-              tabId='create-mosaic-tab-trigger'
-              initialMapZoom={mapZoom}
-              initialMapCenter={mapCenter}
-              onTabClick={() => setActiveTab(1)}
-              onMosaicCreated={() => {
-                setActiveTab(0);
-                setShowModal(false);
-              }}
-            />
-          </TabbedBlock>
-        </ModalContent>
+        <MosaicContentInner
+          name='Create Mosaic'
+          initialMapZoom={mapZoom}
+          initialMapCenter={mapCenter}
+          onMosaicCreated={() => {
+            setShowModal(false);
+          }}
+        />
       }
     />
   );
@@ -108,4 +85,7 @@ export function MosaicSelectorModal({ showModal, setShowModal }) {
 MosaicSelectorModal.propTypes = {
   showModal: T.bool,
   setShowModal: T.func.isRequired,
+  imagerySource: T.shape({
+    name: T.string,
+  }),
 };

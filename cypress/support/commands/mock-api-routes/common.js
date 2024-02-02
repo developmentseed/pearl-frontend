@@ -5,6 +5,7 @@ import apiHealth from '../mock-api-routes/fixtures/health.json';
 import imageryIndex from '../mock-api-routes/fixtures/imagery.json';
 import mosaicIndex from '../mock-api-routes/fixtures/mosaic/index.json';
 import mosaicNaipLatest from '../mock-api-routes/fixtures/mosaic/naip.latest.json';
+import mosaicPostResponse from '../mock-api-routes/fixtures/mosaic/post-response.json';
 
 const restApiEndpoint = Cypress.config('restApiEndpoint');
 
@@ -28,6 +29,7 @@ Cypress.Commands.add('mockCommonApiRoutes', () => {
   interceptApiRoute('', 'GET', apiIndex);
 
   // Mosaic
+  interceptApiRoute('mosaic', 'POST', mosaicPostResponse, 'postMosaic');
   interceptApiRoute('mosaic/naip.latest', 'GET', mosaicNaipLatest);
 
   // Geocoder
@@ -42,6 +44,20 @@ Cypress.Commands.add('mockCommonApiRoutes', () => {
     'GET',
     { fixture: 'geocoder/rural.json' },
     'reverseGeocodeRural'
+  );
+
+  // Planetary Computer
+  interceptUrl(
+    'https://planetarycomputer.microsoft.com/api/data/v1/mosaic/register',
+    'POST',
+    { fixture: 'planetary-computer/data/mosaic/register.json' },
+    'registerPlanetaryComputerMosaic'
+  );
+  interceptUrl(
+    'https://planetarycomputer.microsoft.com/api/stac/v1/collections/sentinel-2-l2a',
+    'GET',
+    { fixture: 'planetary-computer/stac/collections/sentinel-2-l2a.json' },
+    'getPlanetaryComputerSentinel2Collection'
   );
 
   // Imagery and Mosaic

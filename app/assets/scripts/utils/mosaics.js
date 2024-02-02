@@ -1,4 +1,4 @@
-import { formatTimestampToSimpleUTC } from './dates';
+import { formatMosaicDateRange } from './dates';
 
 const MAX_CLOUD_COVER_PERCENTAGE = 10;
 
@@ -117,9 +117,7 @@ export async function generateSentinel2L2AMosaic({
       end: new Date(endTime),
     }),
     imagery_source_id: imagerySourceId,
-    name: `Sentinel-2 Level-2A ${formatTimestampToSimpleUTC(
-      startTime
-    )} - ${formatTimestampToSimpleUTC(endTime)}`,
+    name: formatMosaicDateRange(startTime, endTime),
     mosaic_ts_start: startTime,
     mosaic_ts_end: endTime,
   };
