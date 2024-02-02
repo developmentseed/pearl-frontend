@@ -16,7 +16,7 @@ const SectionWrapper = styled.div`
   grid-template-columns: 1fr 1fr;
   gap: ${glsp()};
   height: 100%;
-  min-height: 38rem;
+  min-height: 35rem;
 `;
 
 const LoadingWrapper = styled.div`
@@ -24,6 +24,7 @@ const LoadingWrapper = styled.div`
   align-items: center;
   justify-content: center;
   height: 100%;
+  min-height: 35rem;
 `;
 
 export const MosaicContentInner = ({
