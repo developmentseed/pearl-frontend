@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { Formik } from 'formik';
+import { addDays, isAfter, parseISO } from 'date-fns';
 
 import { Button } from '@devseed-ui/button';
 import {
@@ -11,6 +12,7 @@ import {
   FormGroupHeader,
   FormInput,
   FormLabel,
+  FormHelperMessage,
 } from '@devseed-ui/form';
 
 import {
@@ -24,6 +26,18 @@ import selectors from '../../../../../../../fsm/project/selectors';
 
 import { InputSelect } from '../../../../../../common/forms/input-select';
 import FormGroupStructure from '../../../../../../common/forms/form-group-structure';
+
+const validateDates = (values) => {
+  const errors = {};
+  const startDate = parseISO(values.startDate);
+  const endDate = parseISO(values.endDate);
+
+  if (isAfter(startDate, endDate) || !isAfter(endDate, addDays(startDate, 1))) {
+    errors.endDate = 'End date must be at least one day after the start date';
+  }
+
+  return errors;
+};
 
 const FormWrapper = styled.div`
   width: 500px;
@@ -97,8 +111,8 @@ export const CreateMosaicForm = ({
 
   return (
     <FormWrapper>
-      <Formik initialValues={initialFormValues}>
-        {({ setFieldValue, values }) => (
+      <Formik initialValues={initialFormValues} validate={validateDates}>
+        {({ values, errors, setValues, isValid }) => (
           <Form>
             <div>All mosaics from Planetary Computer, &lt;10% cloud cover</div>
             <FormGroup>
@@ -112,7 +126,6 @@ export const CreateMosaicForm = ({
                   value={values.dateRange}
                   onChange={(e) => {
                     const { value } = e.target;
-                    setFieldValue('dateRange', value);
                     if (value !== 'custom') {
                       const selectedQuarter = availableQuarters.find(
                         (quarter) => quarter.label === value
@@ -121,14 +134,21 @@ export const CreateMosaicForm = ({
                         selectedQuarter.startTimestamp,
                         selectedQuarter.endTimestamp
                       );
-                      setFieldValue(
-                        'startDate',
-                        getDatePartFromISOString(selectedQuarter.startTimestamp)
-                      );
-                      setFieldValue(
-                        'endDate',
-                        getDatePartFromISOString(selectedQuarter.endTimestamp)
-                      );
+                      setValues({
+                        ...values,
+                        dateRange: value,
+                        startDate: getDatePartFromISOString(
+                          selectedQuarter.startTimestamp
+                        ),
+                        endDate: getDatePartFromISOString(
+                          selectedQuarter.endTimestamp
+                        ),
+                      });
+                    } else {
+                      setValues({
+                        ...values,
+                        dateRange: value,
+                      });
                     }
                   }}
                 />
@@ -147,8 +167,11 @@ export const CreateMosaicForm = ({
                   value={values.startDate}
                   onChange={(e) => {
                     const { value } = e.target;
-                    setFieldValue('startDate', value);
-                    setFieldValue('dateRange', 'custom');
+                    setValues({
+                      ...values,
+                      startDate: value,
+                      dateRange: 'custom',
+                    });
                     handleDateChange(
                       new Date(value).getTime(),
                       new Date(values.endDate).getTime()
@@ -162,18 +185,26 @@ export const CreateMosaicForm = ({
             <FormGroup>
               <FormGroupStructure
                 label='End Date:'
-                description='End date automatically set to 90 days following start date'
+                helper={
+                  errors?.endDate ? (
+                    <FormHelperMessage invalid>
+                      {errors.endDate}
+                    </FormHelperMessage>
+                  ) : null
+                }
               >
                 <FormInput
                   type='date'
                   id='endDate'
                   name='endDate'
-                  disabled
                   value={values.endDate}
                   onChange={(e) => {
                     const { value } = e.target;
-                    setFieldValue('endDate', value);
-                    setFieldValue('dateRange', 'custom');
+                    setValues({
+                      ...values,
+                      endDate: value,
+                      dateRange: 'custom',
+                    });
                     handleDateChange(
                       new Date(values.startDate).getTime(),
                       new Date(value).getTime()
@@ -188,6 +219,7 @@ export const CreateMosaicForm = ({
               useIcon='tick--small'
               type='button'
               onClick={handleMosaicCreation}
+              disabled={!isValid}
               style={{
                 gridColumn: '1 / -1',
               }}
