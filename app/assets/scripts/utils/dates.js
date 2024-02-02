@@ -17,6 +17,13 @@ export function formatTimestampToSimpleUTCDate(timestamp) {
   return `${datePart}`;
 }
 
+export function formatMosaicDateRange(startTimestamp, endTimestamp) {
+  return `${format(startTimestamp, 'MMM dd, yyyy')} to ${format(
+    endTimestamp,
+    'MMM dd, yyyy'
+  )}`;
+}
+
 export function getDatePartFromISOString(isoString) {
   return isoString.split('T')[0];
 }

@@ -14,6 +14,7 @@ import { MosaicSelectorModal } from './modal';
 import { SESSION_MODES } from '../../../../../../fsm/project/constants';
 import selectors from '../../../../../../fsm/project/selectors';
 import * as guards from '../../../../../../fsm/project/guards';
+import { formatMosaicDateRange } from '../../../../../../utils/dates';
 
 export function MosaicSelector() {
   const [showModal, setShowModal] = useState(false);
@@ -39,7 +40,12 @@ export function MosaicSelector() {
   } else if (!currentImagerySource) {
     label = 'Define Imagery Source';
   } else {
-    label = currentMosaic?.name || 'Select Mosaic';
+    label = currentMosaic
+      ? formatMosaicDateRange(
+          currentMosaic?.mosaic_ts_start,
+          currentMosaic?.mosaic_ts_end
+        )
+      : 'Select Mosaic';
     disabled = false;
   }
 
