@@ -55,8 +55,22 @@ export const MosaicContentInner = ({
       return;
     }
 
+    // Create mosaic or retrieve existing one
+    let mosaic;
     try {
-      const mosaic = await apiClient.post('mosaic', newMosaic);
+      mosaic = await apiClient.post('mosaic', newMosaic);
+    } catch (error) {
+      if (error.message === 'mosaics already exists') {
+        try {
+          mosaic = await apiClient.get(`mosaic/${newMosaic.id}`);
+        } catch (error) {
+          toasts.error('Error creating mosaic');
+          return;
+        }
+      }
+    }
+
+    try {
       const { mosaics: mosaicsList } = await apiClient.get('mosaic');
       onMosaicCreated();
       actorRef.send({
