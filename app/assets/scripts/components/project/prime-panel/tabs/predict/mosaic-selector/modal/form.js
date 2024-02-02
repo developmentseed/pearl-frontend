@@ -33,7 +33,7 @@ const validateDates = (values) => {
   const endDate = parseISO(values.endDate);
 
   if (isAfter(startDate, endDate) || !isAfter(endDate, addDays(startDate, 1))) {
-    errors.endDate = 'End date must be at least one day after the start date';
+    errors.endDate = 'End date must be at least two days after the start date';
   }
 
   return errors;
