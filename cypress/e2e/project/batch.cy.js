@@ -142,8 +142,12 @@ describe('Batch predictions', () => {
 
     // Select mosaic
     cy.get('[data-cy=mosaic-selector-label]').should('exist').click();
-    cy.get('[data-cy=select-mosaic-2849689f57f1b3b9c1f725abb75aa411-card]')
+
+    cy.wait('@registerPlanetaryComputerMosaic');
+
+    cy.get('[data-cy="create-mosaic-button"]')
       .should('exist')
+      .should('be.visible')
       .click();
 
     // Check session status message
@@ -622,8 +626,12 @@ describe('Batch predictions', () => {
 
     // Select mosaic
     cy.get('[data-cy=mosaic-selector-label]').should('exist').click();
-    cy.get('[data-cy=select-mosaic-2849689f57f1b3b9c1f725abb75aa411-card]')
+
+    cy.wait('@registerPlanetaryComputerMosaic');
+
+    cy.get('[data-cy="create-mosaic-button"]')
       .should('exist')
+      .should('be.visible')
       .click();
 
     // Check session status message
