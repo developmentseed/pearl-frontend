@@ -18,7 +18,7 @@ export function formatTimestampToSimpleUTCDate(timestamp) {
 }
 
 export function formatMosaicDateRange(startTimestamp, endTimestamp) {
-  return `${format(startTimestamp, 'MMM dd, yyyy')} to ${format(
+  return `${format(startTimestamp, 'MMM dd, yyyy')} - ${format(
     endTimestamp,
     'MMM dd, yyyy'
   )}`;
