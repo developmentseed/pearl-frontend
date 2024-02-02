@@ -21,6 +21,7 @@ import {
   Thumbnail as ClassThumbnail,
   ClassHeading,
 } from '../explore/prime-panel/tabs/retrain-refine-styles';
+import { Accordion, AccordionFold as BaseFold } from '@devseed-ui/accordion';
 import { themeVal, glsp } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
 import { Button } from '@devseed-ui/button';
@@ -54,6 +55,9 @@ const AOIPanel = styled(PanelBlock)`
   ${PanelBlockHeader} {
     padding: 0;
   }
+  ${Heading} {
+    margin: 0;
+  }
   ${PanelBlockFooter} {
     padding: 0;
     display: flex;
@@ -75,6 +79,24 @@ const AOIPanel = styled(PanelBlock)`
     width: ${glsp(0.875)};
     height: ${glsp(0.875)};
     border: 1px solid ${themeVal('color.baseAlphaD')};
+  }
+`;
+
+const AccordionFold = styled(BaseFold)`
+  header {
+    a {
+      padding: ${glsp(0.5)} 0;
+      &:active {
+        transform: none;
+      }
+    }
+  }
+  > div {
+    overflow: visible;
+    & > div {
+      padding: 1rem 2rem;
+      margin: 0 -2rem;
+    }
   }
 `;
 
@@ -215,22 +237,34 @@ function CompareMap() {
         {aoisInfo &&
           aoisInfo.map((aoi, i) => (
             <AOIPanel key={aoi.uuid} leftPanel={i === 0}>
-              <PanelBlockHeader>
-                <Heading size='small'>{aoi.name}</Heading>
-                <DetailsList
-                  details={{
-                    'Imagery source': toTitleCase(
-                      aoi.mosaic.params.collection.replace('-', ' ')
-                    ),
-                    Mosaic: composeMosaicName(
-                      aoi.mosaic.mosaic_ts_start,
-                      aoi.mosaic.mosaic_ts_end
-                    ),
-                    Model: 'model name here',
-                    Checkpoint: aoi.timeframe.checkpoint_id,
-                  }}
-                />
-              </PanelBlockHeader>
+              <Accordion
+                className='aoi__panel'
+                foldCount={1}
+                initialState={[true]}
+              >
+                {({ checkExpanded, setExpanded }) => (
+                  <AccordionFold
+                    title={aoi.name}
+                    isFoldExpanded={checkExpanded(0)}
+                    setFoldExpanded={(v) => setExpanded(0, v)}
+                    content={
+                      <DetailsList
+                        details={{
+                          'Imagery source': toTitleCase(
+                            aoi.mosaic.params.collection.replace('-', ' ')
+                          ),
+                          Mosaic: composeMosaicName(
+                            aoi.mosaic.mosaic_ts_start,
+                            aoi.mosaic.mosaic_ts_end
+                          ),
+                          Model: 'model name here',
+                          Checkpoint: aoi.timeframe.checkpoint_id,
+                        }}
+                      />
+                    }
+                  />
+                )}
+              </Accordion>
               <PanelBlockBody>
                 <Subheading>LULC Classes</Subheading>
                 {aoiClasses[i].length > 1
