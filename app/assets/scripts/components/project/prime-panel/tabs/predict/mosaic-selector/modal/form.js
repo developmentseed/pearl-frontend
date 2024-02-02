@@ -40,7 +40,16 @@ const validateDates = (values) => {
 };
 
 const FormWrapper = styled.div`
-  width: 500px;
+  width: 100%;
+`;
+const FormGroupWrapper = styled.div`
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+  > * {
+    flex: 1;
+  }
 `;
 
 export const CreateMosaicForm = ({
@@ -155,64 +164,66 @@ export const CreateMosaicForm = ({
               </FormGroupBody>
             </FormGroup>
             <p style={{ textAlign: 'center' }}>Or</p>
-            <FormGroup>
-              <FormGroupHeader>
-                <FormLabel>Start date:</FormLabel>{' '}
-              </FormGroupHeader>
-              <FormGroupBody>
-                <FormInput
-                  type='date'
-                  id='startDate'
-                  name='startDate'
-                  value={values.startDate}
-                  onChange={(e) => {
-                    const { value } = e.target;
-                    setValues({
-                      ...values,
-                      startDate: value,
-                      dateRange: 'custom',
-                    });
-                    handleDateChange(
-                      new Date(value).getTime(),
-                      new Date(values.endDate).getTime()
-                    );
-                  }}
-                  min={getDatePartFromISOString(acquisitionStart)}
-                  max={getDatePartFromISOString(acquisitionEnd)}
-                />
-              </FormGroupBody>
-            </FormGroup>
-            <FormGroup>
-              <FormGroupStructure
-                label='End Date:'
-                helper={
-                  errors?.endDate ? (
-                    <FormHelperMessage invalid>
-                      {errors.endDate}
-                    </FormHelperMessage>
-                  ) : null
-                }
-              >
-                <FormInput
-                  type='date'
-                  id='endDate'
-                  name='endDate'
-                  value={values.endDate}
-                  onChange={(e) => {
-                    const { value } = e.target;
-                    setValues({
-                      ...values,
-                      endDate: value,
-                      dateRange: 'custom',
-                    });
-                    handleDateChange(
-                      new Date(values.startDate).getTime(),
-                      new Date(value).getTime()
-                    );
-                  }}
-                />
-              </FormGroupStructure>
-            </FormGroup>
+            <FormGroupWrapper>
+              <FormGroup>
+                <FormGroupHeader>
+                  <FormLabel>Start date:</FormLabel>{' '}
+                </FormGroupHeader>
+                <FormGroupBody>
+                  <FormInput
+                    type='date'
+                    id='startDate'
+                    name='startDate'
+                    value={values.startDate}
+                    onChange={(e) => {
+                      const { value } = e.target;
+                      setValues({
+                        ...values,
+                        startDate: value,
+                        dateRange: 'custom',
+                      });
+                      handleDateChange(
+                        new Date(value).getTime(),
+                        new Date(values.endDate).getTime()
+                      );
+                    }}
+                    min={getDatePartFromISOString(acquisitionStart)}
+                    max={getDatePartFromISOString(acquisitionEnd)}
+                  />
+                </FormGroupBody>
+              </FormGroup>
+              <FormGroup>
+                <FormGroupStructure
+                  label='End Date:'
+                  helper={
+                    errors?.endDate ? (
+                      <FormHelperMessage invalid>
+                        {errors.endDate}
+                      </FormHelperMessage>
+                    ) : null
+                  }
+                >
+                  <FormInput
+                    type='date'
+                    id='endDate'
+                    name='endDate'
+                    value={values.endDate}
+                    onChange={(e) => {
+                      const { value } = e.target;
+                      setValues({
+                        ...values,
+                        endDate: value,
+                        dateRange: 'custom',
+                      });
+                      handleDateChange(
+                        new Date(values.startDate).getTime(),
+                        new Date(value).getTime()
+                      );
+                    }}
+                  />
+                </FormGroupStructure>
+              </FormGroup>
+            </FormGroupWrapper>
             <Button
               data-cy='create-mosaic-button'
               variation='primary-raised-dark'
