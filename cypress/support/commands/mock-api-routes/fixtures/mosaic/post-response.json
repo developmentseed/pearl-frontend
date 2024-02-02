@@ -1,0 +1,17 @@
+{
+  "params": {
+    "assets": ["B04", "B03", "B02", "B08"],
+    "rescale": "0,10000",
+    "collection": "sentinel-2-l2a"
+  },
+  "imagery_source_id": 2,
+  "ui_params": {
+    "assets": ["B04", "B03", "B02"],
+    "collection": "sentinel-2-l2a",
+    "color_formula": "Gamma+RGB+3.2+Saturation+0.8+Sigmoidal+RGB+25+0.35"
+  },
+  "id": "7f63c66c920e8a29b69fa7f45bafe038",
+  "name": "Sentinel-2 Level-2A 2023-12-27 11:25 UTC - 2024-02-27 11:25 UTC",
+  "mosaic_ts_start": 1703676331000,
+  "mosaic_ts_end": 1709033131000
+}

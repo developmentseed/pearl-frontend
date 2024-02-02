@@ -214,6 +214,7 @@ export const CreateMosaicForm = ({
               </FormGroupStructure>
             </FormGroup>
             <Button
+              data-cy='create-mosaic-button'
               variation='primary-raised-dark'
               size='medium'
               useIcon='tick--small'

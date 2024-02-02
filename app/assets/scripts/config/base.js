@@ -10,7 +10,7 @@ module.exports = {
     websocketEndpoint: 'wss://socket.lulc-staging.ds.io',
     websocketPingPongInterval: 3000,
     planetaryComputerStacApi:
-      'https://planetarycomputer.microsoft.com/api/stac/v1/',
+      'https://planetarycomputer.microsoft.com/api/stac/v1',
     auth0Domain: 'pearl-landcover-staging.us.auth0.com',
     auth0ClientId: 'BTwFngSNG0pz1nNXsOFtfN0TUAtPENLu',
     minSampleCount: 1,

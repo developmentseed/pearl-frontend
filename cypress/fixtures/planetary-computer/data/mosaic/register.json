@@ -1,0 +1,15 @@
+{
+  "searchid": "7f63c66c920e8a29b69fa7f45bafe038",
+  "links": [
+    {
+      "rel": "metadata",
+      "type": "application/json",
+      "href": "https://planetarycomputer.microsoft.com/api/data/v1/mosaic/7f63c66c920e8a29b69fa7f45bafe038/info"
+    },
+    {
+      "rel": "tilejson",
+      "type": "application/json",
+      "href": "https://planetarycomputer.microsoft.com/api/data/v1/mosaic/7f63c66c920e8a29b69fa7f45bafe038/tilejson.json"
+    }
+  ]
+}
