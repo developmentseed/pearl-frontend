@@ -11,7 +11,6 @@ function SideBySideTileLayer({
   minZoom,
   maxZoom,
   zIndex,
-  opacity,
 }) {
   const mapInst = useMap();
   function sideBySideControl() {
@@ -20,7 +19,7 @@ function SideBySideTileLayer({
       minZoom: minZoom,
       maxZoom: maxZoom,
       zIndex: zIndex,
-      opacity: opacity,
+      opacity: leftTile.opacity,
     }).addTo(mapInst);
 
     const right = new L.TileLayer(rightTile.url, {
@@ -28,7 +27,7 @@ function SideBySideTileLayer({
       minZoom: minZoom,
       maxZoom: maxZoom,
       zIndex: zIndex,
-      opacity: opacity,
+      opacity: rightTile.opacity,
     }).addTo(mapInst);
 
     const ctrl = L.control.sideBySide(left, right);
@@ -41,11 +40,12 @@ function SideBySideTileLayer({
     }
     const ctrl = sideBySideControl();
     ctrl.addTo(mapInst);
-    L.DomEvent.disableClickPropagation(ctrl);
+    L.DomEvent.disableClickPropagation(mapInst._container);
     return () => {
       ctrl.remove();
     };
   }, []);
+  // }, [leftTile.opacity, rightTile.opacity]);
 
   return <div />;
 }

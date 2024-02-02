@@ -108,9 +108,16 @@ const INITIAL_MAP_LAYERS = {
     visible: true,
     active: true,
   },
-  predictions: {
-    id: 'predictions',
-    name: 'Prediction Results',
+  predictionsLeft: {
+    id: 'predictionsLeft',
+    name: 'Left Prediction Results',
+    opacity: 1,
+    visible: true,
+    active: true,
+  },
+  predictionsRight: {
+    id: 'predictionsRight',
+    name: 'Right Prediction Results',
     opacity: 1,
     visible: true,
     active: true,
@@ -201,19 +208,23 @@ function CompareMap() {
           )}
           {tileUrls[0] && tileUrls[1] && (
             <SideBySideTileLayer
-              leftTile={{ url: tileUrls[0], attr: '' }}
+              leftTile={{
+                url: tileUrls[0],
+                attr: '',
+                opacity: mapLayers.predictionsLeft.visible
+                  ? mapLayers.predictionsLeft.opacity
+                  : 0,
+              }}
               rightTile={{
                 url: tileUrls[1],
                 attr: '',
+                opacity: mapLayers.predictionsRight.visible
+                  ? mapLayers.predictionsRight.opacity
+                  : 0,
               }}
               minZoom={12}
               maxZoom={20}
               zIndex={3}
-              opacity={
-                mapLayers.predictions.visible
-                  ? mapLayers.predictions.opacity
-                  : 0
-              }
             />
           )}
           <FeatureGroup>
