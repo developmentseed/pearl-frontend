@@ -6,7 +6,7 @@ import { media } from '@devseed-ui/theme-provider';
 import { Button } from '@devseed-ui/button';
 import { glsp } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
-import { FormInput } from '@devseed-ui/form';
+import { FormCheckable } from '@devseed-ui/form';
 
 import { useAuth } from '../../context/auth';
 import { formatDateTime, formatThousands } from '../../utils/format';
@@ -30,6 +30,7 @@ import Paginator from '../common/paginator';
 import copyTextToClipboard from '../../utils/copy-text-to-clipboard';
 import toasts from '../common/toasts';
 import { downloadShareGeotiff } from '../../utils/share-link';
+import { StyledLink } from '../../styles/links';
 
 const ITEMS_PER_PAGE = 20;
 
@@ -84,9 +85,10 @@ const HEADERS = [
   'Created',
   'Link',
   'Download',
+  'Compare',
 ];
 
-function RenderRow(share, { restApiClient }) {
+function RenderRow(share, { restApiClient, compareUuids, setCompareUuids }) {
   const shareLink = `${window.location.origin}/share/${share.uuid}/map`;
   const { aoi, timeframe, mosaic } = share;
 
@@ -100,7 +102,6 @@ function RenderRow(share, { restApiClient }) {
       <TableCell>{formatDateTime(timeframe.created)}</TableCell>
       <TableCell>
         <FormInputGroup>
-          <FormInput readOnly value={shareLink} size='small' />
           <Button
             variation='primary-plain'
             useIcon='clipboard'
@@ -126,6 +127,21 @@ function RenderRow(share, { restApiClient }) {
           onClick={() => downloadShareGeotiff(restApiClient, share)}
         />
       </TableCell>
+      <TableCell>
+        <FormCheckable
+          type='checkbox'
+          name={`select-compare-${share.uuid}`}
+          id={`select-compare-${share.uuid}`}
+          checked={compareUuids.includes(share.uuid)}
+          onChange={() => {
+            compareUuids.includes(share.uuid)
+              ? setCompareUuids(
+                  compareUuids.filter((uuid) => uuid != share.uuid)
+                )
+              : setCompareUuids([...compareUuids, share.uuid]);
+          }}
+        />
+      </TableCell>
     </TableRow>
   );
 }
@@ -137,7 +153,7 @@ function ExportedMapsList() {
   const [total, setTotal] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [shares, setShares] = useState([]);
-
+  const [compareUuids, setCompareUuids] = useState([]);
   const { restApiClient } = useAuth();
 
   useEffect(() => {
@@ -172,6 +188,16 @@ function ExportedMapsList() {
         </InpageHeader>
         <InpageBody>
           <SharesBody>
+            {compareUuids.length === 2 && (
+              <Button
+                variation='primary-raised-dark'
+                forwardedAs={StyledLink}
+                to={`/compare/${compareUuids[0]}/${compareUuids[1]}`}
+                useIcon='resize-center-horizontal'
+              >
+                Compare maps
+              </Button>
+            )}
             {shares &&
               (shares.length ? (
                 <>
@@ -183,6 +209,8 @@ function ExportedMapsList() {
                       restApiClient,
                       shares,
                       setShares,
+                      compareUuids,
+                      setCompareUuids,
                     }}
                   />
                   <Paginator
