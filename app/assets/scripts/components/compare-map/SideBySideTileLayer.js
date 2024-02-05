@@ -3,7 +3,7 @@ import { memo, useEffect } from 'react';
 import T from 'prop-types';
 import L from 'leaflet';
 import React from 'react';
-import 'leaflet-side-by-side';
+import './leaflet-side-by-side';
 
 function SideBySideTileLayer({
   leftTile,
@@ -45,7 +45,6 @@ function SideBySideTileLayer({
       ctrl.remove();
     };
   }, []);
-  // }, [leftTile.opacity, rightTile.opacity]);
 
   return <div />;
 }
