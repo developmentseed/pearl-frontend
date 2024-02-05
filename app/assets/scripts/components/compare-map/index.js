@@ -30,7 +30,8 @@ import LayersPanel from '../share-map/layers-control';
 import GenericControl from '../common/map/generic-control';
 import SideBySideTileLayer from './SideBySideTileLayer';
 import DetailsList from '../common/details-list';
-import { toTitleCase } from '../../utils/format';
+import ClassAnalyticsChart from '../project/sec-panel/class-analytics-chart';
+import { round, toTitleCase } from '../../utils/format';
 import { downloadShareGeotiff, getShareLink } from '../../utils/share-link';
 import {
   PanelBlock,
@@ -250,30 +251,57 @@ function CompareMap() {
             <AOIPanel key={aoi.uuid} leftPanel={i === 0}>
               <Accordion
                 className='aoi__panel'
-                foldCount={1}
-                initialState={[true]}
+                foldCount={2}
+                initialState={[true, false]}
               >
                 {({ checkExpanded, setExpanded }) => (
-                  <AccordionFold
-                    title={aoi.name}
-                    isFoldExpanded={checkExpanded(0)}
-                    setFoldExpanded={(v) => setExpanded(0, v)}
-                    content={
-                      <DetailsList
-                        details={{
-                          'Imagery source': toTitleCase(
-                            aoi.mosaic.params.collection.replace('-', ' ')
-                          ),
-                          Mosaic: composeMosaicName(
-                            aoi.mosaic.mosaic_ts_start,
-                            aoi.mosaic.mosaic_ts_end
-                          ),
-                          Model: 'model name here',
-                          Checkpoint: aoi.timeframe.checkpoint_id,
-                        }}
-                      />
-                    }
-                  />
+                  <>
+                    <AccordionFold
+                      title={aoi.name}
+                      isFoldExpanded={checkExpanded(0)}
+                      setFoldExpanded={(v) => setExpanded(0, v)}
+                      content={
+                        <DetailsList
+                          details={{
+                            'Imagery source': toTitleCase(
+                              aoi.mosaic.params.collection.replace('-', ' ')
+                            ),
+                            Mosaic: composeMosaicName(
+                              aoi.mosaic.mosaic_ts_start,
+                              aoi.mosaic.mosaic_ts_end
+                            ),
+                            Model: 'model name here',
+                            Checkpoint: aoi.timeframe.checkpoint_id,
+                          }}
+                        />
+                      }
+                    />
+                    <AccordionFold
+                      title='Class distribution'
+                      isFoldExpanded={checkExpanded(1)}
+                      setFoldExpanded={(v) => setExpanded(1, v)}
+                      content={
+                        Object.keys(aoi.timeframe.px_stats).length ? (
+                          <ClassAnalyticsChart
+                            checkpoint={{
+                              ...aoi.timeframe,
+                              analytics: Object.keys(aoiClasses[i]).map(
+                                (_, ind) => ({
+                                  px_stat: aoi.timeframe.px_stats[ind],
+                                })
+                              ),
+                            }}
+                            bounds={aoi.bounds.bounds}
+                            label='Checkpoint Class Distribution'
+                            metric='px_stat'
+                            formatter={(v) => `${round(v * 100, 0)}%`}
+                          />
+                        ) : (
+                          <p>Class distribution metrics are not available</p>
+                        )
+                      }
+                    />
+                  </>
                 )}
               </Accordion>
               <PanelBlockBody>
