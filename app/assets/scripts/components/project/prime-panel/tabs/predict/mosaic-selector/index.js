@@ -72,6 +72,7 @@ const MosaicOption = styled(Option)`
 `;
 
 export function MosaicSelector() {
+  const actorRef = ProjectMachineContext.useActorRef();
   const [showModal, setShowModal] = useState(false);
 
   const sessionMode = ProjectMachineContext.useSelector(selectors.sessionMode);
@@ -157,13 +158,13 @@ export function MosaicSelector() {
               .map((t) => (
                 <MosaicOption
                   key={t.id}
-                  // disabled={disabled}
-                  // onClick={async () => {
-                  //   actorRef.send({
-                  //     type: 'Apply timeframe',
-                  //     data: { timeframe: { ...t } },
-                  //   });
-                  // }}
+                  disabled={disabled}
+                  onClick={async () => {
+                    actorRef.send({
+                      type: 'Apply timeframe',
+                      data: { timeframe: { ...t } },
+                    });
+                  }}
                 >
                   <Heading size='xsmall'>{t.label}</Heading>
                 </MosaicOption>

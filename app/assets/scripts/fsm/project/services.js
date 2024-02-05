@@ -1055,4 +1055,131 @@ export const services = {
     });
     return () => websocket.close();
   },
+  applyTimeframe: (context) => (callback, onReceive) => {
+    const { currentTimeframe } = context;
+
+    const { token } = context.currentInstance;
+    const websocket = new WebsocketClient(token);
+
+    /**
+     * Ping pong logic
+     */
+    let pingCount = 0;
+    let lastPintCount;
+    let pingPongInterval;
+    websocket.addEventListener('open', () => {
+      // Send first ping
+      websocket.send(`ping#${pingCount}`);
+
+      // Check for pong messages every interval
+      pingPongInterval = setInterval(() => {
+        if (lastPintCount === pingCount) {
+          pingCount = pingCount + 1;
+          websocket.send(`ping#${pingCount}`);
+        } else {
+          // Pong didn't happened, reconnect
+          websocket.reconnect();
+        }
+      }, config.websocketPingPongInterval);
+    });
+    websocket.addEventListener('close', () => {
+      if (pingPongInterval) {
+        clearInterval(pingPongInterval);
+      }
+    });
+
+    /**
+     * Handle events received from the machine
+     */
+    onReceive((event) => {
+      if (event.type === 'Abort retrain') {
+        websocket.sendMessage({
+          action: 'model#abort',
+        });
+        // Ideally we should thrown an error here to make the service
+        // execute the 'onError' event, but XState doesn't support errors
+        // thrown inside onReceive. A fix is planned for XState v5, more
+        // here: https://github.com/statelyai/xstate/issues/3279
+        callback({ type: 'Retrain was aborted' });
+      }
+    });
+
+    /**
+     * Handle events received from the websocket
+     */
+    let isStarted = false;
+    websocket.addEventListener('message', (e) => {
+      // Update ping count on pong
+      if (e.data.startsWith('pong#')) {
+        lastPintCount = parseInt(e.data.split('#')[1], 10);
+        return;
+      }
+
+      const { message, data } = JSON.parse(e.data);
+
+      switch (message) {
+        case 'error':
+          // Send abort message to errored instance
+          websocket.sendMessage({
+            action: 'model#abort',
+          });
+
+          // Send error message to the machine
+          callback({
+            type: 'Unexpected Instance Error',
+            data: { error: data.error },
+          });
+          break;
+        case 'info#connected':
+        case 'info#disconnected':
+        case 'model#timeframe#progress':
+          // After connection, send a message to the server to request
+          // model status
+          websocket.sendMessage({
+            action: 'model#status',
+          });
+          break;
+        case 'model#status':
+          if (!isStarted && data.processing) {
+            // Send abort message to stop previous process
+            websocket.sendMessage({
+              action: 'instance#abort',
+            });
+            callback({
+              type: 'Unexpected Instance Error',
+              data: { error: data.error },
+            });
+          } else if (!isStarted && !data.processing) {
+            isStarted = true;
+            if (data.aoi !== currentTimeframe.id) {
+              websocket.sendMessage({
+                action: 'model#timeframe',
+                data: {
+                  id: context.currentTimeframe.id,
+                },
+              });
+            }
+          }
+          break;
+        case 'model#timeframe#complete':
+          callback({
+            type: 'Timeframe was applied',
+            data,
+          });
+          break;
+
+        default:
+          if (data?.error) {
+            callback({
+              type: 'Unexpected Instance Error',
+              data: { error: data.error },
+            });
+          } else {
+            logger('Unhandled websocket message', message, data);
+          }
+          break;
+      }
+    });
+    return () => websocket.close();
+  },
 };

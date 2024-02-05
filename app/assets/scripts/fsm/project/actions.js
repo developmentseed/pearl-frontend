@@ -454,6 +454,12 @@ export const actions = {
       disabled: false,
     },
   })),
+  enterApplyTimeframe: assign(() => ({
+    sessionStatusMessage: 'Applying timeframe',
+    globalLoading: {
+      disabled: false,
+    },
+  })),
   exitRetrainMode: assign((context) => {
     const { freehandDraw, polygonDraw } = context.mapRef;
 
