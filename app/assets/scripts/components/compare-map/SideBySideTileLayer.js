@@ -13,27 +13,53 @@ function SideBySideTileLayer({
   zIndex,
 }) {
   const mapRef = useMap();
-  const leftMap = useRef(null);
-  const rightMap = useRef(null);
+  const leftPredictionLayerRef = useRef(null);
+  const rightPredictionLayerRef = useRef(null);
 
   function sideBySideControl() {
-    leftMap.current = new L.TileLayer(leftTile.url, {
+    // Create Layer group for the left panel
+    leftPredictionLayerRef.current = new L.TileLayer(leftTile.url, {
       attribution: leftTile.attr,
       minZoom: minZoom,
       maxZoom: maxZoom,
       zIndex: zIndex,
       opacity: leftTile.opacity,
-    }).addTo(mapRef);
+    });
 
-    rightMap.current = new L.TileLayer(rightTile.url, {
+    const leftMosaicLayer = new L.TileLayer(leftTile.mosaicUrl, {
+      attribution: leftTile.mosaicAttr,
+      minZoom: minZoom,
+      maxZoom: maxZoom,
+      zIndex: zIndex,
+    });
+
+    const leftLayerGroup = new L.layerGroup([
+      leftMosaicLayer,
+      leftPredictionLayerRef.current,
+    ]).addTo(mapRef);
+
+    //  Create Layer group for the right panel
+    rightPredictionLayerRef.current = new L.TileLayer(rightTile.url, {
       attribution: rightTile.attr,
       minZoom: minZoom,
       maxZoom: maxZoom,
       zIndex: zIndex,
       opacity: rightTile.opacity,
-    }).addTo(mapRef);
+    });
 
-    const ctrl = L.control.sideBySide(leftMap.current, rightMap.current);
+    const rightMosaicLayer = new L.TileLayer(rightTile.mosaicUrl, {
+      attribution: rightTile.mosaicAttr,
+      minZoom: minZoom,
+      maxZoom: maxZoom,
+      zIndex: zIndex,
+    });
+
+    const rightLayerGroup = new L.layerGroup([
+      rightMosaicLayer,
+      rightPredictionLayerRef.current,
+    ]).addTo(mapRef);
+
+    const ctrl = L.control.sideBySide(leftLayerGroup, rightLayerGroup);
     return ctrl;
   }
 
@@ -50,9 +76,9 @@ function SideBySideTileLayer({
   }, []);
 
   useEffect(() => {
-    if (leftMap.current && rightMap.current) {
-      leftMap.current.setOpacity(leftTile.opacity);
-      rightMap.current.setOpacity(rightTile.opacity);
+    if (leftPredictionLayerRef.current && rightPredictionLayerRef.current) {
+      leftPredictionLayerRef.current.setOpacity(leftTile.opacity);
+      rightPredictionLayerRef.current.setOpacity(rightTile.opacity);
     }
   }, [leftTile.opacity, rightTile.opacity]);
 

@@ -3,15 +3,11 @@ import styled from 'styled-components';
 import PageHeader from '../common/page-header';
 import toasts from '../common/toasts';
 import { PageBody } from '../../styles/page';
-import { MapContainer, TileLayer, FeatureGroup } from 'react-leaflet';
-import { useMosaics } from '../../context/global';
+import { MapContainer, FeatureGroup } from 'react-leaflet';
 
 import { useParams } from 'react-router-dom';
 import App from '../common/app';
-import {
-  MAX_BASE_MAP_ZOOM_LEVEL,
-  BaseMapLayer,
-} from '../common/map/base-map-layer';
+import { MAX_BASE_MAP_ZOOM_LEVEL } from '../common/map/base-map-layer';
 import { BOUNDS_PADDING } from '../common/map/constants';
 import config from '../../config';
 import { useAuth } from '../../context/auth';
@@ -38,8 +34,9 @@ import {
   PanelBlockFooter,
   PanelBlockBody,
 } from '../common/panel-block';
+import { getMosaicTileUrl } from '../../utils/mosaics';
 
-const { restApiEndpoint, tileUrlTemplate } = config;
+const { restApiEndpoint } = config;
 
 const AOIPanel = styled(PanelBlock)`
   background: ${themeVal('color.surface')};
@@ -141,8 +138,7 @@ function CompareMap() {
   const [showLayersControl, setShowLayersControl] = useState(false);
   const [aoiClasses, setAoiClasses] = useState([]);
   const [aoisInfo, setAoisInfo] = useState([]);
-  const { mosaics } = useMosaics();
-  const mosaic = mosaics && mosaics.length > 0 ? mosaics[0] : null;
+  const [mosaicUrls, setMosaicUrls] = useState([]);
 
   useEffect(() => {
     if (!mapRef) return;
@@ -152,8 +148,11 @@ function CompareMap() {
           restApiClient.getTileJSONFromUUID(uuid),
           restApiClient.get(`share/${uuid}`),
         ]);
-
         const tileUrl = `${restApiEndpoint}${tileJSON.tiles[0]}`;
+        setMosaicUrls((prevMosaicUrls) => [
+          ...prevMosaicUrls,
+          getMosaicTileUrl(aoiData.mosaic),
+        ]);
         setTileUrls((prevTileUrls) => [...prevTileUrls, tileUrl]);
         setAoiClasses((prevClasses) => [...prevClasses, aoiData.classes]);
         setAoisInfo((prevAoiInfo) => [
@@ -195,21 +194,11 @@ function CompareMap() {
           maxZoom={MAX_BASE_MAP_ZOOM_LEVEL}
           whenCreated={(m) => setMapRef(m)}
         >
-          <BaseMapLayer />
-          {mosaic && (
-            <TileLayer
-              url={tileUrlTemplate.replace('{LAYER_NAME}', mosaic)}
-              attribution='&copy; NAIP'
-              minZoom={12}
-              maxZoom={20}
-              zIndex={2}
-              opacity={mapLayers.mosaic.visible ? mapLayers.mosaic.opacity : 0}
-            />
-          )}
-          {tileUrls[0] && tileUrls[1] && (
+          {tileUrls[0] && tileUrls[1] && mosaicUrls[0] && mosaicUrls[1] && (
             <SideBySideTileLayer
               leftTile={{
                 url: tileUrls[0],
+                mosaicUrl: mosaicUrls[0],
                 attr: '',
                 opacity: mapLayers.predictionsLeft.visible
                   ? mapLayers.predictionsLeft.opacity
@@ -217,6 +206,7 @@ function CompareMap() {
               }}
               rightTile={{
                 url: tileUrls[1],
+                mosaicUrl: mosaicUrls[1],
                 attr: '',
                 opacity: mapLayers.predictionsRight.visible
                   ? mapLayers.predictionsRight.opacity
