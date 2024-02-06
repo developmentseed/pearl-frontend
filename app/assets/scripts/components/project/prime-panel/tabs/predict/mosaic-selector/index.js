@@ -122,6 +122,7 @@ export function MosaicSelector() {
         mosaic.mosaic_ts_start,
         mosaic.mosaic_ts_end
       ),
+      timeframe: t,
     };
   });
 
@@ -162,7 +163,7 @@ export function MosaicSelector() {
                   onClick={async () => {
                     actorRef.send({
                       type: 'Apply timeframe',
-                      data: { timeframe: { ...t } },
+                      data: { timeframe: { ...t.timeframe } },
                     });
                   }}
                 >

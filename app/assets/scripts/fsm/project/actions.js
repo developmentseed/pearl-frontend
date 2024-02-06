@@ -240,9 +240,19 @@ export const actions = {
     const retrainClasses =
       newTimeframe?.classes || currentCheckpoint?.classes || [];
 
+    // A timeframe is always associated with a mosaic, but currently the API
+    // doesn't populate it in the response
+    const mosaicId =
+      typeof newTimeframe?.mosaic === 'string'
+        ? newTimeframe?.mosaic
+        : newTimeframe?.mosaic?.id;
+
+    const currentMosaic = context.mosaicsList.find((m) => m.id === mosaicId);
+
     // Apply new timeframe and (re-)initialize retrain classes
     return {
       currentTimeframe: { ...newTimeframe },
+      currentMosaic,
       retrainClasses,
     };
   }),
