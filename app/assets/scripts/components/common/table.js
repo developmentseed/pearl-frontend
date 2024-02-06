@@ -20,6 +20,7 @@ const StyledTable = styled.table`
     padding: ${glsp(3 / 8)};
     vertical-align: top;
     text-align: left;
+    font-size: 0.875rem;
   }
   thead th {
     letter-spacing: 0.4px;

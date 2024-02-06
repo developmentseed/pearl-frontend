@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import tArea from '@turf/area';
 
-import { media } from '@devseed-ui/theme-provider';
 import { Button } from '@devseed-ui/button';
 import { glsp } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
@@ -49,31 +48,6 @@ export const SharesHeadline = styled(InpageHeadline)`
   align-items: center;
 `;
 
-const FormInputGroup = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 2.125rem;
-  input {
-    display: none;
-    ${media.mediumUp`
-      display: revert;
-    `};
-  }
-  > :first-child:not(:last-child) {
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-  }
-
-  > :last-child:not(:first-child) {
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-  }
-
-  .form__control::selection {
-    background-color: unset;
-    color: unset;
-  }
-`;
-
 const HEADERS = [
   'AOI Name',
   'AOI Size (Km2)',
@@ -98,23 +72,21 @@ function RenderRow(share, { restApiClient }) {
       <TableCell>{timeframe.classes.length}</TableCell>
       <TableCell>{formatDateTime(timeframe.created)}</TableCell>
       <TableCell>
-        <FormInputGroup>
-          <Button
-            variation='primary-plain'
-            useIcon='clipboard'
-            hideText
-            onClick={() => {
-              copyTextToClipboard(shareLink).then((result) => {
-                if (result) {
-                  toasts.success('URL copied to clipboard');
-                } else {
-                  logger('Failed to copy', result);
-                  toasts.error('Failed to copy URL to clipboard');
-                }
-              });
-            }}
-          />
-        </FormInputGroup>
+        <Button
+          variation='primary-plain'
+          useIcon='clipboard'
+          hideText
+          onClick={() => {
+            copyTextToClipboard(shareLink).then((result) => {
+              if (result) {
+                toasts.success('URL copied to clipboard');
+              } else {
+                logger('Failed to copy', result);
+                toasts.error('Failed to copy URL to clipboard');
+              }
+            });
+          }}
+        />
       </TableCell>
       <TableCell>
         <Button

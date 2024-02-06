@@ -97,6 +97,7 @@ function RenderRow(share, { restApiClient }) {
       <TableCell>
         <Button
           variation='primary-plain'
+          size='small'
           useIcon='clipboard'
           hideText
           onClick={() => {
@@ -306,7 +307,7 @@ function Project() {
             <BatchList projectId={projectId} />
             {shares &&
               (shares.length ? (
-                <>
+                <section>
                   <Heading size='small'>
                     {project ? 'Exported Maps' : 'Loading Project...'}
                   </Heading>
@@ -327,9 +328,9 @@ function Project() {
                     totalItems={total}
                     itemsPerPage={AOIS_PER_PAGE}
                   />
-                </>
+                </section>
               ) : (
-                <Heading>
+                <Heading size='small'>
                   {isAoisLoading
                     ? 'Loading AOIs...'
                     : 'No Exported AOIs for this project.'}
