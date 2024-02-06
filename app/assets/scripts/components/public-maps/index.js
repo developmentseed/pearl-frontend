@@ -6,7 +6,6 @@ import { media } from '@devseed-ui/theme-provider';
 import { Button } from '@devseed-ui/button';
 import { glsp } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
-import { FormInput } from '@devseed-ui/form';
 
 import { useAuth } from '../../context/auth';
 import { formatDateTime, formatThousands } from '../../utils/format';
@@ -100,7 +99,6 @@ function RenderRow(share, { restApiClient }) {
       <TableCell>{formatDateTime(timeframe.created)}</TableCell>
       <TableCell>
         <FormInputGroup>
-          <FormInput readOnly value={shareLink} size='small' />
           <Button
             variation='primary-plain'
             useIcon='clipboard'

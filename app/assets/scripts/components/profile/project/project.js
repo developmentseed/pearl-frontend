@@ -18,7 +18,7 @@ import {
 import { ProjectsBody as ProjectBody } from '../projects/projects';
 import { media } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
-import { FormInput, FormSwitch } from '@devseed-ui/form';
+import { FormSwitch } from '@devseed-ui/form';
 import { StyledLink } from '../../../styles/links';
 import toasts from '../../common/toasts';
 import { useAuth } from '../../../context/auth';
@@ -95,24 +95,21 @@ function RenderRow(share, { restApiClient }) {
       <TableCell>{timeframe.classes.length}</TableCell>
       <TableCell>{formatDateTime(timeframe.created)}</TableCell>
       <TableCell>
-        <FormInputGroup>
-          <FormInput readOnly value={shareLink} size='small' />
-          <Button
-            variation='primary-plain'
-            useIcon='clipboard'
-            hideText
-            onClick={() => {
-              copyTextToClipboard(shareLink).then((result) => {
-                if (result) {
-                  toasts.success('URL copied to clipboard');
-                } else {
-                  logger('Failed to copy', result);
-                  toasts.error('Failed to copy URL to clipboard');
-                }
-              });
-            }}
-          />
-        </FormInputGroup>
+        <Button
+          variation='primary-plain'
+          useIcon='clipboard'
+          hideText
+          onClick={() => {
+            copyTextToClipboard(shareLink).then((result) => {
+              if (result) {
+                toasts.success('URL copied to clipboard');
+              } else {
+                logger('Failed to copy', result);
+                toasts.error('Failed to copy URL to clipboard');
+              }
+            });
+          }}
+        />
       </TableCell>
       <TableCell>
         <Button
