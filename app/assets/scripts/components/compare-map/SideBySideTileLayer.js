@@ -1,5 +1,5 @@
 import { useMap } from 'react-leaflet';
-import { memo, useEffect } from 'react';
+import { memo, useEffect, useRef } from 'react';
 import T from 'prop-types';
 import L from 'leaflet';
 import React from 'react';
@@ -12,39 +12,49 @@ function SideBySideTileLayer({
   maxZoom,
   zIndex,
 }) {
-  const mapInst = useMap();
+  const mapRef = useMap();
+  const leftMap = useRef(null);
+  const rightMap = useRef(null);
+
   function sideBySideControl() {
-    const left = new L.TileLayer(leftTile.url, {
+    leftMap.current = new L.TileLayer(leftTile.url, {
       attribution: leftTile.attr,
       minZoom: minZoom,
       maxZoom: maxZoom,
       zIndex: zIndex,
       opacity: leftTile.opacity,
-    }).addTo(mapInst);
+    }).addTo(mapRef);
 
-    const right = new L.TileLayer(rightTile.url, {
+    rightMap.current = new L.TileLayer(rightTile.url, {
       attribution: rightTile.attr,
       minZoom: minZoom,
       maxZoom: maxZoom,
       zIndex: zIndex,
       opacity: rightTile.opacity,
-    }).addTo(mapInst);
+    }).addTo(mapRef);
 
-    const ctrl = L.control.sideBySide(left, right);
+    const ctrl = L.control.sideBySide(leftMap.current, rightMap.current);
     return ctrl;
   }
 
   useEffect(() => {
-    if (mapInst === null) {
+    if (mapRef === null) {
       return;
     }
     const ctrl = sideBySideControl();
-    ctrl.addTo(mapInst);
-    L.DomEvent.disableClickPropagation(mapInst._container);
+    ctrl.addTo(mapRef);
+    L.DomEvent.disableClickPropagation(mapRef._container);
     return () => {
       ctrl.remove();
     };
   }, []);
+
+  useEffect(() => {
+    if (leftMap.current && rightMap.current) {
+      leftMap.current.setOpacity(leftTile.opacity);
+      rightMap.current.setOpacity(rightTile.opacity);
+    }
+  }, [leftTile.opacity, rightTile.opacity]);
 
   return <div />;
 }
