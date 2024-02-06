@@ -1,6 +1,7 @@
 import { css, createGlobalStyle } from 'styled-components';
 import { collecticonsFont } from './collecticons';
 import leafletStyles from './vendor/leaflet';
+import leafletSideBySideStyles from './vendor/leaflet-side-by-side';
 import reactToastStyles from './vendor/react-toastify';
 import inputRangeStyles from './vendor/react-input-range';
 import joyrideStyles from './vendor/joyridestyles';
@@ -21,6 +22,7 @@ export default createGlobalStyle`
   ${darkStyles()};
   ${collecticonsFont()};
   ${leafletStyles()};
+  ${leafletSideBySideStyles()};
   ${reactToastStyles()};
   ${inputRangeStyles()};
   ${joyrideStyles()};
