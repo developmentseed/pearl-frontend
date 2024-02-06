@@ -26,11 +26,11 @@ const List = styled.ol`
 `;
 
 function DetailsList(props) {
-  const { details } = props;
+  const { details, styles } = props;
   return (
     <List>
       {Object.entries(details).map(([key, value]) => (
-        <li key={key}>
+        <li style={styles} key={key}>
           <>
             <Subheading>{toTitleCase(key)}</Subheading>
             {React.isValidElement(value) ? value : <dd>{value}</dd>}
@@ -43,6 +43,7 @@ function DetailsList(props) {
 
 DetailsList.propTypes = {
   details: T.object,
+  styles: T.object,
 };
 
 export default DetailsList;

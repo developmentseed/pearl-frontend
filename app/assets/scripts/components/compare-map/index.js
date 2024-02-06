@@ -16,7 +16,8 @@ import {
   Class,
   Thumbnail as ClassThumbnail,
   ClassHeading,
-} from '../explore/prime-panel/tabs/retrain-refine-styles';
+} from '../project/prime-panel/tabs/retrain/index';
+
 import { Accordion, AccordionFold as BaseFold } from '@devseed-ui/accordion';
 import { themeVal, glsp } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
@@ -66,11 +67,13 @@ const AOIPanel = styled(PanelBlock)`
   }
   ${Class} {
     grid-template-columns: 1rem minmax(10px, 1fr);
+    gap: 0 ${glsp(0.5)};
     padding: 0;
     min-height: 0;
   }
   ${ClassHeading} {
     white-space: normal;
+    font-size: 0.875rem;
   }
   ${ClassThumbnail} {
     width: ${glsp(0.875)};
@@ -243,6 +246,10 @@ function CompareMap() {
                     setFoldExpanded={(v) => setExpanded(0, v)}
                     content={
                       <DetailsList
+                        styles={{
+                          fontSize: '0.875rem',
+                          gridTemplateColumns: 'minmax(0,3fr) minmax(0,4fr)',
+                        }}
                         details={{
                           'Imagery source': toTitleCase(
                             aoi.mosaic.params.collection.replace('-', ' ')
@@ -251,8 +258,8 @@ function CompareMap() {
                             aoi.mosaic.mosaic_ts_start,
                             aoi.mosaic.mosaic_ts_end
                           ),
-                          Model: 'model name here',
-                          Checkpoint: aoi.timeframe.checkpoint_id,
+                          Model: aoi.model.name,
+                          Checkpoint: aoi.checkpoint.name,
                         }}
                       />
                     }
