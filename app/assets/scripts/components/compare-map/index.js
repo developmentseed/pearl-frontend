@@ -98,13 +98,6 @@ const AccordionFold = styled(BaseFold)`
 `;
 
 const INITIAL_MAP_LAYERS = {
-  mosaic: {
-    id: 'mosaic',
-    name: 'naip.latest',
-    opacity: 1,
-    visible: true,
-    active: true,
-  },
   predictionsLeft: {
     id: 'predictionsLeft',
     name: 'Left Prediction Results',
