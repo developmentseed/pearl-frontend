@@ -117,7 +117,7 @@ const INITIAL_MAP_LAYERS = {
   },
 };
 
-const composeMosaicName = (start, end) =>
+export const composeMosaicName = (start, end) =>
   `${new Date(start).toLocaleString('default', {
     month: 'short',
   })} - ${new Date(end).toLocaleString('default', {

@@ -2,9 +2,8 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import tArea from '@turf/area';
 
-import { media } from '@devseed-ui/theme-provider';
 import { Button } from '@devseed-ui/button';
-import { glsp } from '@devseed-ui/theme-provider';
+import { glsp, themeVal } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
 import { FormCheckable } from '@devseed-ui/form';
 
@@ -31,6 +30,7 @@ import copyTextToClipboard from '../../utils/copy-text-to-clipboard';
 import toasts from '../common/toasts';
 import { downloadShareGeotiff } from '../../utils/share-link';
 import { StyledLink } from '../../styles/links';
+import { composeMosaicName } from '../compare-map';
 
 const ITEMS_PER_PAGE = 20;
 
@@ -51,73 +51,68 @@ export const SharesHeadline = styled(InpageHeadline)`
   align-items: center;
 `;
 
-const FormInputGroup = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 2.125rem;
-  input {
-    display: none;
-    ${media.mediumUp`
-      display: revert;
-    `};
+const SelectedSection = styled.section`
+  display: flex;
+  flex-flow: column nowrap;
+  gap: ${glsp()};
+  table {
+    border: 2px solid ${themeVal('color.primary')};
+    border-radius: ${themeVal('shape.rounded')};
+    border-collapse: separate;
   }
-  > :first-child:not(:last-child) {
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-  }
+`;
 
-  > :last-child:not(:first-child) {
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-  }
-
-  .form__control::selection {
-    background-color: unset;
-    color: unset;
-  }
+const SelectedHeader = styled.div`
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: baseline;
+  gap: ${glsp()};
 `;
 
 const HEADERS = [
   'AOI Name',
-  'AOI Size (Km2)',
-  'Mosaic',
-  'Checkpoint',
-  'Classes',
   'Created',
+  'AOI Size (Km2)',
+  'Model',
+  'Checkpoint',
+  'Mosaic',
+  'Classes',
   'Link',
   'Download',
   'Compare',
 ];
 
-function RenderRow(share, { restApiClient, compareUuids, setCompareUuids }) {
+function RenderRow(share, { restApiClient, compareMaps, setCompareMaps }) {
   const shareLink = `${window.location.origin}/share/${share.uuid}/map`;
-  const { aoi, timeframe, mosaic } = share;
+  const { aoi, checkpoint, model, timeframe, mosaic } = share;
 
   return (
-    <TableRow key={aoi.id}>
+    <TableRow key={share.uuid}>
       <TableCell>{aoi.name}</TableCell>
-      <TableCell>{formatThousands(tArea(aoi.bounds) / 1e6)}</TableCell>
-      <TableCell>{mosaic?.name}</TableCell>
-      <TableCell>{timeframe.checkpoint_id}</TableCell>
-      <TableCell>{timeframe.classes.length}</TableCell>
       <TableCell>{formatDateTime(timeframe.created)}</TableCell>
+      <TableCell>{formatThousands(tArea(aoi.bounds) / 1e6)}</TableCell>
+      <TableCell>{model.name}</TableCell>
+      <TableCell>{checkpoint.name}</TableCell>
       <TableCell>
-        <FormInputGroup>
-          <Button
-            variation='primary-plain'
-            useIcon='clipboard'
-            hideText
-            onClick={() => {
-              copyTextToClipboard(shareLink).then((result) => {
-                if (result) {
-                  toasts.success('URL copied to clipboard');
-                } else {
-                  logger('Failed to copy', result);
-                  toasts.error('Failed to copy URL to clipboard');
-                }
-              });
-            }}
-          />
-        </FormInputGroup>
+        {composeMosaicName(mosaic.mosaic_ts_start, mosaic.mosaic_ts_end)}
+      </TableCell>
+      <TableCell>{timeframe.classes.length}</TableCell>
+      <TableCell>
+        <Button
+          variation='primary-plain'
+          useIcon='clipboard'
+          hideText
+          onClick={() => {
+            copyTextToClipboard(shareLink).then((result) => {
+              if (result) {
+                toasts.success('URL copied to clipboard');
+              } else {
+                logger('Failed to copy', result);
+                toasts.error('Failed to copy URL to clipboard');
+              }
+            });
+          }}
+        />
       </TableCell>
       <TableCell>
         <Button
@@ -132,13 +127,48 @@ function RenderRow(share, { restApiClient, compareUuids, setCompareUuids }) {
           type='checkbox'
           name={`select-compare-${share.uuid}`}
           id={`select-compare-${share.uuid}`}
-          checked={compareUuids.includes(share.uuid)}
+          checked={compareMaps.some(
+            (compareMap) => compareMap.uuid === share.uuid
+          )}
           onChange={() => {
-            compareUuids.includes(share.uuid)
-              ? setCompareUuids(
-                  compareUuids.filter((uuid) => uuid != share.uuid)
+            compareMaps.some((compareMap) => compareMap.uuid === share.uuid)
+              ? setCompareMaps(
+                  compareMaps.filter(
+                    (compareMap) => compareMap.uuid != share.uuid
+                  )
                 )
-              : setCompareUuids([...compareUuids, share.uuid]);
+              : compareMaps.length < 2 &&
+                setCompareMaps([...compareMaps, share]);
+          }}
+        />
+      </TableCell>
+    </TableRow>
+  );
+}
+function RenderSelectedRow(compareMap, { compareMaps, setCompareMaps }) {
+  const { aoi, checkpoint, model, timeframe, mosaic } = compareMap;
+  return (
+    <TableRow key={compareMap.uuid}>
+      <TableCell>{aoi.name}</TableCell>
+      <TableCell>{formatDateTime(timeframe.created)}</TableCell>
+      <TableCell>{model.name}</TableCell>
+      <TableCell>{checkpoint.name}</TableCell>
+      <TableCell>
+        {composeMosaicName(mosaic.mosaic_ts_start, mosaic.mosaic_ts_end)}
+      </TableCell>
+      <TableCell>
+        <FormCheckable
+          type='checkbox'
+          name={`select-compare-${compareMap.uuid}`}
+          id={`select-compare-${compareMap.uuid}`}
+          checked={compareMaps.some((map) => map.uuid === compareMap.uuid)}
+          onChange={() => {
+            compareMaps.some((map) => map.uuid === compareMap.uuid)
+              ? setCompareMaps(
+                  compareMaps.filter((map) => map.uuid != compareMap.uuid)
+                )
+              : compareMaps.length < 2 &&
+                setCompareMaps([...compareMaps, compareMap]);
           }}
         />
       </TableCell>
@@ -153,7 +183,7 @@ function ExportedMapsList() {
   const [total, setTotal] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [shares, setShares] = useState([]);
-  const [compareUuids, setCompareUuids] = useState([]);
+  const [compareMaps, setCompareMaps] = useState([]);
   const { restApiClient } = useAuth();
 
   useEffect(() => {
@@ -188,15 +218,32 @@ function ExportedMapsList() {
         </InpageHeader>
         <InpageBody>
           <SharesBody>
-            {compareUuids.length === 2 && (
-              <Button
-                variation='primary-raised-dark'
-                forwardedAs={StyledLink}
-                to={`/compare/${compareUuids[0]}/${compareUuids[1]}`}
-                useIcon='resize-center-horizontal'
-              >
-                Compare maps
-              </Button>
+            {!!compareMaps.length && (
+              <SelectedSection>
+                <SelectedHeader>
+                  <Heading as='h3' size='xsmall'>
+                    Selected AOIs
+                  </Heading>
+                  <Button
+                    variation='primary-raised-dark'
+                    forwardedAs={StyledLink}
+                    to={`/compare/${compareMaps[0]?.uuid}/${compareMaps[1]?.uuid}`}
+                    useIcon='resize-center-horizontal'
+                    disabled={compareMaps.length < 2}
+                  >
+                    Compare selected
+                  </Button>
+                </SelectedHeader>
+                <Table
+                  headers={[' ']}
+                  data={compareMaps}
+                  renderRow={RenderSelectedRow}
+                  extraData={{
+                    compareMaps,
+                    setCompareMaps,
+                  }}
+                />
+              </SelectedSection>
             )}
             {shares &&
               (shares.length ? (
@@ -209,8 +256,8 @@ function ExportedMapsList() {
                       restApiClient,
                       shares,
                       setShares,
-                      compareUuids,
-                      setCompareUuids,
+                      compareMaps,
+                      setCompareMaps,
                     }}
                   />
                   <Paginator
@@ -221,7 +268,7 @@ function ExportedMapsList() {
                   />
                 </>
               ) : (
-                <Heading>
+                <Heading size='small'>
                   {isLoading
                     ? 'Loading AOIs...'
                     : 'There are no published AOIs.'}
