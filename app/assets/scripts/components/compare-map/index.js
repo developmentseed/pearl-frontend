@@ -208,7 +208,7 @@ function CompareMap() {
                   ? mapLayers.predictionsRight.opacity
                   : 0,
               }}
-              minZoom={12}
+              minZoom={10}
               maxZoom={20}
               zIndex={3}
             />
