@@ -1055,8 +1055,29 @@ export const services = {
     });
     return () => websocket.close();
   },
-  applyTimeframe: (context) => (callback, onReceive) => {
-    const { currentTimeframe } = context;
+  applyTimeframe: (context) => async (callback, onReceive) => {
+    const {
+      currentTimeframe,
+      apiClient,
+      currentAoi,
+      project,
+      mosaicsList,
+      sharesList,
+    } = context;
+
+    let currentShare;
+
+    const currentMosaic = mosaicsList.find(
+      (mosaic) => mosaic.id === currentTimeframe.mosaic
+    );
+    currentMosaic.tileUrl = getMosaicTileUrl(currentMosaic);
+    currentTimeframe.tilejson = await apiClient.get(
+      `project/${project.id}/aoi/${currentAoi.id}/timeframe/${currentTimeframe.id}/tiles`
+    );
+
+    currentShare = sharesList.find(
+      (share) => share.timeframe?.id === currentTimeframe?.id
+    );
 
     const { token } = context.currentInstance;
     const websocket = new WebsocketClient(token);
@@ -1164,8 +1185,13 @@ export const services = {
         case 'model#timeframe#complete':
           callback({
             type: 'Timeframe was applied',
-            data,
+            data: {
+              ...data,
+              currentShare,
+              currentMosaic,
+            },
           });
+
           break;
 
         default:
