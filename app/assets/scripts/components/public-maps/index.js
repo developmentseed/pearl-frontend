@@ -24,7 +24,7 @@ import {
 
 import App from '../common/app';
 import PageHeader from '../common/page-header';
-import Table, { TableRow, TableCell } from '../common/table';
+import Table, { TableRow, TableCell, TableRowHeader } from '../common/table';
 import Paginator from '../common/paginator';
 import copyTextToClipboard from '../../utils/copy-text-to-clipboard';
 import toasts from '../common/toasts';
@@ -56,9 +56,20 @@ const SelectedSection = styled.section`
   flex-flow: column nowrap;
   gap: ${glsp()};
   table {
-    border: 2px solid ${themeVal('color.primary')};
+    border: 1px solid transparent;
+    border-color: ${({ twoSharesSelected }) =>
+      twoSharesSelected ? themeVal('color.primary') : 'transparent'};
     border-radius: ${themeVal('shape.rounded')};
     border-collapse: separate;
+    thead {
+      display: none;
+    }
+    tr {
+      height: 2.25rem;
+    }
+    td {
+      vertical-align: middle;
+    }
   }
 `;
 
@@ -81,6 +92,37 @@ const HEADERS = [
   'Download',
   'Compare',
 ];
+
+const checkHandler = (compareMaps, setCompareMaps, share) => {
+  const shareExistsInCompareArray = compareMaps.some(
+    (c) => c.uuid === share.uuid
+  );
+  // Determine if checked AOI already is selected
+  if (shareExistsInCompareArray) {
+    // If AOI is already selected, unchecking removes it from the compareMaps array
+    let nextCompareMaps = compareMaps.filter((c) => c.uuid !== share.uuid);
+    // If one of two AOIs is unchecked, the remaining AOI should be set to the left side AOI
+    if (nextCompareMaps.length === 1) {
+      nextCompareMaps = [
+        { ...nextCompareMaps[0], side: 'left' },
+        { side: 'right' },
+      ];
+    } else if (!nextCompareMaps.length) {
+      // If all AOIs are unchecked, reset sides
+      nextCompareMaps = [{ side: 'left' }, { side: 'right' }];
+    }
+    setCompareMaps(nextCompareMaps);
+  } else {
+    let compareArrayCount = compareMaps.filter((c) => c.uuid).length;
+    if (!compareArrayCount) {
+      setCompareMaps([{ ...share, side: 'left' }, { side: 'right' }]);
+    } else if (compareArrayCount === 1) {
+      setCompareMaps([compareMaps[0], { ...share, side: 'right' }]);
+    } else {
+      return;
+    }
+  }
+};
 
 function RenderRow(share, { restApiClient, compareMaps, setCompareMaps }) {
   const shareLink = `${window.location.origin}/share/${share.uuid}/map`;
@@ -127,50 +169,47 @@ function RenderRow(share, { restApiClient, compareMaps, setCompareMaps }) {
           type='checkbox'
           name={`select-compare-${share.uuid}`}
           id={`select-compare-${share.uuid}`}
-          checked={compareMaps.some(
-            (compareMap) => compareMap.uuid === share.uuid
-          )}
-          onChange={() => {
+          checked={
+            share.uuid &&
             compareMaps.some((compareMap) => compareMap.uuid === share.uuid)
-              ? setCompareMaps(
-                  compareMaps.filter(
-                    (compareMap) => compareMap.uuid != share.uuid
-                  )
-                )
-              : compareMaps.length < 2 &&
-                setCompareMaps([...compareMaps, share]);
-          }}
+          }
+          onChange={() => checkHandler(compareMaps, setCompareMaps, share)}
         />
       </TableCell>
     </TableRow>
   );
 }
-function RenderSelectedRow(compareMap, { compareMaps, setCompareMaps }) {
-  const { aoi, checkpoint, model, timeframe, mosaic } = compareMap;
+function RenderSelectedRow(share, { compareMaps, setCompareMaps }) {
+  const { side, aoi, checkpoint, model, timeframe, mosaic } = share;
   return (
-    <TableRow key={compareMap.uuid}>
-      <TableCell>{aoi.name}</TableCell>
-      <TableCell>{formatDateTime(timeframe.created)}</TableCell>
-      <TableCell>{model.name}</TableCell>
-      <TableCell>{checkpoint.name}</TableCell>
+    <TableRow key={share.uuid}>
       <TableCell>
-        {composeMosaicName(mosaic.mosaic_ts_start, mosaic.mosaic_ts_end)}
+        <TableRowHeader>{side}</TableRowHeader>
+      </TableCell>
+      <TableCell>{aoi?.name || ''}</TableCell>
+      <TableCell>
+        {timeframe ? formatDateTime(timeframe.created) : ''}
+      </TableCell>
+      <TableCell>{model?.name || ''}</TableCell>
+      <TableCell>{checkpoint?.name || ''}</TableCell>
+      <TableCell>
+        {mosaic
+          ? composeMosaicName(mosaic.mosaic_ts_start, mosaic.mosaic_ts_end)
+          : ''}
       </TableCell>
       <TableCell>
-        <FormCheckable
-          type='checkbox'
-          name={`select-compare-${compareMap.uuid}`}
-          id={`select-compare-${compareMap.uuid}`}
-          checked={compareMaps.some((map) => map.uuid === compareMap.uuid)}
-          onChange={() => {
-            compareMaps.some((map) => map.uuid === compareMap.uuid)
-              ? setCompareMaps(
-                  compareMaps.filter((map) => map.uuid != compareMap.uuid)
-                )
-              : compareMaps.length < 2 &&
-                setCompareMaps([...compareMaps, compareMap]);
-          }}
-        />
+        {share.uuid && (
+          <FormCheckable
+            type='checkbox'
+            name={`select-compare-${share.uuid}`}
+            id={`select-compare-${share.uuid}`}
+            checked={
+              share.uuid &&
+              compareMaps.some((compareMap) => compareMap.uuid === share.uuid)
+            }
+            onChange={() => checkHandler(compareMaps, setCompareMaps, share)}
+          />
+        )}
       </TableCell>
     </TableRow>
   );
@@ -183,7 +222,10 @@ function ExportedMapsList() {
   const [total, setTotal] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [shares, setShares] = useState([]);
-  const [compareMaps, setCompareMaps] = useState([]);
+  const [compareMaps, setCompareMaps] = useState([
+    { side: 'left' },
+    { side: 'right' },
+  ]);
   const { restApiClient } = useAuth();
 
   useEffect(() => {
@@ -205,6 +247,7 @@ function ExportedMapsList() {
     }
     fetchShares();
   }, [apiToken, page]);
+  const twoSharesSelected = compareMaps.filter((c) => c.uuid).length === 2;
 
   return (
     <>
@@ -218,33 +261,31 @@ function ExportedMapsList() {
         </InpageHeader>
         <InpageBody>
           <SharesBody>
-            {!!compareMaps.length && (
-              <SelectedSection>
-                <SelectedHeader>
-                  <Heading as='h3' size='xsmall'>
-                    Selected AOIs
-                  </Heading>
-                  <Button
-                    variation='primary-raised-dark'
-                    forwardedAs={StyledLink}
-                    to={`/compare/${compareMaps[0]?.uuid}/${compareMaps[1]?.uuid}`}
-                    useIcon='resize-center-horizontal'
-                    disabled={compareMaps.length < 2}
-                  >
-                    Compare selected
-                  </Button>
-                </SelectedHeader>
-                <Table
-                  headers={[' ']}
-                  data={compareMaps}
-                  renderRow={RenderSelectedRow}
-                  extraData={{
-                    compareMaps,
-                    setCompareMaps,
-                  }}
-                />
-              </SelectedSection>
-            )}
+            <SelectedSection twoSharesSelected={twoSharesSelected}>
+              <SelectedHeader>
+                <Heading as='h3' size='xsmall'>
+                  Selected AOIs
+                </Heading>
+                <Button
+                  variation='primary-raised-dark'
+                  forwardedAs={StyledLink}
+                  to={`/compare/${compareMaps[0].uuid}/${compareMaps[1].uuid}`}
+                  useIcon='resize-center-horizontal'
+                  disabled={!twoSharesSelected}
+                >
+                  Compare selected
+                </Button>
+              </SelectedHeader>
+              <Table
+                headers={[' ']}
+                data={compareMaps}
+                renderRow={RenderSelectedRow}
+                extraData={{
+                  compareMaps,
+                  setCompareMaps,
+                }}
+              />
+            </SelectedSection>
             {shares &&
               (shares.length ? (
                 <>
