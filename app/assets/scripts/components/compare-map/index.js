@@ -190,29 +190,41 @@ function CompareMap() {
           maxZoom={MAX_BASE_MAP_ZOOM_LEVEL}
           whenCreated={(m) => setMapRef(m)}
         >
-          {tileUrls[0] && tileUrls[1] && mosaicUrls[0] && mosaicUrls[1] && (
-            <SideBySideTileLayer
-              leftTile={{
-                url: tileUrls[0],
-                mosaicUrl: mosaicUrls[0],
-                attr: '',
-                opacity: mapLayers.predictionsLeft.visible
-                  ? mapLayers.predictionsLeft.opacity
-                  : 0,
-              }}
-              rightTile={{
-                url: tileUrls[1],
-                mosaicUrl: mosaicUrls[1],
-                attr: '',
-                opacity: mapLayers.predictionsRight.visible
-                  ? mapLayers.predictionsRight.opacity
-                  : 0,
-              }}
-              minZoom={10}
-              maxZoom={20}
-              zIndex={3}
-            />
-          )}
+          {tileUrls.length === 2 &&
+            mosaicUrls.length === 2 &&
+            aoisInfo.length === 2 && (
+              <SideBySideTileLayer
+                leftTile={{
+                  url: tileUrls[0],
+                  mosaicUrl: mosaicUrls[0],
+                  attr: toTitleCase(
+                    `${aoisInfo[0].mosaic.params.collection.replace(
+                      /-/g,
+                      ' '
+                    )} | Microsoft Planetary Computer`
+                  ),
+                  opacity: mapLayers.predictionsLeft.visible
+                    ? mapLayers.predictionsLeft.opacity
+                    : 0,
+                }}
+                rightTile={{
+                  url: tileUrls[1],
+                  mosaicUrl: mosaicUrls[1],
+                  attr: toTitleCase(
+                    `${aoisInfo[1].mosaic.params.collection.replace(
+                      /-/g,
+                      ' '
+                    )} | Microsoft Planetary Computer`
+                  ),
+                  opacity: mapLayers.predictionsRight.visible
+                    ? mapLayers.predictionsRight.opacity
+                    : 0,
+                }}
+                minZoom={10}
+                maxZoom={20}
+                zIndex={3}
+              />
+            )}
           <FeatureGroup>
             <GenericControl
               id='layer-control'
