@@ -77,6 +77,7 @@ const SelectedHeader = styled.div`
   display: flex;
   flex-flow: row nowrap;
   align-items: baseline;
+  justify-content: space-between;
   gap: ${glsp()};
 `;
 
@@ -263,7 +264,7 @@ function ExportedMapsList() {
           <SharesBody>
             <SelectedSection twoSharesSelected={twoSharesSelected}>
               <SelectedHeader>
-                <Heading as='h3' size='xsmall'>
+                <Heading as='h3' size='small'>
                   Selected AOIs
                 </Heading>
                 <Button
@@ -276,19 +277,26 @@ function ExportedMapsList() {
                   Compare selected
                 </Button>
               </SelectedHeader>
-              <Table
-                headers={[' ']}
-                data={compareMaps}
-                renderRow={RenderSelectedRow}
-                extraData={{
-                  compareMaps,
-                  setCompareMaps,
-                }}
-              />
+              {compareMaps.some((compareMap) => !!compareMap.uuid) ? (
+                <Table
+                  headers={[' ']}
+                  data={compareMaps}
+                  renderRow={RenderSelectedRow}
+                  extraData={{
+                    compareMaps,
+                    setCompareMaps,
+                  }}
+                />
+              ) : (
+                <p>Select maps from below to compare two areas of interest</p>
+              )}
             </SelectedSection>
             {shares &&
               (shares.length ? (
                 <>
+                  <Heading as='h3' size='small'>
+                    All AOIs
+                  </Heading>
                   <Table
                     headers={HEADERS}
                     data={shares}
@@ -309,7 +317,7 @@ function ExportedMapsList() {
                   />
                 </>
               ) : (
-                <Heading size='small'>
+                <Heading as='h3' size='small'>
                   {isLoading
                     ? 'Loading AOIs...'
                     : 'There are no published AOIs.'}
