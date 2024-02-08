@@ -178,7 +178,7 @@ function CompareMap() {
       }
     };
 
-    [leftUUID, rightUUID].forEach(fetchDataForUUID);
+    fetchDataForUUID(leftUUID).then(() => fetchDataForUUID(rightUUID));
   }, [leftUUID, rightUUID, mapRef]);
 
   return (
