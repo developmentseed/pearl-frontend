@@ -4,7 +4,6 @@ on:
     branches:
       - 'develop'
       - 'v2'
-      - 'test-trigger'
 jobs:
   trigger-deploy:
     runs-on: ubuntu-latest
