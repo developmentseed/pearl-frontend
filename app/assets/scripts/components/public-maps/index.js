@@ -55,20 +55,29 @@ const SelectedSection = styled.section`
   display: flex;
   flex-flow: column nowrap;
   gap: ${glsp()};
+  min-height: 8.5rem;
+  p {
+    padding: ${glsp(0.5)} ${glsp()};
+  }
   table {
     border: 1px solid transparent;
     border-color: ${({ twoSharesSelected }) =>
       twoSharesSelected ? themeVal('color.primary') : 'transparent'};
     border-radius: ${themeVal('shape.rounded')};
     border-collapse: separate;
+    table-layout: fixed;
     thead {
       display: none;
     }
     tr {
-      height: 2.25rem;
+      height: 2.5rem;
     }
     td {
       vertical-align: middle;
+    }
+    td:first-child,
+    td:last-child {
+      width: 5.5rem;
     }
   }
 `;
@@ -200,15 +209,11 @@ function RenderSelectedRow(share, { compareMaps, setCompareMaps }) {
       </TableCell>
       <TableCell>
         {share.uuid && (
-          <FormCheckable
-            type='checkbox'
-            name={`select-compare-${share.uuid}`}
-            id={`select-compare-${share.uuid}`}
-            checked={
-              share.uuid &&
-              compareMaps.some((compareMap) => compareMap.uuid === share.uuid)
-            }
-            onChange={() => checkHandler(compareMaps, setCompareMaps, share)}
+          <Button
+            variation='achromic-plain'
+            onClick={() => checkHandler(compareMaps, setCompareMaps, share)}
+            useIcon='xmark--small'
+            hideText
           />
         )}
       </TableCell>
