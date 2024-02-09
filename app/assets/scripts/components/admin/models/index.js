@@ -111,7 +111,7 @@ export default function ModelIndex() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [models, setModels] = useState([]);
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(0);
   const [total, setTotal] = useState(null);
   const [modelToDelete, setModelToDelete] = useState(null);
 
@@ -122,9 +122,7 @@ export default function ModelIndex() {
       try {
         showGlobalLoadingMessage('Loading models...');
         const data = await restApiClient.get(
-          `model/?active=all&storage=all&page=${
-            page - 1
-          }&limit=${ITEMS_PER_PAGE}`
+          `model/?active=all&storage=all&page=${page}&limit=${ITEMS_PER_PAGE}`
         );
         setTotal(data.total);
         setModels(data.models);
@@ -198,9 +196,9 @@ export default function ModelIndex() {
                     />
                     <Paginator
                       currentPage={page}
-                      gotoPage={setPage}
-                      totalItems={total}
-                      itemsPerPage={ITEMS_PER_PAGE}
+                      setPage={setPage}
+                      totalRecords={total}
+                      pageSize={ITEMS_PER_PAGE}
                     />
                   </>
                 ) : (
