@@ -79,6 +79,14 @@ export const TableCell = styled.td`
     }
   `}
 `;
+export const TableRowHeader = styled(Subheading)`
+  letter-spacing: 0.4px;
+  vertical-align: middle;
+  position: relative;
+  text-align: left;
+  font-weight: bold;
+  color: ${themeVal('color.primary')};
+`;
 
 /**
  *
