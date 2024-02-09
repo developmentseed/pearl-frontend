@@ -234,11 +234,10 @@ export const actions = {
     currentCheckpoint: event.data.checkpoint,
   })),
   setCurrentTimeframe: assign((context, event) => {
-    const { currentCheckpoint } = context;
+    const checkpoint = event.data?.checkpoint || context.currentCheckpoint;
     const newTimeframe = event.data.timeframe;
 
-    const retrainClasses =
-      newTimeframe?.classes || currentCheckpoint?.classes || [];
+    const retrainClasses = newTimeframe?.classes || checkpoint?.classes || [];
 
     // A timeframe is always associated with a mosaic, but currently the API
     // doesn't populate it in the response

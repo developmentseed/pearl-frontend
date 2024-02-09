@@ -293,19 +293,13 @@ export const services = {
 
       let instance;
 
-      const instanceConfig = {
-        type: currentInstanceType,
-        ...(currentTimeframe?.id && { timeframe_id: currentTimeframe.id }),
-        ...(currentTimeframe?.checkpoint_id && {
-          checkpoint_id:
-            currentCheckpoint?.id || currentTimeframe.checkpoint_id,
-        }),
-      };
-
       // Fetch active instances for this project
       const activeInstances = await apiClient.get(
         `project/${projectId}/instance?status=active&type=${currentInstanceType}`
       );
+
+      let instanceCheckpoint;
+      let instanceTimeframe;
 
       // Reuse existing instance if available
       if (activeInstances.total > 0) {
@@ -313,12 +307,32 @@ export const services = {
         instance = await apiClient.get(
           `project/${projectId}/instance/${instanceId}`
         );
+        const instanceCheckpointId = instance.checkpoint_id;
+        const instanceTimeframeId = instance.timeframe_id;
+
+        instanceCheckpoint = await apiClient.get(
+          `project/${projectId}/checkpoint/${instanceCheckpointId}`
+        );
+        instanceTimeframe = await apiClient.get(
+          `project/${projectId}/aoi/${context.currentAoi.id}/timeframe/${instanceTimeframeId}`
+        );
       } else {
         instance = await apiClient.post(
           `project/${projectId}/instance`,
           instanceConfig
         );
+        instanceCheckpoint = { ...currentCheckpoint };
+        instanceTimeframe = { ...currentTimeframe };
       }
+
+      const instanceConfig = {
+        type: currentInstanceType,
+        ...(instanceTimeframe?.id && { timeframe_id: instanceTimeframe.id }),
+        ...(instanceTimeframe?.checkpoint_id && {
+          checkpoint_id:
+            instanceCheckpoint?.id || instanceTimeframe.checkpoint_id,
+        }),
+      };
 
       // Confirm instance has running status
       let instanceStatus;
@@ -408,17 +422,7 @@ export const services = {
             });
             break;
           case 'model#status':
-            if (data.processing) {
-              // Instance is processing a different timeframe, abort it
-              if (instanceConfig.timeframe_id !== data.timeframe) {
-                websocket.sendMessage({
-                  action: 'instance#terminate',
-                });
-                callback({
-                  type: 'Instance activation has failed',
-                });
-              }
-            } else {
+            if (!data.processing) {
               // If a timeframe is specified and it is different from the
               // current timeframe, request it
               if (
@@ -442,10 +446,14 @@ export const services = {
                   },
                 });
               } else {
-                // Instance has the same timeframe and is not processing, it should be ready
+                // Instance has the timeframe and is not processing, it should be ready
                 callback({
                   type: 'Instance is ready',
-                  data: { instance },
+                  data: {
+                    instance,
+                    timeframe: instanceTimeframe,
+                    checkpoint: instanceCheckpoint,
+                  },
                 });
                 websocket.close();
               }
