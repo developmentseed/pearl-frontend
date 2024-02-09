@@ -37,7 +37,7 @@ const ClassLegend = styled(ClassList)`
   bottom: ${glsp(2)};
   right: ${glsp(2)};
   padding: ${glsp(1.5)};
-  grid-gap: ${glsp()};
+  grid-gap: ${glsp(0.25)};
   z-index: 401;
   width: 16rem;
   overflow: hidden;
