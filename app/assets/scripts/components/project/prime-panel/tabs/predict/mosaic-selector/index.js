@@ -185,6 +185,11 @@ export function MosaicSelector() {
             title='Delete Current Mosaic'
             id='delete-current-mosaic'
             useIcon='trash-bin'
+            onClick={() => {
+              actorRef.send({
+                type: 'Delete timeframe',
+              });
+            }}
           >
             Delete Current Mosaic
           </ActionButton>

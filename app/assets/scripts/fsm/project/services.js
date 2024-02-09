@@ -1216,4 +1216,48 @@ export const services = {
     });
     return () => websocket.close();
   },
+  deleteCurrentTimeframe: async (context) => {
+    const {
+      apiClient,
+      project,
+      currentAoi,
+      currentTimeframe,
+      timeframesList,
+    } = context;
+
+    const nextTimeframesList = timeframesList.filter(
+      (t) => t.id !== currentTimeframe.id
+    );
+    const nextTimeframe = nextTimeframe.length > 0 ? nextTimeframe[0] : null;
+    let nextInstance = context.currentInstance;
+
+    // If there is a next timeframe, update the instance
+    // or terminate it if there is no next timeframe
+    const { token } = context.currentInstance;
+    const websocket = new WebsocketClient(token);
+    if (nextTimeframe) {
+      websocket.sendMessage({
+        action: 'model#timeframe',
+        data: {
+          id: nextTimeframe.id,
+        },
+      });
+    } else {
+      websocket.sendMessage({
+        action: 'instance#terminate',
+      });
+      nextInstance = null;
+    }
+
+    websocket.close();
+
+    await apiClient.delete(
+      `project/${project.id}/aoi/${currentAoi.id}/timeframe/${currentTimeframe.id}`
+    );
+    return {
+      timeframe: nextTimeframe.length > 0 ? nextTimeframe[0] : null,
+      timeframesList: nextTimeframesList,
+      currentInstance: nextInstance,
+    };
+  },
 };

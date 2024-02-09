@@ -237,6 +237,15 @@ export const actions = {
     const checkpoint = event.data?.checkpoint || context.currentCheckpoint;
     const newTimeframe = event.data.timeframe;
 
+    // Clear current prediction if timeframe is changed
+    if (!newTimeframe) {
+      return {
+        currentTimeframe: null,
+        currentMosaic: null,
+        retrainClasses: [],
+      };
+    }
+
     const retrainClasses = newTimeframe?.classes || checkpoint?.classes || [];
 
     // A timeframe is always associated with a mosaic, but currently the API
