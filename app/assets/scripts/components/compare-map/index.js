@@ -188,7 +188,10 @@ function CompareMap() {
         <MapContainer
           style={{ height: '100%' }}
           maxZoom={MAX_BASE_MAP_ZOOM_LEVEL}
-          whenCreated={(m) => setMapRef(m)}
+          whenCreated={(m) => {
+            m.attributionControl.setPrefix('');
+            setMapRef(m);
+          }}
         >
           {tileUrls.length === 2 &&
             mosaicUrls.length === 2 &&
