@@ -264,7 +264,7 @@ export const projectMachine = createMachine(
 
       'Activating instance for prediction': {
         invoke: {
-          src: 'activateInstance',
+          src: 'activatePredictionRunInstance',
         },
 
         on: {
