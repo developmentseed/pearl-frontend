@@ -162,7 +162,7 @@ export function MosaicSelector() {
                   disabled={disabled}
                   onClick={async () => {
                     actorRef.send({
-                      type: 'Apply timeframe',
+                      type: 'Apply existing timeframe',
                       data: { timeframe: { ...t.timeframe } },
                     });
                   }}
