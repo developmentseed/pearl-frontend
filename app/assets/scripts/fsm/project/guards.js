@@ -19,17 +19,20 @@ export const isPredictionReady = (context) => {
   const {
     currentImagerySource,
     currentMosaic,
-    currentTimeframe,
     currentModel,
     currentAoi,
   } = context;
-  return (
-    !!currentAoi &&
-    !!currentImagerySource &&
-    !!currentMosaic &&
-    !!currentModel &&
-    !currentTimeframe
-  );
+
+  if (context.project.id === 'new') {
+    return (
+      !!currentAoi &&
+      !!currentImagerySource &&
+      !!currentMosaic &&
+      !!currentModel
+    );
+  } else {
+    return !!currentAoi && !!currentMosaic;
+  }
 };
 
 export const isProjectNew = (c) => c.project.id === 'new';

@@ -94,11 +94,18 @@ export const services = {
           } catch (error) {
             logger('Error fetching tilejson');
 
-            currentTimeframe = undefined;
-            currentMosaic = undefined;
+            // Timeframe tilejson is not available, which means there was an
+            // error during prediction. To recover from this, delete this
+            // timeframe and force the user to enter the project explore page
+            // again.
+            await apiClient.delete(
+              `project/${projectId}/aoi/${currentAoi.id}/timeframe/${currentTimeframe.id}`
+            );
+
             toasts.error(
               'There was an error loading the prediction for the latest AOI timeframe, please run a prediction again.'
             );
+            throw new Error('Error loading prediction');
           }
         }
       }
@@ -269,6 +276,7 @@ export const services = {
         `project/${projectId}/instance?status=active&type=${currentInstanceType}`
       );
 
+      let instanceConfig;
       let instanceCheckpoint;
       let instanceTimeframe;
 
@@ -281,32 +289,38 @@ export const services = {
         const instanceCheckpointId = instance.checkpoint_id;
         const instanceTimeframeId = instance.timeframe_id;
 
-        instanceCheckpoint = await apiClient.get(
-          `project/${projectId}/checkpoint/${instanceCheckpointId}`
-        );
-        instanceTimeframe = await apiClient.get(
-          `project/${projectId}/aoi/${context.currentAoi.id}/timeframe/${instanceTimeframeId}`
-        );
-        instanceTimeframe.tilejson = await apiClient.get(
-          `project/${projectId}/aoi/${context.currentAoi.id}/timeframe/${instanceTimeframeId}/tiles`
-        );
+        if (instanceCheckpointId) {
+          instanceCheckpoint = await apiClient.get(
+            `project/${projectId}/checkpoint/${instanceCheckpointId}`
+          );
+        }
+        if (instanceTimeframeId) {
+          instanceTimeframe = await apiClient.get(
+            `project/${projectId}/aoi/${context.currentAoi.id}/timeframe/${instanceTimeframeId}`
+          );
+          instanceTimeframe.tilejson = await apiClient.get(
+            `project/${projectId}/aoi/${context.currentAoi.id}/timeframe/${instanceTimeframeId}/tiles`
+          );
+        }
       } else {
+        // There are no instance running. Check if there is a timeframe or
+        // checkpoint to use and create a new instance
+        const instanceTimeframeId = currentTimeframe?.id;
+        const instanceCheckpointId =
+          currentTimeframe?.checkpoint_id || currentCheckpoint?.id;
+
+        instanceConfig = {
+          type: currentInstanceType,
+          ...(instanceTimeframeId && { timeframe_id: instanceTimeframeId }),
+          ...(instanceCheckpointId && {
+            checkpoint_id: instanceCheckpointId,
+          }),
+        };
         instance = await apiClient.post(
           `project/${projectId}/instance`,
           instanceConfig
         );
-        instanceCheckpoint = { ...currentCheckpoint };
-        instanceTimeframe = { ...currentTimeframe };
       }
-
-      const instanceConfig = {
-        type: currentInstanceType,
-        ...(instanceTimeframe?.id && { timeframe_id: instanceTimeframe.id }),
-        ...(instanceTimeframe?.checkpoint_id && {
-          checkpoint_id:
-            instanceCheckpoint?.id || instanceTimeframe.checkpoint_id,
-        }),
-      };
 
       // Confirm instance has running status
       let instanceStatus;
@@ -400,6 +414,7 @@ export const services = {
               // If a timeframe is specified and it is different from the
               // current timeframe, request it
               if (
+                instanceConfig &&
                 instanceConfig.timeframe_id &&
                 instanceConfig.timeframe_id !== data.timeframe
               ) {
@@ -410,6 +425,7 @@ export const services = {
                   },
                 });
               } else if (
+                instanceConfig &&
                 instanceConfig.checkpoint_id &&
                 instanceConfig.checkpoint_id !== data.checkpoint
               ) {
@@ -430,6 +446,7 @@ export const services = {
                   },
                 });
                 websocket.close();
+                return;
               }
             }
             break;
@@ -438,6 +455,32 @@ export const services = {
             break;
         }
       });
+    } catch (error) {
+      callback({
+        type: 'Instance activation has failed',
+        data: { error },
+      });
+    }
+  },
+  activatePredictionRunInstance: (context) => async (callback) => {
+    try {
+      const { currentInstance, apiClient, project } = context;
+
+      if (!currentInstance) {
+        const instance = await apiClient.post(`project/${project.id}/instance`);
+
+        callback({
+          type: 'Instance is running',
+          data: { instance },
+        });
+      } else {
+        callback({
+          type: 'Instance is ready',
+          data: { instance: context.currentInstance },
+        });
+      }
+
+      // If project is not new, an instance is already running, use it
     } catch (error) {
       callback({
         type: 'Instance activation has failed',

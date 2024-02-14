@@ -91,7 +91,7 @@ export const MosaicContentInner = ({
       const { mosaics: mosaicsList } = await apiClient.get('mosaic');
       onMosaicCreated();
       actorRef.send({
-        type: 'Start new timeframe',
+        type: 'Mosaic was selected',
         data: { mosaic, mosaicsList },
       });
     } catch (error) {
