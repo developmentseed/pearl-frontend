@@ -340,6 +340,9 @@ export const actions = {
   clearCurrentPrediction: assign(() => ({
     currentPrediction: null,
   })),
+  clearCurrentTimeframe: assign(() => ({
+    currentTimeframe: null,
+  })),
   setMapRef: assign((context, event) => ({
     mapRef: event.data.mapRef,
   })),

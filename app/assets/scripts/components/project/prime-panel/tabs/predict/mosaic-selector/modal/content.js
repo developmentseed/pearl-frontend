@@ -36,6 +36,9 @@ export const MosaicContentInner = ({
   const currentImagerySource = ProjectMachineContext.useSelector(
     selectors.currentImagerySource
   );
+  const timeframesList = ProjectMachineContext.useSelector(
+    ({ context }) => context.timeframesList
+  );
 
   const {
     data: collection,
@@ -70,11 +73,25 @@ export const MosaicContentInner = ({
       }
     }
 
+    // Check if mosaic is already used by a timeframe
+    const existingTimeframe = timeframesList.find(
+      (timeframe) => timeframe.mosaic === mosaic.id
+    );
+
+    if (existingTimeframe) {
+      actorRef.send({
+        type: 'Apply existing timeframe',
+        data: { timeframe: existingTimeframe },
+      });
+      onMosaicCreated();
+      return;
+    }
+
     try {
       const { mosaics: mosaicsList } = await apiClient.get('mosaic');
       onMosaicCreated();
       actorRef.send({
-        type: 'Mosaic was selected',
+        type: 'Start new timeframe',
         data: { mosaic, mosaicsList },
       });
     } catch (error) {
