@@ -19,11 +19,16 @@ export const isPredictionReady = (context) => {
   const {
     currentImagerySource,
     currentMosaic,
+    currentTimeframe,
     currentModel,
     currentAoi,
   } = context;
   return (
-    !!currentAoi && !!currentImagerySource && !!currentMosaic && !!currentModel
+    !!currentAoi &&
+    !!currentImagerySource &&
+    !!currentMosaic &&
+    !!currentModel &&
+    !currentTimeframe
   );
 };
 
