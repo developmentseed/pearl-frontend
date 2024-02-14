@@ -316,6 +316,9 @@ export const services = {
         instanceTimeframe = await apiClient.get(
           `project/${projectId}/aoi/${context.currentAoi.id}/timeframe/${instanceTimeframeId}`
         );
+        instanceTimeframe.tilejson = await apiClient.get(
+          `project/${projectId}/aoi/${context.currentAoi.id}/timeframe/${instanceTimeframeId}/tiles`
+        );
       } else {
         instance = await apiClient.post(
           `project/${projectId}/instance`,
