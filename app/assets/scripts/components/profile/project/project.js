@@ -157,7 +157,7 @@ function Project() {
   const { apiToken } = useAuth();
   const history = useHistory();
   const { projectId } = useParams();
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(0);
   const [total, setTotal] = useState(null);
   const [shares, setShares] = useState([]);
   const [isProjectLoading, setIsProjectLoading] = useState(true);
@@ -196,7 +196,7 @@ function Project() {
         setIsAoisLoading(true);
         try {
           const sharesData = await restApiClient.get(
-            `project/${projectId}/share?page=${page - 1}&limit=${AOIS_PER_PAGE}`
+            `project/${projectId}/share?page=${page}&limit=${AOIS_PER_PAGE}`
           );
           setTotal(sharesData.total);
           setShares(sharesData.shares);
@@ -326,9 +326,9 @@ function Project() {
                   />
                   <Paginator
                     currentPage={page}
-                    gotoPage={setPage}
-                    totalItems={total}
-                    itemsPerPage={AOIS_PER_PAGE}
+                    setPage={setPage}
+                    totalRecords={total}
+                    pageSize={AOIS_PER_PAGE}
                   />
                 </>
               ) : (

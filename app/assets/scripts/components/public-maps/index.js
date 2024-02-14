@@ -224,7 +224,7 @@ function RenderSelectedRow(share, { compareMaps, setCompareMaps }) {
 function ExportedMapsList() {
   const { apiToken } = useAuth();
 
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(0);
   const [total, setTotal] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [shares, setShares] = useState([]);
@@ -240,7 +240,7 @@ function ExportedMapsList() {
         try {
           setIsLoading(true);
           const data = await restApiClient.get(
-            `share/?page=${page - 1}&limit=${ITEMS_PER_PAGE}`
+            `share/?page=${page}&limit=${ITEMS_PER_PAGE}`
           );
           setTotal(data.total);
           setShares(data.shares);
@@ -316,9 +316,9 @@ function ExportedMapsList() {
                   />
                   <Paginator
                     currentPage={page}
-                    gotoPage={setPage}
-                    totalItems={total}
-                    itemsPerPage={ITEMS_PER_PAGE}
+                    setPage={setPage}
+                    totalRecords={total}
+                    pageSize={ITEMS_PER_PAGE}
                   />
                 </>
               ) : (
