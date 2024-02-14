@@ -1,12 +1,14 @@
 import { css } from 'styled-components';
 import { themeVal } from '@devseed-ui/theme-provider';
 
-const thumbStyles = ` height: 2rem;
-width: 2rem;
+const thumbStyles = ` height: 3rem;
+width: 3rem;
 border: none;
 margin: 0;
 padding: 0;
 border-radius: 100%;
+border: 4px solid #121826;
+backdrop-filter: blur(5px);
 position: relative;
 pointer-events: auto;
 cursor: ew-resize;
@@ -69,19 +71,19 @@ export default () => css`
   .leaflet-sbs-range::-webkit-slider-thumb {
     -webkit-appearance: none;
     margin-top: -14px;
-    background: url("data:image/svg+xml,%3C%3Fxml version='1.0' encoding='utf-8'%3F%3E%3Csvg width='16' height='16' viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M6.999 16H9.001V0H6.999V16ZM5.414 5.414L4 4L0 8L4 12L5.414 10.586L3.828 9H6V7H3.828L5.414 5.414ZM10.586 5.414L12 4L16 8L12 12L10.586 10.586L12.172 9H10V7H12.172L10.586 5.414Z' fill='%23F0F4FF'/%3E%3C/svg%3E"),
-      ${themeVal('color.background')};
+    background: url("data:image/svg+xml,%3C%3Fxml version='1.0' encoding='utf-8'%3F%3E%3Csvg width='16' height='16' viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M6.999 16H9.001V0H6.999V16ZM5.414 5.414L4 4L0 8L4 12L5.414 10.586L3.828 9H6V7H3.828L5.414 5.414ZM10.586 5.414L12 4L16 8L12 12L10.586 10.586L12.172 9H10V7H12.172L10.586 5.414Z' fill='%23121826'/%3E%3C/svg%3E"),
+      transparent;
     ${thumbStyles};
   }
   .leaflet-sbs-range::-ms-thumb {
-    background: url("data:image/svg+xml,%3C%3Fxml version='1.0' encoding='utf-8'%3F%3E%3Csvg width='16' height='16' viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M6.999 16H9.001V0H6.999V16ZM5.414 5.414L4 4L0 8L4 12L5.414 10.586L3.828 9H6V7H3.828L5.414 5.414ZM10.586 5.414L12 4L16 8L12 12L10.586 10.586L12.172 9H10V7H12.172L10.586 5.414Z' fill='%23F0F4FF'/%3E%3C/svg%3E"),
-      ${themeVal('color.background')};
+    background: url("data:image/svg+xml,%3C%3Fxml version='1.0' encoding='utf-8'%3F%3E%3Csvg width='16' height='16' viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M6.999 16H9.001V0H6.999V16ZM5.414 5.414L4 4L0 8L4 12L5.414 10.586L3.828 9H6V7H3.828L5.414 5.414ZM10.586 5.414L12 4L16 8L12 12L10.586 10.586L12.172 9H10V7H12.172L10.586 5.414Z' fill='%23121826'/%3E%3C/svg%3E"),
+      transparent;
     ${thumbStyles};
   }
   .leaflet-sbs-range::-moz-range-thumb {
     right: 0;
-    background: url("data:image/svg+xml,%3C%3Fxml version='1.0' encoding='utf-8'%3F%3E%3Csvg width='16' height='16' viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M6.999 16H9.001V0H6.999V16ZM5.414 5.414L4 4L0 8L4 12L5.414 10.586L3.828 9H6V7H3.828L5.414 5.414ZM10.586 5.414L12 4L16 8L12 12L10.586 10.586L12.172 9H10V7H12.172L10.586 5.414Z' fill='%23F0F4FF'/%3E%3C/svg%3E"),
-      ${themeVal('color.background')};
+    background: url("data:image/svg+xml,%3C%3Fxml version='1.0' encoding='utf-8'%3F%3E%3Csvg width='16' height='16' viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M6.999 16H9.001V0H6.999V16ZM5.414 5.414L4 4L0 8L4 12L5.414 10.586L3.828 9H6V7H3.828L5.414 5.414ZM10.586 5.414L12 4L16 8L12 12L10.586 10.586L12.172 9H10V7H12.172L10.586 5.414Z' fill='%23121826'/%3E%3C/svg%3E"),
+      transparent;
     ${thumbStyles};
   }
   .leaflet-sbs-range:disabled::-moz-range-thumb {

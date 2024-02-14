@@ -95,6 +95,24 @@ export default () => css`
     border-radius: unset;
     border: unset;
   }
+  #compare-viewmode.leaflet-control.generic-leaflet-control {
+    background: ${themeVal('color.surface')};
+    line-height: 30px;
+    text-align: center;
+  }
+  #compare-viewmode.leaflet-control.generic-leaflet-control {
+    cursor: pointer;
+  }
+  #compare-viewmode.leaflet-control.generic-leaflet-control::after {
+    ${collecticon('resize-center-horizontal')};
+    color: ${themeVal('color.base')};
+    top: unset;
+    left: unset;
+    height: 100%;
+    width: 100%;
+    border-radius: unset;
+    border: unset;
+  }
   .leaflet-control-scale-line {
     background: rgba(255, 255, 255, 0.75);
   }

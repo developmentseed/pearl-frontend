@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import PageHeader from '../common/page-header';
 import toasts from '../common/toasts';
-import { PageBody } from '../../styles/page';
-import { MapContainer, FeatureGroup } from 'react-leaflet';
+import { PageBody as BasePageBody } from '../../styles/page';
+import { MapContainer, FeatureGroup, TileLayer, useMap } from 'react-leaflet';
+import sync from 'leaflet.sync';
 
 import { useParams } from 'react-router-dom';
 import App from '../common/app';
@@ -39,6 +40,15 @@ import { getMosaicTileUrl } from '../../utils/mosaics';
 
 const { restApiEndpoint } = config;
 
+const PageBody = styled(BasePageBody)`
+  display: ${({ viewMode }) => viewMode === 'grid' && 'grid'};
+  grid-template-columns: 1fr 1fr;
+  > *:first-child {
+    border-right: ${({ viewMode }) =>
+      viewMode === 'grid' ? '4px solid transparent' : 'none'};
+    border-color: ${themeVal('color.background')};
+  }
+`;
 const AOIPanel = styled(PanelBlock)`
   background: ${themeVal('color.surface')};
   position: absolute;
@@ -128,6 +138,7 @@ export const composeMosaicName = (start, end) =>
 function CompareMap() {
   const { leftUUID, rightUUID } = useParams();
   const [mapRef, setMapRef] = useState(null);
+  const [mapRef2, setMapRef2] = useState(null);
   const { restApiClient } = useAuth();
   const [tileUrls, setTileUrls] = useState([]);
   const [mapLayers, setMapLayers] = useState(INITIAL_MAP_LAYERS);
@@ -135,9 +146,11 @@ function CompareMap() {
   const [aoiClasses, setAoiClasses] = useState([]);
   const [aoisInfo, setAoisInfo] = useState([]);
   const [mosaicUrls, setMosaicUrls] = useState([]);
+  const [viewMode, setViewMode] = useState('grid');
 
   useEffect(() => {
     if (!mapRef) return;
+    if (viewMode === 'grid' && !mapRef2) return;
     const fetchDataForUUID = async (uuid) => {
       try {
         const [tileJSON, aoiData] = await Promise.all([
@@ -171,6 +184,14 @@ function CompareMap() {
             padding: BOUNDS_PADDING,
             maxZoom: MAX_BASE_MAP_ZOOM_LEVEL,
           });
+          if (viewMode === 'grid') {
+            mapRef2.fitBounds(bounds, {
+              padding: BOUNDS_PADDING,
+              maxZoom: MAX_BASE_MAP_ZOOM_LEVEL,
+            });
+            mapRef.sync(mapRef2);
+            mapRef2.sync(mapRef);
+          }
         }
       } catch (error) {
         logger(error);
@@ -179,12 +200,20 @@ function CompareMap() {
     };
 
     fetchDataForUUID(leftUUID).then(() => fetchDataForUUID(rightUUID));
-  }, [leftUUID, rightUUID, mapRef]);
+  }, [leftUUID, rightUUID, mapRef, mapRef2, viewMode]);
+
+  useEffect(() => {
+    if (!mapRef || !mapRef2) return;
+    setTimeout(() => {
+      mapRef.invalidateSize();
+      mapRef2.invalidateSize();
+    }, 400);
+  }, [mapRef, mapRef2, viewMode]);
 
   return (
     <App pageTitle='Compare AOI Maps'>
       <PageHeader />
-      <PageBody role='main'>
+      <PageBody role='main' viewMode={viewMode}>
         <MapContainer
           style={{ height: '100%' }}
           maxZoom={MAX_BASE_MAP_ZOOM_LEVEL}
@@ -193,7 +222,39 @@ function CompareMap() {
             setMapRef(m);
           }}
         >
-          {tileUrls.length === 2 &&
+          {viewMode === 'grid' &&
+            tileUrls.length === 2 &&
+            mosaicUrls.length === 2 && (
+              <>
+                <TileLayer
+                  url={tileUrls[0]}
+                  minZoom={12}
+                  maxZoom={20}
+                  zIndex={3}
+                  opacity={
+                    mapLayers.predictionsLeft.visible
+                      ? mapLayers.predictionsLeft.opacity
+                      : 0
+                  }
+                  key={`${viewMode}-01`}
+                />
+
+                <TileLayer
+                  url={mosaicUrls[0]}
+                  attribution={toTitleCase(
+                    `${aoisInfo[0].mosaic.params.collection.replace(
+                      /-/g,
+                      ' '
+                    )} | Microsoft Planetary Computer`
+                  )}
+                  minZoom={12}
+                  maxZoom={20}
+                  zIndex={2}
+                />
+              </>
+            )}
+          {viewMode === 'slider' &&
+            tileUrls.length === 2 &&
             mosaicUrls.length === 2 &&
             aoisInfo.length === 2 && (
               <SideBySideTileLayer
@@ -236,8 +297,71 @@ function CompareMap() {
                 setShowLayersControl(!showLayersControl);
               }}
             />
+            {/* <GenericControl
+              id='compare-viewmode'
+              onClick={(e) => {
+                e.stopPropagation();
+                setViewMode((curView) =>
+                  curView === 'grid' ? 'slider' : null
+                );
+              }}
+            /> */}
           </FeatureGroup>
         </MapContainer>
+        {viewMode === 'grid' && (
+          <MapContainer
+            style={{ height: '100%' }}
+            maxZoom={MAX_BASE_MAP_ZOOM_LEVEL}
+            whenCreated={(m) => {
+              setMapRef2(m);
+            }}
+            zoomControl={false}
+          >
+            {tileUrls.length === 2 &&
+              mosaicUrls.length === 2 &&
+              aoisInfo.length === 2 && (
+                <>
+                  <TileLayer
+                    url={tileUrls[1]}
+                    minZoom={12}
+                    maxZoom={20}
+                    zIndex={3}
+                    opacity={
+                      mapLayers.predictionsRight.visible
+                        ? mapLayers.predictionsRight.opacity
+                        : 0
+                    }
+                  />
+
+                  <TileLayer
+                    url={mosaicUrls[1]}
+                    attribution={toTitleCase(
+                      `${aoisInfo[1].mosaic.params.collection.replace(
+                        /-/g,
+                        ' '
+                      )} | Microsoft Planetary Computer`
+                    )}
+                    minZoom={12}
+                    maxZoom={20}
+                    zIndex={2}
+                  />
+                </>
+              )}
+          </MapContainer>
+        )}
+
+        <Button
+          onClick={() => setViewMode(viewMode === 'slider' ? 'grid' : 'slider')}
+          variation='base-plain'
+          useIcon='resize-center-horizontal'
+          hideText
+          style={{
+            position: 'absolute',
+            top: '4rem',
+            right: '2rem',
+            zIndex: '500',
+          }}
+        />
         <LayersPanel
           mapRef={mapRef}
           parentId='layer-control'
@@ -329,3 +453,53 @@ function CompareMap() {
 }
 
 export default CompareMap;
+
+// {
+//   viewMode === 'overlay' && tileUrls.length === 2 && mosaicUrls.length === 2 && (
+//     <>
+//       <TileLayer
+//         url={tileUrls[0]}
+//         minZoom={12}
+//         maxZoom={20}
+//         zIndex={3}
+//         opacity={
+//           mapLayers.predictionsLeft.visible
+//             ? mapLayers.predictionsLeft.opacity
+//             : 0
+//         }
+//       />
+//       <TileLayer
+//         url={tileUrls[1]}
+//         minZoom={12}
+//         maxZoom={20}
+//         zIndex={3}
+//         opacity={
+//           mapLayers.predictionsRight.visible
+//             ? mapLayers.predictionsRight.opacity
+//             : 0
+//         }
+//       />
+//       <TileLayer
+//         url={mosaicUrls[0]}
+//         attribution={toTitleCase(
+//           `${aoisInfo[0].mosaic.params.collection.replace(
+//             /-/g,
+//             ' '
+//           )} | Microsoft Planetary Computer`
+//         )}
+//         minZoom={12}
+//         maxZoom={20}
+//         zIndex={2}
+//       />
+//     </>
+//   );
+// }
+
+{
+  /* <SideBySideView tileUrls={tileUrls}
+aoisInfo={aoisInfo}
+mosaicUrls={mosaicUrls}
+mapRef={mapRef}
+setMapRef={setMapRef}
+bounds /> */
+}
