@@ -1252,7 +1252,10 @@ export const services = {
     const nextTimeframesList = timeframesList.filter(
       (t) => t.id !== currentTimeframe.id
     );
-    const nextTimeframe = nextTimeframe.length > 0 ? nextTimeframe[0] : null;
+
+    const nextTimeframe =
+      nextTimeframesList.length > 0 ? nextTimeframesList[0] : null;
+
     let nextInstance = context.currentInstance;
 
     // If there is a next timeframe, update the instance
@@ -1279,7 +1282,7 @@ export const services = {
       `project/${project.id}/aoi/${currentAoi.id}/timeframe/${currentTimeframe.id}`
     );
     return {
-      timeframe: nextTimeframe.length > 0 ? nextTimeframe[0] : null,
+      timeframe: nextTimeframe,
       timeframesList: nextTimeframesList,
       currentInstance: nextInstance,
     };
