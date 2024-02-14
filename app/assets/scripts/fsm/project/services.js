@@ -1130,6 +1130,8 @@ export const services = {
         // thrown inside onReceive. A fix is planned for XState v5, more
         // here: https://github.com/statelyai/xstate/issues/3279
         callback({ type: 'Retrain was aborted' });
+        websocket.close();
+        return;
       }
     });
 
@@ -1158,7 +1160,9 @@ export const services = {
             type: 'Unexpected Instance Error',
             data: { error: data.error },
           });
-          break;
+          websocket.close();
+          return;
+
         case 'info#connected':
         case 'info#disconnected':
         case 'model#timeframe#progress':
@@ -1178,6 +1182,8 @@ export const services = {
               type: 'Unexpected Instance Error',
               data: { error: data.error },
             });
+            websocket.close();
+            return;
           } else if (!isStarted && !data.processing) {
             isStarted = true;
             if (data.aoi !== currentTimeframe.id) {
@@ -1199,8 +1205,8 @@ export const services = {
               currentMosaic,
             },
           });
-
-          break;
+          websocket.close();
+          return;
 
         default:
           if (data?.error) {
@@ -1208,13 +1214,14 @@ export const services = {
               type: 'Unexpected Instance Error',
               data: { error: data.error },
             });
+            websocket.close();
+            return;
           } else {
             logger('Unhandled websocket message', message, data);
           }
           break;
       }
     });
-    return () => websocket.close();
   },
   deleteCurrentTimeframe: async (context) => {
     const {
