@@ -91,7 +91,9 @@ function RenderRow(share, { restApiClient }) {
     <TableRow key={aoi.id}>
       <TableCell>{aoi.name}</TableCell>
       <TableCell>{formatThousands(tArea(aoi.bounds) / 1e6)}</TableCell>
-      <TableCell>{composeMosaicName(mosaic.mosaic_ts_start, mosaic.mosaic_ts_end)}</TableCell>
+      <TableCell>
+        {composeMosaicName(mosaic.mosaic_ts_start, mosaic.mosaic_ts_end)}
+      </TableCell>
       <TableCell>{timeframe.checkpoint_id}</TableCell>
       <TableCell>{timeframe.classes.length}</TableCell>
       <TableCell>{formatDateTime(timeframe.created)}</TableCell>

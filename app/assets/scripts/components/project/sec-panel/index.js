@@ -43,6 +43,9 @@ const CountList = styled.div`
   display: grid;
   grid-template-columns: auto auto;
   justify-content: space-between;
+  & > ${Prose}:nth-child(2n) {
+    text-align: right;
+  }
 `;
 const DefinedTerm = styled.span`
   display: flex;
@@ -91,12 +94,12 @@ function SecPanel() {
                       {Object.values(currentCheckpoint.classes).map(
                         (cl, ind) => {
                           return (
-                            <div key={cl.name}>
+                            <React.Fragment key={cl.name}>
                               <Prose size='small'>{cl.name}</Prose>
                               <Prose size='small'>
                                 {`${currentCheckpoint.analytics[ind].counts}`}
                               </Prose>
-                            </div>
+                            </React.Fragment>
                           );
                         }
                       )}
