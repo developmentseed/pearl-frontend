@@ -72,10 +72,10 @@ const FormInputGroup = styled.div`
 const AOI_HEADERS = [
   'AOI Name',
   'AOI Size (Km2)',
+  'Created',
   'Mosaic',
   'Checkpoint',
   'Classes',
-  'Created',
   'Link',
   'Download',
   'Published',
@@ -91,12 +91,12 @@ function RenderRow(share, { restApiClient }) {
     <TableRow key={aoi.id}>
       <TableCell>{aoi.name}</TableCell>
       <TableCell>{formatThousands(tArea(aoi.bounds) / 1e6)}</TableCell>
+      <TableCell>{formatDateTime(timeframe.created)}</TableCell>
       <TableCell>
         {composeMosaicName(mosaic.mosaic_ts_start, mosaic.mosaic_ts_end)}
       </TableCell>
       <TableCell>{timeframe.checkpoint_id}</TableCell>
       <TableCell>{timeframe.classes.length}</TableCell>
-      <TableCell>{formatDateTime(timeframe.created)}</TableCell>
       <TableCell>
         <Button
           variation='primary-plain'
