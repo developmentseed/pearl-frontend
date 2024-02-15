@@ -83,9 +83,6 @@ export function MosaicSelector() {
   const currentImagerySource = ProjectMachineContext.useSelector(
     selectors.currentImagerySource
   );
-  const currentCheckpoint = ProjectMachineContext.useSelector(
-    selectors.currentCheckpoint
-  );
   const currentMosaic = ProjectMachineContext.useSelector(
     selectors.currentMosaic
   );

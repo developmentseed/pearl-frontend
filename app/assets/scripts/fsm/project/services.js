@@ -277,8 +277,8 @@ export const services = {
       );
 
       let instanceConfig;
-      let instanceCheckpoint;
-      let instanceTimeframe;
+      let instanceCheckpoint = currentCheckpoint;
+      let instanceTimeframe = currentTimeframe;
 
       // Reuse existing instance if available
       if (activeInstances.total > 0) {
