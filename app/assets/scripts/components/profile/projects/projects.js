@@ -139,6 +139,7 @@ function Projects() {
                     data={projects}
                     renderRow={renderRow}
                     hoverable
+                    fixedTable
                   />
                   <Paginator
                     currentPage={page}

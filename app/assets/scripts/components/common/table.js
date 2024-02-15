@@ -15,6 +15,7 @@ const _rgba = stylizeFunction(rgba);
 const StyledTable = styled.table`
   width: 100%;
   max-width: 100%;
+  table-layout: ${({ fixedTable }) => fixedTable && 'fixed'};
   td,
   th {
     padding: ${glsp(3 / 8)};
@@ -42,6 +43,13 @@ const StyledTable = styled.table`
     vertical-align: baseline;
     border-bottom: ${themeVal('layout.border')} solid
       ${themeVal('color.baseAlphaD')};
+    ${({ fixedTable }) =>
+      fixedTable &&
+      css`
+        overflow: hidden;
+        text-overflow: ellipsis;
+        text-wrap: nowrap;
+      `}
   }
   tbody td {
     background: ${_rgba(themeVal('color.surface'), 0.32)};
@@ -96,9 +104,9 @@ export const TableRowHeader = styled(Subheading)`
  * @param {Function} renderRow - function which receives data objects and returns a <tr>
  * @param {Object} extraData - arbitrary extra data that will be passed to renderRow as second argument
  */
-function Table({ headers, data, renderRow, extraData, hoverable }) {
+function Table({ headers, data, renderRow, extraData, hoverable, fixedTable }) {
   return (
-    <StyledTable hoverable={hoverable}>
+    <StyledTable hoverable={hoverable} fixedTable={fixedTable}>
       <TableHeader>
         <TableRow>
           {headers.map((header) => (
@@ -119,6 +127,7 @@ Table.propTypes = {
   renderRow: T.func,
   extraData: T.object,
   hoverable: T.bool,
+  fixedTable: T.bool,
 };
 
 export default Table;
