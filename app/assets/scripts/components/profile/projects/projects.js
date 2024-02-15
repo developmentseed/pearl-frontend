@@ -81,7 +81,7 @@ function renderRow(proj) {
 function Projects() {
   const { apiToken } = useAuth();
 
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(0);
   const [total, setTotal] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [projects, setProjects] = useState([]);
@@ -94,7 +94,7 @@ function Projects() {
         try {
           showGlobalLoadingMessage('Loading projects...');
           const data = await restApiClient.get(
-            `project/?page=${page - 1}&limit=${PROJECTS_PER_PAGE}`
+            `project/?page=${page}&limit=${PROJECTS_PER_PAGE}`
           );
           setTotal(data.total);
           setProjects(data.projects);
@@ -142,9 +142,9 @@ function Projects() {
                   />
                   <Paginator
                     currentPage={page}
-                    gotoPage={setPage}
-                    totalItems={total}
-                    itemsPerPage={PROJECTS_PER_PAGE}
+                    setPage={setPage}
+                    totalRecords={total}
+                    pageSize={PROJECTS_PER_PAGE}
                   />
                 </>
               ) : (

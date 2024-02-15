@@ -140,11 +140,9 @@ BatchRow.propTypes = {
 };
 
 function BatchList({ projectId }) {
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(0);
   const { isReady, data, hasError } = useFetch(
-    `project/${projectId}/batch?page=${
-      page - 1
-    }&limit=${TABLE_PAGE_SIZE}&order=desc`
+    `project/${projectId}/batch?page=${page}&limit=${TABLE_PAGE_SIZE}&order=desc`
   );
 
   if (!isReady) {
@@ -182,9 +180,9 @@ function BatchList({ projectId }) {
       />
       <Paginator
         currentPage={page}
-        gotoPage={setPage}
-        totalItems={data.total}
-        itemsPerPage={TABLE_PAGE_SIZE}
+        setPage={setPage}
+        totalRecords={data.total}
+        pageSize={TABLE_PAGE_SIZE}
       />
     </section>
   );
