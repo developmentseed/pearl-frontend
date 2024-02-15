@@ -19,7 +19,7 @@ import { SESSION_MODES } from '../../../../../../fsm/project/constants';
 import selectors from '../../../../../../fsm/project/selectors';
 import * as guards from '../../../../../../fsm/project/guards';
 
-import { formatMosaicDateRange } from '../../../../../../utils/dates';
+import { formatTimeframeLabel } from '../../../../../../utils/dates';
 import { SelectorHeadOption } from '../../../selection-styles';
 
 const Option = styled.div`
@@ -109,27 +109,27 @@ export function MosaicSelector() {
     label = 'Define Imagery Source';
   } else {
     label = currentMosaic
-      ? formatMosaicDateRange(
+      ? formatTimeframeLabel(
           currentMosaic?.mosaic_ts_start,
-          currentMosaic?.mosaic_ts_end
+          currentMosaic?.mosaic_ts_end,
+          currentTimeframe?.checkpoint_id
         )
       : 'Select Mosaic';
     disabled = false;
   }
 
-  const optionsList = timeframesList
-    ?.filter((t) => t.checkpoint_id === currentCheckpoint?.id)
-    .map((t) => {
-      const mosaic = mosaicsList.find((m) => m.id === t.mosaic);
-      return {
-        id: t.id,
-        label: formatMosaicDateRange(
-          mosaic.mosaic_ts_start,
-          mosaic.mosaic_ts_end
-        ),
-        timeframe: t,
-      };
-    });
+  const optionsList = timeframesList?.map((t) => {
+    const mosaic = mosaicsList.find((m) => m.id === t.mosaic);
+    return {
+      id: t.id,
+      label: formatTimeframeLabel(
+        mosaic.mosaic_ts_start,
+        mosaic.mosaic_ts_end,
+        t.checkpoint_id
+      ),
+      timeframe: t,
+    };
+  });
 
   return (
     <>
