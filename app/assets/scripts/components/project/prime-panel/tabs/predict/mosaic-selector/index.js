@@ -83,6 +83,9 @@ export function MosaicSelector() {
   const currentImagerySource = ProjectMachineContext.useSelector(
     selectors.currentImagerySource
   );
+  const currentCheckpoint = ProjectMachineContext.useSelector(
+    selectors.currentCheckpoint
+  );
   const currentMosaic = ProjectMachineContext.useSelector(
     selectors.currentMosaic
   );
@@ -114,17 +117,19 @@ export function MosaicSelector() {
     disabled = false;
   }
 
-  const optionsList = timeframesList?.map((t) => {
-    const mosaic = mosaicsList.find((m) => m.id === t.mosaic);
-    return {
-      id: t.id,
-      label: formatMosaicDateRange(
-        mosaic.mosaic_ts_start,
-        mosaic.mosaic_ts_end
-      ),
-      timeframe: t,
-    };
-  });
+  const optionsList = timeframesList
+    ?.filter((t) => t.checkpoint_id === currentCheckpoint?.id)
+    .map((t) => {
+      const mosaic = mosaicsList.find((m) => m.id === t.mosaic);
+      return {
+        id: t.id,
+        label: formatMosaicDateRange(
+          mosaic.mosaic_ts_start,
+          mosaic.mosaic_ts_end
+        ),
+        timeframe: t,
+      };
+    });
 
   return (
     <>
