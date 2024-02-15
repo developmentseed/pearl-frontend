@@ -34,6 +34,7 @@ import copyTextToClipboard from '../../../utils/copy-text-to-clipboard';
 import logger from '../../../utils/logger';
 import BatchList from './batch-list';
 import { downloadShareGeotiff } from '../../../utils/share-link';
+import { composeMosaicName } from '../../compare-map';
 
 // Controls the size of each page
 const AOIS_PER_PAGE = 20;
@@ -90,7 +91,7 @@ function RenderRow(share, { restApiClient }) {
     <TableRow key={aoi.id}>
       <TableCell>{aoi.name}</TableCell>
       <TableCell>{formatThousands(tArea(aoi.bounds) / 1e6)}</TableCell>
-      <TableCell>{mosaic?.name}</TableCell>
+      <TableCell>{composeMosaicName(mosaic.mosaic_ts_start, mosaic.mosaic_ts_end)}</TableCell>
       <TableCell>{timeframe.checkpoint_id}</TableCell>
       <TableCell>{timeframe.classes.length}</TableCell>
       <TableCell>{formatDateTime(timeframe.created)}</TableCell>
