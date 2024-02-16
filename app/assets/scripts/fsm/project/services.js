@@ -266,6 +266,8 @@ export const services = {
         currentInstanceType,
         currentTimeframe,
         currentCheckpoint,
+        timeframesList,
+        mosaicsList,
       } = context;
       const { id: projectId } = context.project;
 
@@ -277,8 +279,9 @@ export const services = {
       );
 
       let instanceConfig;
-      let instanceCheckpoint = currentCheckpoint;
-      let instanceTimeframe = currentTimeframe;
+      let nextCheckpoint = currentCheckpoint;
+      let nextTimeframe = currentTimeframe;
+      let nextMosaic = null;
 
       // Reuse existing instance if available
       if (activeInstances.total > 0) {
@@ -286,34 +289,39 @@ export const services = {
         instance = await apiClient.get(
           `project/${projectId}/instance/${instanceId}`
         );
-        const instanceCheckpointId = instance.checkpoint_id;
-        const instanceTimeframeId = instance.timeframe_id;
+        const nextCheckpointId = instance.checkpoint_id;
 
-        if (instanceCheckpointId) {
-          instanceCheckpoint = await apiClient.get(
-            `project/${projectId}/checkpoint/${instanceCheckpointId}`
+        nextTimeframe =
+          timeframesList?.find(
+            (timeframe) => timeframe.checkpoint_id === nextCheckpointId
+          ) || null;
+
+        if (nextCheckpointId) {
+          nextCheckpoint = await apiClient.get(
+            `project/${projectId}/checkpoint/${nextCheckpointId}`
           );
         }
-        if (instanceTimeframeId) {
-          instanceTimeframe = await apiClient.get(
-            `project/${projectId}/aoi/${context.currentAoi.id}/timeframe/${instanceTimeframeId}`
+
+        if (nextTimeframe) {
+          nextTimeframe.tilejson = await apiClient.get(
+            `project/${projectId}/aoi/${context.currentAoi.id}/timeframe/${nextTimeframe.id}/tiles`
           );
-          instanceTimeframe.tilejson = await apiClient.get(
-            `project/${projectId}/aoi/${context.currentAoi.id}/timeframe/${instanceTimeframeId}/tiles`
+          nextMosaic = mosaicsList.find(
+            (mosaic) => mosaic.id === nextTimeframe.mosaic
           );
         }
       } else {
         // There are no instance running. Check if there is a timeframe or
         // checkpoint to use and create a new instance
-        const instanceTimeframeId = currentTimeframe?.id;
-        const instanceCheckpointId =
+        const nextTimeframeId = currentTimeframe?.id;
+        const nextCheckpointId =
           currentTimeframe?.checkpoint_id || currentCheckpoint?.id;
 
         instanceConfig = {
           type: currentInstanceType,
-          ...(instanceTimeframeId && { timeframe_id: instanceTimeframeId }),
-          ...(instanceCheckpointId && {
-            checkpoint_id: instanceCheckpointId,
+          ...(nextTimeframeId && { timeframe_id: nextTimeframeId }),
+          ...(nextCheckpointId && {
+            checkpoint_id: nextCheckpointId,
           }),
         };
         instance = await apiClient.post(
@@ -441,8 +449,9 @@ export const services = {
                   type: 'Instance is ready',
                   data: {
                     instance,
-                    timeframe: instanceTimeframe,
-                    checkpoint: instanceCheckpoint,
+                    timeframe: nextTimeframe,
+                    checkpoint: nextCheckpoint,
+                    mosaic: nextMosaic,
                   },
                 });
                 websocket.close();
@@ -953,8 +962,23 @@ export const services = {
 
     return { batchPrediction };
   },
-  applyCheckpoint: (context) => (callback, onReceive) => {
+  applyCheckpoint: (context) => async (callback, onReceive) => {
     const { currentCheckpoint } = context;
+
+    const nextTimeframe =
+      context.timeframesList.find(
+        (timeframe) => timeframe.checkpoint_id === currentCheckpoint.id
+      ) || null;
+    let nextMosaic = null;
+
+    if (nextTimeframe) {
+      nextMosaic = context.mosaicsList.find(
+        (mosaic) => mosaic.id === nextTimeframe.mosaic
+      );
+      nextTimeframe.tilejson = await context.apiClient.get(
+        `project/${context.project.id}/aoi/${context.currentAoi.id}/timeframe/${nextTimeframe.id}/tiles`
+      );
+    }
 
     const { token } = context.currentInstance;
     const websocket = new WebsocketClient(token);
@@ -1062,7 +1086,11 @@ export const services = {
         case 'model#checkpoint#complete':
           callback({
             type: 'Checkpoint was applied',
-            data,
+            data: {
+              checkpoint: data,
+              timeframe: nextTimeframe,
+              mosaic: nextMosaic,
+            },
           });
           break;
 
@@ -1246,15 +1274,21 @@ export const services = {
       project,
       currentAoi,
       currentTimeframe,
+      currentCheckpoint,
       timeframesList,
     } = context;
 
     const nextTimeframesList = timeframesList.filter(
-      (t) => t.id !== currentTimeframe.id
+      (t) =>
+        t.id !== currentTimeframe?.id &&
+        t.checkpoint_id === currentCheckpoint.id
     );
 
     const nextTimeframe =
       nextTimeframesList.length > 0 ? nextTimeframesList[0] : null;
+    const nextMosaic = context.mosaicsList.find(
+      (mosaic) => mosaic.id === nextTimeframe?.mosaic
+    );
 
     let nextInstance = context.currentInstance;
 
@@ -1284,6 +1318,7 @@ export const services = {
     return {
       timeframe: nextTimeframe,
       timeframesList: nextTimeframesList,
+      mosaic: nextMosaic,
       currentInstance: nextInstance,
     };
   },

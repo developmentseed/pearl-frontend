@@ -75,7 +75,9 @@ export const actions = {
   }),
   setCurrentMosaic: assign((_, event) => {
     const { mosaic, mosaicsList } = event.data;
-    const currentMosaic = { ...mosaic, tileUrl: getMosaicTileUrl(mosaic) };
+    const currentMosaic = mosaic
+      ? { ...mosaic, tileUrl: getMosaicTileUrl(mosaic) }
+      : null;
 
     // Optionally update mosaic list if provided
     return mosaicsList ? { mosaicsList, currentMosaic } : { currentMosaic };
@@ -469,12 +471,24 @@ export const actions = {
     sessionMode: SESSION_MODES.RETRAIN,
     sessionStatusMessage: 'Ready for retrain run',
   })),
-  enterApplyCheckpoint: assign(() => ({
-    sessionStatusMessage: 'Applying checkpoint',
-    globalLoading: {
-      disabled: false,
-    },
-  })),
+  enterApplyCheckpoint: assign((context) => {
+    const nextTimeframe =
+      context.timeframesList.find(
+        (t) => t.checkpoint_id === context.currentCheckpoint.id
+      ) || null;
+
+    const nextMosaic =
+      context.mosaicsList.find((m) => m.id === nextTimeframe?.mosaic) || null;
+
+    return {
+      sessionStatusMessage: 'Applying checkpoint',
+      currentTimeframe: nextTimeframe,
+      currentMosaic: nextMosaic,
+      globalLoading: {
+        disabled: false,
+      },
+    };
+  }),
   enterApplyTimeframe: assign(() => ({
     sessionStatusMessage: 'Applying timeframe',
     globalLoading: {
