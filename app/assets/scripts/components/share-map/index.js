@@ -181,7 +181,10 @@ function ShareMap() {
         <MapContainer
           style={{ height: '100%' }}
           maxZoom={MAX_BASE_MAP_ZOOM_LEVEL}
-          whenCreated={(m) => setMapRef(m)}
+          whenCreated={(m) => {
+            m.attributionControl.setPrefix('');
+            setMapRef(m);
+          }}
         >
           <BaseMapLayer />
           {mosaicUrl && aoiInfo.mosaic && (
