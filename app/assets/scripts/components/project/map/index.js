@@ -6,7 +6,9 @@ import SizeAwareElement from '../../common/size-aware-element';
 import {
   ImageOverlay,
   MapContainer,
+  ScaleControl,
   TileLayer,
+  FeatureGroup,
   useMapEvent,
 } from 'react-leaflet';
 
@@ -14,6 +16,8 @@ import {
   MAX_BASE_MAP_ZOOM_LEVEL,
   BaseMapLayer,
 } from '../../common/map/base-map-layer';
+import GeoCoder from '../../common/map/geocoder';
+import CenterMap from '../../common/map/center-map';
 
 import { themeVal, multiply } from '@devseed-ui/theme-provider';
 import { ProjectMachineContext } from '../../../fsm/project';
@@ -372,6 +376,11 @@ function Map() {
               opacity={predictionsOpacity}
             />
           ))}
+        <FeatureGroup>
+          <GeoCoder />
+          {currentAoiShape && <CenterMap aoiRef={currentAoiShape} />}
+        </FeatureGroup>
+        <ScaleControl />
       </MapContainer>
     </SizeAwareElement>
   );
