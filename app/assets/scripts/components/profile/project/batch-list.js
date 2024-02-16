@@ -146,20 +146,26 @@ function BatchList({ projectId }) {
   );
 
   if (!isReady) {
-    return <Heading>Loading batch predictions...</Heading>;
+    return <Heading size='small'>Loading batch predictions...</Heading>;
   }
 
   if (hasError) {
-    return <Heading>Batch predictions could not be retrieved.</Heading>;
+    return (
+      <Heading size='small'>Batch predictions could not be retrieved.</Heading>
+    );
   }
 
   if (data && data.total === 0) {
-    return <Heading>No batch predictions for this project.</Heading>;
+    return (
+      <section>
+        <Heading size='small'>No batch predictions for this project.</Heading>
+      </section>
+    );
   }
 
   return (
-    <>
-      <Heading>Batch Predictions</Heading>
+    <section>
+      <Heading size='small'>Batch Predictions</Heading>
       <Table
         data-cy='batch-list-table'
         headers={TABLE_HEADERS}
@@ -178,7 +184,7 @@ function BatchList({ projectId }) {
         totalRecords={data.total}
         pageSize={TABLE_PAGE_SIZE}
       />
-    </>
+    </section>
   );
 }
 

@@ -18,7 +18,7 @@ import {
 import { ProjectsBody as ProjectBody } from '../projects/projects';
 import { media } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
-import { FormInput, FormSwitch } from '@devseed-ui/form';
+import { FormSwitch } from '@devseed-ui/form';
 import { StyledLink } from '../../../styles/links';
 import toasts from '../../common/toasts';
 import { useAuth } from '../../../context/auth';
@@ -34,6 +34,7 @@ import copyTextToClipboard from '../../../utils/copy-text-to-clipboard';
 import logger from '../../../utils/logger';
 import BatchList from './batch-list';
 import { downloadShareGeotiff } from '../../../utils/share-link';
+import { composeMosaicName } from '../../compare-map';
 
 // Controls the size of each page
 const AOIS_PER_PAGE = 20;
@@ -71,10 +72,10 @@ const FormInputGroup = styled.div`
 const AOI_HEADERS = [
   'AOI Name',
   'AOI Size (Km2)',
+  'Created',
   'Mosaic',
   'Checkpoint',
   'Classes',
-  'Created',
   'Link',
   'Download',
   'Published',
@@ -90,29 +91,29 @@ function RenderRow(share, { restApiClient }) {
     <TableRow key={aoi.id}>
       <TableCell>{aoi.name}</TableCell>
       <TableCell>{formatThousands(tArea(aoi.bounds) / 1e6)}</TableCell>
-      <TableCell>{mosaic?.name}</TableCell>
-      <TableCell>{timeframe.checkpoint_id}</TableCell>
-      <TableCell>{timeframe.classes.length}</TableCell>
       <TableCell>{formatDateTime(timeframe.created)}</TableCell>
       <TableCell>
-        <FormInputGroup>
-          <FormInput readOnly value={shareLink} size='small' />
-          <Button
-            variation='primary-plain'
-            useIcon='clipboard'
-            hideText
-            onClick={() => {
-              copyTextToClipboard(shareLink).then((result) => {
-                if (result) {
-                  toasts.success('URL copied to clipboard');
-                } else {
-                  logger('Failed to copy', result);
-                  toasts.error('Failed to copy URL to clipboard');
-                }
-              });
-            }}
-          />
-        </FormInputGroup>
+        {composeMosaicName(mosaic.mosaic_ts_start, mosaic.mosaic_ts_end)}
+      </TableCell>
+      <TableCell>{timeframe.checkpoint_id}</TableCell>
+      <TableCell>{timeframe.classes.length}</TableCell>
+      <TableCell>
+        <Button
+          variation='primary-plain'
+          size='small'
+          useIcon='clipboard'
+          hideText
+          onClick={() => {
+            copyTextToClipboard(shareLink).then((result) => {
+              if (result) {
+                toasts.success('URL copied to clipboard');
+              } else {
+                logger('Failed to copy', result);
+                toasts.error('Failed to copy URL to clipboard');
+              }
+            });
+          }}
+        />
       </TableCell>
       <TableCell>
         <Button
@@ -309,7 +310,7 @@ function Project() {
             <BatchList projectId={projectId} />
             {shares &&
               (shares.length ? (
-                <>
+                <section>
                   <Heading size='small'>
                     {project ? 'Exported Maps' : 'Loading Project...'}
                   </Heading>
@@ -330,9 +331,9 @@ function Project() {
                     totalRecords={total}
                     pageSize={AOIS_PER_PAGE}
                   />
-                </>
+                </section>
               ) : (
-                <Heading>
+                <Heading size='small'>
                   {isAoisLoading
                     ? 'Loading AOIs...'
                     : 'No Exported AOIs for this project.'}

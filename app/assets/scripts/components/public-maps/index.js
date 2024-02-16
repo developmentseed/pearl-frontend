@@ -92,11 +92,11 @@ const SelectedHeader = styled.div`
 
 const HEADERS = [
   'AOI Name',
-  'Created',
   'AOI Size (Km2)',
+  'Created',
+  'Mosaic',
   'Model',
   'Checkpoint',
-  'Mosaic',
   'Classes',
   'Link',
   'Download',
@@ -141,13 +141,13 @@ function RenderRow(share, { restApiClient, compareMaps, setCompareMaps }) {
   return (
     <TableRow key={share.uuid}>
       <TableCell>{aoi.name}</TableCell>
-      <TableCell>{formatDateTime(timeframe.created)}</TableCell>
       <TableCell>{formatThousands(tArea(aoi.bounds) / 1e6)}</TableCell>
-      <TableCell>{model.name}</TableCell>
-      <TableCell>{checkpoint.name}</TableCell>
+      <TableCell>{formatDateTime(timeframe.created)}</TableCell>
       <TableCell>
         {composeMosaicName(mosaic.mosaic_ts_start, mosaic.mosaic_ts_end)}
       </TableCell>
+      <TableCell>{model.name}</TableCell>
+      <TableCell>{checkpoint.name}</TableCell>
       <TableCell>{timeframe.classes.length}</TableCell>
       <TableCell>
         <Button
