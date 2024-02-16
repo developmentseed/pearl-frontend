@@ -22,9 +22,17 @@ export const isPredictionReady = (context) => {
     currentModel,
     currentAoi,
   } = context;
-  return (
-    !!currentAoi && !!currentImagerySource && !!currentMosaic && !!currentModel
-  );
+
+  if (context.project.id === 'new') {
+    return (
+      !!currentAoi &&
+      !!currentImagerySource &&
+      !!currentMosaic &&
+      !!currentModel
+    );
+  } else {
+    return !!currentAoi && !!currentMosaic;
+  }
 };
 
 export const isProjectNew = (c) => c.project.id === 'new';
@@ -38,3 +46,5 @@ export const isLivePredictionAreaSize = ({ currentAoi, apiLimits }) =>
   currentAoi.area < apiLimits.live_inference;
 
 export const hasAois = (c) => c.aoisList?.length > 0;
+
+export const hasTimeframe = (c) => c.currentTimeframe;

@@ -234,15 +234,33 @@ export const actions = {
     currentCheckpoint: event.data.checkpoint,
   })),
   setCurrentTimeframe: assign((context, event) => {
-    const { currentCheckpoint } = context;
+    const checkpoint = event.data?.checkpoint || context.currentCheckpoint;
     const newTimeframe = event.data.timeframe;
 
-    const retrainClasses =
-      newTimeframe?.classes || currentCheckpoint?.classes || [];
+    // Clear current prediction if timeframe is changed
+    if (!newTimeframe) {
+      return {
+        currentTimeframe: null,
+        currentMosaic: null,
+        retrainClasses: [],
+      };
+    }
+
+    const retrainClasses = newTimeframe?.classes || checkpoint?.classes || [];
+
+    // A timeframe is always associated with a mosaic, but currently the API
+    // doesn't populate it in the response
+    const mosaicId =
+      typeof newTimeframe?.mosaic === 'string'
+        ? newTimeframe?.mosaic
+        : newTimeframe?.mosaic?.id;
+
+    const currentMosaic = context.mosaicsList.find((m) => m.id === mosaicId);
 
     // Apply new timeframe and (re-)initialize retrain classes
     return {
       currentTimeframe: { ...newTimeframe },
+      currentMosaic,
       retrainClasses,
     };
   }),
@@ -321,6 +339,9 @@ export const actions = {
   }),
   clearCurrentPrediction: assign(() => ({
     currentPrediction: null,
+  })),
+  clearCurrentTimeframe: assign(() => ({
+    currentTimeframe: null,
   })),
   setMapRef: assign((context, event) => ({
     mapRef: event.data.mapRef,
@@ -450,6 +471,12 @@ export const actions = {
   })),
   enterApplyCheckpoint: assign(() => ({
     sessionStatusMessage: 'Applying checkpoint',
+    globalLoading: {
+      disabled: false,
+    },
+  })),
+  enterApplyTimeframe: assign(() => ({
+    sessionStatusMessage: 'Applying timeframe',
     globalLoading: {
       disabled: false,
     },

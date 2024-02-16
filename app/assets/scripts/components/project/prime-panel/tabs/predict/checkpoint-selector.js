@@ -123,7 +123,6 @@ function CheckpointSelector() {
               .map((c) => (
                 <CheckpointOption
                   key={c.id}
-                  // disabled={disabled}
                   onClick={async () => {
                     actorRef.send({
                       type: 'Apply checkpoint',

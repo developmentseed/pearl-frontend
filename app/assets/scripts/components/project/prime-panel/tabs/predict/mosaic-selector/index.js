@@ -1,22 +1,78 @@
 import React, { useState } from 'react';
-import { ProjectMachineContext } from '../../../../../../fsm/project';
-import { EditButton } from '../../../../../../styles/button';
+
+import styled, { css } from 'styled-components';
+
+import { Heading } from '@devseed-ui/typography';
+import { themeVal, glsp } from '@devseed-ui/theme-provider';
+
+import { ActionButton } from '../../../../../../styles/button';
+import ShadowScrollbar from '../../../../../common/shadow-scrollbar';
 import {
-  HeadOption,
   HeadOptionHeadline,
   HeadOptionToolbar,
 } from '../../../../../../styles/panel';
-import {
-  Subheading,
-  SubheadingStrong,
-} from '../../../../../../styles/type/heading';
+import { Subheading } from '../../../../../../styles/type/heading';
 import { MosaicSelectorModal } from './modal';
+
+import { ProjectMachineContext } from '../../../../../../fsm/project';
 import { SESSION_MODES } from '../../../../../../fsm/project/constants';
 import selectors from '../../../../../../fsm/project/selectors';
 import * as guards from '../../../../../../fsm/project/guards';
+
 import { formatMosaicDateRange } from '../../../../../../utils/dates';
+import { SelectorHeadOption } from '../../../selection-styles';
+
+const Option = styled.div`
+  display: grid;
+  cursor: pointer;
+  background: ${themeVal('color.baseDark')};
+  padding: ${glsp(0.25)} 0;
+
+  h1 {
+    margin: 0;
+    padding-left: ${glsp(1.5)};
+  }
+
+  ${({ hasSubtitle }) =>
+    hasSubtitle &&
+    css`
+      .subtitle {
+        margin: 0;
+      }
+    `}
+  ${({ selected }) =>
+    selected &&
+    css`
+      border-left: ${glsp(0.25)} solid ${themeVal('color.primary')};
+      h1 {
+        color: ${themeVal('color.primary')};
+        padding-left: ${glsp(1.25)};
+      }
+      background: ${themeVal('color.primaryAlphaA')};
+    `}
+
+    ${({ selected }) =>
+    !selected &&
+    css`
+      &:hover {
+        background: ${themeVal('color.baseAlphaC')};
+      }
+    `}
+`;
+
+const MosaicOption = styled(Option)`
+  ${({ disabled }) =>
+    disabled &&
+    css`
+      &:hover {
+        background: ${themeVal('color.baseDark')};
+        cursor: default;
+      }
+    `}
+`;
 
 export function MosaicSelector() {
+  const actorRef = ProjectMachineContext.useActorRef();
   const [showModal, setShowModal] = useState(false);
 
   const sessionMode = ProjectMachineContext.useSelector(selectors.sessionMode);
@@ -29,6 +85,15 @@ export function MosaicSelector() {
   );
   const currentMosaic = ProjectMachineContext.useSelector(
     selectors.currentMosaic
+  );
+  const currentTimeframe = ProjectMachineContext.useSelector(
+    selectors.currentTimeframe
+  );
+  const timeframesList = ProjectMachineContext.useSelector(
+    ({ context }) => context.timeframesList
+  );
+  const mosaicsList = ProjectMachineContext.useSelector(
+    ({ context }) => context.mosaicsList
   );
 
   let label;
@@ -49,6 +114,18 @@ export function MosaicSelector() {
     disabled = false;
   }
 
+  const optionsList = timeframesList?.map((t) => {
+    const mosaic = mosaicsList.find((m) => m.id === t.mosaic);
+    return {
+      id: t.id,
+      label: formatMosaicDateRange(
+        mosaic.mosaic_ts_start,
+        mosaic.mosaic_ts_end
+      ),
+      timeframe: t,
+    };
+  });
+
   return (
     <>
       <MosaicSelectorModal
@@ -57,34 +134,67 @@ export function MosaicSelector() {
         isProjectNew={isProjectNew}
         imagerySource={currentImagerySource}
       />
-      <HeadOption>
+
+      <SelectorHeadOption hasSubtitle>
         <HeadOptionHeadline usePadding>
-          <Subheading>Imagery Mosaic Date Range</Subheading>
+          <Subheading>Mosaics</Subheading>
         </HeadOptionHeadline>
-        <SubheadingStrong
-          data-cy='mosaic-selector-label'
-          onClick={() => !disabled && setShowModal(true)}
-          title={label}
-          disabled={disabled}
+
+        <ShadowScrollbar
+          style={{
+            minHeight: '6rem',
+            maxHeight: '10rem',
+            backgroundColor: '#121826',
+            padding: '0.25rem 0',
+            margin: '0.75rem 0',
+            boxShadow: 'inset 0 -1px 0 0 rgba(240, 244, 255, 0.16)',
+          }}
         >
-          {label}
-        </SubheadingStrong>
-        {!disabled && (
-          <HeadOptionToolbar>
-            <EditButton
-              useIcon='swap-horizontal'
-              id='select-mosaic-trigger'
-              disabled={disabled}
-              onClick={() => {
-                !disabled && setShowModal(true);
-              }}
-              title='Select Imagery Mosaic'
-            >
-              Edit Mosaic Selection
-            </EditButton>
-          </HeadOptionToolbar>
-        )}
-      </HeadOption>
+          <MosaicOption selected data-cy='selected-timeframe-header'>
+            <Heading size='xsmall'>{label}</Heading>
+          </MosaicOption>
+          {!!optionsList?.length &&
+            optionsList
+              .filter((t) => t.id != currentTimeframe?.id)
+              .map((t) => (
+                <MosaicOption
+                  key={t.id}
+                  disabled={disabled}
+                  onClick={async () => {
+                    actorRef.send({
+                      type: 'Apply existing timeframe',
+                      data: { timeframe: { ...t.timeframe } },
+                    });
+                  }}
+                >
+                  <Heading size='xsmall'>{t.label}</Heading>
+                </MosaicOption>
+              ))}
+        </ShadowScrollbar>
+        <HeadOptionToolbar>
+          <ActionButton
+            data-cy='mosaic-selector-label'
+            onClick={() => !disabled && setShowModal(true)}
+            title={label}
+            disabled={disabled}
+            useIcon='plus'
+          >
+            {label}
+          </ActionButton>
+          <ActionButton
+            title='Delete Current Mosaic'
+            id='delete-current-mosaic'
+            useIcon='trash-bin'
+            onClick={() => {
+              actorRef.send({
+                type: 'Delete timeframe',
+              });
+            }}
+          >
+            Delete Current Mosaic
+          </ActionButton>
+        </HeadOptionToolbar>
+      </SelectorHeadOption>
     </>
   );
 }
