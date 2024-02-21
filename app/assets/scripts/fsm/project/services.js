@@ -1108,6 +1108,23 @@ export const services = {
     });
     return () => websocket.close();
   },
+  saveCheckpoint: async (context) => {
+    const { apiClient, project, currentCheckpoint } = context;
+
+    const checkpoint = await apiClient.patch(
+      `project/${project.id}/checkpoint/${currentCheckpoint.id}`,
+      {
+        name: currentCheckpoint.name,
+        bookmarked: true,
+      }
+    );
+
+    const checkpointList = await apiClient.get(
+      `project/${project.id}/checkpoint`
+    );
+
+    return { checkpoint, checkpointList };
+  },
   applyTimeframe: (context) => async (callback, onReceive) => {
     const {
       currentTimeframe,
