@@ -2,20 +2,20 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import T from 'prop-types';
 import { Button } from '@devseed-ui/button';
 import styled from 'styled-components';
-import { Spinner } from '../../common/global-loading/styles';
-import { ProjectMachineContext } from '../../../fsm/project';
-import { useAuth } from '../../../context/auth';
-import logger from '../../../utils/logger';
+import { Spinner } from '../../../common/global-loading/styles';
+import { ProjectMachineContext } from '../../../../fsm/project';
+import { useAuth } from '../../../../context/auth';
+import logger from '../../../../utils/logger';
 
 import { Modal } from '@devseed-ui/modal';
-import { formatDateTime, formatThousands } from '../../../utils/format';
+import { formatDateTime, formatThousands } from '../../../../utils/format';
 import tArea from '@turf/area';
-import Prose from '../../../styles/type/prose';
-import DetailsList from '../../common/details-list';
-import { AbortBatchJobButton } from '../../common/abort-batch-button';
-import { StyledTooltip } from '../../common/tooltip';
+import Prose from '../../../../styles/type/prose';
+import DetailsList from '../../../common/details-list';
+import { AbortBatchJobButton } from '../../../common/abort-batch-button';
+import { StyledTooltip } from '../../../common/tooltip';
 import get from 'lodash.get';
-import selectors from '../../../fsm/project/selectors';
+import selectors from '../../../../fsm/project/selectors';
 
 const ProgressButtonWrapper = styled.div`
   display: flex;
