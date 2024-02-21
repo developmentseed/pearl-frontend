@@ -346,26 +346,7 @@ function RetrainTab({ className }) {
         <>
           <ToolBox>
             <Subheading>Sample Selection Tools</Subheading>
-            {/* <InfoButton
-              data-cy='retrain-draw-polygon'
-              variation={
-                retrainMapMode === RETRAIN_MAP_MODES.ADD_POLYGON
-                  ? 'primary-raised-dark'
-                  : 'primary-plain'
-              }
-              size='small'
-              radius='ellipsoid'
-              useLocalButton
-              useIcon='polygon'
-              visuallyDisabled={!retrainActiveClass}
-              info={!retrainActiveClass && 'No class selected'}
-              onClick={() => toggleMapMode(RETRAIN_MAP_MODES.ADD_POLYGON)}
-              className={
-                retrainMapMode == RETRAIN_MAP_MODES.ADD_POLYGON && 'active'
-              }
-            >
-              Polygon
-            </InfoButton> */}
+
             <InfoButton
               data-cy='retrain-draw-freehand'
               variation={
@@ -385,25 +366,6 @@ function RetrainTab({ className }) {
             >
               Freehand
             </InfoButton>
-            {/* <InfoButton
-              data-cy='add-point-sample-button'
-              variation={
-                retrainMapMode === RETRAIN_MAP_MODES.ADD_POINT
-                  ? 'primary-raised-dark'
-                  : 'primary-plain'
-              }
-              size='small'
-              radius='ellipsoid'
-              useIcon='crosshair'
-              visuallyDisabled={!retrainActiveClass}
-              info={!retrainActiveClass && 'Select a class first'}
-              onClick={() => toggleMapMode(RETRAIN_MAP_MODES.ADD_POINT)}
-              className={
-                retrainMapMode == RETRAIN_MAP_MODES.ADD_POINT && 'active'
-              }
-            >
-              Point
-            </InfoButton> */}
 
             <InfoButton
               data-cy='eraser-button'
@@ -478,15 +440,6 @@ function RetrainTab({ className }) {
                       hideText
                       disabled={retrainActiveClass !== c.name}
                       visuallyDisabled={retrainActiveClass !== c.name}
-                      // onClick={() => {
-                      //   dispatchCurrentCheckpoint({
-                      //     type: actions.CLEAR_CLASS_SAMPLES,
-                      //     data: {
-                      //       className: c.name,
-                      //     },
-                      //   });
-                      //   mapRef.freehandDraw.clearLayer(c.name);
-                      // }}
                     >
                       Clear
                     </InfoButton>
@@ -517,26 +470,6 @@ function RetrainTab({ className }) {
           </ClassList>
         </>
       )}
-
-      {/* {(isLoading || placeholderMessage) && (
-        <ClassList>
-          {isLoading && !isBatchArea ? (
-            [1, 2, 3].map((i) => (
-              // +true workaround
-              // Styled components will try to pass true to the DOM element
-              // assing a + casts it to int which is logically equivalent
-              // but does not cause the DOM error
-              <Class key={i} placeholder={+true} className='placeholder-class'>
-                <ClassThumbnail />
-                <ClassHeading size='xsmall' placeholder={+true} />
-              </Class>
-            ))
-          ) : (
-            <></>
-          )}
-          <PlaceholderMessage>{placeholderMessage}</PlaceholderMessage>
-        </ClassList>
-      )} */}
     </ToolsWrapper>
   );
 }
