@@ -244,6 +244,7 @@ export const actions = {
       return {
         currentTimeframe: null,
         currentMosaic: null,
+        currentShare: null,
         retrainClasses: [],
       };
     }
@@ -259,11 +260,19 @@ export const actions = {
 
     const currentMosaic = context.mosaicsList.find((m) => m.id === mosaicId);
 
+    const currentShare =
+      context.sharesList.find(
+        (s) =>
+          s.timeframe_id === newTimeframe.id &&
+          s.aoi_id === context.currentAoi.id
+      ) || null;
+
     // Apply new timeframe and (re-)initialize retrain classes
     return {
       currentTimeframe: { ...newTimeframe },
       currentMosaic,
       retrainClasses,
+      currentShare,
     };
   }),
   setTimeframesList: assign((context, event) => ({
@@ -341,6 +350,7 @@ export const actions = {
   }),
   clearCurrentPrediction: assign(() => ({
     currentPrediction: null,
+    currentShare: null,
   })),
   clearCurrentTimeframe: assign(() => ({
     currentTimeframe: null,
