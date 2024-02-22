@@ -409,6 +409,19 @@ export const services = {
                 });
               });
             break;
+          case 'model#retrain#progress': {
+            // Instance is retraining, send a message to terminate it because
+            // it should not be retraining at this point
+            websocket.sendMessage({
+              action: 'instance#terminate',
+            });
+
+            callback({
+              type: 'Instance activation has failed',
+              data: { error: 'Instance is retraining' },
+            });
+            break;
+          }
 
           case 'info#disconnected':
             // After connection, send a message to the server to request
