@@ -21,6 +21,8 @@ import get from 'lodash.get';
 import { RETRAIN_MAP_MODES } from '../../../../../fsm/project/constants';
 import selectors from '../../../../../fsm/project/selectors';
 
+import EditClass from './add-class.js';
+
 export const ToolsWrapper = styled.div`
   display: grid;
   grid-gap: ${glsp()};
@@ -348,6 +350,7 @@ function RetrainTab({ className }) {
             <Subheading>Sample Selection Tools</Subheading>
 
             <InfoButton
+              id='freehand-draw-button'
               data-cy='retrain-draw-freehand'
               variation={
                 retrainMapMode === RETRAIN_MAP_MODES.ADD_FREEHAND
@@ -368,6 +371,7 @@ function RetrainTab({ className }) {
             </InfoButton>
 
             <InfoButton
+              id='eraser-button'
               data-cy='eraser-button'
               variation={
                 retrainMapMode === RETRAIN_MAP_MODES.DELETE_SAMPLES
@@ -378,7 +382,6 @@ function RetrainTab({ className }) {
               radius='ellipsoid'
               useLocalButton
               useIcon='eraser'
-              id='eraser-button'
               visuallyDisabled={!retrainActiveClass}
               info={
                 !retrainActiveClass
@@ -452,6 +455,7 @@ function RetrainTab({ className }) {
               direction='up'
               triggerElement={(props) => (
                 <AddClassButton
+                  id='add-class-button'
                   as={DropdownTrigger}
                   variation='primary-plain'
                   useIcon='plus--small'
@@ -465,7 +469,7 @@ function RetrainTab({ className }) {
               )}
               className='add-class__dropdown'
             >
-              {/* <EditClass /> */}
+              <EditClass />
             </Dropdown>
           </ClassList>
         </>

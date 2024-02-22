@@ -406,6 +406,14 @@ export const actions = {
       retrainSamples: newRetrainSamples,
     };
   }),
+  addRetrainClass: assign((context, event) => {
+    const { retrainClasses } = context;
+    const { retrainClass } = event.data;
+
+    return {
+      retrainClasses: retrainClasses.concat(retrainClass),
+    };
+  }),
   updateRetrainClassSamples: assign((context, event) => {
     const { retrainClass, samples } = event.data;
     const { retrainSamples } = context;
