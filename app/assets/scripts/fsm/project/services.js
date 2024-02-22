@@ -953,6 +953,17 @@ export const services = {
     const timeframeId = context.currentTimeframe?.id;
     const sharesList = context.sharesList || [];
 
+    await apiClient.patch(`project/${projectId}/aoi/${aoiId}`, {
+      bookmarked: true,
+    });
+
+    await apiClient.patch(
+      `project/${projectId}/aoi/${aoiId}/timeframe/${timeframeId}`,
+      {
+        bookmarked: true,
+      }
+    );
+
     const share = await apiClient.post(
       `/project/${projectId}/aoi/${aoiId}/timeframe/${timeframeId}/share`
     );
