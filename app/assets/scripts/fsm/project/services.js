@@ -301,15 +301,6 @@ export const services = {
             `project/${projectId}/checkpoint/${nextCheckpointId}`
           );
         }
-
-        if (nextTimeframe) {
-          nextTimeframe.tilejson = await apiClient.get(
-            `project/${projectId}/aoi/${context.currentAoi.id}/timeframe/${nextTimeframe.id}/tiles`
-          );
-          nextMosaic = mosaicsList.find(
-            (mosaic) => mosaic.id === nextTimeframe.mosaic
-          );
-        }
       } else {
         // There are no instance running. Check if there is a timeframe or
         // checkpoint to use and create a new instance
@@ -327,6 +318,15 @@ export const services = {
         instance = await apiClient.post(
           `project/${projectId}/instance`,
           instanceConfig
+        );
+      }
+
+      if (nextTimeframe) {
+        nextTimeframe.tilejson = await apiClient.get(
+          `project/${projectId}/aoi/${context.currentAoi.id}/timeframe/${nextTimeframe.id}/tiles`
+        );
+        nextMosaic = mosaicsList.find(
+          (mosaic) => mosaic.id === nextTimeframe.mosaic
         );
       }
 
