@@ -17,7 +17,7 @@ export const selectors = {
   canSaveCheckpoint: (state) => {
     return (
       // Must be in retrain tab
-      state.matches('Retrain ready') &&
+      (state.matches('Prediction ready') || state.matches('Retrain ready')) &&
       // A checkpoint exists
       state.context.currentCheckpoint &&
       // It is not the base checkpoint

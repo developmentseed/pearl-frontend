@@ -1107,7 +1107,17 @@ export const services = {
             }
           }
           break;
-        case 'model#checkpoint#complete':
+        case 'model#checkpoint#complete': {
+          websocket.sendMessage({
+            action: 'model#timeframe',
+            data: {
+              id: nextTimeframe.id,
+            },
+          });
+          break;
+        }
+        case 'model#timeframe#complete':
+          websocket.close();
           callback({
             type: 'Checkpoint was applied',
             data: {
