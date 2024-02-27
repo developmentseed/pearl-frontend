@@ -33,6 +33,7 @@ import {
   BOUNDS_PADDING,
   MOSAIC_LAYER_OPACITY,
 } from '../../common/map/constants';
+import { getMosaicTileUrl } from '../../../utils/mosaics';
 
 const center = [19.22819, -99.995841];
 const zoom = 12;
@@ -110,9 +111,11 @@ function Map() {
   const currentTilejson = ProjectMachineContext.useSelector(
     selectors.currentTilejson
   );
-  const mosaicTileUrl = ProjectMachineContext.useSelector(
-    selectors.mosaicTileUrl
+
+  const currentMosaic = ProjectMachineContext.useSelector(
+    selectors.currentMosaic
   );
+  const mosaicTileUrl = currentMosaic && getMosaicTileUrl(currentMosaic);
 
   // Event handlers
   const handleMouseDown = useCallback(

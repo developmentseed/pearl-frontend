@@ -301,15 +301,6 @@ export const services = {
             `project/${projectId}/checkpoint/${nextCheckpointId}`
           );
         }
-
-        if (nextTimeframe) {
-          nextTimeframe.tilejson = await apiClient.get(
-            `project/${projectId}/aoi/${context.currentAoi.id}/timeframe/${nextTimeframe.id}/tiles`
-          );
-          nextMosaic = mosaicsList.find(
-            (mosaic) => mosaic.id === nextTimeframe.mosaic
-          );
-        }
       } else {
         // There are no instance running. Check if there is a timeframe or
         // checkpoint to use and create a new instance
@@ -327,6 +318,15 @@ export const services = {
         instance = await apiClient.post(
           `project/${projectId}/instance`,
           instanceConfig
+        );
+      }
+
+      if (nextTimeframe) {
+        nextTimeframe.tilejson = await apiClient.get(
+          `project/${projectId}/aoi/${context.currentAoi.id}/timeframe/${nextTimeframe.id}/tiles`
+        );
+        nextMosaic = mosaicsList.find(
+          (mosaic) => mosaic.id === nextTimeframe.mosaic
         );
       }
 
@@ -409,6 +409,19 @@ export const services = {
                 });
               });
             break;
+          case 'model#retrain#progress': {
+            // Instance is retraining, send a message to terminate it because
+            // it should not be retraining at this point
+            websocket.sendMessage({
+              action: 'instance#terminate',
+            });
+
+            callback({
+              type: 'Instance activation has failed',
+              data: { error: 'Instance is retraining' },
+            });
+            break;
+          }
 
           case 'info#disconnected':
             // After connection, send a message to the server to request
@@ -473,21 +486,54 @@ export const services = {
   },
   activatePredictionRunInstance: (context) => async (callback) => {
     try {
-      const { currentInstance, apiClient, project } = context;
+      const { apiClient, project } = context;
+
+      let currentInstance = context.currentInstance;
 
       if (!currentInstance) {
-        const instance = await apiClient.post(`project/${project.id}/instance`);
-
-        callback({
-          type: 'Instance is running',
-          data: { instance },
-        });
-      } else {
-        callback({
-          type: 'Instance is ready',
-          data: { instance: context.currentInstance },
-        });
+        currentInstance = await apiClient.post(
+          `project/${project.id}/instance`
+        );
       }
+
+      // Confirm instance has running status
+      let instanceStatus;
+      let creationDuration = 0;
+      while (
+        !instanceStatus ||
+        creationDuration < config.instanceCreationTimeout
+      ) {
+        // Get instance status
+        instanceStatus = await apiClient.get(
+          `project/${context.project.id}/instance/${currentInstance.id}`
+        );
+        const instancePhase = get(instanceStatus, 'status.phase');
+
+        // Process status
+        if (instancePhase === 'Running' && instanceStatus.active) {
+          break;
+        } else if (instancePhase === 'Failed') {
+          callback({
+            type: 'Instance activation has failed',
+          });
+        }
+
+        // Update timer
+        await delay(config.instanceCreationCheckInterval);
+        creationDuration += config.instanceCreationCheckInterval;
+
+        // Check timeout
+        if (creationDuration >= config.instanceCreationTimeout) {
+          callback({
+            type: 'Instance activation has failed',
+          });
+        }
+      }
+
+      callback({
+        type: 'Instance is ready',
+        data: { instance: currentInstance },
+      });
 
       // If project is not new, an instance is already running, use it
     } catch (error) {
@@ -613,13 +659,16 @@ export const services = {
               `project/${project.id}/aoi/${currentAoi.id}/timeframe`
             ),
             apiClient.get(
+              `project/${project.id}/aoi/${currentAoi.id}/timeframe/${data.timeframe}`
+            ),
+            apiClient.get(
               `project/${project.id}/aoi/${currentAoi.id}/timeframe/${data.timeframe}/tiles`
             ),
           ])
-            .then(([{ timeframes: timeframesList }, tilejson]) => {
+            .then(([{ timeframes: timeframesList }, timeframe, tilejson]) => {
               callback({
                 type: 'Prediction run was completed',
-                data: { tilejson, timeframesList },
+                data: { tilejson, timeframe, timeframesList },
               });
             })
             .catch((error) => {
@@ -940,6 +989,17 @@ export const services = {
     const timeframeId = context.currentTimeframe?.id;
     const sharesList = context.sharesList || [];
 
+    await apiClient.patch(`project/${projectId}/aoi/${aoiId}`, {
+      bookmarked: true,
+    });
+
+    await apiClient.patch(
+      `project/${projectId}/aoi/${aoiId}/timeframe/${timeframeId}`,
+      {
+        bookmarked: true,
+      }
+    );
+
     const share = await apiClient.post(
       `/project/${projectId}/aoi/${aoiId}/timeframe/${timeframeId}/share`
     );
@@ -1083,7 +1143,17 @@ export const services = {
             }
           }
           break;
-        case 'model#checkpoint#complete':
+        case 'model#checkpoint#complete': {
+          websocket.sendMessage({
+            action: 'model#timeframe',
+            data: {
+              id: nextTimeframe.id,
+            },
+          });
+          break;
+        }
+        case 'model#timeframe#complete':
+          websocket.close();
           callback({
             type: 'Checkpoint was applied',
             data: {
@@ -1107,6 +1177,23 @@ export const services = {
       }
     });
     return () => websocket.close();
+  },
+  saveCheckpoint: async (context) => {
+    const { apiClient, project, currentCheckpoint } = context;
+
+    const checkpoint = await apiClient.patch(
+      `project/${project.id}/checkpoint/${currentCheckpoint.id}`,
+      {
+        name: currentCheckpoint.name,
+        bookmarked: true,
+      }
+    );
+
+    const checkpointList = await apiClient.get(
+      `project/${project.id}/checkpoint`
+    );
+
+    return { checkpoint, checkpointList };
   },
   applyTimeframe: (context) => async (callback, onReceive) => {
     const {
