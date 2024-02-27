@@ -16,7 +16,7 @@ import {
   Class,
   Thumbnail as ClassThumbnail,
   ClassHeading,
-} from '../project/prime-panel/tabs/retrain/index';
+} from '../project/prime-panel/retrain-refine-styles';
 
 import { Accordion, AccordionFold as BaseFold } from '@devseed-ui/accordion';
 import { themeVal, glsp } from '@devseed-ui/theme-provider';

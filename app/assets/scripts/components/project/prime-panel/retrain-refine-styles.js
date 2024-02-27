@@ -275,3 +275,27 @@ export const PickerDropdownFooter = styled(DropdownFooter)`
     grid-template-columns: auto;
   }
 `;
+
+export const ClassThumbnail = styled.div`
+  grid-row: 1 / 3;
+  width: ${glsp(1.5)};
+  height: ${glsp(1.5)};
+  background: ${({ color }) => color || themeVal('color.baseAlphaD')};
+  border: 1px solid ${themeVal('color.baseAlphaD')};
+  display: grid;
+  justify-content: center;
+  align-content: center;
+  ${({ outline }) =>
+    outline &&
+    css`
+      border: 1px solid;
+    `};
+  ${({ useIcon }) =>
+    useIcon &&
+    css`
+      background: none;
+      ::before {
+        ${({ useIcon }) => useIcon && collecticon(useIcon)}
+      }
+    `};
+`;
