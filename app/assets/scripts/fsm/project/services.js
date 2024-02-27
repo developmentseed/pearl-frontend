@@ -486,21 +486,54 @@ export const services = {
   },
   activatePredictionRunInstance: (context) => async (callback) => {
     try {
-      const { currentInstance, apiClient, project } = context;
+      const { apiClient, project } = context;
+
+      let currentInstance = context.currentInstance;
 
       if (!currentInstance) {
-        const instance = await apiClient.post(`project/${project.id}/instance`);
-
-        callback({
-          type: 'Instance is running',
-          data: { instance },
-        });
-      } else {
-        callback({
-          type: 'Instance is ready',
-          data: { instance: context.currentInstance },
-        });
+        currentInstance = await apiClient.post(
+          `project/${project.id}/instance`
+        );
       }
+
+      // Confirm instance has running status
+      let instanceStatus;
+      let creationDuration = 0;
+      while (
+        !instanceStatus ||
+        creationDuration < config.instanceCreationTimeout
+      ) {
+        // Get instance status
+        instanceStatus = await apiClient.get(
+          `project/${context.project.id}/instance/${currentInstance.id}`
+        );
+        const instancePhase = get(instanceStatus, 'status.phase');
+
+        // Process status
+        if (instancePhase === 'Running' && instanceStatus.active) {
+          break;
+        } else if (instancePhase === 'Failed') {
+          callback({
+            type: 'Instance activation has failed',
+          });
+        }
+
+        // Update timer
+        await delay(config.instanceCreationCheckInterval);
+        creationDuration += config.instanceCreationCheckInterval;
+
+        // Check timeout
+        if (creationDuration >= config.instanceCreationTimeout) {
+          callback({
+            type: 'Instance activation has failed',
+          });
+        }
+      }
+
+      callback({
+        type: 'Instance is ready',
+        data: { instance: currentInstance },
+      });
 
       // If project is not new, an instance is already running, use it
     } catch (error) {
