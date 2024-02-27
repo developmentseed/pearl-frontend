@@ -659,13 +659,16 @@ export const services = {
               `project/${project.id}/aoi/${currentAoi.id}/timeframe`
             ),
             apiClient.get(
+              `project/${project.id}/aoi/${currentAoi.id}/timeframe/${data.timeframe}`
+            ),
+            apiClient.get(
               `project/${project.id}/aoi/${currentAoi.id}/timeframe/${data.timeframe}/tiles`
             ),
           ])
-            .then(([{ timeframes: timeframesList }, tilejson]) => {
+            .then(([{ timeframes: timeframesList }, timeframe, tilejson]) => {
               callback({
                 type: 'Prediction run was completed',
-                data: { tilejson, timeframesList },
+                data: { tilejson, timeframe, timeframesList },
               });
             })
             .catch((error) => {

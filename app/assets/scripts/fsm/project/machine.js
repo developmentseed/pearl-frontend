@@ -348,6 +348,7 @@ export const projectMachine = createMachine(
               'hideGlobalLoading',
               'clearCurrentPrediction',
               'setTimeframesList',
+              'setCurrentTimeframe',
               'setCurrentTimeframeTilejson',
               'onPredictionComplete',
             ],
