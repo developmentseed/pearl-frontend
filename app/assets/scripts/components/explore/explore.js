@@ -18,7 +18,7 @@ import { useApiLimits } from '../../context/global';
 import { useSessionStatus } from '../../context/explore';
 import { sessionModes } from '../../context/explore/session-status';
 import { useParams } from 'react-router-dom';
-import LayersPanel from './layers-panel';
+// import LayersPanel from './layers-panel';
 
 const ExploreBody = styled(InpageBody)`
   display: grid;

@@ -12,6 +12,8 @@ import {
   useMapEvent,
 } from 'react-leaflet';
 
+import LayersPanel from '../layers-panel';
+import GenericControl from '../../common/map/generic-control';
 import {
   MAX_BASE_MAP_ZOOM_LEVEL,
   BaseMapLayer,
@@ -39,6 +41,22 @@ const center = [19.22819, -99.995841];
 const zoom = 12;
 
 const DEFAULT_PREDICTION_LAYER_OPACITY = 0.7;
+const INITIAL_MAP_LAYERS = {
+  mosaic: {
+    id: 'mosaic',
+    name: 'Mosaic',
+    opacity: 1,
+    visible: true,
+    active: true,
+  },
+  predictions: {
+    id: 'predictions',
+    name: 'Prediction Results',
+    opacity: 1,
+    visible: true,
+    active: true,
+  },
+};
 
 const Container = styled.div`
   height: 100%;
@@ -89,6 +107,8 @@ function Map() {
   const [predictionsOpacity, setPredictionsOpacity] = useState(
     DEFAULT_PREDICTION_LAYER_OPACITY
   );
+  const [mapLayers, setMapLayers] = useState(INITIAL_MAP_LAYERS);
+  const [showLayersControl, setShowLayersControl] = useState(false);
 
   // FSM listeners
   const actorRef = ProjectMachineContext.useActorRef();
@@ -382,9 +402,24 @@ function Map() {
         <FeatureGroup>
           <GeoCoder />
           {currentAoiShape && <CenterMap aoiRef={currentAoiShape} />}
+          <GenericControl
+            id='layer-control'
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowLayersControl(!showLayersControl);
+            }}
+          />
         </FeatureGroup>
         <ScaleControl />
       </MapContainer>
+      <LayersPanel
+        mapRef={mapRef}
+        parentId='layer-control'
+        className='padded'
+        active={showLayersControl}
+        mapLayers={mapLayers}
+        setMapLayers={setMapLayers}
+      />
     </SizeAwareElement>
   );
 }

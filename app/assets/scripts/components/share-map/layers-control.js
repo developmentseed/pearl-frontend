@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import T from 'prop-types';
 import throttle from 'lodash.throttle';
 
-import { Category, LayersPanelInner } from '../explore/layers-panel';
+import { Category, LayersPanelInner } from '../project/layers-panel';
 import { Accordion } from '@devseed-ui/accordion';
 
 function LayersPanel({
