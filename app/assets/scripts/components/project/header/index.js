@@ -7,7 +7,7 @@ import { themeVal, glsp, media, truncated } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
 import { Form } from '@devseed-ui/form';
 import { Button } from '@devseed-ui/button';
-import { FormInput } from '@devseed-ui/form';
+import { FormInput, FormSwitch } from '@devseed-ui/form';
 
 import { ProjectMachineContext } from '../../../fsm/project';
 
@@ -28,9 +28,11 @@ import {
   downloadShareGeotiff,
   getShareLink,
 } from '../../../utils/share-link';
+import logger from '../../../utils/logger';
 import { useAuth } from '../../../context/auth';
 import selectors from '../../../fsm/project/selectors';
 import toasts from '../../common/toasts';
+import { StyledLink } from '../../../styles/links';
 
 const Wrapper = styled.div`
   flex: 1;
@@ -134,6 +136,7 @@ function ProjectPageHeader({ isMediumDown }) {
   const { restApiClient, user, isAuthenticated } = useAuth();
   const [editProjectNameMode, setEditProjectNameMode] = useState(false);
   const [localProjectName, setLocalProjectName] = useState(null);
+  const [isPublished, setIsPublished] = useState(null);
   const actorRef = ProjectMachineContext.useActorRef();
   const displayProjectNameModal = ProjectMachineContext.useSelector(
     selectors.displayProjectNameModal
@@ -196,6 +199,11 @@ function ProjectPageHeader({ isMediumDown }) {
       setLocalProjectName(projectName);
     }
   }, [projectName]);
+
+  useEffect(() => {
+    if (!currentShare) return;
+    setIsPublished(currentShare.published);
+  }, [currentShare]);
 
   // Delays focus
   const [projectNameInputRef, setProjectNameInputFocus] = useFocus(0);
@@ -420,6 +428,62 @@ function ProjectPageHeader({ isMediumDown }) {
                 </DropdownItem>
               )}
             </li>
+            {currentShare && (
+              <>
+                <li>
+                  <DropdownItem>
+                    <FormSwitch
+                      name='published'
+                      title='Make share map public'
+                      checked={isPublished}
+                      onChange={async () => {
+                        const newIsPublished = !isPublished;
+                        setIsPublished(newIsPublished);
+
+                        try {
+                          await restApiClient.patch(
+                            `share/${currentShare.uuid}`,
+                            {
+                              published: newIsPublished,
+                            }
+                          );
+                          setIsPublished(newIsPublished);
+                        } catch (err) {
+                          setIsPublished(!newIsPublished);
+                          logger(
+                            'There was an unexpected error updating the exported map.',
+                            err
+                          );
+                          toasts.error(
+                            'There was an unexpected error updating the exported map.'
+                          );
+                        }
+                      }}
+                      textPlacement='right'
+                    >
+                      Publish Share
+                    </FormSwitch>
+                  </DropdownItem>
+                </li>
+                <li>
+                  <DropdownItem
+                    useIcon='resize-center-horizontal'
+                    as={StyledLink}
+                    nonhoverable={!isPublished}
+                    muted={!isPublished}
+                    disabled={!isPublished}
+                    to={
+                      isPublished && {
+                        pathname: '/public-maps',
+                        state: { uuid: currentShare.uuid },
+                      }
+                    }
+                  >
+                    Compare map
+                  </DropdownItem>
+                </li>
+              </>
+            )}
           </DropdownBody>
         </>
       </Dropdown>

@@ -31,6 +31,7 @@ import toasts from '../common/toasts';
 import { downloadShareGeotiff } from '../../utils/share-link';
 import { StyledLink } from '../../styles/links';
 import { composeMosaicName } from '../compare-map';
+import { useLocation } from 'react-router-dom';
 
 const ITEMS_PER_PAGE = 20;
 
@@ -223,7 +224,8 @@ function RenderSelectedRow(share, { compareMaps, setCompareMaps }) {
 
 function ExportedMapsList() {
   const { apiToken } = useAuth();
-
+  const location = useLocation();
+  const { uuid } = location.state || 'none';
   const [page, setPage] = useState(0);
   const [total, setTotal] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -254,6 +256,13 @@ function ExportedMapsList() {
     fetchShares();
   }, [apiToken, page]);
   const twoSharesSelected = compareMaps.filter((c) => c.uuid).length === 2;
+
+  let preSelectedShare = shares.find((s) => s.uuid === uuid);
+  useEffect(() => {
+    if (!preSelectedShare) return;
+    setCompareMaps([{ ...preSelectedShare, side: 'left' }, { side: 'right' }]);
+    window.history.replaceState({}, '');
+  }, [preSelectedShare]);
 
   return (
     <>
