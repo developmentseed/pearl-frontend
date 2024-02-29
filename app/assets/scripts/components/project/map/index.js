@@ -6,7 +6,9 @@ import SizeAwareElement from '../../common/size-aware-element';
 import {
   ImageOverlay,
   MapContainer,
+  ScaleControl,
   TileLayer,
+  FeatureGroup,
   useMapEvent,
 } from 'react-leaflet';
 
@@ -14,6 +16,8 @@ import {
   MAX_BASE_MAP_ZOOM_LEVEL,
   BaseMapLayer,
 } from '../../common/map/base-map-layer';
+import GeoCoder from '../../common/map/geocoder';
+import CenterMap from '../../common/map/center-map';
 
 import { themeVal, multiply } from '@devseed-ui/theme-provider';
 import { ProjectMachineContext } from '../../../fsm/project';
@@ -29,6 +33,7 @@ import {
   BOUNDS_PADDING,
   MOSAIC_LAYER_OPACITY,
 } from '../../common/map/constants';
+import { getMosaicTileUrl } from '../../../utils/mosaics';
 
 const center = [19.22819, -99.995841];
 const zoom = 12;
@@ -106,9 +111,11 @@ function Map() {
   const currentTilejson = ProjectMachineContext.useSelector(
     selectors.currentTilejson
   );
-  const mosaicTileUrl = ProjectMachineContext.useSelector(
-    selectors.mosaicTileUrl
+
+  const currentMosaic = ProjectMachineContext.useSelector(
+    selectors.currentMosaic
   );
+  const mosaicTileUrl = currentMosaic && getMosaicTileUrl(currentMosaic);
 
   // Event handlers
   const handleMouseDown = useCallback(
@@ -372,6 +379,11 @@ function Map() {
               opacity={predictionsOpacity}
             />
           ))}
+        <FeatureGroup>
+          <GeoCoder />
+          {currentAoiShape && <CenterMap aoiRef={currentAoiShape} />}
+        </FeatureGroup>
+        <ScaleControl />
       </MapContainer>
     </SizeAwareElement>
   );

@@ -1,5 +1,5 @@
 import { useMap } from 'react-leaflet';
-import { memo, useEffect } from 'react';
+import { memo, useEffect, useRef } from 'react';
 import T from 'prop-types';
 import L from 'leaflet';
 import React from 'react';
@@ -12,39 +12,75 @@ function SideBySideTileLayer({
   maxZoom,
   zIndex,
 }) {
-  const mapInst = useMap();
+  const mapRef = useMap();
+  const leftPredictionLayerRef = useRef(null);
+  const rightPredictionLayerRef = useRef(null);
+
   function sideBySideControl() {
-    const left = new L.TileLayer(leftTile.url, {
+    // Create Layer group for the left panel
+    leftPredictionLayerRef.current = new L.TileLayer(leftTile.url, {
       attribution: leftTile.attr,
       minZoom: minZoom,
       maxZoom: maxZoom,
       zIndex: zIndex,
       opacity: leftTile.opacity,
-    }).addTo(mapInst);
+    });
 
-    const right = new L.TileLayer(rightTile.url, {
+    const leftMosaicLayer = new L.TileLayer(leftTile.mosaicUrl, {
+      attribution: leftTile.mosaicAttr,
+      minZoom: minZoom,
+      maxZoom: maxZoom,
+      zIndex: zIndex,
+    });
+
+    const leftLayerGroup = new L.layerGroup([
+      leftMosaicLayer,
+      leftPredictionLayerRef.current,
+    ]).addTo(mapRef);
+
+    //  Create Layer group for the right panel
+    rightPredictionLayerRef.current = new L.TileLayer(rightTile.url, {
       attribution: rightTile.attr,
       minZoom: minZoom,
       maxZoom: maxZoom,
       zIndex: zIndex,
       opacity: rightTile.opacity,
-    }).addTo(mapInst);
+    });
 
-    const ctrl = L.control.sideBySide(left, right);
+    const rightMosaicLayer = new L.TileLayer(rightTile.mosaicUrl, {
+      attribution: rightTile.mosaicAttr,
+      minZoom: minZoom,
+      maxZoom: maxZoom,
+      zIndex: zIndex,
+    });
+
+    const rightLayerGroup = new L.layerGroup([
+      rightMosaicLayer,
+      rightPredictionLayerRef.current,
+    ]).addTo(mapRef);
+
+    const ctrl = L.control.sideBySide(leftLayerGroup, rightLayerGroup);
     return ctrl;
   }
 
   useEffect(() => {
-    if (mapInst === null) {
+    if (mapRef === null) {
       return;
     }
     const ctrl = sideBySideControl();
-    ctrl.addTo(mapInst);
-    L.DomEvent.disableClickPropagation(mapInst._container);
+    ctrl.addTo(mapRef);
+    L.DomEvent.disableClickPropagation(mapRef._container);
     return () => {
       ctrl.remove();
     };
   }, []);
+
+  useEffect(() => {
+    if (leftPredictionLayerRef.current && rightPredictionLayerRef.current) {
+      leftPredictionLayerRef.current.setOpacity(leftTile.opacity);
+      rightPredictionLayerRef.current.setOpacity(rightTile.opacity);
+    }
+  }, [leftTile.opacity, rightTile.opacity]);
 
   return <div />;
 }

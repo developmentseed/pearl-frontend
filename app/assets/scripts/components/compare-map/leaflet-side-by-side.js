@@ -132,21 +132,35 @@ L.Control.SideBySide = L.Control.extend({
   },
 
   _updateClip: function () {
-    var map = this._map;
-    var nw = map.containerPointToLayerPoint([0, 0]);
-    var se = map.containerPointToLayerPoint(map.getSize());
-    var clipX = nw.x + this.getPosition();
-    var dividerX = this.getPosition();
+    const map = this._map;
+    const nw = map.containerPointToLayerPoint([0, 0]);
+    const se = map.containerPointToLayerPoint(map.getSize());
+    const clipX = nw.x + this.getPosition();
+    const dividerX = this.getPosition();
 
-    this._divider.style.left = dividerX + 'px';
+    this._divider.style.left = `${dividerX}px`;
     this.fire('dividermove', { x: dividerX });
-    var clipLeft = 'rect(' + [nw.y, clipX, se.y, nw.x].join('px,') + 'px)';
-    var clipRight = 'rect(' + [nw.y, se.x, se.y, clipX].join('px,') + 'px)';
+
+    const clipLeft = `rect(${[nw.y, clipX, se.y, nw.x].join('px,')}px)`;
+    const clipRight = `rect(${[nw.y, se.x, se.y, clipX].join('px,')}px)`;
+
+    const applyClip = (layer, clip) => {
+      if (layer instanceof L.LayerGroup) {
+        layer.eachLayer((innerLayer) => {
+          if (innerLayer.getContainer) {
+            innerLayer.getContainer().style.clip = clip;
+          }
+        });
+      } else if (layer.getContainer) {
+        layer.getContainer().style.clip = clip;
+      }
+    };
+
     if (this._leftLayer) {
-      this._leftLayer.getContainer().style.clip = clipLeft;
+      applyClip(this._leftLayer, clipLeft);
     }
     if (this._rightLayer) {
-      this._rightLayer.getContainer().style.clip = clipRight;
+      applyClip(this._rightLayer, clipRight);
     }
   },
 

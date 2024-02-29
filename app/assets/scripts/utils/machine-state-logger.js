@@ -1,3 +1,4 @@
+import get from 'lodash.get';
 /* eslint-disable no-console */
 
 export function machineStateLogger(s) {
@@ -10,4 +11,5 @@ export function machineStateLogger(s) {
   console.log('%c event', 'color: #03A9F4; font-weight: bold;', s.event);
   console.log('%c next state', 'color: #4CAF50; font-weight: bold;', s);
   console.groupEnd();
+  console.log(get(s, 'context.currentAoi'));
 }

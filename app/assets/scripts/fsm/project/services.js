@@ -94,11 +94,18 @@ export const services = {
           } catch (error) {
             logger('Error fetching tilejson');
 
-            currentTimeframe = undefined;
-            currentMosaic = undefined;
+            // Timeframe tilejson is not available, which means there was an
+            // error during prediction. To recover from this, delete this
+            // timeframe and force the user to enter the project explore page
+            // again.
+            await apiClient.delete(
+              `project/${projectId}/aoi/${currentAoi.id}/timeframe/${currentTimeframe.id}`
+            );
+
             toasts.error(
               'There was an error loading the prediction for the latest AOI timeframe, please run a prediction again.'
             );
+            throw new Error('Error loading prediction');
           }
         }
       }
@@ -251,36 +258,7 @@ export const services = {
       timeframesList,
     };
   },
-  fetchLatestMosaicTimeframe: async (context) => {
-    const {
-      currentMosaic,
-      timeframesList,
-      sharesList,
-      apiClient,
-      project,
-      currentAoi,
-    } = context;
 
-    let currentTimeframe = timeframesList
-      .filter((timeframe) => timeframe.mosaic === currentMosaic.id)
-      .sort((a, b) => b.created_at - a.created_at)[0];
-
-    let currentShare;
-
-    if (currentTimeframe) {
-      currentTimeframe.tilejson = await apiClient.get(
-        `project/${project.id}/aoi/${currentAoi.id}/timeframe/${currentTimeframe.id}/tiles`
-      );
-      currentShare = sharesList.find(
-        (share) => share.id === currentTimeframe.share
-      );
-    }
-
-    return {
-      timeframe: currentTimeframe,
-      share: currentShare,
-    };
-  },
   activateInstance: (context) => async (callback) => {
     try {
       const {
@@ -288,24 +266,22 @@ export const services = {
         currentInstanceType,
         currentTimeframe,
         currentCheckpoint,
+        timeframesList,
+        mosaicsList,
       } = context;
       const { id: projectId } = context.project;
 
       let instance;
 
-      const instanceConfig = {
-        type: currentInstanceType,
-        ...(currentTimeframe?.id && { timeframe_id: currentTimeframe.id }),
-        ...(currentTimeframe?.checkpoint_id && {
-          checkpoint_id:
-            currentCheckpoint?.id || currentTimeframe.checkpoint_id,
-        }),
-      };
-
       // Fetch active instances for this project
       const activeInstances = await apiClient.get(
         `project/${projectId}/instance?status=active&type=${currentInstanceType}`
       );
+
+      let instanceConfig;
+      let nextCheckpoint = currentCheckpoint;
+      let nextTimeframe = currentTimeframe;
+      let nextMosaic = null;
 
       // Reuse existing instance if available
       if (activeInstances.total > 0) {
@@ -313,10 +289,44 @@ export const services = {
         instance = await apiClient.get(
           `project/${projectId}/instance/${instanceId}`
         );
+        const nextCheckpointId = instance.checkpoint_id;
+
+        nextTimeframe =
+          timeframesList?.find(
+            (timeframe) => timeframe.checkpoint_id === nextCheckpointId
+          ) || null;
+
+        if (nextCheckpointId) {
+          nextCheckpoint = await apiClient.get(
+            `project/${projectId}/checkpoint/${nextCheckpointId}`
+          );
+        }
       } else {
+        // There are no instance running. Check if there is a timeframe or
+        // checkpoint to use and create a new instance
+        const nextTimeframeId = currentTimeframe?.id;
+        const nextCheckpointId =
+          currentTimeframe?.checkpoint_id || currentCheckpoint?.id;
+
+        instanceConfig = {
+          type: currentInstanceType,
+          ...(nextTimeframeId && { timeframe_id: nextTimeframeId }),
+          ...(nextCheckpointId && {
+            checkpoint_id: nextCheckpointId,
+          }),
+        };
         instance = await apiClient.post(
           `project/${projectId}/instance`,
           instanceConfig
+        );
+      }
+
+      if (nextTimeframe) {
+        nextTimeframe.tilejson = await apiClient.get(
+          `project/${projectId}/aoi/${context.currentAoi.id}/timeframe/${nextTimeframe.id}/tiles`
+        );
+        nextMosaic = mosaicsList.find(
+          (mosaic) => mosaic.id === nextTimeframe.mosaic
         );
       }
 
@@ -399,6 +409,19 @@ export const services = {
                 });
               });
             break;
+          case 'model#retrain#progress': {
+            // Instance is retraining, send a message to terminate it because
+            // it should not be retraining at this point
+            websocket.sendMessage({
+              action: 'instance#terminate',
+            });
+
+            callback({
+              type: 'Instance activation has failed',
+              data: { error: 'Instance is retraining' },
+            });
+            break;
+          }
 
           case 'info#disconnected':
             // After connection, send a message to the server to request
@@ -408,20 +431,11 @@ export const services = {
             });
             break;
           case 'model#status':
-            if (data.processing) {
-              // Instance is processing a different timeframe, abort it
-              if (instanceConfig.timeframe_id !== data.timeframe) {
-                websocket.sendMessage({
-                  action: 'instance#terminate',
-                });
-                callback({
-                  type: 'Instance activation has failed',
-                });
-              }
-            } else {
+            if (!data.processing) {
               // If a timeframe is specified and it is different from the
               // current timeframe, request it
               if (
+                instanceConfig &&
                 instanceConfig.timeframe_id &&
                 instanceConfig.timeframe_id !== data.timeframe
               ) {
@@ -432,6 +446,7 @@ export const services = {
                   },
                 });
               } else if (
+                instanceConfig &&
                 instanceConfig.checkpoint_id &&
                 instanceConfig.checkpoint_id !== data.checkpoint
               ) {
@@ -442,12 +457,18 @@ export const services = {
                   },
                 });
               } else {
-                // Instance has the same timeframe and is not processing, it should be ready
+                // Instance has the timeframe and is not processing, it should be ready
                 callback({
                   type: 'Instance is ready',
-                  data: { instance },
+                  data: {
+                    instance,
+                    timeframe: nextTimeframe,
+                    checkpoint: nextCheckpoint,
+                    mosaic: nextMosaic,
+                  },
                 });
                 websocket.close();
+                return;
               }
             }
             break;
@@ -456,6 +477,65 @@ export const services = {
             break;
         }
       });
+    } catch (error) {
+      callback({
+        type: 'Instance activation has failed',
+        data: { error },
+      });
+    }
+  },
+  activatePredictionRunInstance: (context) => async (callback) => {
+    try {
+      const { apiClient, project } = context;
+
+      let currentInstance = context.currentInstance;
+
+      if (!currentInstance) {
+        currentInstance = await apiClient.post(
+          `project/${project.id}/instance`
+        );
+      }
+
+      // Confirm instance has running status
+      let instanceStatus;
+      let creationDuration = 0;
+      while (
+        !instanceStatus ||
+        creationDuration < config.instanceCreationTimeout
+      ) {
+        // Get instance status
+        instanceStatus = await apiClient.get(
+          `project/${context.project.id}/instance/${currentInstance.id}`
+        );
+        const instancePhase = get(instanceStatus, 'status.phase');
+
+        // Process status
+        if (instancePhase === 'Running' && instanceStatus.active) {
+          break;
+        } else if (instancePhase === 'Failed') {
+          callback({
+            type: 'Instance activation has failed',
+          });
+        }
+
+        // Update timer
+        await delay(config.instanceCreationCheckInterval);
+        creationDuration += config.instanceCreationCheckInterval;
+
+        // Check timeout
+        if (creationDuration >= config.instanceCreationTimeout) {
+          callback({
+            type: 'Instance activation has failed',
+          });
+        }
+      }
+
+      callback({
+        type: 'Instance is ready',
+        data: { instance: currentInstance },
+      });
+
+      // If project is not new, an instance is already running, use it
     } catch (error) {
       callback({
         type: 'Instance activation has failed',
@@ -579,13 +659,16 @@ export const services = {
               `project/${project.id}/aoi/${currentAoi.id}/timeframe`
             ),
             apiClient.get(
+              `project/${project.id}/aoi/${currentAoi.id}/timeframe/${data.timeframe}`
+            ),
+            apiClient.get(
               `project/${project.id}/aoi/${currentAoi.id}/timeframe/${data.timeframe}/tiles`
             ),
           ])
-            .then(([{ timeframes: timeframesList }, tilejson]) => {
+            .then(([{ timeframes: timeframesList }, timeframe, tilejson]) => {
               callback({
                 type: 'Prediction run was completed',
-                data: { tilejson, timeframesList },
+                data: { tilejson, timeframe, timeframesList },
               });
             })
             .catch((error) => {
@@ -906,6 +989,17 @@ export const services = {
     const timeframeId = context.currentTimeframe?.id;
     const sharesList = context.sharesList || [];
 
+    await apiClient.patch(`project/${projectId}/aoi/${aoiId}`, {
+      bookmarked: true,
+    });
+
+    await apiClient.patch(
+      `project/${projectId}/aoi/${aoiId}/timeframe/${timeframeId}`,
+      {
+        bookmarked: true,
+      }
+    );
+
     const share = await apiClient.post(
       `/project/${projectId}/aoi/${aoiId}/timeframe/${timeframeId}/share`
     );
@@ -928,8 +1022,23 @@ export const services = {
 
     return { batchPrediction };
   },
-  applyCheckpoint: (context) => (callback, onReceive) => {
+  applyCheckpoint: (context) => async (callback, onReceive) => {
     const { currentCheckpoint } = context;
+
+    const nextTimeframe =
+      context.timeframesList.find(
+        (timeframe) => timeframe.checkpoint_id === currentCheckpoint.id
+      ) || null;
+    let nextMosaic = null;
+
+    if (nextTimeframe) {
+      nextMosaic = context.mosaicsList.find(
+        (mosaic) => mosaic.id === nextTimeframe.mosaic
+      );
+      nextTimeframe.tilejson = await context.apiClient.get(
+        `project/${context.project.id}/aoi/${context.currentAoi.id}/timeframe/${nextTimeframe.id}/tiles`
+      );
+    }
 
     const { token } = context.currentInstance;
     const websocket = new WebsocketClient(token);
@@ -1034,10 +1143,24 @@ export const services = {
             }
           }
           break;
-        case 'model#checkpoint#complete':
+        case 'model#checkpoint#complete': {
+          websocket.sendMessage({
+            action: 'model#timeframe',
+            data: {
+              id: nextTimeframe.id,
+            },
+          });
+          break;
+        }
+        case 'model#timeframe#complete':
+          websocket.close();
           callback({
             type: 'Checkpoint was applied',
-            data,
+            data: {
+              checkpoint: data,
+              timeframe: nextTimeframe,
+              mosaic: nextMosaic,
+            },
           });
           break;
 
@@ -1054,5 +1177,236 @@ export const services = {
       }
     });
     return () => websocket.close();
+  },
+  saveCheckpoint: async (context) => {
+    const { apiClient, project, currentCheckpoint } = context;
+
+    const checkpoint = await apiClient.patch(
+      `project/${project.id}/checkpoint/${currentCheckpoint.id}`,
+      {
+        name: currentCheckpoint.name,
+        bookmarked: true,
+      }
+    );
+
+    const checkpointList = await apiClient.get(
+      `project/${project.id}/checkpoint`
+    );
+
+    return { checkpoint, checkpointList };
+  },
+  applyTimeframe: (context) => async (callback, onReceive) => {
+    const {
+      currentTimeframe,
+      apiClient,
+      currentAoi,
+      project,
+      mosaicsList,
+      sharesList,
+    } = context;
+
+    let currentShare;
+
+    const currentMosaic = mosaicsList.find(
+      (mosaic) => mosaic.id === currentTimeframe.mosaic
+    );
+    currentMosaic.tileUrl = getMosaicTileUrl(currentMosaic);
+    currentTimeframe.tilejson = await apiClient.get(
+      `project/${project.id}/aoi/${currentAoi.id}/timeframe/${currentTimeframe.id}/tiles`
+    );
+
+    currentShare = sharesList.find(
+      (share) => share.timeframe?.id === currentTimeframe?.id
+    );
+
+    const { token } = context.currentInstance;
+    const websocket = new WebsocketClient(token);
+
+    /**
+     * Ping pong logic
+     */
+    let pingCount = 0;
+    let lastPintCount;
+    let pingPongInterval;
+    websocket.addEventListener('open', () => {
+      // Send first ping
+      websocket.send(`ping#${pingCount}`);
+
+      // Check for pong messages every interval
+      pingPongInterval = setInterval(() => {
+        if (lastPintCount === pingCount) {
+          pingCount = pingCount + 1;
+          websocket.send(`ping#${pingCount}`);
+        } else {
+          // Pong didn't happened, reconnect
+          websocket.reconnect();
+        }
+      }, config.websocketPingPongInterval);
+    });
+    websocket.addEventListener('close', () => {
+      if (pingPongInterval) {
+        clearInterval(pingPongInterval);
+      }
+    });
+
+    /**
+     * Handle events received from the machine
+     */
+    onReceive((event) => {
+      if (event.type === 'Abort retrain') {
+        websocket.sendMessage({
+          action: 'model#abort',
+        });
+        // Ideally we should thrown an error here to make the service
+        // execute the 'onError' event, but XState doesn't support errors
+        // thrown inside onReceive. A fix is planned for XState v5, more
+        // here: https://github.com/statelyai/xstate/issues/3279
+        callback({ type: 'Retrain was aborted' });
+        websocket.close();
+        return;
+      }
+    });
+
+    /**
+     * Handle events received from the websocket
+     */
+    let isStarted = false;
+    websocket.addEventListener('message', (e) => {
+      // Update ping count on pong
+      if (e.data.startsWith('pong#')) {
+        lastPintCount = parseInt(e.data.split('#')[1], 10);
+        return;
+      }
+
+      const { message, data } = JSON.parse(e.data);
+
+      switch (message) {
+        case 'error':
+          // Send abort message to errored instance
+          websocket.sendMessage({
+            action: 'model#abort',
+          });
+
+          // Send error message to the machine
+          callback({
+            type: 'Unexpected Instance Error',
+            data: { error: data.error },
+          });
+          websocket.close();
+          return;
+
+        case 'info#connected':
+        case 'info#disconnected':
+        case 'model#timeframe#progress':
+          // After connection, send a message to the server to request
+          // model status
+          websocket.sendMessage({
+            action: 'model#status',
+          });
+          break;
+        case 'model#status':
+          if (!isStarted && data.processing) {
+            // Send abort message to stop previous process
+            websocket.sendMessage({
+              action: 'instance#abort',
+            });
+            callback({
+              type: 'Unexpected Instance Error',
+              data: { error: data.error },
+            });
+            websocket.close();
+            return;
+          } else if (!isStarted && !data.processing) {
+            isStarted = true;
+            if (data.aoi !== currentTimeframe.id) {
+              websocket.sendMessage({
+                action: 'model#timeframe',
+                data: {
+                  id: context.currentTimeframe.id,
+                },
+              });
+            }
+          }
+          break;
+        case 'model#timeframe#complete':
+          callback({
+            type: 'Timeframe was applied',
+            data: {
+              ...data,
+              currentShare,
+              currentMosaic,
+            },
+          });
+          websocket.close();
+          return;
+
+        default:
+          if (data?.error) {
+            callback({
+              type: 'Unexpected Instance Error',
+              data: { error: data.error },
+            });
+            websocket.close();
+            return;
+          } else {
+            logger('Unhandled websocket message', message, data);
+          }
+          break;
+      }
+    });
+  },
+  deleteCurrentTimeframe: async (context) => {
+    const {
+      apiClient,
+      project,
+      currentAoi,
+      currentTimeframe,
+      currentCheckpoint,
+      timeframesList,
+    } = context;
+
+    const nextTimeframesList = timeframesList.filter(
+      (t) =>
+        t.id !== currentTimeframe?.id &&
+        t.checkpoint_id === currentCheckpoint.id
+    );
+
+    const nextTimeframe =
+      nextTimeframesList.length > 0 ? nextTimeframesList[0] : null;
+    const nextMosaic = context.mosaicsList.find(
+      (mosaic) => mosaic.id === nextTimeframe?.mosaic
+    );
+
+    let nextInstance = context.currentInstance;
+
+    // If there is a next timeframe, update the instance
+    // or terminate it if there is no next timeframe
+    const { token } = context.currentInstance;
+    const websocket = new WebsocketClient(token);
+    if (nextTimeframe) {
+      websocket.sendMessage({
+        action: 'model#timeframe',
+        data: {
+          id: nextTimeframe.id,
+        },
+      });
+    } else {
+      websocket.sendMessage({
+        action: 'instance#terminate',
+      });
+      nextInstance = null;
+    }
+
+    websocket.close();
+
+    await apiClient.delete(
+      `project/${project.id}/aoi/${currentAoi.id}/timeframe/${currentTimeframe.id}`
+    );
+    return {
+      timeframe: nextTimeframe,
+      timeframesList: nextTimeframesList,
+      mosaic: nextMosaic,
+      currentInstance: nextInstance,
+    };
   },
 };

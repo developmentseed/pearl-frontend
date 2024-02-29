@@ -84,7 +84,9 @@ function CheckpointSelector() {
   );
 
   function getCheckpointLabel(c) {
-    return `${c?.name || currentModel.name} (${c?.id || '(Base Model)'})`;
+    return c.parent === null
+      ? `${currentModel.name} (Base Model)`
+      : `${c.name}`;
   }
 
   let selectedOptionLabel;
@@ -96,6 +98,13 @@ function CheckpointSelector() {
   } else {
     selectedOptionLabel = getCheckpointLabel(currentCheckpoint);
   }
+
+  const selectableCheckpoints = checkpointList?.filter(
+    (c) =>
+      (c.parent === null || c.bookmarked) &&
+      currentCheckpoint &&
+      currentCheckpoint.id !== c.id
+  );
 
   return (
     <>
@@ -117,23 +126,19 @@ function CheckpointSelector() {
           <CheckpointOption selected data-cy='selected-checkpoint-header'>
             <Heading size='xsmall'>{selectedOptionLabel}</Heading>
           </CheckpointOption>
-          {!!checkpointList?.length &&
-            checkpointList
-              .filter((c) => c.id != currentCheckpoint?.id)
-              .map((c) => (
-                <CheckpointOption
-                  key={c.id}
-                  // disabled={disabled}
-                  onClick={async () => {
-                    actorRef.send({
-                      type: 'Apply checkpoint',
-                      data: { checkpoint: { ...c } },
-                    });
-                  }}
-                >
-                  <Heading size='xsmall'>{getCheckpointLabel(c)}</Heading>
-                </CheckpointOption>
-              ))}
+          {selectableCheckpoints?.map((c) => (
+            <CheckpointOption
+              key={c.id}
+              onClick={async () => {
+                actorRef.send({
+                  type: 'Apply checkpoint',
+                  data: { checkpoint: { ...c } },
+                });
+              }}
+            >
+              <Heading size='xsmall'>{getCheckpointLabel(c)}</Heading>
+            </CheckpointOption>
+          ))}
         </ShadowScrollbar>
       </HeadOption>
     </>

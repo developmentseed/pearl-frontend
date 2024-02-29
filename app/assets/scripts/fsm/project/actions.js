@@ -75,7 +75,9 @@ export const actions = {
   }),
   setCurrentMosaic: assign((_, event) => {
     const { mosaic, mosaicsList } = event.data;
-    const currentMosaic = { ...mosaic, tileUrl: getMosaicTileUrl(mosaic) };
+    const currentMosaic = mosaic
+      ? { ...mosaic, tileUrl: getMosaicTileUrl(mosaic) }
+      : null;
 
     // Optionally update mosaic list if provided
     return mosaicsList ? { mosaicsList, currentMosaic } : { currentMosaic };
@@ -234,16 +236,43 @@ export const actions = {
     currentCheckpoint: event.data.checkpoint,
   })),
   setCurrentTimeframe: assign((context, event) => {
-    const { currentCheckpoint } = context;
+    const checkpoint = event.data?.checkpoint || context.currentCheckpoint;
     const newTimeframe = event.data.timeframe;
 
-    const retrainClasses =
-      newTimeframe?.classes || currentCheckpoint?.classes || [];
+    // Clear current prediction if timeframe is changed
+    if (!newTimeframe) {
+      return {
+        currentTimeframe: null,
+        currentMosaic: null,
+        currentShare: null,
+        retrainClasses: [],
+      };
+    }
+
+    const retrainClasses = newTimeframe?.classes || checkpoint?.classes || [];
+
+    // A timeframe is always associated with a mosaic, but currently the API
+    // doesn't populate it in the response
+    const mosaicId =
+      typeof newTimeframe?.mosaic === 'string'
+        ? newTimeframe?.mosaic
+        : newTimeframe?.mosaic?.id;
+
+    const currentMosaic = context.mosaicsList.find((m) => m.id === mosaicId);
+
+    const currentShare =
+      context.sharesList.find(
+        (s) =>
+          s.timeframe_id === newTimeframe.id &&
+          s.aoi_id === context.currentAoi.id
+      ) || null;
 
     // Apply new timeframe and (re-)initialize retrain classes
     return {
       currentTimeframe: { ...newTimeframe },
+      currentMosaic,
       retrainClasses,
+      currentShare,
     };
   }),
   setTimeframesList: assign((context, event) => ({
@@ -321,6 +350,10 @@ export const actions = {
   }),
   clearCurrentPrediction: assign(() => ({
     currentPrediction: null,
+    currentShare: null,
+  })),
+  clearCurrentTimeframe: assign(() => ({
+    currentTimeframe: null,
   })),
   setMapRef: assign((context, event) => ({
     mapRef: event.data.mapRef,
@@ -381,6 +414,14 @@ export const actions = {
 
     return {
       retrainSamples: newRetrainSamples,
+    };
+  }),
+  addRetrainClass: assign((context, event) => {
+    const { retrainClasses } = context;
+    const { retrainClass } = event.data;
+
+    return {
+      retrainClasses: retrainClasses.concat(retrainClass),
     };
   }),
   updateRetrainClassSamples: assign((context, event) => {
@@ -448,8 +489,26 @@ export const actions = {
     sessionMode: SESSION_MODES.RETRAIN,
     sessionStatusMessage: 'Ready for retrain run',
   })),
-  enterApplyCheckpoint: assign(() => ({
-    sessionStatusMessage: 'Applying checkpoint',
+  enterApplyCheckpoint: assign((context) => {
+    const nextTimeframe =
+      context.timeframesList.find(
+        (t) => t.checkpoint_id === context.currentCheckpoint.id
+      ) || null;
+
+    const nextMosaic =
+      context.mosaicsList.find((m) => m.id === nextTimeframe?.mosaic) || null;
+
+    return {
+      sessionStatusMessage: 'Applying checkpoint',
+      currentTimeframe: nextTimeframe,
+      currentMosaic: nextMosaic,
+      globalLoading: {
+        disabled: false,
+      },
+    };
+  }),
+  enterApplyTimeframe: assign(() => ({
+    sessionStatusMessage: 'Applying timeframe',
     globalLoading: {
       disabled: false,
     },

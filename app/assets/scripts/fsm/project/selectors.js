@@ -14,6 +14,18 @@ export const selectors = {
   canExport: (state) =>
     state.context.currentTimeframe &&
     (state.matches('Prediction ready') || state.matches('Retrain ready')),
+  canSaveCheckpoint: (state) => {
+    return (
+      // Must be in retrain tab
+      (state.matches('Prediction ready') || state.matches('Retrain ready')) &&
+      // A checkpoint exists
+      state.context.currentCheckpoint &&
+      // It is not the base checkpoint
+      state.context.currentCheckpoint.parent !== null &&
+      // It is not already saved
+      !state.context.currentCheckpoint.bookmarked
+    );
+  },
   checkpointList: (state) => state.context.checkpointList,
   currentAoi: (state) => state.context.currentAoi,
   currentAoiShape: (state) => state.context.currentAoiShape,

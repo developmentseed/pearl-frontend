@@ -3,18 +3,17 @@ on:
   push:
     branches:
       - 'develop'
-      - 'main'
-      - 'add/select-mosaic'
+      - 'v2'
 jobs:
   trigger-deploy:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
-    - name: Trigger deploy workflow
-      uses: benc-uk/workflow-dispatch@v1
-      with:
-        workflow: frontend-staging.yml
-        repo: developmentseed/pearl-reforestamos-deploy
-        inputs: '{ "commit": "${{ github.event.after }}" }'
-        ref: main
-        token: ${{ secrets.PAT }}
+      - name: Trigger deploy workflow
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          workflow: frontend-staging.yml
+          repo: developmentseed/pearl-reforestamos-deploy
+          inputs: '{ "commit": "${{ github.event.after }}", "branch": "${{ github.ref }}" }'
+          ref: main
+          token: ${{ secrets.PAT }}

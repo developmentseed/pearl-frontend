@@ -3,15 +3,11 @@ import styled from 'styled-components';
 import PageHeader from '../common/page-header';
 import toasts from '../common/toasts';
 import { PageBody } from '../../styles/page';
-import { MapContainer, TileLayer, FeatureGroup } from 'react-leaflet';
-import { useMosaics } from '../../context/global';
+import { MapContainer, FeatureGroup } from 'react-leaflet';
 
 import { useParams } from 'react-router-dom';
 import App from '../common/app';
-import {
-  MAX_BASE_MAP_ZOOM_LEVEL,
-  BaseMapLayer,
-} from '../common/map/base-map-layer';
+import { MAX_BASE_MAP_ZOOM_LEVEL } from '../common/map/base-map-layer';
 import { BOUNDS_PADDING } from '../common/map/constants';
 import config from '../../config';
 import { useAuth } from '../../context/auth';
@@ -20,7 +16,8 @@ import {
   Class,
   Thumbnail as ClassThumbnail,
   ClassHeading,
-} from '../explore/prime-panel/tabs/retrain-refine-styles';
+} from '../project/prime-panel/retrain-refine-styles';
+
 import { Accordion, AccordionFold as BaseFold } from '@devseed-ui/accordion';
 import { themeVal, glsp } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
@@ -39,8 +36,9 @@ import {
   PanelBlockFooter,
   PanelBlockBody,
 } from '../common/panel-block';
+import { getMosaicTileUrl } from '../../utils/mosaics';
 
-const { restApiEndpoint, tileUrlTemplate } = config;
+const { restApiEndpoint } = config;
 
 const AOIPanel = styled(PanelBlock)`
   background: ${themeVal('color.surface')};
@@ -70,11 +68,13 @@ const AOIPanel = styled(PanelBlock)`
   }
   ${Class} {
     grid-template-columns: 1rem minmax(10px, 1fr);
+    gap: 0 ${glsp(0.5)};
     padding: 0;
     min-height: 0;
   }
   ${ClassHeading} {
     white-space: normal;
+    font-size: 0.875rem;
   }
   ${ClassThumbnail} {
     width: ${glsp(0.875)};
@@ -102,13 +102,6 @@ const AccordionFold = styled(BaseFold)`
 `;
 
 const INITIAL_MAP_LAYERS = {
-  mosaic: {
-    id: 'mosaic',
-    name: 'naip.latest',
-    opacity: 1,
-    visible: true,
-    active: true,
-  },
   predictionsLeft: {
     id: 'predictionsLeft',
     name: 'Left Prediction Results',
@@ -125,7 +118,7 @@ const INITIAL_MAP_LAYERS = {
   },
 };
 
-const composeMosaicName = (start, end) =>
+export const composeMosaicName = (start, end) =>
   `${new Date(start).toLocaleString('default', {
     month: 'short',
   })} - ${new Date(end).toLocaleString('default', {
@@ -142,8 +135,7 @@ function CompareMap() {
   const [showLayersControl, setShowLayersControl] = useState(false);
   const [aoiClasses, setAoiClasses] = useState([]);
   const [aoisInfo, setAoisInfo] = useState([]);
-  const { mosaics } = useMosaics();
-  const mosaic = mosaics && mosaics.length > 0 ? mosaics[0] : null;
+  const [mosaicUrls, setMosaicUrls] = useState([]);
 
   useEffect(() => {
     if (!mapRef) return;
@@ -153,8 +145,11 @@ function CompareMap() {
           restApiClient.getTileJSONFromUUID(uuid),
           restApiClient.get(`share/${uuid}`),
         ]);
-
         const tileUrl = `${restApiEndpoint}${tileJSON.tiles[0]}`;
+        setMosaicUrls((prevMosaicUrls) => [
+          ...prevMosaicUrls,
+          getMosaicTileUrl(aoiData.mosaic),
+        ]);
         setTileUrls((prevTileUrls) => [...prevTileUrls, tileUrl]);
         setAoiClasses((prevClasses) => [...prevClasses, aoiData.classes]);
         setAoisInfo((prevAoiInfo) => [
@@ -184,7 +179,7 @@ function CompareMap() {
       }
     };
 
-    [leftUUID, rightUUID].forEach(fetchDataForUUID);
+    fetchDataForUUID(leftUUID).then(() => fetchDataForUUID(rightUUID));
   }, [leftUUID, rightUUID, mapRef]);
 
   return (
@@ -194,40 +189,46 @@ function CompareMap() {
         <MapContainer
           style={{ height: '100%' }}
           maxZoom={MAX_BASE_MAP_ZOOM_LEVEL}
-          whenCreated={(m) => setMapRef(m)}
+          whenCreated={(m) => {
+            m.attributionControl.setPrefix('');
+            setMapRef(m);
+          }}
         >
-          <BaseMapLayer />
-          {mosaic && (
-            <TileLayer
-              url={tileUrlTemplate.replace('{LAYER_NAME}', mosaic)}
-              attribution='&copy; NAIP'
-              minZoom={12}
-              maxZoom={20}
-              zIndex={2}
-              opacity={mapLayers.mosaic.visible ? mapLayers.mosaic.opacity : 0}
-            />
-          )}
-          {tileUrls[0] && tileUrls[1] && (
-            <SideBySideTileLayer
-              leftTile={{
-                url: tileUrls[0],
-                attr: '',
-                opacity: mapLayers.predictionsLeft.visible
-                  ? mapLayers.predictionsLeft.opacity
-                  : 0,
-              }}
-              rightTile={{
-                url: tileUrls[1],
-                attr: '',
-                opacity: mapLayers.predictionsRight.visible
-                  ? mapLayers.predictionsRight.opacity
-                  : 0,
-              }}
-              minZoom={12}
-              maxZoom={20}
-              zIndex={3}
-            />
-          )}
+          {tileUrls.length === 2 &&
+            mosaicUrls.length === 2 &&
+            aoisInfo.length === 2 && (
+              <SideBySideTileLayer
+                leftTile={{
+                  url: tileUrls[0],
+                  mosaicUrl: mosaicUrls[0],
+                  attr: toTitleCase(
+                    `${aoisInfo[0].mosaic.params.collection.replace(
+                      /-/g,
+                      ' '
+                    )} | Microsoft Planetary Computer`
+                  ),
+                  opacity: mapLayers.predictionsLeft.visible
+                    ? mapLayers.predictionsLeft.opacity
+                    : 0,
+                }}
+                rightTile={{
+                  url: tileUrls[1],
+                  mosaicUrl: mosaicUrls[1],
+                  attr: toTitleCase(
+                    `${aoisInfo[1].mosaic.params.collection.replace(
+                      /-/g,
+                      ' '
+                    )} | Microsoft Planetary Computer`
+                  ),
+                  opacity: mapLayers.predictionsRight.visible
+                    ? mapLayers.predictionsRight.opacity
+                    : 0,
+                }}
+                minZoom={10}
+                maxZoom={20}
+                zIndex={3}
+              />
+            )}
           <FeatureGroup>
             <GenericControl
               id='layer-control'
@@ -262,6 +263,10 @@ function CompareMap() {
                       setFoldExpanded={(v) => setExpanded(0, v)}
                       content={
                         <DetailsList
+                        styles={{
+                          fontSize: '0.875rem',
+                          gridTemplateColumns: 'minmax(0,3fr) minmax(0,4fr)',
+                        }}
                           details={{
                             'Imagery source': toTitleCase(
                               aoi.mosaic.params.collection.replace('-', ' ')
@@ -270,8 +275,8 @@ function CompareMap() {
                               aoi.mosaic.mosaic_ts_start,
                               aoi.mosaic.mosaic_ts_end
                             ),
-                            Model: 'model name here',
-                            Checkpoint: aoi.timeframe.checkpoint_id,
+                            Model: aoi.model.name,
+                            Checkpoint: aoi.checkpoint.name,
                           }}
                         />
                       }

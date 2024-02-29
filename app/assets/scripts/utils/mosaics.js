@@ -9,6 +9,9 @@ const MAX_CLOUD_COVER_PERCENTAGE = 10;
  */
 export function getMosaicTileUrl(mosaic) {
   if (!mosaic) return;
+
+  const mosaicId = typeof mosaic === 'string' ? mosaic : mosaic.id;
+
   const mosaicParams = mosaic?.ui_params || mosaic?.params;
 
   if (!mosaicParams) return;
@@ -28,9 +31,9 @@ export function getMosaicTileUrl(mosaic) {
   // Serialize remaining params
   for (var p in otherParams) params.push(p + '=' + otherParams[p]);
 
-  return `https://planetarycomputer.microsoft.com/api/data/v1/mosaic/tiles/${
-    mosaic.id
-  }/{z}/{x}/{y}?${params.join('&')}`;
+  return `https://planetarycomputer.microsoft.com/api/data/v1/mosaic/tiles/${mosaicId}/{z}/{x}/{y}?${params.join(
+    '&'
+  )}`;
 }
 
 /**
