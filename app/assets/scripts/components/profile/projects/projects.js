@@ -30,6 +30,7 @@ const HEADERS = [
   'Name',
   'Created',
   'Model',
+  'Checkpoints',
   'Last Checkpoint',
   'AOIs',
   'AOI Names',
@@ -63,16 +64,13 @@ function renderRow(proj) {
       </TableCell>
       <TableCell>{formatDateTime(proj.created)}</TableCell>
       <TableCell>{proj.model ? proj.model.name : 'No model set'}</TableCell>
+      <TableCell>{proj.checkpoints.length}</TableCell>
       <TableCell>
-        {proj.checkpoints.length
-          ? proj.checkpoints[0].name
-          : 'No checkpoint set'}
+        {proj.checkpoints.length ? proj.checkpoints[0].name : ' '}
       </TableCell>
       <TableCell>{proj.aois.length}</TableCell>
       <TableCell>
-        {proj.aois.length
-          ? proj.aois.map((a) => a.name).join(', ')
-          : 'No AOIs set'}
+        {proj.aois.length ? proj.aois.map((a) => a.name).join(', ') : ' '}
       </TableCell>
     </TableRow>
   );

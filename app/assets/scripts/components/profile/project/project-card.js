@@ -29,6 +29,7 @@ function ProjectCard({ project, shares }) {
     details = {
       Created: formatDateTime(project.created),
       Model: project.model_name,
+      Checkpoints: project.checkpoints.length,
       'Last Checkpoint':
         project.checkpoints.length > 0
           ? project.checkpoints[0].name
