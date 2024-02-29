@@ -22,7 +22,6 @@ import { Accordion, AccordionFold as BaseFold } from '@devseed-ui/accordion';
 import { themeVal, glsp } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
 import { Button } from '@devseed-ui/button';
-import { Subheading } from '../../styles/type/heading';
 import LayersPanel from '../share-map/layers-control';
 import GenericControl from '../common/map/generic-control';
 import SideBySideTileLayer from './SideBySideTileLayer';
@@ -252,82 +251,69 @@ function CompareMap() {
             <AOIPanel key={aoi.uuid} leftPanel={i === 0}>
               <Accordion
                 className='aoi__panel'
-                foldCount={2}
-                initialState={[true, false]}
+                foldCount={1}
+                initialState={[true]}
               >
                 {({ checkExpanded, setExpanded }) => (
-                  <>
-                    <AccordionFold
-                      title={aoi.name}
-                      isFoldExpanded={checkExpanded(0)}
-                      setFoldExpanded={(v) => setExpanded(0, v)}
-                      content={
-                        <DetailsList
+                  <AccordionFold
+                    title={aoi.name}
+                    isFoldExpanded={checkExpanded(0)}
+                    setFoldExpanded={(v) => setExpanded(0, v)}
+                    content={
+                      <DetailsList
                         styles={{
                           fontSize: '0.875rem',
                           gridTemplateColumns: 'minmax(0,3fr) minmax(0,4fr)',
                         }}
-                          details={{
-                            'Imagery source': toTitleCase(
-                              aoi.mosaic.params.collection.replace('-', ' ')
-                            ),
-                            Mosaic: composeMosaicName(
-                              aoi.mosaic.mosaic_ts_start,
-                              aoi.mosaic.mosaic_ts_end
-                            ),
-                            Model: aoi.model.name,
-                            Checkpoint: aoi.checkpoint.name,
-                          }}
-                        />
-                      }
-                    />
-                    <AccordionFold
-                      title='Class distribution'
-                      isFoldExpanded={checkExpanded(1)}
-                      setFoldExpanded={(v) => setExpanded(1, v)}
-                      content={
-                        Object.keys(aoi.timeframe.px_stats).length ? (
-                          <ClassAnalyticsChart
-                            checkpoint={{
-                              ...aoi.timeframe,
-                              analytics: Object.keys(aoiClasses[i]).map(
-                                (_, ind) => ({
-                                  px_stat: aoi.timeframe.px_stats[ind],
-                                })
-                              ),
-                            }}
-                            bounds={aoi.bounds.bounds}
-                            label='Checkpoint Class Distribution'
-                            metric='px_stat'
-                            formatter={(v) => `${round(v * 100, 0)}%`}
-                          />
-                        ) : (
-                          <p>Class distribution metrics are not available</p>
-                        )
-                      }
-                    />
-                  </>
+                        details={{
+                          'Imagery source': toTitleCase(
+                            aoi.mosaic.params.collection.replace('-', ' ')
+                          ),
+                          Mosaic: composeMosaicName(
+                            aoi.mosaic.mosaic_ts_start,
+                            aoi.mosaic.mosaic_ts_end
+                          ),
+                          Model: aoi.model.name,
+                          Checkpoint: aoi.checkpoint.name,
+                        }}
+                      />
+                    }
+                  />
                 )}
               </Accordion>
               <PanelBlockBody>
-                <Subheading>LULC Classes</Subheading>
-                {aoiClasses[i].length > 1
-                  ? aoiClasses[i].map((c) => (
-                      <Class key={c.name} noHover>
-                        <ClassThumbnail color={c.color} />
-                        <ClassHeading size='xsmall'>{c.name}</ClassHeading>
-                      </Class>
-                    ))
-                  : [1, 2, 3].map((a) => (
-                      <Class
-                        key={a}
-                        placeholder={+true}
-                        className='placeholder-class'
-                      >
-                        <ClassThumbnail />
-                        <ClassHeading size='xsmall' placeholder={+true} />
-                      </Class>
-                    ))}
+                {Object.keys(aoi.timeframe.px_stats).length ? (
+                  <ClassAnalyticsChart
+                    checkpoint={{
+                      ...aoi.timeframe,
+                      analytics: Object.keys(aoiClasses[i]).map((_, ind) => ({
+                        px_stat: aoi.timeframe.px_stats[ind],
+                      })),
+                    }}
+                    bounds={aoi.bounds.bounds}
+                    label='Checkpoint Class Distribution'
+                    metric='px_stat'
+                    formatter={(v) => `${round(v * 100, 0)}%`}
+                  />
+                ) : aoiClasses[i].length > 1 ? (
+                  aoiClasses[i].map((c) => (
+                    <Class key={c.name} noHover>
+                      <ClassThumbnail color={c.color} />
+                      <ClassHeading size='xsmall'>{c.name}</ClassHeading>
+                    </Class>
+                  ))
+                ) : (
+                  [1, 2, 3].map((a) => (
+                    <Class
+                      key={a}
+                      placeholder={+true}
+                      className='placeholder-class'
+                    >
+                      <ClassThumbnail />
+                      <ClassHeading size='xsmall' placeholder={+true} />
+                    </Class>
+                  ))
+                )}
               </PanelBlockBody>
               <PanelBlockFooter>
                 <Button

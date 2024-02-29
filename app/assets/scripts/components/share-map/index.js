@@ -9,6 +9,8 @@ import { getMosaicTileUrl } from '../../utils/mosaics';
 import { toTitleCase } from '../../utils/format';
 import { composeMosaicName } from '../compare-map';
 import { Accordion, AccordionFold as BaseFold } from '@devseed-ui/accordion';
+import ClassAnalyticsChart from '../project/sec-panel/class-analytics-chart';
+import { round } from '../../utils/format';
 
 import { useParams } from 'react-router-dom';
 import App from '../common/app';
@@ -34,7 +36,6 @@ import {
 } from '../project/prime-panel/retrain-refine-styles';
 import { themeVal, glsp } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
-import { Subheading } from '../../styles/type/heading';
 import { DownloadAoiButton } from '../profile/project/batch-list';
 import LayersPanel from './layers-control';
 import GenericControl from '../common/map/generic-control';
@@ -268,24 +269,38 @@ function ShareMap() {
               )}
             </Accordion>
             <PanelBlockBody>
-              <Subheading>LULC Classes</Subheading>
-              {classes.length > 1
-                ? classes.map((c) => (
-                    <Class key={c.name} noHover>
-                      <ClassThumbnail color={c.color} />
-                      <ClassHeading size='xsmall'>{c.name}</ClassHeading>
-                    </Class>
-                  ))
-                : [1, 2, 3].map((a) => (
-                    <Class
-                      key={a}
-                      placeholder={+true}
-                      className='placeholder-class'
-                    >
-                      <ClassThumbnail />
-                      <ClassHeading size='xsmall' placeholder={+true} />
-                    </Class>
-                  ))}
+              {Object.keys(aoiInfo.timeframe.px_stats).length ? (
+                <ClassAnalyticsChart
+                  checkpoint={{
+                    ...aoiInfo.timeframe,
+                    analytics: Object.keys(classes).map((_, ind) => ({
+                      px_stat: aoiInfo.timeframe.px_stats[ind],
+                    })),
+                  }}
+                  bounds={aoiInfo.bounds.bounds}
+                  label='Checkpoint Class Distribution'
+                  metric='px_stat'
+                  formatter={(v) => `${round(v * 100, 0)}%`}
+                />
+              ) : classes.length > 1 ? (
+                classes.map((c) => (
+                  <Class key={c.name} noHover>
+                    <ClassThumbnail color={c.color} />
+                    <ClassHeading size='xsmall'>{c.name}</ClassHeading>
+                  </Class>
+                ))
+              ) : (
+                [1, 2, 3].map((a) => (
+                  <Class
+                    key={a}
+                    placeholder={+true}
+                    className='placeholder-class'
+                  >
+                    <ClassThumbnail />
+                    <ClassHeading size='xsmall' placeholder={+true} />
+                  </Class>
+                ))
+              )}
             </PanelBlockBody>
           </AOIPanel>
         )}
