@@ -19,7 +19,7 @@ import logger from '../../../utils/logger';
 import useFetch from '../../../utils/use-fetch';
 import { downloadGeotiff } from '../../../utils/share-link';
 import { formatThousands } from '../../../utils/format';
-import { composeMosaicName } from '../../compare-map';
+import { composeMosaicName } from '../../../utils/mosaics';
 
 const TABLE_PAGE_SIZE = 5;
 const TABLE_HEADERS = [
