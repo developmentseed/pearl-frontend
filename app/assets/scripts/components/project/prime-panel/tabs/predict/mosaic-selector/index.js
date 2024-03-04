@@ -193,18 +193,20 @@ export function MosaicSelector() {
           >
             {label}
           </ActionButton>
-          <ActionButton
-            title='Delete Current Mosaic'
-            id='delete-current-mosaic'
-            useIcon='trash-bin'
-            onClick={() => {
-              actorRef.send({
-                type: 'Delete timeframe',
-              });
-            }}
-          >
-            Delete Current Mosaic
-          </ActionButton>
+          {currentMosaic && (
+            <ActionButton
+              title='Delete Current Mosaic'
+              id='delete-current-mosaic'
+              useIcon='trash-bin'
+              onClick={() => {
+                actorRef.send({
+                  type: 'Delete timeframe',
+                });
+              }}
+            >
+              Delete Current Mosaic
+            </ActionButton>
+          )}
         </HeadOptionToolbar>
       </SelectorHeadOption>
     </>
