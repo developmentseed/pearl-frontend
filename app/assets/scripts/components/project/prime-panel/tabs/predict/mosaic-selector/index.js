@@ -116,7 +116,7 @@ export function MosaicSelector() {
   } else {
     label = isProjectNew
       ? 'Select Mosaic'
-      : 'This checkpoint has no mosaics, please select one.';
+      : `This checkpoint doesn't have any predictions, you must select a mosaic and run first prediction.`;
     disabled = false;
   }
 
