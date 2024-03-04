@@ -1027,10 +1027,14 @@ export const services = {
     return { batchPrediction };
   },
   applyCheckpoint: (context) => async (callback, onReceive) => {
-    const { currentCheckpoint, timeframesList, mosaicsList } = context;
+    const { timeframesList, mosaicsList } = context;
+
+    let nextCheckpoint = await context.apiClient.get(
+      `project/${context.project.id}/checkpoint/${context.currentCheckpoint.id}`
+    );
 
     let nextTimeframe = timeframesList.find(
-      (timeframe) => timeframe.checkpoint_id === currentCheckpoint.id
+      (timeframe) => timeframe.checkpoint_id === nextCheckpoint.id
     );
     let nextMosaic = null;
 
@@ -1144,7 +1148,7 @@ export const services = {
             });
           } else if (!isStarted && !data.processing) {
             isStarted = true;
-            if (data.checkpoint !== currentCheckpoint.id) {
+            if (data.checkpoint !== nextCheckpoint.id) {
               websocket.sendMessage({
                 action: 'model#checkpoint',
                 data: {
@@ -1167,7 +1171,7 @@ export const services = {
             callback({
               type: 'Checkpoint was applied',
               data: {
-                checkpoint: data,
+                checkpoint: nextCheckpoint,
                 timeframe: nextTimeframe,
                 mosaic: nextMosaic,
               },
@@ -1180,7 +1184,7 @@ export const services = {
           callback({
             type: 'Checkpoint was applied',
             data: {
-              checkpoint: data,
+              checkpoint: nextCheckpoint,
               timeframe: nextTimeframe,
               mosaic: nextMosaic,
             },
