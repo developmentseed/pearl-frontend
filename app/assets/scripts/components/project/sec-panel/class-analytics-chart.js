@@ -7,6 +7,7 @@ import { glsp, themeVal, truncated } from '@devseed-ui/theme-provider';
 import { round } from '../../../utils/format';
 import { areaFromBounds } from '../../../utils/map';
 import { formatThousands } from '../../../utils/format';
+import { StyledTooltip } from '../../common/tooltip';
 
 const Wrapper = styled.div`
   display: grid;
@@ -154,7 +155,11 @@ function ClassAnalyticsChart(props) {
           (c, i) =>
             checkpoint.analytics[i] && (
               <ClassItem key={c.name} bounds={bounds}>
-                <Icon color={c.color} />
+                <Icon color={c.color} data-tip data-for={c.name}>
+                  <StyledTooltip id={c.name} place='bottom' effect='float'>
+                    {c.name}
+                  </StyledTooltip>
+                </Icon>
                 <Prose size='small'>{c.name}</Prose>
                 {bounds && (
                   <Prose size='small' className='percent'>
