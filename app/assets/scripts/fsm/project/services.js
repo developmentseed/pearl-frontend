@@ -1393,13 +1393,16 @@ export const services = {
     } = context;
 
     const nextTimeframesList = timeframesList.filter(
-      (t) =>
-        t.id !== currentTimeframe?.id &&
-        t.checkpoint_id === currentCheckpoint.id
+      (t) => t.id !== currentTimeframe?.id
     );
 
+    // next timeframe should have the same checkpoint as the current one
     const nextTimeframe =
-      nextTimeframesList.length > 0 ? nextTimeframesList[0] : null;
+      nextTimeframesList.length > 0
+        ? nextTimeframesList.find(
+            (t) => t.checkpoint_id === currentCheckpoint.id
+          )
+        : null;
     const nextMosaic = context.mosaicsList.find(
       (mosaic) => mosaic.id === nextTimeframe?.mosaic
     );
