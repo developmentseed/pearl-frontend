@@ -1027,21 +1027,27 @@ export const services = {
     return { batchPrediction };
   },
   applyCheckpoint: (context) => async (callback, onReceive) => {
-    const { currentCheckpoint } = context;
+    const { currentCheckpoint, timeframesList, mosaicsList } = context;
 
-    const nextTimeframe =
-      context.timeframesList.find(
-        (timeframe) => timeframe.checkpoint_id === currentCheckpoint.id
-      ) || null;
+    let nextTimeframe = timeframesList.find(
+      (timeframe) => timeframe.checkpoint_id === currentCheckpoint.id
+    );
     let nextMosaic = null;
 
     if (nextTimeframe) {
-      nextMosaic = context.mosaicsList.find(
-        (mosaic) => mosaic.id === nextTimeframe.mosaic
-      );
-      nextTimeframe.tilejson = await context.apiClient.get(
-        `project/${context.project.id}/aoi/${context.currentAoi.id}/timeframe/${nextTimeframe.id}/tiles`
-      );
+      try {
+        nextTimeframe = await context.apiClient.get(
+          `project/${context.project.id}/aoi/${context.currentAoi.id}/timeframe/${nextTimeframe.id}`
+        );
+        nextTimeframe.tilejson = await context.apiClient.get(
+          `project/${context.project.id}/aoi/${context.currentAoi.id}/timeframe/${nextTimeframe.id}/tiles`
+        );
+
+        nextMosaic = mosaicsList.find((m) => m.id === nextTimeframe.mosaic.id);
+      } catch (error) {
+        // There is valid timeframe for this checkpoint
+        nextTimeframe = null;
+      }
     }
 
     const { token } = context.currentInstance;
@@ -1119,6 +1125,7 @@ export const services = {
         case 'info#connected':
         case 'info#disconnected':
         case 'model#checkpoint#progress':
+        case 'model#timeframe#progress':
           // After connection, send a message to the server to request
           // model status
           websocket.sendMessage({
@@ -1148,12 +1155,24 @@ export const services = {
           }
           break;
         case 'model#checkpoint#complete': {
-          websocket.sendMessage({
-            action: 'model#timeframe',
-            data: {
-              id: nextTimeframe.id,
-            },
-          });
+          if (nextTimeframe) {
+            websocket.sendMessage({
+              action: 'model#timeframe',
+              data: {
+                id: nextTimeframe.id,
+              },
+            });
+          } else {
+            websocket.close();
+            callback({
+              type: 'Checkpoint was applied',
+              data: {
+                checkpoint: data,
+                timeframe: nextTimeframe,
+                mosaic: nextMosaic,
+              },
+            });
+          }
           break;
         }
         case 'model#timeframe#complete':
