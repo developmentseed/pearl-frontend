@@ -100,16 +100,21 @@ const options = {
 function ClassAnalyticsChart(props) {
   const { checkpoint, label, metric, formatter, bounds } = props;
   const landArea = (percentage) => {
-    return formatThousands((percentage * areaFromBounds(bounds)) / 1e6);
+    const formatted = formatThousands(
+      (percentage * areaFromBounds(bounds)) / 1e6
+    );
+    return formatted !== '0' ? formatted : '-';
   };
   const prettyPrint = (value, metric) => {
+    let formatted;
     if (formatter) {
-      return formatter(value, metric);
+      formatted = formatter(value, metric);
     } else if (metric === 'percent') {
-      return `${round(value, 2) * 100}%`;
+      formatted = `${round(value, 2) * 100}%`;
     } else {
-      return round(value, 2);
+      formatted = round(value, 2);
     }
+    return formatted === '0' || formatted === '0%' ? '-' : formatted;
   };
   return (
     <Wrapper>
