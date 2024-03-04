@@ -106,9 +106,10 @@ export function formatThousands(num, options) {
     ? `${dec}${repeat(0, opts.decimals - dec.length)}`
     : dec;
 
-  return dec !== ''
-    ? `${int}.${dec} ${largeNumUnit}`
-    : `${int} ${largeNumUnit}`;
+  const formatted =
+    dec !== '' ? `${int}.${dec} ${largeNumUnit}` : `${int} ${largeNumUnit}`;
+
+  return formatted.trim();
 }
 /**
  * Returns a title-cased version string passed
