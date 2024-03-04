@@ -949,14 +949,18 @@ export const services = {
           });
           break;
         case 'model#prediction#complete':
-          apiClient
-            .get(
+          Promise.all([
+            apiClient.get(
+              `project/${project.id}/aoi/${currentAoi.id}/timeframe/${data.timeframe}`
+            ),
+            apiClient.get(
               `project/${project.id}/aoi/${currentAoi.id}/timeframe/${data.timeframe}/tiles`
-            )
-            .then((tilejson) => {
+            ),
+          ])
+            .then(([timeframe, tilejson]) => {
               callback({
                 type: 'Retrain run was completed',
-                data: { tilejson },
+                data: { timeframe, tilejson },
               });
             })
             .catch((error) => {

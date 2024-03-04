@@ -678,6 +678,7 @@ export const projectMachine = createMachine(
             actions: [
               'hideGlobalLoading',
               'clearRetrainSamples',
+              'setCurrentTimeframe',
               'setCurrentTimeframeTilejson',
             ],
           },
