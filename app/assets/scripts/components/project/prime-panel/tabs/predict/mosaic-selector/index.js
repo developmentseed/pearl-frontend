@@ -107,13 +107,16 @@ export function MosaicSelector() {
     label = 'Define first AOI';
   } else if (!currentImagerySource) {
     label = 'Define Imagery Source';
+  } else if (currentMosaic) {
+    label = formatMosaicDateRange(
+      currentMosaic?.mosaic_ts_start,
+      currentMosaic?.mosaic_ts_end
+    );
+    disabled = false;
   } else {
-    label = currentMosaic
-      ? formatMosaicDateRange(
-          currentMosaic?.mosaic_ts_start,
-          currentMosaic?.mosaic_ts_end
-        )
-      : 'Select Mosaic';
+    label = isProjectNew
+      ? 'Select Mosaic'
+      : 'This checkpoint has no mosaics, please select one.';
     disabled = false;
   }
 
@@ -155,7 +158,11 @@ export function MosaicSelector() {
             boxShadow: 'inset 0 -1px 0 0 rgba(240, 244, 255, 0.16)',
           }}
         >
-          <MosaicOption selected data-cy='selected-timeframe-header'>
+          <MosaicOption
+            selected
+            data-cy='selected-timeframe-header'
+            onClick={() => !currentMosaic && setShowModal(true)}
+          >
             <Heading size='xsmall'>{label}</Heading>
           </MosaicOption>
           {!!optionsList?.length &&
