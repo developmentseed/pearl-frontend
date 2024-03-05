@@ -79,6 +79,7 @@ export function MosaicSelector() {
   const isProjectNew = ProjectMachineContext.useSelector((s) =>
     guards.isProjectNew(s.context)
   );
+  const isAoiNew = ProjectMachineContext.useSelector(selectors.isAoiNew);
   const currentAoi = ProjectMachineContext.useSelector(selectors.currentAoi);
   const currentImagerySource = ProjectMachineContext.useSelector(
     selectors.currentImagerySource
@@ -165,7 +166,8 @@ export function MosaicSelector() {
           >
             <Heading size='xsmall'>{label}</Heading>
           </MosaicOption>
-          {!!optionsList?.length &&
+          {!isAoiNew &&
+            !!optionsList?.length &&
             optionsList
               .filter((t) => t.id != currentTimeframe?.id)
               .map((t) => (
