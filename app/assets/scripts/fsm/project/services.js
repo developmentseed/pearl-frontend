@@ -1216,7 +1216,7 @@ export const services = {
       }
     );
 
-    const checkpointList = await apiClient.get(
+    const { checkpoints: checkpointList } = await apiClient.get(
       `project/${project.id}/checkpoint`
     );
 
