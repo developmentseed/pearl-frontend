@@ -130,6 +130,7 @@ function SecPanel() {
                           })
                         ),
                       }}
+                      bounds={currentCheckpoint.bounds}
                       label='Checkpoint Class Distribution'
                       metric='px_stat'
                       formatter={(v) => `${round(v * 100, 0)}%`}
