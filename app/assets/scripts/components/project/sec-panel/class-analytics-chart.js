@@ -155,12 +155,13 @@ function ClassAnalyticsChart(props) {
           (c, i) =>
             checkpoint.analytics[i] && (
               <ClassItem key={c.name} bounds={bounds}>
-                <Icon color={c.color} data-tip data-for={c.name}>
-                  <StyledTooltip id={c.name} place='bottom' effect='float'>
-                    {c.name}
-                  </StyledTooltip>
-                </Icon>
-                <Prose size='small'>{c.name}</Prose>
+                <StyledTooltip id={c.name} place='bottom' effect='float'>
+                  {c.name}
+                </StyledTooltip>
+                <Icon color={c.color} data-tip data-for={c.name} />
+                <Prose size='small' data-tip data-for={c.name}>
+                  {c.name}
+                </Prose>
                 {bounds && (
                   <Prose size='small' className='percent'>
                     {landArea(checkpoint.analytics[i][metric])}
