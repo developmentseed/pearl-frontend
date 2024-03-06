@@ -181,7 +181,7 @@ ClassAnalyticsChart.propTypes = {
   checkpoint: T.object,
   label: T.string,
   metric: T.string,
-  bounds: T.string,
+  bounds: T.array,
   formatter: T.func,
 };
 

@@ -369,7 +369,8 @@ function Map() {
           />
         )}
 
-        {currentPrediction &&
+        {!timeframeTilejsonUrl &&
+          currentPrediction &&
           currentPrediction.predictions &&
           currentPrediction.predictions.map((p) => (
             <ImageOverlay
