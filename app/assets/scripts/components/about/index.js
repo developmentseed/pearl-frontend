@@ -159,16 +159,15 @@ class About extends React.Component {
                 <p>
                   First, select an area of interest (AOI) by clicking the pencil
                   icon in the <strong>Selected Area</strong> section to draw a
-                  bounding box on the map. Navigate to your area of concern
-                  directly via the magnifying glass icon on the map to search
+                  bounding box on the map. Navigate directly to your area of
+                  concern using the magnifying glass icon on the map to search
                   for a specific address or region. Areas of interest are
-                  currently limited to a maximum size of 100km2 for live
-                  predictions - the AOI selection box displays the area size as
-                  you draw.
-                </p>
-                <p>
-                  In addition to running live predictions, you can create a
-                  Batch Prediction that runs on AOI&apos;s up to 500km2.
+                  currently limited to a maximum size for live predictions. The
+                  AOI selection box displays the area size as you draw and will
+                  indicate if the area exceeds the maximum size allowed for live
+                  predictions. When an area exceeds the maximum live prediction
+                  size, the processing will be queued and run as a batch
+                  prediction.
                 </p>
                 <Heading size='medium' as='h3' id='guide-imagery'>
                   Selecting an Imagery Source
