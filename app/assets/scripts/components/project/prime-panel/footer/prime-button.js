@@ -17,6 +17,9 @@ export function PrimeButton() {
   const isRetrainReady = ProjectMachineContext.useSelector(
     selectors.isRetrainReady
   );
+  const currentTimeframe = ProjectMachineContext.useSelector(
+    (s) => s.context.currentTimeframe
+  );
 
   let buttonLabel;
   let buttonDisabled = false;
@@ -24,6 +27,11 @@ export function PrimeButton() {
   if (sessionMode === SESSION_MODES.PREDICT) {
     buttonLabel = isLargeAoi ? 'Run Batch Prediction' : 'Run Live Prediction';
     buttonDisabled = !isPredictionReady;
+
+    if (!isPredictionReady && currentTimeframe) {
+      buttonTooltip =
+        'A prediction already exists for this AOI, mosaic and checkpoint.';
+    }
   } else if (sessionMode === SESSION_MODES.RETRAIN) {
     buttonLabel = 'Retrain Model';
     buttonDisabled = !isRetrainReady;
