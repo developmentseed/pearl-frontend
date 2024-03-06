@@ -180,12 +180,15 @@ function RenderRow(share, { restApiClient, compareMaps, setCompareMaps }) {
           type='checkbox'
           name={`select-compare-${share.uuid}`}
           id={`select-compare-${share.uuid}`}
+          hideText
           checked={
             share.uuid &&
             compareMaps.some((compareMap) => compareMap.uuid === share.uuid)
           }
           onChange={() => checkHandler(compareMaps, setCompareMaps, share)}
-        />
+        >
+          Select for comparison
+        </FormCheckable>
       </TableCell>
     </TableRow>
   );
