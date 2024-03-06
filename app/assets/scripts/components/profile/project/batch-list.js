@@ -109,6 +109,7 @@ const BatchRow = ({ batch, projectId }) => {
       <TableCell>{id}</TableCell>
       <TableCell>{aoi?.name}</TableCell>
       <TableCell>{formatThousands(tArea(aoi?.bounds) / 1e6)}</TableCell>
+      <TableCell>{formatDateTime(created)}</TableCell>
       <TableCell>
         {composeMosaicName(mosaic.mosaic_ts_start, mosaic.mosaic_ts_end)}
       </TableCell>
@@ -128,7 +129,6 @@ const BatchRow = ({ batch, projectId }) => {
           status
         )}
       </TableCell>
-      <TableCell>{formatDateTime(created)}</TableCell>
       <TableCell>
         <DownloadAoiButton
           aoi={aoi?.id}
