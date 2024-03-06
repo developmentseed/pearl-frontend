@@ -21,6 +21,7 @@ export const isPredictionReady = (context) => {
     currentMosaic,
     currentModel,
     currentAoi,
+    currentTimeframe,
   } = context;
 
   if (context.project.id === 'new') {
@@ -31,7 +32,7 @@ export const isPredictionReady = (context) => {
       !!currentModel
     );
   } else {
-    return !!currentAoi && !!currentMosaic;
+    return !!currentAoi && !!currentMosaic && !currentTimeframe;
   }
 };
 

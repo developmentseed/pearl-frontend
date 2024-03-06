@@ -5,6 +5,9 @@ import T from 'prop-types';
 import Prose from '../../../styles/type/prose';
 import { glsp, themeVal, truncated } from '@devseed-ui/theme-provider';
 import { round } from '../../../utils/format';
+import { areaFromBounds } from '../../../utils/map';
+import { formatThousands } from '../../../utils/format';
+import { StyledTooltip } from '../../common/tooltip';
 
 const Wrapper = styled.div`
   display: grid;
@@ -22,7 +25,7 @@ const ChartContainer = styled.div`
 const ClassItem = styled.li`
   display: grid;
   grid-gap: 0.75rem;
-  grid-template-columns: 0.75rem minmax(10px, 1fr) 2rem;
+  grid-template-columns: 0.75rem minmax(10px, 1fr) 4rem 4rem;
 
   ${Prose} {
     text-align: left;
@@ -93,16 +96,25 @@ const options = {
   maintainAspectRatio: false,
 };
 function ClassAnalyticsChart(props) {
-  const { checkpoint, label, metric, formatter } = props;
-
+  const { checkpoint, label, metric, formatter, totalArea } = props;
+  const landArea = (percentage) => {
+    const area =
+      totalArea !== undefined && !Number(totalArea)
+        ? areaFromBounds(totalArea)
+        : totalArea;
+    const formatted = formatThousands((percentage * area) / 1e6);
+    return formatted !== '0' ? formatted : '-';
+  };
   const prettyPrint = (value, metric) => {
+    let formatted;
     if (formatter) {
-      return formatter(value, metric);
+      formatted = formatter(value, metric);
     } else if (metric === 'percent') {
-      return `${round(value, 2) * 100}%`;
+      formatted = `${round(value, 2) * 100}%`;
     } else {
-      return round(value, 2);
+      formatted = round(value, 2);
     }
+    return formatted === '0' || formatted === '0%' ? '-' : formatted;
   };
   return (
     <Wrapper>
@@ -126,12 +138,30 @@ function ClassAnalyticsChart(props) {
         />
       </ChartContainer>
       <Summary>
+        <ClassItem>
+          <p> </p>
+          <Prose size='small'>CLASS NAME</Prose>
+          <Prose size='small' className='percent'>
+            AREA KM2
+          </Prose>
+          <Prose size='small' className='percent'>
+            %
+          </Prose>
+        </ClassItem>
         {Object.values(checkpoint.classes).map(
           (c, i) =>
             checkpoint.analytics[i] && (
               <ClassItem key={c.name}>
-                <Icon color={c.color} />
-                <Prose size='small'>{c.name}</Prose>
+                <StyledTooltip id={c.name} place='bottom' effect='float'>
+                  {c.name}
+                </StyledTooltip>
+                <Icon color={c.color} data-tip data-for={c.name} />
+                <Prose size='small' data-tip data-for={c.name}>
+                  {c.name}
+                </Prose>
+                <Prose size='small' className='percent'>
+                  {landArea(checkpoint.analytics[i][metric])}
+                </Prose>
                 <Prose size='small' className='percent'>
                   {prettyPrint(checkpoint.analytics[i][metric], metric)}
                 </Prose>
@@ -146,6 +176,7 @@ ClassAnalyticsChart.propTypes = {
   checkpoint: T.object,
   label: T.string,
   metric: T.string,
+  totalArea: T.number,
   formatter: T.func,
 };
 
