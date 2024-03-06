@@ -42,6 +42,7 @@ function LayersPanel({
       style={{
         top: position.top || 0,
         left: position.right || 0,
+        zIndex: 500,
       }}
       show={active}
       data-cy='share-map-layers-panel'
