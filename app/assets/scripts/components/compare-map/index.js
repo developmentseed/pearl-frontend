@@ -290,7 +290,7 @@ function CompareMap() {
                         px_stat: aoi.timeframe.px_stats[ind],
                       })),
                     }}
-                    bounds={aoi.bounds.bounds}
+                    totalArea={aoi.bounds.bounds}
                     label='Checkpoint Class Distribution'
                     metric='px_stat'
                     formatter={(v) => `${round(v * 100, 0)}%`}

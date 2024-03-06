@@ -277,7 +277,7 @@ function ShareMap() {
                       px_stat: aoiInfo.timeframe.px_stats[ind],
                     })),
                   }}
-                  bounds={aoiInfo.bounds.bounds}
+                  totalArea={aoiInfo.bounds.bounds}
                   label='Checkpoint Class Distribution'
                   metric='px_stat'
                   formatter={(v) => `${round(v * 100, 0)}%`}

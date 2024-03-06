@@ -5,6 +5,7 @@ import T from 'prop-types';
 import Prose from '../../../styles/type/prose';
 import { glsp, themeVal, truncated } from '@devseed-ui/theme-provider';
 import { round } from '../../../utils/format';
+import { areaFromBounds } from '../../../utils/map';
 import { formatThousands } from '../../../utils/format';
 import { StyledTooltip } from '../../common/tooltip';
 
@@ -97,7 +98,11 @@ const options = {
 function ClassAnalyticsChart(props) {
   const { checkpoint, label, metric, formatter, totalArea } = props;
   const landArea = (percentage) => {
-    const formatted = formatThousands((percentage * totalArea) / 1e6);
+    const area =
+      totalArea !== undefined && !Number(totalArea)
+        ? areaFromBounds(totalArea)
+        : totalArea;
+    const formatted = formatThousands((percentage * area) / 1e6);
     return formatted !== '0' ? formatted : '-';
   };
   const prettyPrint = (value, metric) => {
