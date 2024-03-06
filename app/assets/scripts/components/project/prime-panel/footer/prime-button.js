@@ -20,6 +20,9 @@ export function PrimeButton() {
   const currentTimeframe = ProjectMachineContext.useSelector(
     (s) => s.context.currentTimeframe
   );
+  const currentBatchPrediction = ProjectMachineContext.useSelector(
+    (s) => s.context.currentBatchPrediction
+  );
 
   let buttonLabel;
   let buttonDisabled = false;
@@ -28,9 +31,13 @@ export function PrimeButton() {
     buttonLabel = isLargeAoi ? 'Run Batch Prediction' : 'Run Live Prediction';
     buttonDisabled = !isPredictionReady;
 
-    if (!isPredictionReady && currentTimeframe) {
-      buttonTooltip =
-        'A prediction already exists for this AOI, mosaic and checkpoint.';
+    if (!isPredictionReady) {
+      if (currentTimeframe) {
+        buttonTooltip =
+          'A prediction already exists for this AOI, mosaic and checkpoint.';
+      } else if (isLargeAoi && currentBatchPrediction) {
+        buttonTooltip = 'A batch AOI is already being predicted. Please wait.';
+      }
     }
   } else if (sessionMode === SESSION_MODES.RETRAIN) {
     buttonLabel = 'Retrain Model';
