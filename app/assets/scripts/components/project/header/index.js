@@ -473,10 +473,12 @@ function ProjectPageHeader({ isMediumDown }) {
                     muted={!isPublished}
                     disabled={!isPublished}
                     to={
-                      isPublished && {
-                        pathname: '/public-maps',
-                        state: { uuid: currentShare.uuid },
-                      }
+                      isPublished
+                        ? {
+                            pathname: '/public-maps',
+                            state: { uuid: currentShare.uuid },
+                          }
+                        : null
                     }
                   >
                     Compare map
