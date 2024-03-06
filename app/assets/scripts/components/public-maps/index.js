@@ -196,7 +196,7 @@ function RenderRow(share, { restApiClient, compareMaps, setCompareMaps }) {
 function RenderSelectedRow(share, { compareMaps, setCompareMaps }) {
   const { side, aoi, checkpoint, model, timeframe, mosaic } = share;
   return (
-    <TableRow key={share.uuid}>
+    <TableRow key={share.uuid || share.side}>
       <TableCell>
         <TableRowHeader>{side}</TableRowHeader>
       </TableCell>
