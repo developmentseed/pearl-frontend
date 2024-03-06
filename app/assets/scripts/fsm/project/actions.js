@@ -655,6 +655,14 @@ export const actions = {
       },
     };
   }),
+  enterConfiguringNewAoi: assign(() => {
+    return {
+      currentTimeframe: null,
+      currentPrediction: null,
+      currentMosaic: null,
+      timeframesList: [],
+    };
+  }),
   displayAoiAreaModalDialog: assign(() => ({
     aoiAreaModalDialogRevealed: true,
   })),

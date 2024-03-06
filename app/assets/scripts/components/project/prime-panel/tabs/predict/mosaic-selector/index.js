@@ -79,6 +79,7 @@ export function MosaicSelector() {
   const isProjectNew = ProjectMachineContext.useSelector((s) =>
     guards.isProjectNew(s.context)
   );
+  const isAoiNew = ProjectMachineContext.useSelector(selectors.isAoiNew);
   const currentAoi = ProjectMachineContext.useSelector(selectors.currentAoi);
   const currentImagerySource = ProjectMachineContext.useSelector(
     selectors.currentImagerySource
@@ -107,13 +108,16 @@ export function MosaicSelector() {
     label = 'Define first AOI';
   } else if (!currentImagerySource) {
     label = 'Define Imagery Source';
+  } else if (currentMosaic) {
+    label = formatMosaicDateRange(
+      currentMosaic?.mosaic_ts_start,
+      currentMosaic?.mosaic_ts_end
+    );
+    disabled = false;
   } else {
-    label = currentMosaic
-      ? formatMosaicDateRange(
-          currentMosaic?.mosaic_ts_start,
-          currentMosaic?.mosaic_ts_end
-        )
-      : 'Select Mosaic';
+    label = isProjectNew
+      ? 'Select Mosaic'
+      : `This checkpoint doesn't have any predictions, you must select a mosaic and run first prediction.`;
     disabled = false;
   }
 
@@ -155,10 +159,15 @@ export function MosaicSelector() {
             boxShadow: 'inset 0 -1px 0 0 rgba(240, 244, 255, 0.16)',
           }}
         >
-          <MosaicOption selected data-cy='selected-timeframe-header'>
+          <MosaicOption
+            selected
+            data-cy='selected-timeframe-header'
+            onClick={() => !currentMosaic && setShowModal(true)}
+          >
             <Heading size='xsmall'>{label}</Heading>
           </MosaicOption>
-          {!!optionsList?.length &&
+          {!isAoiNew &&
+            !!optionsList?.length &&
             optionsList
               .filter((t) => t.id != currentTimeframe?.id)
               .map((t) => (
@@ -186,18 +195,20 @@ export function MosaicSelector() {
           >
             {label}
           </ActionButton>
-          <ActionButton
-            title='Delete Current Mosaic'
-            id='delete-current-mosaic'
-            useIcon='trash-bin'
-            onClick={() => {
-              actorRef.send({
-                type: 'Delete timeframe',
-              });
-            }}
-          >
-            Delete Current Mosaic
-          </ActionButton>
+          {currentMosaic && (
+            <ActionButton
+              title='Delete Current Mosaic'
+              id='delete-current-mosaic'
+              useIcon='trash-bin'
+              onClick={() => {
+                actorRef.send({
+                  type: 'Delete timeframe',
+                });
+              }}
+            >
+              Delete Current Mosaic
+            </ActionButton>
+          )}
         </HeadOptionToolbar>
       </SelectorHeadOption>
     </>
