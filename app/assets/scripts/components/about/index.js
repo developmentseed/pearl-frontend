@@ -91,9 +91,9 @@ class About extends React.Component {
                   Coverage and Datasets
                 </Heading>
                 <p>
-                  V2.0.0 of PEARL enables mapping land use and land cover in the
-                  United States and globally. The platform users imagery from
-                  the{' '}
+                  This version 2 of PEARL enables mapping land use and land
+                  cover in the United States and globally. The platform users
+                  imagery from the{' '}
                   <a href='https://planetarycomputer.microsoft.com/dataset/naip'>
                     National Agricultural Imagery Program
                   </a>{' '}
@@ -111,22 +111,22 @@ class About extends React.Component {
                   Machine Learning Models
                 </Heading>
                 <p>
-                  Version 2.0.0 of PEARL has 3 base machine learning models for
-                  land use and land cover pixel predictions. Two of these models
-                  have been trained primarily with data from the east coast of
-                  the United States, but they should be a good starting point
-                  for LULC mapping throughout the US. The main difference
-                  between these models is the number of base classes. The
-                  platform can map up to 9 LULC classes using the 9 class model.
-                  These classes are Water, Emergent Wetlands, Tree Canopy,
-                  Shrubland, Low Vegetation, Barren, Structure, Impervious
-                  Surface, and Impervious Roads. The base training data for each
-                  of the models comes from the Chesapeake Conservancy.
+                  PEARL has 3 base machine learning models for land use and land
+                  cover pixel predictions. Two of these models have been trained
+                  primarily with data from the east coast of the United States,
+                  but they should be a good starting point for LULC mapping
+                  throughout the US. The main difference between these models is
+                  the number of base classes. The platform can map up to 9 LULC
+                  classes using the 9 class model. These classes are Water,
+                  Emergent Wetlands, Tree Canopy, Shrubland, Low Vegetation,
+                  Barren, Structure, Impervious Surface, and Impervious Roads.
+                  The base training data for each of the models comes from the
+                  Chesapeake Conservancy.{' '}
                   <a href='https://chesapeakeconservancy.org/wp-content/uploads/2020/03/LC_Class_Descriptions.pdf'>
                     Detailed class descriptions are available here.
-                  </a>
+                  </a>{' '}
                   For global imagery, a 9-class base model is available trained
-                  on Mexico data from Reforestamos .{' '}
+                  on Mexico data from Reforestamos.
                 </p>
                 <Heading size='large' as='h2' id='guide-home'>
                   Getting around PEARL
@@ -135,7 +135,7 @@ class About extends React.Component {
                 <p>
                   The PEARL application has four main pages: the tool itself, a
                   user’s saved projects list, individual project pages, and the
-                  Publi Maps page. From the home page, navigate to the
+                  Public Maps page. From the home page, navigate to the
                   application by clicking “Launch App.” Once logged in, you can
                   view your existing projects from the “Account” dropdown. View
                   project information by navigating to the individual project
@@ -175,9 +175,9 @@ class About extends React.Component {
                 </Heading>
                 <img src='../assets/graphics/content/guide-imagery.png' />
                 <p>
-                  Version 2.0.0 of PEARL permits selection of imagery sources
-                  for the LULC prediction. NAIP and Sentinel 2 L-2A are both
-                  available for generating prediction tiles.
+                  PEARL permits selection of imagery sources for the LULC
+                  prediction. NAIP and Sentinel 2 L-2A are both available for
+                  generating prediction tiles.
                 </p>
                 <Heading size='medium' as='h3' id='guide-mosaic'>
                   Selecting a Mosaic
@@ -306,7 +306,7 @@ class About extends React.Component {
                   <ol>
                     <li>
                       Export via the header “export” dropdown option “Create
-                      Share Link”{' '}
+                      Share Link”
                     </li>
                     <li>
                       Once exports for your two desired maps are generated,
@@ -318,7 +318,7 @@ class About extends React.Component {
                     <li>Navigate to the “Public Maps” page</li>
                     <li>
                       Find and select the two desired AOIs from the public maps
-                      list{' '}
+                      list
                     </li>
                     <li>
                       Click “Compare” to navigate to the corresponding map
@@ -334,8 +334,8 @@ class About extends React.Component {
                     It is possible to run inference over all of the US, however
                     the starter models were only trained in the north eastern
                     United States with data from West Virginia, Maryland,
-                    Pennsylvania, New York, Delaware, and Virgina due to labeled
-                    data constraints. There might be a drop in inference
+                    Pennsylvania, New York, Delaware, and Virginia due to
+                    labeled data constraints. There might be a drop in inference
                     performance in terms of F-scores when compared to the
                     starter model test data set performance metrics is expected
                     for areas outside of where the starter model training data
