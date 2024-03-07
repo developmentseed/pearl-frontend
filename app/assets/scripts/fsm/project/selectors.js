@@ -10,14 +10,17 @@ export const selectors = {
   aoiStatusMessage: (state) => state.context.aoiStatusMessage,
   apiLimits: (state) => state.context.apiLimits,
   canSwitchInstanceType: (state) =>
-    state.matches('Prediction ready') || state.matches('Retrain ready'),
+    state.matches('project.Prediction ready') ||
+    state.matches('project.Retrain ready'),
   canExport: (state) =>
     state.context.currentTimeframe &&
-    (state.matches('Prediction ready') || state.matches('Retrain ready')),
+    (state.matches('project.Prediction ready') ||
+      state.matches('project.Retrain ready')),
   canSaveCheckpoint: (state) => {
     return (
       // Must be in retrain tab
-      (state.matches('Prediction ready') || state.matches('Retrain ready')) &&
+      (state.matches('project.Prediction ready') ||
+        state.matches('project.Retrain ready')) &&
       // A checkpoint exists
       state.context.currentCheckpoint &&
       // It is not the base checkpoint
@@ -44,11 +47,11 @@ export const selectors = {
   currentShare: (state) => get(state, 'context.currentShare'),
   currentTilejson: (state) => get(state, 'context.currentTimeframe.tilejson'),
   displayProjectNameModal: (state) =>
-    state.matches('Entering new project name'),
+    state.matches('project.Entering new project name'),
   globalLoading: (state) => state.context.globalLoading,
   imagerySourcesList: (state) => state.context.imagerySourcesList,
   isAoiNew: (s) => get(s.context, 'currentAoi.id', 'new') === 'new',
-  isLoadingMap: (state) => state.matches('Creating map'),
+  isLoadingMap: (state) => state.matches('project.Creating map'),
   isRetrainReady: ({ context: { retrainClasses, retrainSamples } }) =>
     retrainClasses?.length > 0 && retrainSamples?.length > 0,
   isRevealed: (state) => state.context.aoiAreaModalDialogRevealed,
