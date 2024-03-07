@@ -244,7 +244,7 @@ class About extends React.Component {
                 <Heading size='medium' as='h3' id='guide-analysis'>
                   Prediction Analysis
                 </Heading>
-                <img src='../assets/graphics/content/guide-analysis.png' />
+                <img src='../assets/graphics/content/guide-predictions.png' />
                 <p>
                   After submitting retraining samples, the analysis panel will
                   populate with metrics on class distribution and class f1
