@@ -1439,4 +1439,55 @@ export const services = {
       currentInstance: nextInstance,
     };
   },
+  fetchRunningBatch: async ({ apiClient, project }) => {
+    if (!project || project.id === 'new')
+      return {
+        runningBatch: null,
+      };
+
+    // Get running batch predictions
+    const { batch: batchList } = await apiClient.get(
+      `project/${project.id}/batch?completed=false&order=desc`
+    );
+
+    // If there are running batch predictions, get the first one that is not errored or aborted
+    let runningBatch = null;
+    if (batchList.length > 0) {
+      runningBatch = batchList.find(({ error, aborted }) => !error && !aborted);
+    }
+
+    return {
+      runningBatch,
+    };
+  },
+  fetchRunningBatchStatus: (context) => async (callback) => {
+    const { restApiClient, projectId, runningBatch } = context;
+
+    const fetchStatus = async () => {
+      try {
+        const batch = await restApiClient.get(
+          `project/${projectId}/batch/${runningBatch.id}`
+        );
+        if (batch.completed || batch.abort) {
+          callback('Batch has finished', { runningBatch: null });
+
+          // If the batch is completed or aborted, stop the interval
+          clearInterval(intervalId);
+        } else {
+          callback('Received batch progress', { runningBatch: batch });
+        }
+      } catch (error) {
+        toasts.error(
+          'An unexpected error occurred while fetching batch status.'
+        );
+
+        callback('Unexpected error');
+        // Optionally, stop the interval on error or handle it differently
+        clearInterval(intervalId);
+      }
+    };
+
+    // Call the fetchStatus function every 1000 milliseconds
+    const intervalId = setInterval(fetchStatus, 1000);
+  },
 };
