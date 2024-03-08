@@ -86,26 +86,12 @@ export const services = {
 
           currentMosaic.tileUrl = getMosaicTileUrl(currentMosaic);
 
-          // Fetch timeframe tilejson
           try {
             currentTimeframe.tilejson = await apiClient.get(
               `project/${projectId}/aoi/${currentAoi.id}/timeframe/${currentTimeframe.id}/tiles`
             );
           } catch (error) {
             logger('Error fetching tilejson');
-
-            // Timeframe tilejson is not available, which means there was an
-            // error during prediction. To recover from this, delete this
-            // timeframe and force the user to enter the project explore page
-            // again.
-            await apiClient.delete(
-              `project/${projectId}/aoi/${currentAoi.id}/timeframe/${currentTimeframe.id}`
-            );
-
-            toasts.error(
-              'There was an error loading the prediction for the latest AOI timeframe, please run a prediction again.'
-            );
-            throw new Error('Error loading prediction');
           }
         }
       }
