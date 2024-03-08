@@ -2,16 +2,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import T from 'prop-types';
 import styled, { css } from 'styled-components';
 import { Button } from '@devseed-ui/button';
-import InfoButton from '../../components/common/info-button';
+import InfoButton from '../common/info-button';
 import { Heading } from '@devseed-ui/typography';
 import { themeVal, glsp } from '@devseed-ui/theme-provider';
 import InputRange from 'react-input-range';
 import { Accordion, AccordionFold as BaseFold } from '@devseed-ui/accordion';
 import throttle from 'lodash.throttle';
-import { useMapLayers, useUserLayers, useMapRef } from '../../context/map';
-import { useMapState, useShortcutState } from '../../context/explore';
-import { actions as shortcutActions } from '../../context/explore/shortcuts';
-import { useCheckpoint } from '../../context/checkpoint';
 import { round } from '../../utils/format';
 
 export const LayersPanelInner = styled.div`
@@ -200,27 +196,14 @@ Category.propTypes = {
   onVisibilityToggle: T.func,
 };
 
-function LayersPanel(props) {
-  const { className, parentId } = props;
-
-  const { mapState, mapModes } = useMapState();
-  const disabled = mapState.mode === mapModes.EDIT_AOI_MODE;
-
-  const { userLayers: baseUserLayers, setUserLayers } = useUserLayers();
-  const { shortcutState, dispatchShortcutState } = useShortcutState();
-
-  const userLayers = {
-    ...baseUserLayers,
-    predictions: {
-      ...baseUserLayers.predictions,
-      opacity: shortcutState.predictionLayerOpacity,
-    },
-  };
-
-  const { mapLayers } = useMapLayers();
-  const { mapRef } = useMapRef();
-  const { currentCheckpoint } = useCheckpoint();
-
+function LayersPanel({
+  className,
+  parentId,
+  mapRef,
+  active,
+  mapLayers,
+  setMapLayers,
+}) {
   const [position, setPosition] = useState({});
 
   const parentNodeQuery = document.getElementById(parentId);
@@ -229,16 +212,6 @@ function LayersPanel(props) {
   useEffect(() => {
     parentNode.current = parentNodeQuery;
   }, [parentNodeQuery]);
-
-  useEffect(() => {
-    setUserLayers({
-      ...userLayers,
-      retrainingSamples: {
-        ...userLayers.retrainingSamples,
-        active: currentCheckpoint && currentCheckpoint.retrain_geoms,
-      },
-    });
-  }, [currentCheckpoint && currentCheckpoint.retrain_geoms]);
 
   useEffect(() => {
     function updatePosition() {
@@ -254,6 +227,10 @@ function LayersPanel(props) {
     return () => mapRef && observer.unobserve(mapRef.getContainer());
   }, [mapRef, parentNode]);
 
+  useEffect(() => {
+    parentNode.current = parentNodeQuery;
+  }, [parentNodeQuery]);
+
   if (!parentNode) {
     return null;
   }
@@ -261,74 +238,47 @@ function LayersPanel(props) {
   return (
     <LayersPanelInner
       className={className}
-      show={!disabled && shortcutState.layerTray}
+      show={active}
       style={{
         top: position.top || 0,
         left: position.right || 0,
+        zIndex: 500,
       }}
       data-cy='layers-panel'
     >
       <Accordion
         className={className}
         allowMultiple
-        foldCount={2}
-        initialState={[true, true]}
+        foldCount={1}
+        initialState={[true]}
       >
         {
           ({ checkExpanded, setExpanded }) => (
-            <>
-              <Category
-                checkExpanded={() => checkExpanded(0)}
-                setExpanded={(v) => setExpanded(0, v)}
-                category='User Layers'
-                layers={userLayers}
-                onSliderChange={(layer, value) => {
-                  setUserLayers({
-                    ...userLayers,
-                    [layer.id]: {
-                      ...layer,
-                      opacity: value,
-                      visible: value > 0,
-                    },
-                  });
-
-                  if (layer.id === 'predictions') {
-                    dispatchShortcutState({
-                      type: shortcutActions.UPDATE,
-                      data: {
-                        predictionLayerOpacity: value,
-                      },
-                    });
-                  }
-                }}
-                onVisibilityToggle={(layer) => {
-                  setUserLayers({
-                    ...userLayers,
-                    [layer.id]: {
-                      ...layer,
-                      visible: !layer.visible,
-                    },
-                  });
-                }}
-              />
-
-              <Category
-                checkExpanded={() => checkExpanded(1)}
-                setExpanded={(v) => setExpanded(1, v)}
-                category='Map Layers'
-                layers={mapLayers}
-                onSliderChange={(layer, value) => {
-                  layer.layer.setOpacity(value);
-                }}
-                onVisibilityToggle={(layer, value, sliderValue) => {
-                  if (value) {
-                    layer.layer.setOpacity(sliderValue);
-                  } else {
-                    layer.layer.setOpacity(0);
-                  }
-                }}
-              />
-            </>
+            <Category
+              checkExpanded={() => checkExpanded(1)}
+              setExpanded={(v) => setExpanded(1, v)}
+              category='Map Layers'
+              layers={mapLayers}
+              onSliderChange={(layer, value) => {
+                setMapLayers({
+                  ...mapLayers,
+                  [layer.id]: {
+                    ...layer,
+                    opacity: value,
+                    visible: value > 0,
+                  },
+                });
+              }}
+              onVisibilityToggle={(layer) => {
+                setMapLayers({
+                  ...mapLayers,
+                  [layer.id]: {
+                    ...layer,
+                    visible: !layer.visible,
+                  },
+                });
+              }}
+            />
           )
           /* eslint-disable-next-line react/jsx-curly-newline */
         }
@@ -340,6 +290,10 @@ function LayersPanel(props) {
 LayersPanel.propTypes = {
   className: T.string,
   parentId: T.string.isRequired,
+  active: T.bool,
+  mapLayers: T.object,
+  mapRef: T.object,
+  setMapLayers: T.func,
 };
 
 export default LayersPanel;
