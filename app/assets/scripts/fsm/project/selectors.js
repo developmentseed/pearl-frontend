@@ -47,7 +47,6 @@ export const selectors = {
     state.matches('Entering new project name'),
   globalLoading: (state) => state.context.globalLoading,
   imagerySourcesList: (state) => state.context.imagerySourcesList,
-  isAoiNew: (s) => get(s.context, 'currentAoi.id', 'new') === 'new',
   isLoadingMap: (state) => state.matches('Creating map'),
   isRetrainReady: ({ context: { retrainClasses, retrainSamples } }) =>
     retrainClasses?.length > 0 && retrainSamples?.length > 0,

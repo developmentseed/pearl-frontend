@@ -98,8 +98,6 @@ function ClassAnalyticsChart(props) {
   const prettyPrint = (value, metric) => {
     if (formatter) {
       return formatter(value, metric);
-    } else if (value === 0) {
-      return '-';
     } else if (metric === 'percent') {
       return `${round(value, 2) * 100}%`;
     } else {

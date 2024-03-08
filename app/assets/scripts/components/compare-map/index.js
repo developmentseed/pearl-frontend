@@ -22,12 +22,12 @@ import { Accordion, AccordionFold as BaseFold } from '@devseed-ui/accordion';
 import { themeVal, glsp } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
 import { Button } from '@devseed-ui/button';
+import { Subheading } from '../../styles/type/heading';
 import LayersPanel from '../share-map/layers-control';
 import GenericControl from '../common/map/generic-control';
 import SideBySideTileLayer from './SideBySideTileLayer';
 import DetailsList from '../common/details-list';
-import ClassAnalyticsChart from '../project/sec-panel/class-analytics-chart';
-import { round, toTitleCase } from '../../utils/format';
+import { toTitleCase } from '../../utils/format';
 import { downloadShareGeotiff, getShareLink } from '../../utils/share-link';
 import {
   PanelBlock,
@@ -275,38 +275,24 @@ function CompareMap() {
                 )}
               </Accordion>
               <PanelBlockBody>
-                {Object.keys(aoi.timeframe.px_stats).length ? (
-                  <ClassAnalyticsChart
-                    checkpoint={{
-                      ...aoi.timeframe,
-                      analytics: Object.keys(aoiClasses[i]).map((_, ind) => ({
-                        px_stat: aoi.timeframe.px_stats[ind],
-                      })),
-                    }}
-                    totalArea={aoi.bounds.bounds}
-                    label='Checkpoint Class Distribution'
-                    metric='px_stat'
-                    formatter={(v) => `${round(v * 100, 0)}%`}
-                  />
-                ) : aoiClasses[i].length > 1 ? (
-                  aoiClasses[i].map((c) => (
-                    <Class key={c.name} noHover>
-                      <ClassThumbnail color={c.color} />
-                      <ClassHeading size='xsmall'>{c.name}</ClassHeading>
-                    </Class>
-                  ))
-                ) : (
-                  [1, 2, 3].map((a) => (
-                    <Class
-                      key={a}
-                      placeholder={+true}
-                      className='placeholder-class'
-                    >
-                      <ClassThumbnail />
-                      <ClassHeading size='xsmall' placeholder={+true} />
-                    </Class>
-                  ))
-                )}
+                <Subheading>LULC Classes</Subheading>
+                {aoiClasses[i].length > 1
+                  ? aoiClasses[i].map((c) => (
+                      <Class key={c.name} noHover>
+                        <ClassThumbnail color={c.color} />
+                        <ClassHeading size='xsmall'>{c.name}</ClassHeading>
+                      </Class>
+                    ))
+                  : [1, 2, 3].map((a) => (
+                      <Class
+                        key={a}
+                        placeholder={+true}
+                        className='placeholder-class'
+                      >
+                        <ClassThumbnail />
+                        <ClassHeading size='xsmall' placeholder={+true} />
+                      </Class>
+                    ))}
               </PanelBlockBody>
               <PanelBlockFooter>
                 <Button
