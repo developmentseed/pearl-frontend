@@ -113,7 +113,6 @@ const BatchRow = ({ batch, projectId }) => {
       <TableCell>
         {composeMosaicName(mosaic.mosaic_ts_start, mosaic.mosaic_ts_end)}
       </TableCell>
-      <TableCell>{mosaic?.name}</TableCell>
       <TableCell>
         {status === 'Processing' ? (
           <>
