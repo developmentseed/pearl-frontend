@@ -30,7 +30,7 @@ import copyTextToClipboard from '../../utils/copy-text-to-clipboard';
 import toasts from '../common/toasts';
 import { downloadShareGeotiff } from '../../utils/share-link';
 import { StyledLink } from '../../styles/links';
-import { composeMosaicName } from '../compare-map';
+import { composeMosaicName } from '../../utils/mosaics';
 import { useLocation } from 'react-router-dom';
 
 const ITEMS_PER_PAGE = 20;

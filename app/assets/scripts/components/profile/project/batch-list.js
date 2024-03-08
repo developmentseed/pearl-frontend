@@ -3,6 +3,7 @@ import T from 'prop-types';
 import styled from 'styled-components';
 import { Button } from '@devseed-ui/button';
 import { Heading } from '@devseed-ui/typography';
+import tArea from '@turf/area';
 
 import Table, { TableRow, TableCell } from '../../common/table';
 import Paginator from '../../common/paginator';
@@ -17,14 +18,17 @@ import { formatDateTime } from '../../../utils/format';
 import logger from '../../../utils/logger';
 import useFetch from '../../../utils/use-fetch';
 import { downloadGeotiff } from '../../../utils/share-link';
+import { formatThousands } from '../../../utils/format';
+import { composeMosaicName } from '../../../utils/mosaics';
 
 const TABLE_PAGE_SIZE = 5;
 const TABLE_HEADERS = [
   'Id',
   'AOI Name',
+  'AOI Size (KM2)',
+  'Started',
   'Mosaic',
   'Status',
-  'Started',
   'Download',
 ];
 
@@ -104,6 +108,11 @@ const BatchRow = ({ batch, projectId }) => {
     <TableRow key={id}>
       <TableCell>{id}</TableCell>
       <TableCell>{aoi?.name}</TableCell>
+      <TableCell>{formatThousands(tArea(aoi?.bounds) / 1e6)}</TableCell>
+      <TableCell>{formatDateTime(created)}</TableCell>
+      <TableCell>
+        {composeMosaicName(mosaic.mosaic_ts_start, mosaic.mosaic_ts_end)}
+      </TableCell>
       <TableCell>{mosaic?.name}</TableCell>
       <TableCell>
         {status === 'Processing' ? (
@@ -121,7 +130,6 @@ const BatchRow = ({ batch, projectId }) => {
           status
         )}
       </TableCell>
-      <TableCell>{formatDateTime(created)}</TableCell>
       <TableCell>
         <DownloadAoiButton
           aoi={aoi?.id}

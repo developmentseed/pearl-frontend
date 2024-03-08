@@ -505,12 +505,13 @@ describe('Batch predictions', () => {
 
     // Check available columns
     cy.get('th')
-      .should('have.length', 6)
+      .should('have.length', 7)
       .should('include.text', 'Id')
       .should('include.text', 'AOI Name')
+      .should('include.text', 'AOI Size (KM2)')
+      .should('include.text', 'Started')
       .should('include.text', 'Mosaic')
       .should('include.text', 'Status')
-      .should('include.text', 'Started')
       .should('include.text', 'Download');
 
     // Check if page is well-formed

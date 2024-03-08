@@ -34,7 +34,7 @@ import copyTextToClipboard from '../../../utils/copy-text-to-clipboard';
 import logger from '../../../utils/logger';
 import BatchList from './batch-list';
 import { downloadShareGeotiff } from '../../../utils/share-link';
-import { composeMosaicName } from '../../compare-map';
+import { composeMosaicName } from '../../../utils/mosaics';
 
 // Controls the size of each page
 const AOIS_PER_PAGE = 20;

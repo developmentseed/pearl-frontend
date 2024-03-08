@@ -125,3 +125,18 @@ export async function generateSentinel2L2AMosaic({
     mosaic_ts_end: endTime,
   };
 }
+
+/**
+ * Print a formatted mosaic name
+ *
+ * @param {Date} start
+ * @param {Date} end
+ * @returns Formatted mosaic name
+ */
+export const composeMosaicName = (start, end) =>
+  `${new Date(start).toLocaleString('default', {
+    month: 'short',
+  })} - ${new Date(end).toLocaleString('default', {
+    month: 'short',
+    year: 'numeric',
+  })}`;
