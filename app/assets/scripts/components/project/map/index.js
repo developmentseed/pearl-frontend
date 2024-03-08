@@ -124,7 +124,6 @@ function Map() {
   const currentTilejson = ProjectMachineContext.useSelector(
     selectors.currentTilejson
   );
-
   const currentMosaic = ProjectMachineContext.useSelector(
     selectors.currentMosaic
   );
