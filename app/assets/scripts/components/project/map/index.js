@@ -18,6 +18,7 @@ import {
   MAX_BASE_MAP_ZOOM_LEVEL,
   BaseMapLayer,
 } from '../../common/map/base-map-layer';
+import GeoJSONLayer from '../../common/map/geojson-layer';
 import GeoCoder from '../../common/map/geocoder';
 import CenterMap from '../../common/map/center-map';
 
@@ -101,6 +102,15 @@ function Map() {
   // Local state
   const [mapRef, setMapRef] = useState();
   const [mapLayers, setMapLayers] = useState(INITIAL_MAP_LAYERS);
+  const [userLayers, setUserLayers] = useState({
+    retrainingSamples: {
+      opacity: 0.3,
+      visible: true,
+      active: true,
+      id: 'retrainingSamples',
+      name: 'Retraining Samples',
+    },
+  });
   const [showLayersControl, setShowLayersControl] = useState(false);
 
   // FSM listeners
@@ -124,6 +134,15 @@ function Map() {
   const currentTilejson = ProjectMachineContext.useSelector(
     selectors.currentTilejson
   );
+  const currentCheckpoint = ProjectMachineContext.useSelector(
+    selectors.currentCheckpoint
+  );
+  const retrainSamples = ProjectMachineContext.useSelector(
+    selectors.retrainSamples
+  );
+  console.log(currentCheckpoint);
+  console.log(retrainSamples);
+  console.log(userLayers);
   const currentMosaic = ProjectMachineContext.useSelector(
     selectors.currentMosaic
   );
@@ -391,6 +410,41 @@ function Map() {
             opacity={mapLayers.mosaic.visible ? mapLayers.mosaic.opacity : 0}
           />
         )}
+
+        {currentCheckpoint &&
+          currentCheckpoint.retrain_geoms &&
+          currentCheckpoint.retrain_geoms
+            .filter((geoms, i) => Object.values(currentCheckpoint.classes)[i])
+            .map((geoms, i) => {
+              return (
+                <GeoJSONLayer
+                  key={Object.keys(currentCheckpoint.classes)[i]}
+                  data={{
+                    type: 'Feature',
+                    geometry: geoms,
+                    properties: {
+                      id: currentCheckpoint.id,
+                    },
+                  }}
+                  style={{
+                    stroke: false,
+                    fillColor: Object.values(currentCheckpoint.classes)[i]
+                      .color,
+                    fillOpacity: userLayers.retrainingSamples.opacity,
+                  }}
+                  opacity={
+                    userLayers.retrainingSamples.visible
+                      ? userLayers.retrainingSamples.opacity
+                      : 0
+                  }
+                  pointToLayer={function (feature, latlng) {
+                    return L.circleMarker(latlng, {
+                      radius: 4,
+                    });
+                  }}
+                />
+              );
+            })}
 
         {timeframeTilejsonUrl && (
           <TileLayerWithHeaders

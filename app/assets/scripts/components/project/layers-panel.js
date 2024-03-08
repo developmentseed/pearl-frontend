@@ -8,6 +8,7 @@ import { themeVal, glsp } from '@devseed-ui/theme-provider';
 import InputRange from 'react-input-range';
 import { Accordion, AccordionFold as BaseFold } from '@devseed-ui/accordion';
 import throttle from 'lodash.throttle';
+import { ProjectMachineContext } from '../../fsm/project';
 import { round } from '../../utils/format';
 
 export const LayersPanelInner = styled.div`
@@ -204,6 +205,32 @@ function LayersPanel({
   mapLayers,
   setMapLayers,
 }) {
+  const currentCheckpoint = ProjectMachineContext.useSelector(
+    (s) => s.context.currentCheckpoint
+  );
+  const [userLayers, setUserLayers] = useState({
+    retrainingSamples: {
+      opacity: 0.3,
+      visible: true,
+      active: false,
+      id: 'retrainingSamples',
+      name: 'Retraining Samples',
+    },
+  });
+  // const { mapState, mapModes } = useMapState();
+  // const disabled = mapState.mode === mapModes.EDIT_AOI_MODE;
+
+  // const { userLayers: baseUserLayers, setUserLayers } = useUserLayers();
+  // // const { shortcutState, dispatchShortcutState } = useShortcutState();
+
+  // const userLayers = {
+  //   ...baseUserLayers,
+  //   predictions: {
+  //     ...baseUserLayers.predictions,
+  //     opacity: shortcutState.predictionLayerOpacity,
+  //   },
+  // };
+
   const [position, setPosition] = useState({});
 
   const parentNodeQuery = document.getElementById(parentId);
@@ -212,6 +239,16 @@ function LayersPanel({
   useEffect(() => {
     parentNode.current = parentNodeQuery;
   }, [parentNodeQuery]);
+
+  useEffect(() => {
+    setUserLayers({
+      ...userLayers,
+      retrainingSamples: {
+        ...userLayers.retrainingSamples,
+        active: currentCheckpoint && currentCheckpoint.retrain_geoms,
+      },
+    });
+  }, [currentCheckpoint && currentCheckpoint.retrain_geoms]);
 
   useEffect(() => {
     function updatePosition() {
@@ -249,36 +286,64 @@ function LayersPanel({
       <Accordion
         className={className}
         allowMultiple
-        foldCount={1}
-        initialState={[true]}
+        foldCount={2}
+        initialState={[true, true]}
       >
         {
           ({ checkExpanded, setExpanded }) => (
-            <Category
-              checkExpanded={() => checkExpanded(1)}
-              setExpanded={(v) => setExpanded(1, v)}
-              category='Map Layers'
-              layers={mapLayers}
-              onSliderChange={(layer, value) => {
-                setMapLayers({
-                  ...mapLayers,
-                  [layer.id]: {
-                    ...layer,
-                    opacity: value,
-                    visible: value > 0,
-                  },
-                });
-              }}
-              onVisibilityToggle={(layer) => {
-                setMapLayers({
-                  ...mapLayers,
-                  [layer.id]: {
-                    ...layer,
-                    visible: !layer.visible,
-                  },
-                });
-              }}
-            />
+            <>
+              <Category
+                checkExpanded={() => checkExpanded(0)}
+                setExpanded={(v) => setExpanded(0, v)}
+                category='User Layers'
+                layers={userLayers}
+                onSliderChange={(layer, value) => {
+                  setUserLayers({
+                    ...userLayers,
+                    [layer.id]: {
+                      ...layer,
+                      opacity: value,
+                      visible: value > 0,
+                    },
+                  });
+                }}
+                onVisibilityToggle={(layer) => {
+                  setUserLayers({
+                    ...userLayers,
+                    [layer.id]: {
+                      ...layer,
+                      visible: !layer.visible,
+                    },
+                  });
+                }}
+              />
+
+              <Category
+                checkExpanded={() => checkExpanded(1)}
+                setExpanded={(v) => setExpanded(1, v)}
+                category='Map Layers'
+                layers={mapLayers}
+                onSliderChange={(layer, value) => {
+                  setMapLayers({
+                    ...mapLayers,
+                    [layer.id]: {
+                      ...layer,
+                      opacity: value,
+                      visible: value > 0,
+                    },
+                  });
+                }}
+                onVisibilityToggle={(layer) => {
+                  setMapLayers({
+                    ...mapLayers,
+                    [layer.id]: {
+                      ...layer,
+                      visible: !layer.visible,
+                    },
+                  });
+                }}
+              />
+            </>
           )
           /* eslint-disable-next-line react/jsx-curly-newline */
         }
