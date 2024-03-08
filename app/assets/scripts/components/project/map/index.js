@@ -176,13 +176,13 @@ function Map() {
 
       if (e.key === 'a') {
         // On "a" key press, reduce opacity to zero
-        setMapLayers({
-          ...mapLayers,
+        setMapLayers((prev) => ({
+          ...prev,
           predictions: {
-            ...mapLayers.predictions,
+            ...prev.predictions,
             opacity: 0,
           },
-        });
+        }));
       } else if (e.key === 's') {
         // On "s" key press, reduce opacity by 10%
         setMapLayers((prev) => ({
@@ -203,13 +203,13 @@ function Map() {
         }));
       } else if (e.key === 'f') {
         // On "f" key press, increase opacity to 100%
-        setMapLayers({
-          ...mapLayers,
+        setMapLayers((prev) => ({
+          ...prev,
           predictions: {
-            ...mapLayers.predictions,
+            ...prev.predictions,
             opacity: 1,
           },
-        });
+        }));
       } else if (e.key === ' ' || e.code === 'Space') {
         // On space keypress, pan map to current aoi bounds
         const aoiShape = currentAoiShape;
