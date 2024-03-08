@@ -8,10 +8,7 @@ import { themeVal, glsp } from '@devseed-ui/theme-provider';
 import InputRange from 'react-input-range';
 import { Accordion, AccordionFold as BaseFold } from '@devseed-ui/accordion';
 import throttle from 'lodash.throttle';
-// import { useMapLayers, useUserLayers, useMapRef } from '../../context/map';
-// import { useMapState, useShortcutState } from '../../context/explore';
-// import { actions as shortcutActions } from '../../context/explore/shortcuts';
-// import { useCheckpoint } from '../../context/checkpoint';
+import { ProjectMachineContext } from '../../fsm/project';
 import { round } from '../../utils/format';
 
 export const LayersPanelInner = styled.div`
@@ -208,7 +205,18 @@ function LayersPanel({
   mapLayers,
   setMapLayers,
 }) {
-
+  const currentCheckpoint = ProjectMachineContext.useSelector(
+    (s) => s.context.currentCheckpoint
+  );
+  const [userLayers, setUserLayers] = useState({
+    retrainingSamples: {
+      opacity: 0.3,
+      visible: true,
+      active: false,
+      id: 'retrainingSamples',
+      name: 'Retraining Samples',
+    },
+  });
   // const { mapState, mapModes } = useMapState();
   // const disabled = mapState.mode === mapModes.EDIT_AOI_MODE;
 
@@ -219,50 +227,10 @@ function LayersPanel({
   //   ...baseUserLayers,
   //   predictions: {
   //     ...baseUserLayers.predictions,
-  //     // opacity: shortcutState.predictionLayerOpacity,
+  //     opacity: shortcutState.predictionLayerOpacity,
   //   },
   // };
 
-  // const { mapLayers } = useMapLayers();
-  // const { mapRef } = useMapRef();
-  // const { currentCheckpoint } = useCheckpoint();
-
-  // const [position, setPosition] = useState({});
-
-  // const parentNodeQuery = document.getElementById(parentId);
-  // const parentNode = useRef();
-
-  // useEffect(() => {
-  //   parentNode.current = parentNodeQuery;
-  // }, [parentNodeQuery]);
-
-  // useEffect(() => {
-  //   setUserLayers({
-  //     ...userLayers,
-  //     retrainingSamples: {
-  //       ...userLayers.retrainingSamples,
-  //       active: currentCheckpoint && currentCheckpoint.retrain_geoms,
-  //     },
-  //   });
-  // }, [currentCheckpoint && currentCheckpoint.retrain_geoms]);
-
-  // useEffect(() => {
-  //   function updatePosition() {
-  //     if (parentNode.current) {
-  //       setPosition(parentNode.current.getBoundingClientRect());
-  //     }
-  //   }
-  //   const observer = new ResizeObserver(throttle(updatePosition, 100));
-
-  //   if (mapRef) {
-  //     observer.observe(mapRef.getContainer());
-  //   }
-  //   return () => mapRef && observer.unobserve(mapRef.getContainer());
-  // }, [mapRef, parentNode]);
-
-  // if (!parentNode) {
-  //   return null;
-  // }
   const [position, setPosition] = useState({});
 
   const parentNodeQuery = document.getElementById(parentId);
@@ -271,6 +239,16 @@ function LayersPanel({
   useEffect(() => {
     parentNode.current = parentNodeQuery;
   }, [parentNodeQuery]);
+
+  useEffect(() => {
+    setUserLayers({
+      ...userLayers,
+      retrainingSamples: {
+        ...userLayers.retrainingSamples,
+        active: currentCheckpoint && currentCheckpoint.retrain_geoms,
+      },
+    });
+  }, [currentCheckpoint && currentCheckpoint.retrain_geoms]);
 
   useEffect(() => {
     function updatePosition() {
@@ -286,6 +264,14 @@ function LayersPanel({
     return () => mapRef && observer.unobserve(mapRef.getContainer());
   }, [mapRef, parentNode]);
 
+  useEffect(() => {
+    parentNode.current = parentNodeQuery;
+  }, [parentNodeQuery]);
+
+  if (!parentNode) {
+    return null;
+  }
+
   return (
     <LayersPanelInner
       className={className}
@@ -293,6 +279,7 @@ function LayersPanel({
       style={{
         top: position.top || 0,
         left: position.right || 0,
+        zIndex: 500,
       }}
       data-cy='layers-panel'
     >
@@ -309,6 +296,32 @@ function LayersPanel({
                 checkExpanded={() => checkExpanded(0)}
                 setExpanded={(v) => setExpanded(0, v)}
                 category='User Layers'
+                layers={userLayers}
+                onSliderChange={(layer, value) => {
+                  setUserLayers({
+                    ...userLayers,
+                    [layer.id]: {
+                      ...layer,
+                      opacity: value,
+                      visible: value > 0,
+                    },
+                  });
+                }}
+                onVisibilityToggle={(layer) => {
+                  setUserLayers({
+                    ...userLayers,
+                    [layer.id]: {
+                      ...layer,
+                      visible: !layer.visible,
+                    },
+                  });
+                }}
+              />
+
+              <Category
+                checkExpanded={() => checkExpanded(1)}
+                setExpanded={(v) => setExpanded(1, v)}
+                category='Map Layers'
                 layers={mapLayers}
                 onSliderChange={(layer, value) => {
                   setMapLayers({
@@ -328,23 +341,6 @@ function LayersPanel({
                       visible: !layer.visible,
                     },
                   });
-                }}
-              />
-
-              <Category
-                checkExpanded={() => checkExpanded(1)}
-                setExpanded={(v) => setExpanded(1, v)}
-                category='Map Layers'
-                layers={mapLayers}
-                onSliderChange={(layer, value) => {
-                  layer.layer.setOpacity(value);
-                }}
-                onVisibilityToggle={(layer, value, sliderValue) => {
-                  if (value) {
-                    layer.layer.setOpacity(sliderValue);
-                  } else {
-                    layer.layer.setOpacity(0);
-                  }
                 }}
               />
             </>

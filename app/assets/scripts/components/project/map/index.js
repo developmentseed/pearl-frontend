@@ -31,16 +31,12 @@ import { RETRAIN_MAP_MODES } from '../../../fsm/project/constants';
 import FreehandDrawControl from './freehand-draw-control';
 import PolygonDrawControl from './polygon-draw-control';
 import selectors from '../../../fsm/project/selectors';
-import {
-  BOUNDS_PADDING,
-  MOSAIC_LAYER_OPACITY,
-} from '../../common/map/constants';
+import { BOUNDS_PADDING } from '../../common/map/constants';
 import { getMosaicTileUrl } from '../../../utils/mosaics';
 
 const center = [19.22819, -99.995841];
 const zoom = 12;
 
-const DEFAULT_PREDICTION_LAYER_OPACITY = 0.7;
 const INITIAL_MAP_LAYERS = {
   mosaic: {
     id: 'mosaic',
@@ -104,9 +100,6 @@ function Map() {
 
   // Local state
   const [mapRef, setMapRef] = useState();
-  const [predictionsOpacity, setPredictionsOpacity] = useState(
-    DEFAULT_PREDICTION_LAYER_OPACITY
-  );
   const [mapLayers, setMapLayers] = useState(INITIAL_MAP_LAYERS);
   const [showLayersControl, setShowLayersControl] = useState(false);
 
@@ -184,16 +177,41 @@ function Map() {
 
       if (e.key === 'a') {
         // On "a" key press, reduce opacity to zero
-        setPredictionsOpacity(0);
+        setMapLayers({
+          ...mapLayers,
+          predictions: {
+            ...mapLayers.predictions,
+            opacity: 0,
+            visible: false,
+          },
+        });
       } else if (e.key === 's') {
         // On "s" key press, reduce opacity by 10%
-        setPredictionsOpacity((prev) => prev - 0.1);
+        setMapLayers((prev) => ({
+          ...prev,
+          predictions: {
+            ...prev.predictions,
+            opacity: prev.predictions.opacity - 0.1,
+          },
+        }));
       } else if (e.key === 'd') {
         // On "d" key press, increase opacity by 10%
-        setPredictionsOpacity((prev) => prev + 0.1);
+        setMapLayers((prev) => ({
+          ...prev,
+          predictions: {
+            ...prev.predictions,
+            opacity: prev.predictions.opacity + 0.1,
+          },
+        }));
       } else if (e.key === 'f') {
         // On "f" key press, increase opacity to 100%
-        setPredictionsOpacity(1);
+        setMapLayers({
+          ...mapLayers,
+          predictions: {
+            ...mapLayers.predictions,
+            opacity: 1,
+          },
+        });
       } else if (e.key === ' ' || e.code === 'Space') {
         // On space keypress, pan map to current aoi bounds
         const aoiShape = currentAoiShape;
@@ -372,7 +390,7 @@ function Map() {
           <TileLayer
             key={mosaicTileUrl}
             url={mosaicTileUrl}
-            opacity={MOSAIC_LAYER_OPACITY}
+            opacity={mapLayers.mosaic.visible ? mapLayers.mosaic.opacity : 0}
           />
         )}
 
@@ -385,7 +403,9 @@ function Map() {
                 value: `Bearer ${apiToken}`,
               },
             ]}
-            opacity={predictionsOpacity}
+            opacity={
+              mapLayers.predictions.visible ? mapLayers.predictions.opacity : 0
+            }
           />
         )}
 
@@ -396,7 +416,11 @@ function Map() {
               key={p.key}
               url={p.image}
               bounds={p.bounds}
-              opacity={predictionsOpacity}
+              opacity={
+                mapLayers.predictions.visible
+                  ? mapLayers.predictions.opacity
+                  : 0
+              }
             />
           ))}
         <FeatureGroup>
