@@ -1002,12 +1002,18 @@ export const services = {
     const mosaic = context.currentMosaic?.id;
 
     try {
+      const payload = {
+        mosaic,
+        aoi,
+      };
+
+      if (context.currentCheckpoint) {
+        payload.checkpoint_id = context.currentCheckpoint.id;
+      }
+
       const currentBatchPrediction = await apiClient.post(
         `/project/${projectId}/batch`,
-        {
-          mosaic,
-          aoi,
-        }
+        payload
       );
       callback({
         type: 'Batch prediction was started',
