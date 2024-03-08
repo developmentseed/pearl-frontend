@@ -128,7 +128,6 @@ export const services = {
         (share) => share.timeframe?.id === currentTimeframe?.id
       );
 
-      // Get running batch predictions
       const { batch: batchPredictions } = await apiClient.get(
         `project/${projectId}/batch?completed=false&order=desc`
       );
@@ -1010,21 +1009,31 @@ export const services = {
 
     return { share, sharesList: sharesList.concat(share) };
   },
-  requestBatchPrediction: async (context) => {
+  requestBatchPrediction: (context) => async (callback) => {
     const { apiClient } = context;
     const projectId = context.project?.id;
     const aoi = context.currentAoi?.id;
     const mosaic = context.currentMosaic?.id;
 
-    const batchPrediction = await apiClient.post(
-      `/project/${projectId}/batch`,
-      {
-        mosaic,
-        aoi,
-      }
-    );
+    try {
+      const currentBatchPrediction = await apiClient.post(
+        `/project/${projectId}/batch`,
+        {
+          mosaic,
+          aoi,
+        }
+      );
+      callback({
+        type: 'Batch prediction was started',
+        data: { currentBatchPrediction },
+      });
+    } catch (error) {
+      callback({
+        type: 'Batch prediction has failed',
+      });
+    }
 
-    return { batchPrediction };
+    return;
   },
   applyCheckpoint: (context) => async (callback, onReceive) => {
     const { timeframesList, mosaicsList } = context;
@@ -1439,44 +1448,32 @@ export const services = {
       currentInstance: nextInstance,
     };
   },
-  fetchRunningBatch: async ({ apiClient, project }) => {
-    if (!project || project.id === 'new')
-      return {
-        runningBatch: null,
-      };
-
-    // Get running batch predictions
-    const { batch: batchList } = await apiClient.get(
-      `project/${project.id}/batch?completed=false&order=desc`
-    );
-
-    // If there are running batch predictions, get the first one that is not errored or aborted
-    let runningBatch = null;
-    if (batchList.length > 0) {
-      runningBatch = batchList.find(({ error, aborted }) => !error && !aborted);
-    }
-
-    return {
-      runningBatch,
-    };
-  },
   fetchRunningBatchStatus: (context) => async (callback) => {
-    const { restApiClient, projectId, runningBatch } = context;
+    const { apiClient, project, currentBatchPrediction } = context;
 
     const fetchStatus = async () => {
       try {
-        const batch = await restApiClient.get(
-          `project/${projectId}/batch/${runningBatch.id}`
+        const batch = await apiClient.get(
+          `project/${project.id}/batch/${currentBatchPrediction.id}`
         );
         if (batch.completed || batch.abort) {
-          callback('Batch has finished', { runningBatch: null });
+          callback({
+            type: 'Batch has finished',
+            data: { currentBatchPrediction: null },
+          });
 
           // If the batch is completed or aborted, stop the interval
           clearInterval(intervalId);
         } else {
-          callback('Received batch progress', { runningBatch: batch });
+          callback({
+            type: 'Received batch progress',
+            data: {
+              currentBatchPrediction: batch,
+            },
+          });
         }
       } catch (error) {
+        console.log(error);
         toasts.error(
           'An unexpected error occurred while fetching batch status.'
         );

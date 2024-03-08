@@ -46,7 +46,7 @@ export const isLivePredictionAreaSize = ({ currentAoi, apiLimits }) =>
   currentAoi.area > config.minimumAoiArea &&
   currentAoi.area < apiLimits.live_inference;
 
-export const isRunningBatchPrediction = (c) => c.runningBatch;
+export const isBatchRunning = (c) => !!c.currentBatchPrediction;
 
 export const hasAois = (c) => c.aoisList?.length > 0;
 

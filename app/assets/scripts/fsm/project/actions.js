@@ -286,7 +286,7 @@ export const actions = {
     },
   })),
   setRunningBatch: assign((context, event) => ({
-    currentBatchPrediction: event.data.batchPrediction,
+    currentBatchPrediction: event.data.currentBatchPrediction,
   })),
   setSessionMode: assign((context, event) => ({
     sessionMode: event.data.sessionMode,
