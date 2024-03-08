@@ -75,7 +75,7 @@ function Explore() {
           <ExploreCarto id='welcome-trigger'>
             <Map />
           </ExploreCarto>
-          <LayersPanel parentId='layer-control' className='padded' />
+          {/* <LayersPanel parentId='layer-control' className='padded' /> */}
           <SecPanel />
         </ExploreBody>
         {steps && !isLoading && <Tour steps={steps} />}
