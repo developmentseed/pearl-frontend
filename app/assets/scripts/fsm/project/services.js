@@ -1465,7 +1465,6 @@ export const services = {
           });
         }
       } catch (error) {
-        console.log(error);
         toasts.error(
           'An unexpected error occurred while fetching batch status.'
         );
