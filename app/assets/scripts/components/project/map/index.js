@@ -182,7 +182,6 @@ function Map() {
           predictions: {
             ...mapLayers.predictions,
             opacity: 0,
-            visible: false,
           },
         });
       } else if (e.key === 's') {
