@@ -141,16 +141,18 @@ function ClassAnalyticsChart(props) {
         />
       </ChartContainer>
       <Summary>
-        <ClassItem>
-          <p> </p>
-          <Prose size='small'>CLASS NAME</Prose>
-          <Prose size='small' className='percent'>
-            AREA KM2
-          </Prose>
-          <Prose size='small' className='percent'>
-            %
-          </Prose>
-        </ClassItem>
+        {totalArea && (
+          <ClassItem totalArea={totalArea}>
+            <Prose size='small' />
+            <Prose size='small'>CLASS NAME</Prose>
+            <Prose size='small' className='percent'>
+              AREA KM2
+            </Prose>
+            <Prose size='small' className='percent'>
+              %
+            </Prose>
+          </ClassItem>
+        )}
         {Object.values(checkpoint.classes).map(
           (c, i) =>
             checkpoint.analytics[i] && (
@@ -162,11 +164,11 @@ function ClassAnalyticsChart(props) {
                 <Prose size='small' data-tip data-for={c.name}>
                   {c.name}
                 </Prose>
-            {totalArea && (
-                <Prose size='small' className='percent'>
-                  {landArea(checkpoint.analytics[i][metric])}
-                </Prose>
-            )}
+                {totalArea && (
+                  <Prose size='small' className='percent'>
+                    {landArea(checkpoint.analytics[i][metric])}
+                  </Prose>
+                )}
                 <Prose size='small' className='percent'>
                   {prettyPrint(checkpoint.analytics[i][metric], metric)}
                 </Prose>
