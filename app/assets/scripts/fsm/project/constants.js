@@ -18,3 +18,10 @@ export const RETRAIN_MAP_MODES = {
   REMOVE_SAMPLE: 'REMOVE_SAMPLE',
   DELETE_SAMPLES: 'DELETE_SAMPLES',
 };
+
+export const AOI_SHAPE_STATUS = {
+  MIN: 4,
+  MAX: 3,
+  NO_LIVE: 2,
+  LIVE: 1,
+};

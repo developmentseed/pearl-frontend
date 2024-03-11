@@ -27,12 +27,17 @@ import get from 'lodash.get';
 import { useAuth } from '../../../context/auth';
 import TileLayerWithHeaders from '../../common/map/tile-layer';
 import config from '../../../config';
-import { RETRAIN_MAP_MODES } from '../../../fsm/project/constants';
+import {
+  RETRAIN_MAP_MODES,
+  AOI_SHAPE_STATUS,
+} from '../../../fsm/project/constants';
 import FreehandDrawControl from './freehand-draw-control';
 import PolygonDrawControl from './polygon-draw-control';
 import selectors from '../../../fsm/project/selectors';
 import { BOUNDS_PADDING } from '../../common/map/constants';
 import { getMosaicTileUrl } from '../../../utils/mosaics';
+import theme from '../../../styles/theme';
+import { inRange } from '../../../utils/utils';
 
 const center = [19.22819, -99.995841];
 const zoom = 12;
@@ -118,6 +123,8 @@ function Map() {
   const currentAoiShape = ProjectMachineContext.useSelector(
     selectors.currentAoiShape
   );
+  const aoiArea = ProjectMachineContext.useSelector(selectors.aoiArea);
+  const apiLimits = ProjectMachineContext.useSelector(selectors.apiLimits);
   const currentPrediction = ProjectMachineContext.useSelector(
     selectors.currentPrediction
   );
@@ -220,6 +227,49 @@ function Map() {
     },
     [mapRef, currentAoi]
   );
+
+  // Update color on area size change during draw
+  useEffect(() => {
+    if (!currentAoiShape || !apiLimits) {
+      return;
+    }
+
+    const { max_inference, live_inference } = apiLimits;
+
+    if (
+      inRange(aoiArea, max_inference, Infinity) &&
+      currentAoiShape.status !== AOI_SHAPE_STATUS.MAX
+    ) {
+      currentAoiShape.setStyle({
+        color: theme.dark.color.danger,
+      });
+      currentAoiShape.status = AOI_SHAPE_STATUS.MAX;
+    } else if (
+      inRange(aoiArea, 0, config.minimumAoiArea) &&
+      currentAoiShape.status !== AOI_SHAPE_STATUS.MIN
+    ) {
+      currentAoiShape.setStyle({
+        color: theme.dark.color.danger,
+      });
+      currentAoiShape.status = AOI_SHAPE_STATUS.MIN;
+    } else if (
+      inRange(aoiArea, live_inference, max_inference) &&
+      currentAoiShape.status !== AOI_SHAPE_STATUS.NO_LIVE
+    ) {
+      currentAoiShape.setStyle({
+        color: theme.dark.color.warning,
+      });
+      currentAoiShape.status = AOI_SHAPE_STATUS.NO_LIVE;
+    } else if (
+      inRange(aoiArea, config.minimumAoiArea, live_inference) &&
+      currentAoiShape.status !== AOI_SHAPE_STATUS.LIVE
+    ) {
+      currentAoiShape.setStyle({
+        color: theme.dark.color.info,
+      });
+      currentAoiShape.status = AOI_SHAPE_STATUS.LIVE;
+    }
+  }, [aoiArea, apiLimits, currentAoiShape]);
 
   // Set keyboard listeners and their cleanup
   useEffect(() => {
