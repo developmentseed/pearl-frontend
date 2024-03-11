@@ -25,7 +25,10 @@ const ChartContainer = styled.div`
 const ClassItem = styled.li`
   display: grid;
   grid-gap: 0.75rem;
-  grid-template-columns: 0.75rem minmax(10px, 1fr) 4rem 4rem;
+  grid-template-columns: ${({ totalArea }) =>
+    totalArea
+      ? '0.75rem minmax(10px, 1fr) 4rem 4rem'
+      : '0.75rem minmax(10px, 1fr) 2rem'};
 
   ${Prose} {
     text-align: left;
