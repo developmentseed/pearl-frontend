@@ -154,7 +154,7 @@ function ClassAnalyticsChart(props) {
         {Object.values(checkpoint.classes).map(
           (c, i) =>
             checkpoint.analytics[i] && (
-              <ClassItem key={c.name}>
+              <ClassItem key={c.name} totalArea={totalArea}>
                 <StyledTooltip id={c.name} place='bottom' effect='float'>
                   {c.name}
                 </StyledTooltip>
