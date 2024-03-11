@@ -307,9 +307,13 @@ export const services = {
       }
 
       if (nextTimeframe) {
-        nextTimeframe.tilejson = await apiClient.get(
-          `project/${projectId}/aoi/${context.currentAoi.id}/timeframe/${nextTimeframe.id}/tiles`
-        );
+        try {
+          nextTimeframe.tilejson = await apiClient.get(
+            `project/${projectId}/aoi/${context.currentAoi.id}/timeframe/${nextTimeframe.id}/tiles`
+          );
+        } catch (error) {
+          toasts.error('There was an error fetching the prediction layer.');
+        }
         nextMosaic = mosaicsList.find(
           (mosaic) => mosaic.id === nextTimeframe.mosaic
         );
