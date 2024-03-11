@@ -22,7 +22,25 @@ describe('Batch predictions', () => {
           project_id: 1,
           created: new Date(Date.parse('2001-02-01')).setUTCDate(-i),
           updated: new Date(Date.parse('2001-02-01')).setUTCDate(i + 1),
-          aoi: { id: i, name: `AOI ${i}` },
+          aoi: {
+            id: i,
+            name: `AOI ${i}`,
+            created: `2023-12-04T12:02:26.1792${i}`,
+            updated: `2023-12-04T12:02:26.1792${i}`,
+            bounds: {
+              type: 'Polygon',
+              crs: { type: 'name', properties: { name: 'EPSG:4326' } },
+              coordinates: [
+                [
+                  [-100.08922576904298, 19.28910944501149],
+                  [-99.9700927734375, 19.28910944501149],
+                  [-99.9700927734375, 19.17954399635705],
+                  [-100.08922576904298, 19.17954399635705],
+                  [-100.08922576904298, 19.28910944501149],
+                ],
+              ],
+            },
+          },
           mosaic: { id: i, name: `Mosaic ${i}` },
           abort: false,
           completed: i !== 1,
