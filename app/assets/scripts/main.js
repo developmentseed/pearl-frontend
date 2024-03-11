@@ -12,7 +12,6 @@ import history from './history';
 import theme from './styles/theme';
 
 import Home from './components/home';
-import Explore from './components/explore';
 import PublicMaps from './components/public-maps';
 import ShareMap from './components/share-map';
 import CompareMap from './components/compare-map';
@@ -69,10 +68,6 @@ function Root() {
                 exact
                 path='/public-maps'
                 component={PublicMaps}
-              />
-              <ProtectedRoute
-                path='/project-old/:projectId'
-                component={Explore}
               />
               <ProtectedRoute
                 path='/project/:projectId'
