@@ -60,11 +60,9 @@ function SecPanel() {
   const currentTimeframe = ProjectMachineContext.useSelector(
     selectors.currentTimeframe
   );
+  const currentAoi = ProjectMachineContext.useSelector(selectors.currentAoi);
 
-  if (!currentCheckpoint || !currentCheckpoint.analytics || !currentTimeframe)
-    return null;
-
-  const { px_stats } = currentTimeframe;
+  if (!currentCheckpoint || !currentCheckpoint.analytics) return null;
 
   const sampleCount =
     currentCheckpoint.analytics &&
@@ -107,39 +105,37 @@ function SecPanel() {
                   </StyledBlockBody>
                 )}
 
-              {px_stats && currentCheckpoint.classes && (
-                <StyledBlockBody data-cy='checkpoint_class_distro'>
-                  <PanelBlockHeader>
-                    <DefinedTerm>
-                      <Subheading>Checkpoint Class Distribution</Subheading>
-                      <InfoButton
-                        size='small'
-                        hideText
-                        id='class-dist-info'
-                        info='Pixel distribution per class for the current AOI, at the currently loaded checkpoint.'
-                      />
-                    </DefinedTerm>
-                  </PanelBlockHeader>
-                  {Object.keys(px_stats).length ? (
+              {currentTimeframe?.px_stats &&
+                currentCheckpoint.classes &&
+                Object.keys(currentTimeframe.px_stats).length && (
+                  <StyledBlockBody data-cy='checkpoint_class_distro'>
+                    <PanelBlockHeader>
+                      <DefinedTerm>
+                        <Subheading>Checkpoint Class Distribution</Subheading>
+                        <InfoButton
+                          size='small'
+                          hideText
+                          id='class-dist-info'
+                          info='Pixel distribution per class for the current AOI, at the currently loaded checkpoint.'
+                        />
+                      </DefinedTerm>
+                    </PanelBlockHeader>
                     <ClassAnalyticsChart
                       checkpoint={{
                         ...currentCheckpoint,
                         analytics: Object.keys(currentCheckpoint.classes).map(
                           (_, ind) => ({
-                            px_stat: px_stats[ind],
+                            px_stat: currentTimeframe.px_stats[ind],
                           })
                         ),
                       }}
-                      bounds={currentCheckpoint.bounds}
+                      totalArea={currentAoi.area}
                       label='Checkpoint Class Distribution'
                       metric='px_stat'
                       formatter={(v) => `${round(v * 100, 0)}%`}
                     />
-                  ) : (
-                    <Prose>Class distribution metrics are not available</Prose>
-                  )}
-                </StyledBlockBody>
-              )}
+                  </StyledBlockBody>
+                )}
               {currentCheckpoint.input_geoms &&
                 currentCheckpoint.retrain_geoms &&
                 currentCheckpoint.analytics && (

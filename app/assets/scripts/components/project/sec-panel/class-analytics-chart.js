@@ -25,8 +25,8 @@ const ChartContainer = styled.div`
 const ClassItem = styled.li`
   display: grid;
   grid-gap: 0.75rem;
-  grid-template-columns: ${({ bounds }) =>
-    bounds
+  grid-template-columns: ${({ totalArea }) =>
+    totalArea
       ? '0.75rem minmax(10px, 1fr) 4rem 4rem'
       : '0.75rem minmax(10px, 1fr) 2rem'};
 
@@ -99,11 +99,13 @@ const options = {
   maintainAspectRatio: false,
 };
 function ClassAnalyticsChart(props) {
-  const { checkpoint, label, metric, formatter, bounds } = props;
+  const { checkpoint, label, metric, formatter, totalArea } = props;
   const landArea = (percentage) => {
-    const formatted = formatThousands(
-      (percentage * areaFromBounds(bounds)) / 1e6
-    );
+    const area =
+      totalArea !== undefined && !Number(totalArea)
+        ? areaFromBounds(totalArea)
+        : totalArea;
+    const formatted = formatThousands((percentage * area) / 1e6);
     return formatted !== '0' ? formatted : '-';
   };
   const prettyPrint = (value, metric) => {
@@ -139,9 +141,9 @@ function ClassAnalyticsChart(props) {
         />
       </ChartContainer>
       <Summary>
-        {bounds && (
-          <ClassItem bounds={bounds}>
-            <p> </p>
+        {totalArea && (
+          <ClassItem totalArea={totalArea}>
+            <Prose size='small' />
             <Prose size='small'>CLASS NAME</Prose>
             <Prose size='small' className='percent'>
               AREA KM2
@@ -154,7 +156,7 @@ function ClassAnalyticsChart(props) {
         {Object.values(checkpoint.classes).map(
           (c, i) =>
             checkpoint.analytics[i] && (
-              <ClassItem key={c.name} bounds={bounds}>
+              <ClassItem key={c.name} totalArea={totalArea}>
                 <StyledTooltip id={c.name} place='bottom' effect='float'>
                   {c.name}
                 </StyledTooltip>
@@ -162,7 +164,7 @@ function ClassAnalyticsChart(props) {
                 <Prose size='small' data-tip data-for={c.name}>
                   {c.name}
                 </Prose>
-                {bounds && (
+                {totalArea && (
                   <Prose size='small' className='percent'>
                     {landArea(checkpoint.analytics[i][metric])}
                   </Prose>
@@ -181,7 +183,7 @@ ClassAnalyticsChart.propTypes = {
   checkpoint: T.object,
   label: T.string,
   metric: T.string,
-  bounds: T.array,
+  totalArea: T.number,
   formatter: T.func,
 };
 

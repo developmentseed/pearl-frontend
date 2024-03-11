@@ -285,8 +285,8 @@ export const actions = {
       tilejson: event.data.tilejson,
     },
   })),
-  setCurrentBatchPrediction: assign((context, event) => ({
-    currentBatchPrediction: event.data.batchPrediction,
+  setRunningBatch: assign((context, event) => ({
+    currentBatchPrediction: event.data.currentBatchPrediction,
   })),
   setSessionMode: assign((context, event) => ({
     sessionMode: event.data.sessionMode,

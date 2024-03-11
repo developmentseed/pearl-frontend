@@ -86,26 +86,12 @@ export const services = {
 
           currentMosaic.tileUrl = getMosaicTileUrl(currentMosaic);
 
-          // Fetch timeframe tilejson
           try {
             currentTimeframe.tilejson = await apiClient.get(
               `project/${projectId}/aoi/${currentAoi.id}/timeframe/${currentTimeframe.id}/tiles`
             );
           } catch (error) {
             logger('Error fetching tilejson');
-
-            // Timeframe tilejson is not available, which means there was an
-            // error during prediction. To recover from this, delete this
-            // timeframe and force the user to enter the project explore page
-            // again.
-            await apiClient.delete(
-              `project/${projectId}/aoi/${currentAoi.id}/timeframe/${currentTimeframe.id}`
-            );
-
-            toasts.error(
-              'There was an error loading the prediction for the latest AOI timeframe, please run a prediction again.'
-            );
-            throw new Error('Error loading prediction');
           }
         }
       }
@@ -128,7 +114,6 @@ export const services = {
         (share) => share.timeframe?.id === currentTimeframe?.id
       );
 
-      // Get running batch predictions
       const { batch: batchPredictions } = await apiClient.get(
         `project/${projectId}/batch?completed=false&order=desc`
       );
@@ -1010,21 +995,37 @@ export const services = {
 
     return { share, sharesList: sharesList.concat(share) };
   },
-  requestBatchPrediction: async (context) => {
+  requestBatchPrediction: (context) => async (callback) => {
     const { apiClient } = context;
     const projectId = context.project?.id;
     const aoi = context.currentAoi?.id;
     const mosaic = context.currentMosaic?.id;
 
-    const batchPrediction = await apiClient.post(
-      `/project/${projectId}/batch`,
-      {
+    try {
+      const payload = {
         mosaic,
         aoi,
-      }
-    );
+      };
 
-    return { batchPrediction };
+      if (context.currentCheckpoint) {
+        payload.checkpoint_id = context.currentCheckpoint.id;
+      }
+
+      const currentBatchPrediction = await apiClient.post(
+        `/project/${projectId}/batch`,
+        payload
+      );
+      callback({
+        type: 'Batch prediction was started',
+        data: { currentBatchPrediction },
+      });
+    } catch (error) {
+      callback({
+        type: 'Batch prediction has failed',
+      });
+    }
+
+    return;
   },
   applyCheckpoint: (context) => async (callback, onReceive) => {
     const { timeframesList, mosaicsList } = context;
@@ -1438,5 +1439,43 @@ export const services = {
       mosaic: nextMosaic,
       currentInstance: nextInstance,
     };
+  },
+  fetchRunningBatchStatus: (context) => async (callback) => {
+    const { apiClient, project, currentBatchPrediction } = context;
+
+    const fetchStatus = async () => {
+      try {
+        const batch = await apiClient.get(
+          `project/${project.id}/batch/${currentBatchPrediction.id}`
+        );
+        if (batch.completed || batch.abort) {
+          callback({
+            type: 'Batch has finished',
+            data: { currentBatchPrediction: null },
+          });
+
+          // If the batch is completed or aborted, stop the interval
+          clearInterval(intervalId);
+        } else {
+          callback({
+            type: 'Received batch progress',
+            data: {
+              currentBatchPrediction: batch,
+            },
+          });
+        }
+      } catch (error) {
+        toasts.error(
+          'An unexpected error occurred while fetching batch status.'
+        );
+
+        callback('Unexpected error');
+        // Optionally, stop the interval on error or handle it differently
+        clearInterval(intervalId);
+      }
+    };
+
+    // Call the fetchStatus function every 1000 milliseconds
+    const intervalId = setInterval(fetchStatus, 1000);
   },
 };
