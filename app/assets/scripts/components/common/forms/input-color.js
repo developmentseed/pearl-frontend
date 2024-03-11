@@ -9,7 +9,7 @@ import {
   PickerStyles,
   PickerDropdownBody,
   PickerDropdownItem,
-} from '../../explore/prime-panel/tabs/retrain-refine-styles';
+} from '../../project/prime-panel/retrain-refine-styles';
 import FormGroupStructure from './form-group-structure';
 
 /**
