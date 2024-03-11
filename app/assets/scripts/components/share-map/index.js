@@ -7,7 +7,7 @@ import { MapContainer, TileLayer, FeatureGroup } from 'react-leaflet';
 
 import { getMosaicTileUrl } from '../../utils/mosaics';
 import { toTitleCase } from '../../utils/format';
-import { composeMosaicName } from '../compare-map';
+import { composeMosaicName } from '../../utils/mosaics';
 import { Accordion, AccordionFold as BaseFold } from '@devseed-ui/accordion';
 import ClassAnalyticsChart from '../project/sec-panel/class-analytics-chart';
 import { round } from '../../utils/format';

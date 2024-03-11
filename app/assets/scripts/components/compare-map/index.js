@@ -36,6 +36,7 @@ import {
   PanelBlockBody,
 } from '../common/panel-block';
 import { getMosaicTileUrl } from '../../utils/mosaics';
+import { composeMosaicName } from '../../utils/mosaics';
 
 const { restApiEndpoint } = config;
 
@@ -116,14 +117,6 @@ const INITIAL_MAP_LAYERS = {
     active: true,
   },
 };
-
-export const composeMosaicName = (start, end) =>
-  `${new Date(start).toLocaleString('default', {
-    month: 'short',
-  })} - ${new Date(end).toLocaleString('default', {
-    month: 'short',
-    year: 'numeric',
-  })}`;
 
 function CompareMap() {
   const { leftUUID, rightUUID } = useParams();
