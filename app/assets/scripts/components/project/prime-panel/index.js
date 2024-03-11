@@ -17,8 +17,9 @@ import TabbedBlock from '../../common/tabbed-block-body';
 import PredictTab from './tabs/predict';
 import RetrainTab from './tabs/retrain';
 import { UploadAoiModal } from './upload-aoi-modal';
-import { PrimeButton } from './prime-button';
-import { BatchPredictionPanel } from './batch-prediction-panel';
+import { PrimeButton } from './footer/prime-button';
+import { BatchPredictionPanel } from './footer/batch-prediction-panel';
+import SaveCheckpointButton from './footer/save-checkpoint-button';
 import { ProjectMachineContext } from '../../../fsm/project';
 import { SESSION_MODES } from '../../../fsm/project/constants';
 import selectors from '../../../fsm/project/selectors';
@@ -57,6 +58,9 @@ export function PrimePanel() {
   );
   const retrainModeEnabled = ProjectMachineContext.useSelector(({ context }) =>
     guards.retrainModeEnabled(context)
+  );
+  const canSaveCheckpoint = ProjectMachineContext.useSelector(
+    selectors.canSaveCheckpoint
   );
 
   return (
@@ -104,6 +108,7 @@ export function PrimePanel() {
             </PanelBlockBody>
             <PanelControls>
               <PrimeButton />
+              {canSaveCheckpoint && <SaveCheckpointButton />}
               <BatchPredictionPanel />
             </PanelControls>
           </StyledPanelBlock>

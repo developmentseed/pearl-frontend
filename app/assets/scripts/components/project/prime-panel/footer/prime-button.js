@@ -1,9 +1,9 @@
 import React from 'react';
-import InfoButton from '../../common/info-button';
-import { ProjectMachineContext } from '../../../fsm/project';
-import selectors from '../../../fsm/project/selectors';
-import { SESSION_MODES } from '../../../fsm/project/constants';
-import * as guards from '../../../fsm/project/guards';
+import InfoButton from '../../../common/info-button';
+import { ProjectMachineContext } from '../../../../fsm/project';
+import selectors from '../../../../fsm/project/selectors';
+import { SESSION_MODES } from '../../../../fsm/project/constants';
+import * as guards from '../../../../fsm/project/guards';
 
 export function PrimeButton() {
   const actorRef = ProjectMachineContext.useActorRef();
@@ -17,6 +17,12 @@ export function PrimeButton() {
   const isRetrainReady = ProjectMachineContext.useSelector(
     selectors.isRetrainReady
   );
+  const currentTimeframe = ProjectMachineContext.useSelector(
+    (s) => s.context.currentTimeframe
+  );
+  const currentBatchPrediction = ProjectMachineContext.useSelector(
+    (s) => s.context.currentBatchPrediction
+  );
 
   let buttonLabel;
   let buttonDisabled = false;
@@ -24,6 +30,15 @@ export function PrimeButton() {
   if (sessionMode === SESSION_MODES.PREDICT) {
     buttonLabel = isLargeAoi ? 'Run Batch Prediction' : 'Run Live Prediction';
     buttonDisabled = !isPredictionReady;
+
+    if (!isPredictionReady) {
+      if (currentTimeframe) {
+        buttonTooltip =
+          'A prediction already exists for this AOI, mosaic and checkpoint.';
+      } else if (isLargeAoi && currentBatchPrediction) {
+        buttonTooltip = 'A batch AOI is already being predicted. Please wait.';
+      }
+    }
   } else if (sessionMode === SESSION_MODES.RETRAIN) {
     buttonLabel = 'Retrain Model';
     buttonDisabled = !isRetrainReady;

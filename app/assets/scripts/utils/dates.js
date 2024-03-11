@@ -24,17 +24,6 @@ export function formatMosaicDateRange(startTimestamp, endTimestamp) {
   )}`;
 }
 
-export function formatTimeframeLabel(
-  startTimestamp,
-  endTimestamp,
-  checkpointId
-) {
-  return `${format(startTimestamp, 'MMM dd, yyyy')} - ${format(
-    endTimestamp,
-    'MMM dd, yyyy'
-  )} (${checkpointId ? `Ckpt. ${checkpointId}` : 'Base Model'})`;
-}
-
 export function getDatePartFromISOString(isoString) {
   return isoString.split('T')[0];
 }

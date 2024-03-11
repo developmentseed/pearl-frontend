@@ -75,7 +75,9 @@ export const actions = {
   }),
   setCurrentMosaic: assign((_, event) => {
     const { mosaic, mosaicsList } = event.data;
-    const currentMosaic = { ...mosaic, tileUrl: getMosaicTileUrl(mosaic) };
+    const currentMosaic = mosaic
+      ? { ...mosaic, tileUrl: getMosaicTileUrl(mosaic) }
+      : null;
 
     // Optionally update mosaic list if provided
     return mosaicsList ? { mosaicsList, currentMosaic } : { currentMosaic };
@@ -242,6 +244,7 @@ export const actions = {
       return {
         currentTimeframe: null,
         currentMosaic: null,
+        currentShare: null,
         retrainClasses: [],
       };
     }
@@ -257,11 +260,19 @@ export const actions = {
 
     const currentMosaic = context.mosaicsList.find((m) => m.id === mosaicId);
 
+    const currentShare =
+      context.sharesList.find(
+        (s) =>
+          s.timeframe_id === newTimeframe.id &&
+          s.aoi_id === context.currentAoi.id
+      ) || null;
+
     // Apply new timeframe and (re-)initialize retrain classes
     return {
       currentTimeframe: { ...newTimeframe },
       currentMosaic,
       retrainClasses,
+      currentShare,
     };
   }),
   setTimeframesList: assign((context, event) => ({
@@ -274,8 +285,8 @@ export const actions = {
       tilejson: event.data.tilejson,
     },
   })),
-  setCurrentBatchPrediction: assign((context, event) => ({
-    currentBatchPrediction: event.data.batchPrediction,
+  setRunningBatch: assign((context, event) => ({
+    currentBatchPrediction: event.data.currentBatchPrediction,
   })),
   setSessionMode: assign((context, event) => ({
     sessionMode: event.data.sessionMode,
@@ -339,6 +350,7 @@ export const actions = {
   }),
   clearCurrentPrediction: assign(() => ({
     currentPrediction: null,
+    currentShare: null,
   })),
   clearCurrentTimeframe: assign(() => ({
     currentTimeframe: null,
@@ -402,6 +414,14 @@ export const actions = {
 
     return {
       retrainSamples: newRetrainSamples,
+    };
+  }),
+  addRetrainClass: assign((context, event) => {
+    const { retrainClasses } = context;
+    const { retrainClass } = event.data;
+
+    return {
+      retrainClasses: retrainClasses.concat(retrainClass),
     };
   }),
   updateRetrainClassSamples: assign((context, event) => {
@@ -469,12 +489,24 @@ export const actions = {
     sessionMode: SESSION_MODES.RETRAIN,
     sessionStatusMessage: 'Ready for retrain run',
   })),
-  enterApplyCheckpoint: assign(() => ({
-    sessionStatusMessage: 'Applying checkpoint',
-    globalLoading: {
-      disabled: false,
-    },
-  })),
+  enterApplyCheckpoint: assign((context) => {
+    const nextTimeframe =
+      context.timeframesList.find(
+        (t) => t.checkpoint_id === context.currentCheckpoint.id
+      ) || null;
+
+    const nextMosaic =
+      context.mosaicsList.find((m) => m.id === nextTimeframe?.mosaic) || null;
+
+    return {
+      sessionStatusMessage: 'Applying checkpoint',
+      currentTimeframe: nextTimeframe,
+      currentMosaic: nextMosaic,
+      globalLoading: {
+        disabled: false,
+      },
+    };
+  }),
   enterApplyTimeframe: assign(() => ({
     sessionStatusMessage: 'Applying timeframe',
     globalLoading: {
@@ -621,6 +653,14 @@ export const actions = {
         mouseup: false,
         mousemove: false,
       },
+    };
+  }),
+  enterConfiguringNewAoi: assign(() => {
+    return {
+      currentTimeframe: null,
+      currentPrediction: null,
+      currentMosaic: null,
+      timeframesList: [],
     };
   }),
   displayAoiAreaModalDialog: assign(() => ({

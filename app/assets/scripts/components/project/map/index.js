@@ -6,14 +6,20 @@ import SizeAwareElement from '../../common/size-aware-element';
 import {
   ImageOverlay,
   MapContainer,
+  ScaleControl,
   TileLayer,
+  FeatureGroup,
   useMapEvent,
 } from 'react-leaflet';
 
+import LayersPanel from '../layers-panel';
+import GenericControl from '../../common/map/generic-control';
 import {
   MAX_BASE_MAP_ZOOM_LEVEL,
   BaseMapLayer,
 } from '../../common/map/base-map-layer';
+import GeoCoder from '../../common/map/geocoder';
+import CenterMap from '../../common/map/center-map';
 
 import { themeVal, multiply } from '@devseed-ui/theme-provider';
 import { ProjectMachineContext } from '../../../fsm/project';
@@ -25,15 +31,28 @@ import { RETRAIN_MAP_MODES } from '../../../fsm/project/constants';
 import FreehandDrawControl from './freehand-draw-control';
 import PolygonDrawControl from './polygon-draw-control';
 import selectors from '../../../fsm/project/selectors';
-import {
-  BOUNDS_PADDING,
-  MOSAIC_LAYER_OPACITY,
-} from '../../common/map/constants';
+import { BOUNDS_PADDING } from '../../common/map/constants';
+import { getMosaicTileUrl } from '../../../utils/mosaics';
 
 const center = [19.22819, -99.995841];
 const zoom = 12;
 
-const DEFAULT_PREDICTION_LAYER_OPACITY = 0.7;
+const INITIAL_MAP_LAYERS = {
+  mosaic: {
+    id: 'mosaic',
+    name: 'Mosaic',
+    opacity: 1,
+    visible: true,
+    active: true,
+  },
+  predictions: {
+    id: 'predictions',
+    name: 'Prediction Results',
+    opacity: 1,
+    visible: true,
+    active: true,
+  },
+};
 
 const Container = styled.div`
   height: 100%;
@@ -81,9 +100,8 @@ function Map() {
 
   // Local state
   const [mapRef, setMapRef] = useState();
-  const [predictionsOpacity, setPredictionsOpacity] = useState(
-    DEFAULT_PREDICTION_LAYER_OPACITY
-  );
+  const [mapLayers, setMapLayers] = useState(INITIAL_MAP_LAYERS);
+  const [showLayersControl, setShowLayersControl] = useState(false);
 
   // FSM listeners
   const actorRef = ProjectMachineContext.useActorRef();
@@ -106,9 +124,10 @@ function Map() {
   const currentTilejson = ProjectMachineContext.useSelector(
     selectors.currentTilejson
   );
-  const mosaicTileUrl = ProjectMachineContext.useSelector(
-    selectors.mosaicTileUrl
+  const currentMosaic = ProjectMachineContext.useSelector(
+    selectors.currentMosaic
   );
+  const mosaicTileUrl = currentMosaic && getMosaicTileUrl(currentMosaic);
 
   // Event handlers
   const handleMouseDown = useCallback(
@@ -157,16 +176,40 @@ function Map() {
 
       if (e.key === 'a') {
         // On "a" key press, reduce opacity to zero
-        setPredictionsOpacity(0);
+        setMapLayers((prev) => ({
+          ...prev,
+          predictions: {
+            ...prev.predictions,
+            opacity: 0,
+          },
+        }));
       } else if (e.key === 's') {
         // On "s" key press, reduce opacity by 10%
-        setPredictionsOpacity((prev) => prev - 0.1);
+        setMapLayers((prev) => ({
+          ...prev,
+          predictions: {
+            ...prev.predictions,
+            opacity: prev.predictions.opacity - 0.1,
+          },
+        }));
       } else if (e.key === 'd') {
         // On "d" key press, increase opacity by 10%
-        setPredictionsOpacity((prev) => prev + 0.1);
+        setMapLayers((prev) => ({
+          ...prev,
+          predictions: {
+            ...prev.predictions,
+            opacity: prev.predictions.opacity + 0.1,
+          },
+        }));
       } else if (e.key === 'f') {
         // On "f" key press, increase opacity to 100%
-        setPredictionsOpacity(1);
+        setMapLayers((prev) => ({
+          ...prev,
+          predictions: {
+            ...prev.predictions,
+            opacity: 1,
+          },
+        }));
       } else if (e.key === ' ' || e.code === 'Space') {
         // On space keypress, pan map to current aoi bounds
         const aoiShape = currentAoiShape;
@@ -345,7 +388,7 @@ function Map() {
           <TileLayer
             key={mosaicTileUrl}
             url={mosaicTileUrl}
-            opacity={MOSAIC_LAYER_OPACITY}
+            opacity={mapLayers.mosaic.visible ? mapLayers.mosaic.opacity : 0}
           />
         )}
 
@@ -358,21 +401,48 @@ function Map() {
                 value: `Bearer ${apiToken}`,
               },
             ]}
-            opacity={predictionsOpacity}
+            opacity={
+              mapLayers.predictions.visible ? mapLayers.predictions.opacity : 0
+            }
           />
         )}
 
-        {currentPrediction &&
+        {!timeframeTilejsonUrl &&
+          currentPrediction &&
           currentPrediction.predictions &&
           currentPrediction.predictions.map((p) => (
             <ImageOverlay
               key={p.key}
               url={p.image}
               bounds={p.bounds}
-              opacity={predictionsOpacity}
+              opacity={
+                mapLayers.predictions.visible
+                  ? mapLayers.predictions.opacity
+                  : 0
+              }
             />
           ))}
+        <FeatureGroup>
+          <GeoCoder />
+          {currentAoiShape && <CenterMap aoiRef={currentAoiShape} />}
+          <GenericControl
+            id='layer-control'
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowLayersControl(!showLayersControl);
+            }}
+          />
+        </FeatureGroup>
+        <ScaleControl />
       </MapContainer>
+      <LayersPanel
+        mapRef={mapRef}
+        parentId='layer-control'
+        className='padded'
+        active={showLayersControl}
+        mapLayers={mapLayers}
+        setMapLayers={setMapLayers}
+      />
     </SizeAwareElement>
   );
 }

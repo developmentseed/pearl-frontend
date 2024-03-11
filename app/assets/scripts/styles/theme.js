@@ -121,7 +121,7 @@ const layout = {
   space: '1rem',
   border: '1px',
   min: '320px',
-  max: '1280px',
+  max: '1360px',
 };
 
 const boxShadow = {

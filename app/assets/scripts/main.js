@@ -15,11 +15,11 @@ import Home from './components/home';
 import Explore from './components/explore';
 import PublicMaps from './components/public-maps';
 import ShareMap from './components/share-map';
+import CompareMap from './components/compare-map';
 import About from './components/about';
 import UhOh from './components/uhoh';
 import Projects from './components/profile/projects';
 
-import { GlobalContextProvider } from './context/global';
 import { CollecticonsGlobalStyle } from '@devseed-ui/collecticons';
 import GlobalLoadingProvider from './components/common/global-loading';
 import { ToastContainerCustom } from './components/common/toasts';
@@ -55,70 +55,73 @@ function Root() {
         <Router history={history}>
           <DevseedUiThemeProvider theme={theme.dark}>
             <GlobalLoadingProvider />
-            <GlobalContextProvider>
-              <CollecticonsGlobalStyle />
-              <GlobalStyles />
-              <Switch>
-                <Route exact path='/' component={Home} />
-                <Route exact path='/share/:uuid/map' component={ShareMap} />
-                <ProtectedRoute
-                  exact
-                  path='/public-maps'
-                  component={PublicMaps}
-                />
-                <ProtectedRoute
-                  path='/project-old/:projectId'
-                  component={Explore}
-                />
-                <ProtectedRoute
-                  path='/project/:projectId'
-                  component={ProjectPage}
-                />
-                <ProtectedRoute
-                  exact
-                  path='/profile/projects'
-                  component={Projects}
-                />
-                <ProtectedRoute
-                  exact
-                  path='/profile/projects/:projectId'
-                  component={Project}
-                />
-                <ProtectedRoute
-                  exact
-                  path='/admin/models'
-                  component={ModelIndex}
-                  access='admin'
-                />
-                <ProtectedRoute
-                  exact
-                  path='/admin/models/new'
-                  component={NewModel}
-                  access='admin'
-                />
-                <ProtectedRoute
-                  exact
-                  path='/admin/models/:modelId'
-                  component={ViewModel}
-                  access='admin'
-                />
-                <ProtectedRoute
-                  exact
-                  path='/admin/models/:modelId/upload'
-                  component={UploadModel}
-                  access='admin'
-                />
-                <ProtectedRoute
-                  exact
-                  path='/admin/users'
-                  component={UserIndex}
-                  access='admin'
-                />
-                <Route exact path='/about' component={About} />
-                <Route path='*' component={UhOh} />
-              </Switch>
-              <ToastContainerCustom />
-            </GlobalContextProvider>
+            <CollecticonsGlobalStyle />
+            <GlobalStyles />
+            <Switch>
+              <Route exact path='/' component={Home} />
+              <Route exact path='/share/:uuid/map' component={ShareMap} />
+              <Route
+                exact
+                path='/compare/:leftUUID/:rightUUID'
+                component={CompareMap}
+              />
+              <ProtectedRoute
+                exact
+                path='/public-maps'
+                component={PublicMaps}
+              />
+              <ProtectedRoute
+                path='/project-old/:projectId'
+                component={Explore}
+              />
+              <ProtectedRoute
+                path='/project/:projectId'
+                component={ProjectPage}
+              />
+              <ProtectedRoute
+                exact
+                path='/profile/projects'
+                component={Projects}
+              />
+              <ProtectedRoute
+                exact
+                path='/profile/projects/:projectId'
+                component={Project}
+              />
+              <ProtectedRoute
+                exact
+                path='/admin/models'
+                component={ModelIndex}
+                access='admin'
+              />
+              <ProtectedRoute
+                exact
+                path='/admin/models/new'
+                component={NewModel}
+                access='admin'
+              />
+              <ProtectedRoute
+                exact
+                path='/admin/models/:modelId'
+                component={ViewModel}
+                access='admin'
+              />
+              <ProtectedRoute
+                exact
+                path='/admin/models/:modelId/upload'
+                component={UploadModel}
+                access='admin'
+              />
+              <ProtectedRoute
+                exact
+                path='/admin/users'
+                component={UserIndex}
+                access='admin'
+              />
+              <Route exact path='/about' component={About} />
+              <Route path='*' component={UhOh} />
+            </Switch>
+            <ToastContainerCustom />
           </DevseedUiThemeProvider>
         </Router>
       </ErrorBoundary>

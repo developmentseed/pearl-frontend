@@ -90,32 +90,43 @@ class About extends React.Component {
                 <Heading size='medium' as='h3'>
                   Coverage and Datasets
                 </Heading>
-                <img src='../assets/graphics/content/guide-naip.png' />
                 <p>
-                  V1.0.0 of PEARL supports LULC mapping in the United States.
-                  The platform users imagery from the National Agricultural
-                  Imagery Program (NAIP). NAIP is available as open data and on
-                  Microsoft Azure as part of the Planetary Computer program.
+                  This version 2 of PEARL enables mapping land use and land
+                  cover in the United States and globally. The platform users
+                  imagery from the{' '}
+                  <a href='https://planetarycomputer.microsoft.com/dataset/naip'>
+                    National Agricultural Imagery Program
+                  </a>{' '}
+                  (NAIP) in the United States, and the{' '}
+                  <a href='https://planetarycomputer.microsoft.com/dataset/sentinel-2-l2a'>
+                    Sentinel 2 L-2A
+                  </a>{' '}
+                  program for global imaging. NAIP is available as open data and
+                  on Microsoft Azure as part of the Planetary Computer program.
                   Starting 2003, NAIP was captured during 2003, 2008, 2009, 2010
-                  and 2015.
+                  and 2015. Sentinel 2 L-2A imagery is available from Planetary
+                  Computer starting in 2015.
                 </p>
                 <Heading size='medium' as='h3'>
                   Machine Learning Models
                 </Heading>
                 <p>
-                  This version of PEARL has 2 starter models. While these models
-                  have been trained primarily with data from the east coast of
-                  the United States, they should be a good starting point for
-                  LULC mapping throughout the country. The main difference
-                  between these models is the number of base classes. The
-                  platform can map upto 9 LULC classes using the 9 class model.
-                  These classes are Water, Emergent Wetlands, Tree Canopy,
-                  Shrubland, Low Vegetation, Barren, Structure, Impervious
-                  Surface, and Impervious Roads. The base training data for each
-                  of the models comes from the Chesapeake Conservancy.{' '}
+                  PEARL has 3 base machine learning models for land use and land
+                  cover pixel predictions. Two of these models have been trained
+                  primarily with data from the east coast of the United States,
+                  but they should be a good starting point for LULC mapping
+                  throughout the US. The main difference between these models is
+                  the number of base classes. The platform can map up to 9 LULC
+                  classes using the 9 class model. These classes are Water,
+                  Emergent Wetlands, Tree Canopy, Shrubland, Low Vegetation,
+                  Barren, Structure, Impervious Surface, and Impervious Roads.
+                  The base training data for each of the models comes from the
+                  Chesapeake Conservancy.{' '}
                   <a href='https://chesapeakeconservancy.org/wp-content/uploads/2020/03/LC_Class_Descriptions.pdf'>
                     Detailed class descriptions are available here.
-                  </a>
+                  </a>{' '}
+                  For global imagery, a 9-class base model is available trained
+                  on Mexico data from Reforestamos.
                 </p>
                 <Heading size='large' as='h2' id='guide-home'>
                   Getting around PEARL
@@ -124,13 +135,15 @@ class About extends React.Component {
                 <p>
                   The PEARL application has four main pages: the tool itself, a
                   user’s saved projects list, individual project pages, and the
-                  home page. From the home page, navigate to the application by
-                  clicking “Launch App.” Once logged in, you can view your
-                  existing projects from the “Account” dropdown. View project
-                  information by navigating to the individual project page from
-                  the table of your projects. Past projects can be opened for
-                  retraining and further refinement via the individual project
-                  page.
+                  Public Maps page. From the home page, navigate to the
+                  application by clicking “Launch App.” Once logged in, you can
+                  view your existing projects from the “Account” dropdown. View
+                  project information by navigating to the individual project
+                  page from the table of your projects. Past projects can be
+                  opened for retraining and further refinement via the
+                  individual project page. The Public Maps page allows you to
+                  view any published prediction map, which can also be useful
+                  for comparing LULC maps.
                 </p>
                 <Heading size='medium' as='h3'>
                   Creating Projects and AOIs
@@ -146,12 +159,37 @@ class About extends React.Component {
                 <p>
                   First, select an area of interest (AOI) by clicking the pencil
                   icon in the <strong>Selected Area</strong> section to draw a
-                  bounding box on the map. Navigate to your area of concern via
-                  the magnifying glass icon on the map to search for a specific
-                  address or region. Areas of interest are currently limited to
-                  a maximum size of 100km2 - the AOI selection box displays the
-                  area size as you draw, and the bounding box will turn red to
-                  indicate regions which are too large.
+                  bounding box on the map. Navigate directly to your area of
+                  concern using the magnifying glass icon on the map to search
+                  for a specific address or region. Areas of interest are
+                  currently limited to a maximum size for live predictions. The
+                  AOI selection box displays the area size as you draw and will
+                  indicate if the area exceeds the maximum size allowed for live
+                  predictions. When an area exceeds the maximum live prediction
+                  size, the processing will be queued and run as a batch
+                  prediction.
+                </p>
+                <Heading size='medium' as='h3' id='guide-imagery'>
+                  Selecting an Imagery Source
+                </Heading>
+                <img src='../assets/graphics/content/guide-imagery.png' />
+                <p>
+                  PEARL permits selection of imagery sources for the LULC
+                  prediction. NAIP and Sentinel 2 L-2A are both available for
+                  generating prediction tiles.
+                </p>
+                <Heading size='medium' as='h3' id='guide-mosaic'>
+                  Selecting a Mosaic
+                </Heading>
+                <img src='../assets/graphics/content/guide-mosaic.png' />
+                <p>
+                  For imagery source of Sentinel, select a timeframe. Timeframe
+                  selection permits the prediction of land use and land cover at
+                  any mosaic - a compound image created by stitching together
+                  the most recent, cloud-free images in the selected date range.
+                  Timeframes can be selected from a minimum of 2 days to include
+                  any duration of seasons and months. Preselected timeframes
+                  allow for quarterly mosaic use.
                 </p>
                 <Heading size='medium' as='h3' id='guide-models'>
                   Selecting a Starter Model
@@ -183,17 +221,14 @@ class About extends React.Component {
                   After receiving the initial model inference, retraining allows
                   users to modify the starter model to obtain more accurate
                   predictions for the selected AOI. The <strong>Draw</strong>{' '}
-                  and <strong>Point</strong> tools allow users to select
-                  available classes and mark samples for sending to the model.
-                  Draw allows free-hand creation of polygons via mouse clicking
-                  and dragging, while points are placed as individual movable
-                  markers. When a user draws a polygon during retraining 100
-                  points are randomly sampled from that polygon and used for
-                  retraining.
+                  tool allow users to select available classes and mark samples
+                  for sending to the model. Draw allows free-hand creation of
+                  polygons via mouse clicking and dragging. When a user draws a
+                  polygon during retraining 100 points are randomly sampled from
+                  that polygon and used for retraining.
                 </p>
                 <p>
-                  The <strong>Erase</strong> tool allows the deletion of points
-                  and polygons via mouse click, and subtraction from polygons
+                  The <strong>Erase</strong> tool allows erasure from polygons
                   while clicking and dragging.
                 </p>
                 <p>
@@ -209,7 +244,7 @@ class About extends React.Component {
                 <Heading size='medium' as='h3' id='guide-analysis'>
                   Prediction Analysis
                 </Heading>
-                <img src='../assets/graphics/content/guide-analysis.png' />
+                <img src='../assets/graphics/content/guide-predictions.png' />
                 <p>
                   After submitting retraining samples, the analysis panel will
                   populate with metrics on class distribution and class f1
@@ -246,24 +281,8 @@ class About extends React.Component {
                   and reuse later. Internally, checkpoints store the unique set
                   of model weights based on the retraining steps taken.
                 </p>
-                <Heading size='large' as='h2' id='guide-refine'>
-                  Refining the map output
-                </Heading>
-                <img src='../assets/graphics/content/guide-refine.png' />
-                <p>
-                  After inspecting your model output, you can manually apply
-                  refinements to paint over an area of the map with individual
-                  classes or previous checkpoints. Refinements can be used to
-                  smooth areas that your model consistently misidentifies or
-                  which you wish to normalize. Select either an individual class
-                  or a previous checkpoint, then select the{' '}
-                  <strong>Draw</strong> tool to designate areas on your map to
-                  fill with your selected type. After drawing multiple areas,
-                  click <strong>Save Refinements</strong> to add your changes to
-                  the map.
-                </p>
                 <Heading size='large' as='h2' id='guide-export'>
-                  Sharing Maps
+                  Exporting & Sharing Maps
                 </Heading>
                 <img src='../assets/graphics/content/guide-export.png' />
                 <p>
@@ -271,22 +290,51 @@ class About extends React.Component {
                   GeoTIFF or an interactive map URL that can be embedded. Once
                   an inference is generated and you are satisfied with the
                   output, click on the <strong>Export</strong> button on the top
-                  right corner.
+                  right corner. A “Share URL” must be created first before maps
+                  can be downloaded and shared.
+                </p>
+                <Heading size='large' as='h2' id='guide-compare'>
+                  Compare Maps
+                </Heading>
+                <img src='../assets/graphics/content/guide-compare.png' />
+                <p>
+                  The compare tool allows the direct comparison of two exported
+                  prediction maps. To compare maps, first generate predictions
+                  from your desired AOI. Once ready to compare, you can then
+                  follow the below steps
+                  <ol>
+                    <li>
+                      Export via the header “export” dropdown option “Create
+                      Share Link”
+                    </li>
+                    <li>
+                      Once exports for your two desired maps are generated,
+                      navigate to the respective project page
+                    </li>
+                    <li>
+                      In the exported maps table toggle the “publish” switch
+                    </li>
+                    <li>Navigate to the “Public Maps” page</li>
+                    <li>
+                      Find and select the two desired AOIs from the public maps
+                      list
+                    </li>
+                    <li>
+                      Click “Compare” to navigate to the corresponding map
+                      comparison
+                    </li>
+                  </ol>
                 </p>
                 <Heading size='large' as='h2' id='guide-limitations'>
                   Limitations
                 </Heading>
                 <ul>
                   <li>
-                    This platform is currently limited to run on NAIP imagery in
-                    the United States.
-                  </li>
-                  <li>
                     It is possible to run inference over all of the US, however
                     the starter models were only trained in the north eastern
                     United States with data from West Virginia, Maryland,
-                    Pennsylvania, New York, Delaware, and Virgina due to labeled
-                    data constraints. There might be a drop in inference
+                    Pennsylvania, New York, Delaware, and Virginia due to
+                    labeled data constraints. There might be a drop in inference
                     performance in terms of F-scores when compared to the
                     starter model test data set performance metrics is expected
                     for areas outside of where the starter model training data
@@ -296,11 +344,6 @@ class About extends React.Component {
                   <li>
                     While adding a new class is possible, deleting a class from
                     the model is not supported at the moment.
-                  </li>
-                  <li>
-                    GPUs are limited. At the moment, we can scale reliably up to
-                    32 simultaneous users. Some users may get assigned to a CPU
-                    instance.
                   </li>
                 </ul>
                 <PartnerLogos>
@@ -327,6 +370,12 @@ class About extends React.Component {
                     <a href='#guide-aoi'>Selecting an AOI</a>
                   </li>
                   <li>
+                    <a href='#guide-imagery'>Selecting Imagery</a>
+                  </li>
+                  <li>
+                    <a href='#guide-mosaic'>Selecting Mosaics</a>
+                  </li>
+                  <li>
                     <a href='#guide-models'>Selecting Starter Models</a>
                   </li>
                   <li>
@@ -342,10 +391,10 @@ class About extends React.Component {
                     <a href='#guide-checkpoint'>Saving Checkpoints</a>
                   </li>
                   <li>
-                    <a href='#guide-refine'>Refining output</a>
+                    <a href='#guide-export'>Exporting & Sharing maps</a>
                   </li>
                   <li>
-                    <a href='#guide-export'>Sharing maps</a>
+                    <a href='#guide-compare'>Comparing maps</a>
                   </li>
                   <li>
                     <a href='#guide-limitations'>Limitations</a>

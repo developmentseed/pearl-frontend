@@ -105,7 +105,7 @@ export default function UserIndex() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [users, setUsers] = useState([]);
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(0);
   const [total, setTotal] = useState(null);
 
   const { restApiClient } = useAuth();
@@ -115,7 +115,7 @@ export default function UserIndex() {
       try {
         showGlobalLoadingMessage('Loading users...');
         const data = await restApiClient.get(
-          `user/?sort=username&page=${page - 1}&limit=${ITEMS_PER_PAGE}`
+          `user/?sort=username&page=${page}&limit=${ITEMS_PER_PAGE}`
         );
         setTotal(data.total);
         setUsers(data.users);
@@ -161,9 +161,9 @@ export default function UserIndex() {
                     />
                     <Paginator
                       currentPage={page}
-                      gotoPage={setPage}
-                      totalItems={total}
-                      itemsPerPage={ITEMS_PER_PAGE}
+                      setPage={setPage}
+                      totalRecords={total}
+                      pageSize={ITEMS_PER_PAGE}
                     />
                   </>
                 ) : (
