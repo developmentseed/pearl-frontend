@@ -108,6 +108,9 @@ export function MosaicSelector() {
     label = 'Define first AOI';
   } else if (!currentImagerySource) {
     label = 'Define Imagery Source';
+  } else if (currentImagerySource.id !== 2) {
+    label = 'Mosaics unavailable for this imagery source';
+    disabled = true;
   } else if (currentMosaic) {
     label = formatMosaicDateRange(
       currentMosaic?.mosaic_ts_start,
