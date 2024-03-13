@@ -15,6 +15,7 @@ import getFeatureArea from '@turf/area';
 import get from 'lodash.get';
 import { ProjectMachineContext } from '../../../fsm/project';
 import selectors from '../../../fsm/project/selectors';
+import config from '../../../config';
 
 const Wrapper = styled.div`
   display: grid;
@@ -94,9 +95,9 @@ function UploadAoiModal() {
         //     'Area is out of imagery bounds. Please upload another file.'
         //   );
         //   return;
-      } else if (totalArea > apiLimits.max_inference) {
-        // Area should be lower than max_inference, abort import
-        setWarning('Area is too large, please upload another file.');
+      } else if (totalArea < config.minimumAoiArea) {
+        // Area should be larger than minimum live_inference, abort import
+        setWarning('Area is too small, please upload a larger area.');
         setFile(null);
         return;
       } else if (
@@ -104,6 +105,11 @@ function UploadAoiModal() {
       ) {
         // If area is bigger than apiLimits.live_inference, show warning and proceed import
         setWarning('Due to area size live inference will not be available.');
+      } else if (totalArea > apiLimits.max_inference) {
+        // Area should be lower than max_inference, abort import
+        setWarning('Area is too large, please upload another file.');
+        setFile(null);
+        return;
       } else if (geojson.features.length > 1) {
         setWarning(`GeoJSON file must contain a single feature.`);
         return;
