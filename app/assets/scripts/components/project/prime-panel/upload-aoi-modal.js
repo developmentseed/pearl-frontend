@@ -67,11 +67,15 @@ function UploadAoiModal() {
         return;
       }
 
-      // Drop the crs property if it exists. This will prevent the GeoJSON from
-      // being rejected. All geojson should be considered as using the
-      // default CRS (WGS84).
-      if (geojson.crs) {
-        delete geojson.crs;
+      // Check and handle the CRS property in the GeoJSON.
+      const crs = get(geojson, 'crs.properties.name');
+      if (crs && crs !== 'urn:ogc:def:crs:OGC:1.3:CRS84') {
+        setWarning(
+          'GeoJSON file contains a non-standard CRS. Please upload a file using the default CRS (WGS84).'
+        );
+        return;
+      } else {
+        delete geojson.crs; // Safely remove the CRS property if it exists or is the default.
       }
 
       // The first feature in the GeoJSON file should contain the AOI geometry
@@ -139,8 +143,9 @@ function UploadAoiModal() {
         <Wrapper>
           {!file && (
             <Prose className='prose'>
-              Once imported, the bounding box containing all features in the
-              file will be set as an AOI.
+              The GeoJSON reference system must be WGS 1984 (SRID:4326). Once
+              imported, the bounding box containing all features in the file
+              will be set as an AOI.
             </Prose>
           )}
           <FauxFileDialog
