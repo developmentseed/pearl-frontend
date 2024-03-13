@@ -86,15 +86,6 @@ function UploadAoiModal() {
         );
         setFile(null);
         return;
-        // } else if (
-        //   // If mosaic bounds is available, check if geojson is contained
-        //   mosaicMeta.data?.bounds &&
-        //   !booleanWithin(bboxPolygon(bounds), bboxPolygon(mosaicMeta.data.bounds))
-        // ) {
-        //   setWarning(
-        //     'Area is out of imagery bounds. Please upload another file.'
-        //   );
-        //   return;
       } else if (totalArea < config.minimumAoiArea) {
         // Area should be larger than minimum live_inference, abort import
         setWarning('Area is too small, please upload a larger area.');
