@@ -49,31 +49,20 @@ jobs:
         run: yarn postinstall
 
       - name: Build Prod
-        if: github.ref == 'refs/heads/main'
         run: yarn build
 
       - name: Azure Login
-        if: github.ref == 'refs/heads/main'
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS_PRODUCTION }}
 
       - name: Upload to blob storage
-        if: github.ref == 'refs/heads/main'
         uses: azure/CLI@v1
         with:
           inlineScript: |
             az storage blob upload-batch --account-name $PRODUCTION_STORAGE_ACCOUNT_NAME --overwrite -d '$web' -s ./dist
 
       - name: Purge CDN endpoint
-        if: github.ref == 'refs/heads/develop'
-        uses: azure/CLI@v1
-        with:
-          inlineScript: |
-            az cdn endpoint purge --content-paths  "/*" --profile-name $STAGING_CDN_PROFILE_NAME --name $STAGING_CDN_ENDPOINT --resource-group $STAGING_RESOURCE_GROUP
-
-      - name: Purge CDN endpoint
-        if: github.ref == 'refs/heads/main'
         uses: azure/CLI@v1
         with:
           inlineScript: |
