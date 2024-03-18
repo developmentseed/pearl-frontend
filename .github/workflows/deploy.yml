@@ -3,15 +3,10 @@ name: Deploy
 on:
   push:
     branches:
-      - 'develop'
       - 'main'
+      - origin/add/plausible-to-v1
 
 env:
-  # Staging environemt for v1 is disabled
-  # STAGING_STORAGE_ACCOUNT_NAME: lulcstagingfrontend
-  # STAGING_CDN_PROFILE_NAME: lulc
-  # STAGING_CDN_ENDPOINT: lulcstaging
-  # STAGING_RESOURCE_GROUP: lulcterraformdev
   PRODUCTION_STORAGE_ACCOUNT_NAME: lulctfproductionfrontend
   PRODUCTION_CDN_PROFILE_NAME: lulctfproduction
   PRODUCTION_CDN_ENDPOINT: lulctfproduction
@@ -53,35 +48,15 @@ jobs:
       - name: Post install (make sure local.js exists to avoid breaking config)
         run: yarn postinstall
 
-      # Staging environemt for v1 is disabled
-      # - name: Build Stage
-      #   if: github.ref == 'refs/heads/develop'
-      #   run: yarn stage
-
       - name: Build Prod
         if: github.ref == 'refs/heads/main'
         run: yarn build
-
-      # Staging environemt for v1 is disabled
-      # - name: Azure Login
-      #   if: github.ref == 'refs/heads/develop'
-      #   uses: azure/login@v1
-      #   with:
-      #     creds: ${{ secrets.AZURE_CREDENTIALS_STAGING }}
 
       - name: Azure Login
         if: github.ref == 'refs/heads/main'
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS_PRODUCTION }}
-
-      # Staging environemt for v1 is disabled
-      # - name: Upload to blob storage
-      #   if: github.ref == 'refs/heads/develop'
-      #   uses: azure/CLI@v1
-      #   with:
-      #     inlineScript: |
-      #         az storage blob upload-batch --account-name $STAGING_STORAGE_ACCOUNT_NAME --overwrite -d '$web' -s ./dist
 
       - name: Upload to blob storage
         if: github.ref == 'refs/heads/main'
