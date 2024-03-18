@@ -17,6 +17,7 @@ const { compile: collecticonsCompile } = require('collecticons-processor');
 const {
   appTitle,
   appDescription,
+  plausibleDomain,
 } = require('./app/assets/scripts/config/base').default;
 
 // /////////////////////////////////////////////////////////////////////////////
@@ -79,8 +80,9 @@ function serve() {
         replace: ''
       },
       { match: /{{appTitle}}/g, replace: appTitle },
-      { match: /{{appDescription}}/g, replace: appDescription }
-    ]
+      { match: /{{appDescription}}/g, replace: appDescription },
+      { match: /{{plausibleDomain}}/g, replace: plausibleDomain },
+    ],
   });
 
   // watch for changes
