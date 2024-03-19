@@ -93,7 +93,11 @@ function CheckpointSelector() {
 
   if (sessionMode === SESSION_MODES.LOADING) {
     selectedOptionLabel = 'Loading...';
-  } else if (!checkpointList || checkpointList?.length === 0) {
+  } else if (
+    !checkpointList ||
+    checkpointList?.length === 0 ||
+    !currentCheckpoint
+  ) {
     selectedOptionLabel = 'Run model to create first checkpoint';
   } else {
     selectedOptionLabel = getCheckpointLabel(currentCheckpoint);
