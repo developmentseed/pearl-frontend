@@ -17,6 +17,7 @@ const { compile: collecticonsCompile } = require('collecticons-processor');
 const {
   appTitle,
   appDescription,
+  plausibleDomain,
 } = require('./app/assets/scripts/config/base').default;
 
 // /////////////////////////////////////////////////////////////////////////////
@@ -79,8 +80,8 @@ function serve() {
         replace: ''
       },
       { match: /{{appTitle}}/g, replace: appTitle },
-      { match: /{{appDescription}}/g, replace: appDescription }
-    ]
+      { match: /{{appDescription}}/g, replace: appDescription },
+    ],
   });
 
   // watch for changes
@@ -241,6 +242,12 @@ function html() {
       .pipe($.replace('{{baseurl}}', baseurl))
       .pipe($.replace('{{appTitle}}', appTitle))
       .pipe($.replace('{{appDescription}}', appDescription))
+      .pipe(
+        $.replace(
+          '{{plausibleDomain}}',
+          process.env.NODE_ENV === 'production' ? plausibleDomain : ''
+        )
+      )
       .pipe(gulp.dest('dist'))
   );
 }

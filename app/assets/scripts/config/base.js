@@ -7,6 +7,7 @@ module.exports = {
     appLongTitle: 'Planetary Computer Land Cover Mapping',
     appDescription:
       'Microsoft Planetary Computer Land Use/Land Classification Mapping tool',
+    plausibleDomain: 'landcover.io',
     restApiEndpoint: 'https://api.lulc-staging.ds.io',
     websocketEndpoint: 'wss://socket.lulc-staging.ds.io',
 
