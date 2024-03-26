@@ -81,7 +81,10 @@ function serve() {
       },
       { match: /{{appTitle}}/g, replace: appTitle },
       { match: /{{appDescription}}/g, replace: appDescription },
-      { match: /{{plausibleDomain}}/g, replace: plausibleDomain },
+      {
+        match: /{{plausibleDomain}}/g,
+        replace: process.env.NODE_ENV === 'production' ? plausibleDomain : '',
+      },
     ],
   });
 
