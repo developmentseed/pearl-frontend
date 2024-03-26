@@ -1,136 +1,129 @@
 import React from 'react';
 import styled from 'styled-components';
 import T from 'prop-types';
-import fill from 'fill-range';
-
 import { Button } from '@devseed-ui/button';
 
-const PaginatorContainer = styled.section`
-  display: flex;
-  flex-flow: column nowrap;
-  justify-content: center;
-  text-align: center;
-  font-size: 0.875rem;
-`;
+import { themeVal, multiply } from '@devseed-ui/theme-provider';
+import { listPageOptions } from '../../utils/pagination-options';
 
-const Pager = styled.ul`
+const PaginationWrapper = styled.nav`
+  text-align: center;
+  margin: ${themeVal('layout.space')};
   display: flex;
+  flex-flow: row wrap;
   justify-content: center;
   align-items: center;
-  list-style: none;
-  list-style-type: none !important;
-  & > :not(:first-child) {
-    margin-left: 1rem;
-  }
-  ${Button} {
-    box-shadow: none;
-  }
 `;
 
-const PageButton = styled(Button)`
-  & ~ & {
-    margin-left: 0.5rem;
-  }
+const PaginationSummary = styled.div`
+  margin-top: ${themeVal('layout.space')};
+  font-size: ${multiply(themeVal('type.base.root'), 0.8)};
+  flex-basis: 100%;
 `;
 
-// Print range of page items
-// From https://stackoverflow.com/questions/47698412/pagination-in-javascript-showing-amount-of-elements-per-page
-function renderPageRange(totalItems, itemsPerPage) {
-  function getPageStart(pageSize, pageNr) {
-    return pageSize * pageNr;
+const PaginationButton = styled(Button)`
+  margin-left: ${multiply(themeVal('layout.space'), 0.5)};
+
+  &:first-child {
+    margin-left: 0;
   }
-
-  function getPageLabel(total, pageSize, pageNr) {
-    const start = Math.max(getPageStart(pageSize, pageNr), 0);
-    const end = Math.min(getPageStart(pageSize, pageNr + 1), total);
-
-    return `${start + 1} - ${end}`;
-  }
-
-  const size = itemsPerPage;
-  const pages = Array.from({ length: Math.ceil(totalItems / size) }, (_, i) =>
-    getPageLabel(totalItems, size, i)
-  );
-  return pages;
-}
-
+`;
 /**
  *
- * @param {Number} totalItems - total number of items
- * @param {Number} itemsPerPage - total number of pages
+ * @param {Number} totalRecords - total number of items
+ * @param {Number} pageSize - total number of pages
  * @param {Number} currentPage - current page
- * @param {Function} gotoPage - function to call to navigate to a page
+ * @param {Function} setPage - function to call to navigate to a page
  *                              (passed page number as param)
  */
-function Paginator({ currentPage, gotoPage, totalItems, itemsPerPage }) {
-  const numPages = Math.ceil(totalItems / itemsPerPage);
-  const hasPrev = currentPage > 1;
-  const hasNext = currentPage < numPages;
+function Paginator({ pageSize, currentPage, totalRecords, setPage }) {
+  const maxPages = pageSize ? Math.ceil(totalRecords / pageSize) : 0;
+  const pages = listPageOptions(currentPage + 1, maxPages);
+
   return (
-    <PaginatorContainer>
-      <Pager>
-        <li>
-          <Button
-            disabled={!hasPrev}
+    <PaginationWrapper>
+      <PaginationButton
+        data-cy='first-page-button'
+        onClick={() => setPage(0)}
+        disabled={currentPage === 0}
+        useIcon='chevron-left-trail--small'
+        hideText
+        variation='base-plain'
+        size='small'
+      >
+        First page
+      </PaginationButton>
+      <PaginationButton
+        data-cy='previous-page-button'
+        onClick={() => setPage(currentPage - 1)}
+        disabled={currentPage === 0}
+        useIcon='chevron-left--small'
+        hideText
+        variation='base-plain'
+        size='small'
+      >
+        Previous page
+      </PaginationButton>
+      {pages.map((page) => {
+        return (
+          <PaginationButton
+            onClick={() => setPage(page - 1)}
+            key={`page-${page}`}
+            variation={
+              page === '...'
+                ? 'base-plain'
+                : currentPage + 1 === page
+                ? 'primary-raised-dark'
+                : 'base-plain'
+            }
+            disabled={page === '...'}
+            data-cy={`page-${page}-button`}
             size='small'
-            variation='primary-raised-dark'
-            useIcon='chevron-left--small'
-            hideText
-            onClick={() => {
-              if (hasPrev) {
-                gotoPage(currentPage - 1);
-              }
-            }}
           >
-            Previous
-          </Button>
-        </li>
-        <li>
-          {fill(1, numPages).map((pageNumber) => (
-            <PageButton
-              key={pageNumber}
-              data-cy={`page-${pageNumber}-button`}
-              isCurrent={pageNumber === currentPage}
-              variation={
-                pageNumber === currentPage ? 'primary-plain' : 'base-plain'
-              }
-              onClick={() => gotoPage(pageNumber)}
-            >
-              {pageNumber}
-            </PageButton>
-          ))}
-        </li>
-        <li>
-          <Button
-            disabled={!hasNext}
-            size='small'
-            variation='primary-raised-dark'
-            useIcon='chevron-right--small'
-            data-cy='next-page-button'
-            hideText
-            onClick={() => {
-              if (hasNext) {
-                gotoPage(currentPage + 1);
-              }
-            }}
-          >
-            Next
-          </Button>
-        </li>
-      </Pager>
-      <div>
-        Showing {renderPageRange(totalItems, itemsPerPage)[currentPage - 1]} of{' '}
-        {totalItems}
-      </div>
-    </PaginatorContainer>
+            {page}
+          </PaginationButton>
+        );
+      })}
+      <PaginationButton
+        data-cy='next-page-button'
+        onClick={() => setPage(currentPage + 1)}
+        disabled={currentPage === maxPages - 1}
+        useIcon='chevron-right--small'
+        hideText
+        variation='base-plain'
+        size='small'
+      >
+        Next page
+      </PaginationButton>
+      <PaginationButton
+        data-cy='last-page-button'
+        onClick={() => setPage(maxPages - 1)}
+        disabled={currentPage === maxPages - 1}
+        useIcon='chevron-right-trail--small'
+        hideText
+        variation='base-plain'
+        size='small'
+      >
+        Last page
+      </PaginationButton>
+      <PaginationSummary>
+        Showing {currentPage * pageSize + 1}-
+        {Intl.NumberFormat().format(
+          currentPage === maxPages - 1
+            ? totalRecords
+            : (currentPage + 1) * pageSize
+        )}{' '}
+        of {Intl.NumberFormat().format(totalRecords)}
+      </PaginationSummary>
+    </PaginationWrapper>
   );
 }
 
 Paginator.propTypes = {
-  itemsPerPage: T.number,
-  currentPage: T.number,
-  gotoPage: T.func,
-  totalItems: T.number,
+  pageSize: T.number.isRequired,
+  currentPage: T.number.isRequired,
+  totalRecords: T.number.isRequired,
+  setPage: T.func.isRequired,
 };
 
 export default Paginator;

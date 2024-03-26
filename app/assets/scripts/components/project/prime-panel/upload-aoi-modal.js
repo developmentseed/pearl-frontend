@@ -15,6 +15,7 @@ import getFeatureArea from '@turf/area';
 import get from 'lodash.get';
 import { ProjectMachineContext } from '../../../fsm/project';
 import selectors from '../../../fsm/project/selectors';
+import config from '../../../config';
 
 const Wrapper = styled.div`
   display: grid;
@@ -66,11 +67,15 @@ function UploadAoiModal() {
         return;
       }
 
-      // Drop the crs property if it exists. This will prevent the GeoJSON from
-      // being rejected. All geojson should be considered as using the
-      // default CRS (WGS84).
-      if (geojson.crs) {
-        delete geojson.crs;
+      // Check and handle the CRS property in the GeoJSON.
+      const crs = get(geojson, 'crs.properties.name');
+      if (crs && crs !== 'urn:ogc:def:crs:OGC:1.3:CRS84') {
+        setWarning(
+          'GeoJSON file contains a non-standard CRS. Please upload a file using the default CRS (WGS84).'
+        );
+        return;
+      } else {
+        delete geojson.crs; // Safely remove the CRS property if it exists or is the default.
       }
 
       // The first feature in the GeoJSON file should contain the AOI geometry
@@ -85,18 +90,9 @@ function UploadAoiModal() {
         );
         setFile(null);
         return;
-        // } else if (
-        //   // If mosaic bounds is available, check if geojson is contained
-        //   mosaicMeta.data?.bounds &&
-        //   !booleanWithin(bboxPolygon(bounds), bboxPolygon(mosaicMeta.data.bounds))
-        // ) {
-        //   setWarning(
-        //     'Area is out of imagery bounds. Please upload another file.'
-        //   );
-        //   return;
-      } else if (totalArea > apiLimits.max_inference) {
-        // Area should be lower than max_inference, abort import
-        setWarning('Area is too large, please upload another file.');
+      } else if (totalArea < config.minimumAoiArea) {
+        // Area should be larger than minimum live_inference, abort import
+        setWarning('Area is too small, please upload a larger area.');
         setFile(null);
         return;
       } else if (
@@ -104,6 +100,11 @@ function UploadAoiModal() {
       ) {
         // If area is bigger than apiLimits.live_inference, show warning and proceed import
         setWarning('Due to area size live inference will not be available.');
+      } else if (totalArea > apiLimits.max_inference) {
+        // Area should be lower than max_inference, abort import
+        setWarning('Area is too large, please upload another file.');
+        setFile(null);
+        return;
       } else if (geojson.features.length > 1) {
         setWarning(`GeoJSON file must contain a single feature.`);
         return;
@@ -142,8 +143,9 @@ function UploadAoiModal() {
         <Wrapper>
           {!file && (
             <Prose className='prose'>
-              Once imported, the bounding box containing all features in the
-              file will be set as an AOI.
+              The GeoJSON reference system must be WGS 1984 (SRID:4326). Once
+              imported, the bounding box containing all features in the file
+              will be set as an AOI.
             </Prose>
           )}
           <FauxFileDialog

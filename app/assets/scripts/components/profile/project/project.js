@@ -18,7 +18,7 @@ import {
 import { ProjectsBody as ProjectBody } from '../projects/projects';
 import { media } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
-import { FormInput } from '@devseed-ui/form';
+import { FormSwitch } from '@devseed-ui/form';
 import { StyledLink } from '../../../styles/links';
 import toasts from '../../common/toasts';
 import { useAuth } from '../../../context/auth';
@@ -34,6 +34,7 @@ import copyTextToClipboard from '../../../utils/copy-text-to-clipboard';
 import logger from '../../../utils/logger';
 import BatchList from './batch-list';
 import { downloadShareGeotiff } from '../../../utils/share-link';
+import { composeMosaicName } from '../../../utils/mosaics';
 
 // Controls the size of each page
 const AOIS_PER_PAGE = 20;
@@ -71,46 +72,48 @@ const FormInputGroup = styled.div`
 const AOI_HEADERS = [
   'AOI Name',
   'AOI Size (Km2)',
+  'Created',
   'Mosaic',
   'Checkpoint',
   'Classes',
-  'Created',
   'Link',
   'Download',
+  'Published',
 ];
 
-// Render single AOI row
-function renderRow(share, { restApiClient }) {
+function RenderRow(share, { restApiClient }) {
   const shareLink = `${window.location.origin}/share/${share.uuid}/map`;
-  const { aoi, timeframe, mosaic } = share;
+  const { aoi, checkpoint, timeframe, mosaic } = share;
+
+  const [isPublished, setIsPublished] = useState(share.published);
 
   return (
-    <TableRow key={aoi.id}>
+    <TableRow key={share.uuid}>
       <TableCell>{aoi.name}</TableCell>
       <TableCell>{formatThousands(tArea(aoi.bounds) / 1e6)}</TableCell>
-      <TableCell>{mosaic?.name}</TableCell>
-      <TableCell>{timeframe.checkpoint_id}</TableCell>
-      <TableCell>{timeframe.classes.length}</TableCell>
       <TableCell>{formatDateTime(timeframe.created)}</TableCell>
       <TableCell>
-        <FormInputGroup>
-          <FormInput readOnly value={shareLink} size='small' />
-          <Button
-            variation='primary-plain'
-            useIcon='clipboard'
-            hideText
-            onClick={() => {
-              copyTextToClipboard(shareLink).then((result) => {
-                if (result) {
-                  toasts.success('URL copied to clipboard');
-                } else {
-                  logger('Failed to copy', result);
-                  toasts.error('Failed to copy URL to clipboard');
-                }
-              });
-            }}
-          />
-        </FormInputGroup>
+        {composeMosaicName(mosaic.mosaic_ts_start, mosaic.mosaic_ts_end)}
+      </TableCell>
+      <TableCell>{checkpoint.name}</TableCell>
+      <TableCell>{timeframe.classes.length}</TableCell>
+      <TableCell>
+        <Button
+          variation='primary-plain'
+          size='small'
+          useIcon='clipboard'
+          hideText
+          onClick={() => {
+            copyTextToClipboard(shareLink).then((result) => {
+              if (result) {
+                toasts.success('URL copied to clipboard');
+              } else {
+                logger('Failed to copy', result);
+                toasts.error('Failed to copy URL to clipboard');
+              }
+            });
+          }}
+        />
       </TableCell>
       <TableCell>
         <Button
@@ -120,6 +123,33 @@ function renderRow(share, { restApiClient }) {
           onClick={() => downloadShareGeotiff(restApiClient, share)}
         />
       </TableCell>
+      <TableCell>
+        <FormInputGroup>
+          <FormSwitch
+            checked={isPublished}
+            onChange={async () => {
+              const newIsPublished = !isPublished;
+              setIsPublished(newIsPublished);
+
+              try {
+                await restApiClient.patch(`share/${share.uuid}`, {
+                  published: newIsPublished,
+                });
+                setIsPublished(newIsPublished);
+              } catch (err) {
+                setIsPublished(!newIsPublished);
+                logger(
+                  'There was an unexpected error updating the exported map.',
+                  err
+                );
+                toasts.error(
+                  'There was an unexpected error updating the exported map.'
+                );
+              }
+            }}
+          />
+        </FormInputGroup>
+      </TableCell>
     </TableRow>
   );
 }
@@ -128,7 +158,7 @@ function Project() {
   const { apiToken } = useAuth();
   const history = useHistory();
   const { projectId } = useParams();
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(0);
   const [total, setTotal] = useState(null);
   const [shares, setShares] = useState([]);
   const [isProjectLoading, setIsProjectLoading] = useState(true);
@@ -167,7 +197,7 @@ function Project() {
         setIsAoisLoading(true);
         try {
           const sharesData = await restApiClient.get(
-            `project/${projectId}/share?page=${page - 1}&limit=${AOIS_PER_PAGE}`
+            `project/${projectId}/share?page=${page}&limit=${AOIS_PER_PAGE}`
           );
           setTotal(sharesData.total);
           setShares(sharesData.shares);
@@ -280,14 +310,14 @@ function Project() {
             <BatchList projectId={projectId} />
             {shares &&
               (shares.length ? (
-                <>
+                <section>
                   <Heading size='small'>
                     {project ? 'Exported Maps' : 'Loading Project...'}
                   </Heading>
                   <Table
                     headers={AOI_HEADERS}
                     data={shares}
-                    renderRow={renderRow}
+                    renderRow={RenderRow}
                     extraData={{
                       project,
                       restApiClient,
@@ -297,13 +327,13 @@ function Project() {
                   />
                   <Paginator
                     currentPage={page}
-                    gotoPage={setPage}
-                    totalItems={total}
-                    itemsPerPage={AOIS_PER_PAGE}
+                    setPage={setPage}
+                    totalRecords={total}
+                    pageSize={AOIS_PER_PAGE}
                   />
-                </>
+                </section>
               ) : (
-                <Heading>
+                <Heading size='small'>
                   {isAoisLoading
                     ? 'Loading AOIs...'
                     : 'No Exported AOIs for this project.'}

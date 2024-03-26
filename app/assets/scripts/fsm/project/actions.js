@@ -5,7 +5,7 @@ import L from 'leaflet';
 import turfBboxPolygon from '@turf/bbox-polygon';
 import turfArea from '@turf/area';
 import toasts from '../../components/common/toasts';
-import { getMosaicTileUrl } from './helpers';
+import { getMosaicTileUrl } from '../../utils/mosaics';
 import history from '../../history';
 import { RETRAIN_MAP_MODES, SESSION_MODES } from './constants';
 
@@ -73,12 +73,14 @@ export const actions = {
       ...nextContext,
     };
   }),
-  setCurrentMosaic: assign((context, event) => {
-    const { mosaic } = event.data;
+  setCurrentMosaic: assign((_, event) => {
+    const { mosaic, mosaicsList } = event.data;
+    const currentMosaic = mosaic
+      ? { ...mosaic, tileUrl: getMosaicTileUrl(mosaic) }
+      : null;
 
-    return {
-      currentMosaic: { ...mosaic, tileUrl: getMosaicTileUrl(mosaic) },
-    };
+    // Optionally update mosaic list if provided
+    return mosaicsList ? { mosaicsList, currentMosaic } : { currentMosaic };
   }),
   setCurrentModel: assign((context, event) => {
     const { currentModel, currentImagerySource } = context;
@@ -124,29 +126,18 @@ export const actions = {
     },
   })),
   clearCurrentAoi: assign((context) => {
-    const { currentAoi } = context;
+    const { currentAoiShape } = context;
 
-    if (currentAoi?.shape) {
-      currentAoi.shape.remove();
-    }
+    currentAoiShape?.remove();
 
-    const isFirstAoi = context.aoisList.length === 0;
-    if (isFirstAoi) {
-      // If first AOI is being deleted, reset all AOI-related context
-      return {
-        currentAoi: null,
-        currentImagerySource: null,
-        currentMosaic: null,
-        currentModel: null,
-      };
-    } else {
-      return {
-        currentAoi: null,
-        currentPrediction: null,
-        currentShare: null,
-        currentTimeframe: null,
-      };
-    }
+    return {
+      currentAoi: null,
+      currentAoiShape: null,
+      currentPrediction: null,
+      currentMosaic: null,
+      currentShare: null,
+      currentTimeframe: null,
+    };
   }),
   prependAoisList: assign((context, event) => {
     const { aoisList } = context;
@@ -159,15 +150,17 @@ export const actions = {
     const { aoisList, mapRef } = context;
     const latestAoi = aoisList[aoisList.length - 1];
 
-    let aoiShape;
+    // Remove the current AOI shape from the map, if it exists
+    context.currentAoiShape?.remove();
 
-    // Add latest AOI to the map
-    if (latestAoi && latestAoi.bounds) {
-      aoiShape = mapRef.setAoiShapeFromGeojson(latestAoi.bounds);
-    }
+    // Add the latest AOI to the map, if available
+    const aoiShape = latestAoi?.bounds
+      ? mapRef.setAoiShapeFromGeojson(latestAoi.bounds)
+      : null;
 
     return {
-      currentAoi: { ...latestAoi, shape: aoiShape },
+      currentAoi: latestAoi ? { ...latestAoi } : null,
+      currentAoiShape: aoiShape,
       aoiActionButtons: {
         addNewAoi: true,
         uploadAoi: true,
@@ -175,24 +168,22 @@ export const actions = {
     };
   }),
   applyExistingAoi: assign((context, event) => {
-    const { mapRef, currentAoi, aoisList } = context;
+    const { mapRef, aoisList } = context;
     const { aoiId } = event.data;
 
-    const aoi = aoisList.find((aoi) => aoi.id === aoiId);
+    const selectedAoi = aoisList.find((aoi) => aoi.id === aoiId);
 
-    // Clear existing AOI layer
-    if (currentAoi?.shape) {
-      currentAoi.shape.remove();
+    if (!selectedAoi) {
+      throw new Error(`AOI with id ${aoiId} not found`);
     }
 
-    // Add AOI to the map
-    let aoiShape;
-    if (aoi && aoi.bounds) {
-      aoiShape = mapRef.setAoiShapeFromGeojson(aoi.bounds);
-    }
+    context.currentAoiShape?.remove();
+
+    const aoiShape = mapRef.setAoiShapeFromGeojson(selectedAoi.bounds);
 
     return {
-      currentAoi: { ...aoi, shape: aoiShape },
+      currentAoi: { ...selectedAoi },
+      currentAoiShape: aoiShape,
       aoiActionButtons: {
         addNewAoi: true,
         uploadAoi: true,
@@ -200,16 +191,12 @@ export const actions = {
     };
   }),
   updateAoiLayer: assign((context) => {
-    const { mapRef, currentAoi } = context;
+    const { mapRef, currentAoi, currentAoiShape } = context;
 
-    // Remove AOI layer, if exists
-    if (currentAoi?.shape) {
-      currentAoi.shape.remove();
-    }
+    currentAoiShape?.remove();
 
     const geojson = currentAoi.geojson || currentAoi.bounds;
 
-    // Add new layer from geojson, if exists
     let aoiShape;
     if (geojson) {
       aoiShape = mapRef.setAoiShapeFromGeojson(geojson);
@@ -218,21 +205,15 @@ export const actions = {
     return {
       currentAoi: {
         ...currentAoi,
-        shape: aoiShape,
       },
+      currentAoiShape: aoiShape,
     };
   }),
   onAoiDeletedSuccess: assign((context, event) => {
-    const { currentAoi, aoisList } = context;
+    const { aoisList } = context;
     const { aoiId } = event.data;
 
-    // Remove AOI layer
-    if (currentAoi?.shape) {
-      currentAoi?.shape.remove();
-    }
-
     return {
-      currentAoi: null,
       aoisList: aoisList.filter((aoi) => aoi.id !== aoiId),
     };
   }),
@@ -255,16 +236,43 @@ export const actions = {
     currentCheckpoint: event.data.checkpoint,
   })),
   setCurrentTimeframe: assign((context, event) => {
-    const { currentCheckpoint } = context;
+    const checkpoint = event.data?.checkpoint || context.currentCheckpoint;
     const newTimeframe = event.data.timeframe;
 
-    const retrainClasses =
-      newTimeframe?.classes || currentCheckpoint?.classes || [];
+    // Clear current prediction if timeframe is changed
+    if (!newTimeframe) {
+      return {
+        currentTimeframe: null,
+        currentMosaic: null,
+        currentShare: null,
+        retrainClasses: [],
+      };
+    }
+
+    const retrainClasses = newTimeframe?.classes || checkpoint?.classes || [];
+
+    // A timeframe is always associated with a mosaic, but currently the API
+    // doesn't populate it in the response
+    const mosaicId =
+      typeof newTimeframe?.mosaic === 'string'
+        ? newTimeframe?.mosaic
+        : newTimeframe?.mosaic?.id;
+
+    const currentMosaic = context.mosaicsList.find((m) => m.id === mosaicId);
+
+    const currentShare =
+      context.sharesList.find(
+        (s) =>
+          s.timeframe_id === newTimeframe.id &&
+          s.aoi_id === context.currentAoi.id
+      ) || null;
 
     // Apply new timeframe and (re-)initialize retrain classes
     return {
       currentTimeframe: { ...newTimeframe },
+      currentMosaic,
       retrainClasses,
+      currentShare,
     };
   }),
   setTimeframesList: assign((context, event) => ({
@@ -277,8 +285,8 @@ export const actions = {
       tilejson: event.data.tilejson,
     },
   })),
-  setCurrentBatchPrediction: assign((context, event) => ({
-    currentBatchPrediction: event.data.batchPrediction,
+  setRunningBatch: assign((context, event) => ({
+    currentBatchPrediction: event.data.currentBatchPrediction,
   })),
   setSessionMode: assign((context, event) => ({
     sessionMode: event.data.sessionMode,
@@ -342,6 +350,10 @@ export const actions = {
   }),
   clearCurrentPrediction: assign(() => ({
     currentPrediction: null,
+    currentShare: null,
+  })),
+  clearCurrentTimeframe: assign(() => ({
+    currentTimeframe: null,
   })),
   setMapRef: assign((context, event) => ({
     mapRef: event.data.mapRef,
@@ -402,6 +414,14 @@ export const actions = {
 
     return {
       retrainSamples: newRetrainSamples,
+    };
+  }),
+  addRetrainClass: assign((context, event) => {
+    const { retrainClasses } = context;
+    const { retrainClass } = event.data;
+
+    return {
+      retrainClasses: retrainClasses.concat(retrainClass),
     };
   }),
   updateRetrainClassSamples: assign((context, event) => {
@@ -469,8 +489,26 @@ export const actions = {
     sessionMode: SESSION_MODES.RETRAIN,
     sessionStatusMessage: 'Ready for retrain run',
   })),
-  enterApplyCheckpoint: assign(() => ({
-    sessionStatusMessage: 'Applying checkpoint',
+  enterApplyCheckpoint: assign((context) => {
+    const nextTimeframe =
+      context.timeframesList.find(
+        (t) => t.checkpoint_id === context.currentCheckpoint.id
+      ) || null;
+
+    const nextMosaic =
+      context.mosaicsList.find((m) => m.id === nextTimeframe?.mosaic) || null;
+
+    return {
+      sessionStatusMessage: 'Applying checkpoint',
+      currentTimeframe: nextTimeframe,
+      currentMosaic: nextMosaic,
+      globalLoading: {
+        disabled: false,
+      },
+    };
+  }),
+  enterApplyTimeframe: assign(() => ({
+    sessionStatusMessage: 'Applying timeframe',
     globalLoading: {
       disabled: false,
     },
@@ -508,11 +546,9 @@ export const actions = {
     };
   }),
   setupNewRectangleAoiDraw: assign((context) => {
-    const { currentAoi } = context;
+    const { currentAoiShape } = context;
 
-    if (currentAoi?.shape) {
-      currentAoi.shape.remove();
-    }
+    currentAoiShape?.remove();
 
     if (context.rectangleAoi?.shape) {
       context.rectangleAoi.shape.remove();
@@ -609,7 +645,6 @@ export const actions = {
       aoiActionButtons: {
         uploadAoi: true,
         addNewAoi: !isFirstAoi,
-        editAoi: true,
         deleteAoi: true,
       },
       mapEventHandlers: {
@@ -618,6 +653,14 @@ export const actions = {
         mouseup: false,
         mousemove: false,
       },
+    };
+  }),
+  enterConfiguringNewAoi: assign(() => {
+    return {
+      currentTimeframe: null,
+      currentPrediction: null,
+      currentMosaic: null,
+      timeframesList: [],
     };
   }),
   displayAoiAreaModalDialog: assign(() => ({
@@ -703,5 +746,14 @@ export const actions = {
   redirectToProjectProfilePage: assign((context) => {
     const projectId = context.project.id;
     history.push(`/profile/projects/${projectId}`);
+  }),
+  onPredictionComplete: assign(() => {
+    return {
+      aoiActionButtons: {
+        addNewAoi: true,
+        uploadAoi: true,
+        deleteAoi: true,
+      },
+    };
   }),
 };

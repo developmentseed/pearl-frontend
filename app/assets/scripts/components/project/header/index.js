@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { useFocus } from '../../../utils/use-focus';
@@ -7,11 +7,12 @@ import { themeVal, glsp, media, truncated } from '@devseed-ui/theme-provider';
 import { Heading } from '@devseed-ui/typography';
 import { Form } from '@devseed-ui/form';
 import { Button } from '@devseed-ui/button';
-import { FormInput } from '@devseed-ui/form';
+import { FormInput, FormSwitch } from '@devseed-ui/form';
 
 import { ProjectMachineContext } from '../../../fsm/project';
 
 import { Modal } from '../../common/custom-modal';
+import InfoButton from '../../common/info-button';
 import { useHistory } from 'react-router';
 import {
   Dropdown,
@@ -27,8 +28,11 @@ import {
   downloadShareGeotiff,
   getShareLink,
 } from '../../../utils/share-link';
+import logger from '../../../utils/logger';
 import { useAuth } from '../../../context/auth';
 import selectors from '../../../fsm/project/selectors';
+import toasts from '../../common/toasts';
+import { StyledLink } from '../../../styles/links';
 
 const Wrapper = styled.div`
   flex: 1;
@@ -129,11 +133,16 @@ const ModalForm = styled(Form)`
 
 function ProjectPageHeader({ isMediumDown }) {
   const history = useHistory();
-  const { restApiClient, user } = useAuth();
+  const { restApiClient, user, isAuthenticated } = useAuth();
+  const [editProjectNameMode, setEditProjectNameMode] = useState(false);
   const [localProjectName, setLocalProjectName] = useState(null);
+  const [isPublished, setIsPublished] = useState(null);
   const actorRef = ProjectMachineContext.useActorRef();
   const displayProjectNameModal = ProjectMachineContext.useSelector(
     selectors.displayProjectNameModal
+  );
+  const projectId = ProjectMachineContext.useSelector(
+    (s) => s.context.project.id
   );
   const projectName = ProjectMachineContext.useSelector(selectors.projectName);
   const canExport = ProjectMachineContext.useSelector(selectors.canExport);
@@ -151,16 +160,50 @@ function ProjectPageHeader({ isMediumDown }) {
   );
   const nextInstanceType = currentInstanceType === 'cpu' ? 'gpu' : 'cpu';
 
-  const handleSubmit = (e) => {
+  const handleProjectNameSubmit = (e) => {
     e.preventDefault();
+    const newProjectName = e.target.elements.projectName.value;
 
-    actorRef.send({
-      type: 'Set project name',
-      data: {
-        projectName: e.target.elements.projectName.value,
-      },
-    });
+    // Always turn off edit mode at the end
+    const finalize = (success = true, name = projectName) => {
+      setLocalProjectName(success ? newProjectName : name);
+      setEditProjectNameMode(false);
+      if (!success)
+        toasts.error(
+          newProjectName?.length > 0
+            ? 'Failed to update project name'
+            : 'Project name cannot be empty'
+        );
+    };
+
+    if (newProjectName === '') {
+      finalize(false);
+    } else if (projectId === 'new') {
+      actorRef.send({
+        type: 'Set project name',
+        data: { projectName: newProjectName },
+      });
+      finalize();
+    } else if (newProjectName !== projectName) {
+      restApiClient
+        .patch(`project/${projectId}`, { name: newProjectName })
+        .then(() => finalize())
+        .catch(() => finalize(false));
+    } else {
+      finalize();
+    }
   };
+
+  useEffect(() => {
+    if (projectName) {
+      setLocalProjectName(projectName);
+    }
+  }, [projectName]);
+
+  useEffect(() => {
+    if (!currentShare) return;
+    setIsPublished(currentShare.published);
+  }, [currentShare]);
 
   // Delays focus
   const [projectNameInputRef, setProjectNameInputFocus] = useFocus(0);
@@ -169,9 +212,72 @@ function ProjectPageHeader({ isMediumDown }) {
     <Wrapper>
       <ProjectHeading>
         <p>Project:</p>
-        <Heading size='xsmall' data-cy='project-name'>
-          {projectName}
-        </Heading>
+        {!editProjectNameMode ? (
+          <>
+            <Heading
+              variation={localProjectName ? 'primary' : 'baseAlphaE'}
+              size='xsmall'
+              onClick={() => {
+                isAuthenticated && setEditProjectNameMode(true);
+              }}
+              title={
+                !isAuthenticated ? 'Log in to set project name' : 'Project name'
+              }
+              data-cy='project-name'
+            >
+              {localProjectName}
+            </Heading>
+            <InfoButton
+              size='small'
+              useIcon='pencil'
+              hideText
+              id='project-edit-trigger'
+              data-cy='project-name-edit'
+              info={
+                !isAuthenticated
+                  ? 'Log in to set project name'
+                  : localProjectName
+                  ? 'Edit project Name'
+                  : 'Set Project Name'
+              }
+              onClick={() => {
+                isAuthenticated && setEditProjectNameMode(true);
+              }}
+            />
+          </>
+        ) : (
+          <Form onSubmit={handleProjectNameSubmit}>
+            <HeadingInput
+              name='projectName'
+              placeholder='Set Project Name'
+              onChange={(e) => setLocalProjectName(e.target.value)}
+              onKeyDown={(e) => {
+                e.stopPropagation();
+              }}
+              value={localProjectName || ''}
+              disabled={!isAuthenticated}
+              data-cy='project-input'
+            />
+            <Button
+              type='submit'
+              size='small'
+              useIcon='tick--small'
+              hideText
+              data-cy='project-name-confirm'
+              title='Confirm project name'
+            />
+            <Button
+              onClick={() => {
+                setLocalProjectName(projectName);
+                setEditProjectNameMode(false);
+              }}
+              size='small'
+              useIcon='xmark--small'
+              hideText
+              title='Cancel'
+            />
+          </Form>
+        )}
       </ProjectHeading>
 
       <StatusHeading
@@ -195,7 +301,7 @@ function ProjectPageHeader({ isMediumDown }) {
           setProjectNameInputFocus();
         }}
         content={
-          <ModalForm onSubmit={handleSubmit}>
+          <ModalForm onSubmit={handleProjectNameSubmit}>
             <p>Enter a project name to get started</p>
             <HeadingInput
               name='projectName'
@@ -322,6 +428,64 @@ function ProjectPageHeader({ isMediumDown }) {
                 </DropdownItem>
               )}
             </li>
+            {currentShare && (
+              <>
+                <li>
+                  <DropdownItem>
+                    <FormSwitch
+                      name='published'
+                      title='Make share map public'
+                      checked={isPublished}
+                      onChange={async () => {
+                        const newIsPublished = !isPublished;
+                        setIsPublished(newIsPublished);
+
+                        try {
+                          await restApiClient.patch(
+                            `share/${currentShare.uuid}`,
+                            {
+                              published: newIsPublished,
+                            }
+                          );
+                          setIsPublished(newIsPublished);
+                        } catch (err) {
+                          setIsPublished(!newIsPublished);
+                          logger(
+                            'There was an unexpected error updating the exported map.',
+                            err
+                          );
+                          toasts.error(
+                            'There was an unexpected error updating the exported map.'
+                          );
+                        }
+                      }}
+                      textPlacement='right'
+                    >
+                      Publish Share
+                    </FormSwitch>
+                  </DropdownItem>
+                </li>
+                <li>
+                  <DropdownItem
+                    useIcon='resize-center-horizontal'
+                    as={StyledLink}
+                    nonhoverable={!isPublished}
+                    muted={!isPublished}
+                    disabled={!isPublished}
+                    to={
+                      isPublished
+                        ? {
+                            pathname: '/public-maps',
+                            state: { uuid: currentShare.uuid },
+                          }
+                        : null
+                    }
+                  >
+                    Compare map
+                  </DropdownItem>
+                </li>
+              </>
+            )}
           </DropdownBody>
         </>
       </Dropdown>

@@ -51,14 +51,6 @@ describe('The app header', () => {
     cy.get('#a-toast').should('contain', 'Please sign in to view this page.');
   });
 
-  it('/profile/maps is protected', () => {
-    cy.visit('/profile/maps');
-    cy.location().should((loc) => {
-      expect(loc.pathname).to.eq('/');
-    });
-    cy.get('#a-toast').should('contain', 'Please sign in to view this page.');
-  });
-
   it('/profile/projects is protected', () => {
     cy.visit('/profile/projects');
     cy.location().should((loc) => {

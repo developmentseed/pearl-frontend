@@ -49,7 +49,7 @@ export const InpageHeaderInner = styled.div`
   max-width: ${themeVal('layout.max')};
   margin: 0 auto;
   ${media.mediumUp`
-    padding: ${glsp(4)} ${glsp(4)} ${glsp(2)};
+    padding: ${glsp(2)};
   `}
 `;
 
@@ -113,6 +113,6 @@ export const InpageBodyInner = styled.div`
   max-width: ${themeVal('layout.max')};
   margin: 0 auto;
   ${media.mediumUp`
-    padding: ${glsp(4)};
+    padding: ${glsp(2)};
   `}
 `;

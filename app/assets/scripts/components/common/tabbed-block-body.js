@@ -80,8 +80,10 @@ const TabbedBlockHeader = styled(PanelBlockHeader)`
     ${listReset}
     display: flex;
     flex-flow: row nowrap;
-    justify-content: space-between;
-    padding: 0 ${glsp(1.5)};
+    justify-content: ${({ leftAligned }) =>
+      leftAligned ? 'flex-start' : 'space-between'};
+    gap: ${glsp()};
+    padding: ${({ leftAligned }) => (leftAligned ? '0' : '0 1.5rem')};
     box-shadow: inset 0 -1px 0 0 ${themeVal('color.baseAlphaB')};
   }
   /* PanelBlockHeader sets z-index. This causes
@@ -108,11 +110,11 @@ const PanelBlockScroll = styled(ScrollableBody)`
 `;
 
 function TabbedBlock(props) {
-  const { children, activeTab } = props;
+  const { children, activeTab, leftAligned } = props;
 
   return (
     <>
-      <TabbedBlockHeader as='nav' role='navigation'>
+      <TabbedBlockHeader as='nav' role='navigation' leftAligned={leftAligned}>
         <ul>
           {Children.map(children, (child, ind) => {
             const { name, icon, tabId, disabled, tabTooltip } = child.props;
@@ -153,7 +155,6 @@ function TabbedBlock(props) {
             <>
               {React.cloneElement(child, {
                 active: active,
-                //style: active ? {} : { display: 'none' },
                 className: active ? className : `${className} inactive-panel`,
               })}
             </>
@@ -167,5 +168,6 @@ function TabbedBlock(props) {
 TabbedBlock.propTypes = {
   children: T.node.isRequired,
   activeTab: T.number.isRequired,
+  leftAligned: T.bool,
 };
 export default TabbedBlock;

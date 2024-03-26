@@ -22,7 +22,25 @@ describe('Batch predictions', () => {
           project_id: 1,
           created: new Date(Date.parse('2001-02-01')).setUTCDate(-i),
           updated: new Date(Date.parse('2001-02-01')).setUTCDate(i + 1),
-          aoi: { id: i, name: `AOI ${i}` },
+          aoi: {
+            id: i,
+            name: `AOI ${i}`,
+            created: `2023-12-04T12:02:26.1792${i}`,
+            updated: `2023-12-04T12:02:26.1792${i}`,
+            bounds: {
+              type: 'Polygon',
+              crs: { type: 'name', properties: { name: 'EPSG:4326' } },
+              coordinates: [
+                [
+                  [-100.08922576904298, 19.28910944501149],
+                  [-99.9700927734375, 19.28910944501149],
+                  [-99.9700927734375, 19.17954399635705],
+                  [-100.08922576904298, 19.17954399635705],
+                  [-100.08922576904298, 19.28910944501149],
+                ],
+              ],
+            },
+          },
           mosaic: { id: i, name: `Mosaic ${i}` },
           abort: false,
           completed: i !== 1,
@@ -142,8 +160,12 @@ describe('Batch predictions', () => {
 
     // Select mosaic
     cy.get('[data-cy=mosaic-selector-label]').should('exist').click();
-    cy.get('[data-cy=select-mosaic-2849689f57f1b3b9c1f725abb75aa411-card]')
+
+    cy.wait('@registerPlanetaryComputerMosaic');
+
+    cy.get('[data-cy="create-mosaic-button"]')
       .should('exist')
+      .should('be.visible')
       .click();
 
     // Check session status message
@@ -501,12 +523,13 @@ describe('Batch predictions', () => {
 
     // Check available columns
     cy.get('th')
-      .should('have.length', 6)
+      .should('have.length', 7)
       .should('include.text', 'Id')
       .should('include.text', 'AOI Name')
+      .should('include.text', 'AOI Size (KM2)')
+      .should('include.text', 'Started')
       .should('include.text', 'Mosaic')
       .should('include.text', 'Status')
-      .should('include.text', 'Started')
       .should('include.text', 'Download');
 
     // Check if page is well-formed
@@ -541,7 +564,45 @@ describe('Batch predictions', () => {
             id: 1,
             created: 1630056802895,
             updated: 1630056976364,
-            aoi: 1,
+            aoi: {
+              id: 1,
+              name: `AOI 1`,
+              created: `2023-12-04T12:02:26.17921`,
+              updated: `2023-12-04T12:02:26.17921`,
+              bounds: {
+                type: 'Polygon',
+                crs: { type: 'name', properties: { name: 'EPSG:4326' } },
+                coordinates: [
+                  [
+                    [-100.08922576904298, 19.28910944501149],
+                    [-99.9700927734375, 19.28910944501149],
+                    [-99.9700927734375, 19.17954399635705],
+                    [-100.08922576904298, 19.17954399635705],
+                    [-100.08922576904298, 19.28910944501149],
+                  ],
+                ],
+              },
+            },
+            mosaic: {
+              id: '3c694933cb850c3d76fa7651765ad9c2',
+              name: 'Sep 27, 2021 - Nov 27, 2021',
+              params: {
+                assets: ['B04', 'B03', 'B02', 'B08'],
+                rescale: '0,10000',
+                collection: 'sentinel-2-l2a',
+              },
+              imagery_source_id: 2,
+              created: '2024-02-14T11:18:58.106998',
+              updated: '2024-02-14T11:18:58.106998',
+              mosaic_ts_start: '2021-09-27T10:25:31',
+              mosaic_ts_end: '2021-11-27T11:25:31',
+              ui_params: {
+                assets: ['B04', 'B03', 'B02'],
+                collection: 'sentinel-2-l2a',
+                color_formula:
+                  'Gamma+RGB+3.2+Saturation+0.8+Sigmoidal+RGB+25+0.35',
+              },
+            },
             name: 'Wesley Heights',
             abort: false,
             completed: false,
@@ -551,7 +612,45 @@ describe('Batch predictions', () => {
             id: 2,
             created: 1630056802895,
             updated: 1630056976364,
-            aoi: 1,
+            aoi: {
+              id: 2,
+              name: `AOI 2`,
+              created: `2023-12-04T12:02:26.17922`,
+              updated: `2023-12-04T12:02:26.17922`,
+              bounds: {
+                type: 'Polygon',
+                crs: { type: 'name', properties: { name: 'EPSG:4326' } },
+                coordinates: [
+                  [
+                    [-100.08922576904298, 19.28910944501149],
+                    [-99.9700927734375, 19.28910944501149],
+                    [-99.9700927734375, 19.17954399635705],
+                    [-100.08922576904298, 19.17954399635705],
+                    [-100.08922576904298, 19.28910944501149],
+                  ],
+                ],
+              },
+            },
+            mosaic: {
+              id: '3c694933cb850c3d76fa7651765ad9c2',
+              name: 'Sep 27, 2021 - Nov 27, 2021',
+              params: {
+                assets: ['B04', 'B03', 'B02', 'B08'],
+                rescale: '0,10000',
+                collection: 'sentinel-2-l2a',
+              },
+              imagery_source_id: 2,
+              created: '2024-02-14T11:18:58.106998',
+              updated: '2024-02-14T11:18:58.106998',
+              mosaic_ts_start: '2021-09-27T10:25:31',
+              mosaic_ts_end: '2021-11-27T11:25:31',
+              ui_params: {
+                assets: ['B04', 'B03', 'B02'],
+                collection: 'sentinel-2-l2a',
+                color_formula:
+                  'Gamma+RGB+3.2+Saturation+0.8+Sigmoidal+RGB+25+0.35',
+              },
+            },
             name: 'Wesley Heights',
             abort: true,
             completed: false,
@@ -561,7 +660,45 @@ describe('Batch predictions', () => {
             id: 3,
             created: 1630056802895,
             updated: 1630056976364,
-            aoi: 1,
+            aoi: {
+              id: 3,
+              name: `AOI 3`,
+              created: `2023-12-04T12:02:26.17923`,
+              updated: `2023-12-04T12:02:26.17923`,
+              bounds: {
+                type: 'Polygon',
+                crs: { type: 'name', properties: { name: 'EPSG:4326' } },
+                coordinates: [
+                  [
+                    [-100.08922576904298, 19.28910944501149],
+                    [-99.9700927734375, 19.28910944501149],
+                    [-99.9700927734375, 19.17954399635705],
+                    [-100.08922576904298, 19.17954399635705],
+                    [-100.08922576904298, 19.28910944501149],
+                  ],
+                ],
+              },
+            },
+            mosaic: {
+              id: '3c694933cb850c3d76fa7651765ad9c2',
+              name: 'Sep 27, 2021 - Nov 27, 2021',
+              params: {
+                assets: ['B04', 'B03', 'B02', 'B08'],
+                rescale: '0,10000',
+                collection: 'sentinel-2-l2a',
+              },
+              imagery_source_id: 2,
+              created: '2024-02-14T11:18:58.106998',
+              updated: '2024-02-14T11:18:58.106998',
+              mosaic_ts_start: '2021-09-27T10:25:31',
+              mosaic_ts_end: '2021-11-27T11:25:31',
+              ui_params: {
+                assets: ['B04', 'B03', 'B02'],
+                collection: 'sentinel-2-l2a',
+                color_formula:
+                  'Gamma+RGB+3.2+Saturation+0.8+Sigmoidal+RGB+25+0.35',
+              },
+            },
             name: 'Wesley Heights',
             abort: false,
             completed: true,
@@ -622,8 +759,12 @@ describe('Batch predictions', () => {
 
     // Select mosaic
     cy.get('[data-cy=mosaic-selector-label]').should('exist').click();
-    cy.get('[data-cy=select-mosaic-2849689f57f1b3b9c1f725abb75aa411-card]')
+
+    cy.wait('@registerPlanetaryComputerMosaic');
+
+    cy.get('[data-cy="create-mosaic-button"]')
       .should('exist')
+      .should('be.visible')
       .click();
 
     // Check session status message

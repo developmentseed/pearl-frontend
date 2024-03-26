@@ -30,6 +30,7 @@ const HEADERS = [
   'Name',
   'Created',
   'Model',
+  'Checkpoints',
   'Last Checkpoint',
   'AOIs',
   'AOI Names',
@@ -63,16 +64,13 @@ function renderRow(proj) {
       </TableCell>
       <TableCell>{formatDateTime(proj.created)}</TableCell>
       <TableCell>{proj.model ? proj.model.name : 'No model set'}</TableCell>
+      <TableCell>{proj.checkpoints.length}</TableCell>
       <TableCell>
-        {proj.checkpoints.length
-          ? proj.checkpoints[0].name
-          : 'No checkpoint set'}
+        {proj.checkpoints.length ? proj.checkpoints[0].name : ' '}
       </TableCell>
       <TableCell>{proj.aois.length}</TableCell>
       <TableCell>
-        {proj.aois.length
-          ? proj.aois.map((a) => a.name).join(', ')
-          : 'No AOIs set'}
+        {proj.aois.length ? proj.aois.map((a) => a.name).join(', ') : ' '}
       </TableCell>
     </TableRow>
   );
@@ -81,7 +79,7 @@ function renderRow(proj) {
 function Projects() {
   const { apiToken } = useAuth();
 
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(0);
   const [total, setTotal] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [projects, setProjects] = useState([]);
@@ -94,7 +92,7 @@ function Projects() {
         try {
           showGlobalLoadingMessage('Loading projects...');
           const data = await restApiClient.get(
-            `project/?page=${page - 1}&limit=${PROJECTS_PER_PAGE}`
+            `project/?page=${page}&limit=${PROJECTS_PER_PAGE}`
           );
           setTotal(data.total);
           setProjects(data.projects);
@@ -139,12 +137,13 @@ function Projects() {
                     data={projects}
                     renderRow={renderRow}
                     hoverable
+                    fixedTable
                   />
                   <Paginator
                     currentPage={page}
-                    gotoPage={setPage}
-                    totalItems={total}
-                    itemsPerPage={PROJECTS_PER_PAGE}
+                    setPage={setPage}
+                    totalRecords={total}
+                    pageSize={PROJECTS_PER_PAGE}
                   />
                 </>
               ) : (

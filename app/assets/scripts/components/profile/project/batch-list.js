@@ -3,6 +3,7 @@ import T from 'prop-types';
 import styled from 'styled-components';
 import { Button } from '@devseed-ui/button';
 import { Heading } from '@devseed-ui/typography';
+import tArea from '@turf/area';
 
 import Table, { TableRow, TableCell } from '../../common/table';
 import Paginator from '../../common/paginator';
@@ -17,14 +18,17 @@ import { formatDateTime } from '../../../utils/format';
 import logger from '../../../utils/logger';
 import useFetch from '../../../utils/use-fetch';
 import { downloadGeotiff } from '../../../utils/share-link';
+import { formatThousands } from '../../../utils/format';
+import { composeMosaicName } from '../../../utils/mosaics';
 
 const TABLE_PAGE_SIZE = 5;
 const TABLE_HEADERS = [
   'Id',
   'AOI Name',
+  'AOI Size (KM2)',
+  'Started',
   'Mosaic',
   'Status',
-  'Started',
   'Download',
 ];
 
@@ -104,7 +108,11 @@ const BatchRow = ({ batch, projectId }) => {
     <TableRow key={id}>
       <TableCell>{id}</TableCell>
       <TableCell>{aoi?.name}</TableCell>
-      <TableCell>{mosaic?.name}</TableCell>
+      <TableCell>{formatThousands(tArea(aoi?.bounds) / 1e6)}</TableCell>
+      <TableCell>{formatDateTime(created)}</TableCell>
+      <TableCell>
+        {composeMosaicName(mosaic.mosaic_ts_start, mosaic.mosaic_ts_end)}
+      </TableCell>
       <TableCell>
         {status === 'Processing' ? (
           <>
@@ -121,7 +129,6 @@ const BatchRow = ({ batch, projectId }) => {
           status
         )}
       </TableCell>
-      <TableCell>{formatDateTime(created)}</TableCell>
       <TableCell>
         <DownloadAoiButton
           aoi={aoi?.id}
@@ -140,28 +147,32 @@ BatchRow.propTypes = {
 };
 
 function BatchList({ projectId }) {
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(0);
   const { isReady, data, hasError } = useFetch(
-    `project/${projectId}/batch?page=${
-      page - 1
-    }&limit=${TABLE_PAGE_SIZE}&order=desc`
+    `project/${projectId}/batch?page=${page}&limit=${TABLE_PAGE_SIZE}&order=desc`
   );
 
   if (!isReady) {
-    return <Heading>Loading batch predictions...</Heading>;
+    return <Heading size='small'>Loading batch predictions...</Heading>;
   }
 
   if (hasError) {
-    return <Heading>Batch predictions could not be retrieved.</Heading>;
+    return (
+      <Heading size='small'>Batch predictions could not be retrieved.</Heading>
+    );
   }
 
   if (data && data.total === 0) {
-    return <Heading>No batch predictions for this project.</Heading>;
+    return (
+      <section>
+        <Heading size='small'>No batch predictions for this project.</Heading>
+      </section>
+    );
   }
 
   return (
-    <>
-      <Heading>Batch Predictions</Heading>
+    <section>
+      <Heading size='small'>Batch Predictions</Heading>
       <Table
         data-cy='batch-list-table'
         headers={TABLE_HEADERS}
@@ -176,11 +187,11 @@ function BatchList({ projectId }) {
       />
       <Paginator
         currentPage={page}
-        gotoPage={setPage}
-        totalItems={data.total}
-        itemsPerPage={TABLE_PAGE_SIZE}
+        setPage={setPage}
+        totalRecords={data.total}
+        pageSize={TABLE_PAGE_SIZE}
       />
-    </>
+    </section>
   );
 }
 
