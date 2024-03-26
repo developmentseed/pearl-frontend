@@ -81,10 +81,6 @@ function serve() {
       },
       { match: /{{appTitle}}/g, replace: appTitle },
       { match: /{{appDescription}}/g, replace: appDescription },
-      {
-        match: /{{plausibleDomain}}/g,
-        replace: process.env.NODE_ENV === 'production' ? plausibleDomain : '',
-      },
     ],
   });
 
@@ -246,6 +242,12 @@ function html() {
       .pipe($.replace('{{baseurl}}', baseurl))
       .pipe($.replace('{{appTitle}}', appTitle))
       .pipe($.replace('{{appDescription}}', appDescription))
+      .pipe(
+        $.replace(
+          '{{plausibleDomain}}',
+          process.env.NODE_ENV === 'production' ? plausibleDomain : ''
+        )
+      )
       .pipe(gulp.dest('dist'))
   );
 }
