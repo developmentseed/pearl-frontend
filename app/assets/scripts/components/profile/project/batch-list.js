@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import T from 'prop-types';
 import styled from 'styled-components';
 import { Button } from '@devseed-ui/button';
@@ -28,6 +28,7 @@ const TABLE_HEADERS = [
   'AOI Size (KM2)',
   'Started',
   'Mosaic',
+  'Checkpoint',
   'Status',
   'Download',
 ];
@@ -103,6 +104,22 @@ const BatchRow = ({ batch, projectId }) => {
     created,
   } = batch;
   const [status, setStatus] = useState(getStatus(completed, abort, error));
+  const { restApiClient } = useAuth();
+  const [checkpointName, setCheckpointName] = useState();
+  useEffect(() => {
+    async function fetchCheckpointName() {
+      try {
+        const data = await restApiClient.getCheckpoint(
+          projectId,
+          timeframe.checkpoint_id
+        );
+        setCheckpointName(data.name);
+      } catch (error) {
+        logger(error);
+      }
+    }
+    fetchCheckpointName();
+  }, []);
 
   return (
     <TableRow key={id}>
@@ -113,6 +130,7 @@ const BatchRow = ({ batch, projectId }) => {
       <TableCell>
         {composeMosaicName(mosaic.mosaic_ts_start, mosaic.mosaic_ts_end)}
       </TableCell>
+      <TableCell>{checkpointName}</TableCell>
       <TableCell>
         {status === 'Processing' ? (
           <>
