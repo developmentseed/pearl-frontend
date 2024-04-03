@@ -24,6 +24,12 @@ import EditClass from './add-class.js';
 
 function RetrainTab({ className }) {
   const actorRef = ProjectMachineContext.useActorRef();
+
+  const currentCheckpoint = ProjectMachineContext.useSelector(
+    selectors.currentCheckpoint
+  );
+  const canAddClass = currentCheckpoint?.parent === null;
+
   const retrainClasses = ProjectMachineContext.useSelector(
     selectors.retrainClasses
   );
@@ -170,17 +176,22 @@ function RetrainTab({ className }) {
                   as={DropdownTrigger}
                   variation='primary-plain'
                   useIcon='plus--small'
-                  title='Open dropdown'
                   className='add__class'
                   size='medium'
                   {...props}
+                  visuallyDisabled={!canAddClass}
+                  info={
+                    canAddClass
+                      ? 'Add a new class'
+                      : 'New classes can only be added to the base model'
+                  }
                 >
                   Add Class
                 </AddClassButton>
               )}
               className='add-class__dropdown'
             >
-              <EditClass />
+              {canAddClass && <EditClass />}
             </Dropdown>
           </ClassList>
         </>
