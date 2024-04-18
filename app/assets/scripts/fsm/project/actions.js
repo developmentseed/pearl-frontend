@@ -638,20 +638,24 @@ export const actions = {
       rectangleAoi.shape.remove();
     }
 
-    const isFirstAoi = context.aoisList.length === 0;
-
     return {
       rectangleAoi: null,
-      aoiActionButtons: {
-        uploadAoi: true,
-        addNewAoi: !isFirstAoi,
-        deleteAoi: true,
-      },
       mapEventHandlers: {
         dragging: true,
         mousedown: false,
         mouseup: false,
         mousemove: false,
+      },
+    };
+  }),
+  exitDefiningAoiBounds: assign((context) => {
+    const isFirstAoi = context.aoisList.length === 0;
+
+    return {
+      aoiActionButtons: {
+        uploadAoi: true,
+        addNewAoi: !isFirstAoi,
+        deleteAoi: true,
       },
     };
   }),
