@@ -314,17 +314,19 @@ function Project() {
                   <Heading size='small'>
                     {project ? 'Exported Maps' : 'Loading Project...'}
                   </Heading>
-                  <Table
-                    headers={AOI_HEADERS}
-                    data={shares}
-                    renderRow={RenderRow}
-                    extraData={{
-                      project,
-                      restApiClient,
-                      shares,
-                      setShares,
-                    }}
-                  />
+                  {!isAoisLoading && (
+                    <Table
+                      headers={AOI_HEADERS}
+                      data={shares}
+                      renderRow={RenderRow}
+                      extraData={{
+                        project,
+                        restApiClient,
+                        shares,
+                        setShares,
+                      }}
+                    />
+                  )}
                   <Paginator
                     currentPage={page}
                     setPage={setPage}
