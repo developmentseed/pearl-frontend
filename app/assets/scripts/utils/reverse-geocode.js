@@ -68,29 +68,27 @@ export async function reverseGeocodeLatLng(lat, lng) {
   let name = 'Area';
 
   try {
-    const address = await fetch(
-      `${config.bingSearchUrl}/Locations/${lat},${lng}?radius=${config.reverseGeocodeRadius}&includeEntityTypes=address,AdminDivision1,AdminDivision2, CountryRegion&key=${config.bingApiKey}`,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        mode: 'cors',
-      }
-    ).then((res) => res.json());
+    const url = `${config.bingSearchUrl}/Locations/${lat},${lng}?radius=${config.reverseGeocodeRadius}&includeEntityTypes=address,AdminDivision1,AdminDivision2,CountryRegion&key=${config.bingApiKey}`;
+    const response = await fetch(url, {
+      headers: { 'Content-Type': 'application/json' },
+      mode: 'cors',
+    });
 
-    if (address && address.resourceSets[0].estimatedTotal) {
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const address = await response.json();
+
+    if (address && address.resourceSets[0].estimatedTotal > 0) {
       const result = address.resourceSets[0].resources[0];
-      const { entityType } = result;
 
-      switch (entityType) {
-        case 'Address':
-          name = result.address.locality;
-          break;
-        case 'AdminDivision1':
-        case 'AdminDivision2':
-        case 'CountryRegion':
-          name = result.name;
-      }
+      name =
+        result.address?.locality ||
+        result.address?.adminDistrict2 ||
+        result.address?.adminDistrict ||
+        result.address?.countryRegion ||
+        'Area';
     }
   } catch (error) {
     logger(error);

@@ -209,7 +209,7 @@ export const projectMachine = createMachine(
               src: 'geocodeAoi',
               onDone: {
                 target: 'Configuring new AOI',
-                actions: 'setCurrentAoiName',
+                actions: ['setCurrentAoiName', 'exitDefiningAoiBounds'],
               },
             },
           },
