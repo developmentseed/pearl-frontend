@@ -10,7 +10,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Trigger deploy workflow
-        uses: benc-uk/workflow-dispatch@v1
+        uses: benc-uk/workflow-dispatch@7a027648b88c2413826b6ddd6c76114894dc5ec4 # v1
         with:
           workflow: frontend-staging.yml
           repo: developmentseed/pearl-reforestamos-deploy
